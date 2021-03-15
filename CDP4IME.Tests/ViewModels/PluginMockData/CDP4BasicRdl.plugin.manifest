@@ -1,11 +1,11 @@
 {
-    "ProjectGuid": "bedcc5c5-83b2-41ed-ac9f-895757553bf2",
-    "Name": "CDP4BasicRdl",
-    "Description": "CDP4 test plugin",
-    "Version": "5.5.5.5",
-    "CompatibleIMEVersion": null,
-    "TargetFramework": "net452",
-    "ReleaseNote": null,
-    "Author": "RHEA System S.A.",
-    "Website": "https://store.cdp4.org"
+  "ProjectGuid": "bedcc5c5-83b2-41ed-ac9f-895757553bf2",
+  "Name": "CDP4BasicRdl",
+  "Description": "COMET test plugin",
+  "Version": "5.5.5.5",
+  "CompatibleIMEVersion": null,
+  "TargetFramework": "net452",
+  "ReleaseNote": null,
+  "Author": "RHEA System S.A.",
+  "Website": "https://store.cdp4.org"
 }

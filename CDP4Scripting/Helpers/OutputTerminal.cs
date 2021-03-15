@@ -20,11 +20,11 @@ namespace CDP4Scripting.Helpers
         /// </summary>
         private const string InitMessage = @"
     --------------------------------------------------------------------
-                        CDP4 Scripting Engine					    
+                        COMET Scripting Engine					    
 						
     Start using it writing 'Command.Help()' in the Input console
 	
-    More information can be found on the CDP4 documentation website
+    More information can be found on the COMET documentation website
     http://cdp4docs.rheagroup.com/index.php
 
     --------------------------------------------------------------------

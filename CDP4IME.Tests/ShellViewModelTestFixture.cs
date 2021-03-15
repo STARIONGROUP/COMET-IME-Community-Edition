@@ -145,7 +145,7 @@ namespace CDP4IME.Tests
         [Test]
         public void VerifyThatTheCaptionIsCorrect()
         {
-            var title = "CDP4 IME - Community Edition";
+            var title = "COMET IME - Community Edition";
             Assert.AreEqual(title, this.viewModel.Title);
         }
 

@@ -21,7 +21,7 @@ namespace CDP4Composition.Navigation
         /// <summary>
         /// The relative location of the loading animation image.
         /// </summary>
-        private const string CdpLogoAnimationPath = @"\Resources\Images\animatedcdplogo.gif";
+        private const string CdpLogoAnimationPath = @"\Resources\Images\comet.ico";
 
         /// <summary>
         /// The backing field for <see cref="AnimationUri"/>

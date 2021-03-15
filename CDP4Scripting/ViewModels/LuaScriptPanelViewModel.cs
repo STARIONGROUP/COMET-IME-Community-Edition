@@ -86,7 +86,7 @@ namespace CDP4Scripting.ViewModels
                 this.ScriptingProxy.ScriptingPanelViewModel = this;
 
                 // Allow the user to load scripts located in pathLuaScriptsDirectory
-                var pathLuaScriptsDirectory = @"C:\Users\Mathieu\Documents\CDP4 scripts\?";
+                var pathLuaScriptsDirectory = @"C:\Users\Mathieu\Documents\COMET scripts\?";
                 var pathLuaFiles = pathLuaScriptsDirectory + ".lua";
                 Script.DefaultOptions.ScriptLoader = new ReplInterpreterScriptLoader();
                 ((ScriptLoaderBase)Script.DefaultOptions.ScriptLoader).ModulePaths = new[] { pathLuaScriptsDirectory, pathLuaFiles };

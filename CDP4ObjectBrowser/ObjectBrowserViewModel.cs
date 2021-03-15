@@ -63,7 +63,7 @@ namespace CDP4ObjectBrowser
                 this.Disposables.Add(personSubscription);
             }
 
-            this.Caption = "CDP4 Object Browser";
+            this.Caption = "COMET Object Browser";
             this.ToolTip = string.Format("{0}\n{1}", session.DataSourceUri, session.ActivePerson.Name);
         }
 

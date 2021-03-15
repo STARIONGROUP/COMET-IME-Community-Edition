@@ -152,9 +152,9 @@ namespace CDP4Scripting.Helpers
             }
 
             var sb = new StringBuilder();
-            sb.AppendLine("CDP4 Commands \n");
+            sb.AppendLine("COMET Commands \n");
 
-            sb.AppendLine(string.Format("CDP4 contains a list of commands you can perform from the script. You can use a command as follows : " +
+            sb.AppendLine(string.Format("COMET contains a list of commands you can perform from the script. You can use a command as follows : " +
                               "{0}.CommandName(parameters) \n", ScriptPanelViewModel.Command));
 
             sb.AppendLine("List of the commands available \n");

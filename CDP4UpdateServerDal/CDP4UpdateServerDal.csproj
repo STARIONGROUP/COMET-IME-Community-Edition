@@ -6,7 +6,7 @@
     <AssemblyTitle>CDP4UpdateServerDal</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4UpdateServerDal</Product>
-    <Description>CDP4 Update Server Dal</Description>
+    <Description>COMET Update Server Dal</Description>
   </PropertyGroup>
 
   <ItemGroup>

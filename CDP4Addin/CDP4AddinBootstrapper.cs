@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CDP4AddinBootstrapper.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
@@ -68,7 +68,7 @@ namespace CDP4AddinCE
         /// </summary>
         protected override void InitializeShell()
         {
-            logger.Log(LogLevel.Debug, "Loading CDP4 Plugins");
+            logger.Log(LogLevel.Debug, "Loading COMET Plugins");
 
             var pluginLoader = new PluginLoader<AddinAppSettings>();
 
@@ -78,7 +78,7 @@ namespace CDP4AddinCE
                 logger.Log(LogLevel.Debug, $"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
 
-            logger.Log(LogLevel.Debug, $"{pluginLoader.DirectoryCatalogues.Count} CDP4 Plugins Loaded");
+            logger.Log(LogLevel.Debug, $"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
 
             base.InitializeShell();
         }
@@ -98,12 +98,12 @@ namespace CDP4AddinCE
 
             var sw = new Stopwatch();
             sw.Start();
-            logger.Debug("Loading CDP4 Catalogs");
+            logger.Debug("Loading COMET Catalogs");
 
             var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");
             this.AggregateCatalog.Catalogs.Add(dllCatalog);
 
-            logger.Debug("CDP4 Catalogs loaded in: {0} [ms]", sw.ElapsedMilliseconds);
+            logger.Debug("COMET Catalogs loaded in: {0} [ms]", sw.ElapsedMilliseconds);
         }
     }
 }

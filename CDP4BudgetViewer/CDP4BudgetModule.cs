@@ -38,7 +38,7 @@ namespace CDP4Budget
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="CDP4BudgetModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(CDP4BudgetModule), "CDP4 Budget Module")]
+    [ModuleExportName(typeof(CDP4BudgetModule), "COMET Budget Module")]
     public class CDP4BudgetModule : IModule
     {
         /// <summary>

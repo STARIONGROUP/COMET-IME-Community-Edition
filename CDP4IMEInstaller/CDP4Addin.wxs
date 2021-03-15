@@ -57,8 +57,8 @@
         <!-- register addin with EXCEL-->
 
         <RegistryKey Key="Software\Microsoft\Office\Excel\Addins\CDP4CE.Addin" Root="HKLM" Action="createAndRemoveOnUninstall" ForceDeleteOnUninstall="yes">
-          <RegistryValue Type="string" Name="FriendlyName" Value="CDP4-CE Office Add-in"></RegistryValue>
-          <RegistryValue Type="string" Name="Description" Value="The CDP4-CE Office Add-in provides CDP4 application integration with Microsoft Office Suite"></RegistryValue>
+          <RegistryValue Type="string" Name="FriendlyName" Value="COMET-CE Office Add-in"></RegistryValue>
+          <RegistryValue Type="string" Name="Description" Value="The COMET-CE Office Add-in provides COMET application integration with Microsoft Office Suite"></RegistryValue>
           <RegistryValue Type="integer" Name="LoadBehavior" Value="3"></RegistryValue>
         </RegistryKey>
 
@@ -80,15 +80,15 @@
           </RegistryKey>
 
           <RegistryKey Key="InprocServer32">
-            <RegistryKey Key="6.0.1.0">
-              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=6.0.1.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryKey Key="8.0.0.0">
+              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
               <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.Addin"></RegistryValue>
               <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
               <RegistryValue Type="string" Name="CodeBase" Value="file:///[#_17CAA5BE]"></RegistryValue>
             </RegistryKey>
 
             <RegistryValue Type="string" Value="mscoree.dll"></RegistryValue>
-            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=6.0.1.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
             <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.Addin"></RegistryValue>
             <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
             <RegistryValue Type="string" Name="ThreadingModel" Value="Both"></RegistryValue>
@@ -118,15 +118,15 @@
           </RegistryKey>
 
           <RegistryKey Key="InprocServer32">
-            <RegistryKey Key="6.0.1.0">
-              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=6.0.1.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryKey Key="8.0.0.0">
+              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
               <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
               <RegistryValue Type="string" Name="CodeBase" Value="[#_17CAA5BE]"></RegistryValue>
               <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
             </RegistryKey>
 
             <RegistryValue Type="string" Value="mscoree.dll"></RegistryValue>
-            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=6.0.1.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
             <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
             <RegistryValue Type="string" Name="CodeBase" Value="[#_17CAA5BE]"></RegistryValue>
             <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>

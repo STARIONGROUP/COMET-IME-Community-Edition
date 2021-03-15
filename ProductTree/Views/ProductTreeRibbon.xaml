@@ -25,7 +25,7 @@
                             Content="Product Tree"
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
-                            LargeGlyph="pack://application:,,,/CDP4IME;component/cdplogo_48x48.ico"
+                            LargeGlyph="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
                             Hint="Open the Product Tree for the selected Option">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>

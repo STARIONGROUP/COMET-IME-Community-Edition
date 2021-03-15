@@ -41,7 +41,7 @@ namespace CDP4Composition.Services.AppSettingService
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public const string ConfigurationDirectoryFolder = @"RHEA\CDP4\";
+        public const string ConfigurationDirectoryFolder = @"RHEA\COMET\";
 
         /// <summary>
         /// The setting file extension
@@ -100,9 +100,9 @@ namespace CDP4Composition.Services.AppSettingService
 
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
-                logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
+                logger.Debug("The COMET settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
                 Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
-                logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
+                logger.Debug("The COMET settings folder {0} has been created", this.ApplicationConfigurationDirectory);
             }
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
@@ -143,9 +143,9 @@ namespace CDP4Composition.Services.AppSettingService
 
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
-                logger.Debug("The CDP4 settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
+                logger.Debug("The COMET settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
                 Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
-                logger.Debug("The CDP4 settings folder {0} has been created", this.ApplicationConfigurationDirectory);
+                logger.Debug("The COMET settings folder {0} has been created", this.ApplicationConfigurationDirectory);
             }
 
             var path = Path.Combine(this.ApplicationConfigurationDirectory, $"{assemblyName}{SettingFileExtension}");
