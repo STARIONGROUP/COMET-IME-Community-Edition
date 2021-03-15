@@ -445,41 +445,43 @@ namespace CDP4AddinCE
 
             try
             {
-                if (navigationPanelEvent.View is UIElement uiElement)
+                if (!(navigationPanelEvent.View is UIElement uiElement))
                 {
-                    var identifier = navigationPanelEvent.ViewModel.Identifier;
+                    return;
+                }
 
-                    var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out var identifiableCustomTaskPane);
+                var identifier = navigationPanelEvent.ViewModel.Identifier;
 
-                    if (taskPaneExists)
+                var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out var identifiableCustomTaskPane);
+
+                if (taskPaneExists)
+                {
+                    identifiableCustomTaskPane.CustomTaskPane.Visible = !identifiableCustomTaskPane.CustomTaskPane.Visible;
+                }
+                else
+                {
+                    var title = navigationPanelEvent.ViewModel.Caption;
+
+                    var dockPosition = navigationPanelEvent.RegionName.ToDockPosition();
+                    logger.Trace("Create new Task Pane with title {0}", title);
+                    var taskPane = this.TaskPaneFactory.CreateCTP("CDP4AddinCE.TaskPaneWpfHostControl", title);
+                    taskPane.DockPosition = dockPosition;
+                    taskPane.Width = 300;
+                    taskPane.Visible = true;
+
+                    if (taskPane is CustomTaskPane customTaskPane)
                     {
-                        identifiableCustomTaskPane.CustomTaskPane.Visible = !identifiableCustomTaskPane.CustomTaskPane.Visible;
+                        customTaskPane.VisibleStateChangeEvent += this.CustomTaskPane_VisibleStateChangeEvent;
                     }
-                    else
+
+                    if (taskPane.ContentControl is TaskPaneWpfHostControl wpfHostControl)
                     {
-                        var title = navigationPanelEvent.ViewModel.Caption;
-
-                        var dockPosition = navigationPanelEvent.RegionName.ToDockPosition();
-                        logger.Trace("Create new Task Pane with title {0}", title);
-                        var taskPane = this.TaskPaneFactory.CreateCTP("CDP4AddinCE.TaskPaneWpfHostControl", title);
-                        taskPane.DockPosition = dockPosition;
-                        taskPane.Width = 300;
-                        taskPane.Visible = true;
-
-                        if (taskPane is CustomTaskPane customTaskPane)
-                        {
-                            customTaskPane.VisibleStateChangeEvent += this.CustomTaskPane_VisibleStateChangeEvent;
-                        }
-
-                        if (taskPane.ContentControl is TaskPaneWpfHostControl wpfHostControl)
-                        {
-                            wpfHostControl.SetContent(uiElement);
-                        }
-
-                        identifiableCustomTaskPane = new IdentifiableCustomTaskPane(identifier, taskPane);
-
-                        this.customTaskPanes.Add(identifier, identifiableCustomTaskPane);
+                        wpfHostControl.SetContent(uiElement);
                     }
+
+                    identifiableCustomTaskPane = new IdentifiableCustomTaskPane(identifier, taskPane);
+
+                    this.customTaskPanes.Add(identifier, identifiableCustomTaskPane);
                 }
             }
             catch (Exception ex)
@@ -498,12 +500,14 @@ namespace CDP4AddinCE
         /// </param>
         private void CustomTaskPane_VisibleStateChangeEvent(_CustomTaskPane customTaskPaneInst)
         {
-            if (!customTaskPaneInst.Visible)
+            if (customTaskPaneInst.Visible)
             {
-                var identifier = this.customTaskPanes.SingleOrDefault(x => x.Value.CustomTaskPane == customTaskPaneInst).Key;
-                var hidePanelEvent = new HidePanelEvent(identifier);
-                CDPMessageBus.Current.SendMessage(hidePanelEvent);
+                return;
             }
+
+            var identifier = this.customTaskPanes.SingleOrDefault(x => x.Value.CustomTaskPane == customTaskPaneInst).Key;
+            var hidePanelEvent = new HidePanelEvent(identifier);
+            CDPMessageBus.Current.SendMessage(hidePanelEvent);
         }
 
         /// <summary>
@@ -675,23 +679,24 @@ namespace CDP4AddinCE
         {
             var excel = application as NetOffice.ExcelApi.Application;
 
-            if (excel != null)
+            if (excel == null)
             {
-                // set the excel application object
-                this.excelApplication = excel;
-                this.excelApplication.DisplayAlerts = true;
-                this.excelApplication.ScreenUpdating = true;
-
-                // set the excel instance to the office application wrapper
-                this.officeApplicationWrapper.Excel = excel;
-
-                // create event handlers
-                this.excelApplication.WorkbookActivateEvent += this.OnWorkbookActivateEvent;
-                this.excelApplication.WorkbookDeactivateEvent += this.OnWorkbookDeactivateEvent;
-
-                logger.Debug("The current addin is loaded for Excel");
                 return;
             }
+
+            // set the excel application object
+            this.excelApplication = excel;
+            this.excelApplication.DisplayAlerts = true;
+            this.excelApplication.ScreenUpdating = true;
+
+            // set the excel instance to the office application wrapper
+            this.officeApplicationWrapper.Excel = excel;
+
+            // create event handlers
+            this.excelApplication.WorkbookActivateEvent += this.OnWorkbookActivateEvent;
+            this.excelApplication.WorkbookDeactivateEvent += this.OnWorkbookDeactivateEvent;
+
+            logger.Debug("The current addin is loaded for Excel");
         }
 
         /// <summary>
@@ -699,16 +704,18 @@ namespace CDP4AddinCE
         /// </summary>
         private void DestructApplication()
         {
-            if (this.excelApplication != null)
+            if (this.excelApplication == null)
             {
-                // unregister events
-                this.excelApplication.WorkbookActivateEvent -= this.OnWorkbookActivateEvent;
-                this.excelApplication.WorkbookDeactivateEvent -= this.OnWorkbookDeactivateEvent;
-
-                // set excel instance to null
-                this.officeApplicationWrapper.Excel = null;
-                this.excelApplication = null;
+                return;
             }
+
+            // unregister events
+            this.excelApplication.WorkbookActivateEvent -= this.OnWorkbookActivateEvent;
+            this.excelApplication.WorkbookDeactivateEvent -= this.OnWorkbookDeactivateEvent;
+
+            // set excel instance to null
+            this.officeApplicationWrapper.Excel = null;
+            this.excelApplication = null;
         }
 
         /// <summary>
