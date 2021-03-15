@@ -168,7 +168,7 @@ namespace CDP4CrossViewEditor
             catch (Exception ex)
             {
                 this.application.StatusBar = "Rebuild Crossview sheet failed";
-                Logger.Error(ex);
+                throw ex;
             }
             finally
             {

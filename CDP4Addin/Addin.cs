@@ -35,9 +35,9 @@ namespace CDP4AddinCE
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Runtime.InteropServices;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
-    using System.Windows.Threading;
 
     using CDP4AddinCE.Settings;
     using CDP4AddinCE.Utils;
@@ -187,7 +187,8 @@ namespace CDP4AddinCE
             }
             catch (Exception ex)
             {
-                logger.Log(LogLevel.Error, ex);
+                // NOTE: manually handle exceptions as the UI specific dispatcher thread does not work
+                HandleException(ex);
             }
 
             if (this.RibbonUI != null)
@@ -614,8 +615,6 @@ namespace CDP4AddinCE
                 logger.Trace("set theme");
                 ThemeManager.ApplicationThemeName = Theme.SevenName;
                 AppliedTheme.ThemeName = Theme.SevenName;
-
-                Dispatcher.CurrentDispatcher.UnhandledException += UnhandledException;
             }
             catch (CompositionException compositionException)
             {
@@ -634,21 +633,6 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// Exception handler for uncaught exceptions thrown from any of the WPF modules
-        /// </summary>
-        /// <param name="sender">
-        /// The source of the exception
-        /// </param>
-        /// <param name="unhandledExceptionEventArgs">
-        /// Event args containing the unhandled exception
-        /// </param>
-        private static void UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs unhandledExceptionEventArgs)
-        {
-            HandleException(unhandledExceptionEventArgs.Exception);
-            unhandledExceptionEventArgs.Handled = true;
-        }
-
-        /// <summary>
         /// Handles the provided exception by showing it to the end-user
         /// </summary>
         /// <param name="ex">
@@ -656,17 +640,18 @@ namespace CDP4AddinCE
         /// </param>
         private static void HandleException(Exception ex)
         {
-            if (ex == null)
-            {
-                return;
-            }
-
             logger.Error(ex);
 
-            var exceptionReporter = new ExceptionReporter();
-            exceptionReporter.Show(ex);
+            var thread = new Thread(() =>
+            {
+                var exceptionReporter = new ExceptionReporter();
+                exceptionReporter.Show(ex);
 
-            Environment.Exit(1);
+                Environment.Exit(1);
+            });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
         }
 
         /// <summary>

@@ -272,24 +272,17 @@ namespace CDP4CrossViewEditor
             {
                 var workbook = dialogResult.Workbook;
 
-                try
+                var workbookMetadata = new WorkbookMetadata
                 {
-                    var workbookMetadata = new WorkbookMetadata
-                    {
-                        ElementDefinitions = dialogResult.WorkbookElements.Select(x => x.Iid),
-                        ParameterTypes = dialogResult.WorkbookParameterType.Select(x => x.Iid),
-                        ParameterValues = dialogResult.WorkbookChangedValues,
-                        PersistValues = dialogResult.PersistValues
-                    };
+                    ElementDefinitions = dialogResult.WorkbookElements.Select(x => x.Iid),
+                    ParameterTypes = dialogResult.WorkbookParameterType.Select(x => x.Iid),
+                    ParameterValues = dialogResult.WorkbookChangedValues,
+                    PersistValues = dialogResult.PersistValues
+                };
 
-                    var workbookOperator = new WorkbookOperator(this.officeApplicationWrapper.Excel, workbook, workbookMetadata);
+                var workbookOperator = new WorkbookOperator(this.officeApplicationWrapper.Excel, workbook, workbookMetadata);
 
-                    await workbookOperator.Rebuild(this.Session, iteration, activeParticipant);
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error(ex);
-                }
+                await workbookOperator.Rebuild(this.Session, iteration, activeParticipant);
             }
         }
 
