@@ -646,8 +646,6 @@ namespace CDP4AddinCE
             {
                 var exceptionReporter = new ExceptionReporter();
                 exceptionReporter.Show(ex);
-
-                Environment.Exit(1);
             });
 
             thread.SetApartmentState(ApartmentState.STA);
