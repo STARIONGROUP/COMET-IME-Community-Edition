@@ -4,7 +4,7 @@
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -35,6 +35,7 @@ namespace CDP4AddinCE
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Runtime.InteropServices;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -65,6 +66,8 @@ namespace CDP4AddinCE
     using NLog;
 
     using ReactiveUI;
+
+    using ExceptionReporting;
 
     using MessageBox = System.Windows.Forms.MessageBox;
 
@@ -158,7 +161,7 @@ namespace CDP4AddinCE
         /// The unique id of the Ribbon to be loaded
         /// </param>
         /// <returns>
-        /// the ribbon UI 
+        /// the ribbon UI
         /// </returns>
         public override string GetCustomUI(string ribbonID)
         {
@@ -184,7 +187,8 @@ namespace CDP4AddinCE
             }
             catch (Exception ex)
             {
-                logger.Log(LogLevel.Error, ex);
+                // NOTE: manually handle exceptions as the UI specific dispatcher thread does not work
+                HandleException(ex);
             }
 
             if (this.RibbonUI != null)
@@ -204,7 +208,7 @@ namespace CDP4AddinCE
         /// The ribbon control that invokes the callback
         /// </param>
         /// <returns>
-        /// ribbon XML containing the controls 
+        /// ribbon XML containing the controls
         /// </returns>
         public string GetContent(IRibbonControl control)
         {
@@ -254,7 +258,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// Executes the GetEnabled callback that is invoked from a Toggle control on the <see cref="Office.IRibbonControl"/> 
+        /// Executes the GetEnabled callback that is invoked from a Toggle control on the <see cref="Office.IRibbonControl"/>
         /// </summary>
         /// <param name="control">
         /// The ribbon control that invokes the callback
@@ -269,7 +273,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// Executes the GetVisible callback that is invoked from the <see cref="Office.IRibbonControl"/> 
+        /// Executes the GetVisible callback that is invoked from the <see cref="Office.IRibbonControl"/>
         /// </summary>
         /// <param name="control">
         /// The ribbon control that invokes the callback
@@ -284,7 +288,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// Executes the GetImage callback that is invoked from the <see cref="Office.IRibbonControl"/> 
+        /// Executes the GetImage callback that is invoked from the <see cref="Office.IRibbonControl"/>
         /// </summary>
         /// <param name="control">
         /// The ribbon control that invokes the callback
@@ -365,8 +369,8 @@ namespace CDP4AddinCE
         /// </param>
         /// <param name="publicKeyToken">
         /// The public Key Token of the redirected assembly
-        /// </param>        
-        /// <see cref="http://blog.slaks.net/2013-12-25/redirecting-assembly-loads-at-runtime/"/>         
+        /// </param>
+        /// <see cref="http://blog.slaks.net/2013-12-25/redirecting-assembly-loads-at-runtime/"/>
         private void RedirectAssembly(string shortName, Version targetVersion, string publicKeyToken)
         {
             ResolveEventHandler handler = null;
@@ -442,41 +446,43 @@ namespace CDP4AddinCE
 
             try
             {
-                if (navigationPanelEvent.View is UIElement uiElement)
+                if (!(navigationPanelEvent.View is UIElement uiElement))
                 {
-                    var identifier = navigationPanelEvent.ViewModel.Identifier;
+                    return;
+                }
 
-                    var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out var identifiableCustomTaskPane);
+                var identifier = navigationPanelEvent.ViewModel.Identifier;
 
-                    if (taskPaneExists)
+                var taskPaneExists = this.customTaskPanes.TryGetValue(identifier, out var identifiableCustomTaskPane);
+
+                if (taskPaneExists)
+                {
+                    identifiableCustomTaskPane.CustomTaskPane.Visible = !identifiableCustomTaskPane.CustomTaskPane.Visible;
+                }
+                else
+                {
+                    var title = navigationPanelEvent.ViewModel.Caption;
+
+                    var dockPosition = navigationPanelEvent.RegionName.ToDockPosition();
+                    logger.Trace("Create new Task Pane with title {0}", title);
+                    var taskPane = this.TaskPaneFactory.CreateCTP("CDP4AddinCE.TaskPaneWpfHostControl", title);
+                    taskPane.DockPosition = dockPosition;
+                    taskPane.Width = 300;
+                    taskPane.Visible = true;
+
+                    if (taskPane is CustomTaskPane customTaskPane)
                     {
-                        identifiableCustomTaskPane.CustomTaskPane.Visible = !identifiableCustomTaskPane.CustomTaskPane.Visible;
+                        customTaskPane.VisibleStateChangeEvent += this.CustomTaskPane_VisibleStateChangeEvent;
                     }
-                    else
+
+                    if (taskPane.ContentControl is TaskPaneWpfHostControl wpfHostControl)
                     {
-                        var title = navigationPanelEvent.ViewModel.Caption;
-
-                        var dockPosition = navigationPanelEvent.RegionName.ToDockPosition();
-                        logger.Trace("Create new Task Pane with title {0}", title);
-                        var taskPane = this.TaskPaneFactory.CreateCTP("CDP4AddinCE.TaskPaneWpfHostControl", title);
-                        taskPane.DockPosition = dockPosition;
-                        taskPane.Width = 300;
-                        taskPane.Visible = true;
-
-                        if (taskPane is CustomTaskPane customTaskPane)
-                        {
-                            customTaskPane.VisibleStateChangeEvent += this.CustomTaskPane_VisibleStateChangeEvent;
-                        }
-
-                        if (taskPane.ContentControl is TaskPaneWpfHostControl wpfHostControl)
-                        {
-                            wpfHostControl.SetContent(uiElement);
-                        }
-
-                        identifiableCustomTaskPane = new IdentifiableCustomTaskPane(identifier, taskPane);
-
-                        this.customTaskPanes.Add(identifier, identifiableCustomTaskPane);
+                        wpfHostControl.SetContent(uiElement);
                     }
+
+                    identifiableCustomTaskPane = new IdentifiableCustomTaskPane(identifier, taskPane);
+
+                    this.customTaskPanes.Add(identifier, identifiableCustomTaskPane);
                 }
             }
             catch (Exception ex)
@@ -495,12 +501,14 @@ namespace CDP4AddinCE
         /// </param>
         private void CustomTaskPane_VisibleStateChangeEvent(_CustomTaskPane customTaskPaneInst)
         {
-            if (!customTaskPaneInst.Visible)
+            if (customTaskPaneInst.Visible)
             {
-                var identifier = this.customTaskPanes.SingleOrDefault(x => x.Value.CustomTaskPane == customTaskPaneInst).Key;
-                var hidePanelEvent = new HidePanelEvent(identifier);
-                CDPMessageBus.Current.SendMessage(hidePanelEvent);
+                return;
             }
+
+            var identifier = this.customTaskPanes.SingleOrDefault(x => x.Value.CustomTaskPane == customTaskPaneInst).Key;
+            var hidePanelEvent = new HidePanelEvent(identifier);
+            CDPMessageBus.Current.SendMessage(hidePanelEvent);
         }
 
         /// <summary>
@@ -625,6 +633,26 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
+        /// Handles the provided exception by showing it to the end-user
+        /// </summary>
+        /// <param name="ex">
+        /// The exception that is being handled
+        /// </param>
+        private static void HandleException(Exception ex)
+        {
+            logger.Error(ex);
+
+            var thread = new Thread(() =>
+            {
+                var exceptionReporter = new ExceptionReporter();
+                exceptionReporter.Show(ex);
+            });
+
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+        }
+
+        /// <summary>
         /// Initialize the Office application objects, setup event handlers
         /// </summary>
         /// <param name="application">
@@ -634,23 +662,24 @@ namespace CDP4AddinCE
         {
             var excel = application as NetOffice.ExcelApi.Application;
 
-            if (excel != null)
+            if (excel == null)
             {
-                // set the excel application object
-                this.excelApplication = excel;
-                this.excelApplication.DisplayAlerts = true;
-                this.excelApplication.ScreenUpdating = true;
-
-                // set the excel instance to the office application wrapper
-                this.officeApplicationWrapper.Excel = excel;
-
-                // create event handlers
-                this.excelApplication.WorkbookActivateEvent += this.OnWorkbookActivateEvent;
-                this.excelApplication.WorkbookDeactivateEvent += this.OnWorkbookDeactivateEvent;
-
-                logger.Debug("The current addin is loaded for Excel");
                 return;
             }
+
+            // set the excel application object
+            this.excelApplication = excel;
+            this.excelApplication.DisplayAlerts = true;
+            this.excelApplication.ScreenUpdating = true;
+
+            // set the excel instance to the office application wrapper
+            this.officeApplicationWrapper.Excel = excel;
+
+            // create event handlers
+            this.excelApplication.WorkbookActivateEvent += this.OnWorkbookActivateEvent;
+            this.excelApplication.WorkbookDeactivateEvent += this.OnWorkbookDeactivateEvent;
+
+            logger.Debug("The current addin is loaded for Excel");
         }
 
         /// <summary>
@@ -658,16 +687,18 @@ namespace CDP4AddinCE
         /// </summary>
         private void DestructApplication()
         {
-            if (this.excelApplication != null)
+            if (this.excelApplication == null)
             {
-                // unregister events
-                this.excelApplication.WorkbookActivateEvent -= this.OnWorkbookActivateEvent;
-                this.excelApplication.WorkbookDeactivateEvent -= this.OnWorkbookDeactivateEvent;
-
-                // set excel instance to null
-                this.officeApplicationWrapper.Excel = null;
-                this.excelApplication = null;
+                return;
             }
+
+            // unregister events
+            this.excelApplication.WorkbookActivateEvent -= this.OnWorkbookActivateEvent;
+            this.excelApplication.WorkbookDeactivateEvent -= this.OnWorkbookDeactivateEvent;
+
+            // set excel instance to null
+            this.officeApplicationWrapper.Excel = null;
+            this.excelApplication = null;
         }
 
         /// <summary>
@@ -703,7 +734,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// Initializes the MEF instantiated services and managers        
+        /// Initializes the MEF instantiated services and managers
         /// </summary>
         private void InitializeMefImports()
         {
@@ -735,7 +766,7 @@ namespace CDP4AddinCE
         }
 
         /// <summary>
-        /// The OnStartupComplete method is called when the Office application has completed starting up and has loaded all the COM add-ins 
+        /// The OnStartupComplete method is called when the Office application has completed starting up and has loaded all the COM add-ins
         /// that were registered to load on startup
         /// </summary>
         /// <param name="custom">

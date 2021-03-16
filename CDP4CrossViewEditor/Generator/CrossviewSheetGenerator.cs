@@ -161,8 +161,8 @@ namespace CDP4CrossViewEditor.Generator
             }
             catch (Exception ex)
             {
-                logger.Error(ex);
                 this.excelApplication.StatusBar = $"CDP4: The following error occured while rebuilding the sheet: {ex.Message}";
+                throw ex;
             }
             finally
             {
