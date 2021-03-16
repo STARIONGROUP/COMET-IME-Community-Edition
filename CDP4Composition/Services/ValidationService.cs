@@ -68,7 +68,7 @@ namespace CDP4Composition.Services
             { "FileTypeName", new ValidationRule { PropertyName = "FileTypeName", Rule = @"^(application|audio|example|image|message|model|multipart|text|video)/\S+$", ErrorText = "The Name or short-name shall be consistent with the IANA standard and starts with either \"application/\", \"audio/\", \"example/\", \"image/\", \"message/\", \"model/\", \"multipart/\", \"text/\" or \"video/\" followed by any characters except white-spaces." } },
             { "Value", new ValidationRule { PropertyName = "Value", Rule = @"^(?!\s*$).+", ErrorText = "The Value must not be empty." } },
             { "ModelSetupShortName", new ValidationRule { PropertyName = "ShortName", Rule =  @"^[a-zA-Z0-9_]*$", ErrorText = "The ShortName shall only contain alpha-numerical character." } },
-            { "PersonShortName", new ValidationRule { PropertyName = "Value", Rule = @"^\w+[\s\w]*$", ErrorText = "The User Name cannot be empty and must contain only alphanumeric characters and spaces." } },
+            { "PersonShortName", new ValidationRule { PropertyName = "Value", Rule = @"^(?!\s*$).+", ErrorText = "The User Name must not be empty." } },
             { "RequirementShortName", new ValidationRule { PropertyName = "Value", Rule = @"^\w+[\w-]*$", ErrorText = "The Requirement ShortName cannot be empty and must contain only alphanumeric characters and dashes." } },
             { "ModelSetupName", new ValidationRule { PropertyName = "Name", Rule = @"^([^()\s][\S\s]*)$", ErrorText = "The Name can not be empty or start with a whitespace." } },
             { "ConversionFactor", new ValidationRule { PropertyName = "ConversionFactor", Rule = @"^(?!\s*$).+", ErrorText = "The ConversionFactor must not be empty" } },
