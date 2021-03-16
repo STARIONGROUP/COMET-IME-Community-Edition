@@ -98,10 +98,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		appveyor.yml = appveyor.yml
 		CDP4-CE.sln.DotSettings = CDP4-CE.sln.DotSettings
 		cdp4ime-tests.nunit = cdp4ime-tests.nunit
-		COMET-Community-Edition.png = COMET-Community-Edition.png
 		Nuget.Config = Nuget.Config
 		PluginLicense.txt = PluginLicense.txt
-		README.md = README.md
 		Sdk.Plugin.target = Sdk.Plugin.target
 	EndProjectSection
 EndProject
