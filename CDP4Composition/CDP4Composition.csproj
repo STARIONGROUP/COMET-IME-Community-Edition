@@ -5,10 +5,10 @@
     <AssemblyTitle>CDP4Composition</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Composition</Product>
-    <Description>CDP4 Composition and Infrastructure library</Description>
+    <Description>COMET Composition and Infrastructure library</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>7.0.1.2</AssemblyVersion>
-    <FileVersion>7.0.1.2</FileVersion>
+    <AssemblyVersion>8.0.0.0</AssemblyVersion>
+    <FileVersion>8.0.0.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -304,13 +304,8 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\Images\cdplogo3d_16x16.png" />
-    <Resource Include="Resources\Images\cdplogo3d_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Resources\Images\cdplogo3d_48x48.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <Resource Include="Resources\Images\cometlogo.png" />
+    <Resource Include="Resources\Images\cometlogo_48x48.png" />
     <Resource Include="Resources\Images\Log\Error_16x16.png" />
     <Resource Include="Resources\Images\Log\Info_16x16.png" />
     <Resource Include="Resources\Images\Log\Warning_16x16.png" />
@@ -364,11 +359,10 @@
     <Resource Include="Resources\Images\Cancel_16x16.png" />
     <Resource Include="Resources\Images\Thing\ActualFiniteState_48x48.png" />
     <Content Include="CommonView\markdown.xaml License.txt" />
-    <Content Include="Resources\Images\animatedcdplogo.gif">
+    <Resource Include="Resources\Images\comet.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    </Resource>
     <Resource Include="Resources\Images\Help_128x128.png" />
-    <Resource Include="Resources\Images\cdplogo3d_48x48p10.png" />
     <Resource Include="Resources\Images\domain_switch.png" />
     <Resource Include="Resources\Images\hidden_16x16.png" />
     <Content Include="Resources\Images\IconLicence.txt" />
@@ -682,6 +676,8 @@
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Resources\Images\cometlogo.png" />
+    <None Remove="Resources\Images\cometlogo_48x48.png" />
     <None Remove="Views\CustomFilterEditorDialog.xaml" />
     <None Remove="Views\ElementParameterRowControl.xaml" />
     <None Remove="Views\ManageConfigurationsDialog.xaml" />

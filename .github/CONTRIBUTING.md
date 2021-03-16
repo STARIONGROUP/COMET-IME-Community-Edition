@@ -1,6 +1,6 @@
 # How to contribute
 
-We would like to start with saying thank you for wanting to contribute to CDP4-IME codebase. We want to keep it as easy as possible to contribute changes that get things working in your environment. There are a few guidelines that we need contributors to follow so that we have a chance of keeping on top of things.
+We would like to start with saying thank you for wanting to contribute to COMET-IME codebase. We want to keep it as easy as possible to contribute changes that get things working in your environment. There are a few guidelines that we need contributors to follow so that we have a chance of keeping on top of things.
 
 - [Making Changes](#making-changes)
   - [Handling Updates from Upstream/Development](#handling-updates-from-upstreamdevelopment)
@@ -11,7 +11,7 @@ We would like to start with saying thank you for wanting to contribute to CDP4-I
 
 1. [Fork](http://help.github.com/forking/) on GitHub
 1. Clone your fork locally
-1. Configure the upstream repo (`git remote add upstream git://github.com/RHEAGROUP/CDP4-IME-Community-Edition.git`) 
+1. Configure the upstream repo (`git remote add upstream git://github.com/RHEAGROUP/COMET-IME-Community-Edition.git`) 
 1. Checkout development
 1. Create a local branch (`git checkout -b myBranch`) from development
 1. Work on your feature
@@ -23,7 +23,7 @@ You should **never** work on a clone of master or development, and you should **
 
 ### Handling Updates from Upstream/Development
 
-While you're working away in your branch it's quite possible that your upstream development (most likely the canonical CDP4-IME version) may be updated. If this happens you should:
+While you're working away in your branch it's quite possible that your upstream development (most likely the canonical COMET-IME version) may be updated. If this happens you should:
 
 1. [Stash](http://git-scm.com/book/en/Git-Tools-Stashing) any un-committed changes you need to
 1. `git checkout development`
@@ -46,13 +46,13 @@ When you're ready to go you should confirm that you are up to date and rebased w
 1. Send a descriptive [Pull Request](https://help.github.com/articles/creating-a-pull-request/) on GitHub - making sure you have selected the correct branch in the GitHub UI!
 1. Wait for @samatrhea to merge your changes in.
 
-And remember; **A pull-request with tests is a pull-request that's likely to be pulled in.** :grin: Bonus points if you document your feature in our [wiki](https://github.com/RHEAGROUP/CDP4-IME-Community-Edition/wiki) once it has been pulled in
+And remember; **A pull-request with tests is a pull-request that's likely to be pulled in.** :grin: Bonus points if you document your feature in our [wiki](https://github.com/RHEAGROUP/COMET-IME-Community-Edition/wiki) once it has been pulled in
 
 ## Style Guidelines
 
 - Indent with 4 spaces, **not** tabs.
 - No underscore (`_`) prefix for member names.
-- Use `this` when accessing instance members, e.g. `this.Name = "CDP4";`.
+- Use `this` when accessing instance members, e.g. `this.Name = "COMET";`.
 - Use the `var` keyword unless the inferred type is not obvious.
 - Use the C# type aliases for types that have them, e.g. `int` instead of `Int32`, `string` instead of `String` etc.
 - Use meaningful names (no hungarian notation), we like long descriptive names of methods, variables and parameters.

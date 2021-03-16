@@ -13,7 +13,7 @@
              Height="220"
              dx:ThemeManager.ThemeName="Seven"             
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
-             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
+             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
              ShowTitle="True"
              mc:Ignorable="d">
 

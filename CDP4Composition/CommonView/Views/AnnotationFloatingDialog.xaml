@@ -28,7 +28,7 @@
                         <dxlc:LayoutItem>
                             <Image Width="48"
                                    Height="48"
-                                   Source="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
+                                   Source="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Top"/>
                         </dxlc:LayoutItem>

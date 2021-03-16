@@ -43,7 +43,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Image Name="logo"
-                       Source="../Resources/cdp4logo_brand_textonly.png" Width="200"
+                       Source="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo.png" Width="200"
                        Stretch="Fill"
                        Margin="0,30,0,30"/>
                 <TextBlock x:Name="Version"
@@ -75,7 +75,7 @@
                                Foreground="#FF2D2D2D"
                                Opacity="0.5"
                                TextWrapping="Wrap" >
-                        © 2015-2020 RHEA System S.A. All Rights Reserved.
+                        © 2015-2021 RHEA System S.A. All Rights Reserved.
                     </TextBlock>
                 </DockPanel>
             </Grid>

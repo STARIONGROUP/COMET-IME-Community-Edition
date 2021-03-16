@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
-  <Product Id="*" Name="CDP4-CE" Language="1033" Version="7.0.1.2" Manufacturer="RHEA System S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
+  <Product Id="*" Name="COMET-CE" Language="1033" Version="8.0.0.0" Manufacturer="RHEA System S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
 
     <?include variables.wxi ?>
   
@@ -10,12 +10,12 @@
 		         Compressed="yes" 
 		         InstallScope="perMachine" 
 		         Manufacturer="RHEA" 
-		         Description="Install the CDP4 Community Edition" SummaryCodepage="1252" Platform="$(sys.BUILDARCH)" />
+		         Description="Install the COMET Community Edition" SummaryCodepage="1252" Platform="$(sys.BUILDARCH)" />
     
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." Schedule="afterInstallExecute" AllowSameVersionUpgrades="yes" />
     <MediaTemplate EmbedCab="yes"/>
 
-    <Icon Id="icon.ico" SourceFile="cdplogo_48x48.ico"/>
+    <Icon Id="icon.ico" SourceFile="comet.ico"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico" />
 
     <Property Id="WIXUI_INSTALLDIR" Value="CDP4INSTALLFOLDER" ></Property>
@@ -32,7 +32,7 @@
       <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_452_OR_LATER_INSTALLED]]>
     </Condition>
 
-    <Feature Id="CDP4IMEFeature" Absent="disallow" Title="CDP4 IME" Level="1" ConfigurableDirectory="BIN" AllowAdvertise="no" InstallDefault="local" TypicalDefault="install">
+    <Feature Id="CDP4IMEFeature" Absent="disallow" Title="COMET IME" Level="1" ConfigurableDirectory="BIN" AllowAdvertise="no" InstallDefault="local" TypicalDefault="install">
       <ComponentGroupRef Id="PRISM" />
       <ComponentGroupRef Id="DEPENDENCIES" />
       <ComponentGroupRef Id="DEVEXPRESS" />
@@ -45,95 +45,95 @@
       <ComponentRef Id="DesktopShortcutCDP4CE"/>
     </Feature>
 
-    <Feature Id="CDP4WSPDALPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Wsp Dal Plugin" Level="1" >
+    <Feature Id="CDP4WSPDALPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Wsp Dal Plugin" Level="1" >
       <ComponentGroupRef Id="WSPDAL_CG" />
     </Feature>
 
-    <Feature Id="CDP4SERVICESDAL" TypicalDefault="install" InstallDefault="local" Absent="disallow" AllowAdvertise="no" Title="CDP4 Services Dal Plugin" Level="1" >
+    <Feature Id="CDP4SERVICESDAL" TypicalDefault="install" InstallDefault="local" Absent="disallow" AllowAdvertise="no" Title="COMET Services Dal Plugin" Level="1" >
       <ComponentGroupRef Id="CDP4SERVICESDAL_CG" />
     </Feature>
     
-    <Feature Id="CDP4JSONFILEDALPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Json File Dal Plugin" Level="1" >
+    <Feature Id="CDP4JSONFILEDALPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Json File Dal Plugin" Level="1" >
       <ComponentGroupRef Id="JSONFILEDAL_CG" />
     </Feature>
     
-    <Feature Id="CDP4ADDINPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Office Addin" Level="1" ConfigurableDirectory="BIN">
+    <Feature Id="CDP4ADDINPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Office Addin" Level="1" ConfigurableDirectory="BIN">
       <ComponentGroupRef Id="CDP4ADDIN" />
     </Feature>
 
-    <Feature Id="CDP4DASHBOARDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Dashboard Plugin" Level="1" >
+    <Feature Id="CDP4DASHBOARDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Dashboard Plugin" Level="1" >
       <ComponentGroupRef Id="CDP4DASHBOARD_CG" />
     </Feature>
 
-    <Feature Id="CDP4CROSSVIEWEDITOR" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Crossview Editor Plugin" Level="1" >
+    <Feature Id="CDP4CROSSVIEWEDITOR" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Crossview Editor Plugin" Level="1" >
       <ComponentGroupRef Id="CDP4CROSSVIEWEDITOR_CG" />
     </Feature>
 
-    <Feature Id="CDP4REFERENCEDATAMAPPER" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Reference Data Mapper Plugin" Level="1" >
+    <Feature Id="CDP4REFERENCEDATAMAPPER" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Reference Data Mapper Plugin" Level="1" >
       <ComponentGroupRef Id="CDP4REFERENCEDATAMAPPER_CG" />
     </Feature>
 
-    <Feature Id="PARAMETERSHEETGENERATOR" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Parameter Sheet Generator Plugin" Level="1" >
+    <Feature Id="PARAMETERSHEETGENERATOR" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Parameter Sheet Generator Plugin" Level="1" >
       <ComponentGroupRef Id="PARAMETERSHEETGENERATOR_CG" />
     </Feature>
     
-    <Feature Id="SITEDIRECTORYPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Site Directory Plugin" Level="1" >
+    <Feature Id="SITEDIRECTORYPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Site Directory Plugin" Level="1" >
       <ComponentGroupRef Id="SITEDIRECTORY_CG" />
     </Feature>
 
-    <Feature Id="OBJECTBROWSERPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Object Browser Plugin" Level="1" >
+    <Feature Id="OBJECTBROWSERPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Object Browser Plugin" Level="1" >
       <ComponentGroupRef Id="OBJECTBROWSER_CG" />
     </Feature>
 
-    <Feature Id="BASICRDLPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4 Basic RDL Plugin" Level="1" >
+    <Feature Id="BASICRDLPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="COMET Basic RDL Plugin" Level="1" >
       <ComponentGroupRef Id="BASICRDL_CG" />
     </Feature>
 
-    <Feature Id="ENGINEERINGMODELPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Engineering Model Plugin" Level="1" >
+    <Feature Id="ENGINEERINGMODELPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Engineering Model Plugin" Level="1" >
       <ComponentGroupRef Id="ENGINEERINGMODEL_CG" />
     </Feature>
 
-    <Feature Id="PRODUCTTREEPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Product Tree Plugin" Level="1" >
+    <Feature Id="PRODUCTTREEPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Product Tree Plugin" Level="1" >
       <ComponentGroupRef Id="PRODUCTTREE_CG" />
     </Feature>
     
-    <Feature Id="REQUIREMENTSPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Requirements Engineering Plugin" Level="1" >
+    <Feature Id="REQUIREMENTSPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Requirements Engineering Plugin" Level="1" >
       <ComponentGroupRef Id="REQUIREMENTS_CG" />
     </Feature>
 
-    <Feature Id="PROPERTYGRIDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="disallow" AllowAdvertise="no" Title="CDP4 Property Grid Plugin" Level="1" >
+    <Feature Id="PROPERTYGRIDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="disallow" AllowAdvertise="no" Title="COMET Property Grid Plugin" Level="1" >
       <ComponentGroupRef Id="PROPERTYGRID_CG" />
     </Feature>
 
-    <Feature Id="LOGINFOPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Logging Info Plugin" Level="1" >
+    <Feature Id="LOGINFOPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Logging Info Plugin" Level="1" >
       <ComponentGroupRef Id="LOGINFO_CG" />
     </Feature>
 
-    <Feature Id="BUILTINRULESPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 BuiltIn Rules Plugin" Level="1" >
+    <Feature Id="BUILTINRULESPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET BuiltIn Rules Plugin" Level="1" >
       <ComponentGroupRef Id="BUILTINRULES_CG" />
     </Feature>
 
-    <Feature Id="RELATIONSHIPEDITORPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Relationship Editor Plugin" Level="1" >
+    <Feature Id="RELATIONSHIPEDITORPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Relationship Editor Plugin" Level="1" >
       <ComponentGroupRef Id="RELATIONSHIPEDITOR_CG" />
     </Feature>
 
-    <Feature Id="SCRIPTINGPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Scripting Plugin" Level="1">
+    <Feature Id="SCRIPTINGPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Scripting Plugin" Level="1">
       <ComponentGroupRef Id="SCRIPTING_CG" />
     </Feature>
 
-    <Feature Id="RELATIONMATRIXPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Relationship Matrix Plugin" Level="1">
+    <Feature Id="RELATIONMATRIXPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Relationship Matrix Plugin" Level="1">
       <ComponentGroupRef Id="RELATIONSHIPMATRIX_CG" />
     </Feature>
     
-    <Feature Id="BUDGETPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Budget Plugin" Level="1">
+    <Feature Id="BUDGETPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Budget Plugin" Level="1">
       <ComponentGroupRef Id="BUDGET_CG" />
     </Feature>
 
-    <Feature Id="CDP4REPORTINGPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Reporting Plugin" Level="1">
+    <Feature Id="CDP4REPORTINGPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Reporting Plugin" Level="1">
       <ComponentGroupRef Id="CDP4REPORTING_CG" />
     </Feature>
 
-    <Feature Id="GRAPHERPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4 Grapher Plugin" Level="1">
+    <Feature Id="GRAPHERPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Grapher Plugin" Level="1">
       <ComponentGroupRef Id="CDP4GRAPHER_CG" />
     </Feature>
   </Product>

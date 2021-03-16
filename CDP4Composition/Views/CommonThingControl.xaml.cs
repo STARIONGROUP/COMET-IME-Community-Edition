@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CommonThingControl.xaml.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
 //
@@ -149,14 +149,17 @@ namespace CDP4Composition.Views
         /// <param name="sender">The <see cref="sender"/></param>
         /// <param name="e">The <see cref="ItemClickEventArgs"/></param>
         private void ToggleSearchPanel(object sender, ItemClickEventArgs e)
-        {   
-            if (this.GridView.ActualShowSearchPanel)
+        {
+            if (this.GridView != null)
             {
-                this.GridView.HideSearchPanel();
-            }
-            else
-            {
-                this.GridView.ShowSearchPanel(true);
+                if (this.GridView.ActualShowSearchPanel)
+                {
+                    this.GridView.HideSearchPanel();
+                }
+                else
+                {
+                    this.GridView.ShowSearchPanel(true);
+                }
             }
         }
     }

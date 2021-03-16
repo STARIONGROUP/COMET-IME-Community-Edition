@@ -10,8 +10,8 @@
              dx:ThemeManager.ThemeName="Seven"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              SizeToContent="WidthAndHeight"
-             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
-             Title="About CDP4">
+             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
+             Title="About COMET">
     <dx:DXWindow.Resources>
         <views:TextDataProvider x:Key="TextData" Uri="license.rtf"/>
     </dx:DXWindow.Resources>
@@ -49,7 +49,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Image Name="logo" Stretch="Fill"
-                               Source="../Resources/cdp4logo_brand_textonly.png" Width="200"
+                               Source="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo.png" Width="200"
                                 Grid.ColumnSpan="4" Margin="0,30,0,30" />
                 <TextBlock Name="Version"
                            Grid.Row="1"
@@ -70,7 +70,7 @@
                                        Foreground="#FF2D2D2D"
                                        Opacity="0.5"
                                        TextWrapping="Wrap" >
-                                © 2015-2020 RHEA System S.A. All Rights Reserved. 
+                                © 2015-2021 RHEA System S.A. All Rights Reserved. 
                                 <Hyperlink NavigateUri="http://www.rheagroup.com" RequestNavigate="Hyperlink_OnRequestNavigate">www.rheagroup.com</Hyperlink>
                 </TextBlock>
             </Grid>

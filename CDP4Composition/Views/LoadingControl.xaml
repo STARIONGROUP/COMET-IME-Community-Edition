@@ -19,7 +19,7 @@
                         <RowDefinition Height="55"></RowDefinition>
                         <RowDefinition Height="*"></RowDefinition>
                     </Grid.RowDefinitions>
-                    <Image Grid.Row="0" Source="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png" Stretch="Fill" Width="48" Height="48" Margin="4"></Image>
+                    <Image Grid.Row="0" Source="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico" Stretch="Fill" Width="48" Height="48" Margin="4"></Image>
                         <dx:SimpleButton Grid.Row="1"  Width="90"
                                   Height="19"
                                   Name="CancelButton"
@@ -29,7 +29,7 @@
                                 <TextBlock TextAlignment="Center" VerticalAlignment="Bottom" FontSize="10">Cancel</TextBlock>
                     </dx:SimpleButton>
                 </Grid>
-                <Image Name="NormalImage" Source="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png" Stretch="Fill" Width="48" Height="48" Margin="16"/>
+                <Image Name="NormalImage" Source="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico" Stretch="Fill" Width="48" Height="48" Margin="16"/>
                 <Grid Margin="15,0,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>

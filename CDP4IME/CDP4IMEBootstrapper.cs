@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CDP4IMEBootstrapper.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
 //
@@ -78,7 +78,7 @@ namespace CDP4IME
         /// </summary>
         protected override void InitializeShell()
         {
-            this.UpdateBootstrapperState("Loading CDP4 Plugins");
+            this.UpdateBootstrapperState("Loading COMET Plugins");
 
             var pluginLoader = new PluginLoader<ImeAppSettings>();
 
@@ -89,7 +89,7 @@ namespace CDP4IME
                 this.UpdateBootstrapperState($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
 
-            this.UpdateBootstrapperState($"{pluginLoader.DirectoryCatalogues.Count} CDP4 Plugins Loaded");
+            this.UpdateBootstrapperState($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
 
             this.UpdateBootstrapperState("Initializing the Shell");
 
@@ -128,13 +128,13 @@ namespace CDP4IME
 
             var sw = new Stopwatch();
             sw.Start();    
-            this.UpdateBootstrapperState("Loading CDP4 Catalogs");
+            this.UpdateBootstrapperState("Loading COMET Catalogs");
 
             var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");
             this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4IMEBootstrapper).Assembly));
             this.AggregateCatalog.Catalogs.Add(dllCatalog);
 
-            this.UpdateBootstrapperState($"CDP4 Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
+            this.UpdateBootstrapperState($"COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
         }
 
         /// <summary>

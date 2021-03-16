@@ -48,7 +48,7 @@ namespace CDP4LogInfo.Views
                 case "Trace":
                     return new DXImageExtension { Image = new DXImageConverter().ConvertFrom("Windows_16x16.png") as DXImageInfo }.ProvideValue(null);
                 default:
-                    return "pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_16x16.png";
+                    return "pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico";
             }
         }
 

@@ -12,7 +12,7 @@
              dx:ThemeManager.ThemeName="Seven"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d"
-             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/cdplogo3d_48x48.png"
+             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
              Title="Data Source Selection" ShowTitle="True">
 
     <dx:DXWindow.Resources>
