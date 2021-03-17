@@ -12,6 +12,8 @@
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:local="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
              Height="500"
+             SizeToContent="WidthAndHeight"
+
              d:DesignWidth="750"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
@@ -22,9 +24,8 @@
     </dx:DXWindow.Resources>
     <lc:LayoutControl Margin="5"
                       Orientation="Vertical"
-                      ScrollBars="None">
-        <lc:LayoutGroup Margin="-10,-7,-10,-5"
-                        Orientation="Vertical"
+                      ScrollBars="None" ItemSpace="15">
+        <lc:LayoutGroup Orientation="Vertical"
                         View="Tabs"
                         lc:LayoutControl.AllowHorizontalSizing="True">
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
@@ -87,7 +88,7 @@
                 </lc:LayoutItem>
                 <views:ParameterValueSetLayoutItem Visibility="{Binding IsSampledFunctionParameter, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
             </lc:LayoutGroup>
-            <lc:LayoutGroup Header="Values" Visibility="{Binding IsSampledFunctionParameter, Converter={StaticResource BooleanToVisibilityConverter}}" Orientation="Vertical">
+            <lc:LayoutGroup ItemSpace="15" Header="Values" Visibility="{Binding IsSampledFunctionParameter, Converter={StaticResource BooleanToVisibilityConverter}}" Orientation="Vertical">
                 <lc:LayoutItem Label="Displayed ValueSet: ">
                     <dxe:ComboBoxEdit IsTextEditable="False"
                                       

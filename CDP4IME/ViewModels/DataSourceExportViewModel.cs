@@ -27,7 +27,9 @@ namespace CDP4IME.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
+    using System.Windows;
 
     using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
@@ -36,6 +38,8 @@ namespace CDP4IME.ViewModels
     using CDP4Dal.Operations;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
+
+    using DevExpress.Xpf.Core;
 
     using Microsoft.Practices.ServiceLocation;
     
@@ -110,7 +114,7 @@ namespace CDP4IME.ViewModels
         {
             if (openSaveFileDialogService == null)
             {
-                throw new ArgumentNullException("The openSaveFileDialogService may not be null", "openSaveFileDialogService");
+                throw new ArgumentNullException(nameof(openSaveFileDialogService), "The openSaveFileDialogService may not be null.");
             }
 
             this.openSaveFileDialogService = openSaveFileDialogService;
@@ -129,7 +133,7 @@ namespace CDP4IME.ViewModels
                 vm => vm.Path,
                 (passwordRetype, password, selecteddal, selectedsession, path) => selecteddal != null && selectedsession != null 
                     && !string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(password) && password == passwordRetype);
-            
+
             this.OkCommand = ReactiveCommand.Create(canOk);
             this.OkCommand.Subscribe(_ => this.ExecuteOk());
 
@@ -141,7 +145,7 @@ namespace CDP4IME.ViewModels
 
             this.ResetProperties();
         }
-        
+
         /// <summary>
         /// Gets or sets the selected Data-Source Kind
         /// </summary>
@@ -274,24 +278,49 @@ namespace CDP4IME.ViewModels
         /// </summary>
         private async void ExecuteOk()
         {
+            var fileInfo = new FileInfo(this.Path);
+
+            // check file exists and warn of override
+            if (fileInfo.Exists)
+            {
+                var overrideMessageBox = ThemedMessageBox.Show(title: "File Exists", text: "The selected output file already exists. Would you like to override?", messageBoxButtons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question);
+
+                if (overrideMessageBox == MessageBoxResult.No)
+                {
+                    return;
+                }
+            }
+
+            // check directory exists
+            if (!Directory.Exists(fileInfo.DirectoryName))
+            {
+                this.ErrorMessage = "The output directory does not exist.";
+                return;
+            }
+
             this.IsBusy = true;
             this.LoadingMessage = "Exporting...";
 
             try
             {
                 var creds = new Credentials(this.selectedSession.Credentials.UserName, this.Password, new Uri(this.Path));
-                
-                // TODO: change this to allow (file) dal selection for export
-                var dal = this.dals.Single(x => x.Metadata.DalType == DalType.File);
+
+                var dal = this.dals.Single(x => x.Metadata == this.SelectedDal);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
-                
+
                 var fileExportSession = dalInstance.CreateSession(creds);
 
-                // create write 
+                // create write
                 var operationContainers = new List<OperationContainer>();
 
                 // TODO: allow iteration setup selection by user
-                var openIterations = this.selectedSession.OpenIterations.Select(x => x.Key);
+                var openIterations = this.selectedSession.OpenIterations.Select(x => x.Key).ToList();
+
+                if (!openIterations.Any())
+                {
+                    throw new Exception("There must be at least one open Iteration in the selected Session.");
+                }
+
                 foreach (var iteration in openIterations)
                 {
                     var transactionContext = TransactionContextResolver.ResolveContext(iteration);
@@ -351,7 +380,7 @@ namespace CDP4IME.ViewModels
 
             this.dals = ServiceLocator.Current.GetInstance<AvailableDals>().DataAccessLayerKinds;
 
-            foreach (var dal in this.dals)
+            foreach (var dal in this.dals.Where(d => d.Metadata.DalType == DalType.File))
             {
                 this.AvailableDals.Add(dal.Metadata);
             }

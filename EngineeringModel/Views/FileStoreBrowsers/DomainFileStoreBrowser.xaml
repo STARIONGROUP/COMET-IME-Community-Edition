@@ -98,7 +98,6 @@
             <views:BrowserHeader Grid.Row="1" />
 
             <dxg:TreeListControl Grid.Row="2"
-                                 MaxHeight="1080"
                                  ItemsSource="{Binding ContainedRows}"
                                  SelectedItem="{Binding SelectedThing}"
                                  SelectionMode="Row"
@@ -112,7 +111,8 @@
                 </dxmvvm:Interaction.Behaviors>
                 <dxg:TreeListControl.View>
                     <dxg:TreeListView x:Name="DomainFileStoreView"
-                                      MaxHeight="1080"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
                                       AllowEditing="False"
                                       AutoWidth="False"
                                       ChildNodesPath="ContainedRows"

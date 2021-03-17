@@ -121,31 +121,17 @@
 
                         <dxb:BarItemLinkSeparator />
 
-                        <dxb:BarSplitButtonItem Name="sbSave"
-                                                Content="Save"
+                        <dxb:BarButtonItem Name="sbSave"
+                                                Content="Export Session"
                                                 Glyph="{dxc:DXImage Image=Save_16x16.png}"
+                                                Description="Export a Session"
+                                                Hint="Export a Session to a compatible file-based format."
                                                 IsEnabled="{Binding HasSessions,
                                                                     UpdateSourceTrigger=PropertyChanged}"
+                                                Command="{Binding SaveSessionCommand}"
                                                 LargeGlyph="{dxc:DXImage Image=Save_32x32.png}"
                                                 RibbonStyle="Large">
-                            <dxb:BarSplitButtonItem.PopupControl>
-                                <dxb:PopupMenu>
-                                    <dxb:BarButtonItem Name="bSave"
-                                                       Content="Save"
-                                                       Description="Saves the document."
-                                                       Glyph="{dxc:DXImage Image=Save_16x16.png}"
-                                                       Hint="Saves the document."
-                                                       LargeGlyph="{dxc:DXImage Image=Save_32x32.png}" />
-                                    <dxb:BarButtonItem Name="bExportSession"
-                                                       Command="{Binding SaveSessionCommand}"
-                                                       Content="Export"
-                                                       Description="Export a Session"
-                                                       Glyph="{dxc:DXImage Image=SaveDialog_16x16.png}"
-                                                       Hint="Export a Session"
-                                                       LargeGlyph="{dxc:DXImage Image=SaveDialog_32x32.png}" />
-                                </dxb:PopupMenu>
-                            </dxb:BarSplitButtonItem.PopupControl>
-                        </dxb:BarSplitButtonItem>
+                        </dxb:BarButtonItem>
 
                     </dxr:RibbonPageGroup>
 

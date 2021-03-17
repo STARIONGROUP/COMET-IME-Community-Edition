@@ -31,13 +31,13 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Image Grid.Row="0" Name="logo" Stretch="Fill"
+                    <Image Grid.Row="0" x:Name="logo" Stretch="Fill"
                            Source="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo.png" Width="200" Margin="0,15,0,30" />
                     <dxlc:LayoutControl Grid.Row="1" Orientation="Vertical">
                         <dxlc:LayoutGroup Orientation="Vertical" ItemLabelsAlignment="Default" ItemSpace="10"
                                           HorizontalAlignment="Stretch" View="Group">
                             <dxlc:LayoutItem Label="Source Type">
-                                <ComboBox DisplayMemberPath="Name"
+                                <dxe:ComboBoxEdit DisplayMember="Name"
                                           Margin="10,0,0,0"
                                           ItemsSource="{Binding Path=AvailableDataSourceKinds}"
                                           SelectedItem="{Binding Path=SelectedDataSourceKind,
@@ -92,7 +92,7 @@
                                 </Grid>
                             </dxlc:LayoutItem>
                             <dxlc:LayoutItem Label="Username">
-                                <dxe:TextEdit Name="UserName"
+                                <dxe:TextEdit x:Name="UserName"
                                               MinWidth="150"
                                               Margin="10,0,0,0"
                                               Text="{Binding UserName,
@@ -105,7 +105,7 @@
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <dxe:PasswordBoxEdit Name="PasswordBoxEdit"
+                                    <dxe:PasswordBoxEdit x:Name="PasswordBoxEdit"
                                                          Text="{Binding Password,
                                                          UpdateSourceTrigger=PropertyChanged,
                                                          Mode=TwoWay}" />
@@ -116,14 +116,14 @@
                                                   Visibility="{Binding ElementName=ShowPasswordBox,
                                                        Path=IsChecked,
                                                        Converter={dx:BooleanToVisibilityConverter}}" />
-                                    <CheckBox Name="ShowPasswordBox"
+                                    <dxe:CheckEditBox x:Name="ShowPasswordBox"
                                               Grid.Column="1"
                                               Margin="10,0,10,0"
                                               Content="Show" />
                                 </Grid>
                             </dxlc:LayoutItem>
                             <dxlc:LayoutItem Label="Use Proxy">
-                                <CheckBox Name="ProxyCheckBox"
+                                <dxe:CheckEdit x:Name="ProxyCheckBox"
                                           IsChecked="{Binding IsProxyEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           Margin="10,0,0,0"
                                           HorizontalAlignment="Left"
@@ -138,13 +138,13 @@
                                         <ColumnDefinition Width="60" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
-                                    <dxe:TextEdit Name="ProxyUri"
+                                    <dxe:TextEdit x:Name="ProxyUri"
                                                   Grid.Column="0"
                                                   IsEnabled="False"
                                                   Text="{Binding ProxyUri,
                                         UpdateSourceTrigger=PropertyChanged,
                                         Mode=TwoWay}" />
-                                    <dxe:TextEdit Name="ProxyPort"
+                                    <dxe:TextEdit x:Name="ProxyPort"
                                                   Margin="10,0,0,0"
                                                   Grid.Column="1"
                                                   MaskType="RegEx"

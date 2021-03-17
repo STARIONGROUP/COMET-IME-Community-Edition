@@ -9,6 +9,7 @@
                  xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                  xmlns:local="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
                  mc:Ignorable="d"
+                 ItemSpace="15"
                  Orientation="Vertical"
                  d:DesignHeight="300" d:DesignWidth="300">
     <dxlc:LayoutItem Label="Selected Switch:">
@@ -29,8 +30,8 @@
                              ColumnsSource="{Binding ValueColumns}"
                              AutoGenerateColumns="AddNew"
                              SelectionMode="Cell"
-                             MaxHeight="1080"
-                             Height="Auto"
+                             MaxHeight="500"
+                             Height="500"
                              Width="Auto">
                 <dxg:GridControl.ColumnGeneratorTemplate>
                     <DataTemplate>
@@ -62,8 +63,8 @@
                              SelectionMode="Cell"
                              IsEnabled="{Binding IsValueSetEditable}"
                              x:Name="ManualValueTable"
-                             MaxHeight="1080"
-                             Height="Auto"
+                             MaxHeight="500"
+                             Height="500"
                              Width="Auto">
                 <dxg:GridControl.ColumnGeneratorTemplate>
                     <DataTemplate>
@@ -98,8 +99,8 @@
                              AutoGenerateColumns="AddNew"
                              SelectionMode="Cell"
                              x:Name="ReferenceValueTable"
-                             MaxHeight="1080"
-                             Height="Auto"
+                             MaxHeight="500"
+                             Height="500"
                              Width="Auto">
                 <dxg:GridControl.ColumnGeneratorTemplate>
                     <DataTemplate>
@@ -132,8 +133,8 @@
                              ColumnsSource="{Binding ValueColumns}"
                              AutoGenerateColumns="AddNew"
                              SelectionMode="Cell"
-                             MaxHeight="1080"
-                             Height="Auto"
+                             MaxHeight="500"
+                             Height="500"
                              Width="Auto">
                 <dxg:GridControl.ColumnGeneratorTemplate>
                     <DataTemplate>
@@ -163,8 +164,8 @@
                              ColumnsSource="{Binding ValueColumns}"
                              AutoGenerateColumns="AddNew"
                              SelectionMode="Cell"
-                             MaxHeight="1080"
-                             Height="Auto"
+                             MaxHeight="500"
+                             Height="500"
                              Width="Auto">
                 <dxg:GridControl.ColumnGeneratorTemplate>
                     <DataTemplate>

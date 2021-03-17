@@ -9,9 +9,9 @@
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              dx:ThemeManager.ThemeName="Seven"
-             Height="250"
-             Width="300"
+             SizeToContent="WidthAndHeight"
              mc:Ignorable="d"
+             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              Title="Export Session">
 
@@ -21,80 +21,90 @@
         </ResourceDictionary>
     </dx:DXWindow.Resources>
     <Grid>
-        <dxlc:LayoutControl Background="White" Orientation="Vertical">
-        <dxlc:LayoutGroup Orientation="Vertical">
-
-            <dxlc:LayoutItem AddColonToLabel="True" Label="Session To Export">
-                <ComboBox DisplayMemberPath="Name"
-                          ItemsSource="{Binding Path=OpenSessions,
+        <dxlc:LayoutControl Height="Auto"
+                            Background="White"
+                            Orientation="Vertical">
+            <dxlc:LayoutGroup Width="500" Background="White" Padding="5" Orientation="Vertical" ItemSpace="15"
+                              ItemLabelsAlignment="Local">
+                <dxlc:LayoutItem AddColonToLabel="True" Label="Session To Export">
+                    <dxe:ComboBoxEdit DisplayMember="Name"
+                                      ItemsSource="{Binding Path=OpenSessions,
                                                 UpdateSourceTrigger=PropertyChanged}"
-                          SelectedItem="{Binding Path=SelectedSession,
+                                      SelectedItem="{Binding Path=SelectedSession,
                                                  Mode=TwoWay,
                                                  UpdateSourceTrigger=PropertyChanged}" />
-            </dxlc:LayoutItem>
-            <dxlc:LayoutItem AddColonToLabel="True" Label="ExportType">
-                <ComboBox DisplayMemberPath="Name"
-                          ItemsSource="{Binding Path=AvailableDals,
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem AddColonToLabel="True" Label="Format">
+                    <dxe:ComboBoxEdit DisplayMember="Name"
+                                      ItemsSource="{Binding Path=AvailableDals,
                                                 UpdateSourceTrigger=PropertyChanged}"
-                          SelectedItem="{Binding Path=SelectedDal,
+                                      SelectedItem="{Binding Path=SelectedDal,
                                                  Mode=TwoWay,
                                                  UpdateSourceTrigger=PropertyChanged}" />
-            </dxlc:LayoutItem>
-            <dxlc:LayoutItem AddColonToLabel="True" Label="Path">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="55" />
-                    </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0"
-                             MinWidth="150"
-                             IsEnabled="False"
-                             Text="{Binding Path,
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem AddColonToLabel="True" Label="Output Path">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="55" />
+                        </Grid.ColumnDefinitions>
+                        <dxe:TextEdit Grid.Column="0"
+                                      MinWidth="150"
+                                      IsEnabled="False"
+                                      Text="{Binding Path,
                                             UpdateSourceTrigger=PropertyChanged,
                                             Mode=TwoWay}" />
-                    <Button Grid.Column="1"
-                            Margin="5,0,0,0"
-                            Command="{Binding BrowseCommand}"
-                            Content="..." />
-                </Grid>
+                        <Button Grid.Column="1"
+                                Margin="5,0,0,0"
+                                Command="{Binding BrowseCommand}"
+                                Content="..." />
+                    </Grid>
 
-            </dxlc:LayoutItem>
+                </dxlc:LayoutItem>
 
-            <dxlc:LayoutItem AddColonToLabel="True" Label="Password">
-                <dxe:PasswordBoxEdit MinWidth="150" Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </dxlc:LayoutItem>
+                <dxlc:LayoutItem AddColonToLabel="True" Label="Password">
+                    <dxe:PasswordBoxEdit MinWidth="150"
+                                         Text="{Binding Password, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </dxlc:LayoutItem>
 
-            <dxlc:LayoutItem AddColonToLabel="True" Label="Retype Password">
-                <dxe:PasswordBoxEdit MinWidth="150" Text="{Binding PasswordRetype, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </dxlc:LayoutItem>
+                <dxlc:LayoutItem AddColonToLabel="True" Label="Retype Password">
+                    <dxe:PasswordBoxEdit MinWidth="150"
+                                         Text="{Binding PasswordRetype, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </dxlc:LayoutItem>
 
-            <dxlc:LayoutItem>
-                <TextBox IsReadOnly="True"
-                         Text="{Binding Path=ErrorMessage,
+                <dxlc:LayoutItem>
+                    <TextBlock
+                        Text="{Binding Path=ErrorMessage,
                                         Mode=OneWay}"
-                         Visibility="{Binding Path=HasError,
+                        Padding="10"
+                        Visibility="{Binding Path=HasError,
                                               UpdateSourceTrigger=PropertyChanged,
-                                              Converter={StaticResource BooleanToVisibilityConverter}}" />
-            </dxlc:LayoutItem>
-        </dxlc:LayoutGroup>
-        
-        <dxlc:LayoutGroup Orientation="Horizontal">
-            <Button MinWidth="75"
-                    MinHeight="25"
-                    MaxWidth="75"
-                    MaxHeight="25"
-                    HorizontalAlignment="Right"
-                    Command="{Binding Path=OkCommand}"
-                    Content="Ok" />
-            <Button MinWidth="75"
-                    MinHeight="25"
-                    MaxWidth="75"
-                    MaxHeight="25"
-                    HorizontalAlignment="Right"
-                    Command="{Binding Path=CancelCommand}"
-                    Content="Cancel" />
-        </dxlc:LayoutGroup>
-    </dxlc:LayoutControl>
-        <views:LoadingControl Grid.Row="0" Grid.Column="0" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
-        </Grid>
+                                              Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Background="#FFF5E5E5" />
+                </dxlc:LayoutItem>
+                <dxlc:LayoutGroup Orientation="Horizontal" HorizontalAlignment="Right">
+                    <dxlc:LayoutItem Height="25">
+                        <Button MinWidth="75"
+                                MinHeight="25"
+                                MaxWidth="75"
+                                MaxHeight="25"
+                                HorizontalAlignment="Right"
+                                Command="{Binding Path=OkCommand}"
+                                Content="OK" />
+                    </dxlc:LayoutItem>
+                    <dxlc:LayoutItem Height="25">
+                        <Button MinWidth="75"
+                                MinHeight="25"
+                                MaxWidth="75"
+                                MaxHeight="25"
+                                HorizontalAlignment="Right"
+                                Command="{Binding Path=CancelCommand}"
+                                Content="Cancel" />
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+        <views:LoadingControl Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}" />
+    </Grid>
+
 </dx:DXWindow>
