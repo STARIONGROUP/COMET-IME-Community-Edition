@@ -83,7 +83,6 @@ namespace CDP4IME.Tests.ViewModels
                 .Returns(new AvailableDals(dataAccessLayerKinds));
 
             this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object);
-            
         }
 
         [Test]
@@ -94,7 +93,7 @@ namespace CDP4IME.Tests.ViewModels
 
             this.viewModel.PasswordRetype = "pass";
             this.viewModel.Password = "pass";
-            this.viewModel.Path = @"C:\test\doubletest.zip";
+            this.viewModel.Path = @"C:\test\somerandom\no\existant\path\doubletest.zip";
 
             Assert.AreEqual(this.viewModel.Password, this.viewModel.PasswordRetype);
             Assert.That(this.viewModel.ErrorMessage, Is.Null.Or.Empty);
@@ -102,6 +101,10 @@ namespace CDP4IME.Tests.ViewModels
             Assert.IsNotNull(this.viewModel.SelectedDal);
             Assert.IsNotNull(this.viewModel.SelectedSession);
             Assert.IsTrue(this.viewModel.OkCommand.CanExecute(null));
+
+            this.viewModel.OkCommand.Execute(null);
+
+            Assert.AreEqual("The output directory does not exist.", this.viewModel.ErrorMessage);
         }
 
         [Test]
