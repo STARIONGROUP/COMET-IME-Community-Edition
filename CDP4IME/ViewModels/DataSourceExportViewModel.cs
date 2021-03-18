@@ -31,18 +31,18 @@ namespace CDP4IME.ViewModels
     using System.Linq;
     using System.Windows;
 
+    using CDP4Composition.Exceptions;
     using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
 
-    using DevExpress.Xpf.Core;
-
     using Microsoft.Practices.ServiceLocation;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -100,6 +100,11 @@ namespace CDP4IME.ViewModels
         /// The <see cref="IOpenSaveFileDialogService"/>
         /// </summary>
         private readonly IOpenSaveFileDialogService openSaveFileDialogService;
+
+        /// <summary>
+        /// The (injected) <see cref="DevExpress.Mvvm.IMessageBoxService"/>
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceExportViewModel"/> class.
@@ -283,7 +288,7 @@ namespace CDP4IME.ViewModels
             // check file exists and warn of override
             if (fileInfo.Exists)
             {
-                var overrideMessageBox = ThemedMessageBox.Show(title: "File Exists", text: "The selected output file already exists. Would you like to override?", messageBoxButtons: MessageBoxButton.YesNo, icon: MessageBoxImage.Question);
+                var overrideMessageBox = this.messageBoxService.Show(caption: "File Exists", messageBoxText: "The selected output file already exists. Would you like to override?", button: MessageBoxButton.YesNo, icon: MessageBoxImage.Question);
 
                 if (overrideMessageBox == MessageBoxResult.No)
                 {
@@ -313,12 +318,12 @@ namespace CDP4IME.ViewModels
                 // create write
                 var operationContainers = new List<OperationContainer>();
 
-                // TODO: allow iteration setup selection by user
+                // TODO: GH#782 allow iteration setup selection by user
                 var openIterations = this.selectedSession.OpenIterations.Select(x => x.Key).ToList();
 
                 if (!openIterations.Any())
                 {
-                    throw new Exception("There must be at least one open Iteration in the selected Session.");
+                    throw new SessionHasNoIterationsException();
                 }
 
                 foreach (var iteration in openIterations)

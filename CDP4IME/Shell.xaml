@@ -122,7 +122,7 @@
                         <dxb:BarItemLinkSeparator />
 
                         <dxb:BarButtonItem Name="sbSave"
-                                                Content="Export Session"
+                                                Content="Export Session Data"
                                                 Glyph="{dxc:DXImage Image=Save_16x16.png}"
                                                 Description="Export a Session"
                                                 Hint="Export a Session to a compatible file-based format."
