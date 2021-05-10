@@ -124,7 +124,7 @@ namespace CDP4SiteDirectory.Tests
         public void VerifyThatPropertiesAreSet()
         {
             var vm = new TeamCompositionBrowserViewModel(this.engineeringModelSetup, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
-            Assert.AreEqual("Team composition, test model", vm.Caption);
+            Assert.AreEqual("Team Composition, test model", vm.Caption);
             Assert.AreEqual(1, vm.Participants.Count);
 
             var row = vm.Participants.Single();
