@@ -44,7 +44,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// The Panel Caption
         /// </summary>
-        private const string PanelCaption = "Team composition";
+        private const string PanelCaption = "Team Composition";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TeamCompositionBrowserViewModel"/> class

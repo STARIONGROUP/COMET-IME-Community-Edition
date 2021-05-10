@@ -76,17 +76,20 @@
 
         <dxg:GridControl Grid.Row="2"
                          ItemsSource="{Binding Participants}"
+                         AutoExpandAllGroups="True"
                          SelectedItem="{Binding SelectedThing,
                                                 Mode=TwoWay,
                                                 UpdateSourceTrigger=PropertyChanged}">
 
             <dxg:GridControl.View>
                 <dxg:CardView x:Name="View"
+                              Loaded="View_OnLoaded"
                               AllowEditing="False"
-                              CardAlignment="Center"
+                              CardAlignment="Near"
+                              CardLayout="Columns"
                               CardHeaderBinding="{Binding Path=Data.Person,
                                                           RelativeSource={RelativeSource Self}}"
-                              CardMargin="15"
+                              CardMargin="5"
                               SeparatorThickness="0" />
 
             </dxg:GridControl.View>
@@ -102,7 +105,7 @@
                         </Style>
                     </dxg:GridColumn.CellStyle>
                 </dxg:GridColumn>
-                <dxg:GridColumn FieldName="DomainShortnames" Header="Domains" />
+                <dxg:GridColumn FieldName="DomainShortnames" Header="Domains" GroupIndex="0"/>
                 <dxg:GridColumn FieldName="TelephoneNumber" Header="Telephone Number" />
                 <dxg:GridColumn FieldName="EmailAddress" Header="Email Address">
                     <dxg:GridColumn.CellTemplate>

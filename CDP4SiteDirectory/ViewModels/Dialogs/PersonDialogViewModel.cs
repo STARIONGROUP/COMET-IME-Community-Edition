@@ -87,15 +87,13 @@ namespace CDP4SiteDirectory.ViewModels
         public PersonDialogViewModel(Person person, ThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container, IEnumerable<Thing> chainOfContainers = null)
             : base(person, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
-            this.Password = string.Empty;
-
             this.WhenAnyValue(vm => vm.PwdEditIsChecked).Subscribe(x =>
             {
                 this.RaisePropertyChanged("Password");
                 this.RaisePropertyChanged("PasswordConfirmation");
             });
         }
-        
+
         /// <summary>
         /// Gets or sets the password confirmation value
         /// </summary>
@@ -113,7 +111,7 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.pwdEditIsChecked; }
             set { this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value); }
         }
-        
+
         /// <summary>
         /// Gets or sets the ShortName
         /// </summary>
@@ -133,7 +131,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// Gets the <see cref="ICommand"/> to set the default <see cref="EmailAddress"/>
         /// </summary>
         public ReactiveCommand<object> SetDefaultEmailAddressCommand { get; private set; } 
-        
+
         /// <summary>
         /// Gets the error message for the property with the given name.
         /// </summary>
@@ -154,7 +152,7 @@ namespace CDP4SiteDirectory.ViewModels
                     {
                         this.ValidationErrors.Remove(validationErrorToRemove);
                     }
-                    
+
                     return null;
                 }
 
@@ -175,7 +173,7 @@ namespace CDP4SiteDirectory.ViewModels
                     {
                         this.ValidationErrors.Add(rule);
                     }
-                    
+
                     return rule.ErrorText;
                 }
 
@@ -185,7 +183,7 @@ namespace CDP4SiteDirectory.ViewModels
                 {
                     this.ValidationErrors.Remove(validationError);
                 }
-                
+
                 return ValidationService.ValidateProperty(columnName, this);
             }
         }
@@ -203,6 +201,21 @@ namespace CDP4SiteDirectory.ViewModels
             this.SetDefaultEmailAddressCommand =
                 ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedEmailAddress).Select(x => x != null && !this.IsReadOnly));
             this.SetDefaultEmailAddressCommand.Subscribe(_ => this.ExecuteSetDefaultEmailAddressCommand());
+        }
+
+        /// <summary>
+        /// Update the properties
+        /// </summary>
+        protected override void UpdateProperties()
+        {
+            base.UpdateProperties();
+
+            if (this.dialogKind == ThingDialogKind.Create)
+            {
+                this.IsActive = true;
+            }
+
+            this.Password = string.Empty;
         }
 
         /// <summary>

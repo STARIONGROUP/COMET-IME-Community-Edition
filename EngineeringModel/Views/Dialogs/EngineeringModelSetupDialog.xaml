@@ -104,7 +104,7 @@
                     </lc:LayoutItem>
                 </lc:LayoutGroup>
 
-                <lc:LayoutGroup Header="Active Domain" Orientation="Vertical">
+                <lc:LayoutGroup Header="Active Domain" Orientation="Vertical" IsEnabled="{Binding IsActiveDomainSelectionReadOnly, Converter={StaticResource NotConverter}}">
                     <lc:LayoutItem>
                         <dxe:ListBoxEdit VerticalAlignment="Stretch"
                                          HorizontalAlignment="Stretch"

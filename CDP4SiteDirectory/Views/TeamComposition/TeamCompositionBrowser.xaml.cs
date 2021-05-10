@@ -6,6 +6,7 @@
 
 namespace CDP4SiteDirectory.Views
 {
+    using System.Windows;
     using System.Windows.Controls;
     using CDP4Composition;
     using CDP4Composition.Attributes;
@@ -38,6 +39,19 @@ namespace CDP4SiteDirectory.Views
             {
                 this.InitializeComponent();
             }
+        }
+
+        /// <summary>
+        /// Collapses the cards when the CardView is loaded.
+        /// </summary>
+        /// <remarks>
+        /// Seems to be overboard to create a whole MVVM behaviour for one line of code. Unfortunatelly, there is no XAML dependency property to set this.
+        /// </remarks>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The arguments.</param>
+        private void View_OnLoaded(object sender, RoutedEventArgs e)
+        {
+            this.View.CollapseAllCards();
         }
     }
 }
