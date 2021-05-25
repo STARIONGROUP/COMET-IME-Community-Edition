@@ -47,7 +47,7 @@ namespace CDP4Reporting.Parameters
         /// <summary>
         /// Gets the "calculated" parameter name to be used in the <see cref="Views.ReportDesigner"/>.
         /// </summary>
-        public string ParameterName => $"{NamePrefix}{this.Name}";
+        public string ParameterName => $"{NamePrefix}{this.Name.Replace(" ", "_")}";
 
         /// <summary>
         /// Gets or sets the <see cref="Type"/> of the parameter.
