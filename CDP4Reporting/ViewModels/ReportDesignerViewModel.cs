@@ -857,7 +857,7 @@ namespace CDP4Reporting.ViewModels
                         .Intersect<string>(reportingParameters.Select(x => x.ParameterName))
                         .ToList();
 
-                if (!nonChangedParameters.Count.Equals(currentParameters.Count) || !nonChangedParameters.Count.Equals(reportingParameters.Count()))
+                if (!nonChangedParameters.Count.Equals(currentParameters.Count) || !nonChangedParameters.Count.Equals(reportingParameters.Count))
                 {
                     this.messageBoxService.Show(
                         "Report parameters were added to, or removed from the report definition. Reload the preview tab to reflect these changes in the parameters panel.", 
