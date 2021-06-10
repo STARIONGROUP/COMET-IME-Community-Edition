@@ -45,6 +45,7 @@ namespace CDP4Reporting.Tests.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
@@ -178,6 +179,7 @@ namespace CDP4Reporting.Tests.ViewModels
         private Mock<ISubmittableParameterValuesCollector> submittableParameterValuesCollector;
         private Mock<IDynamicTableChecker> dynamicTableChecker;
         private Mock<IPermissionService> permissionService;
+        private Mock<IMessageBoxService> messageBoxService;
 
         private static readonly Application application = new Application();
 
@@ -222,6 +224,7 @@ namespace CDP4Reporting.Tests.ViewModels
             this.submittableParameterValuesCollector = new Mock<ISubmittableParameterValuesCollector>();
             this.permissionService = new Mock<IPermissionService>();
             this.dynamicTableChecker = new Mock<IDynamicTableChecker>();
+            this.messageBoxService = new Mock<IMessageBoxService>();
 
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -229,6 +232,7 @@ namespace CDP4Reporting.Tests.ViewModels
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.openSaveFileDialogService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<ISubmittableParameterValuesCollector>()).Returns(this.submittableParameterValuesCollector.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IDynamicTableChecker>()).Returns(this.dynamicTableChecker.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
 
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
@@ -529,7 +533,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             var submittableParameterValue = new SubmittableParameterValue(tuple.path)
             {
-                ControlName = "Label", 
+                ControlName = "Label",
                 Text = tuple.newValue
             };
 
@@ -558,14 +562,14 @@ namespace CDP4Reporting.Tests.ViewModels
                 }
             }
 
-            this.openSaveFileDialogService.Setup(x => 
-                x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), 
+            this.openSaveFileDialogService.Setup(x =>
+                x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathSave });
 
             Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
 
             await this.reportDesignerViewModel.Object.CurrentReport.CreateDocumentAsync();
-            
+
             Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.Object.SubmitParameterValuesCommand.ExecuteAsyncTask(null));
 
             if (!tuple.found)
@@ -573,12 +577,12 @@ namespace CDP4Reporting.Tests.ViewModels
                 this.dialogNavigationService.Verify(
                     x => x.NavigateModal(
                         It.Is<OkDialogViewModel>(
-                            okDialog => 
+                            okDialog =>
                                 okDialog.Title == "Warning" &&
                                 okDialog.Message.Contains("The following errors were found during ValueSet lookup") &&
-                                okDialog.Message.Contains(tuple.path) 
-                            )
+                                okDialog.Message.Contains(tuple.path)
                         )
+                    )
                     , Times.Once);
 
                 this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<SubmitConfirmationViewModel>()), Times.Never);
@@ -588,10 +592,10 @@ namespace CDP4Reporting.Tests.ViewModels
                 this.dialogNavigationService.Verify(
                     x => x.NavigateModal(
                         It.Is<OkDialogViewModel>(
-                            okDialog => 
+                            okDialog =>
                                 okDialog.Title == "Warning" &&
                                 okDialog.Message.Contains("The following errors were found during ValueSet lookup") &&
-                                okDialog.Message.Contains(tuple.newValue) 
+                                okDialog.Message.Contains(tuple.newValue)
                         )
                     )
                     , Times.Once);
@@ -600,7 +604,7 @@ namespace CDP4Reporting.Tests.ViewModels
             }
             else
             {
-                var times = tuple.shouldChange ? Times.Once(): Times.Never();
+                var times = tuple.shouldChange ? Times.Once() : Times.Never();
 
                 this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<SubmitConfirmationViewModel>()), times);
             }
@@ -880,6 +884,68 @@ namespace CDP4Reporting.Tests.ViewModels
             Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.Object.RebuildDatasourceCommand.ExecuteAsyncTask(null));
 
             Assert.Zero(this.reportDesignerViewModel.Object.Errors.Length);
+        }
+
+        [Test]
+        public async Task VerifyThatRebuildDataSourceAndRefreshPreviewWorks()
+        {
+            System.IO.File.WriteAllText(this.dsPathOpen, DATASOURCE_CODE);
+
+            var reportStream = new MemoryStream(Encoding.UTF8.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(DATASOURCE_CODE));
+
+            using (var zipFile = ZipFile.Open(this.zipPathOpen, ZipArchiveMode.Create))
+            {
+                using (var reportEntry = zipFile.CreateEntry("Report.repx").Open())
+                {
+                    reportStream.Position = 0;
+                    await reportStream.CopyToAsync(reportEntry);
+                }
+
+                using (var reportEntry = zipFile.CreateEntry("Datasource.cs").Open())
+                {
+                    dataSourceStream.Position = 0;
+                    await dataSourceStream.CopyToAsync(reportEntry);
+                }
+            }
+
+            this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.Object.OpenReportCommand.Execute(null));
+
+            Assert.AreEqual(true, this.reportDesignerViewModel.Object.Output.Contains("File succesfully compiled"));
+
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.Object.RebuildDatasourceAndRefreshPreviewCommand.ExecuteAsyncTask(null));
+
+            Assert.Zero(this.reportDesignerViewModel.Object.Errors.Length);
+
+            //**********************************************************************************************
+            //since ReportDesignerViewModel.currentReportDesignerDocument is null during test execution,
+            //no Parameters will be added to the report designer EVER during report execution.
+            //That's why we can Verify things the way we do in the following section:
+            //**********************************************************************************************
+            this.messageBoxService.Verify(
+                x => x.Show(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<MessageBoxButton>(),
+                    It.IsAny<MessageBoxImage>()), Times.Never);
+
+            this.reportDesignerViewModel.Object.Document.Text = DATASOURCE_CODE_WITH_PARAMS;
+
+            Assert.AreEqual(true, this.reportDesignerViewModel.Object.Output.Contains("File succesfully compiled"));
+
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.Object.RebuildDatasourceAndRefreshPreviewCommand.ExecuteAsyncTask(null));
+
+            Assert.Zero(this.reportDesignerViewModel.Object.Errors.Length);
+
+            this.messageBoxService.Verify(
+                x => x.Show(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<MessageBoxButton>(),
+                    It.IsAny<MessageBoxImage>()), Times.Once);
+
+            //**********************************************************************************************
         }
 
         [Test]

@@ -51,6 +51,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using CDP4Composition.Utilities;
     using CDP4Composition.ViewModels;
 
@@ -64,6 +65,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Reporting.Utilities;
 
     using DevExpress.DataAccess.ObjectBinding;
+    using DevExpress.Xpf.Printing;
     using DevExpress.Xpf.Reports.UserDesigner;
     using DevExpress.XtraReports.Parameters;
     using DevExpress.XtraReports.UI;
@@ -97,6 +99,11 @@ namespace CDP4Reporting.ViewModels
         /// The <see cref="ISubmittableParameterValuesCollector"/> used to collect submittable parameter values from the report previewer.
         /// </summary>
         private readonly ISubmittableParameterValuesCollector submittableParameterValuesCollector = ServiceLocator.Current.GetInstance<ISubmittableParameterValuesCollector>();
+
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> used to show messages.
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
         /// The <see cref="IDynamicTableChecker"/> used to check datatables in the report.
@@ -287,6 +294,11 @@ namespace CDP4Reporting.ViewModels
         public ReactiveCommand<Unit> RebuildDatasourceCommand { get; set; }
 
         /// <summary>
+        /// Rebuild the DataSource and refresh the preview panel
+        /// </summary>
+        public ReactiveCommand<Unit> RebuildDatasourceAndRefreshPreviewCommand { get; set; }
+
+        /// <summary>
         /// Submit data from a previewed report
         /// </summary>
         public ReactiveCommand<Unit> SubmitParameterValuesCommand { get; set; }
@@ -351,6 +363,7 @@ namespace CDP4Reporting.ViewModels
             this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoCompileScript());
 
             this.RebuildDatasourceCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteRebuildDatasourceCommand());
+            this.RebuildDatasourceAndRefreshPreviewCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteRebuildDatasourceAndRefreshPreviewCommand());
 
             this.SubmitParameterValuesCommand = ReactiveCommand.CreateAsyncTask(
                 this.WhenAnyValue(x => x.CanSubmitParameterValues),
@@ -644,11 +657,40 @@ namespace CDP4Reporting.ViewModels
                 this.IsBusy = false;
             }
         }
+        
+        /// <summary>
+        /// Executes the <see cref="RebuildDatasourceAndRefreshPreviewCommand"/>
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        private async Task ExecuteRebuildDatasourceAndRefreshPreviewCommand()
+        {
+            this.IsBusy = true;
+
+            try
+            {
+                var source = this.Document.Text;
+                await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+
+                if (this.CompileResult?.Errors.HasErrors ?? false)
+                {
+                    this.messageBoxService.Show(this.CompileResult?.Errors.ToString(), "Compilation error", MessageBoxButton.OK, MessageBoxImage.Stop);
+                }
+
+                this.RebuildDataSource(true);
+                var presenter = this.currentReportDesignerDocument?.Preview as DocumentPreviewControl;
+                presenter?.ParametersModel.SubmitParameters();  
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
 
         /// <summary>
         /// Rebuild the report's datasource
         /// </summary>
-        private void RebuildDataSource()
+        /// <param name="notifyParameterChange">Indicates if message should be shown when parameter values have been added, or removed.</param>
+        private void RebuildDataSource(bool notifyParameterChange = false)
         {
             const string dataSourceName = "ReportDataSource";
 
@@ -669,15 +711,15 @@ namespace CDP4Reporting.ViewModels
             }
 
             var parameters = this.GetParameters(dataSource);
+            var filterString = string.Empty;
 
             if (parameters?.Any() ?? false)
             {
-                var filterString = this.GetFilterString(parameters);
-
-                this.currentReport.FilterString = filterString;
-
-                this.CheckParameters(parameters);
+                filterString = this.GetFilterString(parameters);
             }
+
+            this.currentReport.FilterString = filterString;
+            this.CheckParameters(parameters, notifyParameterChange);
 
             if (reportDataSource == null)
             {
@@ -790,11 +832,12 @@ namespace CDP4Reporting.ViewModels
         /// <param name="parameters">
         /// The <see cref="IEnumerable{IReportingParameter}"/> that contains the report's parameters
         /// </param>
-        private void CheckParameters(IEnumerable<IReportingParameter> parameters)
+        /// <param name="notifyParameterChange">Indicates if message should be shown when parameter values have been added, or removed.</param>
+        private void CheckParameters(IEnumerable<IReportingParameter> parameters, bool notifyParameterChange)
         {
             var reportingParameters = parameters.ToList();
 
-            var toBeRemoved = new List<DevExpress.XtraReports.Parameters.Parameter>();
+            var currentParameters = new List<DevExpress.XtraReports.Parameters.Parameter>();
             var previouslySetValues = new Dictionary<string, object>();
 
             //Find existing dynamic parameters
@@ -803,14 +846,31 @@ namespace CDP4Reporting.ViewModels
                 if (reportParameter.Name.StartsWith(ReportingParameter.NamePrefix))
                 {
                     previouslySetValues.Add(reportParameter.Name, reportParameter.Value);
-                    toBeRemoved.Add(reportParameter);
+                    currentParameters.Add(reportParameter);
+                }
+            }
+
+            if (notifyParameterChange)
+            {
+                var nonChangedParameters = 
+                    currentParameters.Select(x => x.Name)
+                        .Intersect<string>(reportingParameters.Select(x => x.ParameterName))
+                        .ToList();
+
+                if (!nonChangedParameters.Count.Equals(currentParameters.Count) || !nonChangedParameters.Count.Equals(reportingParameters.Count()))
+                {
+                    this.messageBoxService.Show(
+                        "Report parameters were added to, or removed from the report definition. Reload the preview tab to reflect these changes in the parameters panel.", 
+                        "Reload preview tab", 
+                        MessageBoxButton.OK, 
+                        MessageBoxImage.Information);
                 }
             }
 
             // Remove old dynamic parameters
-            if (toBeRemoved.Any())
+            if (currentParameters.Any())
             {
-                foreach (var reportParameter in toBeRemoved)
+                foreach (var reportParameter in currentParameters)
                 {
                     this.currentReportDesignerDocument?.MakeChanges(
                         changes => { changes.RemoveItem(reportParameter); });

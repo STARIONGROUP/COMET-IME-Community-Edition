@@ -184,6 +184,11 @@
                                         <dxr:RibbonPageGroup Caption="Submit" Name="SubmitGroup" />
                                     </dxb:InsertAction.Element>
                                 </dxb:InsertAction>
+                                <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.PreviewPage}">
+                                    <dxb:InsertAction.Element>
+                                        <dxr:RibbonPageGroup Caption="Rebuild" Name="RebuildGroup" />
+                                    </dxb:InsertAction.Element>
+                                </dxb:InsertAction>
                                 <dxb:InsertAction ContainerName="SubmitGroup">
                                     <dxb:InsertAction.Element>
                                         <dxb:BarButtonItem
@@ -191,6 +196,16 @@
                                             Command="{Binding Path=SubmitParameterValuesCommand}"
                                             Content="Parameter Values"
                                             Hint="Submit Parameter Values" >
+                                        </dxb:BarButtonItem>
+                                    </dxb:InsertAction.Element>
+                                </dxb:InsertAction>
+                                <dxb:InsertAction ContainerName="RebuildGroup">
+                                    <dxb:InsertAction.Element>
+                                        <dxb:BarButtonItem
+                                            LargeGlyph="{dx:DXImage Image=ManageDatasource_32x32.png}"
+                                            Command="{Binding Path=RebuildDatasourceAndRefreshPreviewCommand}"
+                                            Content="Rebuild Datasource"
+                                            Hint="Rebuild Datasource" >
                                         </dxb:BarButtonItem>
                                     </dxb:InsertAction.Element>
                                 </dxb:InsertAction>
