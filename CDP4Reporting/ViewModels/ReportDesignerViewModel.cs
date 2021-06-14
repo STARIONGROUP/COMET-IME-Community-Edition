@@ -1299,7 +1299,7 @@ namespace CDP4Reporting.ViewModels
                 var submitConfirmationViewModel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All);
                 var dialogResult = this.DialogNavigationService.NavigateModal(submitConfirmationViewModel);
 
-                if (dialogResult.Result.HasValue && dialogResult.Result.Value)
+                if ((dialogResult?.Result.HasValue ?? false) && dialogResult.Result.Value)
                 {
                     var submitConfirmationDialogResult = (SubmitConfirmationDialogResult) dialogResult;
 

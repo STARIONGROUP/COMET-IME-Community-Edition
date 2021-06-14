@@ -354,7 +354,7 @@
                                   ShowNodeImages="False"
                                   ShowVerticalLines="False"
                                   FixedLineWidth="0"
-                                  FilterMode="Smart"
+                                  FilteringMode="ParentBranch"
                                   TreeDerivationMode="HierarchicalDataTemplate"
                                   TreeLineStyle="Solid"
                                   VerticalScrollbarVisibility="Auto"
