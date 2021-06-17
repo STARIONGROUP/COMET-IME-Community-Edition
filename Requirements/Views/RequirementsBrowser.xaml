@@ -315,7 +315,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <views:CommonThingControl GridView="{Binding ElementName=View}" />
+            <views:CommonThingControl GridView="{Binding ElementName=View}" FilteringMode="ParentBranch" />
 
             <views:BrowserHeader Grid.Row="1" />
 
@@ -354,7 +354,6 @@
                                   ShowNodeImages="False"
                                   ShowVerticalLines="False"
                                   FixedLineWidth="0"
-                                  FilteringMode="ParentBranch"
                                   TreeDerivationMode="HierarchicalDataTemplate"
                                   TreeLineStyle="Solid"
                                   VerticalScrollbarVisibility="Auto"
