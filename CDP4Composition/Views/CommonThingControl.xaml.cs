@@ -51,6 +51,11 @@ namespace CDP4Composition.Views
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
+        /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="FilteringMode"/> setter method.
+        /// </summary>
+        private static readonly DependencyProperty FilteringModeProperty = DependencyProperty.Register("FilteringMode", typeof(TreeListFilteringMode?), typeof(CommonThingControl));
+
+        /// <summary>
         /// The declaration of the <see cref="DependencyProperty"/> that is accessible via the <see cref="GridView"/> setter method.
         /// </summary>
         private static readonly DependencyProperty GridViewProperty = DependencyProperty.Register("GridView", typeof(DataViewBase), typeof(CommonThingControl), new PropertyMetadata(OnGridViewChanged));
@@ -73,6 +78,15 @@ namespace CDP4Composition.Views
         /// Gets the <see cref="IDialogNavigationService"/> used to navigate to a <see cref="IDialogViewModel"/>
         /// </summary>
         public IDialogNavigationService DialogNavigationService { get; private set; }
+
+        /// <summary>
+        /// The <see cref="FilteringMode"/> this <see cref="CommonThingControl"/> is associated with
+        /// </summary>
+        public TreeListFilteringMode? FilteringMode
+        {
+            get => this.GetValue(FilteringModeProperty) as TreeListFilteringMode?;
+            set => this.SetValue(FilteringModeProperty, value);
+        }
 
         /// <summary>
         /// The <see cref="GridView"/> this <see cref="CommonThingControl"/> is associated with
@@ -116,7 +130,10 @@ namespace CDP4Composition.Views
 
             if (commonThingControl.GridView is TreeListView treeListView)
             {
-                treeListView.SetValue(TreeListView.FilteringModeProperty, TreeListFilteringMode.EntireBranch);
+                treeListView.SetValue(
+                    TreeListView.FilteringModeProperty, 
+                    commonThingControl.FilteringMode ?? TreeListFilteringMode.EntireBranch);
+
                 treeListView.SetValue(TreeListView.EnableDynamicLoadingProperty, false);
             }
         }
