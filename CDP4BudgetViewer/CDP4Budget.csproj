@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{7D862014-4CE6-41AC-940C-49D7DE4C485D}</ProjectGuid>
-    <MinIMEVersion>8.0.0</MinIMEVersion>
+    <MinIMEVersion>8.1.0</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
    
     <AssemblyTitle>CDP4BudgetViewer</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4BudgetViewer</Product>
     <Description>COMET Budget Computation and Viewer Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>8.0.0.0</AssemblyVersion>
-    <FileVersion>8.0.0.0</FileVersion>
+    <AssemblyVersion>8.1.0.0</AssemblyVersion>
+    <FileVersion>8.1.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

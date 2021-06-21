@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{4B9058F7-6ACC-4C1E-B1CD-969B04A9CD9C}</ProjectGuid>
-    <MinIMEVersion>8.0.0</MinIMEVersion>
+    <MinIMEVersion>8.1.0</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
    
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -10,8 +10,8 @@
     <Product>CDP4PropertyGrid</Product>
     <Description>COMET Property Grid Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>8.0.0.0</AssemblyVersion>
-    <FileVersion>8.0.0.0</FileVersion>
+    <AssemblyVersion>8.1.0.0</AssemblyVersion>
+    <FileVersion>8.1.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
