@@ -94,7 +94,15 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Hardcoded power related parameter type short names list
         /// </summary>
-        public static readonly string[] PowerParameters = { Redundancy, POn, PStandBy, PPeak, PDutyCycle, PMean };
+        public static readonly string[] PowerParameters =
+        {
+            Redundancy,
+            POn,
+            PStandBy,
+            /* PPeak, */
+            PDutyCycle,
+            PMean
+        };
 
         /// <summary>
         /// Hardcoded redundancy.scheme
