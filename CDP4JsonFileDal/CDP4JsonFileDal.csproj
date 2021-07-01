@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{7C432D61-867C-4DD2-8B14-EE8AEFD0B3A4}</ProjectGuid>
-    <MinIMEVersion>8.0.0</MinIMEVersion>
+    <MinIMEVersion>8.1.0</MinIMEVersion>
     <RootNamespace>CDP4JsonFileDalPlugin</RootNamespace>
     <AssemblyName>CDP4JsonFileDalPlugin</AssemblyName>
     <TargetFramework>net452</TargetFramework>
@@ -12,8 +12,8 @@
     <Product>CDP4JsonFileDalPlugin</Product>
     <Description>COMET Json File Dal Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>8.0.0.0</AssemblyVersion>
-    <FileVersion>8.0.0.0</FileVersion>
+    <AssemblyVersion>8.1.0.0</AssemblyVersion>
+    <FileVersion>8.1.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -37,14 +37,14 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="7.3.0">
+    <PackageReference Include="CDP4Common-CE" Version="7.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="7.3.0">
+    <PackageReference Include="CDP4Dal-CE" Version="7.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonFileDal-CE" Version="7.3.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.3.0">
+    <PackageReference Include="CDP4JsonFileDal-CE" Version="7.4.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">

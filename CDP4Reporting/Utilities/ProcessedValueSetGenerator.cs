@@ -199,7 +199,7 @@ namespace CDP4Reporting.Utilities
                 processedValueSet = new ProcessedValueSet(parameterValueSet, validationResult);
             }
 
-            if (processedValueSet.IsDirty(componentIndex, parameterType, switchKind, parameterValueSet.Manual[componentIndex], computedValue, parameterValueSet.Reference[componentIndex], parameterValueSet.Formula[componentIndex], out var valueSetValues))
+            if (processedValueSet.IsDirty(componentIndex, parameterType, switchKind, parameterValueSet.Manual[componentIndex], computedValue, parameterValueSet.Reference[componentIndex], computedValue, out var valueSetValues))
             {
                 processedValueSet.UpdateClone(valueSetValues);
 

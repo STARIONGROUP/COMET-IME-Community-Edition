@@ -1,25 +1,48 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BinaryRelationshipDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4CommonView;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
-    using CDP4Dal.Permission;
+    using CDP4Dal.Operations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -28,13 +51,6 @@ namespace CDP4EngineeringModel.ViewModels
     [ThingDialogViewModelExport(ClassKind.BinaryRelationship)]
     public class BinaryRelationshipDialogViewModel : CDP4CommonView.BinaryRelationshipDialogViewModel, IThingDialogViewModel
     {
-        #region private fields
-
-        /// <summary>
-        /// Backinf field for <see cref="IsSourceSelected"/>
-        /// </summary>
-        private ObservableAsPropertyHelper<bool> isSourceSelected;
-
         /// <summary>
         /// The Required Referance-Data-library for the current <see cref="Iteration"/>
         /// </summary>
@@ -50,9 +66,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private ClassKind selectedTargetClasskind;
 
-        #endregion
+        /// <summary>
+        /// The backing field for <see cref="Name"/> property.
+        /// </summary>
+        private string name;
 
-        #region constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryRelationshipDialogViewModel"/> class.
         /// </summary>
@@ -95,9 +113,6 @@ namespace CDP4EngineeringModel.ViewModels
             : base(binaryRelationship, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
         }
-        #endregion
-
-        #region public Properties
 
         /// <summary>
         /// Gets or sets the possible <see cref="ClassKind"/>
@@ -109,8 +124,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public ClassKind SelectedSourceClasskind
         {
-            get { return this.selectedSourceClasskind; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSourceClasskind, value); }
+            get => this.selectedSourceClasskind;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSourceClasskind, value);
         }
 
         /// <summary>
@@ -118,20 +133,29 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public ClassKind SelectedTargetClasskind
         {
-            get { return this.selectedTargetClasskind; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedTargetClasskind, value); }
+            get => this.selectedTargetClasskind;
+            set => this.RaiseAndSetIfChanged(ref this.selectedTargetClasskind, value);
         }
 
-        #endregion
+        /// <summary>
+        /// Gets or sets the Name of the current <see cref="BinaryRelationship"/>
+        /// </summary>
+        /// <remarks>
+        /// The validation of the name has been disabled
+        /// </remarks>
+        [ValidationOverride]
+        public override string Name
+        {
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
+        }
 
-        #region Overriden methods
         /// <summary>
         /// Initializes the dialog
         /// </summary>
         protected override void Initialize()
         {
             base.Initialize();
-
             var iteration = (Iteration)this.Container;
             var model = (EngineeringModel)iteration.Container;
             this.mRdl = model.EngineeringModelSetup.RequiredRdl.Single();
@@ -152,7 +176,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Populate the <see cref="PossibleSource"/> property
+        /// Populate the <see cref="CDP4CommonView.BinaryRelationshipDialogViewModel.PossibleSource"/> property
         /// </summary>
         protected override void PopulatePossibleSource()
         {
@@ -170,13 +194,13 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Populate the <see cref="PossibleTarget"/> property
+        /// Populate the <see cref="CDP4CommonView.BinaryRelationshipDialogViewModel.PossibleTarget"/> property
         /// </summary>
         protected override void PopulatePossibleTarget()
         {
             base.PopulatePossibleTarget();
             var possibleTargets = this.Session.Assembler.Cache.Values.Select(x => x.Value).Where(x => x.ClassKind == this.SelectedTargetClasskind).ToList();
-            
+
             // Avoid setting the same Thing as source and target
             if (this.SelectedSource != null && this.SelectedSource.ClassKind == this.SelectedTargetClasskind)
             {
@@ -187,7 +211,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Populate the <see cref="PossibleOwner"/> property
+        /// Populate the <see cref="RelationshipDialogViewModel{T}.PossibleOwner"/> property
         /// </summary>
         protected override void PopulatePossibleOwner()
         {
@@ -199,7 +223,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Populate the <see cref="PossibleCategory"/> and <see cref="Category"/> properties.
+        /// Populate the <see cref="RelationshipDialogViewModel{T}.PossibleCategory"/> and <see cref="Category"/> properties.
         /// </summary>
         protected override void PopulateCategory()
         {
@@ -212,11 +236,12 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Updates the <see cref="OkCanExecute"/> property
+        /// Updates the <see cref="DialogViewModelBase{T}.OkCanExecute"/> property
         /// </summary>
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
+
             this.OkCanExecute = this.OkCanExecute && this.SelectedSource != null && this.SelectedTarget != null &&
                                 this.SelectedOwner != null;
         }
@@ -247,16 +272,16 @@ namespace CDP4EngineeringModel.ViewModels
             this.PopulateCategory();
         }
 
-        #endregion
-
         /// <summary>
         /// Populates the <see cref="CategoryDialogViewModel.PermissibleClass"/> property
         /// </summary>
         private void PopulatePossibleClasskind()
         {
             this.PossibleClassKind = new List<ClassKind>();
+
             var allClassKinds = typeof(Thing).Assembly.GetTypes().Where(t => typeof(Thing).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
                 .OrderBy(x => x.Name).Select(x => (ClassKind)Enum.Parse(typeof(ClassKind), x.Name));
+
             this.PossibleClassKind.AddRange(allClassKinds);
         }
     }

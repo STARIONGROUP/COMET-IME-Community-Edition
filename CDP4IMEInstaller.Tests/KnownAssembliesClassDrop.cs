@@ -46,6 +46,7 @@ namespace CDP4IMEInstaller.Tests
             { "DevExpress.Data.{VERSION}.dll", "90BBA601-EC72-48D0-B370-A726CFBE26D5"} ,
             { "DevExpress.Data.Desktop.{VERSION}.dll", "461C5BA0-DBDB-4F35-B87C-F0F0E94FA752" },
             { "DevExpress.DataAccess.{VERSION}.dll", "A159A34F-C2BC-4E62-AB7A-2992F34AA343"} ,
+            { "DevExpress.DataVisualization.{VERSION}.Core.dll", "10A6ACDC-91F1-4880-B0B1-E349BD871077" },
             { "DevExpress.Diagram.{VERSION}.Core.dll", "0D4DF5E0-C0AA-47CA-9523-F754919BF970"} ,
             { "DevExpress.Images.{VERSION}.dll", "B9BFD73B-BF82-4742-9F04-0A5F0F537F43"} ,
             { "DevExpress.Mvvm.{VERSION}.dll", "0D612BC9-69A2-4237-93E4-E69CF726B87B"} ,
@@ -100,6 +101,7 @@ namespace CDP4IMEInstaller.Tests
             { "DevExpress.XtraTreeList.{VERSION}.dll", "36B17D24-2AA8-4E20-8A7C-2C569452A7C7" },
             { "DevExpress.XtraVerticalGrid.{VERSION}.dll", "F26DEBE4-6BF2-4A72-8754-FEFBE3BC62B3" },
             { "DevExpress.XtraWizard.{VERSION}.dll", "4043AEC7-1839-4094-8C59-466F4136E0B2" }
+
         };
 
         /// <summary>
