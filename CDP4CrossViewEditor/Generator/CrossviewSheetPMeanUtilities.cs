@@ -98,13 +98,11 @@ namespace CDP4CrossViewEditor.Generator
 
         /// <summary>
         /// Hardcoded redundancy.scheme
-        /// NOTE: not sure about this value
         /// </summary>
         private const string RedundancySchemeHot = "active";
 
         /// <summary>
         /// Hardcoded redundancy.scheme
-        /// NOTE: not sure about this value
         /// </summary>
         private const string RedundancySchemeCold = "passive";
 
@@ -339,17 +337,17 @@ namespace CDP4CrossViewEditor.Generator
                     return pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue;
 
                 case RedundancyTypeExternal:
-                    switch (redundancyScheme.ToLowerInvariant())
+                    if (redundancyScheme.ToLowerInvariant().StartsWith(RedundancySchemeCold))
                     {
-                        case RedundancySchemeCold:
-                            return (pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue) * pRedundancyKValue / pRedundancyNValue;
-
-                        case RedundancySchemeHot:
-                            return pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue;
-
-                        default:
-                            return null;
+                        return (pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue) * pRedundancyKValue / pRedundancyNValue;
                     }
+
+                    if (redundancyScheme.ToLowerInvariant().StartsWith(RedundancySchemeHot))
+                    {
+                        return pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue;
+                    }
+
+                    return null;
 
                 default:
                     return null;
