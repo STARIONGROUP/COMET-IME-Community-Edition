@@ -77,11 +77,6 @@ namespace CDP4CrossViewEditor.Generator
         private const string PStandBy = "p_stby";
 
         /// <summary>
-        /// Power peak parameter type short name
-        /// </summary>
-        private const string PPeak = "p_peak";
-
-        /// <summary>
         /// Power duty cycle parameter type short name
         /// </summary>
         private const string PDutyCycle = "p_duty_cyc";
@@ -99,7 +94,6 @@ namespace CDP4CrossViewEditor.Generator
             Redundancy,
             POn,
             PStandBy,
-            /* PPeak, */
             PDutyCycle,
             PMean
         };
