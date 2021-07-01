@@ -268,7 +268,11 @@ namespace CDP4CrossViewEditor.Generator
 
                     contentRow[index] = value;
 
-                    crossviewArrayAssembler.SpecialHighlighting[namesRow[index] as string] = Color.Green;
+                    // highlight only interactible cells
+                    if (namesRow[index] != null)
+                    {
+                        crossviewArrayAssembler.SpecialHighlighting[namesRow[index] as string] = Color.Green;
+                    }
                 }
             }
         }
