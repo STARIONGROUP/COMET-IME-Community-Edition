@@ -877,10 +877,7 @@ namespace CDP4Reporting.ViewModels
                 }
             }
 
-            if (!(reportingParameters.Any()))
-            {
-                return;
-            }
+            var presenter = (notifyParameterChange ? this.currentReportDesignerDocument?.Preview : null) as DocumentPreviewControl;
 
             // Create new dynamic parameters
             foreach (var reportingParameter in reportingParameters)
@@ -891,6 +888,17 @@ namespace CDP4Reporting.ViewModels
                         : null;
 
                 this.CreateDynamicParameter(reportingParameter, previouslySetValue);
+
+                if (notifyParameterChange)
+                {
+                    var existingInvisibleParameter = 
+                        presenter?.ParametersModel.Parameters.SingleOrDefault(x => !x.Visible && x.Name == reportingParameter.ParameterName);
+
+                    if (existingInvisibleParameter != null)
+                    {
+                        existingInvisibleParameter.Value = reportingParameter.DefaultValue;
+                    }
+                }
             }
         }
 
