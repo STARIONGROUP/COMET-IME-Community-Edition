@@ -90,23 +90,34 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             this.session.Setup(x => x.Credentials).Returns(this.credentials);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri);
-            this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.session.Object.Assembler.Cache, null) { Name = "testRDL", ShortName = "test" };
+            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri);
+            this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(
+                Guid.NewGuid(),
+                this.assembler.Cache,
+                this.credentials.Uri)
+            {
+                Name = "testRDL",
+                ShortName = "test"
+            };
 
             this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteReferenceDataLibrary);
 
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri)
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "Domain"
             };
 
-            this.person = new Person(Guid.NewGuid(), null, null)
+            this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 GivenName = "John",
                 Surname = "Doe"
             };
 
-            this.participant = new Participant(Guid.NewGuid(), this.session.Object.Assembler.Cache, this.session.Object.Credentials.Uri) { Person = this.person, Domain = { this.domain } };
+            this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Person = this.person,
+                Domain = { this.domain }
+            };
 
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
@@ -163,9 +174,9 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 ActualState = { actualFiniteState }
             };
 
-            //NOTE: Required parameter list: "redundancy", "P_on", "P_stby", "P_duty_cyc", "P_mean"
+            // NOTE: Required parameter list: "redundancy", "P_on", "P_stby", "P_duty_cyc", "P_mean"
 
-            var P_redundancy = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            var pRedundancy = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "redundancy",
                 ShortName = "redundancy",
@@ -208,7 +219,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.pRedundancyActiveInternalParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                ParameterType = P_redundancy,
+                ParameterType = pRedundancy,
                 Owner = this.domain,
                 ValueSet =
                 {
@@ -223,7 +234,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.pRedundancyActiveExternalParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                ParameterType = P_redundancy,
+                ParameterType = pRedundancy,
                 Owner = this.domain,
                 ValueSet =
                 {
@@ -236,7 +247,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 }
             };
 
-            var P_on = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            var pOn = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "P_on",
                 ShortName = "P_on"
@@ -244,7 +255,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.pOnParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                ParameterType = P_on,
+                ParameterType = pOn,
                 Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
                     Name = "W",
@@ -261,7 +272,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 }
             };
 
-            var P_stby = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            var pStby = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "P_stby",
                 ShortName = "P_stby"
@@ -269,7 +280,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.pStandByParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                ParameterType = P_stby,
+                ParameterType = pStby,
                 Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
                     Name = "W",
@@ -286,7 +297,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 }
             };
 
-            var P_duty_cyc = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            var pDutyCyc = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "P_duty_cyc",
                 ShortName = "P_duty_cyc"
@@ -294,7 +305,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.pDutyCycleParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                ParameterType = P_duty_cyc,
+                ParameterType = pDutyCyc,
                 Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
                     Name = "W",
@@ -315,7 +326,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.pDutyCycleParameterWithMinusOneValue = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                ParameterType = P_duty_cyc,
+                ParameterType = pDutyCyc,
                 Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
                     Name = "W",
@@ -336,7 +347,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.pDutyCycleParameterWithInvalidValue = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                ParameterType = P_duty_cyc,
+                ParameterType = pDutyCyc,
                 Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
                     Name = "W",
@@ -355,7 +366,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 }
             };
 
-            var P_mean = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            var pMean = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
                 Name = "P_mean",
                 ShortName = "P_mean"
@@ -363,7 +374,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.pMeanParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
-                ParameterType = P_mean,
+                ParameterType = pMean,
                 Scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
                     Name = "W",
@@ -382,11 +393,11 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 }
             };
 
-            this.parameterTypes.Add(P_redundancy);
-            this.parameterTypes.Add(P_on);
-            this.parameterTypes.Add(P_stby);
-            this.parameterTypes.Add(P_duty_cyc);
-            this.parameterTypes.Add(P_mean);
+            this.parameterTypes.Add(pRedundancy);
+            this.parameterTypes.Add(pOn);
+            this.parameterTypes.Add(pStby);
+            this.parameterTypes.Add(pDutyCyc);
+            this.parameterTypes.Add(pMean);
 
             elementDefinition.Parameter.Add(this.pRedundancyActiveInternalParameter);
             elementDefinition.Parameter.Add(this.pOnParameter);
@@ -396,18 +407,22 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             this.iteration.Element.Add(elementDefinition);
 
-            this.siteReferenceDataLibrary.ParameterType.Add(P_redundancy);
-            this.siteReferenceDataLibrary.ParameterType.Add(P_on);
-            this.siteReferenceDataLibrary.ParameterType.Add(P_stby);
-            this.siteReferenceDataLibrary.ParameterType.Add(P_duty_cyc);
-            this.siteReferenceDataLibrary.ParameterType.Add(P_mean);
+            this.siteReferenceDataLibrary.ParameterType.Add(pRedundancy);
+            this.siteReferenceDataLibrary.ParameterType.Add(pOn);
+            this.siteReferenceDataLibrary.ParameterType.Add(pStby);
+            this.siteReferenceDataLibrary.ParameterType.Add(pDutyCyc);
+            this.siteReferenceDataLibrary.ParameterType.Add(pMean);
 
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
-            {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
-            });
+            this.session
+                .Setup(x => x.OpenIterations)
+                .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> 
+                {
+                    { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
+                });
 
-            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domain);
+            this.session
+                .Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>()))
+                .Returns(this.domain);
         }
 
         [Test]
@@ -457,8 +472,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
             this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
 
-            var P_redundancy = this.elementDefinitions.FirstOrDefault()?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_redundancy");
-            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(P_redundancy);
+            var pRedundancy = this.elementDefinitions.FirstOrDefault()
+                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_redundancy");
+
+            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(pRedundancy);
             (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Add(this.pRedundancyActiveExternalParameter);
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
@@ -486,8 +503,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
 
-            var P_duty_cyc = this.elementDefinitions.FirstOrDefault()?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_duty_cyc");
-            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(P_duty_cyc);
+            var pDutyCyc = this.elementDefinitions.FirstOrDefault()
+                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_duty_cyc");
+
+            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(pDutyCyc);
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
 
@@ -510,8 +529,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
 
-            var P_mean = this.elementDefinitions.FirstOrDefault()?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_mean");
-            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(P_mean);
+            var pMean = this.elementDefinitions.FirstOrDefault()
+                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_mean");
+
+            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(pMean);
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
 
@@ -533,11 +554,12 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
 
-            var P_mean = this.elementDefinitions.FirstOrDefault()?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_mean");
+            var pMean = this.elementDefinitions.FirstOrDefault()
+                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_mean");
 
-            if (P_mean != null)
+            if (pMean != null)
             {
-                P_mean.StateDependence = null;
+                pMean.StateDependence = null;
             }
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
@@ -558,11 +580,12 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
             Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
 
-            var P_duty_cyc = this.elementDefinitions.FirstOrDefault()?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_duty_cyc");
+            var pDutyCyc = this.elementDefinitions.FirstOrDefault()
+                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_duty_cyc");
 
-            if (P_duty_cyc != null)
+            if (pDutyCyc != null)
             {
-                P_duty_cyc.IsOptionDependent = true;
+                pDutyCyc.IsOptionDependent = true;
 
                 var option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
                 {
@@ -570,7 +593,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                     ShortName = "OPT_1",
                 };
 
-                foreach (var parameterValueSet in P_duty_cyc.ValueSet)
+                foreach (var parameterValueSet in pDutyCyc.ValueSet)
                 {
                     parameterValueSet.ActualOption = option1;
                 }
@@ -590,8 +613,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         {
             Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
 
-            var P_duty_cyc = this.elementDefinitions.FirstOrDefault()?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_duty_cyc");
-            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(P_duty_cyc);
+            var pDutyCyc = this.elementDefinitions.FirstOrDefault()
+                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_duty_cyc");
+
+            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(pDutyCyc);
             (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Add(this.pDutyCycleParameterWithMinusOneValue);
 
             var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
@@ -613,8 +638,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         {
             Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
 
-            var P_duty_cyc = this.elementDefinitions.FirstOrDefault()?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_duty_cyc");
-            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(P_duty_cyc);
+            var pDutyCyc = this.elementDefinitions.FirstOrDefault()
+                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_duty_cyc");
+
+            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(pDutyCyc);
             (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Add(this.pDutyCycleParameterWithInvalidValue);
 
             var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
