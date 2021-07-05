@@ -56,11 +56,13 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
         private SiteDirectory siteDirectory;
         private SiteReferenceDataLibrary siteReferenceDataLibrary;
-        private EngineeringModel engineeringModel;
-        private Iteration iteration;
-        private Participant participant;
         private DomainOfExpertise domain;
         private Person person;
+        private Participant participant;
+
+        private EngineeringModel engineeringModel;
+        private Iteration iteration;
+
         private Parameter pDutyCycleParameter;
         private Parameter pDutyCycleParameterWithMinusOneValue;
         private Parameter pDutyCycleParameterWithInvalidValue;
@@ -173,8 +175,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 PossibleFiniteStateList = { possibleList },
                 ActualState = { actualFiniteState }
             };
-
-            // NOTE: Required parameter list: "redundancy", "P_on", "P_stby", "P_duty_cyc", "P_mean"
 
             var pRedundancy = new CompoundParameterType(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
@@ -426,11 +426,106 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         }
 
         [Test]
-        public void VerifyThatAssemblerCalculatesPMeanIfPDutyCycleAndPMeanAreProperlySet()
+        public void VerifyPMeanIsNotCalculatedIfRedundancyIsMissing()
         {
             var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
             crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
             this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
+
+            var elementDefinition = this.elementDefinitions.First();
+            elementDefinition.Parameter.Remove(elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "redundancy"));
+
+            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
+
+            Assert.IsFalse(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_mean"));
+
+            Assert.AreEqual(9, arrayAssembler.ContentArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 8]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 8]);
+        }
+
+        [Test]
+        public void VerifyPMeanIsNotCalculatedIfPOnIsMissing()
+        {
+            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
+            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
+            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
+
+            var elementDefinition = this.elementDefinitions.First();
+            elementDefinition.Parameter.Remove(elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "P_on"));
+
+            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsFalse(arrayAssembler.HeaderDictionary.ContainsKey("P_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_mean"));
+
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 11]);
+        }
+
+        [Test]
+        public void VerifyPMeanIsNotCalculatedIfPStandByIsMissing()
+        {
+            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
+            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
+            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
+
+            var elementDefinition = this.elementDefinitions.First();
+            elementDefinition.Parameter.Remove(elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "P_stby"));
+
+            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_on"));
+            Assert.IsFalse(arrayAssembler.HeaderDictionary.ContainsKey("P_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_mean"));
+
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 11]);
+        }
+
+        [Test]
+        public void VerifyPMeanIsNotCalculatedIfPDutyCycIsMissing()
+        {
+            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
+            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
+            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
+
+            var elementDefinition = this.elementDefinitions.First();
+            elementDefinition.Parameter.Remove(elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "P_duty_cyc"));
+
+            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_stby"));
+            Assert.IsFalse(arrayAssembler.HeaderDictionary.ContainsKey("P_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_mean"));
+
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 11]);
+        }
+
+        [Test]
+        public void VerifyPMeanIsNotCalculatedIfPMeanIsMissing()
+        {
+            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
+            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
+            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
+
+            var elementDefinition = this.elementDefinitions.First();
+            elementDefinition.Parameter.Remove(elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "P_mean"));
 
             var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
 
@@ -438,10 +533,9 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_on"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_stby"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_duty_cyc"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_mean"));
+            Assert.IsFalse(arrayAssembler.HeaderDictionary.ContainsKey("P_mean"));
 
-            Assert.AreEqual(@"Crossview_ED_1.P_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
         }
 
         [Test]
@@ -492,57 +586,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsNotNull(arrayAssembler.ContentArray[6, 12]);
 
             Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 12].ToString(), out _));
-        }
-
-        [Test]
-        public void VerifyThatAssemblerNotCalculatesPMeanIfPDutyCycleIsNotProperlySet()
-        {
-            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
-            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
-            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
-
-            Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
-
-            var pDutyCyc = this.elementDefinitions.FirstOrDefault()
-                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_duty_cyc");
-
-            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(pDutyCyc);
-
-            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
-
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_on"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_stby"));
-            Assert.IsFalse(arrayAssembler.HeaderDictionary.ContainsKey("P_duty_cyc"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_mean"));
-
-            Assert.AreEqual(@"Crossview_ED_1.P_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
-        }
-
-        [Test]
-        public void VerifyThatAssemblerNotCalculatesPMeanIfPMeanIsNotProperlySet()
-        {
-            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
-            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
-            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
-
-            Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
-
-            var pMean = this.elementDefinitions.FirstOrDefault()
-                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "P_mean");
-
-            (this.elementDefinitions.FirstOrDefault()?.Parameter)?.Remove(pMean);
-
-            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
-
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_on"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_stby"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("P_duty_cyc"));
-            Assert.IsFalse(arrayAssembler.HeaderDictionary.ContainsKey("P_mean"));
-
-            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
         }
 
         [Test]
