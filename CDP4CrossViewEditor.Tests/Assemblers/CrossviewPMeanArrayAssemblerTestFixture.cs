@@ -602,6 +602,37 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         }
 
         [Test]
+        public void VerifyPMeanIsNotCalculatedIfRedundancyIsNotCompound()
+        {
+            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
+            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
+            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
+
+            var elementDefinition = this.elementDefinitions.First();
+            
+            elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "redundancy")
+                .ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri) 
+                {
+                    Name = "redundancy",
+                    ShortName = "redundancy"
+                };
+
+            var arrayAssembler = new CrossviewArrayAssembler(
+                this.excelRows,
+                elementDefinition.Parameter.Select(p => p.ParameterType.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+
+            Assert.AreEqual(10, arrayAssembler.ContentArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 9]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 9]);
+        }
+
+        [Test]
         public void VerifyThatAssemblerCalculatesPMeanIfRedundancyTypeIsInternal()
         {
             var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
