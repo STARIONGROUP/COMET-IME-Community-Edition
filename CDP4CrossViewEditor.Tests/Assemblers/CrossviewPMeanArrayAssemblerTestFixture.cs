@@ -624,7 +624,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         [Test]
         public void VerifyThatAssemblerCalculatesPMeanIfRedundancyTypeIsExternal()
         {
-            this.elementDefinition.Parameter.RemoveAll(p => p.ParameterType.ShortName == "p_redundancy");
+            this.elementDefinition.Parameter.RemoveAll(p => p.ParameterType.ShortName == "redundancy");
             this.elementDefinition.Parameter.Add(this.pRedundancyActiveExternalParameter);
 
             var arrayAssembler = new CrossviewArrayAssembler(
@@ -637,12 +637,13 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
 
-            Assert.AreEqual(@"Crossview_ED_1.p_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
+            // indices have to account for parameter [re]ordering
+            Assert.AreEqual(@"Crossview_ED_1.p_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 7]);
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 8]);
 
-            Assert.IsNotNull(arrayAssembler.ContentArray[6, 12]);
+            Assert.IsNotNull(arrayAssembler.ContentArray[6, 8]);
 
-            Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 12].ToString(), out _));
+            Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 8].ToString(), out _));
         }
 
         [Test]
@@ -655,12 +656,17 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 this.excelRows,
                 this.elementDefinition.Parameter.Select(p => p.ParameterType.Iid));
 
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
-            Assert.AreEqual(@"Crossview_ED_1.p_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
 
-            Assert.AreEqual(0, arrayAssembler.ContentArray[6, 12]);
+            // indices have to account for parameter [re]ordering
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
+            Assert.AreEqual(@"Crossview_ED_1.p_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
+
+            Assert.AreEqual(0, arrayAssembler.ContentArray[6, 11]);
         }
 
         [Test]
@@ -673,12 +679,17 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
                 this.excelRows,
                 this.elementDefinition.Parameter.Select(p => p.ParameterType.Iid));
 
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
-            Assert.AreEqual(@"Crossview_ED_1.p_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 11]);
-            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
 
-            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 12]);
+            // indices have to account for parameter [re]ordering
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
+            Assert.AreEqual(@"Crossview_ED_1.p_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 12]);
+
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 11]);
         }
     }
 }
