@@ -539,6 +539,69 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         }
 
         [Test]
+        public void VerifyPMeanIsNotCalculatedIfPDutyCycleAndPMeanHaveDifferentOptionDependency()
+        {
+            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
+            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
+            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
+
+            Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
+
+            var pDutyCyc = this.elementDefinitions.FirstOrDefault()
+                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "p_duty_cyc");
+
+            if (pDutyCyc != null)
+            {
+                pDutyCyc.IsOptionDependent = true;
+
+                var option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+                {
+                    Name = "Option 1",
+                    ShortName = "OPT_1",
+                };
+
+                foreach (var parameterValueSet in pDutyCyc.ValueSet)
+                {
+                    parameterValueSet.ActualOption = option1;
+                }
+            }
+
+            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+        }
+
+        [Test]
+        public void VerifyPMeanIsNotCalculatedIfPDutyCycleAndPeanHaveDifferentStateDependency()
+        {
+            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
+            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
+            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
+
+            Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
+
+            var pMean = this.elementDefinitions.FirstOrDefault()
+                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "p_mean");
+
+            if (pMean != null)
+            {
+                pMean.StateDependence = null;
+            }
+
+            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+        }
+
+        [Test]
         public void VerifyThatAssemblerCalculatesPMeanIfRedundancyTypeIsInternal()
         {
             var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
@@ -586,69 +649,6 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsNotNull(arrayAssembler.ContentArray[6, 12]);
 
             Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 12].ToString(), out _));
-        }
-
-        [Test]
-        public void VerifyThatAssemblerNotCalculatesPMeanIfPDutyCycleAndPeanHaveDifferentStateDependency()
-        {
-            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
-            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
-            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
-
-            Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
-
-            var pMean = this.elementDefinitions.FirstOrDefault()
-                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "p_mean");
-
-            if (pMean != null)
-            {
-                pMean.StateDependence = null;
-            }
-
-            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
-
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
-        }
-
-        [Test]
-        public void VerifyThatAssemblerNotCalculatesPMeanIfPDutyCycleAndPMeanHaveDifferentOptionDependency()
-        {
-            var crossviewSheetRowAssembler = new CrossviewSheetRowAssembler();
-            crossviewSheetRowAssembler.Assemble(this.iteration, this.elementDefinitions.Select(x => x.Iid));
-            this.excelRows.AddRange(crossviewSheetRowAssembler.ExcelRows);
-
-            Assert.IsNotNull(this.elementDefinitions.FirstOrDefault());
-
-            var pDutyCyc = this.elementDefinitions.FirstOrDefault()
-                ?.Parameter.FirstOrDefault(p => p.ParameterType.ShortName == "p_duty_cyc");
-
-            if (pDutyCyc != null)
-            {
-                pDutyCyc.IsOptionDependent = true;
-
-                var option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
-                {
-                    Name = "Option 1",
-                    ShortName = "OPT_1",
-                };
-
-                foreach (var parameterValueSet in pDutyCyc.ValueSet)
-                {
-                    parameterValueSet.ActualOption = option1;
-                }
-            }
-
-            var arrayAssembler = new CrossviewArrayAssembler(this.excelRows, this.parameterTypes.Select(x => x.Iid));
-
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
-            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
         }
 
         [Test]
