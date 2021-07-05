@@ -603,6 +603,98 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         }
 
         [Test]
+        public void VerifyPMeanIsNotCalculatedIfRedundancySchemeIsMissing()
+        {
+            var redundancy = this.elementDefinition.Parameter
+                .Single(p => p.ParameterType.ShortName == "redundancy").ParameterType as CompoundParameterType;
+
+            redundancy.Component.Remove(redundancy.Component.Single(c => c.ShortName == "scheme"));
+
+            var arrayAssembler = new CrossviewArrayAssembler(
+                this.excelRows,
+                this.elementDefinition.Parameter.Select(p => p.ParameterType.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 11]);
+        }
+
+        [Test]
+        public void VerifyPMeanIsNotCalculatedIfRedundancyTypeIsMissing()
+        {
+            var redundancy = this.elementDefinition.Parameter
+                .Single(p => p.ParameterType.ShortName == "redundancy").ParameterType as CompoundParameterType;
+
+            redundancy.Component.Remove(redundancy.Component.Single(c => c.ShortName == "type"));
+
+            var arrayAssembler = new CrossviewArrayAssembler(
+                this.excelRows,
+                this.elementDefinition.Parameter.Select(p => p.ParameterType.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 11]);
+        }
+
+        [Test]
+        public void VerifyPMeanIsNotCalculatedIfRedundancyKIsMissing()
+        {
+            var redundancy = this.elementDefinition.Parameter
+                .Single(p => p.ParameterType.ShortName == "redundancy").ParameterType as CompoundParameterType;
+
+            redundancy.Component.Remove(redundancy.Component.Single(c => c.ShortName == "k"));
+
+            var arrayAssembler = new CrossviewArrayAssembler(
+                this.excelRows,
+                this.elementDefinition.Parameter.Select(p => p.ParameterType.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 11]);
+        }
+
+        [Test]
+        public void VerifyPMeanIsNotCalculatedIfRedundancyNIsMissing()
+        {
+            var redundancy = this.elementDefinition.Parameter
+                .Single(p => p.ParameterType.ShortName == "redundancy").ParameterType as CompoundParameterType;
+
+            redundancy.Component.Remove(redundancy.Component.Single(c => c.ShortName == "n"));
+
+            var arrayAssembler = new CrossviewArrayAssembler(
+                this.excelRows,
+                this.elementDefinition.Parameter.Select(p => p.ParameterType.Iid));
+
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("redundancy"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
+            Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+
+            Assert.AreEqual(12, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 11]);
+        }
+
+        [Test]
         public void VerifyThatAssemblerCalculatesPMeanIfRedundancyTypeIsInternal()
         {
             var arrayAssembler = new CrossviewArrayAssembler(
