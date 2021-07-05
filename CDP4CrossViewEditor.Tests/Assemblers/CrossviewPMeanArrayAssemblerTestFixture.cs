@@ -559,12 +559,16 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+
+            Assert.AreEqual(13, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 12]);
         }
 
         [Test]
         public void VerifyPMeanIsNotCalculatedIfPDutyCycleAndPeanHaveDifferentStateDependency()
         {
-            this.elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "p_mean").StateDependence = null;
+            this.elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "p_duty_cyc").StateDependence = null;
 
             var arrayAssembler = new CrossviewArrayAssembler(
                 this.excelRows,
@@ -575,6 +579,10 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_on"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+
+            Assert.AreEqual(13, arrayAssembler.NamesArray.GetLength(1));
+            Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
+            Assert.AreEqual("-", arrayAssembler.ContentArray[6, 12]);
         }
 
         [Test]
