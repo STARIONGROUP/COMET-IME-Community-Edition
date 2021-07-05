@@ -615,6 +615,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
 
+            Assert.AreEqual(13, arrayAssembler.ContentArray.GetLength(1));
             Assert.AreEqual(@"Crossview_ED_1.p_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 11]);
             Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 12]);
 
@@ -637,11 +638,11 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
 
+            Assert.AreEqual(13, arrayAssembler.ContentArray.GetLength(1));
+
             // indices have to account for parameter [re]ordering
             Assert.AreEqual(@"Crossview_ED_1.p_duty_cyc\PS_1", arrayAssembler.NamesArray[6, 7]);
             Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 8]);
-
-            Assert.IsNotNull(arrayAssembler.ContentArray[6, 8]);
 
             Assert.IsTrue(double.TryParse(arrayAssembler.ContentArray[6, 8].ToString(), out _));
         }
@@ -661,6 +662,8 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+
+            Assert.AreEqual(13, arrayAssembler.ContentArray.GetLength(1));
 
             // indices have to account for parameter [re]ordering
             Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
@@ -684,6 +687,8 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_stby"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_duty_cyc"));
             Assert.IsTrue(arrayAssembler.HeaderDictionary.ContainsKey("p_mean"));
+
+            Assert.AreEqual(13, arrayAssembler.ContentArray.GetLength(1));
 
             // indices have to account for parameter [re]ordering
             Assert.AreEqual(@"Crossview_ED_1.p_mean\PS_1", arrayAssembler.NamesArray[6, 11]);
