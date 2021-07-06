@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BinaryRelationshipCreatorViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,13 +29,17 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    
     using CDP4Dal;
     using CDP4Dal.Events;
+    
     using NLog;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -63,8 +86,9 @@ namespace CDP4EngineeringModel.ViewModels
         /// Initializes a new instance of the <see cref="BinaryRelationshipCreatorViewModel"/> class
         /// </summary>
         /// <param name="iteration">The current <see cref="Iteration"/></param>
-        public BinaryRelationshipCreatorViewModel(Iteration iteration)
+        public BinaryRelationshipCreatorViewModel(Iteration iteration, ISession session)
         {
+            this.Session = session;
             this.iteration = iteration;
             this.PossibleCategories = new ReactiveList<Category>();
             this.SourceViewModel = new RelatedThingViewModel();
@@ -94,8 +118,14 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveList<Category> PossibleCategories { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ISession"/>
+        /// </summary>
+        public ISession Session { get; }
+
+        /// <summary>
         /// Gets or sets the Name for the <see cref="BinaryRelationship"/> to create
         /// </summary>
+        [CDPVersion("1.2.0")]
         public string Name
         {
             get { return this.name; }

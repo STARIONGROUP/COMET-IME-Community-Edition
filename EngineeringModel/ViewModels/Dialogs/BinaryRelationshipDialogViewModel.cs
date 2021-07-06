@@ -29,6 +29,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -144,6 +145,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// The validation of the name has been disabled
         /// </remarks>
         [ValidationOverride]
+        [CDPVersion("1.2.0")]
         public override string Name
         {
             get => this.name;

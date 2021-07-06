@@ -24,9 +24,10 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/RibbonMenuItemTemplate.xaml"/>
-                    <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <cdp4Composition:CdpVersionToVisibilityConverter x:Key="CdpVersionToVisibilityConverter" />
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <HierarchicalDataTemplate DataType="{x:Type cdp4Composition:FolderRowViewModel}"
                                   ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
@@ -152,7 +153,8 @@
                 <viewModels:CategoryListConverter x:Key="CategoryListConverter"/>
                 <DataTemplate x:Key="BinaryTemplate">
                     <dxlc:LayoutGroup Orientation="Vertical">
-                        <dxlc:LayoutItem Label="Name:" LabelPosition="Left">
+                        <dxlc:LayoutItem Label="Name:" LabelPosition="Left" 
+                                         Visibility="{Binding Converter={StaticResource CdpVersionToVisibilityConverter}, ConverterParameter='Name'}">
                             <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             </TextBox>
                         </dxlc:LayoutItem>
@@ -203,7 +205,8 @@
                 </DataTemplate>
                 <DataTemplate x:Key="MultiTemplate">
                     <dxlc:LayoutGroup Orientation="Vertical">
-                        <dxlc:LayoutItem Label="Name:" LabelPosition="Left">
+                        <dxlc:LayoutItem Label="Name:" LabelPosition="Left"
+                                         Visibility="{Binding Converter={StaticResource CdpVersionToVisibilityConverter}, ConverterParameter='Name'}">
                             <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             </TextBox>
                         </dxlc:LayoutItem>

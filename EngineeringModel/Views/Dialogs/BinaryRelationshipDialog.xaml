@@ -9,6 +9,7 @@
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
              Height="317"
              d:DesignWidth="400"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -16,6 +17,7 @@
     <dx:DXWindow.Resources>
         <ResourceDictionary>
             <converters:ReactiveClassKindToObjectListConverter x:Key="ReactiveClassKindToObjectListConverter" />
+            <cdp4Composition:CdpVersionToVisibilityConverter x:Key="CdpVersionToVisibilityConverter" />
             <converters:NotConverter x:Key="NotConverter" />
         </ResourceDictionary>
     </dx:DXWindow.Resources>
@@ -27,7 +29,7 @@
                         View="Tabs"
                         lc:LayoutControl.AllowHorizontalSizing="True">
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
-                <items:NameLayoutItem/>
+                <items:NameLayoutItem Visibility="{Binding Converter={StaticResource CdpVersionToVisibilityConverter}, ConverterParameter='Name'}"/>
                 <lc:LayoutItem Label="Source ClassKind:">
                     <Grid>
                         <dxe:ComboBoxEdit Name="SourceClassKind"
