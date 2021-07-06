@@ -1,25 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="LogarithmicScaleRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    This is an auto-generated class. Any manual changes to this file will be overwritten!
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or (at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
 // </summary>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+    using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,36 +49,35 @@ namespace CDP4CommonView
     /// </summary>
     public partial class LogarithmicScaleRowViewModel : MeasurementScaleRowViewModel<LogarithmicScale>
     {
-
         /// <summary>
-        /// Backing field for <see cref="LogarithmBase"/>
-        /// </summary>
-        private LogarithmBaseKind logarithmBase;
-
-        /// <summary>
-        /// Backing field for <see cref="Factor"/>
-        /// </summary>
-        private string factor;
-
-        /// <summary>
-        /// Backing field for <see cref="Exponent"/>
+        /// Backing field for <see cref="Exponent"/> property
         /// </summary>
         private string exponent;
 
         /// <summary>
-        /// Backing field for <see cref="ReferenceQuantityKind"/>
+        /// Backing field for <see cref="Factor"/> property
+        /// </summary>
+        private string factor;
+
+        /// <summary>
+        /// Backing field for <see cref="LogarithmBase"/> property
+        /// </summary>
+        private LogarithmBaseKind logarithmBase;
+
+        /// <summary>
+        /// Backing field for <see cref="ReferenceQuantityKind"/> property
         /// </summary>
         private QuantityKind referenceQuantityKind;
 
         /// <summary>
-        /// Backing field for <see cref="ReferenceQuantityKindShortName"/>
-        /// </summary>
-        private string referenceQuantityKindShortName;
-
-        /// <summary>
-        /// Backing field for <see cref="ReferenceQuantityKindName"/>
+        /// Backing field for <see cref="ReferenceQuantityKindName"/> property
         /// </summary>
         private string referenceQuantityKindName;
+
+        /// <summary>
+        /// Backing field for <see cref="ReferenceQuantityKindShortName"/> property
+        /// </summary>
+        private string referenceQuantityKindShortName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LogarithmicScaleRowViewModel"/> class
@@ -69,14 +90,13 @@ namespace CDP4CommonView
             this.UpdateProperties();
         }
 
-
         /// <summary>
-        /// Gets or sets the LogarithmBase
+        /// Gets or sets the Exponent
         /// </summary>
-        public LogarithmBaseKind LogarithmBase
+        public string Exponent
         {
-            get { return this.logarithmBase; }
-            set { this.RaiseAndSetIfChanged(ref this.logarithmBase, value); }
+            get { return this.exponent; }
+            set { this.RaiseAndSetIfChanged(ref this.exponent, value); }
         }
 
         /// <summary>
@@ -89,12 +109,12 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or sets the Exponent
+        /// Gets or sets the LogarithmBase
         /// </summary>
-        public string Exponent
+        public LogarithmBaseKind LogarithmBase
         {
-            get { return this.exponent; }
-            set { this.RaiseAndSetIfChanged(ref this.exponent, value); }
+            get { return this.logarithmBase; }
+            set { this.RaiseAndSetIfChanged(ref this.logarithmBase, value); }
         }
 
         /// <summary>
@@ -107,15 +127,6 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or set the ShortName of <see cref="ReferenceQuantityKind"/>
-        /// </summary>
-        public string ReferenceQuantityKindShortName
-        {
-            get { return this.referenceQuantityKindShortName; }
-            set { this.RaiseAndSetIfChanged(ref this.referenceQuantityKindShortName, value); }
-        }
-
-        /// <summary>
         /// Gets or set the Name of <see cref="ReferenceQuantityKind"/>
         /// </summary>
         public string ReferenceQuantityKindName
@@ -124,7 +135,15 @@ namespace CDP4CommonView
             set { this.RaiseAndSetIfChanged(ref this.referenceQuantityKindName, value); }
         }
 
-	
+        /// <summary>
+        /// Gets or set the ShortName of <see cref="ReferenceQuantityKind"/>
+        /// </summary>
+        public string ReferenceQuantityKindShortName
+        {
+            get { return this.referenceQuantityKindShortName; }
+            set { this.RaiseAndSetIfChanged(ref this.referenceQuantityKindShortName, value); }
+        }
+
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -135,6 +154,7 @@ namespace CDP4CommonView
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+
             this.UpdateProperties();
         }
 
@@ -143,16 +163,20 @@ namespace CDP4CommonView
         /// </summary>
         private void UpdateProperties()
         {
-            this.ModifiedOn = this.Thing.ModifiedOn;
-            this.LogarithmBase = this.Thing.LogarithmBase;
-            this.Factor = this.Thing.Factor;
             this.Exponent = this.Thing.Exponent;
-			if (this.Thing.ReferenceQuantityKind != null)
-			{
-				this.ReferenceQuantityKindShortName = this.Thing.ReferenceQuantityKind.ShortName;
-				this.ReferenceQuantityKindName = this.Thing.ReferenceQuantityKind.Name;
-			}			
+            this.Factor = this.Thing.Factor;
+            this.LogarithmBase = this.Thing.LogarithmBase;
             this.ReferenceQuantityKind = this.Thing.ReferenceQuantityKind;
+            if (this.Thing.ReferenceQuantityKind != null)
+            {
+                this.ReferenceQuantityKindName = this.Thing.ReferenceQuantityKind.Name;
+                this.ReferenceQuantityKindShortName = this.Thing.ReferenceQuantityKind.ShortName;
+            }
+            else
+            {
+                this.ReferenceQuantityKindName = string.Empty;
+                this.ReferenceQuantityKindShortName = string.Empty;
+            }
         }
     }
 }

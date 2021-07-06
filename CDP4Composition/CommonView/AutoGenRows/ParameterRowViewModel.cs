@@ -1,25 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//
+//    This file is part of CDP4-IME Community Edition.
+//    This is an auto-generated class. Any manual changes to this file will be overwritten!
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or (at your option) any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+//    Lesser General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
 // </summary>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView
 {
     using System;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+    using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,31 +49,30 @@ namespace CDP4CommonView
     /// </summary>
     public partial class ParameterRowViewModel : ParameterOrOverrideBaseRowViewModel<Parameter>
     {
-
         /// <summary>
-        /// Backing field for <see cref="AllowDifferentOwnerOfOverride"/>
+        /// Backing field for <see cref="AllowDifferentOwnerOfOverride"/> property
         /// </summary>
         private bool allowDifferentOwnerOfOverride;
 
         /// <summary>
-        /// Backing field for <see cref="ExpectsOverride"/>
+        /// Backing field for <see cref="ExpectsOverride"/> property
         /// </summary>
         private bool expectsOverride;
 
         /// <summary>
-        /// Backing field for <see cref="RequestedBy"/>
+        /// Backing field for <see cref="RequestedBy"/> property
         /// </summary>
         private DomainOfExpertise requestedBy;
 
         /// <summary>
-        /// Backing field for <see cref="RequestedByShortName"/>
-        /// </summary>
-        private string requestedByShortName;
-
-        /// <summary>
-        /// Backing field for <see cref="RequestedByName"/>
+        /// Backing field for <see cref="RequestedByName"/> property
         /// </summary>
         private string requestedByName;
+
+        /// <summary>
+        /// Backing field for <see cref="RequestedByShortName"/> property
+        /// </summary>
+        private string requestedByShortName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterRowViewModel"/> class
@@ -63,7 +84,6 @@ namespace CDP4CommonView
         {
             this.UpdateProperties();
         }
-
 
         /// <summary>
         /// Gets or sets the AllowDifferentOwnerOfOverride
@@ -93,15 +113,6 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets or set the ShortName of <see cref="RequestedBy"/>
-        /// </summary>
-        public string RequestedByShortName
-        {
-            get { return this.requestedByShortName; }
-            set { this.RaiseAndSetIfChanged(ref this.requestedByShortName, value); }
-        }
-
-        /// <summary>
         /// Gets or set the Name of <see cref="RequestedBy"/>
         /// </summary>
         public string RequestedByName
@@ -110,7 +121,15 @@ namespace CDP4CommonView
             set { this.RaiseAndSetIfChanged(ref this.requestedByName, value); }
         }
 
-	
+        /// <summary>
+        /// Gets or set the ShortName of <see cref="RequestedBy"/>
+        /// </summary>
+        public string RequestedByShortName
+        {
+            get { return this.requestedByShortName; }
+            set { this.RaiseAndSetIfChanged(ref this.requestedByShortName, value); }
+        }
+
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -121,6 +140,7 @@ namespace CDP4CommonView
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
+
             this.UpdateProperties();
         }
 
@@ -129,15 +149,19 @@ namespace CDP4CommonView
         /// </summary>
         private void UpdateProperties()
         {
-            this.ModifiedOn = this.Thing.ModifiedOn;
             this.AllowDifferentOwnerOfOverride = this.Thing.AllowDifferentOwnerOfOverride;
             this.ExpectsOverride = this.Thing.ExpectsOverride;
-			if (this.Thing.RequestedBy != null)
-			{
-				this.RequestedByShortName = this.Thing.RequestedBy.ShortName;
-				this.RequestedByName = this.Thing.RequestedBy.Name;
-			}			
             this.RequestedBy = this.Thing.RequestedBy;
+            if (this.Thing.RequestedBy != null)
+            {
+                this.RequestedByName = this.Thing.RequestedBy.Name;
+                this.RequestedByShortName = this.Thing.RequestedBy.ShortName;
+            }
+            else
+            {
+                this.RequestedByName = string.Empty;
+                this.RequestedByShortName = string.Empty;
+            }
         }
     }
 }
