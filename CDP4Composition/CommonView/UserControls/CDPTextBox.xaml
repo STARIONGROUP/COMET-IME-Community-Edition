@@ -17,10 +17,7 @@
             
             <ControlTemplate.Triggers>
                 <Trigger Property="UIElement.IsEnabled">
-                    <Setter Property="Panel.Background" TargetName="Bd">
-                        <Setter.Value>
-                            <DynamicResource ResourceKey="{x:Static SystemColors.ControlBrushKey}" />
-                        </Setter.Value>
+                    <Setter Property="Panel.Opacity" Value="0.5" >
                     </Setter>
                     <Setter Property="TextElement.Foreground">
                         <Setter.Value>

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition"
              mc:Ignorable="d"
              Label="Name:">
     <dxlc:LayoutItem.Resources>
@@ -12,10 +13,14 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="../Resources/ErrorTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <cdp4Composition:CdpVersionToEnabledConverter x:Key="CdpVersionToEnabledConverter" />
+            <cdp4Composition:CdpVersionToVersionTextConverter x:Key="CdpVersionToVersionTextConverter" />
         </ResourceDictionary>
     </dxlc:LayoutItem.Resources>
     <dxe:TextEdit Name="Name" 
                 Text="{Binding Path=Name, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
+                NullText ="{Binding Converter={StaticResource CdpVersionToVersionTextConverter}, ConverterParameter='Name'}"
+                IsEnabled="{Binding Converter={StaticResource CdpVersionToEnabledConverter}, ConverterParameter='Name'}"
                 IsReadOnly="{Binding IsReadOnly}"
-                  ShowError="True"/>
+                ShowError="True"/>
 </dxlc:LayoutItem>

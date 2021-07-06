@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CdpVersionToVisibilityConverterTestFixture.cs" company="RHEA System S.A.">
+// <copyright file="CdpVersionToVerionTextConverterTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Alexander van Delft, Nathanael Smiechowski
@@ -26,10 +26,7 @@
 namespace CDP4Composition.Tests.Converters
 {
     using System;
-    using System.Windows;
     using System.Windows.Data;
-
-    using CDP4Common;
 
     using CDP4Dal;
 
@@ -38,12 +35,12 @@ namespace CDP4Composition.Tests.Converters
     using NUnit.Framework;
 
     /// <summary>
-    /// Suite of tests for the <see cref="CdpVersionToVisibilityConverter"/> class.
+    /// Suite of tests for the <see cref="CdpVersionToEnabledConverter"/> class.
     /// </summary>
     [TestFixture]
-    public class CdpVersionToVisibilityConverterTestFixture
+    public class CdpVersionToVersionTextConverterTestFixture
     {
-        private CdpVersionToVisibilityConverter cdpVersionToVisibilityConverter;
+        private CdpVersionToVersionTextConverter cdpVersionToVersionTextConverter;
 
         private Mock<ISession> sessionOneOneZero;
 
@@ -58,61 +55,72 @@ namespace CDP4Composition.Tests.Converters
             this.sessionOneTwoZero = new Mock<ISession>();
             this.sessionOneTwoZero.Setup(s => s.DalVersion).Returns(new Version("1.2.0"));
 
-            this.cdpVersionToVisibilityConverter = new CdpVersionToVisibilityConverter();
+            this.cdpVersionToVersionTextConverter = new CdpVersionToVersionTextConverter();
         }
 
         [Test]
-        public void VerifyThatVisibleIsReturnedForVersionProperties()
+        public void VerifyThatVersionTextIsReturnedForVersionProperties()
         {
             var testViewModel = new TestViewModel(this.sessionOneOneZero.Object);
 
-            var result = this.cdpVersionToVisibilityConverter.Convert(testViewModel, null, "Versioned", null);
+            var result = this.cdpVersionToVersionTextConverter.Convert(testViewModel, null, "Versioned", null);
 
-            var visibility = (Visibility) result;
+            var visibility = (string) result;
 
-            Assert.AreEqual(Visibility.Visible, visibility);
+            Assert.AreEqual("", visibility);
 
             testViewModel = new TestViewModel(this.sessionOneTwoZero.Object);
 
-            result = this.cdpVersionToVisibilityConverter.Convert(testViewModel, null, "Versioned", null);
+            result = this.cdpVersionToVersionTextConverter.Convert(testViewModel, null, "Versioned", null);
 
-            visibility = (Visibility) result;
+            visibility = (string) result;
 
-            Assert.AreEqual(Visibility.Visible, visibility);
+            Assert.AreEqual("", visibility);
         }
 
         [Test]
-        public void VerifyThatVisibleIsReturnedForNonVersionProperties()
+        public void VerifyThatVersionTextIsReturnedForHigherVersionProperties()
         {
             var testViewModel = new TestViewModel(this.sessionOneOneZero.Object);
 
-            var result = this.cdpVersionToVisibilityConverter.Convert(testViewModel, null, "HigherVersioned", null);
+            var result = this.cdpVersionToVersionTextConverter.Convert(testViewModel, null, "HigherVersioned", null);
 
-            var visibility = (Visibility) result;
+            var visibility = (string) result;
 
-            Assert.AreEqual(Visibility.Collapsed, visibility);
+            Assert.AreEqual($"Property needs at least COMET model version 1.2.0", visibility);
 
             testViewModel = new TestViewModel(this.sessionOneTwoZero.Object);
 
-            result = this.cdpVersionToVisibilityConverter.Convert(testViewModel, null, "HigherVersioned", null);
+            result = this.cdpVersionToVersionTextConverter.Convert(testViewModel, null, "HigherVersioned", null);
 
-            visibility = (Visibility) result;
+            visibility = (string) result;
 
-            Assert.AreEqual(Visibility.Visible, visibility);
+            Assert.AreEqual("", visibility);
+        }
+
+        [Test]
+        public void VerifyThatVersionTextIsReturnedForNonVersionProperties()
+        {
+            var testViewModel = new TestViewModel(this.sessionOneOneZero.Object);
+
+            var result = this.cdpVersionToVersionTextConverter.Convert(testViewModel, null, "NonVersioned", null);
+            var visibility = (string) result;
+
+            Assert.AreEqual("", visibility);
         }
 
         [Test]
         public void VerifyThatIfNotIISessioniIsPassedDoNothingIsReturned()
         {
-            var result = this.cdpVersionToVisibilityConverter.Convert(new object(), null, "NonVersioned", null);
+            var result = this.cdpVersionToVersionTextConverter.Convert(new object(), null, "NonVersioned", null);
             Assert.AreEqual(Binding.DoNothing, result);
         }
 
         [Test]
-        public void VerfiyThatVisibleIsReturnedForUknownProperty()
+        public void VerfiyThatDoNothingIsReturnedForUnknownProperty()
         {
             var testViewModel = new TestViewModel(this.sessionOneOneZero.Object);
-            var result = this.cdpVersionToVisibilityConverter.Convert(testViewModel, null, "unkownproperty", null);
+            var result = this.cdpVersionToVersionTextConverter.Convert(testViewModel, null, "unkownproperty", null);
             Assert.AreEqual(Binding.DoNothing, result);
         }
 
@@ -121,42 +129,14 @@ namespace CDP4Composition.Tests.Converters
         {
             var testViewModel = new TestViewModel(this.sessionOneOneZero.Object);
 
-            var result = this.cdpVersionToVisibilityConverter.Convert(testViewModel, null, new object(), null);
+            var result = this.cdpVersionToVersionTextConverter.Convert(testViewModel, null, new object(), null);
             Assert.AreEqual(Binding.DoNothing, result);
         }
 
         [Test]
         public void VerifyThatConvertBackThrowsException()
         {
-            Assert.Throws<NotSupportedException>(() => this.cdpVersionToVisibilityConverter.ConvertBack(null, null, null, null));
+            Assert.Throws<NotSupportedException>(() => this.cdpVersionToVersionTextConverter.ConvertBack(null, null, null, null));
         }
-    }
-
-    /// <summary>
-    /// Test view-model
-    /// </summary>
-    internal class TestViewModel : IISession
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TestViewModel"/> class
-        /// </summary>
-        /// <param name="session"></param>
-        public TestViewModel(ISession session)
-        {
-            this.Session = session;
-        }
-
-        /// <summary>
-        /// Gets the <see cref="ISession"/>
-        /// </summary>
-        public ISession Session { get; private set; }
-
-        [CDPVersion("1.1.0")]
-        public string Versioned { get; set; }
-
-        [CDPVersion("1.2.0")]
-        public string HigherVersioned { get; set; }
-
-        public string NonVersioned { get; set; }
     }
 }
