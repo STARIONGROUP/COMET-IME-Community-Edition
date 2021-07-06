@@ -16,6 +16,7 @@
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:views1="clr-namespace:CDP4EngineeringModel.Views"
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
+             xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -27,7 +28,6 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <cdp4Composition:CdpVersionToVisibilityConverter x:Key="CdpVersionToVisibilityConverter" />
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <HierarchicalDataTemplate DataType="{x:Type cdp4Composition:FolderRowViewModel}"
                                   ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
@@ -153,11 +153,7 @@
                 <viewModels:CategoryListConverter x:Key="CategoryListConverter"/>
                 <DataTemplate x:Key="BinaryTemplate">
                     <dxlc:LayoutGroup Orientation="Vertical">
-                        <dxlc:LayoutItem Label="Name:" LabelPosition="Left" 
-                                         Visibility="{Binding Converter={StaticResource CdpVersionToVisibilityConverter}, ConverterParameter='Name'}">
-                            <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            </TextBox>
-                        </dxlc:LayoutItem>
+                        <items:NameLayoutItem />
                         <dxlc:LayoutGroup Orientation="Horizontal">
                             <TextBox DataContext="{Binding SourceViewModel}"
                                      Text="{Binding RelatedThingDenomination, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
@@ -205,11 +201,7 @@
                 </DataTemplate>
                 <DataTemplate x:Key="MultiTemplate">
                     <dxlc:LayoutGroup Orientation="Vertical">
-                        <dxlc:LayoutItem Label="Name:" LabelPosition="Left"
-                                         Visibility="{Binding Converter={StaticResource CdpVersionToVisibilityConverter}, ConverterParameter='Name'}">
-                            <TextBox Text="{Binding Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            </TextBox>
-                        </dxlc:LayoutItem>
+                        <items:NameLayoutItem />
                         <dxlc:LayoutItem Label="Related Things:" LabelPosition="Top">
                             <dxg:GridControl ItemsSource="{Binding RelatedThings, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
                                 <dxg:GridControl.View>

@@ -17,7 +17,6 @@
     <dx:DXWindow.Resources>
         <ResourceDictionary>
             <converters:ReactiveClassKindToObjectListConverter x:Key="ReactiveClassKindToObjectListConverter" />
-            <cdp4Composition:CdpVersionToVisibilityConverter x:Key="CdpVersionToVisibilityConverter" />
             <converters:NotConverter x:Key="NotConverter" />
         </ResourceDictionary>
     </dx:DXWindow.Resources>
@@ -29,7 +28,7 @@
                         View="Tabs"
                         lc:LayoutControl.AllowHorizontalSizing="True">
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
-                <items:NameLayoutItem Visibility="{Binding Converter={StaticResource CdpVersionToVisibilityConverter}, ConverterParameter='Name'}"/>
+                <items:NameLayoutItem />
                 <lc:LayoutItem Label="Source ClassKind:">
                     <Grid>
                         <dxe:ComboBoxEdit Name="SourceClassKind"
