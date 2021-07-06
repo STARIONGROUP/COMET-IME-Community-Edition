@@ -68,7 +68,9 @@ namespace CDP4CrossViewEditor.Tests
             var module = new CrossViewEditorModule(
                 this.fluentRibbonManager.Object,
                 this.panelNavigationService.Object,
-                this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.officeApplicationWrapper.Object);
+                this.thingDialogNavigationService.Object,
+                this.dialogNavigationService.Object,
+                this.officeApplicationWrapper.Object);
 
             module.Initialize();
 

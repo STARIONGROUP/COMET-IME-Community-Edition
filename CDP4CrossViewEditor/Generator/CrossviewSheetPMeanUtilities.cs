@@ -77,11 +77,6 @@ namespace CDP4CrossViewEditor.Generator
         private const string PStandBy = "p_stby";
 
         /// <summary>
-        /// Power peak parameter type short name
-        /// </summary>
-        private const string PPeak = "p_peak";
-
-        /// <summary>
         /// Power duty cycle parameter type short name
         /// </summary>
         private const string PDutyCycle = "p_duty_cyc";
@@ -94,17 +89,22 @@ namespace CDP4CrossViewEditor.Generator
         /// <summary>
         /// Hardcoded power related parameter type short names list
         /// </summary>
-        public static readonly string[] PowerParameters = { Redundancy, POn, PStandBy, PPeak, PDutyCycle, PMean };
+        public static readonly string[] PowerParameters =
+        {
+            Redundancy,
+            POn,
+            PStandBy,
+            PDutyCycle,
+            PMean
+        };
 
         /// <summary>
         /// Hardcoded redundancy.scheme
-        /// NOTE: not sure about this value
         /// </summary>
         private const string RedundancySchemeHot = "active";
 
         /// <summary>
         /// Hardcoded redundancy.scheme
-        /// NOTE: not sure about this value
         /// </summary>
         private const string RedundancySchemeCold = "passive";
 
@@ -268,7 +268,11 @@ namespace CDP4CrossViewEditor.Generator
 
                     contentRow[index] = value;
 
-                    crossviewArrayAssembler.SpecialHighlighting[namesRow[index] as string] = Color.Green;
+                    // highlight only interactible cells
+                    if (namesRow[index] != null)
+                    {
+                        crossviewArrayAssembler.SpecialHighlighting[namesRow[index] as string] = Color.Green;
+                    }
                 }
             }
         }
@@ -335,17 +339,17 @@ namespace CDP4CrossViewEditor.Generator
                     return pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue;
 
                 case RedundancyTypeExternal:
-                    switch (redundancyScheme.ToLowerInvariant())
+                    if (redundancyScheme.ToLowerInvariant().StartsWith(RedundancySchemeCold))
                     {
-                        case RedundancySchemeCold:
-                            return (pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue) * pRedundancyKValue / pRedundancyNValue;
-
-                        case RedundancySchemeHot:
-                            return pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue;
-
-                        default:
-                            return null;
+                        return (pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue) * pRedundancyKValue / pRedundancyNValue;
                     }
+
+                    if (redundancyScheme.ToLowerInvariant().StartsWith(RedundancySchemeHot))
+                    {
+                        return pDutyCycleValue * pOnValue + (1 - pDutyCycleValue) * pStandByValue;
+                    }
+
+                    return null;
 
                 default:
                     return null;
