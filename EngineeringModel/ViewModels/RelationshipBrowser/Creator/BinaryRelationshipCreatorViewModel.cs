@@ -86,6 +86,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Initializes a new instance of the <see cref="BinaryRelationshipCreatorViewModel"/> class
         /// </summary>
         /// <param name="iteration">The current <see cref="Iteration"/></param>
+        /// <param name="session">The <see cref="ISession"/> that was used to retrieve data from the datastore</param>
         public BinaryRelationshipCreatorViewModel(Iteration iteration, ISession session)
         {
             this.Session = session;
