@@ -13,7 +13,7 @@
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
-             xmlns:CDP4CommonView="clr-namespace:CDP4CommonView;assembly=CDP4Composition"
+             xmlns:cdp4CommonView="clr-namespace:CDP4CommonView;assembly=CDP4Composition"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -67,7 +67,7 @@
             </dx:MeasurePixelSnapper>
         </HierarchicalDataTemplate>
 
-        <HierarchicalDataTemplate DataType="{x:Type CDP4CommonView:RuleViolationRowViewModel}">
+        <HierarchicalDataTemplate DataType="{x:Type cdp4CommonView:RuleViolationRowViewModel}">
             <dx:MeasurePixelSnapper>
                 <StackPanel Orientation="Horizontal">
                     <dx:PixelSnapper>
@@ -80,7 +80,7 @@
                         </Image>
                     </dx:PixelSnapper>
                     <ContentPresenter x:Name="defaultRowPresenter"
-                                      Content="{Binding Description, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                      Content="{Binding}"
                                       ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
                 </StackPanel>
             </dx:MeasurePixelSnapper>

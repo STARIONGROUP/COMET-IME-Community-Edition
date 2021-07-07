@@ -44,17 +44,24 @@ namespace CDP4CommonView
             this.UpdateProperties();
         }
 
-
         /// <summary>
         /// Gets or sets the Description
         /// </summary>
         public string Description
         {
             get { return this.description; }
-            set { this.RaiseAndSetIfChanged(ref this.description, value); }
+            set 
+            { 
+                this.RaiseAndSetIfChanged(ref this.description, value);
+                this.RaisePropertyChanged(nameof(Name));
+            }
         }
 
-	
+        /// <summary>
+        /// Name property of the row
+        /// </summary>
+        public string Name => this.description;
+
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model

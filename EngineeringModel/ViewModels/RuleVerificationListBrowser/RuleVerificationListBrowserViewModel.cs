@@ -306,17 +306,18 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Execute the Rule Verification List", "", this.VerifyRuleVerificationList, MenuItemKind.None, ClassKind.NotThing));
             }
         }
-        
+
         /// <summary>
         /// Executes the <see cref="VerifyRuleVerificationList"/> <see cref="ReactiveCommand"/>
         /// </summary>
-        private void ExecuteVerifyRuleVerificationList()
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        private async Task ExecuteVerifyRuleVerificationList()
         {
             var ruleVerificationList = this.SelectedThing as RuleVerificationListRowViewModel;
             if (ruleVerificationList != null)
             {
                 var ruleVerificationService = ServiceLocator.Current.GetInstance<IRuleVerificationService>();
-                ruleVerificationService.Execute(this.Session, ruleVerificationList.Thing);
+                await ruleVerificationService.Execute(this.Session, ruleVerificationList.Thing);
             }            
         }
 

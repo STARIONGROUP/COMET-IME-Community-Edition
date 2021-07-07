@@ -9,6 +9,8 @@ namespace CDP4Composition.Services
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -18,6 +20,7 @@ namespace CDP4Composition.Services
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using NLog;
+    using ReactiveUI;
 
     /// <summary>
     /// The <see cref="RuleVerificationService"/> is used to register rule verification engines that are responsible 
@@ -113,7 +116,8 @@ namespace CDP4Composition.Services
         /// <param name="verificationList">
         /// The <see cref="RuleVerificationList"/> that needs to be verified.
         /// </param>
-        public void Execute(ISession session, RuleVerificationList verificationList)
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        public async Task Execute(ISession session, RuleVerificationList verificationList)
         {
             if (session == null)
             {
@@ -136,7 +140,7 @@ namespace CDP4Composition.Services
                 var userRuleVerification = ruleVerification as UserRuleVerification;
                 if (userRuleVerification != null && userRuleVerification.IsActive)
                 {
-                    this.Execute(session, userRuleVerification, verificationList);
+                    await this.Execute(session, userRuleVerification, verificationList);
                 }
             }
         }
@@ -203,7 +207,8 @@ namespace CDP4Composition.Services
         /// <param name="container">
         /// The container <see cref="RuleVerificationList"/> of the <paramref name="userRuleVerification"/>
         /// </param>
-        private void Execute(ISession session, UserRuleVerification userRuleVerification, RuleVerificationList container)
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        private async Task Execute(ISession session, UserRuleVerification userRuleVerification, RuleVerificationList container)
         {
             var iteration = (Iteration)container.Container;
 
@@ -246,19 +251,35 @@ namespace CDP4Composition.Services
                     break;
             }
 
-            this.UpdateExecutedOn(session, userRuleVerification);
-
             if (violations != null)
             {
-                userRuleVerification.Violation.AddRange(violations);
+                userRuleVerification.Status = RuleVerificationStatusKind.FAILED;
 
-                CDPMessageBus.Current.SendObjectChangeEvent(userRuleVerification, EventKind.Updated);
+                IDisposable subscription = null;
 
-                foreach (var ruleViolation in violations)
-                {
-                    CDPMessageBus.Current.SendObjectChangeEvent(ruleViolation, EventKind.Added);
-                }
+                //Listen for changes to the verification rule that will happen after UpdateExecutedOn in order to get the updated version.
+                //The violations must be added lastly as they are not persistent 
+                subscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(userRuleVerification)
+                                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)                                    
+                                    .ObserveOn(RxApp.MainThreadScheduler)
+                                    .Subscribe( updated =>
+                                    {
+                                        //Only interested in a single update
+                                        subscription.Dispose();
+
+                                        var verification = updated.ChangedThing as UserRuleVerification;
+                                        verification.Violation.AddRange(violations);
+
+                                        CDPMessageBus.Current.SendObjectChangeEvent(verification, EventKind.Updated);
+
+                                        foreach (var ruleViolation in violations)
+                                        {
+                                            CDPMessageBus.Current.SendObjectChangeEvent(ruleViolation, EventKind.Added);
+                                        }
+                                    });
             }
+
+            await this.UpdateExecutedOn(session, userRuleVerification);
         }
 
         /// <summary>
@@ -270,7 +291,8 @@ namespace CDP4Composition.Services
         /// <param name="ruleVerification">
         /// The <see cref="RuleVerification"/> that is to be updated.
         /// </param>
-        private async void UpdateExecutedOn(ISession session, RuleVerification ruleVerification)
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        private async Task UpdateExecutedOn(ISession session, RuleVerification ruleVerification)
         {
             try
             {
