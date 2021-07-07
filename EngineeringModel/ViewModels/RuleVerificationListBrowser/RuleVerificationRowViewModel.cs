@@ -13,6 +13,9 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using ReactiveUI;
+    using System.Reactive.Linq;
+    using System;
 
     /// <summary>
     /// A row representing a <see cref="RuleVerification"/>
@@ -35,6 +38,19 @@ namespace CDP4EngineeringModel.ViewModels
             : base(ruleVerification, session, containerViewModel)
         {
             this.UpdateProperties();
+        }
+
+        protected override void InitializeSubscriptions()
+        {
+            base.InitializeSubscriptions();
+
+            //A subscription is made here in addition to the one made in the base class in order to be notified of non-persistent changes which will not result in an updated revision number
+            var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber == RevisionNumber)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.ObjectChangeEventHandler);
+
+            this.Disposables.Add(thingSubscription);
         }
 
         /// <summary>

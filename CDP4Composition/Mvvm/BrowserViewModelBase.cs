@@ -56,6 +56,7 @@ namespace CDP4Composition.Mvvm
     using NLog;
     
     using ReactiveUI;
+    using CDP4CommonView;
 
     /// <summary>
     /// The View-Model-base that shall be used by a view-model representing a Browser
@@ -851,12 +852,12 @@ namespace CDP4Composition.Mvvm
         public virtual void PopulateContextMenu()
         {
             this.ContextMenu.Clear();
-            if (this.SelectedThing == null)
+            if (this.SelectedThing is null or RuleViolationRowViewModel)
             {
                 return;
             }
 
-            if (!(this.SelectedThing is FolderRowViewModel))
+            if (this.SelectedThing is not FolderRowViewModel)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Edit", "CTRL+E", this.UpdateCommand, MenuItemKind.Edit));
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Inspect", "CTRL+I", this.InspectCommand, MenuItemKind.Inspect));
@@ -888,7 +889,7 @@ namespace CDP4Composition.Mvvm
                 }
             }
 
-            if (this.SelectedThing != null && this.SelectedThing.ContainedRows.Count > 0)
+            if (this.SelectedThing.ContainedRows.Count > 0)
             {
                 this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
                     new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :

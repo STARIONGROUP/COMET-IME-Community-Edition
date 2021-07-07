@@ -10,7 +10,9 @@ namespace CDP4Composition.Tests.RuleVerification
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive.Concurrency;    
+    using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -18,6 +20,7 @@ namespace CDP4Composition.Tests.RuleVerification
     using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;
@@ -126,8 +129,8 @@ namespace CDP4Composition.Tests.RuleVerification
         {
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri);
             var service = new RuleVerificationService(this.builtInRules);
-            
-            Assert.Throws<ArgumentNullException>(() => service.Execute(null, ruleVerificationList));
+
+            Assert.ThrowsAsync<ArgumentNullException>(() => service.Execute(null, ruleVerificationList));
         }
 
         [Test]
@@ -135,7 +138,7 @@ namespace CDP4Composition.Tests.RuleVerification
         {
             var service = new RuleVerificationService(this.builtInRules);
             
-            Assert.Throws<ArgumentNullException>(() => service.Execute(this.session.Object, null));
+            Assert.ThrowsAsync<ArgumentNullException>(() => service.Execute(this.session.Object, null));
         }
 
         [Test]
@@ -167,7 +170,7 @@ namespace CDP4Composition.Tests.RuleVerification
         }
 
         [Test]
-        public void VerifyThatUserRuleVerificationCanBeExecutedAndMessageBusMessagesAreReceived()
+        public async Task VerifyThatUserRuleVerificationCanBeExecutedAndMessageBusMessagesAreReceived()
         {
             var messageReceivedCounter = 0;
 
@@ -183,15 +186,21 @@ namespace CDP4Composition.Tests.RuleVerification
                                                Rule = binaryRelationshipRule
                                            };
 
+            this.session.Setup(s => s.Write(It.IsAny<OperationContainer>()))
+                        .Callback(() =>
+                        {
+                            CDPMessageBus.Current.SendObjectChangeEvent(userRuleVerification, EventKind.Updated);
+                        });
+
             ruleVerificationList.RuleVerification.Add(userRuleVerification);
 
             var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(userRuleVerification)                
                 .Subscribe(
                 x => { messageReceivedCounter++; });
 
-            service.Execute(this.session.Object, ruleVerificationList);
+            await service.Execute(this.session.Object, ruleVerificationList);
 
-            Assert.AreEqual(2, messageReceivedCounter);
+            Assert.AreEqual(3, messageReceivedCounter);
         }
 
         [BuiltInRuleMetaDataExportAttribute("RHEA", "shortname", "verifies that the shortnames are correct")]

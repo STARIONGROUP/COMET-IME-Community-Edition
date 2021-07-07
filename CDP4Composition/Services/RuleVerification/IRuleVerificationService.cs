@@ -8,6 +8,7 @@ namespace CDP4Composition.Services
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal;
 
@@ -41,6 +42,7 @@ namespace CDP4Composition.Services
         /// <param name="verificationList">
         /// The <see cref="RuleVerificationList"/> that needs to be verified.
         /// </param>
-        void Execute(ISession session, RuleVerificationList verificationList);
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        Task Execute(ISession session, RuleVerificationList verificationList);
     }
 }
