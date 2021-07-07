@@ -12,6 +12,7 @@ namespace CDP4Composition.Tests.RuleVerification
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;

@@ -9,17 +9,13 @@
 
 namespace CDP4CommonView
 {
-    using System;
-    using System.Reactive.Linq;
     using CDP4Common.CommonData;
-    using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.ReportingData;
-    using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Permission;    
+
     using ReactiveUI;
 
     /// <summary>
@@ -27,6 +23,7 @@ namespace CDP4CommonView
     /// </summary>
     public partial class RuleViolationRowViewModel : RowViewModelBase<RuleViolation>
     {
+        private ObservableAsPropertyHelper<string> name;
 
         /// <summary>
         /// Backing field for <see cref="Description"/>
@@ -50,17 +47,13 @@ namespace CDP4CommonView
         public string Description
         {
             get { return this.description; }
-            set 
-            { 
-                this.RaiseAndSetIfChanged(ref this.description, value);
-                this.RaisePropertyChanged(nameof(Name));
-            }
+            set { this.RaiseAndSetIfChanged(ref this.description, value); }
         }
 
         /// <summary>
         /// Name property of the row
         /// </summary>
-        public string Name => this.description;
+        public string Name => this.name.Value;
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
@@ -82,6 +75,16 @@ namespace CDP4CommonView
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.Description = this.Thing.Description;
+        }
+
+        protected override void InitializeSubscriptions()
+        {
+            base.InitializeSubscriptions();
+
+            this.name = this.WhenAnyValue(x => x.Description)
+                            .ToProperty(this, x => x.Name);
+
+            this.Disposables.Add(this.name);
         }
     }
 }

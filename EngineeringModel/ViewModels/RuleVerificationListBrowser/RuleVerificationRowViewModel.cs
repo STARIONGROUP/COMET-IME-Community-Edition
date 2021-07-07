@@ -38,8 +38,13 @@ namespace CDP4EngineeringModel.ViewModels
             : base(ruleVerification, session, containerViewModel)
         {
             this.UpdateProperties();
+        }
 
-            //A subscription is made here in addition to the one made in the base class in order to be notified of non-persisntent changes which will not result in an updated revision number
+        protected override void InitializeSubscriptions()
+        {
+            base.InitializeSubscriptions();
+
+            //A subscription is made here in addition to the one made in the base class in order to be notified of non-persistent changes which will not result in an updated revision number
             var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber == RevisionNumber)
                 .ObserveOn(RxApp.MainThreadScheduler)
