@@ -224,6 +224,7 @@
                                           AutoWidth="False"
                                           EditorShowMode="MouseUpFocused"
                                           ExpandCollapseNodesOnNavigation="True"
+                                          ExpandStateFieldName="IsExpanded"
                                           FixedLineWidth="0"
                                           HorizontalScrollbarVisibility="Auto"
                                           NavigationStyle="Cell"

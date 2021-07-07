@@ -37,7 +37,9 @@ namespace CDP4Composition.Mvvm
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common;
-    
+
+    using CDP4CommonView;
+
     using CDP4Composition.Converters;
     using CDP4Composition.DragDrop;
     using CDP4Composition.FilterOperators;
@@ -56,7 +58,8 @@ namespace CDP4Composition.Mvvm
     using NLog;
     
     using ReactiveUI;
-    using CDP4CommonView;
+
+    using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
 
     /// <summary>
     /// The View-Model-base that shall be used by a view-model representing a Browser
