@@ -118,6 +118,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.session.Setup(x => x.OpenIterations).Returns(openIterations);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domainOfExpertise);
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iterationClone)).Returns(this.domainOfExpertise);
 
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
@@ -147,6 +148,29 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual(createdOn, domainFileStoreDialogViewModel.CreatedOn);
             Assert.AreEqual(this.domainOfExpertise, domainFileStoreDialogViewModel.SelectedOwner);
             Assert.AreSame(this.iterationClone, domainFileStoreDialogViewModel.Container);
+            Assert.IsTrue(domainFileStoreDialogViewModel.PossibleOwner.Any());
+        }
+
+        [Test]
+        public void VerifyThatContainerIsSetAsSelectedOwnerWhenThingContainerHasNotbeenSetYet()
+        {
+            var name = "name";
+            var createdOn = DateTime.UtcNow;
+
+            this.domainFileStore.Name = name;
+            this.domainFileStore.CreatedOn = createdOn;
+            this.domainFileStore.Owner = null;
+            this.domainFileStore.Container = null;
+
+            var domainFileStoreDialogViewModel = 
+                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+                    this.thingDialogNavigationService.Object, this.iterationClone);
+
+            Assert.AreEqual(name, domainFileStoreDialogViewModel.Name);
+            Assert.AreEqual(createdOn, domainFileStoreDialogViewModel.CreatedOn);
+            Assert.AreEqual(this.domainOfExpertise, domainFileStoreDialogViewModel.SelectedOwner);
+            Assert.AreSame(this.iterationClone, domainFileStoreDialogViewModel.Container);
+
             Assert.IsTrue(domainFileStoreDialogViewModel.PossibleOwner.Any());
         }
 

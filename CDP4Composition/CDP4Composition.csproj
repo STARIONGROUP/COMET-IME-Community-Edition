@@ -7,8 +7,8 @@
     <Product>CDP4Composition</Product>
     <Description>COMET Composition and Infrastructure library</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>8.1.0.2</AssemblyVersion>
-    <FileVersion>8.1.0.2</FileVersion>
+    <AssemblyVersion>8.1.0.3</AssemblyVersion>
+    <FileVersion>8.1.0.3</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>

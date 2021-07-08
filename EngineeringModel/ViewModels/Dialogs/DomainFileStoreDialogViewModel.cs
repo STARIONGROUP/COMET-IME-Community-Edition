@@ -119,7 +119,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreatedOn = this.Thing.CreatedOn.Equals(DateTime.MinValue) ? DateTime.UtcNow : this.Thing.CreatedOn;
 
-            this.SelectedOwner = this.SelectedOwner ?? this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Thing.Container);
+            this.SelectedOwner = this.SelectedOwner ?? this.Session.QuerySelectedDomainOfExpertise((Iteration)(this.Thing.Container ?? this.Container));
             this.Name = this.Name ?? this.SelectedOwner.Name;
         }
 
