@@ -64,11 +64,11 @@
                                      MaxHeight="250"
                                      Margin="10"
                                      DisplayMember="Name"
-                                     EditValue="{Binding ReferencedCategory,
+                                     EditValue="{Binding RelatedCategory,
                                                          Converter={StaticResource ReactiveCategoryToObjectListConverter},
                                                          UpdateSourceTrigger=PropertyChanged}"
                                      IsReadOnly="{Binding IsReadOnly}"
-                                     ItemsSource="{Binding PossibleReferencedCategory}"
+                                     ItemsSource="{Binding PossibleRelationshipCategory}"
                                      SelectionMode="Multiple">
                         <dxe:ListBoxEdit.StyleSettings>
                             <dxe:CheckedListBoxEditStyleSettings />
