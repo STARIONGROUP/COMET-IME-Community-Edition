@@ -155,14 +155,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="source">The source <see cref="IDiagramObjectViewModel"/></param>
         private void SetSource(object source)
         {
-            var diagramControl = (DiagramControl)this.behaviour.AssociatedObject;
-            var diagramObject = diagramControl.Items.OfType<Cdp4DiagramContentItem>().SingleOrDefault(x => ((IDiagramObjectViewModel)x.DataContext).Thing == source);
-            if (diagramObject == null)
-            {
-                throw new InvalidOperationException("The Source could not be found.");
-            }
-
-            this.BeginItem = diagramObject;
+            this.BeginItem = this.GetDiagramContentItemToConnectTo(source);
         }
 
         /// <summary>
@@ -171,16 +164,27 @@ namespace CDP4CommonView.Diagram
         /// <param name="target">The target <see cref="IDiagramObjectViewModel"/></param>
         private void SetTarget(object target)
         {
-            var diagramControl = (DiagramControl)this.behaviour.AssociatedObject;
-            var diagramObject = diagramControl.Items.OfType<Cdp4DiagramContentItem>().SingleOrDefault(x => ((IDiagramObjectViewModel)x.DataContext).Thing == target);
-            if (diagramObject == null)
-            {
-                throw new InvalidOperationException("The Target could not be found.");
-            }
-
-            this.EndItem = diagramObject;
+            this.EndItem = this.GetDiagramContentItemToConnectTo(target);
         }
 
+        /// <summary>
+        /// Get the the target <see cref="DiagramContentItem"/>
+        /// to be set either as <see cref="Cdp4DiagramConnector.BeginItem"/> or <see cref="Cdp4DiagramConnector.EndItem"/>
+        /// by <see cref="Cdp4DiagramConnector.SetSource"/> or <see cref="Cdp4DiagramConnector.SetTarget"/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        private DiagramContentItem GetDiagramContentItemToConnectTo(object source)
+        {
+            var diagramControl = (DiagramControl)this.behaviour.AssociatedObject;
+            var diagramObject = diagramControl.Items.OfType<DiagramContentItem>().SingleOrDefault(x => ((NamedThingDiagramContentItem)x.Content).DiagramThing == source);
+            if (diagramObject == null)
+            {
+                throw new InvalidOperationException("DiagramContentItem could not be found.");
+            }
+            return diagramObject;
+        }
+        
         /// <summary>
         /// Initializes the component
         /// </summary>

@@ -308,6 +308,7 @@
         <dxdo:DockLayoutManager x:Name="DockManager"
                                 Grid.Row="1"
                                 ClosingBehavior="ImmediatelyRemove"
+                                MDIMergeStyle="Always"
                                 FloatingMode="Desktop">
             <dxdo:LayoutGroup ItemHeight="0.7*" DestroyOnClosingChildren="False" Orientation="Horizontal">
                 <dxdo:TabbedGroup Name="LeftGroup"

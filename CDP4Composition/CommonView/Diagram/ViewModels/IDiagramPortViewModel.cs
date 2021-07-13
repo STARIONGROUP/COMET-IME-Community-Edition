@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IThingDiagramItem.cs" company="RHEA System S.A.">
+// <copyright file="IDiagramPortViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -24,19 +24,52 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-namespace CDP4Composition.Diagram
+namespace CDP4CommonView.Diagram.ViewModels
 {
-    using CDP4Common.CommonData;
+    using System;
+
+    using CDP4Common.DiagramData;
+
+    using CDP4Composition.Mvvm;
 
     /// <summary>
-    /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
+    /// Defines a DiagramPortViewModel that shall be bound to a <see cref="PortContainerDiagramContentItem"/>
     /// </summary>
-    public interface IThingDiagramItem
+    public interface IDiagramPortViewModel : IRowViewModelBase<DiagramObject>
     {
         /// <summary>
-        /// Gets or sets the <see cref="Thing"/>.
+        /// Event handler that fires when the port position has been recalculated
         /// </summary>
-        Thing Thing { get; set; }
+        event EventHandler WhenPositionIsUpdated;
+
+        /// <summary>
+        /// Gets or sets the position
+        /// </summary>
+        System.Windows.Point Position { get; set; }
+
+        /// <summary>
+        /// Gets or sets the side of the container where the PortShape is allowed to be drawn
+        /// </summary>
+        PortContainerShapeSide PortContainerShapeSide { get; set; }
+
+        /// <summary>
+        /// Gets or sets the height
+        /// </summary>
+        double Height { get; set; }
+
+        /// <summary>
+        /// Gets or sets the width
+        /// </summary>
+        double Width { get; set; }
+
+        /// <summary>
+        /// Gets or sets its Parent bound
+        /// </summary>
+        Bounds ContainerBounds { get; set; }
+
+        /// <summary>
+        /// public invoker of <see cref="WhenPositionIsUpdated"/> that is fired when its position is updated
+        /// </summary>
+        void WhenPositionIsUpdatedInvoke();
     }
 }
