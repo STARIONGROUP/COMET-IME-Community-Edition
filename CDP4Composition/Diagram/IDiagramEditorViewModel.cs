@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IThingDiagramItem.cs" company="RHEA System S.A.">
+// <copyright file="IDiagramEditorViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -24,19 +24,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4Composition.Diagram
 {
-    using CDP4Common.CommonData;
-
     /// <summary>
-    /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
+    /// The interface that describes the dirty mechanism of DiagramEditorViewModel
     /// </summary>
-    public interface IThingDiagramItem
+    public interface IDiagramEditorViewModel
     {
         /// <summary>
-        /// Gets or sets the <see cref="Thing"/>.
+        /// Defines the method that update <see cref="IsDirty"/> property
         /// </summary>
-        Thing Thing { get; set; }
+        void UpdateIsDirty();
+
+        /// <summary>
+        /// Defines the <see cref="IsDirty"/> property
+        /// </summary>
+        bool IsDirty { get; }
+
+        /// <summary>
+        /// Removes a diagram item and its connectors.
+        /// </summary>
+        /// <param name="contentItemContent">The item to remove.</param>
+        void RemoveDiagramThingItem(object contentItemContent);
     }
 }

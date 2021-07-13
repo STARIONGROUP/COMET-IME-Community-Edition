@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IThingDiagramItem.cs" company="RHEA System S.A.">
+// <copyright file="DiagramBrowser.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -24,19 +23,40 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-namespace CDP4Composition.Diagram
+namespace CDP4DiagramEditor.Views
 {
-    using CDP4Common.CommonData;
+    using CDP4Composition;
+    using CDP4Composition.Attributes;
+    using NLog;
 
     /// <summary>
-    /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
+    /// Interaction logic for DiagramBrowser
     /// </summary>
-    public interface IThingDiagramItem
+    [PanelViewExport(RegionNames.LeftPanel)]
+    public partial class DiagramBrowser : IPanelView
     {
         /// <summary>
-        /// Gets or sets the <see cref="Thing"/>.
+        /// Initializes a new instance of the <see cref="DiagramBrowser"/> class.
         /// </summary>
-        Thing Thing { get; set; }
+        public DiagramBrowser()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagramBrowser"/> class.
+        /// </summary>
+        /// <param name="initializeComponent">
+        /// a value indicating whether the contained Components shall be loaded
+        /// </param>
+        /// <remarks>
+        /// This constructor is called by the navigation service
+        /// </remarks>
+        public DiagramBrowser(bool initializeComponent)
+        {
+            if (initializeComponent)
+            {
+                this.InitializeComponent();
+            }
+        }
     }
 }

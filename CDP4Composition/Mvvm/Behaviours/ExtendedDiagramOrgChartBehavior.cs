@@ -175,7 +175,6 @@ namespace CDP4Composition.Mvvm.Behaviours
             this.AssociatedObject.PreviewDragLeave -= this.PreviewDragLeave;
             this.AssociatedObject.PreviewDrop -= this.PreviewDrop;
 
-
             base.OnDetaching();
         }
 

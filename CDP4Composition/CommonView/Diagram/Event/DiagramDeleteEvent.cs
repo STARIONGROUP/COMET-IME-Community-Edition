@@ -7,6 +7,8 @@
 namespace CDP4CommonView.Diagram
 {
     using CDP4Common.CommonData;
+
+    using CDP4Composition.Diagram;
     using CDP4Composition.Mvvm;
     using EventAggregator;
 
@@ -19,7 +21,7 @@ namespace CDP4CommonView.Diagram
         /// Initializes a new instance of the <see cref="DiagramDeleteEvent"/> class
         /// </summary>
         /// <param name="viewModelDeleted">The view-model instance to delete</param>
-        public DiagramDeleteEvent(IRowViewModelBase<Thing> viewModelDeleted)
+        public DiagramDeleteEvent(object viewModelDeleted)
         {
             this.ViewModel = viewModelDeleted;
         }
@@ -27,6 +29,6 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Gets the view-model that should be deleted
         /// </summary>
-        public IRowViewModelBase<Thing> ViewModel { get; private set; }
+        public object ViewModel { get; private set; }
     }
 }

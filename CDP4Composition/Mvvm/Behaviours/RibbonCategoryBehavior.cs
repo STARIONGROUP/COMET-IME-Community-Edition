@@ -4,7 +4,7 @@
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
-//    This file is part of CDP4-IME Community Edition.
+//    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -33,6 +33,7 @@ namespace CDP4Composition.Mvvm.Behaviours
 
     using DevExpress.Mvvm.UI;
     using DevExpress.Mvvm.UI.Interactivity;
+    using DevExpress.Xpf.Core.Native;
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;
 
@@ -40,7 +41,7 @@ namespace CDP4Composition.Mvvm.Behaviours
     using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
-    /// Allows proper callbacks on the report designer category ribbon page
+    /// Allows proper callbacks on the diagramming category ribbon page
     /// </summary>
     public class RibbonCategoryBehavior : Behavior<FrameworkElement>
     {
@@ -62,8 +63,8 @@ namespace CDP4Composition.Mvvm.Behaviours
 
             if (this.RegionManager.Regions != null)
             {
-                this.RibbonRegion = this.RegionManager.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);
-            }
+            this.RibbonRegion = this.RegionManager.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);
+        }
         }
 
         /// <summary>
@@ -122,6 +123,7 @@ namespace CDP4Composition.Mvvm.Behaviours
         private void AssociatedObject_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
             var category = this.RibbonRegion.Views.OfType<ExtendedRibbonPageCategory>().FirstOrDefault(view => view.Name == this.CategoryName);
+
             var hostPanel = LayoutTreeHelper.GetVisualParents(this.AssociatedObject).OfType<DocumentPanel>().FirstOrDefault();
 
             if (category == null)
@@ -143,8 +145,12 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// <summary>
         /// Sets the Category name property of the target <see cref="RibbonCategoryBehavior"/>.
         /// </summary>
-        /// <param name="target">The <see cref="RibbonCategoryBehavior"/> that has this behavior attached.</param>
-        /// <param name="value">The actual category name.</param>
+        /// <param name="target">
+        /// the <see cref="RibbonCategoryBehavior"/> that has this behavior attached.
+        /// </param>
+        /// <param name="value">
+        /// The actual category name.
+        /// </param>
         public static void SetCategoryName(RibbonCategoryBehavior target, string value)
         {
             target.SetValue(CategoryNameProperty, value);
@@ -153,8 +159,12 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// <summary>
         /// Event handler for a change on the <see cref="CategoryNameProperty"/>.
         /// </summary>
-        /// <param name="d">The source of the event.</param>
-        /// <param name="e">The event arguments.</param>
+        /// <param name="d">
+        /// The source of the event.
+        /// </param>
+        /// <param name="e">
+        /// The event arguments.
+        /// </param>
         private static void CategoryNameChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is RibbonCategoryBehavior ribbonCategoryBehavior)

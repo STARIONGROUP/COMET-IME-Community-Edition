@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IThingDiagramItem.cs" company="RHEA System S.A.">
+// <copyright file="ICdp4DiagramOrgChartBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -24,19 +24,42 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-namespace CDP4Composition.Diagram
+namespace CDP4CommonView.Diagram
 {
-    using CDP4Common.CommonData;
+    using System.Collections.Generic;
+    using System.Windows;
 
-    /// <summary>
-    /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
-    /// </summary>
-    public interface IThingDiagramItem
+    using DevExpress.Diagram.Core;
+    using DevExpress.Xpf.Diagram;
+
+    public interface ICdp4DiagramOrgChartBehavior
     {
         /// <summary>
-        /// Gets or sets the <see cref="Thing"/>.
+        /// Gets a dictionary of saved diagram item positions.
         /// </summary>
-        Thing Thing { get; set; }
+        Dictionary<object, Point> ItemPositions { get; }
+
+        /// <summary>
+        /// Converts control coordinates into document coordinates.
+        /// </summary>
+        /// <param name="dropPosition">The control <see cref="Point"/> where the drop occurs.</param>
+        /// <returns>The document drop position.</returns>
+        Point GetDiagramPositionFromMousePosition(Point dropPosition);
+
+        /// <summary>
+        /// Activates a new <see cref="ConnectorTool"/> in the Diagram control.
+        /// </summary>
+        void ActivateConnectorTool();
+
+        /// <summary>
+        /// Resets the active tool.
+        /// </summary>
+        void ResetTool();
+
+        /// <summary>
+        /// Applied the automatic layout to children of the item.
+        /// </summary>
+        /// <param name="item">The diagram item.</param>
+        void ApplyChildLayout(DiagramItem item);
     }
 }

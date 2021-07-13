@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IThingDiagramItem.cs" company="RHEA System S.A.">
+// <copyright file="DiagramPortShape.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -24,19 +24,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-namespace CDP4Composition.Diagram
+namespace CDP4CommonView.Diagram.Views
 {
-    using CDP4Common.CommonData;
+    using CDP4CommonView.Diagram;
+    using CDP4CommonView.Diagram.ViewModels;
 
     /// <summary>
-    /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
+    /// Interaction logic for DiagramPortShape.xaml
     /// </summary>
-    public interface IThingDiagramItem
+    public partial class DiagramPortShape
     {
         /// <summary>
-        /// Gets or sets the <see cref="Thing"/>.
+        /// Initializes a new instance of the <see cref="DiagramPortShape"/> class.
         /// </summary>
-        Thing Thing { get; set; }
+        public DiagramPortShape()
+        {
+            this.InitializeComponent();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagramPortShape"/> class.
+        /// </summary>
+        /// <param name="datacontext"/>
+        /// The <see cref="IDiagramPortViewModel"/> data-context
+        public DiagramPortShape(IDiagramPortViewModel datacontext)
+        {
+            this.DataContext = datacontext;
+            this.InitializeComponent();
+        }
     }
 }
