@@ -127,6 +127,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="PrefixedUnit"/>
         /// </summary>
         public ReactiveCommand<object> CreatePrefixedUnit { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.

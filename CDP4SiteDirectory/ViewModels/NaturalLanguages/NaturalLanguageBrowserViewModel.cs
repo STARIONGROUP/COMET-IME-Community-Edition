@@ -78,7 +78,9 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.canCreateLanguage; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateLanguage, value); }
         }
-        
+
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         /// <summary>
         /// Handles the <see cref="ObjectChangedEvent"/>
         /// </summary>

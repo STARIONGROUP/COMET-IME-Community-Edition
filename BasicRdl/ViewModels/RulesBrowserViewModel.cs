@@ -124,6 +124,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ReferencerRule"/>
         /// </summary>
         public ReactiveCommand<object> CreateReferencerRule { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.

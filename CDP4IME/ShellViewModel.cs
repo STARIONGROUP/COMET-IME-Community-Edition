@@ -48,6 +48,9 @@ namespace CDP4IME
     using ReactiveUI;
     
     using CDP4IME.ViewModels;
+    using DevExpress.Xpf.Docking;
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
 
     /// <summary>
     /// The View Model of the <see cref="Shell"/>
@@ -125,7 +128,7 @@ namespace CDP4IME
         /// <param name="dialogNavigationService">
         /// The <see cref="IDialogNavigationService"/> that is used to show modal dialogs to the user
         /// </param>
-        public ShellViewModel(IDialogNavigationService dialogNavigationService)
+        public ShellViewModel(IDialogNavigationService dialogNavigationService, DockLayoutViewModel dockViewModel)
         {
             if (dialogNavigationService == null)
             {
@@ -139,7 +142,7 @@ namespace CDP4IME
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.dialogNavigationService = dialogNavigationService;
-
+            this.DockViewModel = dockViewModel;
             this.Title = "COMET IME - Community Edition";
 
             this.logTarget = new MemoryEventTarget();
@@ -373,6 +376,8 @@ namespace CDP4IME
                 this.RaiseAndSetIfChanged(ref this.title, value);
             }
         }
+
+        public DockLayoutViewModel DockViewModel { get; }
 
         public void Dispose()
         {

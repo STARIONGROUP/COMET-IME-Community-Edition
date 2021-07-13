@@ -336,7 +336,9 @@ namespace CDP4LogInfo.ViewModels
         /// Gets the command to show the details of the selected Log item
         /// </summary>
         public ReactiveCommand<object> ShowDetailsDialogCommand { get; private set; }
-        
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         /// <summary>
         /// Initializes the <see cref="PossibleLoglevels"/> collection
         /// </summary>

@@ -98,6 +98,8 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="FileTypes"/> rows that are contained by this view-model
         /// </summary>
         public DisposableReactiveList<FileTypeRowViewModel> FileTypes { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.

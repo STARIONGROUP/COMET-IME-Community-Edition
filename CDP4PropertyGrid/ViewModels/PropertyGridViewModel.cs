@@ -127,6 +127,9 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         public string DataSource => this.Session.DataSourceUri;
 
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         /// <summary>
         /// Check if a new <see cref="PropertyGridViewModel"/> should be created.
         /// </summary>

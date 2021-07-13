@@ -116,6 +116,8 @@ namespace CDP4ObjectBrowser
         /// Gets the list of <see cref="IDisposable"/> objects that are referenced by this class
         /// </summary>
         protected List<IDisposable> Disposables { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Add the <see cref="Session"/> to the browser

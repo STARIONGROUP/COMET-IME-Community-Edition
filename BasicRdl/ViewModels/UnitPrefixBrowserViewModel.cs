@@ -94,7 +94,9 @@ namespace BasicRdl.ViewModels
             get { return this.canCreateRdlElement; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value); }
         }
-        
+
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         /// <summary>
         /// Initializes the Commands that can be executed from this view model. The commands are initialized
         /// before the <see cref="PopulateContextMenu"/> is invoked

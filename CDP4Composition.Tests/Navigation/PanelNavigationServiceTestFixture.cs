@@ -341,6 +341,8 @@ namespace CDP4Composition.Tests.ViewModels
         public IPanelNavigationService PanelNavigationService { get; private set; }
 
         public IDialogNavigationService DialogNavigationService { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void Dispose()
         {
@@ -376,6 +378,8 @@ namespace CDP4Composition.Tests.ViewModels
         public string ToolTip { get; private set; }
 
         public string DataSource { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void Dispose()
         {
@@ -412,6 +416,8 @@ namespace CDP4Composition.Tests.ViewModels
         public string ToolTip { get; private set; }
 
         public string DataSource { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void Dispose()
         {

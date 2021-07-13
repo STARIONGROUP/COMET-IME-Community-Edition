@@ -214,6 +214,11 @@ namespace CDP4EngineeringModel.ViewModels
         public DisposableReactiveList<RuleVerificationListRowViewModel> RuleVerificationListRowViewModels { get; private set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public string TargetName { get; set; } = "LeftGroup";
+
+        /// <summary>
         /// Initializes the browser
         /// </summary>
         protected override void Initialize()

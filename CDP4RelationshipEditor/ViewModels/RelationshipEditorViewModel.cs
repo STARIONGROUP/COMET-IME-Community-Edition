@@ -377,6 +377,11 @@ namespace CDP4RelationshipEditor.ViewModels
         public BinaryRelationshipRule PendingBinaryRelationshipRule { get; set; }
 
         /// <summary>
+        /// 
+        /// </summary>
+        public string TargetName { get; set; } = "DocumentContainer";
+
+        /// <summary>
         /// Creates a <see cref="BinaryRelationship"/>
         /// </summary>
         public void CreateBinaryRelationshipCommandExecute()

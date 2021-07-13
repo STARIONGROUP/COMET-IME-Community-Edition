@@ -132,6 +132,8 @@ namespace CDP4BuiltInRules.ViewModels
         /// Gets the list of <see cref="BuiltInRuleRowViewModel"/>.
         /// </summary>
         public List<BuiltInRuleRowViewModel> BuiltInRules { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Queries whether a drag can be started

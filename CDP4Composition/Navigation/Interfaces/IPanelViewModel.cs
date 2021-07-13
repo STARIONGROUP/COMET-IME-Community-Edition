@@ -7,11 +7,12 @@
 namespace CDP4Composition
 {
     using System;
+    using DevExpress.Xpf.Docking;
 
     /// <summary>
     /// Interface definition for view models that are intended to be docking panels
     /// </summary>
-    public interface IPanelViewModel : IDisposable
+    public interface IPanelViewModel : IDisposable, IMVVMDockingProperties
     {
         /// <summary>
         /// Gets the caption displayed by the docking panel
@@ -37,5 +38,10 @@ namespace CDP4Composition
         /// Gets a value indicating whether the <see cref="IPanelViewModel"/> is dirty
         /// </summary>
         bool IsDirty { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        bool IsSelected { get; set; } 
     }
 }

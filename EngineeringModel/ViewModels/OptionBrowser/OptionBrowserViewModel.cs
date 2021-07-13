@@ -159,6 +159,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the rows representing <see cref="Option"/>s
         /// </summary>
         public DisposableReactiveList<OptionRowViewModel> Options { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Initializes the browser

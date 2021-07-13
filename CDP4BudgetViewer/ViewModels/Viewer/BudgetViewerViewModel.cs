@@ -212,6 +212,8 @@ namespace CDP4Budget.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.computationError, value); }
         }
 
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         protected override void ExecuteOpenAnnotationWindow(ModellingAnnotationItem annotation)
         {
             throw new System.NotImplementedException();

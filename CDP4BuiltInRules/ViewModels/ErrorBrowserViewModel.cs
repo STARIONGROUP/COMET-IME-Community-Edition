@@ -89,7 +89,8 @@ namespace CDP4BuiltInRules.ViewModels
         /// Gets or sets the Copy Command
         /// </summary>
         public ReactiveCommand<object> CopyErrorCommand { get; protected set; }
-        
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         /// <summary>
         /// Populate the context menu
         /// </summary>

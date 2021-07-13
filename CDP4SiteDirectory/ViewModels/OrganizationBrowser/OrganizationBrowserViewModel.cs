@@ -71,6 +71,8 @@ namespace CDP4SiteDirectory.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.canCreateOrganization, value); }
         }
 
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         /// <summary>
         /// Update the Organization rows
         /// </summary>

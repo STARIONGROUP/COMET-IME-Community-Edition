@@ -244,6 +244,17 @@ namespace CDP4Composition.Mvvm
             set { var x = value; }
         }
 
+
+        private bool isSelected = false;
+        public bool IsSelected
+        {
+            get
+            {
+                return isSelected;
+            }
+            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+        }
+
         /// <summary>
         /// Gets a value indicating whether the "add" button is enabled
         /// </summary>

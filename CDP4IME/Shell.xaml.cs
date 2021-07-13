@@ -14,6 +14,7 @@ namespace CDP4IME
     using System.Windows.Input;
     using CDP4Composition.Events;
     using CDP4Dal;
+    using DevExpress.Xpf.Docking.Base;
     using DevExpress.Xpf.Ribbon;
     using Hardcodet.Wpf.TaskbarNotification;
     using ReactiveUI;
@@ -83,6 +84,24 @@ namespace CDP4IME
             }
 
             this.CdpTaskBarIcon.ShowBalloonTip(notificationEvent.Title, notificationEvent.Message, icon);
+        }
+
+        private void DockManager_DockItemClosing(object sender, ItemCancelEventArgs e)
+        {
+            var vm = this.DataContext as ShellViewModel;
+            vm.DockViewModel.ItemClosing(e);
+        }
+
+        private void DockManager_DockItemClosed(object sender, DockItemClosedEventArgs e)
+        {
+            var vm = this.DataContext as ShellViewModel;
+            vm.DockViewModel.ItemClosed(e);
+        }
+
+        private void DockManager_DockOperationStarting(object sender, DockOperationStartingEventArgs e)
+        {
+            var vm = this.DataContext as ShellViewModel;
+            vm.DockViewModel.DockOperationStarting(e);
         }
     }
 }

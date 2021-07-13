@@ -440,6 +440,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.showRelatedOnly, value); }
         }
 
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         /// <summary>
         /// Reloads the saved configurations.
         /// </summary>

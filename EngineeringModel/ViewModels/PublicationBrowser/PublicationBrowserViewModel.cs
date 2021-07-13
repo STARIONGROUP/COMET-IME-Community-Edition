@@ -163,6 +163,8 @@ namespace CDP4EngineeringModel.ViewModels
             }
         }
 
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
         /// <summary>
         /// Initializes the browser
         /// </summary>

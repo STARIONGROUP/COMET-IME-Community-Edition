@@ -41,7 +41,7 @@ namespace CDP4Composition.Navigation
 
     using CDP4Dal;
     using CDP4Dal.Composition;
-
+    using DevExpress.Xpf.Docking;
     using Microsoft.Practices.Prism.Regions;
 
     using NLog;
@@ -49,14 +49,11 @@ namespace CDP4Composition.Navigation
     /// <summary>
     /// The panel navigation service class that provides services to open a docking panel given a <see cref="Thing"/> or a <see cref="IPanelViewModel"/>
     /// </summary>
-    //[Export(typeof(IPanelNavigationService))]
-    //[PartCreationPolicy(CreationPolicy.Shared)]
-    public class PanelNavigationService : IPanelNavigationService
+    [Export(typeof(IPanelNavigationService))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class TestNavigationService : IPanelNavigationService
     {
-        /// <summary>
-        /// The <see cref="IRegionManager"/> of the application
-        /// </summary>
-        private readonly IRegionManager regionManager;
+        private readonly DockLayoutViewModel dockLayoutViewModel;
 
         /// <summary>
         /// The (injected) <see cref="IFilterStringService"/>
@@ -91,19 +88,16 @@ namespace CDP4Composition.Navigation
         /// <param name="filterStringService">The MEF injected <see cref="IFilterStringService"/></param>
         /// <param name="regionCollectionSearcher">The MEF injected <see cref="IRegionCollectionSearcher"/></param>
         [ImportingConstructor]
-        public PanelNavigationService(
-            [ImportMany] IEnumerable<Lazy<IPanelView, IRegionMetaData>> panelViewKinds,
-            [ImportMany] IEnumerable<IPanelViewModel> panelViewModelKinds,
-            IRegionManager regionManager,
+        public TestNavigationService(
             [ImportMany] IEnumerable<Lazy<IPanelViewModel, INameMetaData>> panelViewModelDecorated,
+            [Import] DockLayoutViewModel dockLayoutViewModel,
             IFilterStringService filterStringService,
             IRegionCollectionSearcher regionCollectionSearcher)
         {
             var sw = new Stopwatch();
             sw.Start();
             logger.Debug("Instantiating the PanelNavigationService");
-
-            this.regionManager = regionManager;
+            this.dockLayoutViewModel = dockLayoutViewModel;
             this.filterStringService = filterStringService;
             this.regionCollectionSearcher = regionCollectionSearcher;
             this.PanelViewKinds = new Dictionary<string, Lazy<IPanelView, IRegionMetaData>>();
@@ -113,22 +107,6 @@ namespace CDP4Composition.Navigation
 
             this.ViewModelViewPairs = new Dictionary<IPanelViewModel, IPanelView>();
             this.PanelViewModelDecorated = new Dictionary<string, Lazy<IPanelViewModel, INameMetaData>>();
-
-            foreach (var panelView in panelViewKinds)
-            {
-                var panelViewName = panelView.Value.ToString();
-
-                this.PanelViewKinds.Add(panelViewName, panelView);
-                logger.Trace("Add panelView {0} ", panelViewName);
-            }
-
-            foreach (var panelViewModel in panelViewModelKinds)
-            {
-                var panelViewModelName = panelViewModel.ToString();
-
-                this.PanelViewModelKinds.Add(panelViewModelName, panelViewModel);
-                logger.Trace("Add panelViewModel {0} ", panelViewModelName);
-            }
 
             foreach (var panelViewModel in panelViewModelDecorated)
             {
@@ -140,38 +118,7 @@ namespace CDP4Composition.Navigation
                 logger.Trace("Add panelViewModel {0} ", panelViewModelName);
             }
 
-            // sets the event handler for the different regions
-            try
-            {
-                this.regionManager.Regions[RegionNames.LeftPanel].Views.CollectionChanged +=
-                    this.ViewCollectionChangedEventHandler;
-            }
-            catch (KeyNotFoundException)
-            {
-                logger.Debug("The {0} does not exist", RegionNames.LeftPanel);
-            }
-
-            try
-            {
-                this.regionManager.Regions[RegionNames.EditorPanel].Views.CollectionChanged +=
-                    this.ViewCollectionChangedEventHandler;
-            }
-            catch (KeyNotFoundException)
-            {
-                logger.Debug("The {0} does not exist", RegionNames.EditorPanel);
-            }
-
-            try
-            {
-                this.regionManager.Regions[RegionNames.RightPanel].Views.CollectionChanged +=
-                    this.ViewCollectionChangedEventHandler;
-            }
-            catch (KeyNotFoundException)
-            {
-                logger.Debug("The {0} does not exist", RegionNames.RightPanel);
-            }
-
-            CDPMessageBus.Current.Listen<ViewModelChangeEvent>().Subscribe(this.PanelViewModelChanged);
+            //CDPMessageBus.Current.Listen<ViewModelChangeEvent>().Subscribe(this.PanelViewModelChanged);
 
             sw.Stop();
             logger.Debug("The PanelNavigationService was instantiated in {0} [ms]", sw.ElapsedMilliseconds);
@@ -205,6 +152,12 @@ namespace CDP4Composition.Navigation
         {
             var sw = Stopwatch.StartNew();
 
+            this.dockLayoutViewModel.AddDockPanelViewModel(viewModel);
+
+            //TODO: refactor so there's no dependency on the view. Use databinding from the View to ViewModel
+            //this.filterStringService.RegisterForService(view, viewModel);
+
+            /*
             var lazyView = this.GetViewType(viewModel);
 
             var parameters = new object[] { true };
@@ -217,10 +170,8 @@ namespace CDP4Composition.Navigation
 
                 // register for Filter Service
                 this.filterStringService.RegisterForService(view, viewModel);
-
-                var region = this.regionManager.Regions[lazyView.Metadata.Region];
-                region.Add(view, view.ToString() + Guid.NewGuid());
             }
+            */
 
             logger.Trace("Navigated to Panel {0} in {1} [ms]", viewModel, sw.ElapsedMilliseconds);
         }
@@ -245,6 +196,9 @@ namespace CDP4Composition.Navigation
                 throw new ArgumentNullException(nameof(viewModel), "The IPanelViewModel may not be null");
             }
 
+            this.Open(viewModel);
+
+            /*
             if (useRegionManager)
             {
                 this.Open(viewModel);
@@ -269,6 +223,7 @@ namespace CDP4Composition.Navigation
                 var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open, regionName);
                 CDPMessageBus.Current.SendMessage(openPanelEvent);
             }
+            */
         }
 
         /// <summary>
@@ -287,6 +242,7 @@ namespace CDP4Composition.Navigation
             IThingDialogNavigationService thingDialogNavigationService,
             IDialogNavigationService dialogNavigationService)
         {
+            /*
             if (!this.PanelViewModelDecorated.TryGetValue(viewModelName, out var returned))
             {
                 throw new ArgumentOutOfRangeException($"The ViewModel with the human readable name {viewModelName} could not be found");
@@ -301,6 +257,7 @@ namespace CDP4Composition.Navigation
             var viewModel = Activator.CreateInstance(returned.Value.GetType(), parameters) as IPanelViewModel;
 
             this.Open(viewModel, useRegionManager);
+            */
         }
         
         /// <summary>
@@ -322,6 +279,9 @@ namespace CDP4Composition.Navigation
         /// </remarks>
         public void OpenExistingOrOpen(IPanelViewModel viewModel, bool useRegionManager)
         {
+            this.Open(viewModel, useRegionManager);
+
+            /*
             if (this.ViewModelViewPairs.TryGetValue(viewModel, out var view))
             {
                 var lazyView = this.GetViewType(viewModel);
@@ -333,6 +293,7 @@ namespace CDP4Composition.Navigation
             {
                 this.Open(viewModel, useRegionManager);
             }
+            */
         }
 
         /// <summary>
@@ -341,19 +302,14 @@ namespace CDP4Composition.Navigation
         /// <param name="viewModel">The <see cref="IPanelViewModel"/></param>
         private void CloseByRegion(IPanelViewModel viewModel)
         {
+            /*
             logger.Debug("Starting to Close view-model {0} of type {1}", viewModel.Caption, viewModel);
 
             if (this.ViewModelViewPairs.TryGetValue(viewModel, out var view))
             {
-                var regions = this.regionCollectionSearcher.GetRegionsByView(this.regionManager.Regions, view);
-
-                foreach (var region in regions)
-                {
-                    region.Remove(view);
-                }
-
                 logger.Debug("Closed view-model {0} of type {1}", viewModel.Caption, viewModel);
             }
+            */
         }
 
         /// <summary>
@@ -387,16 +343,16 @@ namespace CDP4Composition.Navigation
         /// <param name="datasourceUri">The string representation of the data-source's uri</param>
         public void Close(string datasourceUri)
         {
-            logger.Debug("Starting to close all view-models related to data-source {0}", datasourceUri);
+            //logger.Debug("Starting to close all view-models related to data-source {0}", datasourceUri);
 
-            var openViewModel = this.ViewModelViewPairs.Keys.Where(x => x.DataSource == datasourceUri).ToList();
+            //var openViewModel = this.ViewModelViewPairs.Keys.Where(x => x.DataSource == datasourceUri).ToList();
 
-            foreach (var panelViewModel in openViewModel)
-            {
-                this.CloseByRegion(panelViewModel);
-            }
+            //foreach (var panelViewModel in openViewModel)
+            //{
+            //    this.CloseByRegion(panelViewModel);
+            //}
 
-            logger.Debug("All view-models related to data-source {0} closed", datasourceUri);
+            //logger.Debug("All view-models related to data-source {0} closed", datasourceUri);
         }
 
         /// <summary>
@@ -405,12 +361,19 @@ namespace CDP4Composition.Navigation
         /// <param name="viewModelType">The <see cref="Type"/> of the <see cref="IPanelViewModel"/> to close</param>
         public void Close(Type viewModelType)
         {
+            foreach (var vm in this.dockLayoutViewModel.DockPanelViewModels.Where(vm => vm.GetType() == viewModelType))
+            {
+                this.dockLayoutViewModel.DockPanelViewModels.Remove(vm);
+            }
+
+            /*
             var panelsToClose = this.ViewModelViewPairs.Keys.Where(vm => vm.GetType() == viewModelType).ToList();
 
             foreach (var panel in panelsToClose)
             {
                 this.CloseByRegion(panel);
             }
+            */
         }
 
         /// <summary>
@@ -441,59 +404,6 @@ namespace CDP4Composition.Navigation
         }
 
         /// <summary>
-        /// Gets the fully qualified name of the <see cref="IPanelView"/> associated to the <see cref="IPanelViewModel"/>
-        /// </summary>
-        /// <remarks>
-        /// We assume here that for a <see cref="IPanelViewModel"/> with a fully qualified name xxx.yyy.ViewModels.DialogViewModel, the counterpart view is xxx.yyy.Views.Dialog
-        /// </remarks>
-        /// <param name="viewModel">The <see cref="IPanelViewModel"/></param>
-        /// <returns>The Fully qualified Name</returns>
-        private Lazy<IPanelView, IRegionMetaData> GetViewType(IPanelViewModel viewModel)
-        {
-            var fullyQualifiedName = viewModel.ToString().Replace(".ViewModels.", ".Views.");
-
-            // remove "ViewModel" from the name to get the View Name
-            var viewName = System.Text.RegularExpressions.Regex.Replace(fullyQualifiedName, "ViewModel$", "");
-
-            if (!this.PanelViewKinds.TryGetValue(viewName, out var returned))
-            {
-                throw new ArgumentOutOfRangeException($"The View associated to the viewModel {viewModel} could not be found\nMake sure the view has the proper attributes");
-            }
-
-            return returned;
-        }
-
-        /// <summary>
-        /// Handles the view CollectionChanged event
-        /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">the <see cref="NotifyCollectionChangedEventArgs"/></param>
-        private void ViewCollectionChangedEventHandler(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action != NotifyCollectionChangedAction.Remove)
-            {
-                return;
-            }
-
-            foreach (var view in e.OldItems)
-            {
-                if (!(view is IPanelView viewPanel))
-                {
-                    continue;
-                }
-
-                var pair = this.ViewModelViewPairs.SingleOrDefault(x => x.Value == viewPanel);
-
-                if (!pair.Equals(default(KeyValuePair<IPanelViewModel, IPanelView>)))
-                {
-                    var panelViewModel = pair.Key;
-                    var panelView = pair.Value;
-                    this.CleanUpPanelsAndSendCloseEvent(panelViewModel, panelView);
-                }
-            }
-        }
-
-        /// <summary>
         /// removes the view and view-model from the <see cref="ViewModelViewPairs"/> and send a panel close event
         /// </summary>
         /// <param name="panelViewModel">
@@ -504,6 +414,10 @@ namespace CDP4Composition.Navigation
         /// </param>
         private void CleanUpPanelsAndSendCloseEvent(IPanelViewModel panelViewModel, IPanelView panelView)
         {
+
+            this.dockLayoutViewModel.DockPanelViewModels.Remove((IMVVMDockingProperties)panelViewModel);
+
+            /*
             this.ViewModelViewPairs.Remove(panelViewModel);
 
             var closePanelEvent = new NavigationPanelEvent(panelViewModel, panelView, PanelStatus.Closed);
@@ -514,6 +428,7 @@ namespace CDP4Composition.Navigation
 
             // unregister from filter string service
             this.filterStringService.UnregisterFromService(panelView);
+            */
         }
     }
 }

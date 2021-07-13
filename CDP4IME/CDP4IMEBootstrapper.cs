@@ -97,8 +97,9 @@ namespace CDP4IME
             
             var shell = (Shell)this.Shell;
             var dialogNavigationService = this.Container.GetExportedValue<IDialogNavigationService>();
+            var dockViewModel = this.Container.GetExportedValue<DockLayoutViewModel>();
 
-            shell.DataContext = new ShellViewModel(dialogNavigationService);
+            shell.DataContext = new ShellViewModel(dialogNavigationService, dockViewModel);
 
             this.UpdateBootstrapperState("Setting up Regions");
             var regionmanager = this.Container.GetExportedValue<IRegionManager>();
@@ -149,10 +150,10 @@ namespace CDP4IME
 
             var mappings = base.ConfigureRegionAdapterMappings();
 
-            mappings.RegisterMapping(typeof(LayoutPanel), this.Container.GetExportedValue<LayoutPanelAdapter>());
-            mappings.RegisterMapping(typeof(LayoutGroup), this.Container.GetExportedValue<LayoutGroupAdapter>());
-            mappings.RegisterMapping(typeof(DocumentGroup), this.Container.GetExportedValue<DocumentGroupAdapter>());
-            mappings.RegisterMapping(typeof(TabbedGroup), this.Container.GetExportedValue<TabbedGroupAdapter>());
+            //mappings.RegisterMapping(typeof(LayoutPanel), this.Container.GetExportedValue<LayoutPanelAdapter>());
+            //mappings.RegisterMapping(typeof(LayoutGroup), this.Container.GetExportedValue<LayoutGroupAdapter>());
+            //mappings.RegisterMapping(typeof(DocumentGroup), this.Container.GetExportedValue<DocumentGroupAdapter>());
+            //mappings.RegisterMapping(typeof(TabbedGroup), this.Container.GetExportedValue<TabbedGroupAdapter>());
             mappings.RegisterMapping(typeof(RibbonControl), this.Container.GetExportedValue<RibbonAdapter>());
 
             return mappings;

@@ -291,6 +291,7 @@ namespace CDP4Requirements.ViewModels
             get => this.isParametricConstraintDisplayed;
             set => this.RaiseAndSetIfChanged(ref this.isParametricConstraintDisplayed, value);
         }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Updates the current drag state.

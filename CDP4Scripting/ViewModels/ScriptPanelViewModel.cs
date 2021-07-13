@@ -417,6 +417,8 @@ namespace CDP4Scripting.ViewModels
         /// Clears the content of the output.
         /// </summary>
         public ReactiveCommand<object> ClearOutputCommand { get; private set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Event handler when the text of <see cref="AvalonEditor"/> changes. <see cref="IsDirty"/> is set to true.

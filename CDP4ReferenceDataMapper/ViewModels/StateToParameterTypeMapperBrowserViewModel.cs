@@ -316,6 +316,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> to execute when changed values need to be saved
         /// </summary>
         public ReactiveCommand<Unit> SaveValuesCommand { get; protected set; }
+        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Initializes the <see cref="ReactiveCommand"/>s
