@@ -148,6 +148,11 @@ namespace CDP4Composition.Mvvm
         private string domainOfExpertise;
 
         /// <summary>
+        /// Backing field for <see cref="IsSelected"/>
+        /// </summary>
+        private bool isSelected;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModelBase{T}"/> class.
         /// Used by MEF.
         /// </summary>
@@ -244,14 +249,9 @@ namespace CDP4Composition.Mvvm
             set { var x = value; }
         }
 
-
-        private bool isSelected = false;
         public bool IsSelected
         {
-            get
-            {
-                return isSelected;
-            }
+            get { return isSelected; }
             set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
         }
 

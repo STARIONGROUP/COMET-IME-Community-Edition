@@ -101,7 +101,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CDP4Common.SiteDirectoryData.ParticipantRole"/>
         /// </summary>
         public ReactiveCommand<object> CreateParticipantRoleCommand { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
         /// <summary>
         /// Initialize the browser

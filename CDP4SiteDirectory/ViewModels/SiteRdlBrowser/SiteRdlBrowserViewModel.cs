@@ -79,7 +79,7 @@ namespace CDP4SiteDirectory.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.canCreateSiteRdl, value); }
         }
 
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.

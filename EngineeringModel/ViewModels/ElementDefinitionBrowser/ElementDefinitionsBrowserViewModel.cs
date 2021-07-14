@@ -305,7 +305,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         /// <remarks>This was made into a list of generic row to use the ReactiveList extension</remarks>
         public DisposableReactiveList<IRowViewModelBase<Thing>> ElementDefinitionRowViewModels { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
         /// Updates the current drag state.

@@ -107,7 +107,7 @@ namespace CDP4SiteDirectory.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.canCreateParticipant, value); }
         }
 
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
         /// Loads the <see cref="Participant"/>s from the <see cref="EngineeringModelSetup"/> when

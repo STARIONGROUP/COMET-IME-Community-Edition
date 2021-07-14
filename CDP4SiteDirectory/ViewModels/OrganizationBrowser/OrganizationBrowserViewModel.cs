@@ -71,7 +71,7 @@ namespace CDP4SiteDirectory.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.canCreateOrganization, value); }
         }
 
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Update the Organization rows

@@ -62,6 +62,7 @@ namespace CDP4BuiltInRules.ViewModels
         /// Backing field for the <see cref="SelectedRule"/> property.
         /// </summary>
         private BuiltInRuleRowViewModel selectedRule;
+        private bool isSelected;
 
         /// <summary>
         /// Gets the caption of the browser
@@ -132,8 +133,13 @@ namespace CDP4BuiltInRules.ViewModels
         /// Gets the list of <see cref="BuiltInRuleRowViewModel"/>.
         /// </summary>
         public List<BuiltInRuleRowViewModel> BuiltInRules { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
+
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+        }
 
         /// <summary>
         /// Queries whether a drag can be started

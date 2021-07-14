@@ -83,7 +83,8 @@ namespace CDP4LogInfo.ViewModels
         /// Backing field for the <see cref="SelectedItem"/>
         /// </summary>
         private LogInfoRowViewModel selectedItem;
-        
+        private bool isSelected;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="LogInfoPanelViewModel"/> class
         /// </summary>
@@ -336,8 +337,14 @@ namespace CDP4LogInfo.ViewModels
         /// Gets the command to show the details of the selected Log item
         /// </summary>
         public ReactiveCommand<object> ShowDetailsDialogCommand { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
+
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+        }
 
         /// <summary>
         /// Initializes the <see cref="PossibleLoglevels"/> collection

@@ -216,7 +216,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// 
         /// </summary>
-        public string TargetName { get; set; } = "LeftGroup";
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Initializes the browser

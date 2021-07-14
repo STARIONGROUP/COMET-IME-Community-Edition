@@ -440,7 +440,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.showRelatedOnly, value); }
         }
 
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
         /// Reloads the saved configurations.

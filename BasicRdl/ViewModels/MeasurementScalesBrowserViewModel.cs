@@ -132,7 +132,7 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CyclicRatioScale"/>
         /// </summary>
         public ReactiveCommand<object> CreateCyclicRatioScale { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.

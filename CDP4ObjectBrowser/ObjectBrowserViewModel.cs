@@ -30,6 +30,7 @@ namespace CDP4ObjectBrowser
         /// Backing field for <see cref="Person"/> property
         /// </summary>
         private string person;
+        private bool isSelected;
 
         /// <summary>
         /// The <see cref="ISession"/> the current browser is bound to.
@@ -116,9 +117,14 @@ namespace CDP4ObjectBrowser
         /// Gets the list of <see cref="IDisposable"/> objects that are referenced by this class
         /// </summary>
         protected List<IDisposable> Disposables { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+        }
         /// <summary>
         /// Add the <see cref="Session"/> to the browser
         /// </summary>

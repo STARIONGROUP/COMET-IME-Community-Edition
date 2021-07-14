@@ -312,7 +312,7 @@ namespace CDP4Reporting.ViewModels
         /// Fires when the Active Document changes in the Report Designer
         /// </summary>
         public ReactiveCommand<Unit> ActiveDocumentChangedCommand { get; set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportDesignerViewModel"/> class

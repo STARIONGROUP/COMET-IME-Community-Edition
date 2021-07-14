@@ -158,7 +158,7 @@ namespace CDP4Grapher.ViewModels
         /// Gets or sets the custom context menu
         /// </summary>
         public IHaveContextMenu DiagramContextMenuViewModel { get; set; } = new DiagramControlContextMenuViewModel();
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GrapherViewModel"/> class

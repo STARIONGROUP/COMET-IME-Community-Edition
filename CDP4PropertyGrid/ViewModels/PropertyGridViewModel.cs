@@ -39,6 +39,7 @@ namespace CDP4PropertyGrid.ViewModels
     using CDP4Dal;
 
     using CDP4PropertyGrid.Views;
+    using ReactiveUI;
 
     /// <summary>
     /// The view-model for the <see cref="PropertyGrid"/> that displays the properties of a <see cref="Thing"/>
@@ -50,6 +51,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// The <see cref="IDisposable"/> subscription to the <see cref="SelectedThingChangedEvent"/>
         /// </summary>
         private IDisposable selectedThingChangedSubscription;
+        private bool isSelected;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyGridViewModel"/> class
@@ -127,9 +129,13 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         public string DataSource => this.Session.DataSourceUri;
 
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+        }
         /// <summary>
         /// Check if a new <see cref="PropertyGridViewModel"/> should be created.
         /// </summary>

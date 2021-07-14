@@ -6,6 +6,7 @@
 
 namespace CDP4EngineeringModel.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
     using CDP4Composition;
     using CDP4Composition.Attributes;
@@ -13,7 +14,10 @@ namespace CDP4EngineeringModel.Views
     /// <summary>
     /// Interaction logic for RuleVerificationListView XAML
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    //[PanelViewExport(RegionNames.LeftPanel)]
+    //[Export("CDP4EngineeringModel.Views.RuleVerificationListBrowser", typeof(IPanelView))]
+    //[PartCreationPolicy(CreationPolicy.NonShared)]
+    [Export("bleh",typeof(IPanelView))]
     public partial class RuleVerificationListBrowser : UserControl, IPanelView
     {
         /// <summary>

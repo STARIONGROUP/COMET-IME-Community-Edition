@@ -27,7 +27,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-
+using System.Threading.Tasks;
 using CDP4Composition.ViewModels;
 
 using DevExpress.Xpf.Docking;
@@ -49,8 +49,7 @@ namespace CDP4Composition.Navigation
 
             this.dialogNavigationService = dialogNavigationService;
 
-            DockItemClosingCommand = ReactiveCommand.Create();
-            DockItemClosingCommand.Subscribe(ItemClosing);
+            DockItemClosingCommand = ReactiveCommand.CreateAsyncTask(arg => Task.FromResult(ItemClosing(arg)));
 
             DockItemClosedCommand = ReactiveCommand.Create();
             DockItemClosedCommand.Subscribe(ItemClosed);
@@ -60,7 +59,7 @@ namespace CDP4Composition.Navigation
 
         public int LeftGroupSelectedTabIndex { get; set; }
 
-        public ReactiveCommand<object> DockItemClosingCommand { get; }
+        public ReactiveCommand<bool> DockItemClosingCommand { get; }
         public ReactiveCommand<object> DockItemClosedCommand { get; }
 
         public void ItemClosed(object obj)
@@ -73,25 +72,25 @@ namespace CDP4Composition.Navigation
             }
         }
 
-        public void ItemClosing(object obj)
+        public bool ItemClosing(object obj)
         {
             var e = (ItemCancelEventArgs)obj;
 
             var docPanel = e.Item as LayoutPanel;
             if (docPanel is null)
             {
-                return;
+                return false;
             }
 
             var panelViewModel = (IPanelViewModel)docPanel.Content;
             if (panelViewModel == null)
             {
-                return;
+                return false;
             }
 
             if (!panelViewModel.IsDirty)
             {
-                return;
+                return false;
             }
 
             var confirmation = new GenericConfirmationDialogViewModel("Warning", MessageHelper.ClosingPanelConfirmation);
@@ -100,6 +99,8 @@ namespace CDP4Composition.Navigation
             {
                 e.Cancel = true;
             }
+
+            return true;
         }
 
         /// <summary>

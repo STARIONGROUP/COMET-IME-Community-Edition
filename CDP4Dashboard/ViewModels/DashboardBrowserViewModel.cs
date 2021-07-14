@@ -404,7 +404,7 @@ namespace CDP4Dashboard.ViewModels
             get => this.currentIteration;
             private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
         /// Populate the context menu

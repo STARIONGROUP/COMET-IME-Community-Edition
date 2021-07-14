@@ -107,7 +107,10 @@ namespace BasicRdl.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value); }
         }
 
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Initializes the Commands that can be executed from this view model. The commands are initialized

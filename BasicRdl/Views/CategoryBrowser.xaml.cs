@@ -6,6 +6,7 @@
 
 namespace BasicRdl.Views
 {
+    using System.ComponentModel.Composition;
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
@@ -16,6 +17,8 @@ namespace BasicRdl.Views
     /// Interaction logic for <see cref="CategoryBrowser"/>
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
+    //[Export(nameof(CategoryBrowser), typeof(IPanelView))]
+    //[PartCreationPolicy(CreationPolicy.NonShared)]
     public partial class CategoryBrowser : IPanelView, IPanelFilterableDataGridView
     {
         /// <summary>

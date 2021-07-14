@@ -84,7 +84,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// Gets the List of <see cref="DomainOfExpertiseRowViewModel"/>
         /// </summary>
         public DisposableReactiveList<DomainOfExpertiseRowViewModel> DomainOfExpertises { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Initialize the <see cref="ReactiveCommand"/>s of the current view-model

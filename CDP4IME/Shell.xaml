@@ -305,21 +305,21 @@
                                            RegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}" />
             </dxr:RibbonDefaultPageCategory>
         </dxr:RibbonControl>
-
+        <!--DockItemClosing="DockManager_DockItemClosing"-->
         <dxdo:DockLayoutManager x:Name="DockManager"
                                 DataContext="{Binding DockViewModel}"
                                 ItemsSource="{Binding DockPanelViewModels}"
-                                DockItemClosing="DockManager_DockItemClosing"
+                                
                                 DockItemClosed="DockManager_DockItemClosed"
                                 DockOperationStarting="DockManager_DockOperationStarting"
                                 Grid.Row="1"
                                 ClosingBehavior="ImmediatelyRemove"
                                 MDIMergeStyle="Always"
                                 FloatingMode="Desktop">
-            <!--<dxmvvm:Interaction.Behaviors>
+            <dxmvvm:Interaction.Behaviors>
                 <dxmvvm:EventToCommand EventName="DockItemClosing" PassEventArgsToCommand="True" Command="{Binding DockItemClosingCommand}"/>
-                --><!--<dxmvvm:EventToCommand EventName="DockItemClosed" PassEventArgsToCommand="True" Command="{Binding DockItemClosedCommand}"/>--><!--
-            </dxmvvm:Interaction.Behaviors>-->
+                <!--<dxmvvm:EventToCommand EventName="DockItemClosed" PassEventArgsToCommand="True" Command="{Binding DockItemClosedCommand}"/>-->
+            </dxmvvm:Interaction.Behaviors>
             <dxdo:DockLayoutManager.Resources>
                 <Style x:Key="BaseStyle"
                        TargetType="dxdo:LayoutPanel">

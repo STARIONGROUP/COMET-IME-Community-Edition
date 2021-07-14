@@ -273,7 +273,7 @@ namespace CDP4ProductTree.ViewModels
         /// This has to be a list in order to display the tree
         /// </remarks>
         public DisposableReactiveList<ElementDefinitionRowViewModel> TopElement { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
         /// Updates the current drag state.

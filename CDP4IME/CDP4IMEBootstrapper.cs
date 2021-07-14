@@ -31,7 +31,7 @@ namespace CDP4IME
     using System.IO;
     using System.Reflection;
     using System.Windows;
-
+    using CDP4Composition;
     using CDP4Composition.Adapters;
     using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
@@ -103,6 +103,8 @@ namespace CDP4IME
 
             this.UpdateBootstrapperState("Setting up Regions");
             var regionmanager = this.Container.GetExportedValue<IRegionManager>();
+
+            //var bleh = this.Container.GetExportedValue<IPanelView>("bleh");
 
             foreach (var region in regionmanager.Regions)
             {

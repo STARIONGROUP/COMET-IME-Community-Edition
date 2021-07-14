@@ -262,7 +262,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to update multiple <see cref="Parameter"/>s in batch operation mode
         /// </summary>
         public ReactiveCommand<object> BatchUpdateParameterCommand { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Initializes the browser

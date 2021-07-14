@@ -243,7 +243,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to cancel download of a file
         /// </summary>
         public ReactiveCommand<object> CancelDownloadCommand { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s

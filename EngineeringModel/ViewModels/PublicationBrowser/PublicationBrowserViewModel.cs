@@ -163,7 +163,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
         }
 
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Initializes the browser
