@@ -1,9 +1,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramEditorViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -22,12 +21,11 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor.ViewModels
 {
     using System;
-
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -37,10 +35,8 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
-    using CDP4Common.SiteDirectoryData;
     using CDP4Common.EngineeringModelData;
-
-    using CDP4Dal.Operations;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.Diagram;
     using CDP4CommonView.Diagram.ViewModels;
@@ -56,7 +52,7 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
-    using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using CDP4DiagramEditor.ViewModels.Relation;
 
@@ -65,7 +61,6 @@ namespace CDP4DiagramEditor.ViewModels
     using ReactiveUI;
 
     using Point = System.Windows.Point;
-    using IDropTarget = CDP4Composition.DragDrop.IDropTarget;
 
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor"/> view
@@ -132,8 +127,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -160,8 +155,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public ReactiveList<DiagramItem> SelectedItems
         {
-            get { return this.selectedItems; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedItems, value); }
+            get => this.selectedItems;
+            set => this.RaiseAndSetIfChanged(ref this.selectedItems, value);
         }
 
         /// <summary>
@@ -169,8 +164,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public DiagramItem SelectedItem
         {
-            get { return this.selectedItem; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedItem, value); }
+            get => this.selectedItem;
+            set => this.RaiseAndSetIfChanged(ref this.selectedItem, value);
         }
 
         /// <summary>
@@ -250,8 +245,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public DisposableReactiveList<RuleNavBarRelationViewModel> RelationshipRules
         {
-            get { return this.relationshipRules; }
-            set { this.RaiseAndSetIfChanged(ref this.relationshipRules, value); }
+            get => this.relationshipRules;
+            set => this.RaiseAndSetIfChanged(ref this.relationshipRules, value);
         }
 
         /// <summary>
@@ -259,8 +254,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public ReactiveList<ThingDiagramContentItem> ThingDiagramItems
         {
-            get { return this.thingDiagramItems; }
-            set { this.RaiseAndSetIfChanged(ref this.thingDiagramItems, value); }
+            get => this.thingDiagramItems;
+            set => this.RaiseAndSetIfChanged(ref this.thingDiagramItems, value);
         }
 
         /// <summary>
@@ -373,6 +368,7 @@ namespace CDP4DiagramEditor.ViewModels
             foreach (var diagramThing in oldItems)
             {
                 var item = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing == diagramThing);
+
                 if (item != null)
                 {
                     this.ThingDiagramItems.Remove(item);
@@ -486,7 +482,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                 var position = new Point(convertedDropPosition.X, convertedDropPosition.Y);
 
-                block.Bounds.Add(new Bounds { X = (float)position.X, Y = (float)position.Y});
+                block.Bounds.Add(new Bounds { X = (float) position.X, Y = (float) position.Y });
 
                 NamedThingDiagramContentItem diagramItem = null;
 
@@ -522,12 +518,13 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="depictedThing">The dropped <see cref="Thing"/></param>
         /// <param name="diagramPosition">The position of the <see cref="DiagramObject"/></param>
         /// <returns>The <see cref="DiagramObjectViewModel"/> instantiated</returns>
-        private ThingDiagramContentItem CreateDiagramObject(Thing depictedThing, System.Windows.Point diagramPosition, bool shouldAddMissingThings = true)
+        private ThingDiagramContentItem CreateDiagramObject(Thing depictedThing, Point diagramPosition, bool shouldAddMissingThings = true)
         {
             var row = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing.DepictedThing == depictedThing);
+
             if (row != null)
             {
-                return row;// row;
+                return row; // row;
             }
 
             if (!shouldAddMissingThings)
@@ -545,8 +542,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             var bound = new Bounds()
             {
-                X = (float)diagramPosition.X,
-                Y = (float)diagramPosition.Y,
+                X = (float) diagramPosition.X,
+                Y = (float) diagramPosition.Y,
                 Height = Cdp4DiagramHelper.DefaultHeight,
                 Width = Cdp4DiagramHelper.DefaultWidth
             };
@@ -580,7 +577,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="depictedThing">The dropped <see cref="Thing"/></param>
         /// <param name="diagramPosition">The position of the <see cref="DiagramObject"/></param>
         /// <returns>The <see cref="DiagramObjectViewModel"/> instantiated</returns>
-        private void CreateDiagramPort(Thing depictedThing, System.Windows.Point diagramPosition)
+        private void CreateDiagramPort(Thing depictedThing, Point diagramPosition)
         {
             if (this.SelectedItem is DiagramContentItem target && target?.Content is PortContainerDiagramContentItem container)
             {
@@ -621,21 +618,23 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         /// <param name="binaryRelationship">The dropped <see cref="BinaryRelationship"/></param>
         /// <param name="dropPosition">The dropped position</param>
-        private void OnBinaryRelationshipDrop(BinaryRelationship binaryRelationship, System.Windows.Point dropPosition)
+        private void OnBinaryRelationshipDrop(BinaryRelationship binaryRelationship, Point dropPosition)
         {
             // draw the source if it does not exist
             var diagramObjectSource = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing.DepictedThing == binaryRelationship.Source);
+
             if (diagramObjectSource == null)
             {
-                var sourceObjectPosition = new System.Windows.Point(dropPosition.X - Cdp4DiagramHelper.DefaultWidth, dropPosition.Y);
+                var sourceObjectPosition = new Point(dropPosition.X - Cdp4DiagramHelper.DefaultWidth, dropPosition.Y);
                 diagramObjectSource = this.CreateDiagramObject(binaryRelationship.Source, sourceObjectPosition);
             }
 
             // draw the source if it does not exist
             var diagramObjectTarget = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing.DepictedThing == binaryRelationship.Target);
+
             if (diagramObjectTarget == null)
             {
-                var targetObjectPosition = new System.Windows.Point(dropPosition.X + Cdp4DiagramHelper.DefaultWidth, dropPosition.Y);
+                var targetObjectPosition = new Point(dropPosition.X + Cdp4DiagramHelper.DefaultWidth, dropPosition.Y);
                 diagramObjectTarget = this.CreateDiagramObject(binaryRelationship.Target, targetObjectPosition);
             }
 
@@ -651,6 +650,7 @@ namespace CDP4DiagramEditor.ViewModels
         private DiagramEdgeViewModel CreateDiagramConnector(BinaryRelationship binaryRelationship, DiagramObject source, DiagramObject target)
         {
             var connectorItem = this.DiagramConnectorCollection.SingleOrDefault(x => x.Thing.DepictedThing == binaryRelationship);
+
             if (connectorItem != null)
             {
                 return connectorItem;
@@ -699,7 +699,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public void CreatePortCommandExecute()
         {
-            this.CreateDiagramPort(new ElementUsage() { Name = "WhyNot", ShortName = "WhyNot"}, new Point(0,0));
+            this.CreateDiagramPort(new ElementUsage() { Name = "WhyNot", ShortName = "WhyNot" }, new Point(0, 0));
         }
 
         /// <summary>
@@ -708,7 +708,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="contentItem">The content item.</param>
         public void RedrawConnectors(ThingDiagramContentItem contentItem)
         {
-            var iteration = (Iteration)this.Thing.Container;
+            var iteration = (Iteration) this.Thing.Container;
 
             var depictedThing = contentItem.DiagramThing;
             var relationships = iteration.Relationship.OfType<BinaryRelationship>().Where(r => r.Source == depictedThing || r.Target == depictedThing);
@@ -733,7 +733,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="shouldAddMissingThings">True if missing things should be added to diagram.</param>
         public void GenerateDiagramRelation(ThingDiagramContentItem item, bool extendDeep, bool shouldAddMissingThings = true)
         {
-            var iteration = (Iteration)this.Thing.Container;
+            var iteration = (Iteration) this.Thing.Container;
 
             var depictedThing = item.DiagramThing.DepictedThing;
             var relationships = iteration.Relationship.OfType<BinaryRelationship>().Where(r => r.Source == depictedThing || r.Target == depictedThing);
@@ -794,6 +794,7 @@ namespace CDP4DiagramEditor.ViewModels
             clone.DiagramElement.Clear();
 
             var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItems.Select(x => x.DiagramThing));
+
             foreach (var diagramObject in deletedDiagramObj)
             {
                 transaction.Delete(diagramObject.Clone(false));
@@ -818,6 +819,7 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 this.ThingDiagramItems.Remove(diagramObjViewModel);
                 var connectors = this.DiagramConnectorCollection.Where(x => x.Source == diagramObjViewModel.Thing || x.Target == diagramObjViewModel.Thing).ToArray();
+
                 foreach (var diagramEdgeViewModel in connectors)
                 {
                     //this.DiagramConnectorCollection.Remove(diagramEdgeViewModel);
@@ -849,16 +851,5 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.IsDirty |= this.DiagramPortCollection.Any(x => x.IsDirty) || removedItem > 0;
         }
-
-        /// <summary>
-        /// Show the <see cref="SelectedItem"/> in the Property Grid
-        /// </summary>
-        //protected override void ShowInPropertyGrid()
-        //{
-        //    if (this.SelectedItem != null)
-        //    {
-        //        this.PanelNavigationService.Open(((IThingDiagramItem)this.SelectedItem).Thing, this.Session);
-        //    }
-        //}
     }
 }

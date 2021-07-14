@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -21,7 +21,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor.Tests
 {
@@ -83,7 +83,7 @@ namespace CDP4DiagramEditor.Tests
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person, SelectedDomain = this.domain };
-            
+
             this.sitedir.Model.Add(this.modelsetup);
             this.sitedir.Person.Add(this.person);
             this.sitedir.Domain.Add(this.domain);
@@ -115,7 +115,7 @@ namespace CDP4DiagramEditor.Tests
         public void VerifyThatRowsAreCreated()
         {
             var viewmodel = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
-        
+
             Assert.AreEqual(1, viewmodel.Diagrams.Count);
 
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
@@ -140,7 +140,7 @@ namespace CDP4DiagramEditor.Tests
 
             var diagramrow = vm.Diagrams.Single();
             Assert.That(diagramrow.Name, Is.Not.Null.Or.Empty);
-            
+
             Assert.IsFalse(vm.UpdateCommand.CanExecute(null));
             vm.SelectedThing = diagramrow;
             vm.ComputePermission();
@@ -178,7 +178,7 @@ namespace CDP4DiagramEditor.Tests
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(domain, null) }
             });
 
             var vm = new DiagramBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
@@ -186,7 +186,7 @@ namespace CDP4DiagramEditor.Tests
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, null}
+                { this.iteration, null }
             });
 
             vm = new DiagramBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);

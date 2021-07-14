@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleNavBarRelationViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -22,7 +21,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor.ViewModels.Relation
 {
@@ -31,6 +30,7 @@ namespace CDP4DiagramEditor.ViewModels.Relation
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView;
@@ -69,8 +69,7 @@ namespace CDP4DiagramEditor.ViewModels.Relation
         /// </summary>
         private void InitializeCommands()
         {
-            var canCreateRelationshipBasedOnRule = this.Thing is BinaryRelationshipRule ? Observable.Return(true) :
-                ((DiagramEditorViewModel)this.ContainerViewModel).SelectedItems.Changed.Select(_ => this.CanCreateRelationship());
+            var canCreateRelationshipBasedOnRule = this.Thing is BinaryRelationshipRule ? Observable.Return(true) : ((DiagramEditorViewModel) this.ContainerViewModel).SelectedItems.Changed.Select(_ => this.CanCreateRelationship());
 
             this.CreateRelationshipCommand = ReactiveCommand.Create(canCreateRelationshipBasedOnRule);
             this.CreateRelationshipCommand.Subscribe(_ => this.ExecuteCreateRelationshipCommand());
@@ -85,12 +84,12 @@ namespace CDP4DiagramEditor.ViewModels.Relation
         private bool CanCreateRelationship()
         {
             // Multi relationships require more than one item to be selected.
-            if (((DiagramEditorViewModel)this.ContainerViewModel).SelectedItems.Count <= 1)
+            if (((DiagramEditorViewModel) this.ContainerViewModel).SelectedItems.Count <= 1)
             {
                 return false;
             }
 
-            return ((DiagramEditorViewModel)this.ContainerViewModel).SelectedItems.All(x => x is NamedThingDiagramContentItem);
+            return ((DiagramEditorViewModel) this.ContainerViewModel).SelectedItems.All(x => x is NamedThingDiagramContentItem);
         }
 
         /// <summary>

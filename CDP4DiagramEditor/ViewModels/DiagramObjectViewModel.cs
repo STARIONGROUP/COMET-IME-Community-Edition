@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramObjectViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -21,21 +21,22 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor.ViewModels
 {
     using System;
     using System.Linq;
-    using System.Windows;
-    using CDP4Common.CommonData;
+
     using CDP4Common.DiagramData;
-    using CDP4Dal.Operations;
+
     using CDP4CommonView;
     using CDP4CommonView.Diagram;
-    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -43,7 +44,6 @@ namespace CDP4DiagramEditor.ViewModels
     /// </summary>
     public class DiagramObjectViewModel : DiagramObjectRowViewModel, IDiagramObjectViewModel
     {
-        #region Private field
         /// <summary>
         /// Backing field for <see cref="Position"/>
         /// </summary>
@@ -68,9 +68,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// The <see cref="DiagramEditorViewModel"/> container
         /// </summary>
         private DiagramEditorViewModel containerViewModel;
-        #endregion
 
-        #region Constructors and properties
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramObjectViewModel"/> class
         /// </summary>
@@ -83,14 +81,14 @@ namespace CDP4DiagramEditor.ViewModels
             this.UpdateProperties();
             this.WhenAnyValue(x => x.Height, x => x.Width, x => x.Position).Subscribe(x => this.SetDirty());
         }
-        
+
         /// <summary>
         /// Gets or sets the position 
         /// </summary>
         public System.Windows.Point Position
         {
-            get { return this.position; }
-            set { this.RaiseAndSetIfChanged(ref this.position, value); }
+            get => this.position;
+            set => this.RaiseAndSetIfChanged(ref this.position, value);
         }
 
         /// <summary>
@@ -98,8 +96,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public double Height
         {
-            get { return this.height; }
-            set { this.RaiseAndSetIfChanged(ref this.height, value); }
+            get => this.height;
+            set => this.RaiseAndSetIfChanged(ref this.height, value);
         }
 
         /// <summary>
@@ -107,8 +105,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public double Width
         {
-            get { return this.width; }
-            set { this.RaiseAndSetIfChanged(ref this.width, value); }
+            get => this.width;
+            set => this.RaiseAndSetIfChanged(ref this.width, value);
         }
 
         /// <summary>
@@ -116,10 +114,9 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public bool IsDirty
         {
-            get { return this.isDirty; }
-            set { this.RaiseAndSetIfChanged(ref this.isDirty, value); }
+            get => this.isDirty;
+            set => this.RaiseAndSetIfChanged(ref this.isDirty, value);
         }
-        #endregion
 
         /// <summary>
         /// Handles the <see cref="ObjectChangedEvent"/>
@@ -137,6 +134,7 @@ namespace CDP4DiagramEditor.ViewModels
         private void UpdateProperties()
         {
             var bound = this.Thing.Bounds.SingleOrDefault();
+
             if (bound == null)
             {
                 throw new InvalidOperationException("The bound object was not found.");
@@ -153,10 +151,10 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="bound">The <see cref="Bounds"/> to update</param>
         private void UpdateBound(Bounds bound)
         {
-            bound.Height = (float)this.Height;
-            bound.Width = (float)this.Width;
-            bound.X = (float)this.Position.X;
-            bound.Y = (float)this.Position.Y;
+            bound.Height = (float) this.Height;
+            bound.Width = (float) this.Width;
+            bound.X = (float) this.Position.X;
+            bound.Y = (float) this.Position.Y;
             bound.Name = "should not have a name";
         }
 
@@ -166,6 +164,7 @@ namespace CDP4DiagramEditor.ViewModels
         private void SetDirty()
         {
             var bound = this.Thing.Bounds.Single();
+
             this.IsDirty = this.Thing.Iid == Guid.Empty
                            || this.Height != bound.Height
                            || this.Width != bound.Width
@@ -193,8 +192,9 @@ namespace CDP4DiagramEditor.ViewModels
             }
             else
             {
-                var clone = this.Thing.Clone(true); 
+                var clone = this.Thing.Clone(true);
                 var bound = clone.Bounds.SingleOrDefault();
+
                 if (bound != null)
                 {
                     this.UpdateBound(bound);
