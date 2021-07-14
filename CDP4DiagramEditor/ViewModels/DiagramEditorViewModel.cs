@@ -433,24 +433,18 @@ namespace CDP4DiagramEditor.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
-            var rowPayload = dropInfo.Payload as Thing;
-
-            if (rowPayload != null)
+            switch (dropInfo.Payload)
             {
-                if (!this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.Thing).Contains(rowPayload))
-                {
+                case Thing rowPayload when !this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.Thing).Contains(rowPayload):
                     dropInfo.Effects = DragDropEffects.Copy;
                     return;
-                }
+                case Tuple<ParameterType, MeasurementScale> tuplePayload:
+                    dropInfo.Effects = DragDropEffects.Copy;
+                    return;
+                default:
+                    dropInfo.Effects = DragDropEffects.None;
+                    break;
             }
-
-            if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
-            {
-                dropInfo.Effects = DragDropEffects.Copy;
-                return;
-            }
-
-            dropInfo.Effects = DragDropEffects.None;
         }
 
         /// <summary>
@@ -517,6 +511,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         /// <param name="depictedThing">The dropped <see cref="Thing"/></param>
         /// <param name="diagramPosition">The position of the <see cref="DiagramObject"/></param>
+        /// <param name="shouldAddMissingThings">Indicates if missing things should be added</param>
         /// <returns>The <see cref="DiagramObjectViewModel"/> instantiated</returns>
         private ThingDiagramContentItem CreateDiagramObject(Thing depictedThing, Point diagramPosition, bool shouldAddMissingThings = true)
         {
@@ -524,7 +519,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             if (row != null)
             {
-                return row; // row;
+                return row;
             }
 
             if (!shouldAddMissingThings)
@@ -579,7 +574,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>The <see cref="DiagramObjectViewModel"/> instantiated</returns>
         private void CreateDiagramPort(Thing depictedThing, Point diagramPosition)
         {
-            if (this.SelectedItem is DiagramContentItem target && target?.Content is PortContainerDiagramContentItem container)
+            if (this.SelectedItem is DiagramContentItem { Content: PortContainerDiagramContentItem container } target)
             {
                 var row = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing.DepictedThing == depictedThing);
 
@@ -611,34 +606,6 @@ namespace CDP4DiagramEditor.ViewModels
                 this.DiagramPortCollection.Add(diagramItem);
                 this.UpdateIsDirty();
             }
-        }
-
-        /// <summary>
-        /// Handle the drop when the payload is a <see cref="BinaryRelationship"/>
-        /// </summary>
-        /// <param name="binaryRelationship">The dropped <see cref="BinaryRelationship"/></param>
-        /// <param name="dropPosition">The dropped position</param>
-        private void OnBinaryRelationshipDrop(BinaryRelationship binaryRelationship, Point dropPosition)
-        {
-            // draw the source if it does not exist
-            var diagramObjectSource = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing.DepictedThing == binaryRelationship.Source);
-
-            if (diagramObjectSource == null)
-            {
-                var sourceObjectPosition = new Point(dropPosition.X - Cdp4DiagramHelper.DefaultWidth, dropPosition.Y);
-                diagramObjectSource = this.CreateDiagramObject(binaryRelationship.Source, sourceObjectPosition);
-            }
-
-            // draw the source if it does not exist
-            var diagramObjectTarget = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing.DepictedThing == binaryRelationship.Target);
-
-            if (diagramObjectTarget == null)
-            {
-                var targetObjectPosition = new Point(dropPosition.X + Cdp4DiagramHelper.DefaultWidth, dropPosition.Y);
-                diagramObjectTarget = this.CreateDiagramObject(binaryRelationship.Target, targetObjectPosition);
-            }
-
-            this.CreateDiagramConnector(binaryRelationship, diagramObjectSource.DiagramThing, diagramObjectTarget.DiagramThing);
         }
 
         /// <summary>
@@ -708,10 +675,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="contentItem">The content item.</param>
         public void RedrawConnectors(ThingDiagramContentItem contentItem)
         {
-            var iteration = (Iteration) this.Thing.Container;
-
             var depictedThing = contentItem.DiagramThing;
-            var relationships = iteration.Relationship.OfType<BinaryRelationship>().Where(r => r.Source == depictedThing || r.Target == depictedThing);
 
             // cleanup existing and redraw them.
             var existingConnectors = this.DiagramConnectorCollection.Where(x => x.Thing.Source.DepictedThing.Iid.Equals(depictedThing.DepictedThing.Iid) || x.Thing.Target.DepictedThing.Iid.Equals(depictedThing.DepictedThing.Iid)).ToList();
@@ -736,9 +700,11 @@ namespace CDP4DiagramEditor.ViewModels
             var iteration = (Iteration) this.Thing.Container;
 
             var depictedThing = item.DiagramThing.DepictedThing;
-            var relationships = iteration.Relationship.OfType<BinaryRelationship>().Where(r => r.Source == depictedThing || r.Target == depictedThing);
 
-            var sourceIsSet = false;
+            var relationships = 
+                iteration.Relationship
+                    .OfType<BinaryRelationship>()
+                    .Where(r => r.Source == depictedThing || r.Target == depictedThing);
 
             foreach (var binaryRelationship in relationships)
             {
@@ -755,7 +721,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                     if (associatedViewModel != null)
                     {
-                        sourceIsSet = this.CreateDiagramConnector(binaryRelationship, item.DiagramThing, associatedViewModel.DiagramThing) != null;
+                        this.CreateDiagramConnector(binaryRelationship, item.DiagramThing, associatedViewModel.DiagramThing);
                     }
                     else
                     {
@@ -770,8 +736,6 @@ namespace CDP4DiagramEditor.ViewModels
                     {
                         this.CreateDiagramConnector(binaryRelationship, associatedViewModel.DiagramThing, item.DiagramThing);
                     }
-
-                    sourceIsSet = false;
                 }
 
                 if (extendDeep && associatedViewModel != null)
@@ -815,20 +779,14 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="deleteEvent">The <see cref="DiagramDeleteEvent"/></param>
         private void OnDiagramDeleteEvent(DiagramDeleteEvent deleteEvent)
         {
-            if (deleteEvent.ViewModel is ThingDiagramContentItem diagramObjViewModel)
+            switch (deleteEvent.ViewModel)
             {
-                this.ThingDiagramItems.Remove(diagramObjViewModel);
-                var connectors = this.DiagramConnectorCollection.Where(x => x.Source == diagramObjViewModel.Thing || x.Target == diagramObjViewModel.Thing).ToArray();
-
-                foreach (var diagramEdgeViewModel in connectors)
-                {
-                    //this.DiagramConnectorCollection.Remove(diagramEdgeViewModel);
-                }
-            }
-
-            if (deleteEvent.ViewModel is DiagramEdgeViewModel connectorViewModel)
-            {
-                this.DiagramConnectorCollection.Remove(connectorViewModel);
+                case ThingDiagramContentItem diagramObjViewModel:
+                    this.ThingDiagramItems.Remove(diagramObjViewModel);
+                    break;
+                case DiagramEdgeViewModel connectorViewModel:
+                    this.DiagramConnectorCollection.Remove(connectorViewModel);
+                    break;
             }
 
             this.UpdateIsDirty();

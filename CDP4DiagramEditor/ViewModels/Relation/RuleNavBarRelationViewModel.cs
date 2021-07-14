@@ -97,9 +97,9 @@ namespace CDP4DiagramEditor.ViewModels.Relation
         /// </summary>
         private void ExecuteCreateRelationshipCommand()
         {
-            if (!(this.ContainerViewModel is DiagramEditorViewModel))
+            if (this.ContainerViewModel is not DiagramEditorViewModel)
             {
-                throw new NullReferenceException("The Relationship Editor view mdoel is not set");
+                throw new NotSupportedException($"The Relationship Editor view model should be of type {nameof(DiagramEditorViewModel)}");
             }
         }
     }

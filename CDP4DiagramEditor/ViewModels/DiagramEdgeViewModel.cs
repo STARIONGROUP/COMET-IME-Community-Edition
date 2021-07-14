@@ -59,7 +59,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Backing field for <see cref="ConnectingPoints"/>
         /// </summary>
-        public List<Point> connectingPoints;
+        private List<Point> connectingPoints;
 
         /// <summary>
         /// Initializes a new instance of the <see cref=""/> class

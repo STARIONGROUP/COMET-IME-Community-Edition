@@ -1,9 +1,8 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="PortContainerDiagramContentItem.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -22,7 +21,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView.Diagram.ViewModels
 {
@@ -37,8 +36,6 @@ namespace CDP4CommonView.Diagram.ViewModels
 
     using DevExpress.Xpf.Diagram;
 
-    using NLog;
-
     using ReactiveUI;
 
     /// <summary>
@@ -46,11 +43,6 @@ namespace CDP4CommonView.Diagram.ViewModels
     /// </summary>
     public class PortContainerDiagramContentItem : NamedThingDiagramContentItem
     {
-        /// <summary>
-        /// The logger for the current class
-        /// </summary>
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         /// <summary>
         /// Gets or sets the port collection
         /// </summary>
@@ -89,18 +81,22 @@ namespace CDP4CommonView.Diagram.ViewModels
 
         /// <summary>
         /// Recalculate all Ports position then fires <see cref="IDiagramPortViewModel.WhenPositionIsUpdatedInvoke"/>
-        /// todo: refactor, issue GH410
         /// </summary>
         private void RecalculatePortsPosition()
         {
-            var diagramItem = (this.Parent as DiagramItem);
+            var diagramItem = this.Parent as DiagramItem;
+
+            if (diagramItem == null)
+            {
+                return;
+            }
 
             var bottomSide = this.PortCollection.Where(p => p.PortContainerShapeSide == PortContainerShapeSide.Bottom).ToArray();
             var portion = this.CalculatePortion(PortContainerShapeSide.Bottom);
 
             for (var index = 0; index < bottomSide.Count(); index++)
             {
-                var vector = portion * (index + 1) - 10;
+                var vector = (portion * (index + 1)) - 10;
                 bottomSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(vector, diagramItem.ActualHeight - (10)));
                 bottomSide[index].WhenPositionIsUpdatedInvoke();
             }
@@ -110,7 +106,7 @@ namespace CDP4CommonView.Diagram.ViewModels
 
             for (var index = 0; index < leftSide.Count(); index++)
             {
-                var vector = portion * (index + 1) - 10;
+                var vector = (portion * (index + 1)) - 10;
                 leftSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(0 - (10), vector));
                 leftSide[index].WhenPositionIsUpdatedInvoke();
             }
@@ -120,7 +116,7 @@ namespace CDP4CommonView.Diagram.ViewModels
 
             for (var index = 0; index < topSide.Count(); index++)
             {
-                var vector = portion * (index + 1) - 10;
+                var vector = (portion * (index + 1)) - 10;
                 topSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(vector, 0 - (10)));
                 topSide[index].WhenPositionIsUpdatedInvoke();
             }
@@ -130,7 +126,7 @@ namespace CDP4CommonView.Diagram.ViewModels
 
             for (var index = 0; index < rightSide.Count(); index++)
             {
-                var vector = portion * (index + 1) - 10;
+                var vector = (portion * (index + 1)) - 10;
                 rightSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(diagramItem.ActualWidth - (10), vector));
                 rightSide[index].WhenPositionIsUpdatedInvoke();
             }

@@ -1,8 +1,8 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="DiagramBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -21,7 +21,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor.ViewModels
 {
@@ -29,18 +29,23 @@ namespace CDP4DiagramEditor.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView;
+
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
@@ -48,11 +53,6 @@ namespace CDP4DiagramEditor.ViewModels
     /// </summary>
     public class DiagramBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
-        /// <summary>
-        /// Backing field for <see cref="CanSetDefaultDiagram"/>
-        /// </summary>
-        private bool canSetDefaultDiagram;
-
         /// <summary>
         /// Backing field for <see cref="CanCreateDiagram"/>
         /// </summary>
@@ -67,11 +67,6 @@ namespace CDP4DiagramEditor.ViewModels
         /// Backing field for <see cref="CurrentIteration"/>
         /// </summary>
         private int currentIteration;
-
-        /// <summary>
-        /// Backing field for <see cref="DomainOfExpertise"/>
-        /// </summary>
-        private string domainOfExpertise;
 
         /// <summary>
         /// The Panel Caption
@@ -89,8 +84,8 @@ namespace CDP4DiagramEditor.ViewModels
         public DiagramBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
+            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.UpdateDiagrams();
 
@@ -101,18 +96,15 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup
-        {
-            get { return this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>(); }
-        }
+        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -120,26 +112,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
-        }
-
-        /// <summary>
-        /// Gets the current <see cref="DomainOfExpertise"/> name
-        /// </summary>
-        public string DomainOfExpertise
-        {
-            get { return this.domainOfExpertise; }
-            private set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the set default Diagram command is enabled
-        /// </summary>
-        public bool CanSetDefaultDiagram
-        {
-            get { return this.canSetDefaultDiagram; }
-            set { this.RaiseAndSetIfChanged(ref this.canSetDefaultDiagram, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -147,12 +121,12 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public bool CanCreateDiagram
         {
-            get { return this.canCreateDiagram; }
-            set { this.RaiseAndSetIfChanged(ref this.canCreateDiagram, value); }
+            get => this.canCreateDiagram;
+            set => this.RaiseAndSetIfChanged(ref this.canCreateDiagram, value);
         }
 
         /// <summary>
-        /// Gets the rows representing <see cref="Diagram"/>s
+        /// Gets the rows representing Diagrams
         /// </summary>
         public ReactiveList<DiagramCanvasRowViewModel> Diagrams { get; private set; }
 
@@ -171,9 +145,9 @@ namespace CDP4DiagramEditor.ViewModels
         protected override void InitializeCommands()
         {
             var canDelete = this.WhenAnyValue(
-               vm => vm.SelectedThing,
-               vm => vm.CanWriteSelectedThing,
-               (selection, canWrite) => selection != null && canWrite);
+                vm => vm.SelectedThing,
+                vm => vm.CanWriteSelectedThing,
+                (selection, canWrite) => selection != null && canWrite);
 
             this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateDiagram));
             this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<DiagramCanvas>(this.Thing));
@@ -225,6 +199,7 @@ namespace CDP4DiagramEditor.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var iteration in this.Diagrams)
             {
                 iteration.Dispose();
@@ -241,8 +216,10 @@ namespace CDP4DiagramEditor.ViewModels
 
             foreach (var diagram in newDiagrams)
             {
-                var row = new DiagramCanvasRowViewModel(diagram, this.Session, this);
-                row.Index = this.Thing.DiagramCanvas.IndexOf(diagram);
+                var row = new DiagramCanvasRowViewModel(diagram, this.Session, this)
+                {
+                    Index = this.Thing.DiagramCanvas.IndexOf(diagram)
+                };
 
                 this.Diagrams.Add(row);
             }
@@ -250,6 +227,7 @@ namespace CDP4DiagramEditor.ViewModels
             foreach (var diagram in oldDiagrams)
             {
                 var row = this.Diagrams.SingleOrDefault(x => x.Thing == diagram);
+
                 if (row != null)
                 {
                     this.Diagrams.Remove(row);
@@ -265,21 +243,24 @@ namespace CDP4DiagramEditor.ViewModels
         private void AddSubscriptions()
         {
             var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(engineeringModelSetupSubscription);
 
             var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(domainOfExpertiseSubscription);
 
             var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(iterationSetupSubscription);
         }
 
@@ -292,20 +273,21 @@ namespace CDP4DiagramEditor.ViewModels
             this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
 
             var iterationDomainPair = this.Session.OpenIterations.SingleOrDefault(x => x.Key == this.Thing);
+
             if (iterationDomainPair.Equals(default(KeyValuePair<Iteration, Tuple<DomainOfExpertise, Participant>>)))
             {
                 this.DomainOfExpertise = "None";
             }
             else
             {
-                this.DomainOfExpertise = (iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null)
-                                        ? "None"
-                                        : string.Format("{0} [{1}]", iterationDomainPair.Value.Item1.Name, iterationDomainPair.Value.Item1.ShortName);
+                this.DomainOfExpertise = iterationDomainPair.Value == null || iterationDomainPair.Value.Item1 == null
+                    ? "None"
+                    : $"{iterationDomainPair.Value.Item1.Name} [{iterationDomainPair.Value.Item1.ShortName}]";
             }
         }
 
         /// <summary>
-        /// Execute the <see cref="UpdateCommand"/> on the <see cref="SelectedThing"/>
+        /// Execute the <see cref="DiagramBrowserViewModel.UpdateCommand"/> on the <see cref="DiagramBrowserViewModel.SelectedThing"/>
         /// </summary>
         protected override void ExecuteUpdateCommand()
         {
@@ -315,7 +297,7 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             var thing = this.SelectedThing.Thing;
-            var vm = new DiagramEditorViewModel((DiagramCanvas)thing, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+            var vm = new DiagramEditorViewModel((DiagramCanvas) thing, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
             this.PanelNavigationService.Open(vm, true);
         }
     }

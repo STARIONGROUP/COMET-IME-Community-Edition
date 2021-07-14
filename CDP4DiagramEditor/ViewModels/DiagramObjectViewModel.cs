@@ -67,7 +67,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// The <see cref="DiagramEditorViewModel"/> container
         /// </summary>
-        private DiagramEditorViewModel containerViewModel;
+        private readonly DiagramEditorViewModel containerViewModel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramObjectViewModel"/> class
