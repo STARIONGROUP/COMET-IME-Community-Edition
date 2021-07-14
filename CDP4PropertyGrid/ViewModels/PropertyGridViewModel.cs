@@ -45,13 +45,14 @@ namespace CDP4PropertyGrid.ViewModels
     /// The view-model for the <see cref="PropertyGrid"/> that displays the properties of a <see cref="Thing"/>
     /// </summary>
     [Export(typeof(IPanelViewModel))]
-    public class PropertyGridViewModel : ViewModelBase<Thing>, IPanelViewModel
+    public class PropertyGridViewModel : ReactiveObject, IPanelViewModel, IViewModelBase<Thing>
     {
         /// <summary>
         /// The <see cref="IDisposable"/> subscription to the <see cref="SelectedThingChangedEvent"/>
         /// </summary>
         private IDisposable selectedThingChangedSubscription;
         private bool isSelected;
+        private ThingViewModel<Thing> thingViewModel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyGridViewModel"/> class
@@ -62,6 +63,8 @@ namespace CDP4PropertyGrid.ViewModels
         [ImportingConstructor]
         public PropertyGridViewModel(bool initialize)
         {
+            this.thingViewModel = new ThingViewModel<Thing>();
+
             if (initialize)
             {
                 this.Identifier = Guid.NewGuid();
@@ -79,8 +82,8 @@ namespace CDP4PropertyGrid.ViewModels
         /// The session.
         /// </param>
         public PropertyGridViewModel(Thing thing, ISession session)
-            : base(thing, session)
         {
+            this.thingViewModel = new ThingViewModel<Thing>(thing, session);
             this.Initialize();
         }
 
@@ -89,19 +92,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         private void Initialize()
         {
-            this.selectedThingChangedSubscription = CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(this.ChangeViewModel);
-        }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <param name="disposing">
-        /// a value indicating whether the class is being disposed of
-        /// </param>
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            this.selectedThingChangedSubscription?.Dispose();
+            this.selectedThingChangedSubscription = CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(this.HandleSelectedThingChanged);
         }
 
         /// <summary>
@@ -127,7 +118,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// <summary>
         /// Gets the data-source
         /// </summary>
-        public string DataSource => this.Session.DataSourceUri;
+        public string DataSource => this.thingViewModel.Session.DataSourceUri;
 
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
@@ -136,27 +127,30 @@ namespace CDP4PropertyGrid.ViewModels
             get { return isSelected; }
             set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
         }
+
+        public Thing Thing => this.thingViewModel.Thing;
+
         /// <summary>
         /// Check if a new <see cref="PropertyGridViewModel"/> should be created.
         /// </summary>
         /// <param name="selectedThingChangedEvent">
         /// The <see cref="SelectedThingChangedEvent"/>
         /// </param>
-        private void ChangeViewModel(SelectedThingChangedEvent selectedThingChangedEvent)
+        private void HandleSelectedThingChanged(SelectedThingChangedEvent selectedThingChangedEvent)
         {
-            this.Dispose();
+            this.thingViewModel.Dispose();
 
-            Application.Current.Dispatcher.Invoke(
-                () =>
-                {
-                    var newVm = new PropertyGridViewModel(selectedThingChangedEvent.SelectedThing, selectedThingChangedEvent.Session)
-                    {
-                        Identifier = this.Identifier
-                    };
+            this.thingViewModel = new ThingViewModel<Thing>(selectedThingChangedEvent.SelectedThing, selectedThingChangedEvent.Session);
+            this.RaisePropertyChanged(nameof(Thing));
+        }
 
-                    CDPMessageBus.Current.SendMessage(new ViewModelChangeEvent(newVm));
-                },
-                DispatcherPriority.Background);
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose()
+        {
+            this.thingViewModel.Dispose();
+            this.selectedThingChangedSubscription?.Dispose();
         }
     }
 }
