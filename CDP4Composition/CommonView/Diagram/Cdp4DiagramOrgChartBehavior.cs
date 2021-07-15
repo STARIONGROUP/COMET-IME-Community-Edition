@@ -438,12 +438,6 @@ namespace CDP4CommonView.Diagram
                     vm.SelectedItems.Add(controlSelectedItem);
                 }
             }
-
-            ////////////////////////////
-            //TODO: Incoming from Development: What does this need to do?
-            ////////////////////////////
-            //this.EventPublisher.Publish(new DiagramSelectEvent(this.AssociatedObject.SelectedItems.Select(x => (IRowViewModelBase<DiagramContentItem>)x.DataContext).ToArray()));
-            ////////////////////////////
         }
 
         /// <summary>

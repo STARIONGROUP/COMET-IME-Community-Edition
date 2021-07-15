@@ -407,7 +407,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             foreach (var item in this.ThingDiagramItems.ToList())
             {
-                this.GenerateDiagramRelation(item, false, false);
+                this.ComputeDiagramConnector(item);
             }
         }
 
@@ -417,7 +417,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="diagramItem">The diagram item.</param>
         private void ComputeDiagramConnector(ThingDiagramContentItem diagramItem)
         {
-            this.GenerateDiagramRelation(diagramItem, false, false);
+            this.GenerateRelationshipDiagramElements(diagramItem, false, false);
         }
 
         /// <summary>
@@ -570,9 +570,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// create a <see cref="PortContainerDiagramContentItem"/>
         /// </summary>
         /// <param name="depictedThing">The dropped <see cref="Thing"/></param>
-        /// <param name="diagramPosition">The position of the <see cref="DiagramObject"/></param>
         /// <returns>The <see cref="DiagramObjectViewModel"/> instantiated</returns>
-        private void CreateDiagramPort(Thing depictedThing, Point diagramPosition)
+        private void CreateDiagramPort(Thing depictedThing)
         {
             if (this.SelectedItem is DiagramContentItem { Content: PortContainerDiagramContentItem container } target)
             {
@@ -580,7 +579,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                 if (row != null)
                 {
-                    return; //return row;
+                    return;
                 }
 
                 var block = new DiagramObject()
@@ -614,13 +613,13 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="binaryRelationship">The <see cref="BinaryRelationship"/></param>
         /// <param name="source">The <see cref="DiagramObject"/> source</param>
         /// <param name="target">The <see cref="DiagramObject"/> target</param>
-        private DiagramEdgeViewModel CreateDiagramConnector(BinaryRelationship binaryRelationship, DiagramObject source, DiagramObject target)
+        private void CreateDiagramConnector(BinaryRelationship binaryRelationship, DiagramObject source, DiagramObject target)
         {
             var connectorItem = this.DiagramConnectorCollection.SingleOrDefault(x => x.Thing.DepictedThing == binaryRelationship);
 
             if (connectorItem != null)
             {
-                return connectorItem;
+                return;
             }
 
             var connector = new DiagramEdge
@@ -632,8 +631,6 @@ namespace CDP4DiagramEditor.ViewModels
 
             connectorItem = new DiagramEdgeViewModel(connector, this.Session, this);
             this.DiagramConnectorCollection.Add(connectorItem);
-
-            return connectorItem;
         }
 
         /// <summary>
@@ -643,12 +640,12 @@ namespace CDP4DiagramEditor.ViewModels
         {
             foreach (var item in this.SelectedItems)
             {
-                if (!((item as DiagramContentItem)?.Content is ThingDiagramContentItem content))
+                if ((item as DiagramContentItem)?.Content is not ThingDiagramContentItem content)
                 {
                     continue;
                 }
 
-                this.GenerateDiagramRelation(content, extendDeep);
+                this.GenerateRelationshipDiagramElements(content, extendDeep);
                 this.Behavior.ApplyChildLayout(item);
             }
         }
@@ -666,7 +663,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public void CreatePortCommandExecute()
         {
-            this.CreateDiagramPort(new ElementUsage() { Name = "WhyNot", ShortName = "WhyNot" }, new Point(0, 0));
+            this.CreateDiagramPort(new ElementUsage() { Name = "WhyNot", ShortName = "WhyNot" });
         }
 
         /// <summary>
@@ -692,10 +689,10 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Generate the diagram connectors from the <see cref="BinaryRelationship"/> associated to the depicted <see cref="Thing"/>
         /// </summary>
-        /// <param name="item">The <see cref="DiagramObjectViewModel"/> to start from</param>
+        /// <param name="item">The <see cref="ThingDiagramContentItem"/> to start from</param>
         /// <param name="extendDeep">Indicates whether the process shall keep going for the related <see cref="DiagramObjectViewModel"/></param>
         /// <param name="shouldAddMissingThings">True if missing things should be added to diagram.</param>
-        public void GenerateDiagramRelation(ThingDiagramContentItem item, bool extendDeep, bool shouldAddMissingThings = true)
+        public void GenerateRelationshipDiagramElements(ThingDiagramContentItem item, bool extendDeep, bool shouldAddMissingThings = true)
         {
             var iteration = (Iteration) this.Thing.Container;
 
@@ -713,35 +710,49 @@ namespace CDP4DiagramEditor.ViewModels
                     continue;
                 }
 
-                ThingDiagramContentItem associatedViewModel;
-
-                if (binaryRelationship.Source == depictedThing)
-                {
-                    associatedViewModel = this.CreateDiagramObject(binaryRelationship.Target, new Point(item.Position.X + Cdp4DiagramHelper.DefaultSeparation, item.Position.Y), shouldAddMissingThings);
-
-                    if (associatedViewModel != null)
-                    {
-                        this.CreateDiagramConnector(binaryRelationship, item.DiagramThing, associatedViewModel.DiagramThing);
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
-                    associatedViewModel = this.CreateDiagramObject(binaryRelationship.Source, new Point(item.Position.X - Cdp4DiagramHelper.DefaultSeparation, item.Position.Y), shouldAddMissingThings);
-
-                    if (associatedViewModel != null)
-                    {
-                        this.CreateDiagramConnector(binaryRelationship, associatedViewModel.DiagramThing, item.DiagramThing);
-                    }
-                }
+                var associatedViewModel = this.GenerateRelationshipDiagramObjectAndConnector(item, binaryRelationship, shouldAddMissingThings);
 
                 if (extendDeep && associatedViewModel != null)
                 {
-                    this.GenerateDiagramRelation(associatedViewModel, true);
+                    this.GenerateRelationshipDiagramElements(associatedViewModel, true);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Generate DiagramObject and DiagramConnectors for a <see cref="BinaryRelationship"/>
+        /// </summary>
+        /// <param name="item">The <see cref="ThingDiagramContentItem"/> to start from</param>
+        /// <param name="binaryRelationship">The <see cref="BinaryRelationship"/></param>
+        /// <param name="shouldAddMissingThings">True if missing things should be added to diagram.</param>
+        /// <returns>The newly created <see cref="ThingDiagramContentItem"/> that is connected to  the <paramref name="item"/>.</returns>
+        private ThingDiagramContentItem GenerateRelationshipDiagramObjectAndConnector(ThingDiagramContentItem item, BinaryRelationship binaryRelationship, bool shouldAddMissingThings)
+        {
+            var depictedThing = item.DiagramThing.DepictedThing;
+
+            if (binaryRelationship.Source == depictedThing)
+            {
+                var associatedViewModel = this.CreateDiagramObject(binaryRelationship.Target, new Point(item.Position.X + Cdp4DiagramHelper.DefaultSeparation, item.Position.Y), shouldAddMissingThings);
+
+                if (associatedViewModel == null)
+                {
+                    return null;
+                }
+
+                this.CreateDiagramConnector(binaryRelationship, item.DiagramThing, associatedViewModel.DiagramThing);
+                return associatedViewModel;
+            }
+            else
+            {
+                var associatedViewModel = this.CreateDiagramObject(binaryRelationship.Source, new Point(item.Position.X - Cdp4DiagramHelper.DefaultSeparation, item.Position.Y), shouldAddMissingThings);
+
+                if (associatedViewModel == null)
+                {
+                    return null;
+                }
+
+                this.CreateDiagramConnector(binaryRelationship, associatedViewModel.DiagramThing, item.DiagramThing);
+                return associatedViewModel;
             }
         }
 
