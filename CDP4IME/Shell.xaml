@@ -308,8 +308,7 @@
         <!--DockItemClosing="DockManager_DockItemClosing"-->
         <dxdo:DockLayoutManager x:Name="DockManager"
                                 DataContext="{Binding DockViewModel}"
-                                ItemsSource="{Binding DockPanelViewModels}"
-                                
+                                ItemsSource="{Binding DockPanelViewModels}"                                
                                 DockItemClosed="DockManager_DockItemClosed"
                                 DockOperationStarting="DockManager_DockOperationStarting"
                                 Grid.Row="1"
@@ -340,7 +339,6 @@
             </dxdo:DockLayoutManager.Resources>            
             <dxdo:LayoutGroup ItemHeight="0.7*" DestroyOnClosingChildren="False" Orientation="Horizontal">
                 <dxdo:TabbedGroup Name="LeftGroup"
-                                  ItemsSource="{Binding LeftGroupViewModels}"
                                   SelectedTabIndex="{Binding LeftGroupSelectedTabIndex}"
                                   DestroyOnClosingChildren="False"
                                   ItemWidth="0.2*"/>

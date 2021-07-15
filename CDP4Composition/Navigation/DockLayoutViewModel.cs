@@ -45,7 +45,7 @@ namespace CDP4Composition.Navigation
         [ImportingConstructor]
         public DockLayoutViewModel(IDialogNavigationService dialogNavigationService)
         {
-            DockPanelViewModels = new ObservableCollection<IMVVMDockingProperties>();
+            DockPanelViewModels = new ReactiveList<IMVVMDockingProperties>();
 
             this.dialogNavigationService = dialogNavigationService;
 
@@ -55,7 +55,8 @@ namespace CDP4Composition.Navigation
             DockItemClosedCommand.Subscribe(ItemClosed);
         }
 
-        public ObservableCollection<IMVVMDockingProperties> DockPanelViewModels { get; }
+
+        public ReactiveList<IMVVMDockingProperties> DockPanelViewModels { get; }
 
         public int LeftGroupSelectedTabIndex { get; set; }
 

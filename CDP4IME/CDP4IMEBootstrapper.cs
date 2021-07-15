@@ -104,8 +104,6 @@ namespace CDP4IME
             this.UpdateBootstrapperState("Setting up Regions");
             var regionmanager = this.Container.GetExportedValue<IRegionManager>();
 
-            //var bleh = this.Container.GetExportedValue<IPanelView>("bleh");
-
             foreach (var region in regionmanager.Regions)
             {
                 this.UpdateBootstrapperState($"Loaded Region: {region.Name} ");

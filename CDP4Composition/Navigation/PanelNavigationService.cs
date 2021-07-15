@@ -470,14 +470,14 @@ namespace CDP4Composition.Navigation
         /// <param name="e">the <see cref="NotifyCollectionChangedEventArgs"/></param>
         private void ViewCollectionChangedEventHandler(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action != NotifyCollectionChangedAction.Remove)
+            if (e.Action is not NotifyCollectionChangedAction.Remove)
             {
                 return;
             }
 
             foreach (var view in e.OldItems)
             {
-                if (!(view is IPanelView viewPanel))
+                if (view is not IPanelView viewPanel)
                 {
                     continue;
                 }
