@@ -266,7 +266,7 @@ namespace CDP4Composition.Navigation
                     this.filterStringService.RegisterForService(viewModel);
                 }
 
-                var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open, regionName);
+                var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open, viewModel.TargetName);
                 CDPMessageBus.Current.SendMessage(openPanelEvent);
             }
         }
@@ -326,7 +326,7 @@ namespace CDP4Composition.Navigation
             {
                 var lazyView = this.GetViewType(viewModel);
                 var regionName = lazyView.Metadata.Region;
-                var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open, regionName);
+                var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open, viewModel.TargetName);
                 CDPMessageBus.Current.SendMessage(openPanelEvent);
             }
             else
