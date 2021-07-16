@@ -4,7 +4,7 @@
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
-//    This file is part of CDP4-IME Community Edition.
+//    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -52,7 +52,7 @@ namespace CDP4Composition.Ribbon
         /// Gets or sets the name of the container <see cref="RibbonPage"/> that the current <see cref="ExtendedRibbonPageCategory"/> needs to be added to.
         /// </summary>
         /// <remarks>
-        /// The page will only be added by the <see cref="RibbonAdapter"/> if the <see cref="RibbonPage"/> with the specified <see cref="RegionName"/>
+        /// The page will only be added by the <see cref="RibbonAdapter"/> if the <see cref="RibbonPage"/> with the specified <see cref="RegionName"/> 
         /// property can be found in the <see cref="RibbonControl"/>
         /// </remarks>
         public string ContainerRegionName

@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IThingDiagramItem.cs" company="RHEA System S.A.">
+// <copyright file="ClassKindConverterTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -25,18 +24,39 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-namespace CDP4Composition.Diagram
+using System;
+using CDP4Common.CommonData;
+
+namespace CDP4DiagramEditor.Tests.Helpers
 {
-    using CDP4Common.CommonData;
+    using CDP4DiagramEditor.Helpers;
+    using NUnit.Framework;
 
     /// <summary>
-    /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
+    /// Suite of tests for the <see cref="ClassKindConverter"/> class.
     /// </summary>
-    public interface IThingDiagramItem
+    [TestFixture]
+    public class ClassKindConverterTestFixture
     {
-        /// <summary>
-        /// Gets or sets the <see cref="Thing"/>.
-        /// </summary>
-        Thing Thing { get; set; }
+        private ClassKindConverter converter;
+
+        [SetUp]
+        public void SetUp()
+        {
+            this.converter = new ClassKindConverter();
+        }
+
+        [Test]
+        public void VerifyThatConverReturnsTheExpectedResult()
+        {
+            var result = this.converter.Convert(ClassKind.ElementDefinition, null, null, null);
+            Assert.AreEqual("<<Element Definition>>", result);
+        }
+
+        [Test]
+        public void VerifyThatConvertBackThrowsNotSupportedException()
+        {
+            Assert.Throws<NotSupportedException>(() => this.converter.ConvertBack(null, null, null, null));
+        }
     }
 }

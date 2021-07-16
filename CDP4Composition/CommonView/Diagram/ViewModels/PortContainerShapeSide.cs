@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IThingDiagramItem.cs" company="RHEA System S.A.">
+// <copyright file="PortContainerShapeSide.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -24,19 +24,37 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-namespace CDP4Composition.Diagram
+namespace CDP4CommonView.Diagram.ViewModels
 {
-    using CDP4Common.CommonData;
-
     /// <summary>
-    /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
+    /// enumeration ShapeSide that denotes the possible sides of diagram element such as Element definitiom.
+    /// Used to calculate Ports location on Port container
     /// </summary>
-    public interface IThingDiagramItem
+    public enum PortContainerShapeSide
     {
         /// <summary>
-        /// Gets or sets the <see cref="Thing"/>.
+        /// Default value
         /// </summary>
-        Thing Thing { get; set; }
+        Undefined = -1,
+
+        /// <summary>
+        /// Represent the bottom side of the port container <see cref="PortContainerDiagramContentItem"/>
+        /// </summary>
+        Bottom = 0,
+
+        /// <summary>
+        /// Represent the left side of the port container <see cref="PortContainerDiagramContentItem"/>
+        /// </summary>
+        Left = 1,
+
+        /// <summary>
+        /// represent the top side of the port container <see cref="PortContainerDiagramContentItem"/>
+        /// </summary>
+        Top = 2,
+
+        /// <summary>
+        /// Represent the right side of the port container <see cref="PortContainerDiagramContentItem"/>
+        /// </summary>
+        Right = 3
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IThingDiagramItem.cs" company="RHEA System S.A.">
+// <copyright file="DiagramItemDataTemplateSelector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -23,20 +23,42 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
-
-namespace CDP4Composition.Diagram
+namespace CDP4DiagramEditor.ViewModels
 {
-    using CDP4Common.CommonData;
+    using System.Windows;
+    using System.Windows.Controls;
+
+    using CDP4Composition.Diagram;
 
     /// <summary>
-    /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
+    /// The <see cref="DataTemplateSelector"/> to select a <see cref="DataTemplate"/> depending on the kind of budget to compute
     /// </summary>
-    public interface IThingDiagramItem
+    public class DiagramItemDataTemplateSelector : DataTemplateSelector
     {
         /// <summary>
-        /// Gets or sets the <see cref="Thing"/>.
+        /// Selects the template for a <see cref="NamedThingDiagramContentItem"/>
         /// </summary>
-        Thing Thing { get; set; }
+        /// <param name="item">The <see cref="NamedThingDiagramContentItem"/></param>
+        /// <param name="container">the dependency-object</param>
+        /// <returns>The <see cref="DataTemplate"/> to use</returns>
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            if (!(item is NamedThingDiagramContentItem))
+            {
+                return base.SelectTemplate(item, container);
+            }
+            
+            return item is DiagramPortViewModel ? this.DiagramPortTemplate : this.GenericDiagramItemDataTemplate;
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> for a mass-budget template
+        /// </summary>
+        public DataTemplate GenericDiagramItemDataTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> for a generic-budget
+        /// </summary>
+        public DataTemplate DiagramPortTemplate { get; set; }
     }
 }

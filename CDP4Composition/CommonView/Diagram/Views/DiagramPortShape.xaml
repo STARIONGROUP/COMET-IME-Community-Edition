@@ -1,0 +1,26 @@
+﻿<dxdiag:DiagramShape x:Class="CDP4CommonView.Diagram.Views.DiagramPortShape"
+                     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+                     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                     xmlns:dxdiag="http://schemas.devexpress.com/winfx/2008/xaml/diagram"
+                     xmlns:behaviors="clr-namespace:CDP4CommonView.Diagram.Behaviors"
+                     xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+                     mc:Ignorable="d"
+                     Shape="BasicShapes.Rectangle"
+                     Height="20"
+                     Width="20"
+                     Anchors="Bottom"
+                     SnapsToDevicePixels="False"
+                     CanSnapToOtherItems="False"
+                     CanSnapToThisItem="False"
+                     CanMove="True"
+                     ConnectionPoints="0.5,1"
+                     Background="LightGray"
+                     BorderBrush="LightGray"
+                     BorderThickness="1"
+                     d:DesignHeight="300" d:DesignWidth="300">
+    <dxmvvm:Interaction.Behaviors>
+        <behaviors:DiagramPortShapeBehavior></behaviors:DiagramPortShapeBehavior>
+    </dxmvvm:Interaction.Behaviors>
+</dxdiag:DiagramShape>

@@ -1,5 +1,5 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DiagramDeleteEvent.cs" company="RHEA System S.A.">
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DiagramEditor.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
@@ -23,27 +23,42 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4CommonView.Diagram
+namespace CDP4DiagramEditor.Views
 {
-    using CDP4CommonView.EventAggregator;
+    using CDP4Composition;
+    using CDP4Composition.Attributes;
 
     /// <summary>
-    /// A delete event for the diagramming tool
+    /// Interaction logic for CDP4DiagramEditor.xaml
     /// </summary>
-    public class DiagramDeleteEvent : BaseEvent
+    [PanelViewExport(RegionNames.EditorPanel)]
+    public partial class DiagramEditor : IPanelView
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiagramDeleteEvent"/> class
+        /// Initializes a new instance of the <see cref="DiagramEditor"/> class
         /// </summary>
-        /// <param name="viewModelDeleted">The view-model instance to delete</param>
-        public DiagramDeleteEvent(object viewModelDeleted)
+        /// <remarks>
+        /// Called by MEF
+        /// </remarks>
+        public DiagramEditor()
         {
-            this.ViewModel = viewModelDeleted;
         }
 
         /// <summary>
-        /// Gets the view-model that should be deleted
+        /// Initializes a new instance of the <see cref="DiagramEditor"/> class.
         /// </summary>
-        public object ViewModel { get; private set; }
+        /// <param name="initializeComponent">
+        /// a value indicating whether the contained Components shall be loaded
+        /// </param>
+        /// <remarks>
+        /// This constructor is called by the navigation service
+        /// </remarks>
+        public DiagramEditor(bool initializeComponent)
+        {
+            if (initializeComponent)
+            {
+                this.InitializeComponent();
+            }
+        }
     }
 }
