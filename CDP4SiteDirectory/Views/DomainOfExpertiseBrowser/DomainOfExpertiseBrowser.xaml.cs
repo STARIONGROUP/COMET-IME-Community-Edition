@@ -17,7 +17,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for DomainOfExpertiseBrowser
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class DomainOfExpertiseBrowser : IPanelView, IPanelFilterableDataGridView
+    public partial class DomainOfExpertiseBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -45,13 +45,7 @@ namespace CDP4SiteDirectory.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.DomainsGridControl;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }

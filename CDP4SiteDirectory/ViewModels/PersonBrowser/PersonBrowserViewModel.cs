@@ -25,7 +25,7 @@ namespace CDP4SiteDirectory.ViewModels
     /// that shows the <see cref="Person"/>s and the related <see cref="Participant"/> contained by a <see cref="SiteDirectory"/>
     /// </summary>
     public class PersonBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
-        IDeprecatableBrowserViewModel
+        IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
     {
         /// <summary>
         /// Backing field for <see cref="CanCreatePerson"/>
@@ -36,6 +36,16 @@ namespace CDP4SiteDirectory.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Persons";
+
+        /// <summary>
+        /// Baking field for <see cref="FilterString"/>
+        /// </summary>
+        private string filterString;
+
+        /// <summary>
+        /// Baking field for <see cref="IsFilterEnabled"/>
+        /// </summary>
+        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonBrowserViewModel"/> class.
@@ -80,7 +90,22 @@ namespace CDP4SiteDirectory.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.canCreatePerson, value); }
         }
 
+        ///<inheritdoc/>
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
+
+        ///<inheritdoc/>
+        public string FilterString
+        {
+            get { return this.filterString; }
+            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
+        }
+
+        ///<inheritdoc/>
+        public bool IsFilterEnabled
+        {
+            get { return this.isFilterEnabled; }
+            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
+        }
 
         /// <summary>
         /// Update the person rows

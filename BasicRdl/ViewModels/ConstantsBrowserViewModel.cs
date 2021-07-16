@@ -51,7 +51,7 @@ namespace BasicRdl.ViewModels
     /// The purpose of the <see cref="ConstantsBrowserViewModel"/> is to represent the view-model for <see cref="Constant"/>s
     /// </summary>
     public class ConstantsBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget,
-        IDeprecatableBrowserViewModel
+        IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -67,6 +67,16 @@ namespace BasicRdl.ViewModels
         /// Backing field for <see cref="CanCreateRdlElement"/>
         /// </summary>
         private bool canCreateRdlElement;
+
+        /// <summary>
+        /// Baking field for <see cref="FilterString"/>
+        /// </summary>
+        private string filterString;
+
+        /// <summary>
+        /// Baking field for <see cref="IsFilterEnabled"/>
+        /// </summary>
+        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstantsBrowserViewModel"/> class.
@@ -107,10 +117,22 @@ namespace BasicRdl.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value); }
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
+        ///<inheritdoc/>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        ///<inheritdoc/>
+        public string FilterString
+        {
+            get { return this.filterString; }
+            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
+        }
+
+        ///<inheritdoc/>
+        public bool IsFilterEnabled
+        {
+            get { return this.isFilterEnabled; }
+            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
+        }
 
         /// <summary>
         /// Initializes the Commands that can be executed from this view model. The commands are initialized

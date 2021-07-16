@@ -17,7 +17,7 @@ namespace BasicRdl.Views
     /// Interaction logic for Parameter types browser
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class ParameterTypesBrowser : IPanelView, IPanelFilterableDataGridView
+    public partial class ParameterTypesBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -45,14 +45,8 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.ParameterTypesGridControl;
                 this.View.ShowSearchPanel(true);
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }

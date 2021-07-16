@@ -17,7 +17,7 @@ namespace BasicRdl.Views
     /// Interaction logic for <see cref="MeasurementUnitsBrowser"/>
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class MeasurementUnitsBrowser : IPanelView, IPanelFilterableDataGridView
+    public partial class MeasurementUnitsBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -48,13 +48,7 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.MeasurementUnitGridControl;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }

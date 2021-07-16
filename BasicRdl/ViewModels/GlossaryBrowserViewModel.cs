@@ -53,7 +53,7 @@ namespace BasicRdl.ViewModels
     /// that shows all the <see cref="Glossary"/>s contained by a data-source following the containment tree that is modeled in 10-25 and the CDP4 extensions.
     /// </summary>
     public class GlossaryBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget,
-        IDeprecatableBrowserViewModel
+        IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
     {
         /// <summary>
         /// The NLog logger
@@ -74,6 +74,16 @@ namespace BasicRdl.ViewModels
         /// Backing field for <see cref="CanCreateGlossary"/>
         /// </summary>
         private bool canCreateGlossary;
+
+        /// <summary>
+        /// Baking field for <see cref="FilterString"/>
+        /// </summary>
+        private string filterString;
+
+        /// <summary>
+        /// Baking field for <see cref="IsFilterEnabled"/>
+        /// </summary>
+        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GlossaryBrowserViewModel"/> class.
@@ -130,7 +140,23 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="Glossary"/> Creation <see cref="ICommand"/>
         /// </summary>
         public ReactiveCommand<object> CreateGlossaryCommand { get; private set; }
+
+        ///<inheritdoc/>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        ///<inheritdoc/>
+        public string FilterString
+        {
+            get { return this.filterString; }
+            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
+        }
+
+        ///<inheritdoc/>
+        public bool IsFilterEnabled
+        {
+            get { return this.isFilterEnabled; }
+            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
+        }
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.

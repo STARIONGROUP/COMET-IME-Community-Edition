@@ -17,7 +17,7 @@ namespace CDP4Requirements.Views
     /// Interaction logic for RequirementsBrowser.xaml
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class RequirementsBrowser : IPanelView, IPanelFilterableDataGridView
+    public partial class RequirementsBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -45,13 +45,7 @@ namespace CDP4Requirements.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.RequirementBrowserTreeListControl;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }

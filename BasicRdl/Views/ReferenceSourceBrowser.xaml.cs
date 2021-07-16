@@ -17,7 +17,7 @@ namespace BasicRdl.Views
     /// Interaction logic for ReferenceSourceBrowser
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class ReferenceSourceBrowser : IPanelView, IPanelFilterableDataGridView
+    public partial class ReferenceSourceBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -45,13 +45,7 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.ReferenceSourceGridControl;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }

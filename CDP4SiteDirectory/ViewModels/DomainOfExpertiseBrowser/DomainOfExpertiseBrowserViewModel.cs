@@ -25,7 +25,7 @@ namespace CDP4SiteDirectory.ViewModels
     /// represents a view-model for the <see cref="DomainOfExpertise"/>s in a <see cref="SiteDirectory"/>
     /// </summary>
     public class DomainOfExpertiseBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
-        IDeprecatableBrowserViewModel
+        IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
     {
         /// <summary>
         /// The row comparer
@@ -41,6 +41,16 @@ namespace CDP4SiteDirectory.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Domains of Expertise";
+
+        /// <summary>
+        /// Baking field for <see cref="FilterString"/>
+        /// </summary>
+        private string filterString;
+
+        /// <summary>
+        /// Baking field for <see cref="IsFilterEnabled"/>
+        /// </summary>
+        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainOfExpertiseBrowserViewModel"/> class
@@ -84,7 +94,23 @@ namespace CDP4SiteDirectory.ViewModels
         /// Gets the List of <see cref="DomainOfExpertiseRowViewModel"/>
         /// </summary>
         public DisposableReactiveList<DomainOfExpertiseRowViewModel> DomainOfExpertises { get; private set; }
+
+        ///<inheritdoc/>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        ///<inheritdoc/>
+        public string FilterString
+        {
+            get { return this.filterString; }
+            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
+        }
+
+        ///<inheritdoc/>
+        public bool IsFilterEnabled
+        {
+            get { return this.isFilterEnabled; }
+            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
+        }
 
         /// <summary>
         /// Initialize the <see cref="ReactiveCommand"/>s of the current view-model

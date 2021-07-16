@@ -17,7 +17,7 @@ namespace BasicRdl.Views
     /// Interaction logic for ConstantsBrowser
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class ConstantsBrowser : IPanelView, IPanelFilterableDataGridView
+    public partial class ConstantsBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger

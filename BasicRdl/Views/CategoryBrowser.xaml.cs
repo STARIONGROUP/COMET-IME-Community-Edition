@@ -19,7 +19,7 @@ namespace BasicRdl.Views
     [PanelViewExport(RegionNames.LeftPanel)]
     //[Export(nameof(CategoryBrowser), typeof(IPanelView))]
     //[PartCreationPolicy(CreationPolicy.NonShared)]
-    public partial class CategoryBrowser : IPanelView, IPanelFilterableDataGridView
+    public partial class CategoryBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -50,13 +50,7 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.CategoriesGridControl;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }

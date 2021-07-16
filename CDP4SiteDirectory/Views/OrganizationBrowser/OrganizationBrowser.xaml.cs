@@ -17,7 +17,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for OrganizationBrowser.xaml
     /// </summary>
     [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class OrganizationBrowser : IPanelView, IPanelFilterableDataGridView
+    public partial class OrganizationBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -45,14 +45,7 @@ namespace CDP4SiteDirectory.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.OrganizationsTreeList;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
-
     }
 }

@@ -216,7 +216,7 @@ namespace CDP4Composition.Navigation
                 this.ViewModelViewPairs.Add(viewModel, view);
 
                 // register for Filter Service
-                this.filterStringService.RegisterForService(view, viewModel);
+                this.filterStringService.RegisterForService(viewModel);
 
                 var region = this.regionManager.Regions[lazyView.Metadata.Region];
                 region.Add(view, view.ToString() + Guid.NewGuid());
@@ -263,7 +263,7 @@ namespace CDP4Composition.Navigation
                     this.ViewModelViewPairs.Add(viewModel, view);
 
                     // register for Filter Service
-                    this.filterStringService.RegisterForService(view, viewModel);
+                    this.filterStringService.RegisterForService(viewModel);
                 }
 
                 var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open, regionName);
@@ -513,7 +513,7 @@ namespace CDP4Composition.Navigation
             panelViewModel.Dispose();
 
             // unregister from filter string service
-            this.filterStringService.UnregisterFromService(panelView);
+            this.filterStringService.UnregisterFromService(panelViewModel);
         }
     }
 }

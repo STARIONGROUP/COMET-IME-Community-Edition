@@ -39,7 +39,7 @@ namespace CDP4Composition.Tests.Services
         private Mock<IDeprecatableToggleViewModel> deprecatableToggle;
 
         private Mock<IPanelView> goodView;
-        private Mock<IPanelFilterableDataGridView> goodViewFilterable;
+        private Mock<IPanelFilterableDataGridViewModel> goodViewFilterable;
         private Mock<IPanelView> badView;
         private Mock<IPanelViewModel> goodViewModel;
         private Mock<IPanelViewModel> badViewModel;
@@ -53,7 +53,7 @@ namespace CDP4Composition.Tests.Services
             this.goodView = new Mock<IPanelView>();
             this.badView = new Mock<IPanelView>();
 
-            this.goodViewFilterable = this.goodView.As<IPanelFilterableDataGridView>();
+            this.goodViewFilterable = this.goodView.As<IPanelFilterableDataGridViewModel>();
             this.goodViewModel = new Mock<IPanelViewModel>();
             this.goodViewModelDeprecatable = this.goodViewModel.As<IDeprecatableBrowserViewModel>();
             this.goodViewModelFavorable = this.goodViewModel.As<IFavoritesBrowserViewModel>();
@@ -67,12 +67,12 @@ namespace CDP4Composition.Tests.Services
             var filterStringService = new FilterStringService();
 
             Assert.AreEqual(0, filterStringService.OpenDeprecatedControls.Count);
-            Assert.AreEqual(0, filterStringService.OpenFavoriteControls.Count);
+            Assert.AreEqual(0, filterStringService.OpenFavoriteViewModels.Count);
 
-            filterStringService.RegisterForService(this.badView.Object, this.badViewModel.Object);
+            filterStringService.RegisterForService(this.badViewModel.Object);
 
             Assert.AreEqual(0, filterStringService.OpenDeprecatedControls.Count);
-            Assert.AreEqual(0, filterStringService.OpenFavoriteControls.Count);
+            Assert.AreEqual(0, filterStringService.OpenFavoriteViewModels.Count);
         }
     }
 }

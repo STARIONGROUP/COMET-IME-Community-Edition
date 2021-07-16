@@ -17,7 +17,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for PersonBrowser
     /// </summary>
     [PanelViewExport(RegionNames.RightPanel)]
-    public partial class PersonBrowser : IPanelView, IPanelFilterableDataGridView
+    public partial class PersonBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -45,13 +45,7 @@ namespace CDP4SiteDirectory.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.PersonsTreeListControl;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }

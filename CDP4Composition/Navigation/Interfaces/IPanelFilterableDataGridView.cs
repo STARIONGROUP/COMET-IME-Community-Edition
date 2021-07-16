@@ -6,16 +6,19 @@
 
 namespace CDP4Composition.Navigation.Interfaces
 {
-    using DevExpress.Xpf.Grid;
-
     /// <summary>
-    /// An inteface for a panel with filterable data grid.
+    /// An inteface for a panel view model with filterable data grid.
     /// </summary>
-    public interface IPanelFilterableDataGridView
+    public interface IPanelFilterableDataGridViewModel
     {
         /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
+        /// The filter string which the view is bound to.
         /// </summary>
-        DataControlBase FilterableControl { get; }
+        string FilterString { get; set; }
+
+        /// <summary>
+        /// The enabled value of the filter which the view is bound to.
+        /// </summary>
+        bool IsFilterEnabled { get; set; }
     }
 }

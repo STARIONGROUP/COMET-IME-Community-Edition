@@ -61,11 +61,6 @@ namespace CDP4Composition.Navigation
         private readonly IFilterStringService filterStringService;
 
         /// <summary>
-        /// The (injected) <see cref="IRegionCollectionSearcher"/>
-        /// </summary>
-        private readonly IRegionCollectionSearcher regionCollectionSearcher;
-
-        /// <summary>
         /// The logger for the current class
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
@@ -138,7 +133,7 @@ namespace CDP4Composition.Navigation
             this.dockLayoutViewModel.AddDockPanelViewModel(viewModel);
 
             //TODO: refactor so there's no dependency on the view. Use databinding from the View to ViewModel
-            //this.filterStringService.RegisterForService(view, viewModel);
+            this.filterStringService.RegisterForService(viewModel);
 
             logger.Trace("Navigated to Panel {0} in {1} [ms]", viewModel, sw.ElapsedMilliseconds);
         }
@@ -302,7 +297,7 @@ namespace CDP4Composition.Navigation
             panelViewModel.Dispose();
 
             // unregister from filter string service
-            //this.filterStringService.UnregisterFromService(panelView);
+            this.filterStringService.UnregisterFromService(panelViewModel);
         }
     }
 }

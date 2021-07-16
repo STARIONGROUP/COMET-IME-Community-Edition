@@ -82,6 +82,8 @@
             <dxg:TreeListControl x:Name="GlossaryTreeListControl"
                              Grid.Row="2"
                              ItemsSource="{Binding Path=Glossaries}"
+                             FilterString="{Binding FilterString, Mode=TwoWay}"
+                             IsFilterEnabled="{Binding IsFilterEnabled, Mode=TwoWay}"                                                          
                              SelectedItem="{Binding SelectedThing,
                                                     Mode=TwoWay,
                                                     UpdateSourceTrigger=PropertyChanged}"

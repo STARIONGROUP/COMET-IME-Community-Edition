@@ -48,7 +48,7 @@ namespace BasicRdl.ViewModels
     /// The purpose of the <see cref="MeasurementScalesBrowserViewModel"/> is to represent the view-model for <see cref="MeasurementScale"/>s
     /// </summary>
     public class MeasurementScalesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
-        IDeprecatableBrowserViewModel
+        IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -65,6 +65,16 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private readonly DisposableReactiveList<MeasurementScaleRowViewModel> measurementScales =
             new DisposableReactiveList<MeasurementScaleRowViewModel>();
+
+        /// <summary>
+        /// Baking field for <see cref="FilterString"/>
+        /// </summary>
+        private string filterString;
+
+        /// <summary>
+        /// Baking field for <see cref="IsFilterEnabled"/>
+        /// </summary>
+        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeasurementScalesBrowserViewModel"/> class.
@@ -132,7 +142,23 @@ namespace BasicRdl.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CyclicRatioScale"/>
         /// </summary>
         public ReactiveCommand<object> CreateCyclicRatioScale { get; private set; }
+
+        ///<inheritdoc/>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        ///<inheritdoc/>
+        public string FilterString
+        {
+            get { return this.filterString; }
+            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
+        }
+
+        ///<inheritdoc/>
+        public bool IsFilterEnabled
+        {
+            get { return this.isFilterEnabled; }
+            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
+        }
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.

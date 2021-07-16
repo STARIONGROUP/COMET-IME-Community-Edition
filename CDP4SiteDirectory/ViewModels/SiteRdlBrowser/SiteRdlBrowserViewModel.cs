@@ -24,7 +24,7 @@ namespace CDP4SiteDirectory.ViewModels
     /// The view-model for the <see cref="SiteRdlBrowserViewModel"/>
     /// </summary>
     public class SiteRdlBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
-        IDeprecatableBrowserViewModel
+        IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
     {
         /// <summary>
         /// Backing field for <see cref="CanCreateSiteRdl"/>
@@ -35,6 +35,16 @@ namespace CDP4SiteDirectory.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Site RDLs";
+
+        /// <summary>
+        /// Baking field for <see cref="FilterString"/>
+        /// </summary>
+        private string filterString;
+
+        /// <summary>
+        /// Baking field for <see cref="IsFilterEnabled"/>
+        /// </summary>
+        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SiteRdlBrowserViewModel"/> class
@@ -79,7 +89,22 @@ namespace CDP4SiteDirectory.ViewModels
             private set { this.RaiseAndSetIfChanged(ref this.canCreateSiteRdl, value); }
         }
 
+        ///<inheritdoc/>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        ///<inheritdoc/>
+        public string FilterString
+        {
+            get { return this.filterString; }
+            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
+        }
+
+        ///<inheritdoc/>
+        public bool IsFilterEnabled
+        {
+            get { return this.isFilterEnabled; }
+            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
+        }
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
