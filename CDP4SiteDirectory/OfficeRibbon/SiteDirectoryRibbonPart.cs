@@ -188,25 +188,25 @@ namespace CDP4SiteDirectory
         /// </summary>
         private void CloseAll()
         {
-            this.PanelNavigationService.Close(this.domainOfExpertiseBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.domainOfExpertiseBrowserViewModel);
             this.domainOfExpertiseBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.modelBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.modelBrowserViewModel);
             this.modelBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.naturalLanguageBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.naturalLanguageBrowserViewModel);
             this.naturalLanguageBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.organizationBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.organizationBrowserViewModel);
             this.organizationBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.personBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.personBrowserViewModel);
             this.personBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.roleBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.roleBrowserViewModel);
             this.roleBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.siteRdlBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.siteRdlBrowserViewModel);
             this.siteRdlBrowserViewModel = null;
         }
 
@@ -229,25 +229,25 @@ namespace CDP4SiteDirectory
             switch (ribbonControlId)
             {
                 case "ShowDomainsOfExpertise":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.domainOfExpertiseBrowserViewModel, false);
+                    this.PanelNavigationService.CloseInAddIn(this.domainOfExpertiseBrowserViewModel);
                     break;
                 case "ShowModels":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.modelBrowserViewModel, false);
+                    this.PanelNavigationService.CloseInAddIn(this.modelBrowserViewModel);
                     break;
                 case "ShowLanguages":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.naturalLanguageBrowserViewModel, false);
+                    this.PanelNavigationService.CloseInAddIn(this.naturalLanguageBrowserViewModel);
                     break;
                 case "ShowOrganizations":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.organizationBrowserViewModel, false);
+                    this.PanelNavigationService.CloseInAddIn(this.organizationBrowserViewModel);
                     break;
                 case "ShowPersons":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.personBrowserViewModel, false);
+                    this.PanelNavigationService.CloseInAddIn(this.personBrowserViewModel);
                     break;
                 case "ShowRoles":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.roleBrowserViewModel, false);
+                    this.PanelNavigationService.CloseInAddIn(this.roleBrowserViewModel);
                     break;
                 case "ShowSiteRDLs":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.siteRdlBrowserViewModel, false);
+                    this.PanelNavigationService.CloseInAddIn(this.siteRdlBrowserViewModel);
                     break;
                 case "ShowHideDeprecatedThings":
                     this.showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings = !this.showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings;

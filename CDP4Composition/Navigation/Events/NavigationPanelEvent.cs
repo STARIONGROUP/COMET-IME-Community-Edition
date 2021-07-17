@@ -42,7 +42,7 @@ namespace CDP4Composition.Navigation.Events
         /// <param name="regionName">
         /// The name of the region in which the panel shall be opened
         /// </param>
-        public NavigationPanelEvent(IPanelViewModel viewModel, IPanelView view, PanelStatus status, string regionName = "")
+        public NavigationPanelEvent(IPanelViewModel viewModel, IPanelView view, PanelStatus status)
         {
             this.ViewModel = viewModel;
             this.View = view;
@@ -63,10 +63,5 @@ namespace CDP4Composition.Navigation.Events
         /// Gets The status of the panel
         /// </summary>
         public PanelStatus PanelStatus { get; private set; }
-
-        /// <summary>
-        /// Gets the name of the Region in which the panel should be opened
-        /// </summary>
-        public string RegionName { get; private set; }
     }
 }

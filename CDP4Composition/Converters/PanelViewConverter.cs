@@ -24,25 +24,25 @@ namespace CDP4Composition.Converters
                 return null;
             }
 
+            /*
             if(value is not IPanelViewModel)
             {
                 return null;
             }
+            */
 
             var fullyQualifiedName = value.GetType().FullName.Replace(".ViewModels.", ".Views.");
             var viewName = Regex.Replace(fullyQualifiedName, "ViewModel$", "");
 
             //IPanelView view2 = ServiceLocator.Current.GetInstance<IPanelView>(viewName);
             //view2.DataContext = value;
-
             
             var assembly = value.GetType().Assembly;
 
             var view = (FrameworkElement)assembly.CreateInstance(viewName, false, BindingFlags.Default, null, new object[] { true }, null, null );
             view.DataContext = value;
             
-
-            return view;            
+            return view;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

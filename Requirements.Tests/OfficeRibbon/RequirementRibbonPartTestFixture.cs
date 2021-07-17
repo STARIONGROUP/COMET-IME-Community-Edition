@@ -221,7 +221,7 @@ namespace CDP4Requirements.Tests.OfficeRibbon
             var content = this.ribbonPart.GetContent("ShowRequirements");
             this.ribbonPart.OnAction(string.Format("ShowRequirement_{0}", this.iteration.Iid), string.Format("{0}", this.iteration.Iid));
 
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenInAddIn(It.IsAny<IPanelViewModel>()));
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);

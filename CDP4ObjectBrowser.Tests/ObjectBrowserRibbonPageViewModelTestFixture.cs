@@ -108,10 +108,10 @@ namespace CDP4ObjectBrowser.Tests
 
             vm.OpenSingleBrowserCommand.Execute(null);
 
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(1));
+            this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
             vm.OpenSingleBrowserCommand.Execute(null);
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(2));
+            this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
         }
     }
 }

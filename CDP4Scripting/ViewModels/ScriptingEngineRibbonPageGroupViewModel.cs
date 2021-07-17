@@ -215,7 +215,7 @@ namespace CDP4Scripting.ViewModels
                     throw new NotSupportedException(string.Format("The {0} is not supported", scriptingLanguage));
             }
 
-            this.PanelNavigationService.Open(scriptPanelViewModel as IPanelViewModel, true);
+            this.PanelNavigationService.OpenInDock(scriptPanelViewModel as IPanelViewModel);
             this.CollectionScriptPanelViewModels.Add(scriptPanelViewModel);
             return scriptPanelViewModel;
         }

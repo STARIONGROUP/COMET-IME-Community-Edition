@@ -115,8 +115,8 @@ namespace BasicRdl.Tests
             ribbon4.OpenSingleBrowserCommand.Execute(null);
             ribbon5.OpenSingleBrowserCommand.Execute(null);
 
-            this.navigation.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Never());
-            this.navigation.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), true), Times.Never());
+            this.navigation.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Never());
+            this.navigation.Verify(x => x.CloseInDock(It.IsAny<IPanelViewModel>()), Times.Never());
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace BasicRdl.Tests
             ribbon4.OpenSingleBrowserCommand.Execute(null);
             ribbon5.OpenSingleBrowserCommand.Execute(null);
 
-            this.navigation.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(5));
+            this.navigation.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(5));
 
             ribbon1.OpenSingleBrowserCommand.Execute(null);
             ribbon2.OpenSingleBrowserCommand.Execute(null);
@@ -144,7 +144,7 @@ namespace BasicRdl.Tests
             ribbon4.OpenSingleBrowserCommand.Execute(null);
             ribbon5.OpenSingleBrowserCommand.Execute(null);
 
-            this.navigation.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(10));
+            this.navigation.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(10));
         }
 
         [Test]

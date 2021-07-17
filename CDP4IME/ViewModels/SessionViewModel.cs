@@ -373,7 +373,7 @@ namespace CDP4IME.ViewModels
         private void ExecuteHideAll()
         {
             var navigation = ServiceLocator.Current.GetInstance<IPanelNavigationService>();
-            navigation.Close(this.Session.DataSourceUri);
+            navigation.CloseInDock(this.Session.DataSourceUri);
         }
     }
 }

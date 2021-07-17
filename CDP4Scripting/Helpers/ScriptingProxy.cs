@@ -123,7 +123,7 @@ namespace CDP4Scripting.Helpers
         {
             if (this.ScriptingPanelViewModel?.SelectedSession != null)
             {
-                this.PanelNavigationService.Open("Model Browser", this.ScriptingPanelViewModel.SelectedSession, true, this.ThingDialogNavigationService, this.DialogNavigationService);
+                this.PanelNavigationService.OpenInDock("Model Browser", this.ScriptingPanelViewModel.SelectedSession, this.ThingDialogNavigationService, this.DialogNavigationService);
             }
         }
 

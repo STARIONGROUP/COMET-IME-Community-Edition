@@ -254,7 +254,7 @@ namespace CDP4ProductTree.Tests.OfficeRibbon
             var content = this.ribbonPart.GetContent("ShowProductTree_");
             await this.ribbonPart.OnAction($"ShowProductTree_{this.iteration.Iid}_{this.option1.Iid}", $"{this.iteration.Iid}_{this.option1.Iid}");
 
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenInAddIn(It.IsAny<IPanelViewModel>()));
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
@@ -278,12 +278,12 @@ namespace CDP4ProductTree.Tests.OfficeRibbon
             var content = this.ribbonPart.GetContent("ShowProductTree_");
             await this.ribbonPart.OnAction($"ShowProductTree_{this.iteration.Iid}_{this.option1.Iid}", $"{this.iteration.Iid}_{this.option1.Iid}");
 
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenInAddIn(It.IsAny<IPanelViewModel>()));
 
             var allBrowsers = this.ribbonPart.GetAllOpenBrowsers();
             CDPMessageBus.Current.SendMessage(new HidePanelEvent(allBrowsers.SelectMany(x => x).First().Identifier));
 
-            this.panelNavigationService.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), false), Times.Once);
+            this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<IPanelViewModel>()), Times.Once);
 
             CollectionAssert.IsEmpty(this.ribbonPart.GetAllOpenBrowsers().SelectMany(x => x));
         }

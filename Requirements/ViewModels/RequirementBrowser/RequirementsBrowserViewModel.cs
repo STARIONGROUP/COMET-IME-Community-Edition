@@ -595,7 +595,7 @@ namespace CDP4Requirements.ViewModels
 
             foreach (var vm in this.openRequirementsSpecificationEditorViewModels)
             {
-                this.PanelNavigationService.Close(vm, true);
+                this.PanelNavigationService.CloseInAddIn(vm);
                 vm.Dispose();
             }
         }
@@ -787,7 +787,7 @@ namespace CDP4Requirements.ViewModels
                     this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService,
                     this.PluginSettingsService);
                 this.openRequirementsSpecificationEditorViewModels.Add(vm);
-                this.PanelNavigationService.Open(vm, true);
+                this.PanelNavigationService.OpenInAddIn(vm);
             }
         }
 

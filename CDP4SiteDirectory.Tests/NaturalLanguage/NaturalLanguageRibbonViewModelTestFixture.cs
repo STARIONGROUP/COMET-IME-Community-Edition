@@ -117,7 +117,7 @@ namespace CDP4SiteDirectory.Tests.ViewModels
 
             // Simulate a click on the button open when theres a unique session open
             viewmodel.OpenSingleBrowserCommand.Execute(null);
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true));
+            this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
         }
     }
 }

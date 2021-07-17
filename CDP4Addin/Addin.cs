@@ -463,7 +463,7 @@ namespace CDP4AddinCE
                 {
                     var title = navigationPanelEvent.ViewModel.Caption;
 
-                    var dockPosition = navigationPanelEvent.RegionName.ToDockPosition();
+                    var dockPosition = navigationPanelEvent.ViewModel.TargetName.ToDockPosition();
                     logger.Trace("Create new Task Pane with title {0}", title);
                     var taskPane = this.TaskPaneFactory.CreateCTP("CDP4AddinCE.TaskPaneWpfHostControl", title);
                     taskPane.DockPosition = dockPosition;

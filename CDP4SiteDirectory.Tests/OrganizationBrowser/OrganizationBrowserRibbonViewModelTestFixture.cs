@@ -112,15 +112,15 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
             var vm = new OrganizationBrowserRibbonViewModel();
 
             vm.OpenSingleBrowserCommand.Execute(null);
-            Assert.Throws<MockException>(() => this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true)));
+            Assert.Throws<MockException>(() => this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>())));
 
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
             vm.OpenSingleBrowserCommand.Execute(null);
 
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(1));
+            this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
             vm.OpenSingleBrowserCommand.Execute(null);
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(2));
+            this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
         }
     }
 }

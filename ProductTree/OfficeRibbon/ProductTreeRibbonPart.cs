@@ -320,7 +320,7 @@ namespace CDP4ProductTree
 
                 if (browser != null)
                 {
-                    this.PanelNavigationService.Close(browser, false);
+                    this.PanelNavigationService.CloseInAddIn(browser);
                     this.openProductTree.Remove(browser);
                 }
 
@@ -335,7 +335,7 @@ namespace CDP4ProductTree
         {
             foreach (var productTree in this.openProductTree)
             {
-                this.PanelNavigationService.Close(productTree, false);
+                this.PanelNavigationService.CloseInAddIn(productTree);
             }
 
             this.openProductTree.Clear();
@@ -354,7 +354,7 @@ namespace CDP4ProductTree
 
             if (browser != null)
             {
-                this.PanelNavigationService.Close(browser, false);
+                this.PanelNavigationService.CloseInAddIn(browser);
 
                 if (this.openProductTree.Contains(browser))
                 {
@@ -411,7 +411,7 @@ namespace CDP4ProductTree
 
             if (browser != null)
             {
-                this.PanelNavigationService.Close(browser, false);
+                this.PanelNavigationService.CloseInAddIn(browser);
                 this.openProductTree.Remove(browser);
                 return;
             }
@@ -419,7 +419,7 @@ namespace CDP4ProductTree
             browser = new ProductTreeViewModel(option, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.openProductTree.Add(browser);
-            this.PanelNavigationService.Open(browser, false);
+            this.PanelNavigationService.OpenInAddIn(browser);
         }
     }
 }

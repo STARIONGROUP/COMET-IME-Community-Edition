@@ -81,7 +81,7 @@ namespace CDP4Composition.Tests.Navigation
 
         private Mock<INameMetaData> describeMetaData;
 
-        private PanelNavigationService NavigationService;
+        private TestNavigationService NavigationService;
 
         [SetUp]
         public void Setup()
@@ -120,7 +120,7 @@ namespace CDP4Composition.Tests.Navigation
             this.viewModelList.Add(this.panelViewModel);
             this.viewModelList.Add(new TestGridViewModel());
 
-            this.NavigationService = new PanelNavigationService(this.viewList, this.viewModelList, this.regionManager.Object, this.viewModelDecoratedList, this.filterStringService.Object, this.regionCollectionSearcher.Object);
+            this.NavigationService = new TestNavigationService(this.viewList, this.viewModelList, this.viewModelDecoratedList, new DockLayoutViewModel(dialogNavigationService.Object), this.filterStringService.Object);
 
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -136,14 +136,14 @@ namespace CDP4Composition.Tests.Navigation
         [Test]
         public void VerifyThatOpenViewModelWorks()
         {
-            this.NavigationService.Open(this.panelViewModel, true);
+            this.NavigationService.OpenInDock(this.panelViewModel);
             this.region.Verify(x => x.Add(It.IsAny<object>(), It.IsAny<string>()));
         }
 
         [Test]
         public void VerifyThatOpenViewModelByNameWorks()
         {
-            this.NavigationService.Open(this.describeMetaData.Object.Name, this.session.Object, true,
+            this.NavigationService.OpenInDock(this.describeMetaData.Object.Name, this.session.Object,
                 this.thingDialogNavigationService.Object, this.dialogNavigationService.Object);
 
             this.region.Verify(x => x.Add(It.IsAny<object>(), It.IsAny<string>()));
@@ -152,13 +152,13 @@ namespace CDP4Composition.Tests.Navigation
         [Test]
         public void VerifyThatOpenExisitngOrOpenWorksForRegionManager()
         {
-            this.NavigationService.OpenExistingOrOpen(this.panelViewModel, true);
+            this.NavigationService.OpenExistingOrOpenInAddIn(this.panelViewModel);
             var opened = false;
             CDPMessageBus.Current.Listen<NavigationPanelEvent>().Subscribe(x => { opened = true; });
             this.region.Verify(x => x.Add(It.IsAny<object>(), It.IsAny<string>()));
             Assert.IsFalse(opened);
 
-            this.NavigationService.OpenExistingOrOpen(this.panelViewModel, true);
+            this.NavigationService.OpenExistingOrOpenInAddIn(this.panelViewModel);
 
             Assert.IsTrue(opened);
         }
@@ -169,19 +169,19 @@ namespace CDP4Composition.Tests.Navigation
             var opened = false;
             CDPMessageBus.Current.Listen<NavigationPanelEvent>().Subscribe(x => { opened = true; });
 
-            this.NavigationService.OpenExistingOrOpen(this.panelViewModel, false);
+            this.NavigationService.OpenExistingOrOpenInAddIn(this.panelViewModel);
             Assert.IsTrue(opened);
 
             opened = false;
-            this.NavigationService.OpenExistingOrOpen(this.panelViewModel, false);
+            this.NavigationService.OpenExistingOrOpenInAddIn(this.panelViewModel);
             Assert.IsTrue(opened);
         }
 
         [Test]
         public void VerifyThatCloseViewModelWorks()
         {
-            this.NavigationService.Open(this.panelViewModel, true);
-            this.NavigationService.Close(this.panelViewModel, true);
+            this.NavigationService.OpenInDock(this.panelViewModel);
+            this.NavigationService.CloseInDock(this.panelViewModel);
 
             this.region.Verify(x => x.Remove(It.IsAny<object>()));
         }
@@ -189,11 +189,11 @@ namespace CDP4Composition.Tests.Navigation
         [Test]
         public void VerifyThatCloseAllPanelTypeWorks()
         {
-            this.NavigationService.Open(new TestGridViewModel(), true);
+            this.NavigationService.OpenInDock(new TestGridViewModel());
 
             Assert.AreEqual(1, this.NavigationService.ViewModelViewPairs.Count);
 
-            this.NavigationService.Close(typeof(TestGridViewModel));
+            this.NavigationService.CloseInDock(typeof(TestGridViewModel));
             this.region.Verify(x => x.Remove(It.IsAny<object>()));
         }
 
@@ -206,7 +206,7 @@ namespace CDP4Composition.Tests.Navigation
                 .Where(x => x.ViewModel == this.panelViewModel && x.PanelStatus == PanelStatus.Closed)
                 .Subscribe(x => { closed = true; });
 
-            this.NavigationService.Open(this.panelViewModel, true);
+            this.NavigationService.OpenInDock(this.panelViewModel);
             var olditems = new List<IPanelView>() { this.NavigationService.ViewModelViewPairs.Values.Single() };
 
             this.viewsCollection.Raise(x => x.CollectionChanged += null, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, olditems));
@@ -217,19 +217,19 @@ namespace CDP4Composition.Tests.Navigation
         [Test]
         public void VerifyThatNavigationServiceThrowsException()
         {
-            Assert.Throws<ArgumentOutOfRangeException>(() => this.NavigationService.Open(new ExceptionViewModel(), true));
+            Assert.Throws<ArgumentOutOfRangeException>(() => this.NavigationService.OpenInDock(new ExceptionViewModel()));
         }
 
         [Test]
         public void VerifyThatCloseDataSourceWorks()
         {
-            this.NavigationService.Open(new TestViewModel("uri"), true);
-            this.NavigationService.Open(new TestViewModel("uri"), true);
-            this.NavigationService.Open(new TestViewModel("alalala"), true);
+            this.NavigationService.OpenInDock(new TestViewModel("uri"));
+            this.NavigationService.OpenInDock(new TestViewModel("uri"));
+            this.NavigationService.OpenInDock(new TestViewModel("alalala"));
 
             Assert.AreEqual(3, this.NavigationService.ViewModelViewPairs.Count);
 
-            this.NavigationService.Close("uri");
+            this.NavigationService.CloseInDock("uri");
             this.region.Verify(x => x.Remove(It.IsAny<IPanelView>()), Times.Exactly(2));
         }
 
@@ -238,7 +238,7 @@ namespace CDP4Composition.Tests.Navigation
         {
             var viewModel = new TestViewModel();
             Assert.AreEqual(0, this.NavigationService.ViewModelViewPairs.Count);
-            this.NavigationService.Open(viewModel, true);
+            this.NavigationService.OpenInDock(viewModel);
             Assert.AreEqual(1, this.NavigationService.ViewModelViewPairs.Count);
 
             var newViewModel1 = new TestViewModel();

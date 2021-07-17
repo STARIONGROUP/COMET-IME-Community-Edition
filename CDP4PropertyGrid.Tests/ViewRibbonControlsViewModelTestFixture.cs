@@ -49,11 +49,11 @@ namespace CDP4PropertyGrid.Tests
             vm.IsChecked = true;
             vm.OpenClosePanelCommand.Execute(null);
 
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true));
+            this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
 
             vm.IsChecked = false;
             vm.OpenClosePanelCommand.Execute(null);
-            this.navigationService.Verify(x => x.Close(It.IsAny<Type>()));
+            this.navigationService.Verify(x => x.CloseInDock(It.IsAny<Type>()));
 
             // Verify PanelEVentClosed
             vm.IsChecked = true;

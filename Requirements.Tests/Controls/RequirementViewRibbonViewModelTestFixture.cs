@@ -152,7 +152,7 @@ namespace CDP4Requirements.Tests.Controls
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
 
-             this.navigationService.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), true), Times.Exactly(1));
+             this.navigationService.Verify(x => x.CloseInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
             Assert.AreEqual(0, viewmodel.OpenModels.Count);
 
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));

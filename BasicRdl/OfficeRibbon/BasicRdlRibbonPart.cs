@@ -178,19 +178,19 @@ namespace BasicRdl
         /// </summary>
         private void CloseAll()
         {
-            this.PanelNavigationService.Close(this.measurementUnitsBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.measurementUnitsBrowserViewModel);
             this.measurementUnitsBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.measurementScalesBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.measurementScalesBrowserViewModel);
             this.measurementScalesBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.rulesBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.rulesBrowserViewModel);
             this.rulesBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.categoryBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.categoryBrowserViewModel);
             this.categoryBrowserViewModel = null;
 
-            this.PanelNavigationService.Close(this.parameterTypesBrowserViewModel, false);
+            this.PanelNavigationService.CloseInAddIn(this.parameterTypesBrowserViewModel);
             this.parameterTypesBrowserViewModel = null;
         }
 
@@ -213,19 +213,19 @@ namespace BasicRdl
             switch (ribbonControlId)
             {
                 case "ShowMeasurementUnits":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.measurementUnitsBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.measurementUnitsBrowserViewModel);
                     break;
                 case "ShowMeasurementScales":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.measurementScalesBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.measurementScalesBrowserViewModel);
                     break;
                 case "ShowParameterTypes":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.parameterTypesBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.parameterTypesBrowserViewModel);
                     break;
                 case "ShowRules":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.rulesBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.rulesBrowserViewModel);
                     break;
                 case "ShowCategories":
-                    this.PanelNavigationService.OpenExistingOrOpen(this.categoryBrowserViewModel, false);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.categoryBrowserViewModel);
                     break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);

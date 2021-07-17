@@ -116,10 +116,10 @@ namespace CDP4Composition.Tests.Mvvm
 
             menu.ShowPanelCommand.Execute(null);
 
-            this.navigation.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(1));
+            this.navigation.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
             menu.ShowPanelCommand.Execute(null);
-            this.navigation.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(2));
+            this.navigation.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
 
             var modelbrowser = menu.PanelViewModels.First();
             CDPMessageBus.Current.SendMessage(new NavigationPanelEvent(modelbrowser, this.panelView.Object, PanelStatus.Closed));
@@ -127,7 +127,7 @@ namespace CDP4Composition.Tests.Mvvm
             Assert.AreEqual(1, menu.PanelViewModels.Count);
 
             menu.ShowPanelCommand.Execute(null);
-            this.navigation.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(3));
+            this.navigation.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(3));
         }
 
         [Test]

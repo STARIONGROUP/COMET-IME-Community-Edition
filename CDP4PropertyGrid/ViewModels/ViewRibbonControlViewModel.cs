@@ -84,11 +84,11 @@ namespace CDP4PropertyGrid.ViewModels
 
             if (this.IsChecked)
             {
-                panelNavigationService.Open(new PropertyGridViewModel(true), true);
+                panelNavigationService.OpenInDock(new PropertyGridViewModel(true));
             }
             else
             {
-                panelNavigationService.Close(typeof(PropertyGridViewModel));
+                panelNavigationService.CloseInDock(typeof(PropertyGridViewModel));
             }
         }
 
