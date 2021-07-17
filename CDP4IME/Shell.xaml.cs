@@ -85,24 +85,5 @@ namespace CDP4IME
 
             this.CdpTaskBarIcon.ShowBalloonTip(notificationEvent.Title, notificationEvent.Message, icon);
         }
-
-        private void DockManager_DockItemClosing(object sender, ItemCancelEventArgs e)
-        {
-            //var vm = this.DataContext as ShellViewModel;
-            //vm.DockViewModel.DockItemClosingCommand.Execute(e);
-            //vm.DockViewModel.ItemClosing(e);
-        }
-
-        private void DockManager_DockItemClosed(object sender, DockItemClosedEventArgs e)
-        {
-            var vm = this.DataContext as ShellViewModel;
-            vm.DockViewModel.ItemClosed(e);
-        }
-
-        private void DockManager_DockOperationStarting(object sender, DockOperationStartingEventArgs e)
-        {
-            var vm = this.DataContext as ShellViewModel;
-            vm.DockViewModel.DockOperationStarting(e);
-        }
     }
 }

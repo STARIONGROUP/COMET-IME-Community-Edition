@@ -27,21 +27,20 @@ namespace CDP4Composition.Navigation
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
     using System.ComponentModel.Composition;
     using System.Diagnostics;
     using System.Linq;
     using System.Text.RegularExpressions;
+
     using CDP4Common.CommonData;
 
-    using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Composition;
-    using DevExpress.Xpf.Docking;
+
     using Microsoft.Practices.Prism.Regions;
 
     using NLog;
@@ -53,6 +52,9 @@ namespace CDP4Composition.Navigation
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class TestNavigationService : IPanelNavigationService
     {
+        /// <summary>
+        /// The view model that represents the main docking panel
+        /// </summary>
         private readonly DockLayoutViewModel dockLayoutViewModel;
 
         /// <summary>
@@ -89,14 +91,10 @@ namespace CDP4Composition.Navigation
         /// <param name="panelViewModelKinds">
         /// The MEF injected Panel view models that can be navigated to.
         /// </param>
-        /// <param name="regionManager">
-        /// the <see cref="IRegionManager"/> that is used to manage the regions
-        /// </param>
         /// <param name="panelViewModelDecorated">
         /// The MEF injected <see cref="IPanelViewModel"/> which are decorated with <see cref="INameMetaData"/> and can be navigated to.
         /// </param>
         /// <param name="filterStringService">The MEF injected <see cref="IFilterStringService"/></param>
-        /// <param name="regionCollectionSearcher">The MEF injected <see cref="IRegionCollectionSearcher"/></param>
         [ImportingConstructor]
         public TestNavigationService(
             [ImportMany] IEnumerable<IPanelView> panelViewKinds,
@@ -111,7 +109,7 @@ namespace CDP4Composition.Navigation
             this.dockLayoutViewModel = dockLayoutViewModel;
             this.filterStringService = filterStringService;
 
-            this.dockLayoutViewModel.DockPanelViewModels.ItemsRemoved.Subscribe(ItemsRemoved);
+            this.dockLayoutViewModel.DockPanelViewModels.ItemsRemoved.Subscribe(CleanUpPanelsAndSendCloseEvent);
 
             this.PanelViewKinds = new Dictionary<string, IPanelView>();
 
@@ -148,11 +146,6 @@ namespace CDP4Composition.Navigation
 
             sw.Stop();
             logger.Debug($"The PanelNavigationService was instantiated in {sw.ElapsedMilliseconds} [ms] ");
-        }
-
-        private void ItemsRemoved(IMVVMDockingProperties obj)
-        {
-            CleanUpPanelsAndSendCloseEvent((IPanelViewModel)obj);
         }
 
         /// <summary>
@@ -261,29 +254,16 @@ namespace CDP4Composition.Navigation
         /// <summary>
         /// Closes the <see cref="IPanelView"/> associated to the <see cref="IPanelViewModel"/>
         /// </summary>
-        /// <param name="viewModel">The <see cref="IPanelViewModel"/></param>
-        private void CloseInDockInternal(IPanelViewModel viewModel)
+        /// <param name="viewModel">
+        /// The view-model that is to be closed.
+        /// </param>
+        public void CloseInDock(IPanelViewModel viewModel)
         {            
             logger.Debug("Starting to Close view-model {0} of type {1}", viewModel.Caption, viewModel);
 
             this.dockLayoutViewModel.DockPanelViewModels.Remove(viewModel);
 
             logger.Debug("Closed view-model {0} of type {1}", viewModel.Caption, viewModel);
-        }
-
-        /// <summary>
-        /// Closes the <see cref="IPanelView"/> associated to the <see cref="IPanelViewModel"/>
-        /// </summary>
-        /// <param name="viewModel">
-        /// The view-model that is to be closed.
-        /// </param>
-        /// <param name="useRegionManager">
-        /// A value indicating whether handling the opening of the view shall be handled by the region manager. In case this region manager does not handle
-        /// this it will be event-based using the <see cref="CDPMessageBus"/>.
-        /// </param>
-        public void CloseInDock(IPanelViewModel viewModel)
-        {
-            this.CloseInDockInternal(viewModel);
         }
 
         /// <summary>
@@ -302,7 +282,7 @@ namespace CDP4Composition.Navigation
 
             foreach (var panelViewModel in openViewModels)
             {
-                this.CloseInDockInternal(panelViewModel);
+                this.CloseInDock(panelViewModel);
             }
 
             logger.Debug("All view-models related to data-source {0} closed", datasourceUri);
@@ -321,7 +301,7 @@ namespace CDP4Composition.Navigation
 
             foreach (var vm in viewModels)
             {
-                this.CloseInDockInternal((IPanelViewModel)vm);
+                this.CloseInDock(vm);
             }
         }
 
@@ -331,9 +311,32 @@ namespace CDP4Composition.Navigation
         /// <param name="panelViewModel">
         /// The <see cref="IPanelViewModel"/> that needs to be cleaned up
         /// </param>
-        private void CleanUpPanelsAndSendCloseEvent(IPanelViewModel panelViewModel, IPanelView view = null)
+        /// <param name="panelView">
+        /// The <see cref="IPanelView"/> that needs to be cleaned up
+        /// </param>
+        private void CleanUpPanelsAndSendCloseEvent(IPanelViewModel panelViewModel, IPanelView panelView)
         {
-            var closePanelEvent = new NavigationPanelEvent(panelViewModel, view, PanelStatus.Closed);
+            this.ViewModelViewPairs.Remove(panelViewModel);
+
+            var closePanelEvent = new NavigationPanelEvent(panelViewModel, panelView, PanelStatus.Closed);
+            CDPMessageBus.Current.SendMessage(closePanelEvent);
+
+            panelView.DataContext = null;
+            panelViewModel.Dispose();
+
+            // unregister from filter string service
+            this.filterStringService.UnregisterFromService(panelViewModel);
+        }
+
+        /// <summary>
+        /// Finalizes the <see cref="IPanelViewModel"/> on close        
+        /// </summary>
+        /// <param name="panelViewModel">
+        /// The <see cref="IPanelViewModel"/> that needs to be cleaned up
+        /// </param>
+        private void CleanUpPanelsAndSendCloseEvent(IPanelViewModel panelViewModel)
+        {
+            var closePanelEvent = new NavigationPanelEvent(panelViewModel, null, PanelStatus.Closed);
             CDPMessageBus.Current.SendMessage(closePanelEvent);
 
             panelViewModel.Dispose();
@@ -392,6 +395,5 @@ namespace CDP4Composition.Navigation
 
             return viewInstance.GetType();
         }
-
     }
 }

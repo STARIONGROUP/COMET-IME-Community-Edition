@@ -27,6 +27,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Reactive;
 using System.Threading.Tasks;
 using CDP4Composition.ViewModels;
 
@@ -37,6 +38,9 @@ using ReactiveUI;
 
 namespace CDP4Composition.Navigation
 {
+    /// <summary>
+    /// This is the view model for the main application docking control. 
+    /// </summary>
     [Export]
     public class DockLayoutViewModel : ReactiveObject
     {
@@ -45,53 +49,49 @@ namespace CDP4Composition.Navigation
         [ImportingConstructor]
         public DockLayoutViewModel(IDialogNavigationService dialogNavigationService)
         {
-            DockPanelViewModels = new ReactiveList<IMVVMDockingProperties>();
+            DockPanelViewModels = new ReactiveList<IPanelViewModel>();
 
             this.dialogNavigationService = dialogNavigationService;
 
-            DockItemClosingCommand = ReactiveCommand.CreateAsyncTask(arg => Task.FromResult(ItemClosing(arg)));
-
-            DockItemClosedCommand = ReactiveCommand.Create();
-            DockItemClosedCommand.Subscribe(ItemClosed);
+            DockPanelClosingCommand = ReactiveCommand.CreateAsyncTask(arg => PanelClosing((ItemCancelEventArgs)arg));
+            DockPanelClosedCommand = ReactiveCommand.CreateAsyncTask(arg => PanelClosed((DockItemClosedEventArgs)arg));
+            DockOperationStartingCommand = ReactiveCommand.CreateAsyncTask(arg => DockOperationStarting((DockOperationStartingEventArgs)arg));
         }
 
+        /// <summary>
+        /// The panel items of the dock
+        /// </summary>
+        public ReactiveList<IPanelViewModel> DockPanelViewModels { get; }
 
-        public ReactiveList<IMVVMDockingProperties> DockPanelViewModels { get; }
+        public ReactiveCommand<Unit> DockPanelClosingCommand { get; }
+        public ReactiveCommand<Unit> DockPanelClosedCommand { get; }
+        public ReactiveCommand<Unit> DockOperationStartingCommand { get; }
 
-        public int LeftGroupSelectedTabIndex { get; set; }
-
-        public ReactiveCommand<bool> DockItemClosingCommand { get; }
-        public ReactiveCommand<object> DockItemClosedCommand { get; }
-
-        public void ItemClosed(object obj)
+        private async Task PanelClosed(DockItemClosedEventArgs e)
         {
-            var e = (DockItemClosedEventArgs)obj;
-
-            foreach (var dockPanelViewModel in e.AffectedItems.Select(p => p.DataContext).OfType<IMVVMDockingProperties>())
+            foreach (var dockPanelViewModel in e.AffectedItems.Select(p => p.DataContext).OfType<IPanelViewModel>())
             {
-                DockPanelViewModels.Remove(dockPanelViewModel);            
+                DockPanelViewModels.Remove(dockPanelViewModel);
             }
         }
 
-        public bool ItemClosing(object obj)
+        private async Task PanelClosing(ItemCancelEventArgs e)
         {
-            var e = (ItemCancelEventArgs)obj;
-
             var docPanel = e.Item as LayoutPanel;
             if (docPanel is null)
             {
-                return false;
+                return;
             }
 
             var panelViewModel = (IPanelViewModel)docPanel.Content;
-            if (panelViewModel == null)
+            if (panelViewModel is null)
             {
-                return false;
+                return;
             }
 
             if (!panelViewModel.IsDirty)
             {
-                return false;
+                return;
             }
 
             var confirmation = new GenericConfirmationDialogViewModel("Warning", MessageHelper.ClosingPanelConfirmation);
@@ -100,8 +100,6 @@ namespace CDP4Composition.Navigation
             {
                 e.Cancel = true;
             }
-
-            return true;
         }
 
         /// <summary>
@@ -116,7 +114,7 @@ namespace CDP4Composition.Navigation
         /// Put the group back to left or right
         /// </summary>
         /// <param name="e"></param>
-        public void DockOperationStarting(DockOperationStartingEventArgs e)
+        public async Task DockOperationStarting(DockOperationStartingEventArgs e)
         {
             if (e.DockOperation is not DockOperation.Dock)
             {
@@ -147,20 +145,23 @@ namespace CDP4Composition.Navigation
 
             switch (groupName)
             {
-                case "LeftGroup":
+                case LayoutGroupNames.LeftGroup:
                     tabbedGroup.GetDockLayoutManager().DockController.Dock(tabbedGroup, documentGroup.Parent, DockType.Left);
                     break;
-                case "RightGroup":
+                case LayoutGroupNames.RightGroup:
                     tabbedGroup.GetDockLayoutManager().DockController.Dock(tabbedGroup, documentGroup.Parent, DockType.Right);
                     break;
             }
         }
 
-        public void AddDockPanelViewModel(IPanelViewModel dockPanelViewModel)
+        /// <summary>
+        /// Adds a panel to the dock
+        /// </summary>
+        /// <param name="panelViewModel">The  </param>
+        public void AddDockPanelViewModel(IPanelViewModel panelViewModel)
         {
-            DockPanelViewModels.Add(dockPanelViewModel);
-
-            dockPanelViewModel.IsSelected = true;
+            this.DockPanelViewModels.Add(panelViewModel);
+            panelViewModel.IsSelected = true;
         }
     }
 }
