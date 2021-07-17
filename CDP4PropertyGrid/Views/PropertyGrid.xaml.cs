@@ -6,6 +6,7 @@
 
 namespace CDP4PropertyGrid.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
 
     using CDP4Composition;
@@ -14,7 +15,7 @@ namespace CDP4PropertyGrid.Views
     /// <summary>
     /// Interaction logic for PropertyGrid.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.RightPanel)]
+    [Export(typeof(IPanelView))]
     public partial class PropertyGrid : UserControl, IPanelView
     {
         public PropertyGrid()

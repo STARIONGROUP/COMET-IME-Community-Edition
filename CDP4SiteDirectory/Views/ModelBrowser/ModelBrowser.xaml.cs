@@ -6,6 +6,7 @@
 
 namespace CDP4SiteDirectory.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
     using CDP4Composition;
     using CDP4Composition.Attributes;
@@ -13,7 +14,7 @@ namespace CDP4SiteDirectory.Views
     /// <summary>
     /// Interaction logic for ModelBrowser.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class ModelBrowser : UserControl, IPanelView
     {
         /// <summary>

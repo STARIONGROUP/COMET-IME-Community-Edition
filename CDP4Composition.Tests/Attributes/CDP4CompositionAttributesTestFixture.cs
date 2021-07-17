@@ -51,12 +51,12 @@ namespace CDP4Composition.Tests.Attributes
             Assert.AreEqual(typeof(TestClass), attributes.ModuleType);
         }
 
-        [Test]
-        public void TestPanelViewExport()
-        {
-            var attributes = new PanelViewExportAttribute("region");
-            Assert.AreEqual("region", attributes.Region);
-        }
+        //[Test]
+        //public void TestPanelViewExport()
+        //{
+        //    var attributes = new PanelViewExportAttribute("region");
+        //    Assert.AreEqual("region", attributes.Region);
+        //}
 
         [Test]
         public void TestPanelViewModelExport()

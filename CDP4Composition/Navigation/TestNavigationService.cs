@@ -31,7 +31,7 @@ namespace CDP4Composition.Navigation
     using System.ComponentModel.Composition;
     using System.Diagnostics;
     using System.Linq;
-
+    using System.Text.RegularExpressions;
     using CDP4Common.CommonData;
 
     using CDP4Composition.Attributes;
@@ -68,7 +68,7 @@ namespace CDP4Composition.Navigation
         /// <summary>
         /// Gets the list of <see cref="IPanelView"/> in the application
         /// </summary>
-        public Dictionary<string, Lazy<IPanelView, IRegionMetaData>> PanelViewKinds { get; private set; }
+        public Dictionary<string, IPanelView> PanelViewKinds { get; private set; }
 
         /// <summary>
         /// Gets the list of <see cref="IPanelView"/> in the application
@@ -99,7 +99,7 @@ namespace CDP4Composition.Navigation
         /// <param name="regionCollectionSearcher">The MEF injected <see cref="IRegionCollectionSearcher"/></param>
         [ImportingConstructor]
         public TestNavigationService(
-            [ImportMany] IEnumerable<Lazy<IPanelView, IRegionMetaData>> panelViewKinds,
+            [ImportMany] IEnumerable<IPanelView> panelViewKinds,
             [ImportMany] IEnumerable<IPanelViewModel> panelViewModelKinds,
             [ImportMany] IEnumerable<Lazy<IPanelViewModel, INameMetaData>> panelViewModelDecorated,
             [Import] DockLayoutViewModel dockLayoutViewModel,
@@ -113,7 +113,7 @@ namespace CDP4Composition.Navigation
 
             this.dockLayoutViewModel.DockPanelViewModels.ItemsRemoved.Subscribe(ItemsRemoved);
 
-            this.PanelViewKinds = new Dictionary<string, Lazy<IPanelView, IRegionMetaData>>();
+            this.PanelViewKinds = new Dictionary<string, IPanelView>();
 
             // TODO T2428 : PanelViewModelKinds seems to be always empty and is used only one time in the Open(Thing thing, ISession session) method. We should probably refactor this part of the code.
             this.PanelViewModelKinds = new Dictionary<string, IPanelViewModel>();
@@ -122,10 +122,10 @@ namespace CDP4Composition.Navigation
 
             foreach (var panelView in panelViewKinds)
             {
-                var panelViewName = panelView.Value.ToString();
+                var panelViewName = panelView.ToString();
 
-                this.PanelViewKinds.Add(panelViewName, panelView);
-                logger.Trace("Add panelView {0} ", panelViewName);
+                this.PanelViewKinds.Add(panelViewName.ToString(), panelView);
+                logger.Trace($"Add panelView {panelViewName} ");
             }
 
             foreach (var panelViewModel in panelViewModelKinds)
@@ -133,7 +133,7 @@ namespace CDP4Composition.Navigation
                 var panelViewModelName = panelViewModel.ToString();
 
                 this.PanelViewModelKinds.Add(panelViewModelName, panelViewModel);
-                logger.Trace("Add panelViewModel {0} ", panelViewModelName);
+                logger.Trace($"Add panelViewModel {panelViewModelName} ");
             }
 
             foreach (var panelViewModel in panelViewModelDecorated)
@@ -143,11 +143,11 @@ namespace CDP4Composition.Navigation
                 var panelViewModelDescribeName = panelViewModel.Metadata.Name;
                 this.PanelViewModelDecorated.Add(panelViewModelDescribeName, panelViewModel);
 
-                logger.Trace("Add panelViewModel {0} ", panelViewModelName);
+                logger.Trace($"Add panelViewModel {panelViewModelName} ");
             }
 
             sw.Stop();
-            logger.Debug("The PanelNavigationService was instantiated in {0} [ms]", sw.ElapsedMilliseconds);
+            logger.Debug($"The PanelNavigationService was instantiated in {sw.ElapsedMilliseconds} [ms] ");
         }
 
         private void ItemsRemoved(IMVVMDockingProperties obj)
@@ -344,11 +344,10 @@ namespace CDP4Composition.Navigation
 
         public void OpenInAddIn(IPanelViewModel viewModel)
         {
-            var lazyView = this.GetViewType(viewModel);
-            var regionName = lazyView.Metadata.Region;
+            var viewType = this.GetViewType(viewModel);
 
             var parameters = new object[] { true };
-            var view = Activator.CreateInstance(lazyView.Value.GetType(), parameters) as IPanelView;
+            var view = Activator.CreateInstance(viewType, parameters) as IPanelView;
 
             if (view != null)
             {
@@ -379,19 +378,19 @@ namespace CDP4Composition.Navigation
         /// </remarks>
         /// <param name="viewModel">The <see cref="IPanelViewModel"/></param>
         /// <returns>The Fully qualified Name</returns>
-        private Lazy<IPanelView, IRegionMetaData> GetViewType(IPanelViewModel viewModel)
+        private Type GetViewType(IPanelViewModel viewModel)
         {
             var fullyQualifiedName = viewModel.ToString().Replace(".ViewModels.", ".Views.");
 
             // remove "ViewModel" from the name to get the View Name
-            var viewName = System.Text.RegularExpressions.Regex.Replace(fullyQualifiedName, "ViewModel$", "");
+            var viewName = Regex.Replace(fullyQualifiedName, "ViewModel$", string.Empty);
 
-            if (!this.PanelViewKinds.TryGetValue(viewName, out var returned))
+            if (!this.PanelViewKinds.TryGetValue(viewName, out var viewInstance))
             {
                 throw new ArgumentOutOfRangeException($"The View associated to the viewModel {viewModel} could not be found\nMake sure the view has the proper attributes");
             }
 
-            return returned;
+            return viewInstance.GetType();
         }
 
     }

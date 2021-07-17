@@ -24,11 +24,12 @@ namespace CDP4EngineeringModel.Views
     using System.Windows.Media.Imaging;
     using System.Windows.Navigation;
     using System.Windows.Shapes;
+    using System.ComponentModel.Composition;
 
     /// <summary>
     /// Interaction logic for CommonFileStoreBrowser
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class DomainFileStoreBrowser : UserControl, IPanelView
     {
         /// <summary>

@@ -6,6 +6,7 @@
 
 namespace CDP4EngineeringModel.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
 
     using CDP4Composition;
@@ -14,7 +15,7 @@ namespace CDP4EngineeringModel.Views
     /// <summary>
     /// Interaction logic for CommonFileStoreBrowser
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class CommonFileStoreBrowser : UserControl, IPanelView
     {
         /// <summary>

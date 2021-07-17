@@ -16,9 +16,7 @@ namespace BasicRdl.Views
     /// <summary>
     /// Interaction logic for <see cref="CategoryBrowser"/>
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
-    //[Export(nameof(CategoryBrowser), typeof(IPanelView))]
-    //[PartCreationPolicy(CreationPolicy.NonShared)]
+    [Export(typeof(IPanelView))]
     public partial class CategoryBrowser : IPanelView
     {
         /// <summary>

@@ -34,7 +34,7 @@ namespace CDP4Reporting.Views
     /// <summary>
     /// Interaction logic for ReportDesigner.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.EditorPanel)]
+    [Export(typeof(IPanelView))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class ReportDesigner : IPanelView
     {

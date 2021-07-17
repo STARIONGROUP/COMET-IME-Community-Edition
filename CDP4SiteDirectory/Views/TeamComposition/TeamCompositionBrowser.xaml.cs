@@ -6,6 +6,7 @@
 
 namespace CDP4SiteDirectory.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows;
     using System.Windows.Controls;
     using CDP4Composition;
@@ -14,7 +15,7 @@ namespace CDP4SiteDirectory.Views
     /// <summary>
     /// Interaction logic for TeamCompositionBrowser XAML
     /// </summary>
-    [PanelViewExport(RegionNames.EditorPanel)]
+    [Export(typeof(IPanelView))]
     public partial class TeamCompositionBrowser : UserControl, IPanelView
     {
         /// <summary>

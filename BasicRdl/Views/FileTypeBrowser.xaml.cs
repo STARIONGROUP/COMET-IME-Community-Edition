@@ -6,6 +6,7 @@
 
 namespace BasicRdl.Views
 {
+    using System.ComponentModel.Composition;
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
@@ -16,7 +17,7 @@ namespace BasicRdl.Views
     /// <summary>
     /// Interaction logic for FileTypeBrowser
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class FileTypeBrowser : IPanelView
     {
         /// <summary>

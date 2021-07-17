@@ -71,13 +71,11 @@ namespace CDP4Composition.Tests.Navigation
 
         private IPanelViewModel panelViewModel2;
 
-        private List<Lazy<IPanelView, IRegionMetaData>> viewList;
+        private List<IPanelView> viewList;
 
         private List<Lazy<IPanelViewModel, INameMetaData>> viewModelDecoratedList;
 
         private List<IPanelViewModel> viewModelList;
-
-        private Mock<IRegionMetaData> metadata;
 
         private Mock<INameMetaData> describeMetaData;
 
@@ -94,7 +92,6 @@ namespace CDP4Composition.Tests.Navigation
 
             this.regionManager = new Mock<IRegionManager>();
             this.region = new Mock<IRegion>();
-            this.metadata = new Mock<IRegionMetaData>();
             this.viewsCollection = new Mock<IViewsCollection>();
 
             this.describeMetaData = new Mock<INameMetaData>();
@@ -109,9 +106,9 @@ namespace CDP4Composition.Tests.Navigation
             this.panelViewModel = new TestViewModel();
             this.panelViewModel2 = new TestViewModel("data source");
 
-            this.viewList = new List<Lazy<IPanelView, IRegionMetaData>>();
-            this.viewList.Add(new Lazy<IPanelView, IRegionMetaData>(() => this.panelView, this.metadata.Object));
-            this.viewList.Add(new Lazy<IPanelView, IRegionMetaData>(() => new TestGrid(), this.metadata.Object));
+            this.viewList = new List<IPanelView>();
+            this.viewList.Add(this.panelView);
+            this.viewList.Add(new TestGrid());
 
             this.viewModelDecoratedList = new List<Lazy<IPanelViewModel, INameMetaData>>();
             this.viewModelDecoratedList.Add(new Lazy<IPanelViewModel, INameMetaData>(() => this.panelViewModel2, this.describeMetaData.Object));

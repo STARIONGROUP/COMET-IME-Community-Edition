@@ -12,11 +12,12 @@ namespace CDP4EngineeringModel.Views
     using CDP4Composition.Attributes;
     using DevExpress.Xpf.Grid;
     using ViewModels;
+    using System.ComponentModel.Composition;
 
     /// <summary>
     /// Interaction logic for FiniteStateBrowser.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class FiniteStateBrowser : UserControl, IPanelView
     {
         /// <summary>

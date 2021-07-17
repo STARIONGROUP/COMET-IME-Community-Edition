@@ -14,10 +14,7 @@ namespace CDP4EngineeringModel.Views
     /// <summary>
     /// Interaction logic for RuleVerificationListView XAML
     /// </summary>
-    //[PanelViewExport(RegionNames.LeftPanel)]
-    //[Export("CDP4EngineeringModel.Views.RuleVerificationListBrowser", typeof(IPanelView))]
-    //[PartCreationPolicy(CreationPolicy.NonShared)]
-    [Export("bleh",typeof(IPanelView))]
+    [Export(typeof(IPanelView))]
     public partial class RuleVerificationListBrowser : UserControl, IPanelView
     {
         /// <summary>

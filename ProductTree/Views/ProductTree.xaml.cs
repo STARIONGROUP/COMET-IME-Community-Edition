@@ -25,6 +25,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 namespace CDP4ProductTree.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
 
     using CDP4Composition;
@@ -33,7 +34,7 @@ namespace CDP4ProductTree.Views
     /// <summary>
     /// Interaction logic for CDP4ProductTree.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.EditorPanel)]
+    [Export(typeof(IPanelView))]
     public partial class ProductTree : UserControl, IPanelView
     {
         /// <summary>

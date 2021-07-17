@@ -6,13 +6,14 @@
 
 namespace CDP4Scripting.Views
 {
+    using System.ComponentModel.Composition;
     using CDP4Composition;
     using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for LuaScriptPanel.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.EditorPanel)]
+    [Export(typeof(IPanelView))]
     public class LuaScriptPanel : ScriptPanel
     {
         /// <summary>

@@ -25,13 +25,14 @@
 
 namespace CDP4EngineeringModel.Views
 {
+    using System.ComponentModel.Composition;
     using CDP4Composition;
     using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for ElementDefinitions view
     /// </summary>
-    [PanelViewExport(RegionNames.EditorPanel)]
+    [Export(typeof(IPanelView))]
     public partial class ElementDefinitionsBrowser : IPanelView
     {
         /// <summary>

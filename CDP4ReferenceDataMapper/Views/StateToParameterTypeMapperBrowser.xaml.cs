@@ -25,6 +25,7 @@
 
 namespace CDP4ReferenceDataMapper.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
 
     using CDP4Composition;
@@ -33,7 +34,7 @@ namespace CDP4ReferenceDataMapper.Views
     /// <summary>
     /// Interaction logic for OptionBrowser.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class StateToParameterTypeMapperBrowser : UserControl, IPanelView
     {
         /// <summary>

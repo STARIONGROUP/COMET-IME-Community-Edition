@@ -6,6 +6,7 @@
 
 namespace CDP4SiteDirectory.Views
 {
+    using System.ComponentModel.Composition;
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
@@ -16,7 +17,7 @@ namespace CDP4SiteDirectory.Views
     /// <summary>
     /// Interaction logic for OrganizationBrowser.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class OrganizationBrowser : IPanelView
     {
         /// <summary>
