@@ -46,13 +46,7 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.ConstantsGridControl;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }
