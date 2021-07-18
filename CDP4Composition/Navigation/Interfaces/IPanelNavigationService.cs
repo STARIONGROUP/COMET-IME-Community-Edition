@@ -25,7 +25,7 @@
 namespace CDP4Composition.Navigation
 {
     using System;
-
+    using System.Collections.Generic;
     using CDP4Dal;
     using CDP4Dal.Composition;
 

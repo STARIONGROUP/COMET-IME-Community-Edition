@@ -80,7 +80,7 @@ namespace CDP4Composition.Navigation
         /// <summary>
         /// Gets the {<see cref="IPanelViewModel"/>, <see cref="IPanelView"/>} pairs that are in the regions
         /// </summary>
-        public Dictionary<IPanelViewModel, IPanelView> ViewModelViewPairs { get; private set; }
+        public Dictionary<IPanelViewModel, IPanelView> AddInViewModelViewPairs { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PanelNavigationService"/> class
@@ -115,7 +115,7 @@ namespace CDP4Composition.Navigation
 
             // TODO T2428 : PanelViewModelKinds seems to be always empty and is used only one time in the Open(Thing thing, ISession session) method. We should probably refactor this part of the code.
             this.PanelViewModelKinds = new Dictionary<string, IPanelViewModel>();
-            this.ViewModelViewPairs = new Dictionary<IPanelViewModel, IPanelView>();
+            this.AddInViewModelViewPairs = new Dictionary<IPanelViewModel, IPanelView>();
             this.PanelViewModelDecorated = new Dictionary<string, Lazy<IPanelViewModel, INameMetaData>>();
 
             foreach (var panelView in panelViewKinds)
@@ -240,7 +240,7 @@ namespace CDP4Composition.Navigation
         /// </remarks>
         public void OpenExistingOrOpenInAddIn(IPanelViewModel viewModel)
         {
-            if (this.ViewModelViewPairs.TryGetValue(viewModel, out var view))
+            if (this.AddInViewModelViewPairs.TryGetValue(viewModel, out var view))
             {
                 var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open);
                 CDPMessageBus.Current.SendMessage(openPanelEvent);
@@ -306,7 +306,7 @@ namespace CDP4Composition.Navigation
         }
 
         /// <summary>
-        /// removes the view and view-model from the <see cref="ViewModelViewPairs"/> and send a panel close event
+        /// removes the view and view-model from the <see cref="AddInViewModelViewPairs"/> and send a panel close event
         /// </summary>
         /// <param name="panelViewModel">
         /// The <see cref="IPanelViewModel"/> that needs to be cleaned up
@@ -316,7 +316,7 @@ namespace CDP4Composition.Navigation
         /// </param>
         private void CleanUpPanelsAndSendCloseEvent(IPanelViewModel panelViewModel, IPanelView panelView)
         {
-            this.ViewModelViewPairs.Remove(panelViewModel);
+            this.AddInViewModelViewPairs.Remove(panelViewModel);
 
             var closePanelEvent = new NavigationPanelEvent(panelViewModel, panelView, PanelStatus.Closed);
             CDPMessageBus.Current.SendMessage(closePanelEvent);
@@ -355,7 +355,7 @@ namespace CDP4Composition.Navigation
             if (view != null)
             {
                 view.DataContext = viewModel;
-                this.ViewModelViewPairs.Add(viewModel, view);
+                this.AddInViewModelViewPairs.Add(viewModel, view);
 
                 // register for Filter Service
                 this.filterStringService.RegisterForService(viewModel);
@@ -367,7 +367,7 @@ namespace CDP4Composition.Navigation
 
         public void CloseInAddIn(IPanelViewModel viewModel)
         {
-            if (this.ViewModelViewPairs.TryGetValue(viewModel, out var view))
+            if (this.AddInViewModelViewPairs.TryGetValue(viewModel, out var view))
             {
                 this.CleanUpPanelsAndSendCloseEvent(viewModel, view);
             }

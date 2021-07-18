@@ -229,25 +229,25 @@ namespace CDP4SiteDirectory
             switch (ribbonControlId)
             {
                 case "ShowDomainsOfExpertise":
-                    this.PanelNavigationService.CloseInAddIn(this.domainOfExpertiseBrowserViewModel);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.domainOfExpertiseBrowserViewModel);
                     break;
                 case "ShowModels":
-                    this.PanelNavigationService.CloseInAddIn(this.modelBrowserViewModel);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.modelBrowserViewModel);
                     break;
                 case "ShowLanguages":
-                    this.PanelNavigationService.CloseInAddIn(this.naturalLanguageBrowserViewModel);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.naturalLanguageBrowserViewModel);
                     break;
                 case "ShowOrganizations":
-                    this.PanelNavigationService.CloseInAddIn(this.organizationBrowserViewModel);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.organizationBrowserViewModel);
                     break;
                 case "ShowPersons":
-                    this.PanelNavigationService.CloseInAddIn(this.personBrowserViewModel);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.personBrowserViewModel);
                     break;
                 case "ShowRoles":
-                    this.PanelNavigationService.CloseInAddIn(this.roleBrowserViewModel);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.roleBrowserViewModel);
                     break;
                 case "ShowSiteRDLs":
-                    this.PanelNavigationService.CloseInAddIn(this.siteRdlBrowserViewModel);
+                    this.PanelNavigationService.OpenExistingOrOpenInAddIn(this.siteRdlBrowserViewModel);
                     break;
                 case "ShowHideDeprecatedThings":
                     this.showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings = !this.showDeprecatedBrowserRibbonViewModel.ShowDeprecatedThings;

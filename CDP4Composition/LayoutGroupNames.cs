@@ -22,5 +22,10 @@ namespace CDP4Composition
         /// 
         /// </summary>
         public const string DocumentContainer = "DocumentContainer";
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public const string BottomGroup = "BottomGroup";
     }
 }

@@ -40,13 +40,13 @@ namespace CDP4AddinCE.Tests.Utils
         [Test]
         public void VerifyThatToDockPositionReturnsExpectedResults()
         {
-            var left = "LeftPanel";
+            var left = "LeftGroup";
             Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionLeft, StringExtension.ToDockPosition(left));
 
-            var right = "RightPanel";
+            var right = "RightGroup";
             Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionRight, StringExtension.ToDockPosition(right));
 
-            var bottom = "BottomPanel";
+            var bottom = "BottomGroup";
             Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionBottom, StringExtension.ToDockPosition(bottom));
 
             var anystring = "somestring";
