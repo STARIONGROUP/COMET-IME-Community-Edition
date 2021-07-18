@@ -71,7 +71,7 @@ namespace CDP4Composition.Tests.Navigation
 
         private Mock<INameMetaData> describeMetaData;
         private DockLayoutViewModel dockLayoutViewModel;
-        private TestNavigationService NavigationService;
+        private PanelNavigationService NavigationService;
 
         [SetUp]
         public void Setup()
@@ -102,7 +102,7 @@ namespace CDP4Composition.Tests.Navigation
 
             this.dockLayoutViewModel = new DockLayoutViewModel(dialogNavigationService.Object);
 
-            this.NavigationService = new TestNavigationService(this.viewList, this.viewModelList, this.viewModelDecoratedList, this.dockLayoutViewModel, this.filterStringService.Object);
+            this.NavigationService = new PanelNavigationService(this.viewList, this.viewModelList, this.viewModelDecoratedList, this.dockLayoutViewModel, this.filterStringService.Object);
 
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
