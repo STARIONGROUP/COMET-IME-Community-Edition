@@ -195,7 +195,11 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
             /// Gets the <see cref="FileTypes"/> rows that are contained by this view-model
             /// </summary>
             public ReactiveList<FileTypeRowViewModel> FileTypes { get; private set; }
-            public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            /// <summary>
+            /// Gets or sets the dock layout group target name to attach this panel to on opening
+            /// </summary>
+            public string TargetName { get; set; }
 
             /// <summary>
             /// Loads the <see cref="FileType"/>s from the cache when the browser is instantiated.

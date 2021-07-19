@@ -120,6 +120,9 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         public string DataSource => this.thingViewModel.Session.DataSourceUri;
 
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
         public bool IsSelected

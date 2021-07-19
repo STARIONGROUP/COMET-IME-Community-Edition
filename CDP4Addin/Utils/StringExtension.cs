@@ -55,9 +55,6 @@ namespace CDP4AddinCE.Utils
                 case LayoutGroupNames.RightGroup:
                     dockPosition = MsoCTPDockPosition.msoCTPDockPositionRight;
                     break;
-                case LayoutGroupNames.BottomGroup:
-                    dockPosition = MsoCTPDockPosition.msoCTPDockPositionBottom;
-                    break;
                 default:
                     dockPosition = MsoCTPDockPosition.msoCTPDockPositionLeft;
                     break;

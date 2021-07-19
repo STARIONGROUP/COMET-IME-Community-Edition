@@ -133,8 +133,13 @@ namespace CDP4BuiltInRules.ViewModels
         /// Gets the list of <see cref="BuiltInRuleRowViewModel"/>.
         /// </summary>
         public List<BuiltInRuleRowViewModel> BuiltInRules { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
+        /// <inheritdoc/>
         public bool IsSelected
         {
             get { return isSelected; }

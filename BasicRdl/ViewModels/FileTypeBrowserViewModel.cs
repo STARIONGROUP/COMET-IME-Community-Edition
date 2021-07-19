@@ -109,7 +109,9 @@ namespace BasicRdl.ViewModels
         /// </summary>
         public DisposableReactiveList<FileTypeRowViewModel> FileTypes { get; private set; }
 
-        ///<inheritdoc/>
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         ///<inheritdoc/>

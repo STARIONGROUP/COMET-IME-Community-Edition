@@ -338,6 +338,9 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public ReactiveCommand<object> ShowDetailsDialogCommand { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
         public bool IsSelected

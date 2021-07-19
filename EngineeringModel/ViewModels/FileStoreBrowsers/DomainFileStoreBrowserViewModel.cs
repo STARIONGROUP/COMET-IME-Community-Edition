@@ -243,6 +243,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to cancel download of a file
         /// </summary>
         public ReactiveCommand<object> CancelDownloadCommand { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>

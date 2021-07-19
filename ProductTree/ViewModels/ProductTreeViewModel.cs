@@ -273,6 +273,10 @@ namespace CDP4ProductTree.ViewModels
         /// This has to be a list in order to display the tree
         /// </remarks>
         public DisposableReactiveList<ElementDefinitionRowViewModel> TopElement { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>

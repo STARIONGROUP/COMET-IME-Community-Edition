@@ -344,8 +344,10 @@ namespace CDP4Composition.Tests.ViewModels
         public string ToolTip { get; private set; }
 
         public string DataSource { get; private set; }
-        public string TargetName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool IsSelected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+        public string TargetName { get; set; }
+
+        public bool IsSelected { get; set; }
 
         public void Dispose()
         {

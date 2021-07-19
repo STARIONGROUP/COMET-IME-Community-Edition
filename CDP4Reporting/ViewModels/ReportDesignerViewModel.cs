@@ -312,6 +312,10 @@ namespace CDP4Reporting.ViewModels
         /// Fires when the Active Document changes in the Report Designer
         /// </summary>
         public ReactiveCommand<Unit> ActiveDocumentChangedCommand { get; set; }
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>

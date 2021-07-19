@@ -305,6 +305,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         /// <remarks>This was made into a list of generic row to use the ReactiveList extension</remarks>
         public DisposableReactiveList<IRowViewModelBase<Thing>> ElementDefinitionRowViewModels { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>

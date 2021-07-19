@@ -118,6 +118,9 @@ namespace CDP4ObjectBrowser
         /// </summary>
         protected List<IDisposable> Disposables { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         public bool IsSelected

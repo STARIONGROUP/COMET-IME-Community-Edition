@@ -302,7 +302,9 @@ namespace CDP4Requirements.ViewModels
             set => this.RaiseAndSetIfChanged(ref this.isParametricConstraintDisplayed, value);
         }
 
-        ///<inheritdoc/>
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         ///<inheritdoc/>
