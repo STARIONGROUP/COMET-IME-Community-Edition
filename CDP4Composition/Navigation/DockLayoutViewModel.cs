@@ -23,21 +23,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
-using System.Collections.ObjectModel;
-using System.ComponentModel.Composition;
-using System.Linq;
-using System.Reactive;
-using System.Threading.Tasks;
-using CDP4Composition.ViewModels;
-
-using DevExpress.Xpf.Docking;
-using DevExpress.Xpf.Docking.Base;
-using DevExpress.Xpf.Layout.Core;
-using ReactiveUI;
-
 namespace CDP4Composition.Navigation
 {
+    using System.ComponentModel.Composition;
+    using System.Linq;
+    using System.Reactive;    
+    using System.Threading.Tasks;
+
+    using CDP4Composition.ViewModels;
+
+    using DevExpress.Xpf.Docking;
+    using DevExpress.Xpf.Docking.Base;
+
+    using ReactiveUI;
+
     /// <summary>
     /// This is the view model for the main application docking control. 
     /// </summary>
@@ -55,7 +54,6 @@ namespace CDP4Composition.Navigation
 
             DockPanelClosingCommand = ReactiveCommand.CreateAsyncTask(arg => PanelClosing((ItemCancelEventArgs)arg));
             DockPanelClosedCommand = ReactiveCommand.CreateAsyncTask(arg => PanelClosed((DockItemClosedEventArgs)arg));
-            DockOperationStartingCommand = ReactiveCommand.CreateAsyncTask(arg => DockOperationStarting((DockOperationStartingEventArgs)arg));
         }
 
         /// <summary>
@@ -64,19 +62,14 @@ namespace CDP4Composition.Navigation
         public ReactiveList<IPanelViewModel> DockPanelViewModels { get; }
 
         /// <summary>
-        /// 
+        /// Gets the command that is called when the dock panel is closing
         /// </summary>
         public ReactiveCommand<Unit> DockPanelClosingCommand { get; }
 
         /// <summary>
-        /// 
+        /// Gets the command that is called when the dock panel is closed
         /// </summary>
         public ReactiveCommand<Unit> DockPanelClosedCommand { get; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ReactiveCommand<Unit> DockOperationStartingCommand { get; }
 
         private async Task PanelClosed(DockItemClosedEventArgs e)
         {
@@ -110,46 +103,6 @@ namespace CDP4Composition.Navigation
             if (this.dialogNavigationService.NavigateModal(confirmation)?.Result is not true)
             {
                 e.Cancel = true;
-            }
-        }
-
-        private async Task DockOperationStarting(DockOperationStartingEventArgs e)
-        {
-            if (e.DockOperation is not DockOperation.Dock)
-            {
-                return;
-            }
-
-            if (e.DockTarget is not DocumentGroup documentGroup)
-            {
-                return;
-            }
-
-            if (e.Item is not TabbedGroup tabbedGroup)
-            {
-                return;
-            }
-
-            var groupName = tabbedGroup.Name;
-
-            if (string.IsNullOrWhiteSpace(groupName))
-            {
-                return;
-            }
-
-            e.Cancel = true;
-            var itemsToCopy = tabbedGroup.Items.ToArray();
-            tabbedGroup.Items.Clear();
-            documentGroup.AddRange(itemsToCopy);
-
-            switch (groupName)
-            {
-                case LayoutGroupNames.LeftGroup:
-                    tabbedGroup.GetDockLayoutManager().DockController.Dock(tabbedGroup, documentGroup.Parent, DockType.Left);
-                    break;
-                case LayoutGroupNames.RightGroup:
-                    tabbedGroup.GetDockLayoutManager().DockController.Dock(tabbedGroup, documentGroup.Parent, DockType.Right);
-                    break;
             }
         }
 

@@ -14,7 +14,8 @@
                     xmlns:tb="http://www.hardcodet.net/taskbar"
                     xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
                     xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
-                    xmlns:views1="clr-namespace:CDP4IME.Views"
+                    xmlns:views1="clr-namespace:CDP4IME.Views" 
+                    xmlns:behaviors="clr-namespace:CDP4IME.Behaviors"
                     Title="{Binding Path=Title}"
                     Width="774.254"
                     Height="441.045"
@@ -314,7 +315,7 @@
             <dxmvvm:Interaction.Behaviors>
                 <dxmvvm:EventToCommand EventName="DockItemClosing" PassEventArgsToCommand="True" Command="{Binding DockPanelClosingCommand}"/>
                 <dxmvvm:EventToCommand EventName="DockItemClosed" PassEventArgsToCommand="True" Command="{Binding DockPanelClosedCommand}"/>
-                <dxmvvm:EventToCommand EventName="DockOperationStarting" PassEventArgsToCommand="True" Command="{Binding DockOperationStartingCommand}"/>
+                <behaviors:DockOperationBehavior/>
             </dxmvvm:Interaction.Behaviors>
             <dxdo:DockLayoutManager.Resources>
                 <Style x:Key="BaseStyle"
