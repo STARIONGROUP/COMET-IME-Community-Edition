@@ -37,6 +37,7 @@ namespace CDP4Composition.Navigation
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
+    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Composition;

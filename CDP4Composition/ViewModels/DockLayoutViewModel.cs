@@ -23,14 +23,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Navigation
+namespace CDP4Composition.ViewModels
 {
     using System.ComponentModel.Composition;
     using System.Linq;
-    using System.Reactive;    
+    using System.Reactive;
     using System.Threading.Tasks;
 
-    using CDP4Composition.ViewModels;
+    using CDP4Composition.Navigation;
 
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Docking.Base;
@@ -75,7 +75,7 @@ namespace CDP4Composition.Navigation
         {
             foreach (var dockPanelViewModel in e.AffectedItems.Select(p => p.DataContext).OfType<IPanelViewModel>())
             {
-                DockPanelViewModels.Remove(dockPanelViewModel);
+                this.DockPanelViewModels.Remove(dockPanelViewModel);
             }
         }
 
@@ -100,7 +100,7 @@ namespace CDP4Composition.Navigation
 
             var confirmation = new GenericConfirmationDialogViewModel("Warning", MessageHelper.ClosingPanelConfirmation);
 
-            if (this.dialogNavigationService.NavigateModal(confirmation)?.Result is not true)
+            if (dialogNavigationService.NavigateModal(confirmation)?.Result is not true)
             {
                 e.Cancel = true;
             }
@@ -109,7 +109,7 @@ namespace CDP4Composition.Navigation
         /// <summary>
         /// Adds a panel to the dock
         /// </summary>
-        /// <param name="panelViewModel">The  </param>
+        /// <param name="panelViewModel">The <see cref="IPanelViewModel"/> to add to the dock</param>
         public void AddDockPanelViewModel(IPanelViewModel panelViewModel)
         {
             this.DockPanelViewModels.Add(panelViewModel);

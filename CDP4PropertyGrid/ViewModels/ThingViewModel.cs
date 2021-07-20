@@ -32,9 +32,9 @@ namespace CDP4PropertyGrid.ViewModels
     using CDP4Dal;
 
     /// <summary>
-    /// Minimal implementation of <see cref="ViewModelBase<T>"/>. 
+    /// Minimal implementation of <see cref="ViewModelBase<T>"/> is wrapped by <see cref="PropertyGridViewModel"/>
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">The <see cref="Thing"/></typeparam>
     public class ThingViewModel<T> : ViewModelBase<T> where T : Thing
     {
         public ThingViewModel() : base()

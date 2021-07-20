@@ -37,6 +37,7 @@ namespace CDP4Composition.Tests.Navigation
     using CDP4Composition.Services;
     using CDP4Composition.Tests.ViewModels;
     using CDP4Composition.Tests.Views;
+    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Composition;

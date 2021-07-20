@@ -33,21 +33,21 @@ namespace CDP4IME
     using CDP4Composition.Log;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Events;
 
     using CDP4IME.Settings;
+    using CDP4IME.ViewModels;
 
     using CDP4ShellDialogs.ViewModels;
 
     using Microsoft.Practices.ServiceLocation;
-    
+
     using NLog;
-    
+
     using ReactiveUI;
-    
-    using CDP4IME.ViewModels;
 
     /// <summary>
     /// The View Model of the <see cref="Shell"/>

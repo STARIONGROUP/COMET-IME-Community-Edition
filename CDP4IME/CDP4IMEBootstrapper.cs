@@ -35,6 +35,7 @@ namespace CDP4IME
     using CDP4Composition.Adapters;
     using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
+    using CDP4Composition.ViewModels;
 
     using CDP4IME.Settings;
 
