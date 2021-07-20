@@ -7,7 +7,7 @@
 namespace CDP4Composition.Navigation.Interfaces
 {
     /// <summary>
-    /// An inteface for a panel view model with filterable data grid.
+    /// An interface for a panel view model with filterable data grid.
     /// </summary>
     public interface IPanelFilterableDataGridViewModel
     {

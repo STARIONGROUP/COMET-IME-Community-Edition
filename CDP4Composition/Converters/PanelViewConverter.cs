@@ -1,50 +1,40 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Media;
-using Microsoft.Practices.ServiceLocation;
 
 namespace CDP4Composition.Converters
 {
+    /// <summary>
+    /// Converter that resolves a panel view model to its view by name convention. 
+    /// The view is assumed to be in the same assembly as the view model.
+    /// </summary>
     public class PanelViewConverter : IValueConverter
     {
+        /// <inheritdoc/>
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if(value is null)
+            if (value is null)
             {
                 return null;
             }
-
-            /*
-            if(value is not IPanelViewModel)
-            {
-                return null;
-            }
-            */
 
             var fullyQualifiedName = value.GetType().FullName.Replace(".ViewModels.", ".Views.");
-            var viewName = Regex.Replace(fullyQualifiedName, "ViewModel$", "");
+            var viewName = Regex.Replace(fullyQualifiedName, "ViewModel$", string.Empty);
 
-            //IPanelView view2 = ServiceLocator.Current.GetInstance<IPanelView>(viewName);
-            //view2.DataContext = value;
-            
+            //View should be in the same assembly as the view model
             var assembly = value.GetType().Assembly;
 
+            //Instantiate the view from the view model assembly by name convention
             var view = (FrameworkElement)assembly.CreateInstance(viewName, false, BindingFlags.Default, null, new object[] { true }, null, null );
             view.DataContext = value;
             
             return view;
         }
 
+        /// <inheritdoc/>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();

@@ -63,8 +63,19 @@ namespace CDP4Composition.Navigation
         /// </summary>
         public ReactiveList<IPanelViewModel> DockPanelViewModels { get; }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public ReactiveCommand<Unit> DockPanelClosingCommand { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public ReactiveCommand<Unit> DockPanelClosedCommand { get; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public ReactiveCommand<Unit> DockOperationStartingCommand { get; }
 
         private async Task PanelClosed(DockItemClosedEventArgs e)
@@ -102,19 +113,7 @@ namespace CDP4Composition.Navigation
             }
         }
 
-        /// <summary>
-        /// TODO: move out of VM as it accesses view controls.
-        /// if its not a dock operation
-        /// the dock target is document group 
-        /// the item is a tabbedgroup
-        /// cancel the operation
-        /// clear the tabbed group
-        /// add them to the document group
-        /// This would be better put in a behavior
-        /// Put the group back to left or right
-        /// </summary>
-        /// <param name="e"></param>
-        public async Task DockOperationStarting(DockOperationStartingEventArgs e)
+        private async Task DockOperationStarting(DockOperationStartingEventArgs e)
         {
             if (e.DockOperation is not DockOperation.Dock)
             {

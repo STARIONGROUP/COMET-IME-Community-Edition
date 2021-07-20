@@ -48,9 +48,6 @@ namespace CDP4IME
     using ReactiveUI;
     
     using CDP4IME.ViewModels;
-    using DevExpress.Xpf.Docking;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
 
     /// <summary>
     /// The View Model of the <see cref="Shell"/>
@@ -377,6 +374,9 @@ namespace CDP4IME
             }
         }
 
+        /// <summary>
+        /// Gets the view model for the dock
+        /// </summary>
         public DockLayoutViewModel DockViewModel { get; }
 
         public void Dispose()

@@ -64,12 +64,12 @@ namespace BasicRdl.ViewModels
         private bool canWriteFileType;
 
         /// <summary>
-        /// Baking field for <see cref="FilterString"/>
+        /// Backing field for <see cref="FilterString"/>
         /// </summary>
         private string filterString;
 
         /// <summary>
-        /// Baking field for <see cref="IsFilterEnabled"/>
+        /// Backing field for <see cref="IsFilterEnabled"/>
         /// </summary>
         private bool isFilterEnabled;
 

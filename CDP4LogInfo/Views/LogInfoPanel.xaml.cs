@@ -10,7 +10,6 @@ namespace CDP4LogInfo.Views
     using System.Windows.Controls;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for LogInfoPanel view

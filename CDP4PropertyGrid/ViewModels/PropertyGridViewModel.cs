@@ -27,8 +27,6 @@ namespace CDP4PropertyGrid.ViewModels
 {
     using System;
     using System.ComponentModel.Composition;
-    using System.Windows;
-    using System.Windows.Threading;
 
     using CDP4Common.CommonData;
 
@@ -45,13 +43,21 @@ namespace CDP4PropertyGrid.ViewModels
     /// The view-model for the <see cref="PropertyGrid"/> that displays the properties of a <see cref="Thing"/>
     /// </summary>
     [Export(typeof(IPanelViewModel))]
-    public class PropertyGridViewModel : ReactiveObject, IPanelViewModel, IViewModelBase<Thing>
+    public sealed class PropertyGridViewModel : ReactiveObject, IPanelViewModel, IViewModelBase<Thing>
     {
         /// <summary>
         /// The <see cref="IDisposable"/> subscription to the <see cref="SelectedThingChangedEvent"/>
         /// </summary>
         private IDisposable selectedThingChangedSubscription;
+
+        /// <summary>
+        /// Backing field for the <see cref="IsSelected"/>
+        /// </summary>
         private bool isSelected;
+
+        /// <summary>
+        /// Internal view model which is switched when the selected thing changes
+        /// </summary>
         private ThingViewModel<Thing> thingViewModel;
 
         /// <summary>
@@ -125,16 +131,18 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
+        /// <inheritdoc/>
         public bool IsSelected
         {
             get { return isSelected; }
             set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
         }
 
+        /// <inheritdoc/>
         public Thing Thing => this.thingViewModel.Thing;
 
         /// <summary>
-        /// Check if a new <see cref="PropertyGridViewModel"/> should be created.
+        /// Creates a new internal view model when the Thing changes
         /// </summary>
         /// <param name="selectedThingChangedEvent">
         /// The <see cref="SelectedThingChangedEvent"/>
@@ -148,7 +156,7 @@ namespace CDP4PropertyGrid.ViewModels
         }
 
         /// <summary>
-        /// 
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         public void Dispose()
         {

@@ -29,7 +29,6 @@ namespace CDP4Grapher.Views
     using System.Windows.Controls;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for CDP4Grapher.xaml

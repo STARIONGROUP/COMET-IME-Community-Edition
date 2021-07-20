@@ -7,10 +7,9 @@
 namespace BasicRdl.Views
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition;
-    using CDP4Composition.Attributes;
-    using CDP4Composition.Navigation.Interfaces;
-    using DevExpress.Xpf.Grid;
+
     using NLog;
 
     /// <summary>

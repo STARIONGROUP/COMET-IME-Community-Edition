@@ -30,6 +30,10 @@ namespace CDP4ObjectBrowser
         /// Backing field for <see cref="Person"/> property
         /// </summary>
         private string person;
+
+        /// <summary>
+        /// Backing field for the <see cref="IsSelected"/>
+        /// </summary>
         private bool isSelected;
 
         /// <summary>
@@ -123,6 +127,7 @@ namespace CDP4ObjectBrowser
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
+        /// <inheritdoc/>
         public bool IsSelected
         {
             get { return isSelected; }

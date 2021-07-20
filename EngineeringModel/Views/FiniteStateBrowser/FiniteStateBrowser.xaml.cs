@@ -4,15 +4,13 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
+
 namespace CDP4EngineeringModel.Views
 {
-    using System.Windows;
-    using CDP4Composition;
-    using System.Windows.Controls;
-    using CDP4Composition.Attributes;
-    using DevExpress.Xpf.Grid;
-    using ViewModels;
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
+
+    using CDP4Composition;
 
     /// <summary>
     /// Interaction logic for FiniteStateBrowser.xaml

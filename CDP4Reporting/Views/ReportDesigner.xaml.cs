@@ -29,7 +29,6 @@ namespace CDP4Reporting.Views
     using System.Windows.Controls;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for ReportDesigner.xaml

@@ -7,8 +7,8 @@
 namespace CDP4Scripting.Views
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for PythonScriptPanel.xaml

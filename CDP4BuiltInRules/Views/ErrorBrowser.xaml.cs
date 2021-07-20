@@ -26,8 +26,8 @@
 namespace CDP4BuiltInRules.Views
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for <see cref="ErrorBrowser"/> XAML

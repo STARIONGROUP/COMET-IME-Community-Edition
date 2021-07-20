@@ -62,6 +62,10 @@ namespace CDP4BuiltInRules.ViewModels
         /// Backing field for the <see cref="SelectedRule"/> property.
         /// </summary>
         private BuiltInRuleRowViewModel selectedRule;
+
+        /// <summary>
+        /// Backing field for the <see cref="IsSelected"/>
+        /// </summary>
         private bool isSelected;
 
         /// <summary>

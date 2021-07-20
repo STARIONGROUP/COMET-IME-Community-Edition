@@ -40,7 +40,7 @@ namespace CDP4Composition
         bool IsDirty { get; }
 
         /// <summary>
-        /// 
+        /// Gets or sets a value indicating if the <see cref="IPanelViewModel"/> is selected
         /// </summary>
         bool IsSelected { get; set; } 
     }

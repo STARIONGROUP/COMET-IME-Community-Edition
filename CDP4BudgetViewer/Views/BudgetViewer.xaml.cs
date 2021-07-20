@@ -8,7 +8,6 @@ namespace CDP4Budget.Views
 {
     using System.ComponentModel.Composition;
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for BudgetViewer view

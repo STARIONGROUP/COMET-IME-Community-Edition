@@ -40,25 +40,5 @@ namespace CDP4Composition
         /// Defines the Ribbon Region
         /// </summary>
         public const string CustomRibbonRegion = "CustomRibbonRegion";
-
-        /// <summary>
-        /// Defines the Left Panel Region
-        /// </summary>
-        public const string LeftPanel = "LeftPanel";
-
-        /// <summary>
-        /// Defines the Right Panel Region
-        /// </summary>
-        public const string RightPanel = "RightPanel";
-
-        /// <summary>
-        /// Defines the Bottom Panel Region
-        /// </summary>
-        public const string BottomPanel = "BottomPanel";
-
-        /// <summary>
-        /// Defines the Editor Panel Region
-        /// </summary>
-        public const string EditorPanel = "Editor";
     }
 }

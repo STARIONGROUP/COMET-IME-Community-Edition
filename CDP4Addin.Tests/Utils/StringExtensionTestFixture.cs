@@ -46,9 +46,6 @@ namespace CDP4AddinCE.Tests.Utils
             var right = "RightGroup";
             Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionRight, StringExtension.ToDockPosition(right));
 
-            var bottom = "BottomGroup";
-            Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionBottom, StringExtension.ToDockPosition(bottom));
-
             var anystring = "somestring";
             Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionLeft, StringExtension.ToDockPosition(anystring));
         }

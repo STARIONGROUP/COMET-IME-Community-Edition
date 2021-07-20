@@ -249,6 +249,7 @@ namespace CDP4Composition.Mvvm
             set { var x = value; }
         }
 
+        /// <inheritdoc/>
         public bool IsSelected
         {
             get { return isSelected; }

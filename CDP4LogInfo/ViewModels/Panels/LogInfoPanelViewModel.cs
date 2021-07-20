@@ -83,6 +83,10 @@ namespace CDP4LogInfo.ViewModels
         /// Backing field for the <see cref="SelectedItem"/>
         /// </summary>
         private LogInfoRowViewModel selectedItem;
+
+        /// <summary>
+        /// Backing field for the <see cref="IsSelected"/>
+        /// </summary>
         private bool isSelected;
 
         /// <summary>
@@ -343,6 +347,7 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
+        /// <inheritdoc/>
         public bool IsSelected
         {
             get { return isSelected; }

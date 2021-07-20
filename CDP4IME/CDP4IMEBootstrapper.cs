@@ -31,7 +31,7 @@ namespace CDP4IME
     using System.IO;
     using System.Reflection;
     using System.Windows;
-    using CDP4Composition;
+
     using CDP4Composition.Adapters;
     using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
@@ -39,7 +39,6 @@ namespace CDP4IME
     using CDP4IME.Settings;
 
     using DevExpress.Xpf.Core;
-    using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;
 
     using Microsoft.Practices.Prism.MefExtensions;
@@ -149,11 +148,6 @@ namespace CDP4IME
             this.UpdateBootstrapperState("Configuring Region Mappings");
 
             var mappings = base.ConfigureRegionAdapterMappings();
-
-            //mappings.RegisterMapping(typeof(LayoutPanel), this.Container.GetExportedValue<LayoutPanelAdapter>());
-            //mappings.RegisterMapping(typeof(LayoutGroup), this.Container.GetExportedValue<LayoutGroupAdapter>());
-            //mappings.RegisterMapping(typeof(DocumentGroup), this.Container.GetExportedValue<DocumentGroupAdapter>());
-            //mappings.RegisterMapping(typeof(TabbedGroup), this.Container.GetExportedValue<TabbedGroupAdapter>());
             mappings.RegisterMapping(typeof(RibbonControl), this.Container.GetExportedValue<RibbonAdapter>());
 
             return mappings;
