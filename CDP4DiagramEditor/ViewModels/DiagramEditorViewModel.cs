@@ -274,6 +274,11 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<object> CreateBinaryRelationshipCommand { get; protected set; }
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
+
+        /// <summary>
         /// Initialize the browser
         /// </summary>
         protected override void Initialize()
