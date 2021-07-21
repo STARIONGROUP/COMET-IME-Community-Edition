@@ -48,12 +48,6 @@ namespace CDP4Composition.Navigation
         void OpenInDock(IPanelViewModel viewModel);
 
         /// <summary>
-        /// Opens the view associated with the <see cref="IPanelViewModel"/> in the AddIn
-        /// </summary>
-        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to open</param>
-        void OpenInAddIn(IPanelViewModel viewModel);
-
-        /// <summary>
         /// Opens the view associated to a view-model. The view-model is identified by its <see cref="INameMetaData.Name"/>.
         /// </summary>
         /// <param name="viewModelName">The name we want to compare to the <see cref="INameMetaData.Name"/> of the view-models.</param>
@@ -61,6 +55,12 @@ namespace CDP4Composition.Navigation
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/>.</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/>.</param>
         void OpenInDock(string viewModelName, ISession session, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService);
+
+        /// <summary>
+        /// Opens the view associated with the <see cref="IPanelViewModel"/> in the AddIn
+        /// </summary>
+        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to open</param>
+        void OpenInAddIn(IPanelViewModel viewModel);
 
         /// <summary>
         /// Re-opens an exisiting View associated to the provided view-model, or opens a new View
@@ -83,12 +83,6 @@ namespace CDP4Composition.Navigation
         void CloseInDock(IPanelViewModel viewModel);
 
         /// <summary>
-        /// Closes the view associated with the <see cref="IPanelViewModel"/> in the AddIn
-        /// </summary>
-        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to close</param>
-        void CloseInAddIn(IPanelViewModel viewModel);
-
-        /// <summary>
         /// Closes all the <see cref="IPanelView"/> which associated <see cref="IPanelViewModel"/> is of a certain Type
         /// </summary>
         /// <param name="viewModelType">The <see cref="Type"/> of the <see cref="IPanelViewModel"/> to close</param>
@@ -99,5 +93,11 @@ namespace CDP4Composition.Navigation
         /// </summary>
         /// <param name="datasourceUri">The string representation of the data-source's uri</param>
         void CloseInDock(string datasourceUri);
+
+        /// <summary>
+        /// Closes the view associated with the <see cref="IPanelViewModel"/> in the AddIn
+        /// </summary>
+        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to close</param>
+        void CloseInAddIn(IPanelViewModel viewModel);
     }
 }
