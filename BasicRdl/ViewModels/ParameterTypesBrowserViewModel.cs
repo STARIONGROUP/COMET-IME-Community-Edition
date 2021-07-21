@@ -56,7 +56,7 @@ namespace BasicRdl.ViewModels
     /// The purpose of the <see cref="ParameterTypesBrowserViewModel"/> is to represent the view-model for <see cref="ParameterType"/>s
     /// </summary>
     public class ParameterTypesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget,
-        IFavoritesBrowserViewModel, IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
+        IFavoritesBrowserViewModel, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -72,16 +72,6 @@ namespace BasicRdl.ViewModels
         /// The backing field for <see cref="ShowOnlyFavorites"/> property.
         /// </summary>
         private bool showOnlyFavorites;
-
-        /// <summary>
-        /// Backing field for <see cref="FilterString"/>
-        /// </summary>
-        private string filterString;
-
-        /// <summary>
-        /// Backing field for <see cref="IsFilterEnabled"/>
-        /// </summary>
-        private bool isFilterEnabled;
 
         /// <summary>
         /// The <see cref="IFavoritesService"/> used to work with favorite Things.
@@ -228,20 +218,6 @@ namespace BasicRdl.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
-
-        ///<inheritdoc/>
-        public string FilterString
-        {
-            get { return this.filterString; }
-            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
-        }
-
-        ///<inheritdoc/>
-        public bool IsFilterEnabled
-        {
-            get { return this.isFilterEnabled; }
-            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
-        }
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.

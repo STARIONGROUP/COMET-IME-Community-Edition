@@ -1,10 +1,10 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PropertyGridViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition.
+//    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -21,7 +21,7 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4PropertyGrid.ViewModels
 {
@@ -131,14 +131,18 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets a value indicating if the <see cref="IPanelViewModel"/> is selected
+        /// </summary>
         public bool IsSelected
         {
             get { return isSelected; }
             set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets the <see cref="Thing"/> that is represented by the view-model
+        /// </summary>
         public Thing Thing => this.thingViewModel.Thing;
 
         /// <summary>

@@ -1,10 +1,10 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="PropertyGridViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ThingViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition.
+//    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -21,26 +21,37 @@
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4PropertyGrid.ViewModels
 {
-
     using CDP4Common.CommonData;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
 
     /// <summary>
-    /// Minimal implementation of <see cref="ViewModelBase<T>"/> is wrapped by <see cref="PropertyGridViewModel"/>
+    /// Minimal implementation of <see cref="ThingViewModel{T}"/> is wrapped by <see cref="PropertyGridViewModel"/>
     /// </summary>
     /// <typeparam name="T">The <see cref="Thing"/></typeparam>
     public class ThingViewModel<T> : ViewModelBase<T> where T : Thing
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ThingViewModel{T}"/> class.
+        /// </summary>
         public ThingViewModel() : base()
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ThingViewModel{T}"/> class.
+        /// </summary>
+        /// <param name="thing">
+        /// The thing.
+        /// </param>
+        /// <param name="session">
+        /// The session this view model belongs to.
+        /// </param>
         public ThingViewModel(T thing, ISession session)
             : base(thing, session)
         {

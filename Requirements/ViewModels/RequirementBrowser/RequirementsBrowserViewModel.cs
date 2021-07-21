@@ -68,7 +68,7 @@ namespace CDP4Requirements.ViewModels
     /// The View-Model for the <see cref="RequirementsBrowser"/>
     /// </summary>
     public class RequirementsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget,
-        IRequirementBrowserDisplaySettings, IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
+        IRequirementBrowserDisplaySettings, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The logger for the current class
@@ -124,16 +124,6 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="IsParametricConstraintDisplayed"/>
         /// </summary>
         private bool isParametricConstraintDisplayed;
-
-        /// <summary>
-        /// Backing field for <see cref="FilterString"/>
-        /// </summary>
-        private string filterString;
-
-        /// <summary>
-        /// Backing field for <see cref="IsFilterEnabled"/>
-        /// </summary>
-        private bool isFilterEnabled;
 
         /// <summary>
         /// The Panel Caption
@@ -306,20 +296,6 @@ namespace CDP4Requirements.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
-
-        ///<inheritdoc/>
-        public string FilterString
-        {
-            get { return this.filterString; }
-            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
-        }
-
-        ///<inheritdoc/>
-        public bool IsFilterEnabled
-        {
-            get { return this.isFilterEnabled; }
-            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
-        }
 
         /// <summary>
         /// Updates the current drag state.

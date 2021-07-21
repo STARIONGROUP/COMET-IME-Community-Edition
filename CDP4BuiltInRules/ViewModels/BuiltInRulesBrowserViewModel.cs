@@ -143,7 +143,9 @@ namespace CDP4BuiltInRules.ViewModels
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets a value indicating if the <see cref="IPanelViewModel"/> is selected
+        /// </summary>
         public bool IsSelected
         {
             get { return isSelected; }

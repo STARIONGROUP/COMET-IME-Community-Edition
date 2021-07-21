@@ -47,7 +47,7 @@ namespace BasicRdl.ViewModels
     /// <summary>
     /// The purpose of the <see cref="UnitPrefixBrowserViewModel"/> is to represent the view-model for <see cref="UnitPrefix"/>es
     /// </summary>
-    public class UnitPrefixBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
+    public class UnitPrefixBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -58,16 +58,6 @@ namespace BasicRdl.ViewModels
         /// Backing field for <see cref="CanCreateRdlElement"/>
         /// </summary>
         private bool canCreateRdlElement;
-
-        /// <summary>
-        /// Backing field for <see cref="FilterString"/>
-        /// </summary>
-        private string filterString;
-
-        /// <summary>
-        /// Backing field for <see cref="IsFilterEnabled"/>
-        /// </summary>
-        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitPrefixBrowserViewModel"/> class.
@@ -109,20 +99,6 @@ namespace BasicRdl.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
-
-        ///<inheritdoc/>
-        public string FilterString
-        {
-            get { return this.filterString; }
-            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
-        }
-
-        ///<inheritdoc/>
-        public bool IsFilterEnabled
-        {
-            get { return this.isFilterEnabled; }
-            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
-        }
 
         /// <summary>
         /// Initializes the Commands that can be executed from this view model. The commands are initialized

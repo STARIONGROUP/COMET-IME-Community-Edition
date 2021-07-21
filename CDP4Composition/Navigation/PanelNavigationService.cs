@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PanelNavigationService.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition.
+//    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -42,8 +42,6 @@ namespace CDP4Composition.Navigation
     using CDP4Dal;
     using CDP4Dal.Composition;
 
-    using Microsoft.Practices.Prism.Regions;
-
     using NLog;
 
     /// <summary>
@@ -79,7 +77,7 @@ namespace CDP4Composition.Navigation
         public Dictionary<string, IPanelViewModel> PanelViewModelKinds { get; private set; }
 
         /// <summary>
-        /// Gets the {<see cref="IPanelViewModel"/>, <see cref="IPanelView"/>} pairs that are in the regions
+        /// Gets the <see cref="IPanelViewModel"/>, <see cref="IPanelView"/>} pairs that are in the AddIn regions
         /// </summary>
         public Dictionary<IPanelViewModel, IPanelView> AddInViewModelViewPairs { get; private set; }
 
@@ -101,7 +99,7 @@ namespace CDP4Composition.Navigation
             [ImportMany] IEnumerable<IPanelView> panelViewKinds,
             [ImportMany] IEnumerable<IPanelViewModel> panelViewModelKinds,
             [ImportMany] IEnumerable<Lazy<IPanelViewModel, INameMetaData>> panelViewModelDecorated,
-            [Import] DockLayoutViewModel dockLayoutViewModel,
+            DockLayoutViewModel dockLayoutViewModel,
             IFilterStringService filterStringService)
         {
             var sw = new Stopwatch();
@@ -155,11 +153,21 @@ namespace CDP4Composition.Navigation
         public Dictionary<string, Lazy<IPanelViewModel, INameMetaData>> PanelViewModelDecorated { get; private set; }
 
         /// <summary>
-        /// Opens the <see cref="IPanelView"/> associated to the <see cref="IPanelViewModel"/>
+        /// Opens the view associated to the provided view-model in the dock
         /// </summary>
-        /// <param name="viewModel">The <see cref="IPanelViewModel"/></param>
-        private void OpenInDockInternal(IPanelViewModel viewModel)
+        /// <param name="viewModel">
+        /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened
+        /// </param>
+        /// <remarks>
+        /// The data context of the view is the <see cref="IPanelViewModel"/>
+        /// </remarks>
+        public void OpenInDock(IPanelViewModel viewModel)
         {
+            if (viewModel == null)
+            {
+                throw new ArgumentNullException(nameof(viewModel), $"The {nameof(IPanelViewModel)} may not be null");
+            }
+
             var sw = Stopwatch.StartNew();
 
             this.dockLayoutViewModel.AddDockPanelViewModel(viewModel);
@@ -170,35 +178,10 @@ namespace CDP4Composition.Navigation
         }
 
         /// <summary>
-        /// Opens the view associated to the provided view-model
-        /// </summary>
-        /// <param name="viewModel">
-        /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened
-        /// </param>
-        /// <param name="useRegionManager">
-        /// A value indicating whether handling the opening of the view shall be handled by the region manager. In case this region manager does not handle
-        /// this it will be event-based using the <see cref="CDPMessageBus"/>.
-        /// </param>
-        /// <remarks>
-        /// The data context of the view is the <see cref="IPanelViewModel"/>
-        /// </remarks>
-        public void OpenInDock(IPanelViewModel viewModel)
-        {
-            if (viewModel == null)
-            {
-                throw new ArgumentNullException(nameof(viewModel), "The IPanelViewModel may not be null");
-            }
-
-            this.OpenInDockInternal(viewModel);
-        }
-
-        /// <summary>
         /// Opens the view associated to a view-model. The view-model is identified by its <see cref="INameMetaData.Name"/>.
         /// </summary>
         /// <param name="viewModelName">The name we want to compare to the <see cref="INameMetaData.Name"/> of the view-models.</param>
         /// <param name="session">The <see cref="ISession"/> associated.</param>
-        /// <param name="useRegionManager">A value indicating whether handling the opening of the view shall be handled by the region manager.
-        /// In case this region manager does not handle this, it will be event-based using the <see cref="CDPMessageBus"/>.</param>
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/>.</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/>.</param>
         public void OpenInDock(
@@ -233,12 +216,6 @@ namespace CDP4Composition.Navigation
         /// <param name="viewModel">
         /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened, or closed
         /// </param>
-        /// A value indicating whether handling the opening of the view shall be message-based or not. In case it is
-        /// NOT message-based, the <see cref="IRegionManager"/> handles opening and placement of the view.
-        /// </param>
-        /// <remarks>
-        /// The data context of the view is the <see cref="IPanelViewModel"/>
-        /// </remarks>
         public void OpenExistingOrOpenInAddIn(IPanelViewModel viewModel)
         {
             if (this.AddInViewModelViewPairs.TryGetValue(viewModel, out var view))
@@ -277,7 +254,6 @@ namespace CDP4Composition.Navigation
 
             var openViewModels = this.dockLayoutViewModel
                 .DockPanelViewModels
-                .OfType<IPanelViewModel>()
                 .Where(x => x.DataSource == datasourceUri)
                 .ToList();
 
@@ -346,6 +322,10 @@ namespace CDP4Composition.Navigation
             this.filterStringService.UnregisterFromService(panelViewModel);
         }
 
+        /// <summary>
+        /// Opens the view associated with the <see cref="IPanelViewModel"/> in the AddIn
+        /// </summary>
+        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to open</param>
         public void OpenInAddIn(IPanelViewModel viewModel)
         {
             var viewType = this.GetViewType(viewModel);
@@ -366,6 +346,10 @@ namespace CDP4Composition.Navigation
             CDPMessageBus.Current.SendMessage(openPanelEvent);
         }
 
+        /// <summary>
+        /// Closes the view associated with the <see cref="IPanelViewModel"/> in the AddIn
+        /// </summary>
+        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to close</param>
         public void CloseInAddIn(IPanelViewModel viewModel)
         {
             if (this.AddInViewModelViewPairs.TryGetValue(viewModel, out var view))

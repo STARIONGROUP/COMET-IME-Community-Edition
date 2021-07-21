@@ -25,7 +25,7 @@
 namespace CDP4Composition.Navigation
 {
     using System;
-    using System.Collections.Generic;
+
     using CDP4Dal;
     using CDP4Dal.Composition;
 
@@ -37,20 +37,20 @@ namespace CDP4Composition.Navigation
     public interface IPanelNavigationService
     {
         /// <summary>
-        /// Opens the view associated to the provided view-model
+        /// Opens the view associated to the provided view-model in the dock
         /// </summary>
         /// <param name="viewModel">
         /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened
-        /// </param>
-        /// <param name="useRegionManager">
-        /// A value indicating whether handling the opening of the view shall be message-based or not. In case it is
-        /// NOT message-based, the <see cref="IRegionManager"/> handles opening and placement of the view.
         /// </param>
         /// <remarks>
         /// The data context of the view is the <see cref="IPanelViewModel"/>
         /// </remarks>
         void OpenInDock(IPanelViewModel viewModel);
 
+        /// <summary>
+        /// Opens the view associated with the <see cref="IPanelViewModel"/> in the AddIn
+        /// </summary>
+        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to open</param>
         void OpenInAddIn(IPanelViewModel viewModel);
 
         /// <summary>
@@ -58,25 +58,20 @@ namespace CDP4Composition.Navigation
         /// </summary>
         /// <param name="viewModelName">The name we want to compare to the <see cref="INameMetaData.Name"/> of the view-models.</param>
         /// <param name="session">The <see cref="ISession"/> associated.</param>
-        /// <param name="useRegionManager">A value indicating whether handling the opening of the view shall be handled by the region manager.
-        /// In case this region manager does not handle this, it will be event-based using the <see cref="CDPMessageBus"/>.</param>
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/>.</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/>.</param>
         void OpenInDock(string viewModelName, ISession session, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService);
 
         /// <summary>
-        /// Opens or closes the view associated to the provided view-model
+        /// Re-opens an exisiting View associated to the provided view-model, or opens a new View
+        /// Re-opening is done by sending a <see cref="CDPMessageBus"/> event.
+        /// This event can be handled by more specific code,  for example in the addin, where some
+        /// ViewModels should not close at all. For those viewmodels visibility is toggled on every
+        /// <see cref="NavigationPanelEvent"/> event that has <see cref="PanelStatus.Open"/> set.
         /// </summary>
         /// <param name="viewModel">
-        /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened
+        /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened, or closed
         /// </param>
-        /// <param name="useRegionManager">
-        /// A value indicating whether handling the opening of the view shall be message-based or not. In case it is
-        /// NOT message-based, the <see cref="IRegionManager"/> handles opening and placement of the view.
-        /// </param>
-        /// <remarks>
-        /// The data context of the view is the <see cref="IPanelViewModel"/>
-        /// </remarks>
         void OpenExistingOrOpenInAddIn(IPanelViewModel viewModel);
 
         /// <summary>
@@ -85,12 +80,12 @@ namespace CDP4Composition.Navigation
         /// <param name="viewModel">
         /// The view-model that is to be closed.
         /// </param>
-        /// <param name="useRegionManager">
-        /// A value indicating whether handling the opening of the view shall be handled by the region manager. In case this region manager does not handle
-        /// this it will be event-based using the <see cref="CDPMessageBus"/>.
-        /// </param>
         void CloseInDock(IPanelViewModel viewModel);
 
+        /// <summary>
+        /// Closes the view associated with the <see cref="IPanelViewModel"/> in the AddIn
+        /// </summary>
+        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to close</param>
         void CloseInAddIn(IPanelViewModel viewModel);
 
         /// <summary>

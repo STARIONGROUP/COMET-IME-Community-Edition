@@ -66,13 +66,13 @@ namespace CDP4Composition.Services
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// The view and viewmodel of deprecatable browsers.
+        /// The viewmodel of deprecatable browsers.
         /// </summary>
-        public readonly List<IPanelFilterableDataGridViewModel> OpenDeprecatedControls =
+        public readonly List<IPanelFilterableDataGridViewModel> OpenDeprecatedViewModels =
             new List<IPanelFilterableDataGridViewModel>();
 
         /// <summary>
-        /// The view and viewmodel of favoritable browsers.
+        /// The viewmodel of favoritable browsers.
         /// </summary>
         public readonly List<IPanelFilterableDataGridViewModel> OpenFavoriteViewModels =
             new List<IPanelFilterableDataGridViewModel>();
@@ -128,7 +128,7 @@ namespace CDP4Composition.Services
         }
 
         /// <summary>
-        /// Add the deprecatable browser view and viewmodel to the list of open controls <see cref="OpenDeprecatedControls"/>.
+        /// Add the deprecatable browser view and viewmodel to the list of open controls <see cref="OpenDeprecatedViewModels"/>.
         /// </summary>
         /// <param name="view">The view.</param>
         /// <param name="viewModel">The view model.</param>
@@ -139,7 +139,7 @@ namespace CDP4Composition.Services
                 return;
             }
 
-            this.OpenDeprecatedControls.Add(viewModel);
+            this.OpenDeprecatedViewModels.Add(viewModel);
             this.Refresh(viewModel);
 
             logger.Debug($"{viewModel} Added deprecatable to the FilterStringService");
@@ -164,11 +164,11 @@ namespace CDP4Composition.Services
         }
 
         /// <summary>
-        /// Refresh all <see cref="OpenDeprecatedControls"/>.
+        /// Refresh all <see cref="OpenDeprecatedViewModels"/>.
         /// </summary>
         public void RefreshDeprecatableFilterAll()
         {
-            foreach (var grid in this.OpenDeprecatedControls)
+            foreach (var grid in this.OpenDeprecatedViewModels)
             {
                 this.Refresh(grid);
             }
@@ -195,7 +195,7 @@ namespace CDP4Composition.Services
         /// <param name="view">The view to remove.</param>
         private void RemoveView(IPanelFilterableDataGridViewModel viewModel)
         {
-            this.OpenDeprecatedControls.Remove(viewModel);
+            this.OpenDeprecatedViewModels.Remove(viewModel);
             this.OpenFavoriteViewModels.Remove(viewModel);
         }
 

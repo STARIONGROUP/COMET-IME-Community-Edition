@@ -65,7 +65,7 @@ namespace CDP4Composition.Mvvm
     /// The View-Model-base that shall be used by a view-model representing a Browser
     /// </summary>
     /// <typeparam name="T">The <see cref="Thing"/> the browser is associated to</typeparam>
-    public abstract class BrowserViewModelBase<T> : ViewModelBase<T>, IBrowserViewModelBase<T>, IHaveCustomFilterOperators where T : Thing
+    public abstract class BrowserViewModelBase<T> : ViewModelBase<T>, IBrowserViewModelBase<T>, IHaveCustomFilterOperators, IPanelFilterableDataGridViewModel where T : Thing
     {
         /// <summary>
         /// The <see cref="CamelCaseToSpaceConverter"/> converter.
@@ -151,6 +151,16 @@ namespace CDP4Composition.Mvvm
         /// Backing field for <see cref="IsSelected"/>
         /// </summary>
         private bool isSelected;
+
+        /// <summary>
+        /// Backing field for <see cref="FilterString"/>
+        /// </summary>
+        private string filterString;
+
+        /// <summary>
+        /// Backing field for <see cref="IsFilterEnabled"/>
+        /// </summary>
+        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModelBase{T}"/> class.
@@ -249,11 +259,31 @@ namespace CDP4Composition.Mvvm
             set { var x = value; }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets a value indicating if the View-Model is selected
+        /// </summary>
         public bool IsSelected
         {
             get { return isSelected; }
             set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets filter string which the view is bound to.
+        /// </summary>
+        public string FilterString
+        {
+            get { return this.filterString; }
+            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
+        }
+
+        /// <summary>
+        ///  Gets or sets enabled value of the filter which the view is bound to.
+        /// </summary>
+        public bool IsFilterEnabled
+        {
+            get { return this.isFilterEnabled; }
+            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
         }
 
         /// <summary>
@@ -464,6 +494,7 @@ namespace CDP4Composition.Mvvm
             get { return this.tooltip; }
             protected set { this.RaiseAndSetIfChanged(ref this.tooltip, value); }
         }
+
 
         /// <summary>
         /// Execute the generic <see cref="CreateCommand"/>

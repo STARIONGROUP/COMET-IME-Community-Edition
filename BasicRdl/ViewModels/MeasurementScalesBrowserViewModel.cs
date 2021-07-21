@@ -48,7 +48,7 @@ namespace BasicRdl.ViewModels
     /// The purpose of the <see cref="MeasurementScalesBrowserViewModel"/> is to represent the view-model for <see cref="MeasurementScale"/>s
     /// </summary>
     public class MeasurementScalesBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel,
-        IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
+        IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -65,16 +65,6 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private readonly DisposableReactiveList<MeasurementScaleRowViewModel> measurementScales =
             new DisposableReactiveList<MeasurementScaleRowViewModel>();
-
-        /// <summary>
-        /// Backing field for <see cref="FilterString"/>
-        /// </summary>
-        private string filterString;
-
-        /// <summary>
-        /// Backing field for <see cref="IsFilterEnabled"/>
-        /// </summary>
-        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeasurementScalesBrowserViewModel"/> class.
@@ -147,20 +137,6 @@ namespace BasicRdl.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
-
-        ///<inheritdoc/>
-        public string FilterString
-        {
-            get { return this.filterString; }
-            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
-        }
-
-        ///<inheritdoc/>
-        public bool IsFilterEnabled
-        {
-            get { return this.isFilterEnabled; }
-            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
-        }
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.

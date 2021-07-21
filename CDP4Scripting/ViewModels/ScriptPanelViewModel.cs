@@ -429,7 +429,9 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets a value indicating if the <see cref="IPanelViewModel"/> is selected
+        /// </summary>
         public bool IsSelected
         {
             get { return isSelected; }

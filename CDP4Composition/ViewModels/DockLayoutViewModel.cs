@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PanelNavigationService.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="DockLayoutViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition.
+//    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -43,8 +43,15 @@ namespace CDP4Composition.ViewModels
     [Export]
     public class DockLayoutViewModel : ReactiveObject
     {
+        /// <summary>
+        /// A dialog service for displaying user confirmations
+        /// </summary>
         private readonly IDialogNavigationService dialogNavigationService;
 
+        /// <summary>
+        /// Initalizes a new instance of the <see cref="DockLayoutViewModel"/>
+        /// </summary>
+        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/> to display user prompts</param>
         [ImportingConstructor]
         public DockLayoutViewModel(IDialogNavigationService dialogNavigationService)
         {
@@ -71,6 +78,11 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         public ReactiveCommand<Unit> DockPanelClosedCommand { get; }
 
+        /// <summary>
+        /// Responds when a panel is closed and removes the view model from the collection
+        /// </summary>
+        /// <param name="e">The <see cref="DockItemClosedEventArgs"/></param>
+        /// <returns>async Task</returns>
         private async Task PanelClosed(DockItemClosedEventArgs e)
         {
             foreach (var dockPanelViewModel in e.AffectedItems.Select(p => p.DataContext).OfType<IPanelViewModel>())
@@ -79,6 +91,11 @@ namespace CDP4Composition.ViewModels
             }
         }
 
+        /// <summary>
+        /// Ask user for confirmation before closing panel
+        /// </summary>
+        /// <param name="e">The <see cref="ItemCancelEventArgs"/></param>
+        /// <returns>async Task</returns>
         private async Task PanelClosing(ItemCancelEventArgs e)
         {
             var docPanel = e.Item as LayoutPanel;

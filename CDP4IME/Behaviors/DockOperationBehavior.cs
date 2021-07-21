@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PanelNavigationService.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="DockOperationBehavior.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition.
+//    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -23,10 +23,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
-
 namespace CDP4IME.Behaviors
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     using CDP4Composition;
@@ -39,6 +38,7 @@ namespace CDP4IME.Behaviors
     /// <summary>
     /// Customizes the docking behaviour when a group of tabs is moved from a side pannel to the document group.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class DockOperationBehavior : Behavior<DockLayoutManager>
     {
         /// <summary>

@@ -127,7 +127,9 @@ namespace CDP4ObjectBrowser
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets or sets a value indicating if the <see cref="IPanelViewModel"/> is selected
+        /// </summary>
         public bool IsSelected
         {
             get { return isSelected; }

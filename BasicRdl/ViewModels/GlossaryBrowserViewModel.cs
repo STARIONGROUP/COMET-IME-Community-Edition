@@ -53,7 +53,7 @@ namespace BasicRdl.ViewModels
     /// that shows all the <see cref="Glossary"/>s contained by a data-source following the containment tree that is modeled in 10-25 and the CDP4 extensions.
     /// </summary>
     public class GlossaryBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IDropTarget,
-        IDeprecatableBrowserViewModel, IPanelFilterableDataGridViewModel
+        IDeprecatableBrowserViewModel
     {
         /// <summary>
         /// The NLog logger
@@ -74,16 +74,6 @@ namespace BasicRdl.ViewModels
         /// Backing field for <see cref="CanCreateGlossary"/>
         /// </summary>
         private bool canCreateGlossary;
-
-        /// <summary>
-        /// Backing field for <see cref="FilterString"/>
-        /// </summary>
-        private string filterString;
-
-        /// <summary>
-        /// Backing field for <see cref="IsFilterEnabled"/>
-        /// </summary>
-        private bool isFilterEnabled;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GlossaryBrowserViewModel"/> class.
@@ -145,20 +135,6 @@ namespace BasicRdl.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
-
-        ///<inheritdoc/>
-        public string FilterString
-        {
-            get { return this.filterString; }
-            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
-        }
-
-        ///<inheritdoc/>
-        public bool IsFilterEnabled
-        {
-            get { return this.isFilterEnabled; }
-            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
-        }
 
         /// <summary>
         /// Add the necessary subscriptions for this view model.
