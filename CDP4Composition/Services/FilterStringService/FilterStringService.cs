@@ -28,12 +28,14 @@ namespace CDP4Composition.Services
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Linq;
+
     using Navigation.Interfaces;
+
     using NLog;
 
     /// <summary>
     /// The purpose of the <see cref="FilterStringService"/> is to set the <see cref="DevExpress.Xpf.Grid.DataControlBase.FilterString"/> property
-    /// on registered view/view model combinations.
+    /// on registered view model.
     /// </summary>
     [Export(typeof(IFilterStringService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
@@ -237,8 +239,6 @@ namespace CDP4Composition.Services
                 {
                     viewModel.FilterString = string.Empty;
                 }
-
-                return;
             }
         }
     }

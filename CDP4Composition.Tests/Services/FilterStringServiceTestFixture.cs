@@ -25,10 +25,15 @@
 
 namespace CDP4Composition.Tests.Services
 {
-    using NUnit.Framework;
-    using CDP4Composition.Services;
-    using Moq;
+    using System.Linq;
 
+    using NUnit.Framework;
+
+    using CDP4Composition.Services;
+    using CDP4Composition.Navigation.Interfaces;
+
+    using Moq;
+    
     /// <summary>
     /// Suite of tests for the <see cref="FilterStringServiceTestFixture"/> class
     /// </summary>
@@ -56,6 +61,46 @@ namespace CDP4Composition.Tests.Services
 
             Assert.AreEqual(0, filterStringService.OpenDeprecatedViewModels.Count);
             Assert.AreEqual(0, filterStringService.OpenFavoriteViewModels.Count);
+        }
+
+        [Test]
+        public void VerifyThatRegisteringDeprecatedBrowserViewModelWorks()
+        {
+            var deprecatable = new Mock<IDeprecatableBrowserViewModel>();
+            var filterable = deprecatable.As<IPanelFilterableDataGridViewModel>();
+            filterable.SetupAllProperties();
+
+            var panel = filterable.As<IPanelViewModel>();
+
+            var filterStringService = new FilterStringService();
+
+            filterStringService.RegisterForService(panel.Object);
+
+            Assert.That(filterStringService.OpenDeprecatedViewModels.Single(), Is.EqualTo(panel.Object));
+            Assert.IsTrue(filterable.Object.IsFilterEnabled);
+            Assert.That(filterable.Object.FilterString, Is.EqualTo("[IsDeprecated]=False"));
+        }
+
+        [Test]
+        public void VerifyThatRegisteringFavouritesBrowserViewModelWorks()
+        {
+            var favourites = new Mock<IFavoritesBrowserViewModel>();
+            favourites.SetupAllProperties();
+
+            var filterable = favourites.As<IPanelFilterableDataGridViewModel>();
+            filterable.SetupAllProperties();
+            var panel = filterable.As<IPanelViewModel>();
+
+            ((IFavoritesBrowserViewModel)panel.Object).ShowOnlyFavorites = true;
+
+            var filterStringService = new FilterStringService();
+            filterStringService.ShowDeprecatedThings = true;
+
+            filterStringService.RegisterForService(panel.Object);
+
+            Assert.That(filterStringService.OpenFavoriteViewModels.Single(), Is.EqualTo(panel.Object));
+            Assert.IsTrue(filterable.Object.IsFilterEnabled);
+            Assert.That(filterable.Object.FilterString, Is.EqualTo("[IsFavorite]=True"));
         }
     }
 }
