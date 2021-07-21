@@ -28,7 +28,6 @@ namespace CDP4Composition.ViewModels
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Reactive;
-    using System.Threading.Tasks;
 
     using CDP4Composition.Navigation;
 
@@ -59,8 +58,9 @@ namespace CDP4Composition.ViewModels
 
             this.dialogNavigationService = dialogNavigationService;
 
-            DockPanelClosingCommand = ReactiveCommand.CreateAsyncTask(arg => PanelClosing((ItemCancelEventArgs)arg));
-            DockPanelClosedCommand = ReactiveCommand.CreateAsyncTask(arg => PanelClosed((DockItemClosedEventArgs)arg));
+            //Forced to use async delegate without an await in order to achieve sychronous command call. Should be better options available in newer versions of reactive.
+            DockPanelClosingCommand = ReactiveCommand.CreateAsyncTask(async arg => PanelClosing((ItemCancelEventArgs)arg));
+            DockPanelClosedCommand = ReactiveCommand.CreateAsyncTask(async arg => PanelClosed((DockItemClosedEventArgs)arg));
         }
 
         /// <summary>
@@ -82,8 +82,7 @@ namespace CDP4Composition.ViewModels
         /// Responds when a panel is closed and removes the view model from the collection
         /// </summary>
         /// <param name="e">The <see cref="DockItemClosedEventArgs"/></param>
-        /// <returns>async Task</returns>
-        private async Task PanelClosed(DockItemClosedEventArgs e)
+        private void PanelClosed(DockItemClosedEventArgs e)
         {
             foreach (var dockPanelViewModel in e.AffectedItems.Select(p => p.DataContext).OfType<IPanelViewModel>())
             {
@@ -95,8 +94,7 @@ namespace CDP4Composition.ViewModels
         /// Ask user for confirmation before closing panel
         /// </summary>
         /// <param name="e">The <see cref="ItemCancelEventArgs"/></param>
-        /// <returns>async Task</returns>
-        private async Task PanelClosing(ItemCancelEventArgs e)
+        private void PanelClosing(ItemCancelEventArgs e)
         {
             var docPanel = e.Item as LayoutPanel;
             if (docPanel is null)

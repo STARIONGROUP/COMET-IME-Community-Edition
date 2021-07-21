@@ -25,16 +25,15 @@
 
 namespace CDP4Composition.Tests.ViewModels
 {
-    using System;
     using System.Linq;
     using System.Threading;
 
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.ViewModels;
 
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Docking.Base;
-    using DevExpress.Xpf.Layout.Core;
 
     using Moq;
 
@@ -43,13 +42,10 @@ namespace CDP4Composition.Tests.ViewModels
     [TestFixture]
     public class DockLayoutViewModelFixture
     {
-        private DockLayoutViewModel viewModel;
-
         [Test]
         public void VerifyViewModelInitialState()
         {
-            var dialogMock = new Mock<IDialogNavigationService>();
-            viewModel = new DockLayoutViewModel(dialogMock.Object);
+            var viewModel = new DockLayoutViewModel(Mock.Of<IDialogNavigationService>());
 
             Assert.That(viewModel.DockPanelViewModels.Count(), Is.EqualTo(0));
         }
@@ -58,9 +54,9 @@ namespace CDP4Composition.Tests.ViewModels
         public void VerifyViewModelIsSetAndSelectedWhenAdding()
         {
             var dialogMock = new Mock<IDialogNavigationService>();
-            viewModel = new DockLayoutViewModel(dialogMock.Object);
+            var viewModel = new DockLayoutViewModel(dialogMock.Object);
 
-            var panelViewModel = new PanelViewModelStub();
+            var panelViewModel = Mock.Of<IPanelViewModel>();
 
             viewModel.AddDockPanelViewModel(panelViewModel);
 
@@ -72,48 +68,43 @@ namespace CDP4Composition.Tests.ViewModels
         [Apartment(ApartmentState.STA)]
         public void VerifyCloseCommandRemovesPanelViewModel()
         {
-            var dialogMock = new Mock<IDialogNavigationService>();
-            viewModel = new DockLayoutViewModel(dialogMock.Object);
+            var viewModel  = new DockLayoutViewModel(Mock.Of<IDialogNavigationService>());
 
-            var panelViewModel = new PanelViewModelStub();
-            viewModel.AddDockPanelViewModel(panelViewModel);
+            var panelViewModelStub = Mock.Of<IPanelViewModel>();
+            viewModel.AddDockPanelViewModel(panelViewModelStub);
 
-            viewModel.DockPanelClosedCommand.Execute(new DockItemClosedEventArgs(null, new[] { new LayoutItemStub(panelViewModel) }));
-            Assert.That(viewModel.DockPanelViewModels.Count(), Is.EqualTo(0));
-        }
-    }
-
-    class LayoutItemStub : BaseLayoutItem
-    {
-        public LayoutItemStub(IPanelViewModel panelViewModel)
-        {
-            DataContext = panelViewModel;
+            viewModel.DockPanelClosedCommand.Execute(new DockItemClosedEventArgs(null, new[] { new LayoutPanel() { Content = panelViewModelStub }}));
+            Assert.IsEmpty(viewModel.DockPanelViewModels);
         }
 
-        protected override LayoutItemType GetLayoutItemTypeCore()
+        [TestCase(true, ExpectedResult = false)]
+        [TestCase(false, ExpectedResult = true)]
+        [Apartment(ApartmentState.STA)]
+        public bool VerifyClosingCommandCancellation(bool userCancel)
         {
-            return LayoutItemType.Document;
-        }        
-    }
+            var dialogStub = new Mock<IDialogNavigationService>();
+            dialogStub.Setup(d => d.NavigateModal(It.IsAny<IDialogViewModel>()))
+                .Returns(new BaseDialogResult(userCancel));
 
-    class PanelViewModelStub : IPanelViewModel
-    {
-        public string Caption { get; }
+            var viewModel = new DockLayoutViewModel(dialogStub.Object);
 
-        public Guid Identifier { get; }
+            //Create panel view model stub
+            var panelViewModelStub = new Mock<IPanelViewModel>();
+            panelViewModelStub.SetupAllProperties();
+            panelViewModelStub.SetupGet(p => p.IsDirty).Returns(true);
 
-        public string ToolTip { get; }
+            //Add stub to dock view model
+            viewModel.AddDockPanelViewModel(panelViewModelStub.Object);
 
-        public string DataSource { get; }
+            var args = new ItemCancelEventArgs(new LayoutPanel() 
+            {
+                Content = panelViewModelStub.Object 
+            });
 
-        public bool IsDirty { get; }
+            //Act
+            viewModel.DockPanelClosingCommand.Execute(args);
 
-        public bool IsSelected { get; set; }
-
-        public string TargetName { get; set; }
-
-        public void Dispose()
-        {
+            return args.Cancel;
         }
     }
 }
