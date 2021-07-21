@@ -201,6 +201,24 @@ namespace CDP4Composition.Tests.Navigation
         }
 
         [Test]
+        public void VerifyThatEventHandlerIsTriggeredFromAddIn()
+        {
+            var closed = false;
+
+            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+                .Where(x => x.ViewModel == this.panelViewModel && x.PanelStatus == PanelStatus.Closed)
+                .Subscribe(x => { closed = true; });
+
+            this.NavigationService.OpenInAddIn(this.panelViewModel);
+            var olditems = new List<IPanelView>() { this.NavigationService.AddInViewModelViewPairs.Values.Single() };
+
+            this.NavigationService.CloseInAddIn(this.panelViewModel);
+
+            Assert.IsTrue(closed);
+            Assert.AreEqual(0, this.NavigationService.AddInViewModelViewPairs.Count);
+        }
+
+        [Test]
         public void VerifyThatNavigationServiceThrowsException()
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => this.NavigationService.OpenInAddIn(new ExceptionViewModel()));

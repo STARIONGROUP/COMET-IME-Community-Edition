@@ -29,7 +29,6 @@ namespace CDP4Composition.Converters
     using System.Globalization;
     using System.Reflection;
     using System.Text.RegularExpressions;
-    using System.Windows;
     using System.Windows.Data;
 
     /// <summary>
@@ -60,7 +59,7 @@ namespace CDP4Composition.Converters
             var assembly = value.GetType().Assembly;
 
             //Instantiate the view from the view model assembly by name convention
-            var view = (FrameworkElement)assembly.CreateInstance(viewName, false, BindingFlags.Default, null, new object[] { true }, null, null );
+            var view = (IPanelView)assembly.CreateInstance(viewName, false, BindingFlags.Default, null, new object[] { true }, null, null );
             view.DataContext = value;
             
             return view;
@@ -76,7 +75,7 @@ namespace CDP4Composition.Converters
         /// <returns></returns>
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }
