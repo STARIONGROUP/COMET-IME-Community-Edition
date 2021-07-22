@@ -125,6 +125,9 @@ namespace CDP4IME
         /// <param name="dialogNavigationService">
         /// The <see cref="IDialogNavigationService"/> that is used to show modal dialogs to the user
         /// </param>
+        /// <param name="dockViewModel">
+        /// The <see cref="DockLayoutViewModel" for the panel dock/>
+        /// </param>
         public ShellViewModel(IDialogNavigationService dialogNavigationService, DockLayoutViewModel dockViewModel)
         {
             if (dialogNavigationService == null)

@@ -50,7 +50,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// The thing.
         /// </param>
         /// <param name="session">
-        /// The session this view model belongs to.
+        /// The <see cref="ISession"/> this view model belongs to.
         /// </param>
         public ThingViewModel(T thing, ISession session)
             : base(thing, session)
