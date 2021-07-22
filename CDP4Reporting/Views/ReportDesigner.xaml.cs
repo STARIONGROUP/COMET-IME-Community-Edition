@@ -29,12 +29,11 @@ namespace CDP4Reporting.Views
     using System.Windows.Controls;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for ReportDesigner.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.EditorPanel)]
+    [Export(typeof(IPanelView))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class ReportDesigner : IPanelView
     {

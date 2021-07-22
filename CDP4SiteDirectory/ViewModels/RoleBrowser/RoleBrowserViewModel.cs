@@ -93,6 +93,11 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
+
+        /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CDP4Common.SiteDirectoryData.PersonRole"/>
         /// </summary>
         public ReactiveCommand<object> CreatePersonRoleCommand { get; private set; }

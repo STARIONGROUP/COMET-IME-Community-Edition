@@ -45,6 +45,8 @@
                                                 Mode=TwoWay,
                                                 UpdateSourceTrigger=PropertyChanged}"
                          SelectionMode="Row"
+                         FilterString="{Binding FilterString, Mode=TwoWay}"
+                         IsFilterEnabled="{Binding IsFilterEnabled, Mode=TwoWay}"                                                  
                          services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
             <dxmvvm:Interaction.Behaviors>
                 <cdp4Composition:ContextMenuBehavior />

@@ -25,15 +25,15 @@
 
 namespace CDP4BuiltInRules.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for <see cref="BuiltInRulesBrowser"/> XAML
     /// </summary>
-    [PanelViewExport(RegionNames.RightPanel)]
+    [Export(typeof(IPanelView))]
     public partial class BuiltInRulesBrowser : UserControl, IPanelView
     {
         /// <summary>

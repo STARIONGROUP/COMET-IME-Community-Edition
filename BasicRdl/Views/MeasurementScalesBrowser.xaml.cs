@@ -6,18 +6,17 @@
 
 namespace BasicRdl.Views
 {
+    using System.ComponentModel.Composition;
+
     using CDP4Composition;
-    using CDP4Composition.Attributes;
-    using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.Services;
-    using DevExpress.Xpf.Grid;
+
     using NLog;
 
     /// <summary>
     /// Interaction logic for MeasurementScalesBrowser
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
-    public partial class MeasurementScalesBrowser : IPanelView, IPanelFilterableDataGridView
+    [Export(typeof(IPanelView))]
+    public partial class MeasurementScalesBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -45,13 +44,7 @@ namespace BasicRdl.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.MeasurementScalesGridControl;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }

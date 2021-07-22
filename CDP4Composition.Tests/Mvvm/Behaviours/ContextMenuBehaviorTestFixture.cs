@@ -197,6 +197,11 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
             public ReactiveList<FileTypeRowViewModel> FileTypes { get; private set; }
 
             /// <summary>
+            /// Gets or sets the dock layout group target name to attach this panel to on opening
+            /// </summary>
+            public string TargetName { get; set; }
+
+            /// <summary>
             /// Loads the <see cref="FileType"/>s from the cache when the browser is instantiated.
             /// </summary>
             protected override void Initialize()

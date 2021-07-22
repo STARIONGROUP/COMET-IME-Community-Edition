@@ -77,18 +77,16 @@ namespace CDP4PropertyGrid.Tests
         }
 
         [Test]
-        public void VerifyThatViewModelChangeOccurs()
+        public void VerifyThatThingChangeOccursWhenSelectedThingChanges()
         {
             var person = new Person();
             var vm = new PropertyGridViewModel(person, this.session.Object);
 
-            var eventCalled = false;
+            var expectedPerson = new Person();
 
-            CDPMessageBus.Current.Listen<ViewModelChangeEvent>().Subscribe(x => { eventCalled = true; });
-                
-            CDPMessageBus.Current.SendMessage(new SelectedThingChangedEvent(new Person(), this.session.Object));
+            CDPMessageBus.Current.SendMessage(new SelectedThingChangedEvent(expectedPerson, this.session.Object));
 
-            Assert.IsTrue(eventCalled);
+            Assert.That(vm.Thing, Is.EqualTo(expectedPerson));
         }
     }
 }

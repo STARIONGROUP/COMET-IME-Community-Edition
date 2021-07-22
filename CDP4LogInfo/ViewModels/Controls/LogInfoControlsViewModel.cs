@@ -70,11 +70,11 @@ namespace CDP4LogInfo.ViewModels
 
             if (this.IsChecked)
             {
-                panelNavigationService.Open(this.LogInfoPanel, true);
+                panelNavigationService.OpenInDock(this.LogInfoPanel);
             }
             else
             {
-                panelNavigationService.Close(this.LogInfoPanel, true);
+                panelNavigationService.CloseInDock(this.LogInfoPanel);
             }
         }
 

@@ -160,6 +160,11 @@ namespace CDP4Grapher.ViewModels
         public IHaveContextMenu DiagramContextMenuViewModel { get; set; } = new DiagramControlContextMenuViewModel();
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="GrapherViewModel"/> class
         /// </summary>
         /// <param name="option">The <see cref="Option"/> of which this browser is of</param>

@@ -6,14 +6,15 @@
 
 namespace CDP4EngineeringModel.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
+
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for OptionBrowser.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class OptionBrowser : UserControl, IPanelView
     {
         public OptionBrowser()

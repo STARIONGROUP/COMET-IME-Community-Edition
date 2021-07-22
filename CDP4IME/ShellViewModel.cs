@@ -33,21 +33,21 @@ namespace CDP4IME
     using CDP4Composition.Log;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Events;
 
     using CDP4IME.Settings;
+    using CDP4IME.ViewModels;
 
     using CDP4ShellDialogs.ViewModels;
 
     using Microsoft.Practices.ServiceLocation;
-    
+
     using NLog;
-    
+
     using ReactiveUI;
-    
-    using CDP4IME.ViewModels;
 
     /// <summary>
     /// The View Model of the <see cref="Shell"/>
@@ -125,7 +125,10 @@ namespace CDP4IME
         /// <param name="dialogNavigationService">
         /// The <see cref="IDialogNavigationService"/> that is used to show modal dialogs to the user
         /// </param>
-        public ShellViewModel(IDialogNavigationService dialogNavigationService)
+        /// <param name="dockViewModel">
+        /// The <see cref="DockLayoutViewModel" for the panel dock/>
+        /// </param>
+        public ShellViewModel(IDialogNavigationService dialogNavigationService, DockLayoutViewModel dockViewModel)
         {
             if (dialogNavigationService == null)
             {
@@ -139,7 +142,7 @@ namespace CDP4IME
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.dialogNavigationService = dialogNavigationService;
-
+            this.DockViewModel = dockViewModel;
             this.Title = "COMET IME - Community Edition";
 
             this.logTarget = new MemoryEventTarget();
@@ -373,6 +376,11 @@ namespace CDP4IME
                 this.RaiseAndSetIfChanged(ref this.title, value);
             }
         }
+
+        /// <summary>
+        /// Gets the view model for the dock
+        /// </summary>
+        public DockLayoutViewModel DockViewModel { get; }
 
         public void Dispose()
         {

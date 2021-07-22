@@ -47,6 +47,8 @@
                                                 Mode=TwoWay,
                                                 UpdateSourceTrigger=PropertyChanged}"
                          SelectionMode="Row"
+                         FilterString="{Binding FilterString, Mode=TwoWay}"
+                         IsFilterEnabled="{Binding IsFilterEnabled, Mode=TwoWay}"                                                  
                          services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted,
                                                                             Mode=OneWay,
                                                                             UpdateSourceTrigger=PropertyChanged}">

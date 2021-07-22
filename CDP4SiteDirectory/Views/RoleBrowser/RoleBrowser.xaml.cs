@@ -6,18 +6,17 @@
 
 namespace CDP4SiteDirectory.Views
 {
+    using System.ComponentModel.Composition;
+
     using CDP4Composition;
-    using CDP4Composition.Attributes;
-    using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.Services;
-    using DevExpress.Xpf.Grid;
+
     using NLog;
 
     /// <summary>
     /// Interaction logic for Role browser
     /// </summary>
-    [PanelViewExport(RegionNames.RightPanel)]
-    public partial class RoleBrowser : IPanelView, IPanelFilterableDataGridView
+    [Export(typeof(IPanelView))]
+    public partial class RoleBrowser : IPanelView
     {
         /// <summary>
         /// The NLog logger
@@ -45,13 +44,7 @@ namespace CDP4SiteDirectory.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
-                this.FilterableControl = this.RolesTreeListControl;
             }
         }
-
-        /// <summary>
-        /// Gets the <see cref="DataControlBase"/> that is to be set up for filtering service.
-        /// </summary>
-        public DataControlBase FilterableControl { get; private set; }
     }
 }

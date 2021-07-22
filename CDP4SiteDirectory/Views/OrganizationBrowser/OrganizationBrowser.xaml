@@ -80,6 +80,8 @@
                              Grid.Row="2"
                              ItemsSource="{Binding Path=Organizations}"
                              SelectedItem="{Binding SelectedThing}"
+                             FilterString="{Binding FilterString, Mode=TwoWay}"
+                             IsFilterEnabled="{Binding IsFilterEnabled, Mode=TwoWay}"                                                      
                              services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
             <dxmvvm:Interaction.Behaviors>
                 <cdp4Composition:ContextMenuBehavior />

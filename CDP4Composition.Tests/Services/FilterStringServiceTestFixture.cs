@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FilterStringServiceTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -15,8 +15,8 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
@@ -25,39 +25,26 @@
 
 namespace CDP4Composition.Tests.Services
 {
-    using NUnit.Framework;
-    using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.Services;
-    using Moq;
+    using System.Linq;
 
+    using NUnit.Framework;
+
+    using CDP4Composition.Services;
+    using CDP4Composition.Navigation.Interfaces;
+
+    using Moq;
+    
     /// <summary>
     /// Suite of tests for the <see cref="FilterStringServiceTestFixture"/> class
     /// </summary>
     [TestFixture]
     public class FilterStringServiceTestFixture
     {
-        private Mock<IDeprecatableToggleViewModel> deprecatableToggle;
-
-        private Mock<IPanelView> goodView;
-        private Mock<IPanelFilterableDataGridView> goodViewFilterable;
-        private Mock<IPanelView> badView;
-        private Mock<IPanelViewModel> goodViewModel;
         private Mock<IPanelViewModel> badViewModel;
-        private Mock<IDeprecatableBrowserViewModel> goodViewModelDeprecatable;
-        private Mock<IFavoritesBrowserViewModel> goodViewModelFavorable;
 
         [SetUp]
         public void SetUp()
         {
-            this.deprecatableToggle = new Mock<IDeprecatableToggleViewModel>();
-            this.goodView = new Mock<IPanelView>();
-            this.badView = new Mock<IPanelView>();
-
-            this.goodViewFilterable = this.goodView.As<IPanelFilterableDataGridView>();
-            this.goodViewModel = new Mock<IPanelViewModel>();
-            this.goodViewModelDeprecatable = this.goodViewModel.As<IDeprecatableBrowserViewModel>();
-            this.goodViewModelFavorable = this.goodViewModel.As<IFavoritesBrowserViewModel>();
-
             this.badViewModel = new Mock<IPanelViewModel>();
         }
 
@@ -66,13 +53,54 @@ namespace CDP4Composition.Tests.Services
         {
             var filterStringService = new FilterStringService();
 
-            Assert.AreEqual(0, filterStringService.OpenDeprecatedControls.Count);
-            Assert.AreEqual(0, filterStringService.OpenFavoriteControls.Count);
+            Assert.AreEqual(0, filterStringService.OpenDeprecatedViewModels.Count);
+            Assert.AreEqual(0, filterStringService.OpenFavoriteViewModels.Count);
 
-            filterStringService.RegisterForService(this.badView.Object, this.badViewModel.Object);
+            filterStringService.RegisterForService(this.badViewModel.Object);
+            filterStringService.RegisterForService(this.badViewModel.Object);
 
-            Assert.AreEqual(0, filterStringService.OpenDeprecatedControls.Count);
-            Assert.AreEqual(0, filterStringService.OpenFavoriteControls.Count);
+            Assert.AreEqual(0, filterStringService.OpenDeprecatedViewModels.Count);
+            Assert.AreEqual(0, filterStringService.OpenFavoriteViewModels.Count);
+        }
+
+        [Test]
+        public void VerifyThatRegisteringDeprecatedBrowserViewModelWorks()
+        {
+            var deprecatable = new Mock<IDeprecatableBrowserViewModel>();
+            var filterable = deprecatable.As<IPanelFilterableDataGridViewModel>();
+            filterable.SetupAllProperties();
+
+            var panel = filterable.As<IPanelViewModel>();
+
+            var filterStringService = new FilterStringService();
+
+            filterStringService.RegisterForService(panel.Object);
+
+            Assert.That(filterStringService.OpenDeprecatedViewModels.Single(), Is.EqualTo(panel.Object));
+            Assert.IsTrue(filterable.Object.IsFilterEnabled);
+            Assert.That(filterable.Object.FilterString, Is.EqualTo("[IsDeprecated]=False"));
+        }
+
+        [Test]
+        public void VerifyThatRegisteringFavouritesBrowserViewModelWorks()
+        {
+            var favourites = new Mock<IFavoritesBrowserViewModel>();
+            favourites.SetupAllProperties();
+
+            var filterable = favourites.As<IPanelFilterableDataGridViewModel>();
+            filterable.SetupAllProperties();
+            var panel = filterable.As<IPanelViewModel>();
+
+            ((IFavoritesBrowserViewModel)panel.Object).ShowOnlyFavorites = true;
+
+            var filterStringService = new FilterStringService();
+            filterStringService.ShowDeprecatedThings = true;
+
+            filterStringService.RegisterForService(panel.Object);
+
+            Assert.That(filterStringService.OpenFavoriteViewModels.Single(), Is.EqualTo(panel.Object));
+            Assert.IsTrue(filterable.Object.IsFilterEnabled);
+            Assert.That(filterable.Object.FilterString, Is.EqualTo("[IsFavorite]=True"));
         }
     }
 }

@@ -111,6 +111,8 @@
                              Grid.Row="2"
                              ItemsSource="{Binding Path=PersonRowViewModels}"
                              SelectedItem="{Binding SelectedThing}"
+                             FilterString="{Binding FilterString, Mode=TwoWay}"
+                             IsFilterEnabled="{Binding IsFilterEnabled, Mode=TwoWay}"                                                      
                              services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
             <i:Interaction.Behaviors>
                 <dragDrop:FrameworkElementDragBehavior />

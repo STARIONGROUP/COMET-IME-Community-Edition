@@ -28,12 +28,14 @@ namespace CDP4Composition.Services
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Linq;
+
     using Navigation.Interfaces;
+
     using NLog;
 
     /// <summary>
     /// The purpose of the <see cref="FilterStringService"/> is to set the <see cref="DevExpress.Xpf.Grid.DataControlBase.FilterString"/> property
-    /// on registered view/view model combinations.
+    /// on registered view model.
     /// </summary>
     [Export(typeof(IFilterStringService))]
     [PartCreationPolicy(CreationPolicy.Shared)]
@@ -66,16 +68,16 @@ namespace CDP4Composition.Services
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// The view and viewmodel of deprecatable browsers.
+        /// The viewmodel of deprecatable browsers.
         /// </summary>
-        public readonly Dictionary<IPanelFilterableDataGridView, IDeprecatableBrowserViewModel> OpenDeprecatedControls =
-            new Dictionary<IPanelFilterableDataGridView, IDeprecatableBrowserViewModel>();
+        public readonly List<IPanelFilterableDataGridViewModel> OpenDeprecatedViewModels =
+            new List<IPanelFilterableDataGridViewModel>();
 
         /// <summary>
-        /// The view and viewmodel of favoritable browsers.
+        /// The viewmodel of favoritable browsers.
         /// </summary>
-        public readonly Dictionary<IPanelFilterableDataGridView, IFavoritesBrowserViewModel> OpenFavoriteControls =
-            new Dictionary<IPanelFilterableDataGridView, IFavoritesBrowserViewModel>();
+        public readonly List<IPanelFilterableDataGridViewModel> OpenFavoriteViewModels =
+            new List<IPanelFilterableDataGridViewModel>();
 
         /// <summary>
         /// Gets or sets a value indicating whether <see cref="CDP4Common.CommonData.IDeprecatableThing"/> are visible.
@@ -92,24 +94,24 @@ namespace CDP4Composition.Services
         /// </summary>
         /// <param name="view">The view that is to be registered</param>
         /// <param name="viewModel">The viewmodel that is to be registered</param>
-        public void RegisterForService(IPanelView view, IPanelViewModel viewModel)
+        public void RegisterForService(IPanelViewModel viewModel)
         {
-            if (!(view is IPanelFilterableDataGridView filterableView))
+            if (viewModel is not IPanelFilterableDataGridViewModel panelFilterableDataGridViewModel)
             {
                 // if not filterable view, do not bother registration
                 return;
             }
 
-            if (viewModel is IDeprecatableBrowserViewModel deprecatableViewModel)
+            if (viewModel is IDeprecatableBrowserViewModel)
             {
                 // deprecatable viewmodel
-                this.AddDeprecatedControl(filterableView, deprecatableViewModel);
+                this.AddDeprecatedControl(panelFilterableDataGridViewModel);
             }
 
-            if (viewModel is IFavoritesBrowserViewModel favoritableViewModel)
+            if (viewModel is IFavoritesBrowserViewModel)
             {
                 // favoritable viewmodel
-                this.AddFavoritesControl(filterableView, favoritableViewModel);
+                this.AddFavoritesControl(panelFilterableDataGridViewModel);
             }
         }
 
@@ -117,60 +119,60 @@ namespace CDP4Composition.Services
         /// Unregisters a panel view from all relevant collections.
         /// </summary>
         /// <param name="view">The view to unregister.</param>
-        public void UnregisterFromService(IPanelView view)
+        public void UnregisterFromService(IPanelViewModel viewModel)
         {
-            if (!(view is IPanelFilterableDataGridView filterableView))
+            if (viewModel is not IPanelFilterableDataGridViewModel panelFilterableDataGridViewModel)
             {
                 return;
             }
 
-            this.RemoveView(filterableView);
+            this.RemoveView(panelFilterableDataGridViewModel);
         }
 
         /// <summary>
-        /// Add the deprecatable browser view and viewmodel to the list of open controls <see cref="OpenDeprecatedControls"/>.
+        /// Add the deprecatable browser view and viewmodel to the list of open controls <see cref="OpenDeprecatedViewModels"/>.
         /// </summary>
         /// <param name="view">The view.</param>
         /// <param name="viewModel">The view model.</param>
-        private void AddDeprecatedControl(IPanelFilterableDataGridView view, IDeprecatableBrowserViewModel viewModel)
+        private void AddDeprecatedControl(IPanelFilterableDataGridViewModel viewModel)
         {
-            if (view == null || viewModel == null)
+            if (viewModel is null)
             {
                 return;
             }
 
-            this.OpenDeprecatedControls.Add(view, viewModel);
-            this.RefreshControl(view);
+            this.OpenDeprecatedViewModels.Add(viewModel);
+            this.Refresh(viewModel);
 
-            logger.Debug("{0} Added deprecatable to the FilterStringService", view.FilterableControl.Name);
+            logger.Debug($"{viewModel} Added deprecatable to the FilterStringService");
         }
 
         /// <summary>
-        /// Add the favoratable browser view and viewmodel to the list of open controls <see cref="OpenFavoriteControls"/>.
+        /// Add the favoratable browser view and viewmodel to the list of open controls <see cref="OpenFavoriteViewModels"/>.
         /// </summary>
         /// <param name="view">The view.</param>
         /// <param name="viewModel">The view model.</param>
-        private void AddFavoritesControl(IPanelFilterableDataGridView view, IFavoritesBrowserViewModel viewModel)
+        private void AddFavoritesControl(IPanelFilterableDataGridViewModel viewModel)
         {
-            if (view == null || viewModel == null)
+            if (viewModel is null)
             {
                 return;
             }
 
-            this.OpenFavoriteControls.Add(view, viewModel);
-            this.RefreshControl(view);
+            this.OpenFavoriteViewModels.Add(viewModel);
+            this.Refresh(viewModel);
 
-            logger.Debug("{0} Added to the Favorites FilterStringService", view.FilterableControl.Name);
+            logger.Debug($"{viewModel} Added to the Favorites FilterStringService");
         }
 
         /// <summary>
-        /// Refresh all <see cref="OpenDeprecatedControls"/>.
+        /// Refresh all <see cref="OpenDeprecatedViewModels"/>.
         /// </summary>
         public void RefreshDeprecatableFilterAll()
         {
-            foreach (var grid in this.OpenDeprecatedControls.Keys)
+            foreach (var grid in this.OpenDeprecatedViewModels)
             {
-                this.RefreshControl(grid);
+                this.Refresh(grid);
             }
         }
 
@@ -180,12 +182,12 @@ namespace CDP4Composition.Services
         /// <param name="vm">The ViewModel of type <see cref="IFavoritesBrowserViewModel"/> to refresh</param>
         public void RefreshFavoriteBrowser(IFavoritesBrowserViewModel vm)
         {
-            var registeredView = this.OpenFavoriteControls
-                .FirstOrDefault(c => c.Value == vm).Key;
+            var registeredViewModel = this.OpenFavoriteViewModels
+                .FirstOrDefault(c => c == vm);
 
-            if (registeredView != null)
+            if (registeredViewModel is not null)
             {
-                this.RefreshControl(registeredView);
+                this.Refresh(registeredViewModel);
             }
         }
 
@@ -193,54 +195,51 @@ namespace CDP4Composition.Services
         /// Remove the view from all registered disctionaries.
         /// </summary>
         /// <param name="view">The view to remove.</param>
-        private void RemoveView(IPanelFilterableDataGridView view)
+        private void RemoveView(IPanelFilterableDataGridViewModel viewModel)
         {
-            this.OpenDeprecatedControls.Remove(view);
-            this.OpenFavoriteControls.Remove(view);
+            this.OpenDeprecatedViewModels.Remove(viewModel);
+            this.OpenFavoriteViewModels.Remove(viewModel);
         }
 
         /// <summary>
         /// Handles the refreshing of the control when needed
         /// </summary>
-        /// <param name="view">The view to refresh.</param>
-        private void RefreshControl(IPanelFilterableDataGridView view)
+        /// <param name="viewModel">The view to refresh.</param>
+        private void Refresh(IPanelFilterableDataGridViewModel viewModel)
         {
-            var control = view.FilterableControl;
-            control.FilterString = string.Empty;
+            viewModel.FilterString = string.Empty;
 
             // filters are always reenabled in case they were manually turned off.
-            control.IsFilterEnabled = true;
+            viewModel.IsFilterEnabled = true;
 
             // deprecation state can be told no matter if the browser has the favorites vm assigned or not
             if (!this.ShowDeprecatedThings)
             {
-                control.FilterString = DeprecatedFilterString;
+                viewModel.FilterString = DeprecatedFilterString;
             }
 
             // if the control is favoratable
-            if (this.OpenFavoriteControls.TryGetValue(view, out var viewModel))
+            if (this.OpenFavoriteViewModels.Contains(viewModel))
             {
-                if (!this.ShowDeprecatedThings && viewModel.ShowOnlyFavorites)
+                var favoritesBrowserViewModel = (IFavoritesBrowserViewModel)viewModel;
+
+                if (!this.ShowDeprecatedThings && favoritesBrowserViewModel.ShowOnlyFavorites)
                 {
-                    control.FilterString = FavoriteAndHideDeprecatedFilterString;
+                    viewModel.FilterString = FavoriteAndHideDeprecatedFilterString;
                 }
-                else if (this.ShowDeprecatedThings && viewModel.ShowOnlyFavorites)
+                else if (this.ShowDeprecatedThings && favoritesBrowserViewModel.ShowOnlyFavorites)
                 {
-                    control.FilterString = FavoriteFilterString;
+                    viewModel.FilterString = FavoriteFilterString;
                 }
-                else if (!this.ShowDeprecatedThings && !viewModel.ShowOnlyFavorites)
+                else if (!this.ShowDeprecatedThings && !favoritesBrowserViewModel.ShowOnlyFavorites)
                 {
-                    control.FilterString = DeprecatedFilterString;
+                    viewModel.FilterString = DeprecatedFilterString;
                 }
                 else
                 {
-                    control.FilterString = string.Empty;
+                    viewModel.FilterString = string.Empty;
                 }
-
-                return;
             }
-
-            control.RefreshData();
         }
     }
 }

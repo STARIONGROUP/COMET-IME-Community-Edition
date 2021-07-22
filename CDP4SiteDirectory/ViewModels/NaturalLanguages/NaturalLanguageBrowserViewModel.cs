@@ -78,7 +78,12 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.canCreateLanguage; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateLanguage, value); }
         }
-        
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
         /// <summary>
         /// Handles the <see cref="ObjectChangedEvent"/>
         /// </summary>

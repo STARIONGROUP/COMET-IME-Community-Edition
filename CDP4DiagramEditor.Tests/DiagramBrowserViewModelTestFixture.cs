@@ -130,7 +130,7 @@ namespace CDP4DiagramEditor.Tests
             viewmodel.SelectedThing = diagramrow;
 
             viewmodel.UpdateCommand.Execute(null);
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<DiagramEditorViewModel>(), true));
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<DiagramEditorViewModel>()));
         }
 
         [Test]
@@ -147,7 +147,7 @@ namespace CDP4DiagramEditor.Tests
             Assert.IsTrue(vm.UpdateCommand.CanExecute(null));
 
             vm.UpdateCommand.Execute(null);
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<DiagramEditorViewModel>(), true));
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<DiagramEditorViewModel>()));
         }
 
         [Test]

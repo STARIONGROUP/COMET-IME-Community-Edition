@@ -77,21 +77,21 @@ namespace CDP4Scripting.Tests.ViewModels
         public void VerifyThatNewScriptCommandsWork()
         {
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.NewLuaScriptCommand.Execute(null));
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Once);
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Once);
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 1);
             var scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(0);
             Assert.AreEqual(scriptViewModel.Caption, "lua0");
             Assert.AreEqual(scriptViewModel.FileExtension, "*.lua");
 
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.NewPythonScriptCommand.Execute(null));
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(2));
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 2);
             scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(1);
             Assert.AreEqual(scriptViewModel.Caption, "python1");
             Assert.AreEqual(scriptViewModel.FileExtension, "*.py");
 
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.NewTextScriptCommand.Execute(null));
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(3));
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(3));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 3);
             scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
             Assert.AreEqual(scriptViewModel.Caption, "text2");
@@ -99,7 +99,7 @@ namespace CDP4Scripting.Tests.ViewModels
 
             this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.RemoveAt(1);
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.NewTextScriptCommand.Execute(null));
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(4));
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(4));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 3);
             scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
             Assert.AreEqual(scriptViewModel.Caption, "text3");
@@ -219,7 +219,7 @@ namespace CDP4Scripting.Tests.ViewModels
             paths[0] = this.filePathOpenTest;
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(5));
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Once);
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Once);
             var viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(0);
             Assert.AreEqual("content of the lua file", viewModel.AvalonEditor.Text);
             Assert.AreEqual("test.lua", viewModel.Caption);
@@ -238,7 +238,7 @@ namespace CDP4Scripting.Tests.ViewModels
             paths[0] = this.filePathOpenTest;
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(6));
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(2));
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
             viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(1);
             Assert.AreEqual("content of the python file", viewModel.AvalonEditor.Text);
             Assert.AreEqual("test.py", viewModel.Caption);
@@ -254,7 +254,7 @@ namespace CDP4Scripting.Tests.ViewModels
             paths[0] = this.filePathOpenTest;
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(7));
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(3));
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(3));
             viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
             Assert.AreEqual("content of the text file", viewModel.AvalonEditor.Text);
             Assert.AreEqual("test.txt", viewModel.Caption);
@@ -272,7 +272,7 @@ namespace CDP4Scripting.Tests.ViewModels
             this.fileDialogService.Setup(x => x.GetOpenFileDialog(false, false, true, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4)).Returns(paths);
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(8));
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true), Times.Exactly(5));
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(5));
             viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(3);
             Assert.AreEqual("test2.txt", viewModel.Caption);
             Assert.AreEqual("content of the text file 2", viewModel.AvalonEditor.Text);

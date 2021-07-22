@@ -318,6 +318,11 @@ namespace CDP4ReferenceDataMapper.ViewModels
         public ReactiveCommand<Unit> SaveValuesCommand { get; protected set; }
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        /// <summary>
         /// Initializes the <see cref="ReactiveCommand"/>s
         /// </summary>
         protected override void InitializeCommands()

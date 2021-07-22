@@ -35,11 +35,11 @@ namespace CDP4IME
     using CDP4Composition.Adapters;
     using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
+    using CDP4Composition.ViewModels;
 
     using CDP4IME.Settings;
 
     using DevExpress.Xpf.Core;
-    using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;
 
     using Microsoft.Practices.Prism.MefExtensions;
@@ -97,8 +97,9 @@ namespace CDP4IME
             
             var shell = (Shell)this.Shell;
             var dialogNavigationService = this.Container.GetExportedValue<IDialogNavigationService>();
+            var dockViewModel = this.Container.GetExportedValue<DockLayoutViewModel>();
 
-            shell.DataContext = new ShellViewModel(dialogNavigationService);
+            shell.DataContext = new ShellViewModel(dialogNavigationService, dockViewModel);
 
             this.UpdateBootstrapperState("Setting up Regions");
             var regionmanager = this.Container.GetExportedValue<IRegionManager>();
@@ -148,11 +149,6 @@ namespace CDP4IME
             this.UpdateBootstrapperState("Configuring Region Mappings");
 
             var mappings = base.ConfigureRegionAdapterMappings();
-
-            mappings.RegisterMapping(typeof(LayoutPanel), this.Container.GetExportedValue<LayoutPanelAdapter>());
-            mappings.RegisterMapping(typeof(LayoutGroup), this.Container.GetExportedValue<LayoutGroupAdapter>());
-            mappings.RegisterMapping(typeof(DocumentGroup), this.Container.GetExportedValue<DocumentGroupAdapter>());
-            mappings.RegisterMapping(typeof(TabbedGroup), this.Container.GetExportedValue<TabbedGroupAdapter>());
             mappings.RegisterMapping(typeof(RibbonControl), this.Container.GetExportedValue<RibbonAdapter>());
 
             return mappings;

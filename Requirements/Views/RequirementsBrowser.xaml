@@ -322,6 +322,8 @@
             <dxg:TreeListControl x:Name="RequirementBrowserTreeListControl"
                              Grid.Row="2"
                              ItemsSource="{Binding ReqSpecificationRows}"
+                             FilterString="{Binding FilterString, Mode=TwoWay}"
+                             IsFilterEnabled="{Binding IsFilterEnabled, Mode=TwoWay}"                                                          
                              SelectedItem="{Binding SelectedThing,
                                                     Mode=TwoWay,
                                                     UpdateSourceTrigger=PropertyChanged}"

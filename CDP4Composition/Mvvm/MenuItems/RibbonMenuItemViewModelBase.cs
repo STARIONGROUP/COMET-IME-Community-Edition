@@ -238,7 +238,7 @@ namespace CDP4Composition.Mvvm
             }
 
             this.PanelViewModels.Add(panelViewModel);
-            this.PanelNavigationServive.Open(panelViewModel, true);
+            this.PanelNavigationServive.OpenInDock(panelViewModel);
         }
 
         /// <summary>
@@ -255,7 +255,7 @@ namespace CDP4Composition.Mvvm
 
                     if (result != null && result.Result.HasValue && result.Result.Value)
                     {
-                        this.PanelNavigationServive.Close(panel, true);
+                        this.PanelNavigationServive.CloseInDock(panel);
                     }
                     else
                     {
@@ -264,7 +264,7 @@ namespace CDP4Composition.Mvvm
                 }
                 else
                 {
-                    this.PanelNavigationServive.Close(panel, true);
+                    this.PanelNavigationServive.CloseInDock(panel);
                 }
 
                 this.HandleClosedPanel(panel);

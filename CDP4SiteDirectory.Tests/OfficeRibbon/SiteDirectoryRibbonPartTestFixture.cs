@@ -186,44 +186,44 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             CDPMessageBus.Current.SendMessage(openSessionEvent);
 
             this.ribbonPart.OnAction("ShowDomainsOfExpertise");
-            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<DomainOfExpertiseBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpenInAddIn(It.IsAny<DomainOfExpertiseBrowserViewModel>()));
 
             this.ribbonPart.OnAction("ShowModels");
-            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<ModelBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpenInAddIn(It.IsAny<ModelBrowserViewModel>()));
 
             this.ribbonPart.OnAction("ShowLanguages");
-            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<NaturalLanguageBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpenInAddIn(It.IsAny<NaturalLanguageBrowserViewModel>()));
 
             this.ribbonPart.OnAction("ShowOrganizations");
-            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<OrganizationBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpenInAddIn(It.IsAny<OrganizationBrowserViewModel>()));
 
             this.ribbonPart.OnAction("ShowRoles");
-            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<RoleBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpenInAddIn(It.IsAny<RoleBrowserViewModel>()));
 
             this.ribbonPart.OnAction("ShowPersons");
-            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<PersonBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpenInAddIn(It.IsAny<PersonBrowserViewModel>()));
 
             this.ribbonPart.OnAction("ShowSiteRDLs");
-            this.panelNavigationService.Verify(x => x.OpenExistingOrOpen(It.IsAny<SiteRdlBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.OpenExistingOrOpenInAddIn(It.IsAny<SiteRdlBrowserViewModel>()));
 
             // close viewmodels
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
             CDPMessageBus.Current.SendMessage(closeSessionEvent);
 
-            this.panelNavigationService.Verify(x => x.Close(It.IsAny<DomainOfExpertiseBrowserViewModel>(), false));
-            this.panelNavigationService.Verify(x => x.Close(It.IsAny<ModelBrowserViewModel>(), false));
-            this.panelNavigationService.Verify(x => x.Close(It.IsAny<NaturalLanguageBrowserViewModel>(), false));
-            this.panelNavigationService.Verify(x => x.Close(It.IsAny<OrganizationBrowserViewModel>(), false));
-            this.panelNavigationService.Verify(x => x.Close(It.IsAny<RoleBrowserViewModel>(), false));
-            this.panelNavigationService.Verify(x => x.Close(It.IsAny<PersonBrowserViewModel>(), false));
-            this.panelNavigationService.Verify(x => x.Close(It.IsAny<SiteRdlBrowserViewModel>(), false));
+            this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<DomainOfExpertiseBrowserViewModel>()));
+            this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<ModelBrowserViewModel>()));
+            this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<NaturalLanguageBrowserViewModel>()));
+            this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<OrganizationBrowserViewModel>()));
+            this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<RoleBrowserViewModel>()));
+            this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<PersonBrowserViewModel>()));
+            this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<SiteRdlBrowserViewModel>()));
         }
 
         [Test]
         public void VerifyThatOnActionDoesNotInvokePanelNavigationWhenSessionIsNull()
         {
             this.ribbonPart.OnAction("ShowDomainsOfExpertise");
-            this.panelNavigationService.Verify(x => x.Open(It.IsAny<DomainOfExpertiseBrowserViewModel>(), false), Times.Never);
+            this.panelNavigationService.Verify(x => x.OpenInAddIn(It.IsAny<DomainOfExpertiseBrowserViewModel>()), Times.Never);
         }
 
         [Test]

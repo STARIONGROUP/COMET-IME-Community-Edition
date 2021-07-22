@@ -195,7 +195,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="CommonFileStore"/>
         /// </summary>
-        public ReactiveCommand<object> CreateStoreCommand { get; private set; } 
+        public ReactiveCommand<object> CreateStoreCommand { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s

@@ -32,6 +32,11 @@ namespace CDP4ObjectBrowser
         private string person;
 
         /// <summary>
+        /// Backing field for the <see cref="IsSelected"/>
+        /// </summary>
+        private bool isSelected;
+
+        /// <summary>
         /// The <see cref="ISession"/> the current browser is bound to.
         /// </summary>
         private readonly ISession session;
@@ -117,6 +122,19 @@ namespace CDP4ObjectBrowser
         /// </summary>
         protected List<IDisposable> Disposables { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        /// <summary>
+        /// Gets or sets a value indicating if the <see cref="IPanelViewModel"/> is selected
+        /// </summary>
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+        }
         /// <summary>
         /// Add the <see cref="Session"/> to the browser
         /// </summary>

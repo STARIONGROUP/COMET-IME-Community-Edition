@@ -31,53 +31,48 @@ namespace CDP4Composition.Navigation
 
     using Interfaces;
     
-    using Microsoft.Practices.Prism.Regions;
-
     /// <summary>
     /// The Interface for Panel Navigation Service
     /// </summary>
     public interface IPanelNavigationService
     {
         /// <summary>
-        /// Opens the view associated to the provided view-model
+        /// Opens the view associated to the provided view-model in the dock
         /// </summary>
         /// <param name="viewModel">
         /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened
         /// </param>
-        /// <param name="useRegionManager">
-        /// A value indicating whether handling the opening of the view shall be message-based or not. In case it is
-        /// NOT message-based, the <see cref="IRegionManager"/> handles opening and placement of the view.
-        /// </param>
         /// <remarks>
         /// The data context of the view is the <see cref="IPanelViewModel"/>
         /// </remarks>
-        void Open(IPanelViewModel viewModel, bool useRegionManager);
+        void OpenInDock(IPanelViewModel viewModel);
 
         /// <summary>
         /// Opens the view associated to a view-model. The view-model is identified by its <see cref="INameMetaData.Name"/>.
         /// </summary>
         /// <param name="viewModelName">The name we want to compare to the <see cref="INameMetaData.Name"/> of the view-models.</param>
         /// <param name="session">The <see cref="ISession"/> associated.</param>
-        /// <param name="useRegionManager">A value indicating whether handling the opening of the view shall be handled by the region manager.
-        /// In case this region manager does not handle this, it will be event-based using the <see cref="CDPMessageBus"/>.</param>
         /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/>.</param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/>.</param>
-        void Open(string viewModelName, ISession session, bool useRegionManager, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService);
+        void OpenInDock(string viewModelName, ISession session, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService);
 
         /// <summary>
-        /// Opens or closes the view associated to the provided view-model
+        /// Opens the view associated with the <see cref="IPanelViewModel"/> in the AddIn
+        /// </summary>
+        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to open</param>
+        void OpenInAddIn(IPanelViewModel viewModel);
+
+        /// <summary>
+        /// Re-opens an exisiting View associated to the provided view-model, or opens a new View
+        /// Re-opening is done by sending a <see cref="CDPMessageBus"/> event.
+        /// This event can be handled by more specific code,  for example in the addin, where some
+        /// ViewModels should not close at all. For those viewmodels visibility is toggled on every
+        /// <see cref="NavigationPanelEvent"/> event that has <see cref="PanelStatus.Open"/> set.
         /// </summary>
         /// <param name="viewModel">
-        /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened
+        /// The <see cref="IPanelViewModel"/> for which the associated view needs to be opened, or closed
         /// </param>
-        /// <param name="useRegionManager">
-        /// A value indicating whether handling the opening of the view shall be message-based or not. In case it is
-        /// NOT message-based, the <see cref="IRegionManager"/> handles opening and placement of the view.
-        /// </param>
-        /// <remarks>
-        /// The data context of the view is the <see cref="IPanelViewModel"/>
-        /// </remarks>
-        void OpenExistingOrOpen(IPanelViewModel viewModel, bool useRegionManager);
+        void OpenExistingOrOpenInAddIn(IPanelViewModel viewModel);
 
         /// <summary>
         /// Closes the <see cref="IPanelView"/> associated to the <see cref="IPanelViewModel"/>
@@ -85,22 +80,24 @@ namespace CDP4Composition.Navigation
         /// <param name="viewModel">
         /// The view-model that is to be closed.
         /// </param>
-        /// <param name="useRegionManager">
-        /// A value indicating whether handling the opening of the view shall be handled by the region manager. In case this region manager does not handle
-        /// this it will be event-based using the <see cref="CDPMessageBus"/>.
-        /// </param>
-        void Close(IPanelViewModel viewModel, bool useRegionManager);
+        void CloseInDock(IPanelViewModel viewModel);
 
         /// <summary>
         /// Closes all the <see cref="IPanelView"/> which associated <see cref="IPanelViewModel"/> is of a certain Type
         /// </summary>
         /// <param name="viewModelType">The <see cref="Type"/> of the <see cref="IPanelViewModel"/> to close</param>
-        void Close(Type viewModelType);
+        void CloseInDock(Type viewModelType);
 
         /// <summary>
         /// Closes all the <see cref="IPanelView"/> associated to a data-source
         /// </summary>
         /// <param name="datasourceUri">The string representation of the data-source's uri</param>
-        void Close(string datasourceUri);
+        void CloseInDock(string datasourceUri);
+
+        /// <summary>
+        /// Closes the view associated with the <see cref="IPanelViewModel"/> in the AddIn
+        /// </summary>
+        /// <param name="viewModel">The <see cref="IPanelViewModel"/> to close</param>
+        void CloseInAddIn(IPanelViewModel viewModel);
     }
 }

@@ -330,7 +330,7 @@ namespace CDP4Requirements
                 var browser = this.openRequirementBrowser.SingleOrDefault(x => x.Thing.Container == iteration);
                 if (browser != null)
                 {
-                    this.PanelNavigationService.Close(browser, false);
+                    this.PanelNavigationService.CloseInAddIn(browser);
                     this.openRequirementBrowser.Remove(browser);
                 }
 
@@ -345,7 +345,7 @@ namespace CDP4Requirements
         {
             foreach (var browser in this.openRequirementBrowser)
             {
-                this.PanelNavigationService.Close(browser, false);
+                this.PanelNavigationService.CloseInAddIn(browser);
             }
 
             this.openRequirementBrowser.Clear();
@@ -371,7 +371,7 @@ namespace CDP4Requirements
             var browser = this.openRequirementBrowser.SingleOrDefault(x => x.Thing == iteration);
             if (browser != null)
             {
-                this.PanelNavigationService.Close(browser, false);
+                this.PanelNavigationService.CloseInAddIn(browser);
                 this.openRequirementBrowser.Remove(browser);
                 return;
             }
@@ -379,7 +379,7 @@ namespace CDP4Requirements
             browser = new RequirementsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.openRequirementBrowser.Add(browser);
-            this.PanelNavigationService.Open(browser, false);
+            this.PanelNavigationService.OpenInAddIn(browser);
         }
 
         /// <summary>

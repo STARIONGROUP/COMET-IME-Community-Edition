@@ -131,6 +131,11 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveList<DiagramCanvasRowViewModel> Diagrams { get; private set; }
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        /// <summary>
         /// Initializes the browser
         /// </summary>
         protected override void Initialize()
@@ -298,7 +303,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             var thing = this.SelectedThing.Thing;
             var vm = new DiagramEditorViewModel((DiagramCanvas) thing, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
-            this.PanelNavigationService.Open(vm, true);
+            this.PanelNavigationService.OpenInDock(vm);
         }
     }
 }

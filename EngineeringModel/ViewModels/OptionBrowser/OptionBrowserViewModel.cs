@@ -161,6 +161,11 @@ namespace CDP4EngineeringModel.ViewModels
         public DisposableReactiveList<OptionRowViewModel> Options { get; private set; }
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        /// <summary>
         /// Initializes the browser
         /// </summary>
         protected override void Initialize()

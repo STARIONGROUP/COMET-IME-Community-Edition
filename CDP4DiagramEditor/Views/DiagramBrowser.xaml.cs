@@ -25,14 +25,14 @@
 
 namespace CDP4DiagramEditor.Views
 {
+    using System.ComponentModel.Composition;
+
     using CDP4Composition;
-    using CDP4Composition.Attributes;
-    using NLog;
 
     /// <summary>
     /// Interaction logic for DiagramBrowser
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class DiagramBrowser : IPanelView
     {
         /// <summary>

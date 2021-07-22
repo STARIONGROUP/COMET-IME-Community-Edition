@@ -23,6 +23,13 @@
     </UserControl.Resources>
 
     <dxdo:DockLayoutManager FloatingMode="Desktop">
+        <dxdo:DockLayoutManager.Resources>
+            <Style x:Key="BaseStyle"
+                   TargetType="dxdo:LayoutPanel">
+            </Style>
+            <Style BasedOn="{StaticResource BaseStyle}" TargetType="dxdo:DocumentPanel" />
+            <Style BasedOn="{StaticResource BaseStyle}" TargetType="dxdo:LayoutPanel" />
+        </dxdo:DockLayoutManager.Resources>
         <dxdo:LayoutGroup AllowSplitters="True" Orientation="Horizontal">
             <dxdo:LayoutGroup ItemWidth="7*" Orientation="Vertical">
                 <dxdo:LayoutPanel AllowClose="False" VerticalAlignment="Stretch">

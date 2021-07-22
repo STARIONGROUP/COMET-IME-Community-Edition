@@ -95,7 +95,7 @@ namespace CDP4Composition.Tests.Mvvm
             viewmodel.IsChecked = true;
             viewmodel.ShowPanelCommand.Execute(null);
 
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true));
+            this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace CDP4Composition.Tests.Mvvm
             viewmodel.IsChecked = false;
             viewmodel.ShowPanelCommand.Execute(null);
 
-            this.navigationService.Verify(x => x.Close(It.IsAny<IPanelViewModel>(), true), Times.Never());
+            this.navigationService.Verify(x => x.CloseInDock(It.IsAny<IPanelViewModel>()), Times.Never());
         }
 
         [Test]
@@ -137,6 +137,8 @@ namespace CDP4Composition.Tests.Mvvm
             public string ToolTip { get; private set; }
 
             public string DataSource { get; private set; }
+
+            public string TargetName { get; set; }
 
             public override void ComputePermission()
             {

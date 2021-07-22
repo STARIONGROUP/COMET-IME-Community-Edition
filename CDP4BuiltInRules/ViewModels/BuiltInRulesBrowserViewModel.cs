@@ -64,6 +64,11 @@ namespace CDP4BuiltInRules.ViewModels
         private BuiltInRuleRowViewModel selectedRule;
 
         /// <summary>
+        /// Backing field for the <see cref="IsSelected"/>
+        /// </summary>
+        private bool isSelected;
+
+        /// <summary>
         /// Gets the caption of the browser
         /// </summary>
         public string Caption => "Built-In Rules Browser";
@@ -132,6 +137,20 @@ namespace CDP4BuiltInRules.ViewModels
         /// Gets the list of <see cref="BuiltInRuleRowViewModel"/>.
         /// </summary>
         public List<BuiltInRuleRowViewModel> BuiltInRules { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
+
+        /// <summary>
+        /// Gets or sets a value indicating if the <see cref="IPanelViewModel"/> is selected
+        /// </summary>
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+        }
 
         /// <summary>
         /// Queries whether a drag can be started

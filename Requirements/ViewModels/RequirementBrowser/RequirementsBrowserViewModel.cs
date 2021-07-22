@@ -293,6 +293,11 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        /// <summary>
         /// Updates the current drag state.
         /// </summary>
         /// <param name="dropInfo">
@@ -568,7 +573,7 @@ namespace CDP4Requirements.ViewModels
 
             foreach (var vm in this.openRequirementsSpecificationEditorViewModels)
             {
-                this.PanelNavigationService.Close(vm, true);
+                this.PanelNavigationService.CloseInAddIn(vm);
                 vm.Dispose();
             }
         }
@@ -760,7 +765,7 @@ namespace CDP4Requirements.ViewModels
                     this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService,
                     this.PluginSettingsService);
                 this.openRequirementsSpecificationEditorViewModels.Add(vm);
-                this.PanelNavigationService.Open(vm, true);
+                this.PanelNavigationService.OpenInAddIn(vm);
             }
         }
 

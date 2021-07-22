@@ -26,7 +26,7 @@
 namespace CDP4AddinCE.Tests.Utils
 {
     using CDP4AddinCE.Utils;
-
+    using CDP4Composition;
     using NetOffice.OfficeApi.Enums;
 
     using NUnit.Framework;
@@ -40,14 +40,11 @@ namespace CDP4AddinCE.Tests.Utils
         [Test]
         public void VerifyThatToDockPositionReturnsExpectedResults()
         {
-            var left = "LeftPanel";
+            var left = LayoutGroupNames.LeftGroup;
             Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionLeft, StringExtension.ToDockPosition(left));
 
-            var right = "RightPanel";
+            var right = LayoutGroupNames.RightGroup;
             Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionRight, StringExtension.ToDockPosition(right));
-
-            var bottom = "BottomPanel";
-            Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionBottom, StringExtension.ToDockPosition(bottom));
 
             var anystring = "somestring";
             Assert.AreEqual(MsoCTPDockPosition.msoCTPDockPositionLeft, StringExtension.ToDockPosition(anystring));

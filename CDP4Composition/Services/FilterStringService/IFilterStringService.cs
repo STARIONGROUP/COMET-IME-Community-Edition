@@ -46,13 +46,13 @@ namespace CDP4Composition.Services
         /// </summary>
         /// <param name="view">The view that is to be registered</param>
         /// <param name="viewModel">The viewmodel that is to be registered</param>
-        void RegisterForService(IPanelView view, IPanelViewModel viewModel);
+        void RegisterForService(IPanelViewModel viewModel);
 
         /// <summary>
         /// Unregisters a panel view from all relevant collections.
         /// </summary>
         /// <param name="view">The view to unregister.</param>
-        void UnregisterFromService(IPanelView view);
+        void UnregisterFromService(IPanelViewModel viewModel);
 
         /// <summary>
         /// Refresh all <see cref="OpenDeprecatedControls"/>.

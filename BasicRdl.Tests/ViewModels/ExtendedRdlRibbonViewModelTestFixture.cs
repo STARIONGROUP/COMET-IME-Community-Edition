@@ -97,7 +97,7 @@ namespace BasicRDL.Tests
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
             viewmodel.OpenSingleBrowserCommand.Execute(null);
 
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true));
+            this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace BasicRDL.Tests
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
             viewmodel.OpenSingleBrowserCommand.Execute(null);
 
-            this.navigationService.Verify(x => x.Open(It.IsAny<IPanelViewModel>(), true));
+            this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
         }
     }
 }

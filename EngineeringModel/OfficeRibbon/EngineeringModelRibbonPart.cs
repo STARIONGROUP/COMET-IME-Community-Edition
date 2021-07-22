@@ -473,7 +473,7 @@ namespace CDP4EngineeringModel
                 var browser = this.openElementDefinitionBrowsers.SingleOrDefault(x => x.Thing == iteration);
                 if (browser != null)
                 {
-                    this.PanelNavigationService.Close(browser, false);
+                    this.PanelNavigationService.CloseInAddIn(browser);
                     this.openElementDefinitionBrowsers.Remove(browser);
                 }
 
@@ -494,7 +494,7 @@ namespace CDP4EngineeringModel
 
             if (browser != null)
             {
-                this.PanelNavigationService.Close(browser, false);
+                this.PanelNavigationService.CloseInAddIn(browser);
 
                 if (this.openElementDefinitionBrowsers.Contains(browser))
                 {
@@ -540,7 +540,7 @@ namespace CDP4EngineeringModel
         {
             foreach (var browserViewModel in this.openElementDefinitionBrowsers)
             {
-                this.PanelNavigationService.Close(browserViewModel, false);
+                this.PanelNavigationService.CloseInAddIn(browserViewModel);
             }
 
             this.openElementDefinitionBrowsers.Clear();
@@ -565,7 +565,7 @@ namespace CDP4EngineeringModel
             var browser = this.openElementDefinitionBrowsers.SingleOrDefault(x => x.Thing == iteration);
             if (browser != null)
             {
-                this.PanelNavigationService.Close(browser, false);
+                this.PanelNavigationService.CloseInAddIn(browser);
                 this.openElementDefinitionBrowsers.Remove(browser);
                 return;
             }
@@ -579,7 +579,7 @@ namespace CDP4EngineeringModel
             browser = new ElementDefinitionsBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.parameterSubscriptionBatchService, this.changeOwnershipBatchService);
 
             this.openElementDefinitionBrowsers.Add(browser);
-            this.PanelNavigationService.Open(browser, false);
+            this.PanelNavigationService.OpenInAddIn(browser);
         }
 
         /// <summary>
@@ -601,7 +601,7 @@ namespace CDP4EngineeringModel
             var browser = this.openOptionBrowsers.SingleOrDefault(x => x.Thing == iteration);
             if (browser != null)
             {
-                this.PanelNavigationService.Close(browser, false);
+                this.PanelNavigationService.CloseInAddIn(browser);
                 this.openOptionBrowsers.Remove(browser);
                 return;
             }
@@ -615,7 +615,7 @@ namespace CDP4EngineeringModel
             browser = new OptionBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.openOptionBrowsers.Add(browser);
-            this.PanelNavigationService.Open(browser, false);
+            this.PanelNavigationService.OpenInAddIn(browser);
         }
 
         /// <summary>
@@ -637,7 +637,7 @@ namespace CDP4EngineeringModel
             var browser = this.openFiniteStateBrowsers.SingleOrDefault(x => x.Thing == iteration);
             if (browser != null)
             {
-                this.PanelNavigationService.Close(browser, false);
+                this.PanelNavigationService.CloseInAddIn(browser);
                 this.openFiniteStateBrowsers.Remove(browser);
                 return;
             }
@@ -651,7 +651,7 @@ namespace CDP4EngineeringModel
             browser = new FiniteStateBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.parameterActualFiniteStateListApplicationBatchService);
 
             this.openFiniteStateBrowsers.Add(browser);
-            this.PanelNavigationService.Open(browser, false);
+            this.PanelNavigationService.OpenInAddIn(browser);
         }
 
         /// <summary>
@@ -673,7 +673,7 @@ namespace CDP4EngineeringModel
             var browser = this.openPublicationBrowsers.SingleOrDefault(x => x.Thing == iteration);
             if (browser != null)
             {
-                this.PanelNavigationService.Close(browser, false);
+                this.PanelNavigationService.CloseInAddIn(browser);
                 this.openPublicationBrowsers.Remove(browser);
                 return;
             }
@@ -687,7 +687,7 @@ namespace CDP4EngineeringModel
             browser = new PublicationBrowserViewModel(iteration, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
 
             this.openPublicationBrowsers.Add(browser);
-            this.PanelNavigationService.Open(browser, false);
+            this.PanelNavigationService.OpenInAddIn(browser);
         }
     }
 }

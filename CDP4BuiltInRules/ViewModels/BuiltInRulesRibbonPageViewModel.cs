@@ -98,11 +98,11 @@ namespace CDP4BuiltInRules.ViewModels
             if (this.builtInRulesBrowserViewModel == null)
             {
                 this.builtInRulesBrowserViewModel = new BuiltInRulesBrowserViewModel(this.ruleVerificationService, this.dialogNavigationService);
-                this.panelNavigationService.Open(this.builtInRulesBrowserViewModel, true);
+                this.panelNavigationService.OpenInDock(this.builtInRulesBrowserViewModel);
             }
             else
             {
-                this.panelNavigationService.Close(this.builtInRulesBrowserViewModel, true);
+                this.panelNavigationService.CloseInDock(this.builtInRulesBrowserViewModel);
                 this.builtInRulesBrowserViewModel = null;
             }
         }

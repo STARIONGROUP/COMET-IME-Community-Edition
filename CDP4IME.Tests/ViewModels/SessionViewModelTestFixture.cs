@@ -219,7 +219,7 @@ namespace CDP4IME.Tests.ViewModels
             servicelocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(navigation.Object);
 
             this.sessionViewModel.HideAll.Execute(null);
-            navigation.Verify(x => x.Close(this.uri));
+            navigation.Verify(x => x.CloseInDock(this.uri));
         }
 
         private void OnEvent(Thing thing)

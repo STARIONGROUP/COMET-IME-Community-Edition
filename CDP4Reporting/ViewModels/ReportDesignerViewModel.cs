@@ -314,6 +314,11 @@ namespace CDP4Reporting.ViewModels
         public ReactiveCommand<Unit> ActiveDocumentChangedCommand { get; set; }
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ReportDesignerViewModel"/> class
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> to display</param>

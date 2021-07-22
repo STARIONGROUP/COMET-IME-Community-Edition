@@ -4,19 +4,18 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
+
 namespace CDP4EngineeringModel.Views
 {
-    using System.Windows;
-    using CDP4Composition;
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
-    using CDP4Composition.Attributes;
-    using DevExpress.Xpf.Grid;
-    using ViewModels;
+
+    using CDP4Composition;
 
     /// <summary>
     /// Interaction logic for FiniteStateBrowser.xaml
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class FiniteStateBrowser : UserControl, IPanelView
     {
         /// <summary>

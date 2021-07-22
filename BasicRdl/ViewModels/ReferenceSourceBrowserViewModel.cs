@@ -106,6 +106,11 @@ namespace BasicRdl.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        /// <summary>
         /// Initializes the Commands that can be executed from this view model. The commands are initialized
         /// before the <see cref="PopulateContextMenu"/> is invoked
         /// </summary>

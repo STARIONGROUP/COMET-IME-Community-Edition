@@ -49,15 +49,12 @@ namespace CDP4AddinCE.Utils
 
             switch (str)
             {
-                case RegionNames.LeftPanel:
+                case LayoutGroupNames.LeftGroup:
                     dockPosition = MsoCTPDockPosition.msoCTPDockPositionLeft;
                     break;
-                case RegionNames.RightPanel:
+                case LayoutGroupNames.RightGroup:
                     dockPosition = MsoCTPDockPosition.msoCTPDockPositionRight;
                     break;
-                case RegionNames.BottomPanel:
-                    dockPosition = MsoCTPDockPosition.msoCTPDockPositionBottom;
-                    break;                    
                 default:
                     dockPosition = MsoCTPDockPosition.msoCTPDockPositionLeft;
                     break;

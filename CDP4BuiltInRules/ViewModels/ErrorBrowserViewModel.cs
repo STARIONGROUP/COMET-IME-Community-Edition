@@ -89,7 +89,12 @@ namespace CDP4BuiltInRules.ViewModels
         /// Gets or sets the Copy Command
         /// </summary>
         public ReactiveCommand<object> CopyErrorCommand { get; protected set; }
-        
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.RightGroup;
+
         /// <summary>
         /// Populate the context menu
         /// </summary>

@@ -94,7 +94,12 @@ namespace BasicRdl.ViewModels
             get { return this.canCreateRdlElement; }
             private set { this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value); }
         }
-        
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
         /// <summary>
         /// Initializes the Commands that can be executed from this view model. The commands are initialized
         /// before the <see cref="PopulateContextMenu"/> is invoked

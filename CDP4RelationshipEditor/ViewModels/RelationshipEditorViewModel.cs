@@ -377,6 +377,11 @@ namespace CDP4RelationshipEditor.ViewModels
         public BinaryRelationshipRule PendingBinaryRelationshipRule { get; set; }
 
         /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
+
+        /// <summary>
         /// Creates a <see cref="BinaryRelationship"/>
         /// </summary>
         public void CreateBinaryRelationshipCommandExecute()

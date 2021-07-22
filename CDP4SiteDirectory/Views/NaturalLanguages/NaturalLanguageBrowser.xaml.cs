@@ -6,13 +6,14 @@
 
 namespace CDP4SiteDirectory.Views
 {
+    using System.ComponentModel.Composition;
+
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for NaturalLanguageBrowser
     /// </summary>
-    [PanelViewExport(RegionNames.LeftPanel)]
+    [Export(typeof(IPanelView))]
     public partial class NaturalLanguageBrowser : IPanelView
     {
         /// <summary>

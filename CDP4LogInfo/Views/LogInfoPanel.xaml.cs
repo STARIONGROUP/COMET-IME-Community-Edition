@@ -6,15 +6,15 @@
 
 namespace CDP4LogInfo.Views
 {
+    using System.ComponentModel.Composition;
     using System.Windows.Controls;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
 
     /// <summary>
     /// Interaction logic for LogInfoPanel view
     /// </summary>
-    [PanelViewExport(RegionNames.RightPanel)]
+    [Export(typeof(IPanelView))]
     public partial class LogInfoPanel : UserControl, IPanelView
     {
         /// <summary>
