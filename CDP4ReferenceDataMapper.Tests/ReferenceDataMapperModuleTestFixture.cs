@@ -2,9 +2,9 @@
 // <copyright file="ReferenceDataMapperModuleTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -32,8 +32,6 @@ namespace CDP4ReferenceDataMapper.Tests
 
     using CDP4ReferenceDataMapper;
 
-    using Microsoft.Practices.Prism.Regions;
-
     using Moq;
 
     using NUnit.Framework;
@@ -44,7 +42,6 @@ namespace CDP4ReferenceDataMapper.Tests
     [TestFixture]
     public class ReferenceDataMapperModuleTestFixture
     {
-        private Mock<IRegionManager> regionManager;
         private Mock<IFluentRibbonManager> ribbonManager;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -54,7 +51,6 @@ namespace CDP4ReferenceDataMapper.Tests
         [SetUp]
         public void SetUp()
         {
-            this.regionManager = new Mock<IRegionManager>();
             this.ribbonManager = new Mock<IFluentRibbonManager>(); 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -65,14 +61,13 @@ namespace CDP4ReferenceDataMapper.Tests
         [Test]
         public void Verify_that_properties_are_set_one_module_instantiation()
         {
-            var referenceDataMapperModule = new ReferenceDataMapperModule(this.regionManager.Object, 
+            var referenceDataMapperModule = new ReferenceDataMapperModule(
                 this.ribbonManager.Object, 
                 this.panelNavigationService.Object, 
                 this.thingDialogNavigationService.Object,
                 this.dialogNavigationService.Object,
                 this.pluginSettingsService.Object);
 
-            Assert.That(referenceDataMapperModule.RegionManager, Is.EqualTo(this.regionManager.Object));
             Assert.That(referenceDataMapperModule.RibbonManager, Is.EqualTo(this.ribbonManager.Object));
             Assert.That(referenceDataMapperModule.PanelNavigationService, Is.EqualTo(this.panelNavigationService.Object));
             Assert.That(referenceDataMapperModule.ThingDialogNavigationService, Is.EqualTo(this.thingDialogNavigationService.Object));

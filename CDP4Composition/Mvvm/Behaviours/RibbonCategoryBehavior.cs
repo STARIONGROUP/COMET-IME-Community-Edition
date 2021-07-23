@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RibbonCategoryBehavior.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -33,11 +33,9 @@ namespace CDP4Composition.Mvvm.Behaviours
 
     using DevExpress.Mvvm.UI;
     using DevExpress.Mvvm.UI.Interactivity;
-    using DevExpress.Xpf.Core.Native;
     using DevExpress.Xpf.Docking;
     using DevExpress.Xpf.Ribbon;
 
-    using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
@@ -50,32 +48,7 @@ namespace CDP4Composition.Mvvm.Behaviours
         /// </summary>
         public RibbonCategoryBehavior()
         {
-            this.RegisterRegions();
         }
-
-        /// <summary>
-        /// Register the regions
-        /// </summary>
-        [ExcludeFromCodeCoverage]
-        private void RegisterRegions()
-        {
-            this.RegionManager = ServiceLocator.Current.GetInstance<IRegionManager>();
-
-            if (this.RegionManager.Regions != null)
-            {
-            this.RibbonRegion = this.RegionManager.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);
-        }
-        }
-
-        /// <summary>
-        /// the <see cref="IRegionManager"/> that is used to get the <see cref="RibbonRegion"/>
-        /// </summary>
-        public IRegionManager RegionManager { get; set; }
-
-        /// <summary>
-        /// the <see cref="IRegion"/> that is used to get the <see cref="ExtendedRibbonPageCategory"/>
-        /// </summary>
-        public IRegion RibbonRegion { get; set; }
 
         /// <summary>
         /// <para>Gets or sets the category name of the target <see cref="ExtendedRibbonPageCategory"/></para>
@@ -122,7 +95,7 @@ namespace CDP4Composition.Mvvm.Behaviours
         [ExcludeFromCodeCoverage]
         private void AssociatedObject_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            var category = this.RibbonRegion.Views.OfType<ExtendedRibbonPageCategory>().FirstOrDefault(view => view.Name == this.CategoryName);
+            var category = ServiceLocator.Current.GetAllInstances<ExtendedRibbonPageCategory>().FirstOrDefault(view => view.Name == this.CategoryName);
 
             var hostPanel = LayoutTreeHelper.GetVisualParents(this.AssociatedObject).OfType<DocumentPanel>().FirstOrDefault();
 

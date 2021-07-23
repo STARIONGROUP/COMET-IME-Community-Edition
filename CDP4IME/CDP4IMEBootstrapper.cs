@@ -2,9 +2,9 @@
 // <copyright file="CDP4IMEBootstrapper.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -32,18 +32,16 @@ namespace CDP4IME
     using System.Reflection;
     using System.Windows;
 
-    using CDP4Composition.Adapters;
     using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Ribbon;
     using CDP4Composition.ViewModels;
 
     using CDP4IME.Settings;
 
     using DevExpress.Xpf.Core;
-    using DevExpress.Xpf.Ribbon;
 
     using Microsoft.Practices.Prism.MefExtensions;
-    using Microsoft.Practices.Prism.Regions;
 
     using NLog;
 
@@ -98,16 +96,11 @@ namespace CDP4IME
             var shell = (Shell)this.Shell;
             var dialogNavigationService = this.Container.GetExportedValue<IDialogNavigationService>();
             var dockViewModel = this.Container.GetExportedValue<DockLayoutViewModel>();
+            var ribbonBuilder = this.Container.GetExportedValue<IRibbonContentBuilder>();
 
+            //TODO: GH#861 'Make do' solution until the bootstrapper is replaced. Currently injecting the builder into the Shell view is rejected by the composition.
+            ribbonBuilder.BuildAndAppendToRibbon(shell.Ribbon);
             shell.DataContext = new ShellViewModel(dialogNavigationService, dockViewModel);
-
-            this.UpdateBootstrapperState("Setting up Regions");
-            var regionmanager = this.Container.GetExportedValue<IRegionManager>();
-
-            foreach (var region in regionmanager.Regions)
-            {
-                this.UpdateBootstrapperState($"Loaded Region: {region.Name} ");
-            }
 
             Application.Current.MainWindow = shell;
         }
@@ -136,22 +129,6 @@ namespace CDP4IME
             this.AggregateCatalog.Catalogs.Add(dllCatalog);
 
             this.UpdateBootstrapperState($"COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
-        }
-
-        /// <summary>
-        /// Register the custom Region Adapters
-        /// </summary>
-        /// <returns>
-        /// an instance of <see cref="RegionAdapterMappings"/> containing the registered Region Adapters
-        /// </returns>
-        protected override RegionAdapterMappings ConfigureRegionAdapterMappings()
-        {
-            this.UpdateBootstrapperState("Configuring Region Mappings");
-
-            var mappings = base.ConfigureRegionAdapterMappings();
-            mappings.RegisterMapping(typeof(RibbonControl), this.Container.GetExportedValue<RibbonAdapter>());
-
-            return mappings;
         }
 
         /// <summary>

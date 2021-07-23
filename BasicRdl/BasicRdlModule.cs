@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BasicRdlModule.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -27,8 +27,6 @@ namespace BasicRdl
 {
     using System.ComponentModel.Composition;
 
-    using BasicRdl.Views;
-    
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
@@ -37,7 +35,6 @@ namespace BasicRdl
     using CDP4Composition.Services.FavoritesService;
     
     using Microsoft.Practices.Prism.Modularity;
-    using Microsoft.Practices.Prism.Regions;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="BasicRdlModule"/> Component
@@ -48,9 +45,6 @@ namespace BasicRdl
         /// <summary>
         /// Initializes a new instance of the <see cref="BasicRdlModule"/> class.
         /// </summary>
-        /// <param name="regionManager">
-        /// The (MEF injected) instance of <see cref="IRegionManager"/>
-        /// </param>
         /// <param name="ribbonManager">
         /// The (MEF injected) instance of <see cref="IFluentRibbonManager"/>
         /// </param>
@@ -68,9 +62,8 @@ namespace BasicRdl
         /// </param>
         /// <param name="favoritesService">The <see cref="IFavoritesService"/> to be used to store and retrieve favorite things.</param>
         [ImportingConstructor]
-        public BasicRdlModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IFavoritesService favoritesService)
+        public BasicRdlModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IFavoritesService favoritesService)
         {
-            this.RegionManager = regionManager;
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
@@ -78,11 +71,6 @@ namespace BasicRdl
             this.PluginSettingsService = pluginSettingsService;
             this.FavoritesService = favoritesService;
         }
-
-        /// <summary>
-        /// Gets the <see cref="IRegionManager"/> that is used by the <see cref="BasicRdlModule"/> to register the regions
-        /// </summary>
-        internal IRegionManager RegionManager { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IFluentRibbonManager"/> that is used by the <see cref="BasicRdlModule"/> to register Office Fluent Ribbon XML
@@ -119,8 +107,6 @@ namespace BasicRdl
         /// </summary>
         public void Initialize()
         {
-            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(SiteRdlSelectionRibbon));
-            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(BasicRdlRibbon));
             this.RegisterRibbonParts();
         }
 

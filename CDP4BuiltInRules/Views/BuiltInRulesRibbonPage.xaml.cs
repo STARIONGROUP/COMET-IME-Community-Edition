@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BuiltInRulesRibbonPage.xaml.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -40,7 +40,7 @@ namespace CDP4BuiltInRules.Views
     /// <summary>
     /// Interaction logic for ObjectBrowserRibbon
     /// </summary>
-    [Export(typeof(BuiltInRulesRibbonPage))]
+    [Export(typeof(ExtendedRibbonPage))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class BuiltInRulesRibbonPage : ExtendedRibbonPage, IView
     {

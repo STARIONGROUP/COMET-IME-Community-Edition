@@ -31,8 +31,6 @@ namespace CDP4EngineeringModel.Tests
 
     using CDP4EngineeringModel.Services;
 
-    using Microsoft.Practices.Prism.Regions;
-
     using Moq;
 
     using NUnit.Framework;
@@ -66,8 +64,7 @@ namespace CDP4EngineeringModel.Tests
         [Test]
         public void VerifyThatServicesAreSetByConstructor()
         {
-            var regionManager = new RegionManager();
-            var module = new EngineeringModelModule(regionManager, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, this.parameterActualFiniteStateListApplicationBatchService.Object, this.changeOwnershipBatchService.Object);
+            var module = new EngineeringModelModule(this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, this.parameterActualFiniteStateListApplicationBatchService.Object, this.changeOwnershipBatchService.Object);
             
             Assert.AreEqual(this.fluentRibbonManager.Object, module.RibbonManager);
             Assert.AreEqual(this.panelNavigationService.Object, module.PanelNavigationService);

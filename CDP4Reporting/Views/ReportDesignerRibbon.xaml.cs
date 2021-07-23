@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReportDesignerRibbon.xaml.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -33,7 +33,7 @@ namespace CDP4Reporting.Views
     /// <summary>
     /// Interaction logic for ObjectBrowserRibbon
     /// </summary>
-    [Export(typeof(ReportDesignerRibbon))]
+    [Export(typeof(ExtendedRibbonPageGroup))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class ReportDesignerRibbon : ExtendedRibbonPageGroup, IView
     {

@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RelationshpMatrixPluginSettingsTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="RelationshipMatrixPluginSettingsTestFixture.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -23,17 +23,17 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-
 namespace CDP4RelationshipMatrix.Tests.Settings
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
+
     using CDP4Common.CommonData;
+
     using CDP4Composition.PluginSettingService;
+
     using CDP4RelationshipMatrix.Settings;
-    using Microsoft.Practices.Prism.Regions;
-    using Moq;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -46,7 +46,6 @@ namespace CDP4RelationshipMatrix.Tests.Settings
         private PluginSettingsService pluginSettingsService;
         private RelationshipMatrixModule relationshipMatrixModule;
         private RelationshipMatrixPluginSettings settings;
-        private Mock<IRegionManager> regionManager;
 
         [SetUp]
         public void SetUp()
@@ -59,9 +58,7 @@ namespace CDP4RelationshipMatrix.Tests.Settings
                     this.pluginSettingsService.Cdp4ConfigurationDirectoryFolder,
                     "CDP4RelationshipMatrix.settings.json");
 
-            this.regionManager = new Mock<IRegionManager>();
-
-            this.relationshipMatrixModule = new RelationshipMatrixModule(this.regionManager.Object, null, null, null, null, null);
+            this.relationshipMatrixModule = new RelationshipMatrixModule(null, null, null, null, null);
 
             this.settings = new RelationshipMatrixPluginSettings
             {

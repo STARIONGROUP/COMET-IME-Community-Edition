@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RibbonCategoryBehaviorTextFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -32,7 +32,6 @@ namespace CDP4Reporting.Tests.Behaviour
 
     using CDP4Dal;
 
-    using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
@@ -46,7 +45,6 @@ namespace CDP4Reporting.Tests.Behaviour
     public class RibbonCategoryBehaviorTextFixture
     {
         private Mock<IServiceLocator> serviceLocator;
-        private Mock<IRegionManager> regionManager;
         private RibbonCategoryBehavior ribbonCategoryBehavior;
 
         [SetUp]
@@ -57,17 +55,12 @@ namespace CDP4Reporting.Tests.Behaviour
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
-            this.regionManager = new Mock<IRegionManager>();
-            this.serviceLocator.Setup(x => x.GetInstance<IRegionManager>()).Returns(this.regionManager.Object);
-
             this.ribbonCategoryBehavior = new RibbonCategoryBehavior();
         }
 
         [Test]
         public void VerifyInitializedMembers()
         {
-            Assert.IsNotNull(this.ribbonCategoryBehavior.RegionManager);
-            Assert.IsNull(this.ribbonCategoryBehavior.RibbonRegion);
             Assert.IsNull(this.ribbonCategoryBehavior.CategoryName);
         }
 
