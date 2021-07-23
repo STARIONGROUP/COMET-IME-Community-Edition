@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeModule.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -15,13 +15,13 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ProductTree
 {
@@ -32,9 +32,8 @@ namespace CDP4ProductTree
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    using CDP4ProductTree.Views;
+
     using Microsoft.Practices.Prism.Modularity;
-    using Microsoft.Practices.Prism.Regions;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="ProductTreeModule"/> Component
@@ -45,9 +44,6 @@ namespace CDP4ProductTree
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductTreeModule"/> class.
         /// </summary>
-        /// <param name="regionManager">
-        /// The (MEF injected) instance of <see cref="IRegionManager"/>
-        /// </param>
         /// <param name="ribbonManager">
         /// The (MEF injected) instance of <see cref="IFluentRibbonManager"/>
         /// </param>
@@ -61,19 +57,13 @@ namespace CDP4ProductTree
         /// The (MEF injected) instance of <see cref="IThingDialogNavigationService"/>
         /// </param>
         [ImportingConstructor]
-        public ProductTreeModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService)
+        public ProductTreeModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService)
         {
-            this.RegionManager = regionManager;
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
             this.DialogNavigationService = dialogNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
         }
-
-        /// <summary>
-        /// Gets the <see cref="IRegionManager"/> that is used by the <see cref="ProductTreeModule"/> to register the regions
-        /// </summary>
-        internal IRegionManager RegionManager { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IFluentRibbonManager"/> that is used by the <see cref="ProductTreeModule"/> to register Office Fluent Ribbon XML
@@ -105,16 +95,7 @@ namespace CDP4ProductTree
         /// </summary>
         public void Initialize()
         {
-            this.RegisterRegions();
             this.RegisterRibbonParts();
-        }
-
-        /// <summary>
-        /// Register the view view-models with the <see cref="Region"/>s
-        /// </summary>
-        private void RegisterRegions()
-        {
-            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(ProductTreeRibbon));
         }
 
         /// <summary>

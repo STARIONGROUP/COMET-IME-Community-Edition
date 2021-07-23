@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MoveGroupAction.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski, Kamil Wojnowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -29,14 +29,12 @@ namespace CDP4DiagramEditor.Helpers
     using System.Windows;
     using System.Windows.Media;
 
-    using CDP4Composition;
     using CDP4Composition.Ribbon;
     
     using DevExpress.Xpf.Bars;
     using DevExpress.Xpf.Bars.Native;
     using DevExpress.Xpf.Ribbon;
 
-    using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
@@ -75,36 +73,15 @@ namespace CDP4DiagramEditor.Helpers
         }
 
         /// <summary>
-        /// the <see cref="IRegion"/> property that is used to get the <see cref="RibbonPage"/> to move
-        /// </summary>
-        public IRegion RibbonRegion { get; set; }
-
-        /// <summary>
-        /// the <see cref="IRegionManager"/> property that is used to get the <see cref="RibbonRegion"/>
-        /// </summary>
-        public IRegionManager RegionManager { get; set; }
-        
-        /// <summary>
-        /// Constructor of <see cref="MoveGroupAction"/>
-        /// Resolve <see cref="IRegionManager"/>
-        /// And Sets the <see cref="RibbonRegion"/> Property
-        /// </summary>
-        public MoveGroupAction()
-        {
-            this.RegionManager = ServiceLocator.Current.GetInstance<IRegionManager>();
-            this.RibbonRegion = this.RegionManager?.Regions.FirstOrDefault(region => region.Name == RegionNames.RibbonRegion);
-        }
-
-        /// <summary>
         /// The main logic that is being executed when this <see cref="MoveGroupAction"/> action is used
         /// </summary>
         /// <param name="context"></param>
         protected override void ExecuteCore(DependencyObject context)
         {
-            var page = this.RibbonRegion?.Views.OfType<ExtendedRibbonPage>().FirstOrDefault(rb => (string)rb.Caption == this.TargetPageCaption);
+            var page = ServiceLocator.Current.GetAllInstances<ExtendedRibbonPage>().FirstOrDefault(rb => (string)rb.Caption == this.TargetPageCaption);
             var group = CollectionActionHelper.Instance.FindElementByName(VisualTreeHelper.GetParent(context), this.GroupName, this.Container, ScopeSearchSettings.Descendants) as RibbonPageGroup;
             
-            if (group == null || page == null || group.Page == null || group.Page.Caption == page.Caption)
+            if (group is null || page is null || group.Page is null || group.Page.Caption == page.Caption)
             {
                 return;
             }

@@ -46,13 +46,14 @@
         </Grid.RowDefinitions>
 
         <dxr:RibbonControl x:Name="Ribbon"
+                           x:FieldModifier="public"
                            Grid.Row="0"
                            ApplicationButtonLargeIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo_48x48.png"
                            ApplicationButtonSmallIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo_48x48.png"
                            ApplicationButtonText="COMET-CE"
                            PageCategoryAlignment="Right"
                            RibbonStyle="Office2007"
-                           regions:RegionManager.RegionName="{x:Static cdp4Composition:RegionNames.RibbonRegion}" Padding="0">
+                           Padding="0">
 
             <dxr:RibbonControl.PageHeaderItems>
                 <dxb:BarButtonItem Name="bAbout"

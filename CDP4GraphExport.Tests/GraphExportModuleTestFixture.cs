@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GraphExportModuleTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -30,7 +30,6 @@ namespace CDP4Grapher.Tests
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
-    using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
@@ -46,11 +45,9 @@ namespace CDP4Grapher.Tests
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IPluginSettingsService> pluginSettingService;
-        private Mock<IRegionManager> regionManager;
         private Mock<IFluentRibbonManager> fluentribbonManager;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IServiceLocator> serviceLocator;
-        private Mock<IRegionViewRegistry> regionViewRegistry;
 
         [SetUp]
         public void Setup()
@@ -60,15 +57,10 @@ namespace CDP4Grapher.Tests
             this.pluginSettingService = new Mock<IPluginSettingsService>();
             this.fluentribbonManager = new Mock<IFluentRibbonManager>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
-            this.regionManager = new Mock<IRegionManager>();
             this.serviceLocator = new Mock<IServiceLocator>();
-            this.regionViewRegistry = new Mock<IRegionViewRegistry>();
 
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>())
                 .Returns(this.panelNavigationService.Object);
-
-            this.serviceLocator.Setup(x => x.GetInstance<IRegionViewRegistry>())
-                .Returns(this.regionViewRegistry.Object);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
         }
@@ -76,7 +68,7 @@ namespace CDP4Grapher.Tests
         [Test]
         public void VerifyInitialize()
         {
-            var module = new GraphExportModule(this.regionManager.Object, this.fluentribbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, this.pluginSettingService.Object);
+            var module = new GraphExportModule(this.fluentribbonManager.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.thingDialogNavigationService.Object, this.pluginSettingService.Object);
             Assert.IsNotNull(module);
             module.Initialize();
         }

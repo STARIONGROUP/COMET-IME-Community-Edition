@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CDP4BuiltInRulesModuleTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -29,8 +29,6 @@ namespace CDP4BuiltInRules.Tests
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
-    using Microsoft.Practices.Prism.Regions;
-
     using Moq;
 
     using NUnit.Framework;
@@ -41,7 +39,6 @@ namespace CDP4BuiltInRules.Tests
     [TestFixture]
     public class CDP4BuiltInRulesModuleTestFixture
     {
-        private Mock<IRegionManager> regionManager;
         private Mock<IFluentRibbonManager> fluentRibbonManager;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -50,7 +47,6 @@ namespace CDP4BuiltInRules.Tests
         [SetUp]
         public void SetUp()
         {
-            this.regionManager = new Mock<IRegionManager>();
             this.fluentRibbonManager = new Mock<IFluentRibbonManager>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -60,9 +56,8 @@ namespace CDP4BuiltInRules.Tests
         [Test]
         public void VerifyThatServicePropertiesAreSetByConstrcuctor()
         {
-            var module = new CDP4BuiltInRulesModule(this.regionManager.Object, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object);
+            var module = new CDP4BuiltInRulesModule(this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object);
 
-            Assert.AreEqual(this.regionManager.Object, module.RegionManager);
             Assert.AreEqual(this.fluentRibbonManager.Object, module.RibbonManager);
             Assert.AreEqual(this.panelNavigationService.Object, module.PanelNavigationService);
             Assert.AreEqual(this.thingDialogNavigationService.Object, module.ThingDialogNavigationService);

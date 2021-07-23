@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CDP4ReportingModuleTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -31,7 +31,6 @@ namespace CDP4Reporting.Tests
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
-    using Microsoft.Practices.Prism.Regions;
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
@@ -47,7 +46,6 @@ namespace CDP4Reporting.Tests
     public class CDP4ReportingModuleTestFixture
     {
         private Mock<IServiceLocator> serviceLocator;
-        private Mock<IRegionManager> regionManager;
         private Mock<IFluentRibbonManager> fluentRibbonManager;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -60,9 +58,6 @@ namespace CDP4Reporting.Tests
 
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
-
-            this.regionManager = new Mock<IRegionManager>();
-            this.serviceLocator.Setup(x => x.GetInstance<IRegionManager>()).Returns(this.regionManager.Object);
 
             this.fluentRibbonManager = new Mock<IFluentRibbonManager>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -82,9 +77,8 @@ namespace CDP4Reporting.Tests
         [Test]
         public void VerifyThatServicesAreSetByConstructor()
         {
-            var module = new Cdp4ReportingModule(this.regionManager.Object, this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object);
+            var module = new Cdp4ReportingModule(this.fluentRibbonManager.Object, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object);
 
-            Assert.AreEqual(this.regionManager.Object, module.RegionManager);
             Assert.AreEqual(this.fluentRibbonManager.Object, module.RibbonManager);
             Assert.AreEqual(this.panelNavigationService.Object, module.PanelNavigationService);
             Assert.AreEqual(this.thingDialogNavigationService.Object, module.ThingDialogNavigationService);

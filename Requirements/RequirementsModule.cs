@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsModule.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -15,30 +15,32 @@
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements
 {
     using System;
     using System.ComponentModel.Composition;
+
     using CDP4Composition;
     using CDP4Composition.Attributes;
     using CDP4Composition.Exceptions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4OfficeInfrastructure;
 
     using CDP4Requirements.Settings.JsonConverters;
-    using CDP4Requirements.Views;
+
     using Microsoft.Practices.Prism.Modularity;
-    using Microsoft.Practices.Prism.Regions;
+
     using NLog;
 
     /// <summary>
@@ -60,9 +62,6 @@ namespace CDP4Requirements
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementsModule"/> class.
         /// </summary>
-        /// <param name="regionManager">
-        /// The (MEF injected) instance of <see cref="IRegionManager"/>
-        /// </param>
         /// <param name="ribbonManager">
         /// The (MEF injected) instance of <see cref="IFluentRibbonManager"/>
         /// </param>
@@ -82,9 +81,8 @@ namespace CDP4Requirements
         /// The MEF injected instance of <see cref="IOfficeApplicationWrapper"/>
         /// </param>
         [ImportingConstructor]
-        public RequirementsModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper)
+        public RequirementsModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper)
         {
-            this.RegionManager = regionManager;
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
@@ -92,11 +90,6 @@ namespace CDP4Requirements
             this.PluginSettingsService = pluginSettingsService;
             this.OfficeApplicationWrapper = officeApplicationWrapper;
         }
-
-        /// <summary>
-        /// Gets the <see cref="IRegionManager"/> that is used by the <see cref="RequirementsModule"/> to register the regions
-        /// </summary>
-        public IRegionManager RegionManager { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IFluentRibbonManager"/> that is used by the <see cref="RequirementsModule"/> to register Office Fluent Ribbon XML
@@ -151,7 +144,6 @@ namespace CDP4Requirements
                 throw ex;
             }
 
-            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(RequirementsRibbon));
             this.RegisterRibbonParts();
         }
 

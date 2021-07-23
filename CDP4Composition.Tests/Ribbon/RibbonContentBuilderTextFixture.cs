@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OrganizationBrowserRibbon.xaml.cs" company="RHEA System S.A.">
+// <copyright file="RibbonContentBuilderTextFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
@@ -23,28 +23,50 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4SiteDirectory.Views
+namespace CDP4Composition.Tests.Ribbon
 {
-    using System.ComponentModel.Composition;
-    using CDP4SiteDirectory.ViewModels;
+    using System.Threading;
 
+    using CDP4Composition.Ribbon;
     using DevExpress.Xpf.Ribbon;
+    using NUnit.Framework;
 
-    using Microsoft.Practices.Prism.Mvvm;
-    
-    /// <summary>
-    /// Interaction logic for LogInfoControls.xaml
-    /// </summary>
-    [Export(typeof(RibbonPageGroup))]
-    public partial class OrganizationBrowserRibbon : IView
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
+    public class RibbonContentBuilderTextFixture
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="OrganizationBrowserRibbon"/> class
-        /// </summary>
-        public OrganizationBrowserRibbon()
+        [Test]
+        public void Test()
         {
-            this.InitializeComponent();
-            this.DataContext = new OrganizationBrowserRibbonViewModel();
+            var categories = new[]
+            {
+                new ExtendedRibbonPageCategory(),
+            };
+
+            var pages = new[]
+            {
+                new ExtendedRibbonPage(),
+                new ExtendedRibbonPage(),
+                new ExtendedRibbonPage(),
+            };
+
+            var groups = new[]
+            {
+                new ExtendedRibbonPageGroup(),
+                new ExtendedRibbonPageGroup(),
+                new ExtendedRibbonPageGroup(),
+            };
+
+            var builder = new RibbonContentBuilder(categories, groups, pages);
+
+            var ribbon = new RibbonControl();
+            ribbon.Categories.Add(new RibbonDefaultPageCategory());
+
+            builder.BuildAndAppendToRibbon(ribbon);
+
+            Assert.That(ribbon.ActualCategories.Count, Is.EqualTo(2));
+            Assert.That(ribbon.ActualCategories[1].Pages.Count, Is.EqualTo(3));
+            Assert.That(ribbon.ActualCategories[1].Pages[0].ActualGroups.Count, Is.EqualTo(3));
         }
     }
 }

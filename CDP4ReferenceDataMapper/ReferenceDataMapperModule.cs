@@ -2,9 +2,9 @@
 // <copyright file="ReferenceDataMapperModule.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -33,10 +33,7 @@ namespace CDP4ReferenceDataMapper
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
-    using CDP4ReferenceDataMapper.Views;
-
     using Microsoft.Practices.Prism.Modularity;
-    using Microsoft.Practices.Prism.Regions;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="ReferenceDataMapperModule"/> plugin
@@ -44,10 +41,6 @@ namespace CDP4ReferenceDataMapper
     [ModuleExportName(typeof(ReferenceDataMapperModule), "Reference Data Mapper Module")]
     public class ReferenceDataMapperModule : IModule
     {
-        /// <summary>
-        /// the <see cref="IRegionManager"/> that is used by the <see cref="ReferenceDataMapperModule"/> to register the regions
-        /// </summary>
-        public readonly IRegionManager RegionManager;
 
         /// <summary>
         /// Gets the <see cref="IFluentRibbonManager"/> that is used by the <see cref="ReferenceDataMapperModule"/> to register Office Fluent Ribbon XML
@@ -77,9 +70,6 @@ namespace CDP4ReferenceDataMapper
         /// <summary>
         /// Initializes a new instance of the <see cref="ReferenceDataMapperModule"/> class.
         /// </summary>
-        /// <param name="regionManager">
-        /// The (MEF injected) instance of <see cref="IRegionManager"/>
-        /// </param>
         /// <param name="ribbonManager">
         /// The (MEF injected) instance of <see cref="IFluentRibbonManager"/>
         /// </param>
@@ -93,9 +83,8 @@ namespace CDP4ReferenceDataMapper
         /// The (MEF injected) instance of <see cref="IDialogNavigationService"/>
         /// </param>
         [ImportingConstructor]
-        public ReferenceDataMapperModule(IRegionManager regionManager, IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        public ReferenceDataMapperModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            this.RegionManager = regionManager;
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
@@ -108,7 +97,6 @@ namespace CDP4ReferenceDataMapper
         /// </summary>
         public void Initialize()
         {
-            this.RegionManager.RegisterViewWithRegion(RegionNames.RibbonRegion, typeof(StateToParameterTypeMapperRibbon));
         }
     }
 }
