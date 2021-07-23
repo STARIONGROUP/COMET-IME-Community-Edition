@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelOpeningDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -29,15 +28,21 @@ namespace CDP4ShellDialogs.Tests
     using System;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
+
     using CDP4ShellDialogs.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -98,7 +103,7 @@ namespace CDP4ShellDialogs.Tests
             this.assembler = new Assembler(this.uri);
 
             var lazysiteDirectory = new Lazy<Thing>(() => this.siteDirectory);
-            this.assembler.Cache.GetOrAdd(new CacheKey(lazysiteDirectory.Value.Iid, null) , lazysiteDirectory);
+            this.assembler.Cache.GetOrAdd(new CacheKey(lazysiteDirectory.Value.Iid, null), lazysiteDirectory);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
@@ -115,7 +120,7 @@ namespace CDP4ShellDialogs.Tests
         [Test]
         public void VerifyThatModelOpeningDialogReturnResult()
         {
-            var sessions = new List<ISession> {this.session.Object};
+            var sessions = new List<ISession> { this.session.Object };
 
             var viewmodel = new ModelOpeningDialogViewModel(sessions);
             viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iteration11, this.participant, this.session.Object));
@@ -126,21 +131,20 @@ namespace CDP4ShellDialogs.Tests
             Assert.IsNotNull(res);
             Assert.IsTrue(res.Result.Value);
 
-            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>()));
+            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>()));
         }
 
         [Test]
         public void VerifyThatErrorAreCaught()
         {
             var sessions = new List<ISession> { this.session.Object };
-            this.session.Setup(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>())).Throws(new Exception("test"));
-
+            this.session.Setup(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>())).Throws(new Exception("test"));
 
             var viewmodel = new ModelOpeningDialogViewModel(sessions);
             viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iteration11, this.participant, this.session.Object));
 
             viewmodel.SelectCommand.Execute(null);
-            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>()));
+            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>()));
 
             Assert.IsTrue(viewmodel.HasError);
             Assert.AreEqual("test", viewmodel.ErrorMessage);
@@ -169,7 +173,7 @@ namespace CDP4ShellDialogs.Tests
             var res = viewmodel.DialogResult;
             Assert.IsNotNull(res);
             Assert.IsFalse(res.Result.Value);
-            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>()), Times.Never);
+            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>()), Times.Never);
         }
     }
 }
