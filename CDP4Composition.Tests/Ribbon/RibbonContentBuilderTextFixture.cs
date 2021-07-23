@@ -36,17 +36,25 @@ namespace CDP4Composition.Tests.Ribbon
     public class RibbonContentBuilderTextFixture
     {
         [Test]
-        public void Test()
+        public void VerifyThatContentIsCorrectlyBuilt()
         {
             var categories = new[]
             {
                 new ExtendedRibbonPageCategory(),
+                new ExtendedRibbonPageCategory() 
+                { 
+                    Name = "CustomCategory" 
+                },
             };
 
             var pages = new[]
             {
                 new ExtendedRibbonPage(),
-                new ExtendedRibbonPage(),
+                new ExtendedRibbonPage() 
+                { 
+                    IsInDefaultPageCategory = false, 
+                    CustomPageCategoryName = "CustomCategory" 
+                },
                 new ExtendedRibbonPage(),
             };
 
@@ -64,9 +72,10 @@ namespace CDP4Composition.Tests.Ribbon
 
             builder.BuildAndAppendToRibbon(ribbon);
 
-            Assert.That(ribbon.ActualCategories.Count, Is.EqualTo(2));
-            Assert.That(ribbon.ActualCategories[1].Pages.Count, Is.EqualTo(3));
-            Assert.That(ribbon.ActualCategories[1].Pages[0].ActualGroups.Count, Is.EqualTo(3));
+            Assert.That(ribbon.ActualCategories.Count, Is.EqualTo(3));
+            Assert.That(ribbon.ActualCategories[1].Pages.Count, Is.EqualTo(1));
+            Assert.That(ribbon.ActualCategories[2].Pages.Count, Is.EqualTo(2));
+            Assert.That(ribbon.ActualCategories[2].Pages[0].ActualGroups.Count, Is.EqualTo(3));
         }
     }
 }

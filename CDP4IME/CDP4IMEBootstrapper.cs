@@ -98,7 +98,7 @@ namespace CDP4IME
             var dockViewModel = this.Container.GetExportedValue<DockLayoutViewModel>();
             var ribbonBuilder = this.Container.GetExportedValue<IRibbonContentBuilder>();
 
-            //'Make do' solution until the bootstrapper is replaced. Currently injecting the builder into the Shell view is rejected by the composition.
+            //TODO: GH#861 'Make do' solution until the bootstrapper is replaced. Currently injecting the builder into the Shell view is rejected by the composition.
             ribbonBuilder.BuildAndAppendToRibbon(shell.Ribbon);
             shell.DataContext = new ShellViewModel(dialogNavigationService, dockViewModel);
 
