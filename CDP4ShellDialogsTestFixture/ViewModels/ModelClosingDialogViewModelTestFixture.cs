@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelClosingDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -32,15 +31,21 @@ namespace CDP4ShellDialogs.Tests
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
+
     using CDP4ShellDialogs.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -175,7 +180,7 @@ namespace CDP4ShellDialogs.Tests
             var res = viewmodel.DialogResult;
             Assert.IsNotNull(res);
             Assert.IsFalse(res.Result.Value);
-            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>()), Times.Never);
+            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>()), Times.Never);
         }
 
         [Test]
@@ -184,6 +189,7 @@ namespace CDP4ShellDialogs.Tests
             var lazyiterationSetup21 = new Lazy<Thing>(() => this.iterationSetup21);
             this.assembler.Cache.GetOrAdd(new CacheKey(lazyiterationSetup21.Value.Iid, null), lazyiterationSetup21);
             var iteration21 = new Iteration(this.iterationSetup21.IterationIid, this.assembler.Cache, this.uri);
+
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { iteration21, null } });
 
