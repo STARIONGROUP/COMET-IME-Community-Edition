@@ -26,10 +26,12 @@
 namespace CDP4LogInfo.Views
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Ribbon;
-    using CDP4LogInfo.ViewModels;
-    using Microsoft.Practices.Prism.Mvvm;
+    using CDP4Composition.Mvvm;
+
+    using CDP4LogInfo.ViewModels;    
     
     /// <summary>
     /// Interaction logic for LogInfoControls.xaml

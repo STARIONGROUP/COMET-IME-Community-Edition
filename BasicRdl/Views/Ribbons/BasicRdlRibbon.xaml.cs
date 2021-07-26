@@ -27,8 +27,8 @@ namespace BasicRdl.Views
 {
     using System.ComponentModel.Composition;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Ribbon;
-    using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>
     /// Interaction logic for <see cref="BasicRdlRibbon"/>

@@ -30,11 +30,10 @@ namespace CDP4ReferenceDataMapper.Views
     using System.ComponentModel.Composition;
 
     using CDP4Composition.Ribbon;
+    using CDP4Composition.Mvvm;
 
     using CDP4ReferenceDataMapper.ViewModels;
     
-    using Microsoft.Practices.Prism.Mvvm;
-
     /// <summary>
     /// Interaction logic for OptionBrowserRibbon.xaml
     /// </summary>

@@ -26,12 +26,11 @@
 namespace CDP4EngineeringModel.Views
 {
     using CDP4Composition.Ribbon;
+    using CDP4Composition.Mvvm;
 
     using CDP4EngineeringModel.ViewModels;
 
     using System.ComponentModel.Composition;
-
-    using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>
     /// Interaction logic for PublicationBrowserRibbon.xaml

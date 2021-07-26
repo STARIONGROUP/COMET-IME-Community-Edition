@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,8 @@ namespace CDP4RelationshipMatrix.Views
     using System.ComponentModel.Composition;
 
     using CDP4Composition.Ribbon;
-    using Microsoft.Practices.Prism.Mvvm;
+    using CDP4Composition.Mvvm;
+
     using ViewModels;
 
     /// <summary>
