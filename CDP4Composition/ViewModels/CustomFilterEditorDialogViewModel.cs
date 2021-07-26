@@ -1,8 +1,8 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CustomFilterEditorDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -19,9 +19,9 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.ViewModels
 {
@@ -39,13 +39,13 @@ namespace CDP4Composition.ViewModels
     using CDP4Composition.FilterOperators;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.FilterEditorService;
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
 
     using DevExpress.Xpf.Core.FilteringUI;
     using DevExpress.Xpf.Grid;
 
-    using Microsoft.Practices.Prism.Mvvm;
     using Microsoft.Practices.ServiceLocation;
 
     using ReactiveUI;

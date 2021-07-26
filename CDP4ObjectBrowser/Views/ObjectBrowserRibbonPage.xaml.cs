@@ -26,9 +26,11 @@
 namespace CDP4ObjectBrowser.Views
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition.Ribbon;
+    using CDP4Composition.Mvvm;
+
     using CDP4ObjectBrowser.ViewModels;
-    using Microsoft.Practices.Prism.Mvvm;
 
     /// <summary>
     /// Interaction logic for ObjectBrowserRibbon

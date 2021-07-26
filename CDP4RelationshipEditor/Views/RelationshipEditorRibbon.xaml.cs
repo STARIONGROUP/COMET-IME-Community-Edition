@@ -26,8 +26,10 @@
 namespace CDP4RelationshipEditor.Views
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition.Ribbon;
-    using Microsoft.Practices.Prism.Mvvm;
+    using CDP4Composition.Mvvm;
+
     using ViewModels;
 
     /// <summary>

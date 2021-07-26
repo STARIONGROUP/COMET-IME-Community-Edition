@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ShowDeprecatedRibbon.xaml.cs" company="RHEA System S.A.">
+// <copyright file="IView.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
@@ -19,32 +19,20 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4SiteDirectory.Views
+namespace CDP4Composition.Mvvm
 {
-    using System.ComponentModel.Composition;
-
-    using CDP4Composition.Ribbon;
-    using CDP4Composition.Mvvm;
-
-    using CDP4SiteDirectory.ViewModels;
-    
     /// <summary>
-    /// Interaction logic for ShowDeprecatedRibbon
+    /// Interface that represents a view with a <see cref="DataContext"/>
     /// </summary>
-    [Export(typeof(ExtendedRibbonPageGroup))]
-    public partial class ShowDeprecatedRibbon : IView
+    public interface IView
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ShowDeprecatedRibbon"/> class
+        /// The data context of this view
         /// </summary>
-        public ShowDeprecatedRibbon()
-        {
-            this.InitializeComponent();
-            this.DataContext = new ShowDeprecatedBrowserRibbonViewModel();
-        }
+        object DataContext { get; set; }
     }
 }

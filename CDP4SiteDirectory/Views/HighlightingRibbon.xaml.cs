@@ -31,7 +31,7 @@ namespace CDP4SiteDirectory.Views
 
     using CDP4SiteDirectory.ViewModels;
 
-    using Microsoft.Practices.Prism.Mvvm;
+    using CDP4Composition.Mvvm;
 
     /// <summary>
     /// Interaction logic for HighlightingRibbon

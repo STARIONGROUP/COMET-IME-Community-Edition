@@ -26,10 +26,13 @@
 namespace CDP4Scripting.Views
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Ribbon;
+    using CDP4Composition.Mvvm;
+
     using Interfaces;
-    using Microsoft.Practices.Prism.Mvvm;
+
     using ViewModels;
 
     /// <summary>

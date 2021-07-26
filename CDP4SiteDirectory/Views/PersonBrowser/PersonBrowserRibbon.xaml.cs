@@ -31,7 +31,7 @@ namespace CDP4SiteDirectory.Views
 
     using DevExpress.Xpf.Ribbon;
 
-    using Microsoft.Practices.Prism.Mvvm;
+    using CDP4Composition.Mvvm;
     
     /// <summary>
     /// Interaction logic for LogInfoControls.xaml

@@ -12,7 +12,7 @@ namespace CDP4Dashboard.Views
 
     using CDP4Dashboard.ViewModels;
 
-    using Microsoft.Practices.Prism.Mvvm;
+    using CDP4Composition.Mvvm;
 
     /// <summary>
     /// Interaction logic for RequirementBrowserRibbon.xaml

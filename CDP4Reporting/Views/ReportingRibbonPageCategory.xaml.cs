@@ -26,8 +26,9 @@
 namespace CDP4Reporting.Views
 {
     using System.ComponentModel.Composition;
+
     using CDP4Composition.Ribbon;
-    using Microsoft.Practices.Prism.Mvvm;
+    using CDP4Composition.Mvvm;
 
     /// <summary>
     /// Interaction logic for ReportingRibbonPageCategory.xaml
