@@ -37,7 +37,7 @@ namespace CDP4Composition.Modularity
         /// <summary>
         /// The <see cref="IModule"/>s to initialize
         /// </summary>
-        private IEnumerable<IModule> modules;
+        private readonly IEnumerable<IModule> modules;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModuleInitializer"/> class
