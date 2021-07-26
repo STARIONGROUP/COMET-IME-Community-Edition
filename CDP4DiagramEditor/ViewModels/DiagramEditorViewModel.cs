@@ -387,7 +387,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                 if (diagramThing.DepictedThing is ElementDefinition)
                 {
-                    newDiagramElement = new PortContainerDiagramContentItem(diagramThing, this);
+                    newDiagramElement = new ElementDefinitionDiagramContentItem(diagramThing, this.Session, this);
                 }
                 else
                 {
@@ -487,7 +487,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                 if (rowPayload is ElementDefinition elementDefinition)
                 {
-                    diagramItem = new PortContainerDiagramContentItem(block, this);
+                    diagramItem = new ElementDefinitionDiagramContentItem(block, this.Session, this);
                 }
                 else if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
                 {
@@ -554,7 +554,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             if (depictedThing is ElementDefinition)
             {
-                newDiagramElement = new PortContainerDiagramContentItem(block, this);
+                newDiagramElement = new ElementDefinitionDiagramContentItem(block, this.Session, this);
             }
             else
             {
@@ -703,7 +703,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             var depictedThing = item.DiagramThing.DepictedThing;
 
-            var relationships = 
+            var relationships =
                 iteration.Relationship
                     .OfType<BinaryRelationship>()
                     .Where(r => r.Source == depictedThing || r.Target == depictedThing);
