@@ -28,18 +28,16 @@ namespace CDP4Budget
     using System.ComponentModel.Composition;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
     using CDP4Dal.Permission;
 
-    using Microsoft.Practices.Prism.Modularity;
-
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="CDP4BudgetModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(CDP4BudgetModule), "COMET Budget Module")]
+    [Export(typeof(IModule))]
     public class CDP4BudgetModule : IModule
     {
 

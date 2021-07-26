@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,15 +27,13 @@ namespace CDP4Scripting
 {
     using System.ComponentModel.Composition;
 
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
-
-    using Microsoft.Practices.Prism.Modularity;
 
     /// <summary>
     ///  The <see cref="IModule"/> implementation for the <see cref="CDP4ScriptingModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(CDP4ScriptingModule), "Scripting Module")]
+    [Export(typeof(IModule))]
     public class CDP4ScriptingModule : IModule
     {
         /// <summary>

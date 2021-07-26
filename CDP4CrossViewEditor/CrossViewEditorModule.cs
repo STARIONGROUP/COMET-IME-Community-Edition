@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,19 +28,17 @@ namespace CDP4CrossViewEditor
     using System.ComponentModel.Composition;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
     using CDP4OfficeInfrastructure;
 
-    using Microsoft.Practices.Prism.Modularity;
-
     /// <summary>
     /// The purpose of the <see cref="CrossViewEditorModule"/> class is to enable this library
     /// to be loaded as a PRISM Module
     /// </summary>
-    [ModuleExportName(typeof(CrossViewEditorModule), "CrossView Editor Generator Module")]
+    [Export(typeof(IModule))]
     public class CrossViewEditorModule : IModule
     {
         /// <summary>

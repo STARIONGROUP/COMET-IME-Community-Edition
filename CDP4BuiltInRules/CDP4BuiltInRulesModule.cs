@@ -28,19 +28,17 @@ namespace CDP4BuiltInRules
     using System.ComponentModel.Composition;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
-    using Microsoft.Practices.Prism.Modularity;
-
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="CDP4BuiltInRulesModule"/> Component
     /// </summary>
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="CDP4BuiltInRulesModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(CDP4BuiltInRulesModule), "Built-In Rules Module")]
+    [Export(typeof(IModule))]
     public class CDP4BuiltInRulesModule : IModule 
     {
         /// <summary>

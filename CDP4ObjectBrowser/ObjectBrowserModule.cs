@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,14 +27,12 @@ namespace CDP4ObjectBrowser
 {
     using System.ComponentModel.Composition;
 
-    using CDP4Composition.Attributes;
-
-    using Microsoft.Practices.Prism.Modularity;
+    using CDP4Composition.Modularity;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="CDP4ObjectBrowser"/> Component
     /// </summary>
-    [ModuleExportName(typeof(ObjectBrowserModule), "Object Browser Module")]
+    [Export(typeof(IModule))]
     public class ObjectBrowserModule : IModule
     {
 

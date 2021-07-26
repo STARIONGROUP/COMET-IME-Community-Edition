@@ -28,19 +28,17 @@ namespace CDP4EngineeringModel
     using System.ComponentModel.Composition;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
     using CDP4EngineeringModel.Services;
 
-    using Microsoft.Practices.Prism.Modularity;
-
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="EngineeringModelModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(EngineeringModelModule), "Engineering Model Module")]
+    [Export(typeof(IModule))]
     public class EngineeringModelModule : IModule
     { 
         /// <summary>

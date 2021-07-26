@@ -28,18 +28,16 @@ namespace BasicRdl
     using System.ComponentModel.Composition;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.FavoritesService;
-    
-    using Microsoft.Practices.Prism.Modularity;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="BasicRdlModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(BasicRdlModule), "Basic Reference Data Module")]
+    [Export(typeof(IModule))]
     public class BasicRdlModule : IModule
     {
         /// <summary>

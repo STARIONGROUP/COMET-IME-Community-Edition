@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,11 +29,11 @@ namespace CDP4Reporting
     using System.Diagnostics.CodeAnalysis;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
-    using Microsoft.Practices.Prism.Modularity;
+
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="Cdp4ReportingModule"/> Component
@@ -41,7 +41,7 @@ namespace CDP4Reporting
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="Cdp4ReportingModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(Cdp4ReportingModule), "Reporting Module")]
+    [Export(typeof(IModule))]
     public class Cdp4ReportingModule : IModule
     {
         /// <summary>

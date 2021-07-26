@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,17 +27,15 @@ namespace CDP4DiagramEditor
 {
     using System.ComponentModel.Composition;
 
-    using Microsoft.Practices.Prism.Modularity;
-
     using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="CDP4DiagramEditorModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(CDP4DiagramEditorModule), "Diagram editor Module")]
+    [Export(typeof(IModule))]
     public class CDP4DiagramEditorModule : IModule
     {
         /// <summary>

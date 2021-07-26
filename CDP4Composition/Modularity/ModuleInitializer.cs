@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TestModule.cs" company="RHEA System S.A.">
+// <copyright file="ModuleInitializer.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
@@ -23,37 +23,41 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.PluginSettingService
+namespace CDP4Composition.Modularity
 {
+    using System.Collections.Generic;
     using System.ComponentModel.Composition;
 
-    using CDP4Composition.Modularity;
-    using CDP4Composition.PluginSettingService;
-    
     /// <summary>
-    /// an <see cref="IModule"/> implementation for the purpose of testing the <see cref="PluginSettingsService"/>
+    /// A class to collect all <see cref="IModule"/>s loaded and initializes them
     /// </summary>
-    [Export(typeof(IModule))]
-    internal class TestModule : IModule
+    [Export(typeof(IModuleInitializer))]
+    public class ModuleInitializer : IModuleInitializer
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="TestModule"/>
+        /// The <see cref="IModule"/>s to initialize
         /// </summary>
-        /// <param name="pluginSettingsService">
-        /// The <see cref="IPluginSettingsService"/> used to read/write the <see cref="PluginSettings"/>
-        /// </param>
-        internal TestModule(IPluginSettingsService pluginSettingsService)
+        private IEnumerable<IModule> modules;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModuleInitializer"/> class
+        /// </summary>
+        /// <param name="modules">The <see cref="IModule"s to initialize/></param>
+        [ImportingConstructor]
+        public ModuleInitializer([ImportMany] IEnumerable<IModule> modules)
         {
-            this.PluginSettingsService = pluginSettingsService;
+            this.modules = modules;
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="IPluginSettingsService"/> used to read/write the <see cref="PluginSettings"/>
+        /// Initializes the <see cref="IModule"/>s
         /// </summary>
-        internal IPluginSettingsService PluginSettingsService { get; set; }
-
         public void Initialize()
         {
+            foreach (var module in modules)
+            {
+                module.Initialize();
+            }
         }
     }
 }
