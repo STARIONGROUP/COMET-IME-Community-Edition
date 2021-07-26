@@ -19,20 +19,20 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4PropertyGrid
 {
     using System.ComponentModel.Composition;
-    using CDP4Composition.Attributes;
-    using Microsoft.Practices.Prism.Modularity;
+
+    using CDP4Composition.Modularity;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="PropertyGrid"/> Component
     /// </summary>
-    [ModuleExportName(typeof(PropertyGridModule), "Property Grid Module")]
+    [Export(typeof(IModule))]
     public class PropertyGridModule : IModule
     {
 

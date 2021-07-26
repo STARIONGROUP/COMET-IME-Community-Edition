@@ -28,16 +28,14 @@ namespace CDP4SystemsToolKit
     using System.ComponentModel.Composition;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-
-    using Microsoft.Practices.Prism.Modularity;
 
     /// <summary>
     /// Initializes the SiteDirectoryModule Plugin
     /// </summary>
-    [ModuleExportName(typeof(SystemsToolKitModule), "Systems Tool Kit Module")]
+    [Export(typeof(IModule))]
     public class SystemsToolKitModule : IModule
     {
         /// <summary>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TestModule.cs" company="RHEA System S.A.">
+// <copyright file="IModuleInitializer.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
@@ -23,37 +23,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.PluginSettingService
+namespace CDP4Composition.Modularity
 {
-    using System.ComponentModel.Composition;
-
-    using CDP4Composition.Modularity;
-    using CDP4Composition.PluginSettingService;
-    
     /// <summary>
-    /// an <see cref="IModule"/> implementation for the purpose of testing the <see cref="PluginSettingsService"/>
+    /// Collects all <see cref="IModule"/>s loaded and initializes them via the <see cref="Initialize"/> method
     /// </summary>
-    [Export(typeof(IModule))]
-    internal class TestModule : IModule
+    public interface IModuleInitializer
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="TestModule"/>
+        /// Initializes the <see cref="IModule"/>s
         /// </summary>
-        /// <param name="pluginSettingsService">
-        /// The <see cref="IPluginSettingsService"/> used to read/write the <see cref="PluginSettings"/>
-        /// </param>
-        internal TestModule(IPluginSettingsService pluginSettingsService)
-        {
-            this.PluginSettingsService = pluginSettingsService;
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="IPluginSettingsService"/> used to read/write the <see cref="PluginSettings"/>
-        /// </summary>
-        internal IPluginSettingsService PluginSettingsService { get; set; }
-
-        public void Initialize()
-        {
-        }
+        public void Initialize();
     }
 }

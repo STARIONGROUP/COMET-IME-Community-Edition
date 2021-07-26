@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,19 +31,17 @@ namespace CDP4RelationshipMatrix
 
     using CDP4Composition;
     using CDP4Composition.Exceptions;
-    using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-
-    using Microsoft.Practices.Prism.Modularity;
+    using CDP4Composition.Modularity;
 
     using NLog;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="RelationshipMatrixModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(RelationshipMatrixModule), "Module that provides a relationship-matrix view")]
+    [Export(typeof(IModule))]
     public class RelationshipMatrixModule : IModule
     {
         /// <summary>

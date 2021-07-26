@@ -63,13 +63,6 @@
         </dxb:ToolBarControl>
         <Grid Grid.Row="1">
             <dxdo:DockLayoutManager FloatingMode="Window">
-                <dxdo:DockLayoutManager.Resources>
-                    <Style x:Key="BaseStyle"
-                       TargetType="dxdo:LayoutPanel">
-                    </Style>
-                    <Style BasedOn="{StaticResource BaseStyle}" TargetType="dxdo:DocumentPanel" />
-                    <Style BasedOn="{StaticResource BaseStyle}" TargetType="dxdo:LayoutPanel" />
-                </dxdo:DockLayoutManager.Resources>
                 <dxdo:LayoutGroup Orientation="Vertical">
                     <dxdo:LayoutGroup Orientation="Horizontal" ItemHeight="2*">
                         <dxdo:LayoutPanel Caption="Script Editor" ShowCloseButton="False" ItemWidth="3*"

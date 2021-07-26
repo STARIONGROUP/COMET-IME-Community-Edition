@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,8 +29,8 @@ namespace CDP4Requirements
     using System.ComponentModel.Composition;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
     using CDP4Composition.Exceptions;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -38,15 +38,13 @@ namespace CDP4Requirements
     using CDP4OfficeInfrastructure;
 
     using CDP4Requirements.Settings.JsonConverters;
-
-    using Microsoft.Practices.Prism.Modularity;
-
+    
     using NLog;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="RequirementsModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(RequirementsModule), "Requirements Module")]
+    [Export(typeof(IModule))]
     public class RequirementsModule : IModule
     {
         /// <summary>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="TestModule.cs" company="RHEA System S.A.">
+// <copyright file="ModuleInitializerTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
@@ -23,37 +23,46 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Tests.PluginSettingService
+namespace CDP4Composition.Tests.Modularity
 {
-    using System.ComponentModel.Composition;
+    using System.Collections.Generic;
+    using System.Linq;
 
     using CDP4Composition.Modularity;
-    using CDP4Composition.PluginSettingService;
-    
-    /// <summary>
-    /// an <see cref="IModule"/> implementation for the purpose of testing the <see cref="PluginSettingsService"/>
-    /// </summary>
-    [Export(typeof(IModule))]
-    internal class TestModule : IModule
+
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class ModuleInitializerTestFixture
     {
-        /// <summary>
-        /// Initializes a new instance of <see cref="TestModule"/>
-        /// </summary>
-        /// <param name="pluginSettingsService">
-        /// The <see cref="IPluginSettingsService"/> used to read/write the <see cref="PluginSettings"/>
-        /// </param>
-        internal TestModule(IPluginSettingsService pluginSettingsService)
+        [Test]
+        public void VerifyAllModulesGetInitialized()
         {
-            this.PluginSettingsService = pluginSettingsService;
+            const int ModuleCount = 10;
+
+            var modules = CreateModules(ModuleCount).ToList();
+            IModuleInitializer moduleInitializer = new ModuleInitializer(modules);
+            moduleInitializer.Initialize();
+
+            Assert.That(modules.Select(m => m.InitializeCount), Has.All.EqualTo(1));
         }
 
-        /// <summary>
-        /// Gets or sets the <see cref="IPluginSettingsService"/> used to read/write the <see cref="PluginSettings"/>
-        /// </summary>
-        internal IPluginSettingsService PluginSettingsService { get; set; }
+        private IEnumerable<ModuleStub> CreateModules(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                yield return new ModuleStub();
+            }
+        }
+    }
+
+    class ModuleStub : IModule
+    {
+        public int InitializeCount { get; private set; }
 
         public void Initialize()
         {
+            InitializeCount++;
         }
     }
 }

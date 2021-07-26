@@ -2,9 +2,9 @@
 // <copyright file="CDP4AddinBootstrapper.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -77,6 +77,9 @@ namespace CDP4AddinCE
                 this.AggregateCatalog.Catalogs.Add(directoryCatalog);
                 logger.Log(LogLevel.Debug, $"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
+
+            var moduleInitializer = this.Container.GetExportedValue<IModuleInitializer>();
+            moduleInitializer.Initialize();
 
             logger.Log(LogLevel.Debug, $"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
 

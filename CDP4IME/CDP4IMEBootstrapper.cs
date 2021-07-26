@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -87,12 +87,15 @@ namespace CDP4IME
                 this.UpdateBootstrapperState($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
 
+            var moduleInitializer = this.Container.GetExportedValue<IModuleInitializer>();
+            moduleInitializer.Initialize();
+
             this.UpdateBootstrapperState($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
 
             this.UpdateBootstrapperState("Initializing the Shell");
 
             base.InitializeShell();
-            
+
             var shell = (Shell)this.Shell;
             var dialogNavigationService = this.Container.GetExportedValue<IDialogNavigationService>();
             var dockViewModel = this.Container.GetExportedValue<DockLayoutViewModel>();

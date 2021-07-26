@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,17 +28,15 @@ namespace CDP4DashboardModule
     using System.ComponentModel.Composition;
 
     using CDP4Composition;
-    using CDP4Composition.Attributes;
+    using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
-    using Microsoft.Practices.Prism.Modularity;
-
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="CDP4DashboardModule"/> Component
     /// </summary>
-    [ModuleExportName(typeof(CDP4DashboardModule), "Dashboard Module")]
+    [Export(typeof(IModule))]
     public class CDP4DashboardModule : IModule
     {
         /// <summary>
