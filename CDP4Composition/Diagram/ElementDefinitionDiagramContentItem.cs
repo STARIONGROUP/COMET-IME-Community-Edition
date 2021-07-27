@@ -27,7 +27,6 @@ namespace CDP4Composition.Diagram
 {
     using System.Linq;
 
-    using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
@@ -38,10 +37,13 @@ namespace CDP4Composition.Diagram
     using ReactiveUI;
 
     /// <summary>
-    /// Represents a <see cref="ThingDiagramContentItem"/> with a name and a <see cref="ClassKind"/>
+    /// Represents an <see cref="ElementDefinition"/> to be used in a Diagram
     /// </summary>
     public class ElementDefinitionDiagramContentItem : PortContainerDiagramContentItem, IDiagramContentItemChildren
     {
+        /// <summary>
+        /// The <see cref="ISession"/> to be used when creating other view models
+        /// </summary>
         private readonly ISession session;
 
         /// <summary>
