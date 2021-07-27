@@ -15,6 +15,11 @@
              xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
              xmlns:viewModels="clr-namespace:CDP4DiagramEditor.ViewModels"
              xmlns:diagram="clr-namespace:CDP4CommonView.Diagram;assembly=CDP4Composition"
+             xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
+             xmlns:dxa="http://schemas.devexpress.com/winfx/2008/xaml/accordion"
+             xmlns:engineeringModelData="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
@@ -139,6 +144,40 @@
                                     </Image>
                                     <TextBlock Text="{Binding FullName}" TextAlignment="Center" FontWeight="Bold" FontSize="14" Margin="10,0,10,10"></TextBlock>
                                     <TextBlock Text="{Binding ShortName}" TextAlignment="Center" FontStyle="Italic" FontSize="11" Margin="10,0,10,10"></TextBlock>
+                                    <dxlc:LayoutGroup Header="Parameters"
+                                                      View="GroupBox"
+                                                      HorizontalAlignment="Stretch"
+                                                      VerticalAlignment="Stretch"
+                                                      IsCollapsible="True"
+                                                      IsCollapsed="True"
+                                                      Orientation="Vertical"
+                                                      ScrollBars="Auto"
+                                                      GroupBoxDisplayMode="Normal"
+                                                      Margin="3,0,3,0">
+                                        <dxlc:LayoutGroup.HeaderTemplate>
+                                            <DataTemplate>  
+                                                <Grid>  
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">  
+                                                        <TextBlock Text="{Binding}" FontStyle="Italic" Foreground="Black" />  
+                                                    </StackPanel>  
+                                                </Grid>  
+                                            </DataTemplate>  
+                                        </dxlc:LayoutGroup.HeaderTemplate>  
+                                        <ItemsControl ItemsSource="{Binding DiagramContentItemChildren}" MaxHeight="150" MaxWidth="200">
+                                            <ItemsControl.Template>
+                                                <ControlTemplate>
+                                                    <ScrollViewer x:Name="ScrollViewer" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >
+                                                        <ItemsPresenter />
+                                                    </ScrollViewer>
+                                                </ControlTemplate>
+                                            </ItemsControl.Template>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding DiagramContentItemChildString}" />
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </dxlc:LayoutGroup>
                                 </StackPanel>
                             </DataTemplate>
                         </diagram:Cdp4DiagramOrgChartBehavior.ItemTemplate>
