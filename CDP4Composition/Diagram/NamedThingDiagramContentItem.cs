@@ -43,7 +43,7 @@ namespace CDP4Composition.Diagram
         /// </param>
         public NamedThingDiagramContentItem(Thing thing) : base(thing)
         {
-            this.SetProperty();
+            this.UpdateProperties();
         }
 
         /// <summary>
@@ -56,13 +56,13 @@ namespace CDP4Composition.Diagram
         public NamedThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel container) 
             : base(diagramThing, container)
         {
-            this.SetProperty();
+            this.UpdateProperties();
         }
 
         /// <summary>
         /// Sets <see cref="NamedThingDiagramContentItem.Thing"/> related property used to display
         /// </summary>
-        private void SetProperty()
+        private void UpdateProperties()
         {
             if (this.Thing is INamedThing namedThing)
             {
