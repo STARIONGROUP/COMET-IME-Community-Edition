@@ -345,14 +345,6 @@ namespace CDP4AddinCE
             var serviceLocationTargetVersion = new Version("1.3.0.0");
             this.RedirectAssembly("Microsoft.Practices.ServiceLocation", serviceLocationTargetVersion, "31bf3856ad364e35");
 
-            logger.Trace("Microsoft.Practices.Prism.PubSubEvents");
-            var pubSubEventsTargetVersion = new Version("1.1.0.0");
-            this.RedirectAssembly("Microsoft.Practices.Prism.PubSubEvents", pubSubEventsTargetVersion, "31bf3856ad364e35");
-
-            logger.Trace("Microsoft.Practices.Prism.SharedInterfaces");
-            var pubSubEventsSharedInterfaces = new Version("1.1.1.0");
-            this.RedirectAssembly("Microsoft.Practices.Prism.SharedInterfaces", pubSubEventsSharedInterfaces, "31bf3856ad364e35");
-
             logger.Trace("System.Windows.Interactivity");
             var windowsInteractivity = new Version("4.5.0.0");
             this.RedirectAssembly("System.Windows.Interactivity", windowsInteractivity, "31bf3856ad364e35");

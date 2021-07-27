@@ -36,7 +36,7 @@ namespace CDP4CrossViewEditor
 
     /// <summary>
     /// The purpose of the <see cref="CrossViewEditorModule"/> class is to enable this library
-    /// to be loaded as a PRISM Module
+    /// to be loaded as an <see cref="IModule"/>
     /// </summary>
     [Export(typeof(IModule))]
     public class CrossViewEditorModule : IModule

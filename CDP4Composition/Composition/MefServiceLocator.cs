@@ -29,6 +29,7 @@ namespace CDP4Composition.Composition
     using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
     using System.Linq;
+
     using Microsoft.Practices.ServiceLocation;
 
     class MefServiceLocator : IServiceLocator
