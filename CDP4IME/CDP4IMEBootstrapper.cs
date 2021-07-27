@@ -27,7 +27,7 @@ namespace CDP4IME
 {
     using System.ComponentModel.Composition.Hosting;
     using System.Windows;
-
+    using CDP4Composition.Composition;
     using CDP4IME.Settings;
     using DevExpress.Xpf.Core;
 

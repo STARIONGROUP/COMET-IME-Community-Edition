@@ -27,53 +27,64 @@ namespace CDP4Composition.Composition
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.Composition;
     using System.ComponentModel.Composition.Hosting;
     using System.Linq;
 
     using Microsoft.Practices.ServiceLocation;
 
-    class MefServiceLocator : IServiceLocator
+    /// <summary>
+    /// Provides service location utilizing the Managed Extensibility Framework container.
+    /// </summary>
+    public class MefServiceLocator : ServiceLocatorImplBase
     {
-        private readonly CompositionContainer container;
+        private readonly CompositionContainer compositionContainer;
 
-        public MefServiceLocator(CompositionContainer container)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MefServiceLocator"/> class.
+        /// </summary>
+        /// <param name="compositionContainer">The MEF composition container.</param>
+        public MefServiceLocator(CompositionContainer compositionContainer)
         {
-            this.container = container;
+            this.compositionContainer = compositionContainer;
         }
 
-        public IEnumerable<object> GetAllInstances(Type serviceType)
+        /// <summary>
+        /// Resolves the instance of the requested service.
+        /// </summary>
+        /// <param name="serviceType">Type of instance requested.</param>
+        /// <returns>The requested service instance.</returns>
+        protected override object DoGetInstance(Type serviceType, string key)
         {
-            return container.GetExports(serviceType, null, null);
+            IEnumerable<Lazy<object, object>> exports = this.compositionContainer.GetExports(serviceType, null, key);
+            if (exports is not null && exports.Count() > 0)
+            {
+                // If there is more than one value, this will throw an InvalidOperationException, 
+                // which will be wrapped by the base class as an ActivationException.
+                return exports.Single().Value;
+            }
+
+            throw new ActivationException(
+                this.FormatActivationExceptionMessage(new CompositionException("Export not found"), serviceType, key));
         }
 
-        public IEnumerable<TService> GetAllInstances<TService>()
+        /// <summary>
+        /// Resolves all the instances of the requested service.
+        /// </summary>
+        /// <param name="serviceType">Type of service requested.</param>
+        /// <param name="key">Name of registered service you want. May be null.</param>
+        /// <returns>Sequence of service instance objects.</returns>
+        protected override IEnumerable<object> DoGetAllInstances(Type serviceType)
         {
-            return container.GetExportedValues<TService>();
-        }
+            List<object> instances = new List<object>();
 
-        public object GetInstance(Type serviceType)
-        {
-            return container.GetExports(serviceType, null, null).FirstOrDefault();
-        }
+            IEnumerable<Lazy<object, object>> exports = this.compositionContainer.GetExports(serviceType, null, null);
+            if (exports != null)
+            {
+                instances.AddRange(exports.Select(export => export.Value));
+            }
 
-        public object GetInstance(Type serviceType, string key)
-        {
-            return container.GetExports(serviceType, null, key).FirstOrDefault();
-        }
-
-        public TService GetInstance<TService>()
-        {
-            return container.GetExportedValue<TService>();
-        }
-
-        public TService GetInstance<TService>(string key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public object GetService(Type serviceType)
-        {
-            throw new NotImplementedException();
+            return instances;
         }
     }
 }

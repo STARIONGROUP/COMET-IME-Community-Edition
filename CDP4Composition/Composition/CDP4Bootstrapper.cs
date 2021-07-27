@@ -109,7 +109,7 @@ namespace CDP4Composition.Composition
         /// </summary>
         /// <param name="container"></param>
         private void ConfigureServiceLocator(CompositionContainer container)
-        {
+        {            
             var serviceLocator = new MefServiceLocator(container);
             ServiceLocator.SetLocatorProvider(() => serviceLocator);
         }
