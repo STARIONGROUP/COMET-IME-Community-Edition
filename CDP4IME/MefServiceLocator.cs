@@ -25,29 +25,54 @@
 
 namespace CDP4IME
 {
+    using System;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition.Hosting;
-    using System.Windows;
+    using System.Linq;
+    using Microsoft.Practices.ServiceLocation;
 
-    using CDP4IME.Settings;
-    using DevExpress.Xpf.Core;
-
-    public class CDP4IMEBootstrapper : CDP4Bootstrapper<ImeAppSettings>
+    class MefServiceLocator : IServiceLocator
     {
-        protected override void AddCustomCatalogs(AggregateCatalog catalog)
+        private readonly CompositionContainer container;
+
+        public MefServiceLocator(CompositionContainer container)
         {
-            catalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4IMEBootstrapper).Assembly));
+            this.container = container;
         }
 
-        protected override void OnComposed(CompositionContainer container)
+        public IEnumerable<object> GetAllInstances(Type serviceType)
         {
-            this.UpdateBootstrapperStatus("Creating the Shell");
-            Application.Current.MainWindow = container.GetExportedValue<Shell>();
+            return this.container.GetExports(serviceType, null, null);
         }
 
-        protected override void UpdateBootstrapperStatus(string message)
+        public IEnumerable<TService> GetAllInstances<TService>()
         {
-            base.UpdateBootstrapperStatus(message);
-            DXSplashScreen.SetState(message);
+            return container.GetExportedValues<TService>();
+        }
+
+        public object GetInstance(Type serviceType)
+        {
+            return this.container.GetExports(serviceType, null, null).FirstOrDefault();
+        }
+
+        public object GetInstance(Type serviceType, string key)
+        {
+            return this.container.GetExports(serviceType, null, key).FirstOrDefault();
+        }
+
+        public TService GetInstance<TService>()
+        {
+            return container.GetExportedValue<TService>();
+        }
+
+        public TService GetInstance<TService>(string key)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object GetService(Type serviceType)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -601,7 +601,7 @@ namespace CDP4AddinCE
                 logger.Trace("new up bootstrapper");
                 var bootstrapper = new CDP4AddinBootstrapper();
                 logger.Trace("run bootstrapper");
-                bootstrapper.Run(true);
+                bootstrapper.Run();
 
                 logger.Trace("InitializeMefImports");
                 this.InitializeMefImports();
