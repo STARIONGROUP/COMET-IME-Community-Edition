@@ -96,6 +96,21 @@ namespace CDP4Composition.Tests.Composition
         }
 
         [Test]
+        public void VerifyGetInstanceThrowsWithZeroInstances()
+        {
+            string firstStringInstance = nameof(firstStringInstance);
+            string secondStringInstance = nameof(secondStringInstance);
+
+            var container = new CompositionContainer();
+            container.ComposeExportedValue(firstStringInstance);
+            container.ComposeExportedValue(secondStringInstance);
+
+            var serviceLocator = new MefServiceLocator(container);
+
+            Assert.Throws<ActivationException>(() => serviceLocator.GetInstance<int>());
+        }
+
+        [Test]
         public void VerifyGetInstanceReturnsCorrectInstance()
         {
             string stringInstance = nameof(stringInstance);
