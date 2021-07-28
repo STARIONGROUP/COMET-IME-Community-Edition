@@ -25,88 +25,23 @@
 
 namespace CDP4AddinCE
 {
-    using System;
     using System.ComponentModel.Composition.Hosting;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Reflection;
-    using System.Windows;
 
     using CDP4AddinCE.Settings;
-
-    using CDP4Composition.Modularity;
-
-    using Microsoft.Practices.Prism.MefExtensions;
-
-    using NLog;
+    using CDP4Composition.Composition;
 
     /// <summary>
-    /// The Class that provides the bootstrapping sequence that registers all the 
-    /// Modules of the application
+    /// Bootstrapper implementation for the Addin
     /// </summary>
-    /// <remarks>
-    /// There is no shell to be initialized for the addin
-    /// </remarks>
-    public class CDP4AddinBootstrapper : MefBootstrapper
+    public class CDP4AddinBootstrapper : COMETBootstrapper<AddinAppSettings>
     {
         /// <summary>
-        /// A <see cref="Logger"/> instance
+        /// Overrides the on composed and simply makes a status update
         /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// Creates the shell or main window of the application.
-        /// </summary>
-        /// <returns>null due to the fact there is no shell in the addin</returns>
-        protected override DependencyObject CreateShell()
+        /// <param name="container">The <see cref="CompositionContainer"/></param>
+        protected override void OnComposed(CompositionContainer container)
         {
-            return new DependencyObject();
-        }
-
-        /// <summary>
-        /// Initializes the shell.
-        /// </summary>
-        protected override void InitializeShell()
-        {
-            logger.Log(LogLevel.Debug, "Loading COMET Plugins");
-
-            var pluginLoader = new PluginLoader<AddinAppSettings>();
-
-            foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
-            {
-                this.AggregateCatalog.Catalogs.Add(directoryCatalog);
-                logger.Log(LogLevel.Debug, $"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
-            }
-
-            var moduleInitializer = this.Container.GetExportedValue<IModuleInitializer>();
-            moduleInitializer.Initialize();
-
-            logger.Log(LogLevel.Debug, $"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
-
-            base.InitializeShell();
-        }
-
-        /// <summary>
-        /// Configures the <see cref="AggregateCatalog"/> used by MEF.
-        /// </summary>
-        protected override void ConfigureAggregateCatalog()
-        {
-            base.ConfigureAggregateCatalog();
-            var currentAssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            if (currentAssemblyPath == null)
-            {
-                throw new InvalidOperationException("Cannot find directory path for " + Assembly.GetExecutingAssembly().FullName);
-            }
-
-            var sw = new Stopwatch();
-            sw.Start();
-            logger.Debug("Loading COMET Catalogs");
-
-            var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");
-            this.AggregateCatalog.Catalogs.Add(dllCatalog);
-
-            logger.Debug("COMET Catalogs loaded in: {0} [ms]", sw.ElapsedMilliseconds);
+            this.UpdateBootstrapperStatus("Composed");
         }
     }
 }

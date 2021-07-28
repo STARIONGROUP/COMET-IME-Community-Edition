@@ -63,7 +63,6 @@
     <Compile Include="EngineeringModelPlugin.wxs" />
     <Compile Include="CDP4BuiltInRules.wxs" />
     <Compile Include="ParameterSheetGeneratorPlugin.wxs" />
-    <Compile Include="PRISM.wxs" />
     <Compile Include="Plugins.wxs" />
     <Compile Include="Directories.wxs" />
     <Compile Include="Product.wxs" />

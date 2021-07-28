@@ -26,6 +26,7 @@
 namespace CDP4IME
 {
     using System;
+    using System.ComponentModel.Composition;
     using System.Linq;
     using System.Reactive.Linq;
 
@@ -52,6 +53,7 @@ namespace CDP4IME
     /// <summary>
     /// The View Model of the <see cref="Shell"/>
     /// </summary>
+    [Export(typeof(ShellViewModel))]
     public class ShellViewModel : ReactiveObject, IDisposable
     {
         /// <summary>
@@ -128,6 +130,7 @@ namespace CDP4IME
         /// <param name="dockViewModel">
         /// The <see cref="DockLayoutViewModel" for the panel dock/>
         /// </param>
+        [ImportingConstructor]
         public ShellViewModel(IDialogNavigationService dialogNavigationService, DockLayoutViewModel dockViewModel)
         {
             if (dialogNavigationService == null)

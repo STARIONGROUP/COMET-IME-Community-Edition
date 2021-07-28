@@ -31,7 +31,7 @@ namespace CDP4IME
     using System.Reactive.Linq;
 
     using CDP4Composition.Events;
-
+    using CDP4Composition.Ribbon;
     using CDP4Dal;
 
     using DevExpress.Xpf.Ribbon;
@@ -53,10 +53,18 @@ namespace CDP4IME
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Shell"/> class.
-        /// </summary>        
-        public Shell()
+        /// </summary>
+        /// <param name="viewModel">The <see cref="ShellViewModel"/> for this view</param>
+        /// <param name="ribbonContentBuilder">The <see cref="IRibbonContentBuilder"/></param>
+        [ImportingConstructor]
+        public Shell(ShellViewModel viewModel, IRibbonContentBuilder ribbonContentBuilder)
         {
             this.InitializeComponent();
+
+            this.DataContext = viewModel;
+
+            ribbonContentBuilder.BuildAndAppendToRibbon(Ribbon);
+
             this.subscription = CDPMessageBus.Current.Listen<TaskbarNotificationEvent>()
                                 .ObserveOn(RxApp.MainThreadScheduler)
                                 .Subscribe(this.ShowTaskBarNotification);

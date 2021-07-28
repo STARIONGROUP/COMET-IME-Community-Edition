@@ -25,127 +25,47 @@
 
 namespace CDP4IME
 {
-    using System;
     using System.ComponentModel.Composition.Hosting;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Reflection;
     using System.Windows;
 
-    using CDP4Composition.Modularity;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Ribbon;
-    using CDP4Composition.ViewModels;
+    using CDP4Composition.Composition;
 
     using CDP4IME.Settings;
 
     using DevExpress.Xpf.Core;
 
-    using Microsoft.Practices.Prism.MefExtensions;
-
-    using NLog;
-
     /// <summary>
-    /// The Class that provides the bootstrapping sequence that registers all the 
-    /// Modules of the application and initializes the Shell
+    /// Bootstrapper implementation for the IME
     /// </summary>
-    public class CDP4IMEBootstrapper : MefBootstrapper
+    public class CDP4IMEBootstrapper : COMETBootstrapper<ImeAppSettings>
     {
         /// <summary>
-        /// A <see cref="Logger"/> instance
+        /// Adds the bootstrapper assembly to the catalogues
         /// </summary>
-        private static Logger logger = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        /// represents the state of the <see cref="CDP4IMEBootstrapper"/>
-        /// </summary>
-        private string state;
-
-        /// <summary>
-        /// Creates the shell or main window of the application.
-        /// </summary>
-        /// <returns>The shell of the application.</returns>
-        protected override DependencyObject CreateShell()
+        /// <param name="catalog">The <see cref="AggregateCatalog"/></param>
+        protected override void AddCustomCatalogs(AggregateCatalog catalog)
         {
-            logger.Trace("Creating Shell");
-            return this.Container.GetExportedValue<Shell>();
+            catalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4IMEBootstrapper).Assembly));
         }
 
         /// <summary>
-        /// Initializes the shell.
+        /// Override to set the initial <see cref="Shell"/> window after composition
         /// </summary>
-        protected override void InitializeShell()
+        /// <param name="container">The <see cref="AggregateCatalog"/></param>
+        protected override void OnComposed(CompositionContainer container)
         {
-            this.UpdateBootstrapperState("Loading COMET Plugins");
-
-            var pluginLoader = new PluginLoader<ImeAppSettings>();
-
-            foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
-            {
-                this.AggregateCatalog.Catalogs.Add(directoryCatalog);
-
-                this.UpdateBootstrapperState($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
-            }
-
-            var moduleInitializer = this.Container.GetExportedValue<IModuleInitializer>();
-            moduleInitializer.Initialize();
-
-            this.UpdateBootstrapperState($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
-
-            this.UpdateBootstrapperState("Initializing the Shell");
-
-            base.InitializeShell();
-
-            var shell = (Shell)this.Shell;
-            var dialogNavigationService = this.Container.GetExportedValue<IDialogNavigationService>();
-            var dockViewModel = this.Container.GetExportedValue<DockLayoutViewModel>();
-            var ribbonBuilder = this.Container.GetExportedValue<IRibbonContentBuilder>();
-
-            //TODO: GH#861 'Make do' solution until the bootstrapper is replaced. Currently injecting the builder into the Shell view is rejected by the composition.
-            ribbonBuilder.BuildAndAppendToRibbon(shell.Ribbon);
-            shell.DataContext = new ShellViewModel(dialogNavigationService, dockViewModel);
-
-            Application.Current.MainWindow = shell;
+            this.UpdateBootstrapperStatus("Creating the Shell");
+            Application.Current.MainWindow = container.GetExportedValue<Shell>();
         }
 
         /// <summary>
-        /// Configures the <see cref="AggregateCatalog"/> used by MEF.
+        /// Overrides the status update to provide status updates to the <see cref="DXSplashScreen"/>
         /// </summary>
-        protected override void ConfigureAggregateCatalog()
+        /// <param name="message">The status message</param>
+        protected override void UpdateBootstrapperStatus(string message)
         {
-            this.UpdateBootstrapperState("Configuring catalogs");
-
-            base.ConfigureAggregateCatalog();
-            var currentAssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-
-            if (currentAssemblyPath == null)
-            {
-                throw new InvalidOperationException("Cannot find directory path for " + Assembly.GetExecutingAssembly().FullName);
-            }
-
-            var sw = new Stopwatch();
-            sw.Start();    
-            this.UpdateBootstrapperState("Loading COMET Catalogs");
-
-            var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");
-            this.AggregateCatalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4IMEBootstrapper).Assembly));
-            this.AggregateCatalog.Catalogs.Add(dllCatalog);
-
-            this.UpdateBootstrapperState($"COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
-        }
-
-        /// <summary>
-        /// Updates the state of the <see cref="CDP4IMEBootstrapper"/> and shows this on the splash screen
-        /// and logs it to the logger
-        /// </summary>
-        /// <param name="message">
-        /// the message that reflects the state of the <see cref="CDP4IMEBootstrapper"/>
-        /// </param>
-        private void UpdateBootstrapperState(string message)
-        {
-            this.state = message;
-            logger.Debug(this.state);
-            DXSplashScreen.SetState(this.state);
+            base.UpdateBootstrapperStatus(message);
+            DXSplashScreen.SetState(message);
         }
     }
 }

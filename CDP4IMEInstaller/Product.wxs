@@ -33,7 +33,6 @@
     </Condition>
 
     <Feature Id="CDP4IMEFeature" Absent="disallow" Title="COMET IME" Level="1" ConfigurableDirectory="BIN" AllowAdvertise="no" InstallDefault="local" TypicalDefault="install">
-      <ComponentGroupRef Id="PRISM" />
       <ComponentGroupRef Id="DEPENDENCIES" />
       <ComponentGroupRef Id="DEVEXPRESS" />
       <ComponentGroupRef Id="CDP4IME" />
