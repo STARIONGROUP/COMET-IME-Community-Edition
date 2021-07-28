@@ -29,8 +29,6 @@ namespace CDP4Composition.Services.AppSettingService
     using System;
     using System.Collections.Generic;
 
-    using CDP4Composition.Modularity;
-
     /// <summary>
     /// Base class from which all <see cref="AppSettings"/> shall derive
     /// </summary>

@@ -8,13 +8,13 @@
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software{colon} you can redistribute it and/or
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
-//    License as published by the Free Software Foundation{colon} either
+//    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY{colon} without even the implied warranty of
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
@@ -39,6 +39,10 @@ namespace CDP4Composition.Composition
 
     using NLog;
 
+    /// <summary>
+    /// Base class that provides basic bootstrapping using MEF
+    /// </summary>
+    /// <typeparam name="T">The <see cref="AppSettings"/></typeparam>
     public abstract class CDP4Bootstrapper<T> where T : AppSettings, new()
     {
         /// <summary>
@@ -47,43 +51,39 @@ namespace CDP4Composition.Composition
         protected static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// represents the state of the <see cref="CDP4IMEBootstrapperLegacy"/>
+        /// Represents the state of the <see cref="CDP4Bootstrapper"/>
         /// </summary>
         protected string status;
 
+        /// <summary>
+        /// Runs the bootstrapper
+        /// </summary>
         public void Run()
         {
-            try
-            {
-                UpdateBootstrapperStatus("Configuring catalogs");
+            UpdateBootstrapperStatus("Configuring catalogs");
 
-                var catalog = new AggregateCatalog();
-                var container = new CompositionContainer(catalog);
+            var catalog = new AggregateCatalog();
+            var container = new CompositionContainer(catalog);
 
-                var sw = Stopwatch.StartNew();
-                UpdateBootstrapperStatus("Loading COMET Catalogs");
+            var sw = Stopwatch.StartNew();
+            UpdateBootstrapperStatus("Loading COMET Catalogs");
 
-                AddExecutingAssemblyCatalog(catalog);
-                AddCustomCatalogs(catalog);
+            AddExecutingAssemblyCatalog(catalog);
+            AddCustomCatalogs(catalog);
 
-                UpdateBootstrapperStatus($"COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
+            UpdateBootstrapperStatus($"COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
 
-                ConfigureServiceLocator(container);
+            ConfigureServiceLocator(container);
 
-                AddPluginCatalogs(catalog);
+            AddPluginCatalogs(catalog);
 
-                UpdateBootstrapperStatus("Composing parts");
-                container.ComposeParts();
+            UpdateBootstrapperStatus("Composing parts");
+            container.ComposeParts();
 
-                UpdateBootstrapperStatus("Initializing modules");
-                InitialiseModules(container);
+            UpdateBootstrapperStatus("Initializing modules");
+            InitializeModules(container);
 
-                OnComposed(container);
-            }
-            catch (CompositionException compositionException)
-            {
-                Console.WriteLine(compositionException.ToString());
-            }
+            OnComposed(container);
         }
 
         /// <summary>
@@ -107,7 +107,7 @@ namespace CDP4Composition.Composition
         /// <summary>
         /// Configures the service locator to the current MEF composition
         /// </summary>
-        /// <param name="container"></param>
+        /// <param name="container">The <see cref="CompositionContainer"/></param>
         private void ConfigureServiceLocator(CompositionContainer container)
         {            
             var serviceLocator = new MefServiceLocator(container);
@@ -136,8 +136,8 @@ namespace CDP4Composition.Composition
         /// <summary>
         /// Calls initialize on all <see cref="IModule"/>s in the container/>
         /// </summary>
-        /// <param name="container"></param>
-        private void InitialiseModules(CompositionContainer container)
+        /// <param name="container">The <see cref="CompositionContainer"/></param>
+        private void InitializeModules(CompositionContainer container)
         {
             var moduleInitializer = container.GetExportedValue<IModuleInitializer>();
             moduleInitializer.Initialize();
@@ -156,13 +156,13 @@ namespace CDP4Composition.Composition
         /// <summary>
         /// Is called after the container has been composed
         /// </summary>
-        /// <param name="container"></param>
+        /// <param name="container">The <see cref="CompositionContainer"/></param>
         protected abstract void OnComposed(CompositionContainer container);
 
         /// <summary>
         /// Optional override to add custom catalogs in concrete class
         /// </summary>
-        /// <param name="catalog"></param>
+        /// <param name="catalog">The <see cref="AggregateCatalog"/></param>
         protected virtual void AddCustomCatalogs(AggregateCatalog catalog)
         {
         }

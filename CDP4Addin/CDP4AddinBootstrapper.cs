@@ -30,8 +30,15 @@ namespace CDP4AddinCE
     using CDP4AddinCE.Settings;
     using CDP4Composition.Composition;
 
+    /// <summary>
+    /// Bootstrapper implementation for the Addin
+    /// </summary>
     public class CDP4AddinBootstrapper : CDP4Bootstrapper<AddinAppSettings>
     {
+        /// <summary>
+        /// Overrides the on composed and simply makes a status update
+        /// </summary>
+        /// <param name="container">The <see cref="CompositionContainer"/></param>
         protected override void OnComposed(CompositionContainer container)
         {
             this.UpdateBootstrapperStatus("Composed");

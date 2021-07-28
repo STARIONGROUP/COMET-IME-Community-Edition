@@ -53,7 +53,9 @@ namespace CDP4IME
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Shell"/> class.
-        /// </summary>       
+        /// </summary>
+        /// <param name="viewModel">The <see cref="ShellViewModel"/> for this view</param>
+        /// <param name="ribbonContentBuilder">The <see cref="IRibbonContentBuilder"/></param>
         [ImportingConstructor]
         public Shell(ShellViewModel viewModel, IRibbonContentBuilder ribbonContentBuilder)
         {
