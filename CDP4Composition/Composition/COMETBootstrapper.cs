@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CDP4Bootstrapper.cs" company="RHEA System S.A.">
+// <copyright file="COMETBootstrapper.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
@@ -43,7 +43,7 @@ namespace CDP4Composition.Composition
     /// Base class that provides basic bootstrapping using MEF
     /// </summary>
     /// <typeparam name="T">The <see cref="AppSettings"/></typeparam>
-    public abstract class CDP4Bootstrapper<T> where T : AppSettings, new()
+    public abstract class COMETBootstrapper<T> where T : AppSettings, new()
     {
         /// <summary>
         /// A <see cref="Logger"/> instance
@@ -51,7 +51,7 @@ namespace CDP4Composition.Composition
         protected readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
-        /// Represents the state of the <see cref="CDP4Bootstrapper"/>
+        /// Represents the state of the <see cref="COMETBootstrapper"/>
         /// </summary>
         protected string status;
 

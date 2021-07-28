@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CDP4BootstrapperTextFixture.cs" company="RHEA System S.A.">
+// <copyright file="COMETBootstrapperTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
@@ -33,10 +33,10 @@ namespace CDP4Composition.Tests.Composition
     using NUnit.Framework;
 
     [TestFixture]
-    public class CDP4BootstrapperTestFixture
+    public class COMETBootstrapperTestFixture
     {
         [Test]
-        public void VerifyCDP4BootstrapperComposition()
+        public void VerifyCOMETBootstrapperComposition()
         {
             TestBootstrapper bootstrapper = new TestBootstrapper();
             bootstrapper.Run();
@@ -47,7 +47,7 @@ namespace CDP4Composition.Tests.Composition
         }
     }
 
-    internal class TestBootstrapper : CDP4Bootstrapper<TestAppSettings>
+    internal class TestBootstrapper : COMETBootstrapper<TestAppSettings>
     {
         public bool TestModuleInitialized { get; private set; }
         public bool TestComponentAdded { get; private set; }

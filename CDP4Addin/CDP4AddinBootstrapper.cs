@@ -33,7 +33,7 @@ namespace CDP4AddinCE
     /// <summary>
     /// Bootstrapper implementation for the Addin
     /// </summary>
-    public class CDP4AddinBootstrapper : CDP4Bootstrapper<AddinAppSettings>
+    public class CDP4AddinBootstrapper : COMETBootstrapper<AddinAppSettings>
     {
         /// <summary>
         /// Overrides the on composed and simply makes a status update

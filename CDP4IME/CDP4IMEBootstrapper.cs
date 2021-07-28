@@ -37,7 +37,7 @@ namespace CDP4IME
     /// <summary>
     /// Bootstrapper implementation for the IME
     /// </summary>
-    public class CDP4IMEBootstrapper : CDP4Bootstrapper<ImeAppSettings>
+    public class CDP4IMEBootstrapper : COMETBootstrapper<ImeAppSettings>
     {
         /// <summary>
         /// Adds the bootstrapper assembly to the catalogues
