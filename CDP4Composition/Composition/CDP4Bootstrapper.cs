@@ -48,7 +48,7 @@ namespace CDP4Composition.Composition
         /// <summary>
         /// A <see cref="Logger"/> instance
         /// </summary>
-        protected static Logger logger = LogManager.GetCurrentClassLogger();
+        protected readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Represents the state of the <see cref="CDP4Bootstrapper"/>
@@ -60,37 +60,37 @@ namespace CDP4Composition.Composition
         /// </summary>
         public void Run()
         {
-            UpdateBootstrapperStatus("Configuring catalogs");
+            this.UpdateBootstrapperStatus("Configuring catalogs");
 
             var catalog = new AggregateCatalog();
             var container = new CompositionContainer(catalog);
 
             var sw = Stopwatch.StartNew();
-            UpdateBootstrapperStatus("Loading COMET Catalogs");
+            this.UpdateBootstrapperStatus("Loading COMET Catalogs");
 
-            AddExecutingAssemblyCatalog(catalog);
-            AddCustomCatalogs(catalog);
+            this.AddExecutingAssemblyCatalog(catalog);
+            this.AddCustomCatalogs(catalog);
 
-            UpdateBootstrapperStatus($"COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
+            this.UpdateBootstrapperStatus($"COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
 
-            ConfigureServiceLocator(container);
+            this.ConfigureServiceLocator(container);
 
-            AddPluginCatalogs(catalog);
+            this.AddPluginCatalogs(catalog);
 
-            UpdateBootstrapperStatus("Composing parts");
+            this.UpdateBootstrapperStatus("Composing parts");
             container.ComposeParts();
 
-            UpdateBootstrapperStatus("Initializing modules");
-            InitializeModules(container);
+            this.UpdateBootstrapperStatus("Initializing modules");
+            this.InitializeModules(container);
 
-            OnComposed(container);
+            this.OnComposed(container);
         }
 
         /// <summary>
         /// Add the main application catalogues
         /// </summary>
         /// <param name="catalog">The composition  <see cref="AggregateCatalog"/></param>
-        private static void AddExecutingAssemblyCatalog(AggregateCatalog catalog)
+        private void AddExecutingAssemblyCatalog(AggregateCatalog catalog)
         {
             var currentAssemblyPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
@@ -120,7 +120,7 @@ namespace CDP4Composition.Composition
         /// <param name="catalog">The <see cref="AggregateCatalog"/></param>
         private void AddPluginCatalogs(AggregateCatalog catalog)
         {
-            UpdateBootstrapperStatus("Loading COMET Plugins");
+            this.UpdateBootstrapperStatus("Loading COMET Plugins");
 
             var pluginLoader = new PluginLoader<T>();
 
@@ -130,7 +130,7 @@ namespace CDP4Composition.Composition
                 UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
             }
 
-            UpdateBootstrapperStatus($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
+            this.UpdateBootstrapperStatus($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
         }
 
         /// <summary>
@@ -149,8 +149,8 @@ namespace CDP4Composition.Composition
         /// <param name="message">The status message</param>
         protected virtual void UpdateBootstrapperStatus(string message)
         {
-            status = message;
-            logger.Debug(status);
+            this.status = message;
+            this.logger.Debug(status);
         }
 
         /// <summary>

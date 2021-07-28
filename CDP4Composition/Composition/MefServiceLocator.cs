@@ -59,8 +59,8 @@ namespace CDP4Composition.Composition
         /// <returns>The requested service instance.</returns>
         protected override object DoGetInstance(Type serviceType, string key)
         {
-            IEnumerable<Lazy<object, object>> exports = this.compositionContainer.GetExports(serviceType, null, key);
-            if (exports is not null && exports.Count() > 0)
+            var exports = this.compositionContainer.GetExports(serviceType, null, key);
+            if (exports is not null && exports.Any())
             {
                 // If there is more than one value, this will throw an InvalidOperationException, 
                 // which will be wrapped by the base class as an ActivationException.
@@ -79,9 +79,9 @@ namespace CDP4Composition.Composition
         /// <returns>Sequence of service instance objects.</returns>
         protected override IEnumerable<object> DoGetAllInstances(Type serviceType)
         {
-            List<object> instances = new List<object>();
+            var instances = new List<object>();
 
-            IEnumerable<Lazy<object, object>> exports = this.compositionContainer.GetExports(serviceType, null, null);
+            var exports = this.compositionContainer.GetExports(serviceType, null, null);
             if (exports is not null)
             {
                 instances.AddRange(exports.Select(export => export.Value));

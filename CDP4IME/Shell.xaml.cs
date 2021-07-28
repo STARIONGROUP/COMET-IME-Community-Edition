@@ -61,7 +61,7 @@ namespace CDP4IME
         {
             this.InitializeComponent();
 
-            DataContext = viewModel;
+            this.DataContext = viewModel;
 
             ribbonContentBuilder.BuildAndAppendToRibbon(Ribbon);
 
