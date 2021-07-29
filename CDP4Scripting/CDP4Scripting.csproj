@@ -3,7 +3,6 @@
     <ProjectGuid>{DA9183AB-D060-488F-89E9-DEC1F0177B1E}</ProjectGuid>
     <MinIMEVersion>8.1.0</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
-   
     <AssemblyTitle>CDP4Scripting</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Scripting</Product>

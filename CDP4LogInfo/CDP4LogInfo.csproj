@@ -3,7 +3,6 @@
     <ProjectGuid>{D619E973-C080-4B58-8E69-565BF7218F4B}</ProjectGuid>
     <MinIMEVersion>8.1.0</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
-   
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4LogInfo</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
