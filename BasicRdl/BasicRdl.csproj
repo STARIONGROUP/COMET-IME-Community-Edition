@@ -4,7 +4,6 @@
     <MinIMEVersion>8.1.0</MinIMEVersion>
     <AssemblyName>CDP4BasicRdl</AssemblyName>
     <TargetFramework>net452</TargetFramework>
-   
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4BasicRdl</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

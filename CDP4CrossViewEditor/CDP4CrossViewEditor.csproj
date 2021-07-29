@@ -3,7 +3,6 @@
     <ProjectGuid>{A9113A52-C31F-4C76-B87F-AB28E079284C}</ProjectGuid>
     <MinIMEVersion>8.1.0</MinIMEVersion>
     <TargetFramework>net452</TargetFramework>
-
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4CrossViewEditor</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

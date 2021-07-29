@@ -5,7 +5,6 @@
     <RootNamespace>CDP4Requirements</RootNamespace>
     <AssemblyName>CDP4Requirements</AssemblyName>
     <TargetFramework>net452</TargetFramework>
-   
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4Requirements</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
