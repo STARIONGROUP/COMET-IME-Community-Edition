@@ -2,7 +2,7 @@
 // <copyright file="Cdp4DiagramOrgChartBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -35,7 +35,6 @@ namespace CDP4CommonView.Diagram
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.Diagram.ViewModels;
     using CDP4CommonView.Diagram.Views;
@@ -611,14 +610,12 @@ namespace CDP4CommonView.Diagram
 
             foreach (var item in e.Items)
             {
-                if (((DiagramContentItem)item).Content is not ThingDiagramContentItem namedThingDiagramContentItem)
+                if (item is DiagramContentItem { Content: ThingDiagramContentItem thingDiagramContentItem })
                 {
-                    continue;
-                }
-
-                if (this.ItemPositions.TryGetValue(namedThingDiagramContentItem, out var itemPosition))
-                {
-                    item.Position = itemPosition;
+                    if (this.ItemPositions.TryGetValue(thingDiagramContentItem, out var itemPosition))
+                    {
+                        item.Position = itemPosition;
+                    }
                 }
             }
 
@@ -764,7 +761,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
         private void PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (!(e.Source is Thing))
+            if (!this.IsMovable(e.Source))
             {
                 return;
             }
@@ -789,12 +786,22 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
         private void PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (!(e.Source is Thing))
+            if (!this.IsMovable(e.Source))
             {
                 return;
             }
 
             this.dragInfo = null;
+        }
+
+        /// <summary>
+        /// Checks if an object is a movable object.
+        /// </summary>
+        /// <param name="obj">The object</param>
+        /// <returns>true if movable, otherwide false</returns>
+        private bool IsMovable(object obj)
+        {
+            return obj is Thing;
         }
 
         /// <summary>
@@ -817,7 +824,7 @@ namespace CDP4CommonView.Diagram
                 return;
             }
 
-            if (!(e.Source is Thing))
+            if (!this.IsMovable(e.Source))
             {
                 return;
             }
@@ -825,7 +832,7 @@ namespace CDP4CommonView.Diagram
             var dragStart = this.dragInfo.DragStartPosition;
             var position = e.GetPosition(null);
 
-            if ((Math.Abs(position.X - dragStart.X) <= SystemParameters.MinimumHorizontalDragDistance) 
+            if (Math.Abs(position.X - dragStart.X) <= SystemParameters.MinimumHorizontalDragDistance
                 && Math.Abs(position.Y - dragStart.Y) <= SystemParameters.MinimumVerticalDragDistance)
             {
                 return;
@@ -881,15 +888,34 @@ namespace CDP4CommonView.Diagram
         {
             var dropInfo = new DiagramDropInfo(sender, e);
 
+            if (e.Source is DiagramContentItem { Content: IDropTarget controlDropTarget })
+            {
+                controlDropTarget.DragOver(dropInfo);
+                e.Effects = dropInfo.Effects;
+                e.Handled = dropInfo.Handled;
+
+                if (e.Handled)
+                {
+                    return;
+                }
+            }
+
+            if (e.Source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
+            {
+                controlHavingDropTarget.DropTarget.DragOver(dropInfo);
+                e.Effects = dropInfo.Effects;
+                e.Handled = dropInfo.Handled;
+
+                if (e.Handled)
+                {
+                    return;
+                }
+            }
+
             //If the sender is a port and its element definition is not selected
             if (((DiagramControl)sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
             {
                 e.Handled = true;
-                return;
-            }
-
-            if (!(e.Source is Thing || dropInfo.Payload is Thing || dropInfo.Payload is Tuple<ParameterType, MeasurementScale>))
-            {
                 return;
             }
 
@@ -898,7 +924,7 @@ namespace CDP4CommonView.Diagram
                 dropTarget.DragOver(dropInfo);
 
                 e.Effects = dropInfo.Effects;
-                e.Handled = true;
+                e.Handled = dropInfo.Handled;
             }
 
             if (sender is DependencyObject dependencyObject)
@@ -961,15 +987,32 @@ namespace CDP4CommonView.Diagram
         {
             var dropInfo = new DiagramDropInfo(sender, e);
 
-            if (!(e.Source is Thing || dropInfo.Payload is Thing || dropInfo.Payload is Tuple<ParameterType, MeasurementScale>))
+            if (e.Source is DiagramContentItem { Content: IDropTarget controlDropTarget })
             {
-                return;
+                controlDropTarget.Drop(dropInfo);
+                e.Handled = dropInfo.Handled;
+
+                if (e.Handled)
+                {
+                    return;
+                }
             }
 
-            if (this.AssociatedObject.DataContext is IDropTarget dropTarget)
+            if (e.Source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
             {
-                dropTarget.Drop(dropInfo);
-                e.Handled = true;
+                controlHavingDropTarget.DropTarget.Drop(dropInfo);
+                e.Handled = dropInfo.Handled;
+
+                if (e.Handled)
+                {
+                    return;
+                }
+            }
+
+            if (this.AssociatedObject.DataContext is IDropTarget vmDropTarget)
+            {
+                vmDropTarget.Drop(dropInfo);
+                e.Handled = dropInfo.Handled;
             }
         }
 

@@ -1,9 +1,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ThingDiagramContentItem.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -27,21 +26,52 @@
 namespace CDP4Composition.Diagram
 {
     using System;
+    using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
+    using System.Reactive.Linq;
 
+    using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
 
+    using CDP4Dal;
+    using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
     using DevExpress.Xpf.Diagram;
-    
-    using Thing = CDP4Common.CommonData.Thing;
+
+    using NLog;
+
+    using ReactiveUI;
+
+    using PropertyChangingEventArgs = ReactiveUI.PropertyChangingEventArgs;
+    using PropertyChangingEventHandler = ReactiveUI.PropertyChangingEventHandler;
 
     /// <summary>
     /// Represents a diagram content control class that can store a <see cref="Thing"/>.
     /// </summary>
-    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem
+    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject
     {
+        /// <summary> 
+        /// <see cref="ReactiveUI.PropertyChangingEventHandler"/> event
+        /// </summary>
+        public event PropertyChangingEventHandler PropertyChanging;
+
+        /// <summary> 
+        /// <see cref="System.ComponentModel.PropertyChangedEventHandler"/> event
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        protected static Logger Logger;
+
+        /// <summary>
+        /// Backing field for <see cref="RevisionNumber"/>
+        /// </summary>
+        private int revisionNumber;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ThingDiagramContentItem"/> class.
         /// </summary>
@@ -51,6 +81,7 @@ namespace CDP4Composition.Diagram
         {
             this.Thing = thing;
             this.Content = thing;
+            this.InitializeSubscriptions();
         }
 
         /// <summary>
@@ -66,6 +97,33 @@ namespace CDP4Composition.Diagram
             this.Thing = diagramThing.DepictedThing;
             this.Content = diagramThing.DepictedThing;
             this.DiagramThing = diagramThing;
+            this.InitializeSubscriptions();
+        }
+
+        /// <summary>
+        /// Happens when the class is destroyed.
+        /// </summary>
+        ~ThingDiagramContentItem()
+        {
+            foreach (var disposable in this.Disposables)
+            {
+                disposable.Dispose();
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of <see cref="IDisposable"/> objects that are referenced by this class
+        /// </summary>
+        protected List<IDisposable> Disposables { get; } = new();
+
+        /// <summary>
+        /// Gets the revision number of the <see cref="Thing"/> that is represented by the view-model when
+        /// it was last updated
+        /// </summary>
+        public int RevisionNumber
+        {
+            get => this.revisionNumber;
+            private set => this.RaiseAndSetIfChanged(ref this.revisionNumber, value);
         }
 
         /// <summary>
@@ -94,6 +152,31 @@ namespace CDP4Composition.Diagram
         public IDisposable PositionObservable { get; set; }
 
         /// <summary>
+        /// Initialize subscriptions
+        /// </summary>
+        private void InitializeSubscriptions()
+        {
+            var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.ObjectChangeEventHandler);
+
+            this.Disposables.Add(thingSubscription);
+        }
+
+        /// <summary>
+        /// The event-handler that is invoked by the subscription that listens for updates
+        /// on the <see cref="Thing"/> that is being represented by the view-model
+        /// </summary>
+        /// <param name="objectChange">
+        /// The payload of the event that is being handled
+        /// </param>
+        protected virtual void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
+        {
+            this.RevisionNumber = objectChange.ChangedThing.RevisionNumber;
+        }
+
+        /// <summary>
         /// Sets the <see cref="IsDirty"/> property
         /// </summary>
         public void SetDirty()
@@ -102,9 +185,9 @@ namespace CDP4Composition.Diagram
 
             this.IsDirty = this.Parent is DiagramContentItem parent
                            && parent.Position != default
-                           && (this.Thing.Iid == Guid.Empty 
-                           || (float)parent.Position.X != bound.X
-                           || (float)parent.Position.Y != bound.Y);
+                           && (this.Thing.Iid == Guid.Empty
+                               || (float)parent.Position.X != bound.X
+                               || (float)parent.Position.Y != bound.Y);
 
             this.containerViewModel?.UpdateIsDirty();
         }
@@ -155,6 +238,38 @@ namespace CDP4Composition.Diagram
                 bound.Y = (float)parent.Position.Y;
                 bound.Name = "should not have a name";
             }
+        }
+
+        /// <summary>
+        /// Executes the PropertyChanging event
+        /// </summary>
+        /// <param name="args">The <see cref="ReactiveUI.PropertyChangingEventArgs"/></param>
+        void IReactiveObject.RaisePropertyChanging(PropertyChangingEventArgs args)
+        {
+            var propertyChanging = this.PropertyChanging;
+
+            if (propertyChanging == null)
+            {
+                return;
+            }
+
+            propertyChanging((object)this, args);
+        }
+
+        /// <summary>
+        /// Executes the PropertyChanged event
+        /// </summary>
+        /// <param name="args">The <see cref="PropertyChangedEventArgs"/></param>
+        void IReactiveObject.RaisePropertyChanged(PropertyChangedEventArgs args)
+        {
+            var propertyChanged = this.PropertyChanged;
+
+            if (propertyChanged == null)
+            {
+                return;
+            }
+
+            propertyChanged((object)this, args);
         }
     }
 }

@@ -27,24 +27,38 @@ namespace CDP4Composition.Diagram
 {
     using System.Linq;
 
+    using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
     using CDP4CommonView.Diagram.ViewModels;
 
+    using CDP4Composition.DragDrop;
+
     using CDP4Dal;
+    using CDP4Dal.Events;
 
     using ReactiveUI;
 
     /// <summary>
     /// Represents an <see cref="ElementDefinition"/> to be used in a Diagram
     /// </summary>
-    public class ElementDefinitionDiagramContentItem : PortContainerDiagramContentItem, IDiagramContentItemChildren
+    public class ElementDefinitionDiagramContentItem : PortContainerDiagramContentItem, IDiagramContentItemChildren, IIDropTarget
     {
         /// <summary>
         /// The <see cref="ISession"/> to be used when creating other view models
         /// </summary>
         private readonly ISession session;
+
+        /// <summary>
+        /// Gets or sets the Children of the <see cref="ElementDefinitionDiagramContentItem"/>
+        /// </summary>
+        public ReactiveList<IDiagramContentItemChild> DiagramContentItemChildren { get; set; } = new();
+
+        /// <summary>
+        /// A specific class that handles the <see cref="IDropTarget"/> functionality
+        /// </summary>
+        public IDropTarget DropTarget { get; protected set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
@@ -54,10 +68,16 @@ namespace CDP4Composition.Diagram
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public ElementDefinitionDiagramContentItem(DiagramObject diagramThing, ISession session, IDiagramEditorViewModel container) 
+        public ElementDefinitionDiagramContentItem(DiagramObject diagramThing, ISession session, IDiagramEditorViewModel container)
             : base(diagramThing, container)
         {
             this.session = session;
+
+            if (diagramThing.DepictedThing is ElementDefinition elementDefinition)
+            {
+                this.DropTarget = new ElementDefinitionDropTarget(elementDefinition, this.session);
+            }
+
             this.UpdateProperties();
         }
 
@@ -68,6 +88,8 @@ namespace CDP4Composition.Diagram
         {
             if (this.Thing is ElementDefinition elementDefinition)
             {
+                this.DiagramContentItemChildren.Clear();
+
                 foreach (var parameter in elementDefinition.Parameter.OrderBy(x => x.ParameterType.Name))
                 {
                     var parameterRowViewModel = new DiagramContentItemParameterRowViewModel(parameter, this.session, null);
@@ -77,8 +99,16 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets or sets the Children of the <see cref="ElementDefinitionDiagramContentItem"/>
+        /// The event-handler that is invoked by the subscription that listens for updates
+        /// on the <see cref="Thing"/> that is being represented by the view-model
         /// </summary>
-        public ReactiveList<IDiagramContentItemChild> DiagramContentItemChildren { get; set; } = new();
+        /// <param name="objectChange">
+        /// The payload of the event that is being handled
+        /// </param>
+        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
+        {
+            base.ObjectChangeEventHandler(objectChange);
+            this.UpdateProperties();
+        }
     }
 }
