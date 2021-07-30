@@ -50,7 +50,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents a diagram content control class that can store a <see cref="Thing"/>.
     /// </summary>
-    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject
+    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject, IDisposable
     {
         /// <summary> 
         /// <see cref="ReactiveUI.PropertyChangingEventHandler"/> event
@@ -66,6 +66,11 @@ namespace CDP4Composition.Diagram
         /// The NLog logger
         /// </summary>
         protected static Logger Logger;
+
+        /// <summary>
+        /// a value indicating whether the instance is disposed
+        /// </summary>
+        private bool isDisposed;
 
         /// <summary>
         /// Backing field for <see cref="RevisionNumber"/>
@@ -98,17 +103,6 @@ namespace CDP4Composition.Diagram
             this.Content = diagramThing.DepictedThing;
             this.DiagramThing = diagramThing;
             this.InitializeSubscriptions();
-        }
-
-        /// <summary>
-        /// Happens when the class is destroyed.
-        /// </summary>
-        ~ThingDiagramContentItem()
-        {
-            foreach (var disposable in this.Disposables)
-            {
-                disposable.Dispose();
-            }
         }
 
         /// <summary>
@@ -270,6 +264,53 @@ namespace CDP4Composition.Diagram
             }
 
             propertyChanged((object)this, args);
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// a value indicating whether the class is being disposed of
+        /// </param>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.isDisposed)
+            {
+                return;
+            }
+
+            if (disposing) //Free any other managed objects here
+            {
+                // Clear all property values that maybe have been set
+                // when the class was instantiated
+                this.RevisionNumber = 0;
+                this.Thing = null;
+
+                this.PositionObservable.Dispose();
+
+                if (this.Disposables != null)
+                {
+                    foreach (var disposable in this.Disposables)
+                    {
+                        disposable.Dispose();
+                    }
+                }
+                else
+                {
+                    Logger.Trace("The Disposables collection of the {0} is null", this.GetType().Name);
+                }
+            }
+
+            // Indicate that the instance has been disposed.
+            this.isDisposed = true;
         }
     }
 }

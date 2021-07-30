@@ -517,14 +517,16 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Delete related port shape when ever an element definition gets deleted
+        /// Delete  and related port shape when ever a <see cref="DiagramContentItem"/> gets deleted
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The <see cref="DiagramItemsDeletingEventArgs"/></param>
         private void ItemsDeleting(object sender, DiagramItemsDeletingEventArgs e)
         {
             foreach (var item in e.Items)
             {
+                object element = null;
+
                 if (item is DiagramContentItem contentItem)
                 {
                     if (contentItem.Content is PortContainerDiagramContentItem portContainer)
@@ -542,14 +544,16 @@ namespace CDP4CommonView.Diagram
                         this.AssociatedObject.UnselectItem(selected);
                     }
 
-                    (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.RemoveDiagramThingItem(contentItem.Content);
-
-                    (contentItem.Content as ThingDiagramContentItem)?.PositionObservable.Dispose();
+                    element = contentItem.Content;
                 }
-
                 else if (item is Cdp4DiagramConnector connector)
                 {
-                    (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.RemoveDiagramThingItem(connector.DataContext);
+                    element = connector.DataContext;
+                }
+
+                if (element != null)
+                {
+                    (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.RemoveDiagramThingItem(element);
                 }
             }
         }
