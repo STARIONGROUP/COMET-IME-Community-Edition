@@ -294,7 +294,7 @@ namespace CDP4Composition.Diagram
                 this.RevisionNumber = 0;
                 this.Thing = null;
 
-                this.PositionObservable.Dispose();
+                this.PositionObservable?.Dispose();
 
                 if (this.Disposables != null)
                 {
