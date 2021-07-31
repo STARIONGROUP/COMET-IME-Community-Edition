@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{A9113A52-C31F-4C76-B87F-AB28E079284C}</ProjectGuid>
     <MinIMEVersion>8.1.0</MinIMEVersion>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4CrossViewEditor</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -33,6 +33,11 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
+  <ItemGroup>
+    <Compile Remove="Converters\**" />
+    <EmbeddedResource Remove="Converters\**" />
+    <None Remove="Converters\**" />
+  </ItemGroup>
   <ItemGroup>
     <Compile Remove="Views\UserControls\ElementSelectorSource.xaml.cs" />
     <Compile Remove="Views\UserControls\ElementSelectorTarget.xaml.cs" />
@@ -329,8 +334,5 @@
     <Reference Update="System.Xml.Linq">
       <Private>false</Private>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Converters\" />
   </ItemGroup>
 </Project>

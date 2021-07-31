@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>CDP4Dashboard.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Dashboard.Tests</Product>

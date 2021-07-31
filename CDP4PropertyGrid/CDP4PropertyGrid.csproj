@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{4B9058F7-6ACC-4C1E-B1CD-969B04A9CD9C}</ProjectGuid>
     <MinIMEVersion>8.1.0</MinIMEVersion>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4PropertyGrid</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

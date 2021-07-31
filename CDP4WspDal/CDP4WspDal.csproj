@@ -4,7 +4,7 @@
     <MinIMEVersion>8.1.0</MinIMEVersion>
     <RootNamespace>CDP4WspDalPlugin</RootNamespace>
     <AssemblyName>CDP4WspDalPlugin</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4WspDal</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

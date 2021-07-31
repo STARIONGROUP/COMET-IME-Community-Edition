@@ -3,7 +3,7 @@
     <ProjectGuid>{161E536A-DB05-4BFD-BADD-A5B9EF605DA5}</ProjectGuid>
     <RootNamespace>CDP4AddinCE</RootNamespace>
     <AssemblyName>CDP4AddinCE</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4AddinCE</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

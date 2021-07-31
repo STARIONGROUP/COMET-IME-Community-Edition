@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{F541DA64-5C66-45FE-822C-CF93964A3F52}</ProjectGuid>
     <MinIMEVersion>8.0.0</MinIMEVersion>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4DiagramEditor</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>CDP4IME</RootNamespace>
     <AssemblyName>COMET</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <OutputPath>bin\$(Configuration)\net452\</OutputPath>
     <AssemblyTitle>CDP4IME</AssemblyTitle>

@@ -1,10 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>CDP4SystemsToolKit.Tests</AssemblyTitle>
-    <Company>HP Inc.</Company>
+    <Company>RHEA System S.A.</Company>
     <Product>CDP4SystemsToolKit.Tests</Product>
-    <Copyright>Copyright © HP Inc. 2018</Copyright>
+    <Copyright>Copyright © RHEA System S.A.</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

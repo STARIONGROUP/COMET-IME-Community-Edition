@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>CDP4Requirements.Tests</RootNamespace>
     <AssemblyName>CDP4Requirements.Tests</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>Requirements.Tests</AssemblyTitle>
