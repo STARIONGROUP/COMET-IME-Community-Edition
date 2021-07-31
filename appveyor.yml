@@ -25,12 +25,12 @@ for:
 configuration: Debug
 
 install:
-  - choco install opencover.portable --version=4.7.922
+  - choco install opencover.portable --version=4.7.1221
   - choco install "sonarscanner-msbuild-net46" -y
 
 before_build:
-  - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
-  - cmd: nuget install NUnit.Runners -Version 3.11.1 -OutputDirectory testrunner
+  - cmd: nuget install NUnit.Console -Version 3.12.0 -OutputDirectory testrunner
+  - cmd: nuget install NUnit.Runners -Version 3.12.0 -OutputDirectory testrunner
   - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
   - cmd: nuget sources add -name github -source https://nuget.pkg.github.com/RHEAGROUP/index.json -username %GITHUB_USER% -password %GITHUB_TOKEN% -StorePasswordInClearText
   - cmd: nuget restore -verbosity quiet
@@ -60,7 +60,7 @@ test_script:
       OpenCover.Console.exe
       -log:Error
       -register
-      -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools\nunit3-console.exe"
+      -target:".\testrunner\NUnit.ConsoleRunner.3.12.0\tools\nunit3-console.exe"
       -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent"" --config=%CONFIGURATION%"
       -returntargetcode
       -hideskipped:All
