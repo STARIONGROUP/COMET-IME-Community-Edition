@@ -28,6 +28,7 @@ namespace CDP4LogInfo.ViewModels
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Globalization;
     using System.IO;
     using System.Reactive.Linq;
     using System.Windows;
@@ -435,7 +436,7 @@ namespace CDP4LogInfo.ViewModels
 
             using (TextWriter writer = File.CreateText(result))
             {
-                var csv = new CsvHelper.CsvWriter(writer);
+                var csv = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture);
                 foreach (var logInfoRowViewModel in this.LogEventInfo)
                 {
                     csv.WriteField(logInfoRowViewModel.TimeStamp);
