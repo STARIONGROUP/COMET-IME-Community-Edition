@@ -66,7 +66,7 @@
     <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="20.2.7" />
     <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="20.2.7" />
     <PackageReference Include="DevExpress.Xpo" Version="20.2.7" />
-    <PackageReference Include="ExceptionReporter" Version="2.1.2" />
+    <PackageReference Include="ExceptionReporter" Version="4.0.2" />
     <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.7.4.8" />
     <PackageReference Include="NetOfficeFw.Excel" Version="1.7.4.8" />

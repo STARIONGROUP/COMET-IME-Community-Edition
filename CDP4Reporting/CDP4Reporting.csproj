@@ -44,7 +44,7 @@
     <None Remove="Views\ReportingRibbonPageCategory.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AvalonEdit" Version="6.0.1" />
+    <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
     <PackageReference Include="CDP4Common-CE" Version="7.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
