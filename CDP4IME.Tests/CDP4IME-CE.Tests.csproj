@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>CDP4IME.Tests</RootNamespace>
     <AssemblyName>CDP4IME.Tests</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4IME.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
