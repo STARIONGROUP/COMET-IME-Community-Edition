@@ -1,21 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelSetupRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.ViewModels
 {
+    using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView;
     using CDP4Composition.Converters;
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
+
     using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
+    using DomainOfExpertiseRowViewModel = ModelBrowser.Rows.DomainOfExpertiseRowViewModel;
 
     /// <summary>
     /// The Row-view-model representing a <see cref="EngineeringModelSetup"/>
@@ -178,6 +204,8 @@ namespace CDP4SiteDirectory.ViewModels
                 this.AddOrganization(organization);
             }
 
+            UpdateDomainParticipants(this.Thing.Participant);
+
             var orderedCollection = this.activeDomainFolderRow.ContainedRows.OfType<DomainOfExpertiseRowViewModel>().OrderBy(x => x.Name).ToArray();
             this.activeDomainFolderRow.ContainedRows.ClearWithoutDispose();
             this.activeDomainFolderRow.ContainedRows.AddRange(orderedCollection);
@@ -266,6 +294,18 @@ namespace CDP4SiteDirectory.ViewModels
         {
             var row = new DomainOfExpertiseRowViewModel(domain, this.Session, this);
             this.activeDomainFolderRow.ContainedRows.Add(row);
+        }
+
+        /// <summary>
+        /// Updates the <see cref="DomainOfExpertiseRowViewModel/> with <see cref="Participant"/>s
+        /// </summary>
+        /// <param name="participants">The <see cref="Participant"/>s</param>
+        private void UpdateDomainParticipants(IEnumerable<Participant> participants)
+        {
+            foreach(var domain in this.activeDomainFolderRow.ContainedRows.OfType<DomainOfExpertiseRowViewModel>())
+            {
+                domain.UpdateParticipants(participants);
+            }
         }
 
         /// <summary>

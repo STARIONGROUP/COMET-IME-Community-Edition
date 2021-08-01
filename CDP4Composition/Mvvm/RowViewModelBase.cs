@@ -249,6 +249,11 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// Indicates if edit functions in context menu are active
+        /// </summary>
+        public virtual bool CanEditThing { get; } = true;
+
+        /// <summary>
         /// Gets the list of <see cref="IDisposable"/> objects that are referenced by this class used for cancelation of highlight.
         /// </summary>
         protected List<IDisposable> HighlightCancelDisposables { get; private set; }
