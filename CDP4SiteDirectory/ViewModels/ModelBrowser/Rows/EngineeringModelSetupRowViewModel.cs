@@ -204,7 +204,7 @@ namespace CDP4SiteDirectory.ViewModels
                 this.AddOrganization(organization);
             }
 
-            UpdateDomainParticipants(this.Thing.Participant);
+            this.UpdateDomainParticipants(this.Thing.Participant);
 
             var orderedCollection = this.activeDomainFolderRow.ContainedRows.OfType<DomainOfExpertiseRowViewModel>().OrderBy(x => x.Name).ToArray();
             this.activeDomainFolderRow.ContainedRows.ClearWithoutDispose();

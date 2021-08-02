@@ -127,7 +127,7 @@ namespace CDP4SiteDirectory.ViewModels
                 this.RoleShortName = this.Role.ShortName;
             }
 
-            if (showDomains)
+            if (this.showDomains)
             {
                 foreach (var domain in this.Thing.Domain)
                 {
