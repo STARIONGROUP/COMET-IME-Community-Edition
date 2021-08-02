@@ -517,7 +517,7 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Delete  and related port shape when ever a <see cref="DiagramContentItem"/> gets deleted
+        /// Remove a <see cref="DiagramContentItem"/> from the ViewModel and delete its related port shapes whenever a <see cref="DiagramContentItem"/> gets deleted
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The <see cref="DiagramItemsDeletingEventArgs"/></param>

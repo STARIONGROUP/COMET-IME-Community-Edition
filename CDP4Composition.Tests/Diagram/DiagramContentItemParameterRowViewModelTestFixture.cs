@@ -84,11 +84,10 @@ namespace CDP4Composition.Tests.Diagram
             this.parameter1.ValueSet.Add(
                 new ParameterValueSet
                 {
-                    Manual = new ValueArray<string>(new[]
+                    Published = new ValueArray<string>(new[]
                     {
                         "value1"
                     }),
-                    ValueSwitch = ParameterSwitchKind.MANUAL,
                     ActualState = actualState1,
                     ActualOption = new Option { Name = "option1" }
                 });
@@ -96,11 +95,10 @@ namespace CDP4Composition.Tests.Diagram
             this.parameter1.ValueSet.Add(
                 new ParameterValueSet
                 {
-                    Manual = new ValueArray<string>(new[]
+                    Published = new ValueArray<string>(new[]
                     {
                         "value2"
                     }),
-                    ValueSwitch = ParameterSwitchKind.MANUAL,
                     ActualState = actualState2,
                     ActualOption = new Option { Name = "option2" }
                 });
@@ -124,12 +122,11 @@ namespace CDP4Composition.Tests.Diagram
             this.parameter2.ValueSet.Add(
                 new ParameterValueSet
                 {
-                    Manual = new ValueArray<string>(new[]
+                    Published = new ValueArray<string>(new[]
                     {
                         "value3",
                         "value4"
-                    }),
-                    ValueSwitch = ParameterSwitchKind.MANUAL
+                    })
                 });
 
             this.session = Mock.Of<ISession>();
