@@ -5,15 +5,15 @@
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 // 
 //    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 // 
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 // 
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //    Lesser General Public License for more details.
@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Composition
+namespace CDP4Composition.Exceptions
 {
     using System;
     using System.Reflection;
@@ -34,6 +34,19 @@ namespace CDP4Composition.Composition
     /// </summary>
     public class CometReflectionTypeLoadException : Exception
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SettingsException"/> class.
+        /// </summary>
+        public CometReflectionTypeLoadException()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ReflectionTypeLoadException"/> class.
+        /// </summary>
+        /// <param name="reflectionTypeLoadException">
+        /// The 
+        /// </param>
         public CometReflectionTypeLoadException(ReflectionTypeLoadException reflectionTypeLoadException) 
             : base(BuildMessage(reflectionTypeLoadException), reflectionTypeLoadException)
         {
@@ -43,19 +56,21 @@ namespace CDP4Composition.Composition
         /// Adds information from the original <see cref="ReflectionTypeLoadException.LoaderExceptions"/> to the <see cref="CometReflectionTypeLoadException.Message "/> property.
         /// </summary>
         /// <param name="reflectionTypeLoadException">The original <see cref="ReflectionTypeLoadException"/></param>
-        /// <returns></returns>
+        /// <returns>
+        /// a string containing the loader exception description
+        /// </returns>
         private static string BuildMessage(ReflectionTypeLoadException reflectionTypeLoadException)
         {
-            var messageBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
 
-            messageBuilder.AppendLine(reflectionTypeLoadException.Message);
+            stringBuilder.AppendLine(reflectionTypeLoadException.Message);
 
             foreach (var exception in reflectionTypeLoadException.LoaderExceptions)
             {
-                messageBuilder.AppendLine($" ---> {exception.Message}");
+                stringBuilder.AppendLine($" ---> {exception.Message}");
             }
 
-            return messageBuilder.ToString();
+            return stringBuilder.ToString();
         }
     }
 }

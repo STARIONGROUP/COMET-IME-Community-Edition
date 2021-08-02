@@ -7,7 +7,6 @@
 namespace CDP4Composition.Exceptions
 {
     using System;
-    using CDP4Composition.PluginSettingService;
 
     /// <summary>
     /// An <see cref="PluginSettingsException"/> is thrown when <see cref="SettingsException"/> cannot be loaded or written
