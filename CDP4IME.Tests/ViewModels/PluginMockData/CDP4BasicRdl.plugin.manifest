@@ -4,7 +4,7 @@
   "Description": "COMET test plugin",
   "Version": "5.5.5.5",
   "CompatibleIMEVersion": null,
-  "TargetFramework": "net452",
+  "TargetFramework": "net48",
   "ReleaseNote": null,
   "Author": "RHEA System S.A.",
   "Website": "https://store.cdp4.org"

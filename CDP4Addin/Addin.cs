@@ -331,9 +331,11 @@ namespace CDP4AddinCE
         /// </summary>
         private void PreloadAssemblies()
         {
-            logger.Trace("Markdown.Xaml");
+            //These assemblies are present in the main folder (bin), but are not used (yet) bij the Addin itself
+            logger.Trace("Pre-register Addin Assemblies");
             Assembly.Load("Markdown.Xaml");
             Assembly.Load("System.Net.Http.Formatting");
+            Assembly.Load("System.Threading.Tasks.Extensions");
         }
 
         /// <summary>
@@ -348,6 +350,10 @@ namespace CDP4AddinCE
             logger.Trace("System.Windows.Interactivity");
             var windowsInteractivity = new Version("4.5.0.0");
             this.RedirectAssembly("System.Windows.Interactivity", windowsInteractivity, "31bf3856ad364e35");
+
+            logger.Trace("System.Threading.Tasks.Extensions");
+            var threadingTasksExtensions = new Version("4.5.4.0");
+            this.RedirectAssembly("System.Threading.Tasks.Extensions", threadingTasksExtensions, "31bf3856ad364e35");
         }
 
         /// <summary>

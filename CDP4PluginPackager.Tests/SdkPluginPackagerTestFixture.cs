@@ -55,9 +55,9 @@ namespace CDP4PluginPackager.Tests
             Directory.SetCurrentDirectory(testDirectory);
 
 #if DEBUG
-            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Debug", "net452", "AnyCPU");
+            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Debug", "net48", "AnyCPU");
 #else
-            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Release", "net452", "AnyCPU");
+            this.sdkPluginPackager = new SdkPluginPackager(testDirectory, true, "Release", "net48", "AnyCPU");
 #endif
             this.sdkPluginPackager.Start();
         }

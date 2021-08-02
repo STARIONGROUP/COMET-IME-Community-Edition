@@ -126,8 +126,15 @@ namespace CDP4Composition.Composition
 
             foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
             {
-                catalog.Catalogs.Add(directoryCatalog);
-                UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
+                try
+                {
+                    catalog.Catalogs.Add(directoryCatalog);
+                    this.UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
+                }
+                catch (Exception ex)
+                {
+
+                }
             }
 
             this.UpdateBootstrapperStatus($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
