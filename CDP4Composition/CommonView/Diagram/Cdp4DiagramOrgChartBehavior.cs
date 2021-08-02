@@ -890,51 +890,62 @@ namespace CDP4CommonView.Diagram
         /// </remarks>
         private void PreviewDragOver(object sender, DragEventArgs e)
         {
-            var dropInfo = new DiagramDropInfo(sender, e);
-
-            if (e.Source is DiagramContentItem { Content: IDropTarget controlDropTarget })
-            {
-                controlDropTarget.DragOver(dropInfo);
-                e.Effects = dropInfo.Effects;
-                e.Handled = dropInfo.Handled;
-
-                if (e.Handled)
-                {
-                    return;
-                }
-            }
-
-            if (e.Source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
-            {
-                controlHavingDropTarget.DropTarget.DragOver(dropInfo);
-                e.Effects = dropInfo.Effects;
-                e.Handled = dropInfo.Handled;
-
-                if (e.Handled)
-                {
-                    return;
-                }
-            }
-
             //If the sender is a port and its element definition is not selected
-            if (((DiagramControl)sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
+            if (((DiagramControl) sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
             {
-                e.Handled = true;
                 return;
             }
 
-            if (this.AssociatedObject.DataContext is IDropTarget dropTarget)
-            {
-                dropTarget.DragOver(dropInfo);
+            var dropInfo = new DiagramDropInfo(sender, e);
 
-                e.Effects = dropInfo.Effects;
-                e.Handled = dropInfo.Handled;
+            e.Handled = this.HandleDragOver(e.Source, dropInfo);
+            e.Effects = dropInfo.Effects;
+
+            if (e.Handled)
+            {
+                return;
             }
 
             if (sender is DependencyObject dependencyObject)
             {
                 this.Scroll(dependencyObject, e);
             }
+        }
+
+        /// <summary>
+        /// Handles the PreviewDragOver event
+        /// </summary>
+        /// <param name="source">The source <see cref="object"/> that originated the DragOver action.</param>
+        /// <param name="dropInfo">The <see cref="DiagramDropInfo"/> object that was created based on the DragOver action.</param>
+        /// <returns>true if the DragOver action was handled, otherwise false</returns>
+        public bool HandleDragOver(object source, IDiagramDropInfo dropInfo)
+        {
+            if (source is DiagramContentItem { Content: IDropTarget controlDropTarget })
+            {
+                controlDropTarget.DragOver(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
+            }
+
+            if (source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
+            {
+                controlHavingDropTarget.DropTarget.DragOver(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
+            }
+
+            if (this.AssociatedObject?.DataContext is IDropTarget dropTarget)
+            {
+                dropTarget.DragOver(dropInfo);
+            }
+
+            return dropInfo.Handled;
         }
 
         /// <summary>
@@ -991,33 +1002,43 @@ namespace CDP4CommonView.Diagram
         {
             var dropInfo = new DiagramDropInfo(sender, e);
 
-            if (e.Source is DiagramContentItem { Content: IDropTarget controlDropTarget })
+            e.Handled = this.HandleDrop(e, dropInfo);
+        }
+
+        /// <summary>
+        /// Handles the PreviewDrop event
+        /// </summary>
+        /// <param name="source">The source <see cref="object"/> that originated the Drop action.</param>
+        /// <param name="dropInfo">The <see cref="DiagramDropInfo"/> object that was created based on the Drop action.</param>
+        /// <returns>true if the Drop action was handled, otherwise false</returns>
+        public virtual bool HandleDrop(object source, IDiagramDropInfo dropInfo)
+        {
+            if (source is DiagramContentItem { Content: IDropTarget controlDropTarget })
             {
                 controlDropTarget.Drop(dropInfo);
-                e.Handled = dropInfo.Handled;
 
-                if (e.Handled)
+                if (dropInfo.Handled)
                 {
-                    return;
+                    return true;
                 }
             }
 
-            if (e.Source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
+            if (source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
             {
                 controlHavingDropTarget.DropTarget.Drop(dropInfo);
-                e.Handled = dropInfo.Handled;
 
-                if (e.Handled)
+                if (dropInfo.Handled)
                 {
-                    return;
+                    return true;
                 }
             }
 
-            if (this.AssociatedObject.DataContext is IDropTarget vmDropTarget)
+            if (this.AssociatedObject?.DataContext is IDropTarget vmDropTarget)
             {
                 vmDropTarget.Drop(dropInfo);
-                e.Handled = dropInfo.Handled;
             }
+
+            return dropInfo.Handled;
         }
 
         /// <summary>
