@@ -131,9 +131,9 @@ namespace CDP4Composition.Composition
                     catalog.Catalogs.Add(directoryCatalog);
                     this.UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
                 }
-                catch (Exception ex)
+                catch (ReflectionTypeLoadException reflectionTypeLoadException)
                 {
-
+                    throw new CometReflectionTypeLoadException(reflectionTypeLoadException);
                 }
             }
 
