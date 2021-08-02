@@ -1,8 +1,8 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -19,9 +19,9 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Tests
 {
@@ -170,8 +170,9 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.SelectedThing = participantFolderRow.ContainedRows.First();
             var participantRow = participantFolderRow.ContainedRows.First() as ModelParticipantRowViewModel;
             Assert.NotNull(participantRow);
-            Assert.AreEqual("DoE: Thermal, Organization: RHEA", participantRow.Description);
+            Assert.AreEqual("Organization: RHEA", participantRow.Description);
             Assert.IsTrue(selectedThingChangedRaised);
+            Assert.That(participantRow.ContainedRows.Single().Thing, Is.EqualTo(testDomain));
         }
 
         [Test]
@@ -181,14 +182,15 @@ namespace CDP4SiteDirectory.Tests
 
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
 
+            var domain = new DomainOfExpertise();
+            model.ActiveDomain.Add(domain);
+
             var participant = new Participant(Guid.NewGuid(), null, this.uri);
             participant.Person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "blabla", Surname = "blabla" };
+            participant.Domain.Add(domain);
 
             model.Participant.Add(participant);
             model.IterationSetup.Add(new IterationSetup());
-
-            var domain = new DomainOfExpertise();
-            model.ActiveDomain.Add(domain);
 
             this.siteDirectory.Model.Add(model);
             revPropertyInfo.SetValue(this.siteDirectory, 50);
@@ -203,6 +205,7 @@ namespace CDP4SiteDirectory.Tests
             Assert.AreEqual(1, participantFolderRow.ContainedRows.Count);
             Assert.AreEqual(1, iterationFolderRow.ContainedRows.Count);
             Assert.AreEqual(1, domainFolderRow.ContainedRows.Count);
+            Assert.AreEqual(1, domainFolderRow.ContainedRows[0].ContainedRows.Count);
 
             model.Participant.Clear();
             model.IterationSetup.Clear();

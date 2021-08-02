@@ -68,7 +68,8 @@
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type viewModels:ModelParticipantRowViewModel}">
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:ModelParticipantRowViewModel}" 
+                                      ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
@@ -114,7 +115,8 @@
                 </dx:MeasurePixelSnapper>
             </HierarchicalDataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type CDP4CommonView:DomainOfExpertiseRowViewModel}">
+            <HierarchicalDataTemplate DataType="{x:Type CDP4CommonView:DomainOfExpertiseRowViewModel}"
+                                      ItemsSource="{Binding ContainedRows}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
