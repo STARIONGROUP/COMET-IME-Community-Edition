@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramItemDataTemplateSelector.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -23,10 +22,13 @@
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4DiagramEditor.ViewModels
 {
     using System.Windows;
     using System.Windows.Controls;
+
+    using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Diagram;
 
@@ -36,6 +38,21 @@ namespace CDP4DiagramEditor.ViewModels
     public class DiagramItemDataTemplateSelector : DataTemplateSelector
     {
         /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> for a normal DiagramContentItem
+        /// </summary>
+        public DataTemplate GenericDiagramItemDataTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> for a DiagramPort
+        /// </summary>
+        public DataTemplate DiagramPortTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> for a DiagramCOntentItem that represents an <see cref="ElementBase"/>
+        /// </summary>
+        public DataTemplate ElementBaseDiagramItemTemplate { get; set; }
+
+        /// <summary>
         /// Selects the template for a <see cref="NamedThingDiagramContentItem"/>
         /// </summary>
         /// <param name="item">The <see cref="NamedThingDiagramContentItem"/></param>
@@ -43,22 +60,13 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>The <see cref="DataTemplate"/> to use</returns>
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (!(item is NamedThingDiagramContentItem))
+            return item switch
             {
-                return base.SelectTemplate(item, container);
-            }
-            
-            return item is DiagramPortViewModel ? this.DiagramPortTemplate : this.GenericDiagramItemDataTemplate;
+                ElementDefinitionDiagramContentItem => this.ElementBaseDiagramItemTemplate,
+                NamedThingDiagramContentItem => this.GenericDiagramItemDataTemplate,
+                DiagramPortViewModel => this.DiagramPortTemplate,
+                _ => base.SelectTemplate(item, container)
+            };
         }
-
-        /// <summary>
-        /// Gets or sets the <see cref="DataTemplate"/> for a mass-budget template
-        /// </summary>
-        public DataTemplate GenericDiagramItemDataTemplate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="DataTemplate"/> for a generic-budget
-        /// </summary>
-        public DataTemplate DiagramPortTemplate { get; set; }
     }
 }

@@ -1,9 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="NamedThingDiagramContentItem.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -29,6 +28,8 @@ namespace CDP4Composition.Diagram
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Dal.Events;
 
     /// <summary>
     /// Represents a <see cref="ThingDiagramContentItem"/> with a name and a <see cref="ClassKind"/>
@@ -82,6 +83,19 @@ namespace CDP4Composition.Diagram
                 this.FullName = parameterBaseThing.UserFriendlyName;
                 this.ShortName = parameterBaseThing.UserFriendlyShortName;
             }
+        }
+
+        /// <summary>
+        /// The event-handler that is invoked by the subscription that listens for updates
+        /// on the <see cref="Thing"/> that is being represented by the view-model
+        /// </summary>
+        /// <param name="objectChange">
+        /// The payload of the event that is being handled
+        /// </param>
+        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
+        {
+            base.ObjectChangeEventHandler(objectChange);
+            this.UpdateProperties();
         }
 
         /// <summary>
