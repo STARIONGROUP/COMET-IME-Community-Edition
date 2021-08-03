@@ -1002,7 +1002,7 @@ namespace CDP4CommonView.Diagram
         {
             var dropInfo = new DiagramDropInfo(sender, e);
 
-            e.Handled = this.HandleDrop(e, dropInfo);
+            e.Handled = this.HandleDrop(e.Source, dropInfo);
         }
 
         /// <summary>
