@@ -139,13 +139,13 @@ namespace CDP4Composition.Diagram
                         stringBuilder.Append(component.ShortName);
                         stringBuilder.Append($" [{component.Scale?.ShortName ?? "-"}]");
                         stringBuilder.Append(" = ");
-                        stringBuilder.Append(valueset.ActualValue[component.Index]);
+                        stringBuilder.Append(valueset.Published[component.Index]);
                     }
                 }
                 else
                 {
                     stringBuilder.Append(" = ");
-                    stringBuilder.Append(valueset.ActualValue[0]);
+                    stringBuilder.Append(valueset.Published[0]);
                 }
             }
         }
