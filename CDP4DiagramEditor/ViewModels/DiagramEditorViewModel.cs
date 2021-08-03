@@ -2,7 +2,7 @@
 // <copyright file="DiagramEditorViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -70,7 +70,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Backing field for <see cref="ThingDiagramItems"/>
         /// </summary>
-        private ReactiveList<ThingDiagramContentItem> thingDiagramItems;
+        private DisposableReactiveList<ThingDiagramContentItem> thingDiagramItems;
 
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -207,7 +207,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             if (contentItemContent is ThingDiagramContentItem item)
             {
-                this.ThingDiagramItems.Remove(item);
+                this.ThingDiagramItems.RemoveAndDispose(item);
                 this.Behavior.ItemPositions.Remove(item);
 
                 var connectors = this.DiagramConnectorCollection.Where(x => x.Source.DepictedThing == item.DiagramThing.DepictedThing || x.Target.DepictedThing == item.DiagramThing.DepictedThing).ToArray();
@@ -252,7 +252,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets or sets the collection of diagram items.
         /// </summary>
-        public ReactiveList<ThingDiagramContentItem> ThingDiagramItems
+        public DisposableReactiveList<ThingDiagramContentItem> ThingDiagramItems
         {
             get => this.thingDiagramItems;
             set => this.RaiseAndSetIfChanged(ref this.thingDiagramItems, value);
@@ -293,7 +293,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.Disposables.Add(deleteObservable);
             this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel> { ChangeTrackingEnabled = true };
-            this.ThingDiagramItems = new ReactiveList<ThingDiagramContentItem> { ChangeTrackingEnabled = true };
+            this.ThingDiagramItems = new DisposableReactiveList<ThingDiagramContentItem> { ChangeTrackingEnabled = true };
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
 
             this.DiagramPortCollection = new ReactiveList<DiagramPortViewModel> { ChangeTrackingEnabled = true };
@@ -376,7 +376,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                 if (item != null)
                 {
-                    this.ThingDiagramItems.Remove(item);
+                    this.ThingDiagramItems.RemoveAndDispose(item);
                     this.Behavior.ItemPositions.Remove(item);
                 }
             }
@@ -387,7 +387,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                 if (diagramThing.DepictedThing is ElementDefinition)
                 {
-                    newDiagramElement = new PortContainerDiagramContentItem(diagramThing, this);
+                    newDiagramElement = new ElementDefinitionDiagramContentItem(diagramThing, this.Session, this);
                 }
                 else
                 {
@@ -487,7 +487,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                 if (rowPayload is ElementDefinition elementDefinition)
                 {
-                    diagramItem = new PortContainerDiagramContentItem(block, this);
+                    diagramItem = new ElementDefinitionDiagramContentItem(block, this.Session, this);
                 }
                 else if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
                 {
@@ -554,7 +554,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             if (depictedThing is ElementDefinition)
             {
-                newDiagramElement = new PortContainerDiagramContentItem(block, this);
+                newDiagramElement = new ElementDefinitionDiagramContentItem(block, this.Session, this);
             }
             else
             {
@@ -703,7 +703,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             var depictedThing = item.DiagramThing.DepictedThing;
 
-            var relationships = 
+            var relationships =
                 iteration.Relationship
                     .OfType<BinaryRelationship>()
                     .Where(r => r.Source == depictedThing || r.Target == depictedThing);
@@ -798,7 +798,7 @@ namespace CDP4DiagramEditor.ViewModels
             switch (deleteEvent.ViewModel)
             {
                 case ThingDiagramContentItem diagramObjViewModel:
-                    this.ThingDiagramItems.Remove(diagramObjViewModel);
+                    this.ThingDiagramItems.RemoveAndDispose(diagramObjViewModel);
                     break;
                 case DiagramEdgeViewModel connectorViewModel:
                     this.DiagramConnectorCollection.Remove(connectorViewModel);

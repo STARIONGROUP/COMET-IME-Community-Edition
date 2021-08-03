@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DropInfo.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,7 +29,10 @@ namespace CDP4Composition.DragDrop
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
+    using System.Windows.Interactivity;
+
     using DevExpress.Xpf.Grid;
+
     using NLog;
 
     /// <summary>
@@ -45,29 +67,26 @@ namespace CDP4Composition.DragDrop
             this.Effects = e.Effects;
             this.VisualTarget = sender as UIElement;
             this.DropPosition = e.GetPosition(this.VisualTarget);
-            
+            this.Handled = e.Handled;
             var control = sender as Control;
             this.TargetGroup = VisualTreeExtensions.FindGroup(control, this.DropPosition);
 
-            var gridcontrol = sender as GridControl;
-            if (gridcontrol != null)
+            if (sender is GridControl gridcontrol)
             {
                 this.SetTargetItem(gridcontrol, e);
             }
 
-            var treeListControl = sender as TreeListControl;
-            if (treeListControl != null)
+            if (sender is TreeListControl treeListControl)
             {
                 this.SetTargetItem(treeListControl, e);
             }
 
-            var itemsControl = sender as ItemsControl;
-            if (itemsControl != null)
+            if (sender is ItemsControl itemsControl)
             {
                 this.SetTargetItem(itemsControl);
             }
         }
-        
+
         /// <summary>
         /// Sets the <see cref="TargetItem"/> to the row that the mouse is over.
         /// </summary>
@@ -76,16 +95,17 @@ namespace CDP4Composition.DragDrop
         /// </param>
         private void SetTargetItem(GridControl gridControl, DragEventArgs e)
         {
-            var tableView = gridControl.View as TableView;
-            if (tableView != null)
+            if (gridControl.View is TableView tableView)
             {
                 try
                 {
                     var tableViewHitInfo = tableView.CalcHitInfo(this.DropPosition);
                     var rowHandle = tableViewHitInfo.RowHandle;
+
                     if (tableViewHitInfo.InRow)
                     {
                         var dropPosition = tableView.GetCellElementByRowHandleAndColumn(rowHandle, tableViewHitInfo.Column);
+
                         if (dropPosition != null)
                         {
                             this.targetHeight = dropPosition.ActualHeight;
@@ -100,44 +120,45 @@ namespace CDP4Composition.DragDrop
                 {
                     Logger.Debug(ex);
                     this.TargetItem = null;
-                }                
+                }
             }
 
-            var cardView = gridControl.View as CardView;
-            if (cardView != null)
+            if (gridControl.View is CardView cardView)
             {
                 // Do nothing
             }
 
-            var treeListView = gridControl.View as TreeListView;
-            if (treeListView != null)
+            if (gridControl.View is TreeListView treeListView)
             {
                 try
                 {
                     var listViewHitInfo = treeListView.CalcHitInfo(this.DropPosition);
                     var rowHandle = listViewHitInfo.RowHandle;
+
                     if (listViewHitInfo.InNodeExpandButton)
                     {
                         treeListView.ExpandNode(rowHandle);
                     }
-                    
+
                     if (listViewHitInfo.InRow)
                     {
                         var dropPosition = treeListView.GetCellElementByRowHandleAndColumn(rowHandle, listViewHitInfo.Column);
+
                         if (dropPosition != null)
                         {
                             this.targetHeight = dropPosition.ActualHeight;
                             this.RelativePositionToDrop = e.GetPosition(dropPosition);
                         }
+
                         var row = gridControl.GetRow(rowHandle);
                         this.TargetItem = row;
-                    }       
+                    }
                 }
                 catch (NullReferenceException ex)
                 {
                     Logger.Debug(ex);
                     this.TargetItem = null;
-                }                
+                }
             }
         }
 
@@ -153,6 +174,7 @@ namespace CDP4Composition.DragDrop
             {
                 var treeListViewHitInfo = treeListControl.View.CalcHitInfo(this.DropPosition);
                 var rowHandle = treeListViewHitInfo.RowHandle;
+
                 if (treeListViewHitInfo.InNodeExpandButton)
                 {
                     treeListControl.View.ExpandNode(rowHandle);
@@ -162,7 +184,7 @@ namespace CDP4Composition.DragDrop
                 {
                     var dropPosition = treeListControl.View.GetCellElementByRowHandleAndColumn(rowHandle, treeListViewHitInfo.Column);
                     var row = treeListControl.GetRow(rowHandle);
-                    
+
                     if (dropPosition != null)
                     {
                         this.targetHeight = dropPosition.ActualHeight;
@@ -176,7 +198,7 @@ namespace CDP4Composition.DragDrop
             {
                 Logger.Debug(ex);
                 this.TargetItem = null;
-            }            
+            }
         }
 
         /// <summary>
@@ -188,13 +210,14 @@ namespace CDP4Composition.DragDrop
         private void SetTargetItem(ItemsControl itemsControl)
         {
             var item = VisualTreeExtensions.GetItemContainerAt(itemsControl, this.DropPosition);
+
             if (item != null)
             {
                 this.VisualTargetOrientation = VisualTreeExtensions.GetItemsPanelOrientation(itemsControl);
 
                 var itemParent = ItemsControl.ItemsControlFromItemContainer(item);
                 this.TargetItem = itemParent.ItemContainerGenerator.ItemFromContainer(item);
-            }            
+            }
         }
 
         /// <summary>
@@ -215,7 +238,7 @@ namespace CDP4Composition.DragDrop
         /// <summary>
         /// Gets a value indicating whether the item is dropped after this <see cref="TargetItem"/> (false means before)
         /// </summary>
-        public bool IsDroppedAfter => this.RelativePositionToDrop.Y - this.targetHeight/2 >= 0; 
+        public bool IsDroppedAfter => this.RelativePositionToDrop.Y - (this.targetHeight / 2) >= 0;
 
         /// <summary>
         /// Gets or sets the class of drop target to display.
@@ -241,7 +264,7 @@ namespace CDP4Composition.DragDrop
         /// <remarks>
         /// If the current drop target is unbound or not an ItemsControl, this will be null.
         /// </remarks>
-        public object TargetItem { get; private set; }
+        public object TargetItem { get; protected set; }
 
         /// <summary>
         /// Gets the current group target.
@@ -266,5 +289,17 @@ namespace CDP4Composition.DragDrop
         /// Gets the current state of the modifier keys (SHIFT, CTRL, and ALT), as well as the state of the mouse buttons.
         /// </summary>
         public DragDropKeyStates KeyStates { get; private set; }
+
+        /// <summary>
+        /// Indicates that Drop/Drag functionality is handled by another class. See <see cref="DragEventArgs.Handled"/>.
+        /// </summary>
+        /// <remarks>
+        /// The property was added at a later time so it is only implemented at specific places in the application!!!
+        /// It was introduced specifically in case a complicated Drag/Drop event firing sequence is used.
+        /// For example, when the Diagram Editor is used combined with a <see cref="Behavior{T}"/>.
+        /// It doesn't make the event firing sequence less complex, but can help to prioritise specific functionality
+        /// created in Preview* and normal event handlers like PreviewDrop and Drop.
+        /// </remarks>
+        public bool Handled { get; set; }
     }
 }

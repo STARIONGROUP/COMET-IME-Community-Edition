@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NamedThingDiagramContentItem.cs" company="RHEA System S.A.">
+// <copyright file="ElementDefinitionDiagramContentItem.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -25,63 +25,76 @@
 
 namespace CDP4Composition.Diagram
 {
+    using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4CommonView.Diagram.ViewModels;
+
+    using CDP4Composition.DragDrop;
+
+    using CDP4Dal;
     using CDP4Dal.Events;
 
+    using ReactiveUI;
+
     /// <summary>
-    /// Represents a <see cref="ThingDiagramContentItem"/> with a name and a <see cref="ClassKind"/>
+    /// Represents an <see cref="ElementDefinition"/> to be used in a Diagram
     /// </summary>
-    public class NamedThingDiagramContentItem : ThingDiagramContentItem
+    public class ElementDefinitionDiagramContentItem : PortContainerDiagramContentItem, IDiagramContentItemChildren, IIDropTarget
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
+        /// The <see cref="ISession"/> to be used when creating other view models
         /// </summary>
-        /// <param name="thing">
-        /// The thing.
-        /// </param>
-        public NamedThingDiagramContentItem(Thing thing) : base(thing)
-        {
-            this.UpdateProperties();
-        }
+        private readonly ISession session;
+
+        /// <summary>
+        /// Gets or sets the Children of the <see cref="ElementDefinitionDiagramContentItem"/>
+        /// </summary>
+        public ReactiveList<IDiagramContentItemChild> DiagramContentItemChildren { get; set; } = new();
+
+        /// <summary>
+        /// A specific class that handles the <see cref="IDropTarget"/> functionality
+        /// </summary>
+        public IDropTarget DropTarget { get; protected set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
         /// </summary>
         /// <param name="diagramThing">
         /// The diagramThing contained</param>
+        /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public NamedThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel container) 
+        public ElementDefinitionDiagramContentItem(DiagramObject diagramThing, ISession session, IDiagramEditorViewModel container)
             : base(diagramThing, container)
         {
+            this.session = session;
+
+            if (diagramThing.DepictedThing is ElementDefinition elementDefinition)
+            {
+                this.DropTarget = new ElementDefinitionDropTarget(elementDefinition, this.session);
+            }
+
             this.UpdateProperties();
         }
 
         /// <summary>
-        /// Sets <see cref="NamedThingDiagramContentItem.Thing"/> related property used to display
+        /// Sets <see cref="ElementDefinitionDiagramContentItem.Thing"/> related properties
         /// </summary>
         private void UpdateProperties()
         {
-            if (this.Thing is INamedThing namedThing)
+            if (this.Thing is ElementDefinition elementDefinition)
             {
-                this.FullName = namedThing.Name;
-            }
+                this.DiagramContentItemChildren.Clear();
 
-            if (this.Thing is IShortNamedThing shortNamedThing)
-            {
-                this.ShortName = shortNamedThing.ShortName;
-            }
-
-            this.ClassKind = $"<<{this.Thing.ClassKind}>>";
-
-            // special cases
-            if (this.Thing is ParameterBase parameterBaseThing)
-            {
-                this.FullName = parameterBaseThing.UserFriendlyName;
-                this.ShortName = parameterBaseThing.UserFriendlyShortName;
+                foreach (var parameter in elementDefinition.Parameter.OrderBy(x => x.ParameterType.Name))
+                {
+                    var parameterRowViewModel = new DiagramContentItemParameterRowViewModel(parameter, this.session, null);
+                    this.DiagramContentItemChildren.Add(parameterRowViewModel);
+                }
             }
         }
 
@@ -97,20 +110,5 @@ namespace CDP4Composition.Diagram
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-
-        /// <summary>
-        /// Gets or sets the class kind of the <see cref="NamedThingDiagramContentItem"/>
-        /// </summary>
-        public string ClassKind { get; set; }
-
-        /// <summary>
-        /// Gets or sets the name of the <see cref="NamedThingDiagramContentItem"/>
-        /// </summary>
-        public string FullName { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets the shortname of the <see cref="NamedThingDiagramContentItem"/>
-        /// </summary>
-        public string ShortName { get; set; } = string.Empty;
     }
 }

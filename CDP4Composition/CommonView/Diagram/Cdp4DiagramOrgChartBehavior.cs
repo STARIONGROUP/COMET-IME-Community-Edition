@@ -2,7 +2,7 @@
 // <copyright file="Cdp4DiagramOrgChartBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -35,7 +35,6 @@ namespace CDP4CommonView.Diagram
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.Diagram.ViewModels;
     using CDP4CommonView.Diagram.Views;
@@ -518,14 +517,16 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Delete related port shape when ever an element definition gets deleted
+        /// Remove a <see cref="DiagramContentItem"/> from the ViewModel and delete its related port shapes whenever a <see cref="DiagramContentItem"/> gets deleted
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The <see cref="DiagramItemsDeletingEventArgs"/></param>
         private void ItemsDeleting(object sender, DiagramItemsDeletingEventArgs e)
         {
             foreach (var item in e.Items)
             {
+                object element = null;
+
                 if (item is DiagramContentItem contentItem)
                 {
                     if (contentItem.Content is PortContainerDiagramContentItem portContainer)
@@ -543,14 +544,16 @@ namespace CDP4CommonView.Diagram
                         this.AssociatedObject.UnselectItem(selected);
                     }
 
-                    (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.RemoveDiagramThingItem(contentItem.Content);
-
-                    (contentItem.Content as ThingDiagramContentItem)?.PositionObservable.Dispose();
+                    element = contentItem.Content;
                 }
-
                 else if (item is Cdp4DiagramConnector connector)
                 {
-                    (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.RemoveDiagramThingItem(connector.DataContext);
+                    element = connector.DataContext;
+                }
+
+                if (element != null)
+                {
+                    (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.RemoveDiagramThingItem(element);
                 }
             }
         }
@@ -611,14 +614,12 @@ namespace CDP4CommonView.Diagram
 
             foreach (var item in e.Items)
             {
-                if (((DiagramContentItem)item).Content is not ThingDiagramContentItem namedThingDiagramContentItem)
+                if (item is DiagramContentItem { Content: ThingDiagramContentItem thingDiagramContentItem })
                 {
-                    continue;
-                }
-
-                if (this.ItemPositions.TryGetValue(namedThingDiagramContentItem, out var itemPosition))
-                {
-                    item.Position = itemPosition;
+                    if (this.ItemPositions.TryGetValue(thingDiagramContentItem, out var itemPosition))
+                    {
+                        item.Position = itemPosition;
+                    }
                 }
             }
 
@@ -764,7 +765,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
         private void PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (!(e.Source is Thing))
+            if (!this.IsMovable(e.Source))
             {
                 return;
             }
@@ -789,12 +790,22 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
         private void PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            if (!(e.Source is Thing))
+            if (!this.IsMovable(e.Source))
             {
                 return;
             }
 
             this.dragInfo = null;
+        }
+
+        /// <summary>
+        /// Checks if an object is a movable object.
+        /// </summary>
+        /// <param name="obj">The object</param>
+        /// <returns>true if movable, otherwide false</returns>
+        private bool IsMovable(object obj)
+        {
+            return obj is Thing;
         }
 
         /// <summary>
@@ -817,7 +828,7 @@ namespace CDP4CommonView.Diagram
                 return;
             }
 
-            if (!(e.Source is Thing))
+            if (!this.IsMovable(e.Source))
             {
                 return;
             }
@@ -825,7 +836,7 @@ namespace CDP4CommonView.Diagram
             var dragStart = this.dragInfo.DragStartPosition;
             var position = e.GetPosition(null);
 
-            if ((Math.Abs(position.X - dragStart.X) <= SystemParameters.MinimumHorizontalDragDistance) 
+            if (Math.Abs(position.X - dragStart.X) <= SystemParameters.MinimumHorizontalDragDistance
                 && Math.Abs(position.Y - dragStart.Y) <= SystemParameters.MinimumVerticalDragDistance)
             {
                 return;
@@ -879,32 +890,62 @@ namespace CDP4CommonView.Diagram
         /// </remarks>
         private void PreviewDragOver(object sender, DragEventArgs e)
         {
+            //If the sender is a port and its element definition is not selected
+            if (((DiagramControl) sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
+            {
+                return;
+            }
+
             var dropInfo = new DiagramDropInfo(sender, e);
 
-            //If the sender is a port and its element definition is not selected
-            if (((DiagramControl)sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
-            {
-                e.Handled = true;
-                return;
-            }
+            e.Handled = this.HandleDragOver(e.Source, dropInfo);
+            e.Effects = dropInfo.Effects;
 
-            if (!(e.Source is Thing || dropInfo.Payload is Thing || dropInfo.Payload is Tuple<ParameterType, MeasurementScale>))
+            if (e.Handled)
             {
                 return;
-            }
-
-            if (this.AssociatedObject.DataContext is IDropTarget dropTarget)
-            {
-                dropTarget.DragOver(dropInfo);
-
-                e.Effects = dropInfo.Effects;
-                e.Handled = true;
             }
 
             if (sender is DependencyObject dependencyObject)
             {
                 this.Scroll(dependencyObject, e);
             }
+        }
+
+        /// <summary>
+        /// Handles the PreviewDragOver event
+        /// </summary>
+        /// <param name="source">The source <see cref="object"/> that originated the DragOver action.</param>
+        /// <param name="dropInfo">The <see cref="DiagramDropInfo"/> object that was created based on the DragOver action.</param>
+        /// <returns>true if the DragOver action was handled, otherwise false</returns>
+        public bool HandleDragOver(object source, IDiagramDropInfo dropInfo)
+        {
+            if (source is DiagramContentItem { Content: IDropTarget controlDropTarget })
+            {
+                controlDropTarget.DragOver(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
+            }
+
+            if (source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
+            {
+                controlHavingDropTarget.DropTarget.DragOver(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
+            }
+
+            if (this.AssociatedObject?.DataContext is IDropTarget dropTarget)
+            {
+                dropTarget.DragOver(dropInfo);
+            }
+
+            return dropInfo.Handled;
         }
 
         /// <summary>
@@ -961,16 +1002,43 @@ namespace CDP4CommonView.Diagram
         {
             var dropInfo = new DiagramDropInfo(sender, e);
 
-            if (!(e.Source is Thing || dropInfo.Payload is Thing || dropInfo.Payload is Tuple<ParameterType, MeasurementScale>))
+            e.Handled = this.HandleDrop(e.Source, dropInfo);
+        }
+
+        /// <summary>
+        /// Handles the PreviewDrop event
+        /// </summary>
+        /// <param name="source">The source <see cref="object"/> that originated the Drop action.</param>
+        /// <param name="dropInfo">The <see cref="DiagramDropInfo"/> object that was created based on the Drop action.</param>
+        /// <returns>true if the Drop action was handled, otherwise false</returns>
+        public virtual bool HandleDrop(object source, IDiagramDropInfo dropInfo)
+        {
+            if (source is DiagramContentItem { Content: IDropTarget controlDropTarget })
             {
-                return;
+                controlDropTarget.Drop(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
             }
 
-            if (this.AssociatedObject.DataContext is IDropTarget dropTarget)
+            if (source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
             {
-                dropTarget.Drop(dropInfo);
-                e.Handled = true;
+                controlHavingDropTarget.DropTarget.Drop(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
             }
+
+            if (this.AssociatedObject?.DataContext is IDropTarget vmDropTarget)
+            {
+                vmDropTarget.Drop(dropInfo);
+            }
+
+            return dropInfo.Handled;
         }
 
         /// <summary>
