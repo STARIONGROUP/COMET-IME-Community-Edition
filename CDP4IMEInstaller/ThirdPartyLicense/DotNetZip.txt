@@ -1,7 +1,9 @@
 ﻿name: DotNetZip
-version: 1.10.1
+version: 1.13.8
 project url: https://github.com/haf/DotNetZip.Semverd
 license url: https://raw.githubusercontent.com/haf/DotNetZip.Semverd/master/LICENSE
+Software Licenses that apply to the DotNetZip library and tools
+
 Software Licenses that apply to the DotNetZip library and tools
 
 As DotNetZip includes work derived from other projects, you are required to comply with the terms and conditions for each of them. These licenses include BSD, Apache, and zlib.
@@ -87,3 +89,33 @@ Apache Commons Compress ( http://commons.apache.org/proper/commons-compress/ ) i
     Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
 
 Many thanks to Julian Seward for the original C implementation of BZip2 ( http://www.bzip.org/ ).
+
+--------------------------------------------------------------
+
+The managed Deflate64 code included  Ionic.Zip.dll is modified code, based on C# code in the .NET Core Libraries (CoreFX) (System.IO.Compression/DeflateManaged).
+
+Code is provided under MIT licence:
+
+	The MIT License (MIT)
+
+	Copyright (c) .NET Foundation and Contributors
+
+	All rights reserved.
+
+	Permission is hereby granted, free of charge, to any person obtaining a copy
+	of this software and associated documentation files (the "Software"), to deal
+	in the Software without restriction, including without limitation the rights
+	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+	copies of the Software, and to permit persons to whom the Software is
+	furnished to do so, subject to the following conditions:
+
+	The above copyright notice and this permission notice shall be included in all
+	copies or substantial portions of the Software.
+
+	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+	SOFTWARE.

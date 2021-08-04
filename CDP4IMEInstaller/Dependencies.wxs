@@ -8,8 +8,8 @@
 	<Fragment>
     <ComponentGroup Id="DEPENDENCIES" Directory="BIN">
 
-      <Component Id="comp_ExceptionReporter_WinForms" Guid="{DDBBAB53-5E15-4461-85BB-4B0456A090F6}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_ExceptionReporter_WinForms" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)ExceptionReporter.WinForms.dll" KeyPath="yes" />
+      <Component Id="comp_ExceptionReporter_NET" Guid="{804BA25C-9BA6-406F-96C5-8E84E21EFF3B}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_ExceptionReporter_NET" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)ExceptionReporter.NET.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="comp_Hardcodet_Wpf_TaskbarNotification" Guid="{71968271-91D9-4BE8-9B53-0637495B0157}" Location="local" Win64="$(var.Win64)">
