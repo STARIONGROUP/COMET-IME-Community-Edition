@@ -105,7 +105,67 @@
       <Component Id="comp_license_System_Xml_XmlSerializer" Guid="{0C741452-C104-4353-B257-F98E3CE844B2}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_license_System_Xml_XmlSerializer" Vital="yes" Source="ThirdPartyLicense\System.Xml.XmlSerializer.txt" KeyPath="yes"></File>
       </Component>
-      
-    </ComponentGroup>
+		
+	  <Component Id="comp_license_System_ValueTuple" Guid="{50ADFA0C-4753-46DE-852A-596BC87DD7F8}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_System_ValueTuple" Vital="yes" Source="ThirdPartyLicense\System.ValueTuple.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_System_Threading_Tasks_Extensions" Guid="{B1E571CD-A77F-4983-9528-AC4016215C2F}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_System_Threading_Tasks_Extensions" Vital="yes" Source="ThirdPartyLicense\System.Threading.Tasks.Extensions.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_System_Runtime_CompilerServices_Unsafe" Guid="{4C609DE0-BEA5-4E31-9D40-45BFFA08B927}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_System_Runtime_CompilerServices_Unsafe" Vital="yes" Source="ThirdPartyLicense\System.Runtime.CompilerServices.Unsafe.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_Microsoft_NET_Test_Sdk" Guid="{563B2C5E-BDF5-4FC9-A202-0D0A86112462}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_Microsoft_NET_Test_Sdk" Vital="yes" Source="ThirdPartyLicense\Microsoft.NET.Test.Sdk.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_Microsoft_CSharp" Guid="{3D66F95A-A7FF-4C93-B79C-11ABFE096999}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_Microsoft_CSharp" Vital="yes" Source="ThirdPartyLicense\Microsoft.CSharp.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_Microsoft_AspNet_WebApi_Client" Guid="{BF0816AE-EACF-46F6-9CA4-8A7348BA271E}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_Microsoft_AspNet_WebApi_Client" Vital="yes" Source="ThirdPartyLicense\Microsoft.AspNet.WebApi.Client.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_Microsoft_AspNet_Mvc" Guid="{F749E628-6BE4-42B2-98A3-27A043AA86E2}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_Microsoft_AspNet_Mvc" Vital="yes" Source="ThirdPartyLicense\Microsoft.AspNet.Mvc.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_Moq" Guid="{0D90696F-74EC-4832-B3DB-9914174D1541}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_Moq" Vital="yes" Source="ThirdPartyLicense\Moq.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_CDP4Common_CE" Guid="{9216BF8C-78A1-417D-8FFF-805CA2EE43F3}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_CDP4Common_CE" Vital="yes" Source="ThirdPartyLicense\CDP4Common-CE.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_CDP4Dal_CE" Guid="{31C55927-DBD2-4419-B712-F057FE8EBBF7}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_CDP4Dal_CE" Vital="yes" Source="ThirdPartyLicense\CDP4Dal-CE.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_CDP4JsonFileDal_CE" Guid="{517EF7FB-6924-45EF-BEF8-431B0C8F6459}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_CDP4JsonFileDal_CE" Vital="yes" Source="ThirdPartyLicense\CDP4JsonFileDal-CE.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_CDP4JsonSerializer_CE" Guid="{8AB977E1-7E6B-45A8-BFA2-E934D9641A86}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_CDP4JsonSerializer_CE" Vital="yes" Source="ThirdPartyLicense\CDP4JsonSerializer-CE.txt" KeyPath="yes"></File>
+	  </Component>
+		
+	  <Component Id="comp_license_CDP4RequirementsVerification_CE" Guid="{BDA5383C-7DD6-4C69-B0A9-D4A3330660FE}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_CDP4RequirementsVerification_CE" Vital="yes" Source="ThirdPartyLicense\CDP4RequirementsVerification-CE.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_CDP4ServicesDal_CE" Guid="{C934670E-D7B9-4C5E-8743-42EC4A5EFC87}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_CDP4ServicesDal_CE" Vital="yes" Source="ThirdPartyLicense\CDP4ServicesDal-CE.txt" KeyPath="yes"></File>
+	  </Component>
+
+	  <Component Id="comp_license_CDP4WspDal_CE" Guid="{58AF4B27-31A9-45F2-AE84-41671CE36DC3}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_license_CDP4WspDal_CE" Vital="yes" Source="ThirdPartyLicense\CDP4WspDal-CE.txt" KeyPath="yes"></File>
+	  </Component>
+	
+	</ComponentGroup>
 	</Fragment>
 </Wix>

@@ -28,7 +28,7 @@
 
     <PropertyRef Id='WIXNETFX4RELEASEINSTALLED'/>  
     <Condition Message='This setup requires .NET Framework 4.8 or greater to be installed.'>
-      <![CDATA[Installed OR (WIXNETFX4RELEASEINSTALLED = "#528040")]]>
+      <![CDATA[Installed OR (WIXNETFX4RELEASEINSTALLED >= "#528040")]]>
     </Condition>
 
     <Feature Id="CDP4IMEFeature" Absent="disallow" Title="COMET IME" Level="1" ConfigurableDirectory="BIN" AllowAdvertise="no" InstallDefault="local" TypicalDefault="install">

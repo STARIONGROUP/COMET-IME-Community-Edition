@@ -1,4 +1,4 @@
-﻿name: AvalonEdit
+﻿name: Castle.Core
 version: 4.4.0
 project url: http://www.castleproject.org/
 license url: http://www.apache.org/licenses/LICENSE-2.0.html
