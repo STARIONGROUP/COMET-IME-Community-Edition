@@ -107,9 +107,7 @@
     <Content Include="ThirdPartyLicense\Microsoft.AspNet.Mvc.txt" />
     <Content Include="ThirdPartyLicense\Microsoft.AspNet.WebApi.Client.txt" />
     <Content Include="ThirdPartyLicense\Microsoft.CSharp.txt" />
-    <Content Include="ThirdPartyLicense\Microsoft.NET.Test.Sdk.txt" />
     <Content Include="ThirdPartyLicense\MoonSharp.txt" />
-    <Content Include="ThirdPartyLicense\Moq.txt" />
     <Content Include="ThirdPartyLicense\NetOffice.txt" />
     <Content Include="ThirdPartyLicense\Newtonsoft.Json.txt" />
     <Content Include="ThirdPartyLicense\NLog.txt" />
