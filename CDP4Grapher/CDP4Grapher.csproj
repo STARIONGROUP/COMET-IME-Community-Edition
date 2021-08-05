@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{7DEDB709-7B9D-4CEC-B98C-CC29874E357B}</ProjectGuid>
     <MinIMEVersion>8.1.0</MinIMEVersion>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4Grapher</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -42,7 +42,7 @@
     <PackageReference Include="CommonServiceLocator" Version="1.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DynamicLanguageRuntime" Version="1.2.3" />
+    <PackageReference Include="DynamicLanguageRuntime" Version="1.3.0" />
     <PackageReference Include="reactiveui" Version="6.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>

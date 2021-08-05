@@ -161,8 +161,7 @@ namespace CDP4Requirements.Tests.ReqIF
         {
             this.thingDialogNavigationService.Setup(
                     x => x.Navigate(It.IsAny<ParameterType>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null))
-                .Returns(true)
-                .Callback<ParameterType, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, Thing[]>((parameterType, tr, s, boolean, kind, transaction, c, chain) => this.srdl.ParameterType.Add(parameterType));
+                .Returns(true);
 
             this.dialog.SelectedRow = this.dialog.MappingRows.First(x => x.Identifiable == this.stringDatadef);
             this.dialog.CreateParameterTypeCommands.First().MenuCommand.Execute(null);
@@ -176,9 +175,8 @@ namespace CDP4Requirements.Tests.ReqIF
         {
             this.thingDialogNavigationService.Setup(
                     x => x.Navigate(It.IsAny<ParameterType>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, null, null))
-                .Returns(true)
-                .Callback<ParameterType, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, Thing[]>((parameterType, tr, s, boolean, kind, transaction, c, chain) => this.srdl.ParameterType.Add(parameterType));
-
+                .Returns(true);
+            
             this.dialog.SelectedRow = this.dialog.MappingRows.First(x => x.Identifiable == this.enumDatadef);
             this.dialog.CreateParameterTypeCommands.First().MenuCommand.Execute(null);
 

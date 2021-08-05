@@ -44,7 +44,7 @@ namespace CDP4PluginPackager
         /// <param name="path">the working directory</param>
         /// <param name="shouldPluginGetPacked">state if a plugin needs to be packed in a zip</param>
         /// <param name="buildConfiguration">the current build configuration (Debug/Release)</param>
-        /// <param name="buildTargetFramework">The target framework version (net452)</param>
+        /// <param name="buildTargetFramework">The target framework version (net48)</param>
         /// <param name="buildPlatform">The build platform (AnyCpu/x64)</param>
         public SdkPluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration, string buildTargetFramework, string buildPlatform) : base(path, shouldPluginGetPacked, buildConfiguration, buildTargetFramework, buildPlatform)
         {

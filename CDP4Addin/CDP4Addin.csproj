@@ -3,7 +3,7 @@
     <ProjectGuid>{161E536A-DB05-4BFD-BADD-A5B9EF605DA5}</ProjectGuid>
     <RootNamespace>CDP4AddinCE</RootNamespace>
     <AssemblyName>CDP4AddinCE</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4AddinCE</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -66,7 +66,7 @@
     <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="20.2.7" />
     <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="20.2.7" />
     <PackageReference Include="DevExpress.Xpo" Version="20.2.7" />
-    <PackageReference Include="ExceptionReporter" Version="2.1.2" />
+    <PackageReference Include="ExceptionReporter" Version="4.0.2" />
     <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.7.4.8" />
     <PackageReference Include="NetOfficeFw.Excel" Version="1.7.4.8" />

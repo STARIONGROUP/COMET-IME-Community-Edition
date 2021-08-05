@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{FC0997A4-F981-4002-9BDC-BC2FFA6DF552}</ProjectGuid>
     <MinIMEVersion>8.1.0</MinIMEVersion>
-    <TargetFramework>net452</TargetFramework>   
+    <TargetFramework>net48</TargetFramework>   
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ReferenceDataMapper</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

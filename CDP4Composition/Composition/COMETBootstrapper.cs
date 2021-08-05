@@ -4,16 +4,16 @@
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -32,6 +32,7 @@ namespace CDP4Composition.Composition
     using System.IO;
     using System.Reflection;
 
+    using CDP4Composition.Exceptions;
     using CDP4Composition.Modularity;
     using CDP4Composition.Services.AppSettingService;
 
@@ -126,8 +127,15 @@ namespace CDP4Composition.Composition
 
             foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
             {
-                catalog.Catalogs.Add(directoryCatalog);
-                UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
+                try
+                {
+                    catalog.Catalogs.Add(directoryCatalog);
+                    this.UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
+                }
+                catch (ReflectionTypeLoadException reflectionTypeLoadException)
+                {
+                    throw new CometReflectionTypeLoadException(reflectionTypeLoadException);
+                }
             }
 
             this.UpdateBootstrapperStatus($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
@@ -150,7 +158,7 @@ namespace CDP4Composition.Composition
         protected virtual void UpdateBootstrapperStatus(string message)
         {
             this.status = message;
-            this.logger.Debug(status);
+            this.logger.Debug(this.status);
         }
 
         /// <summary>

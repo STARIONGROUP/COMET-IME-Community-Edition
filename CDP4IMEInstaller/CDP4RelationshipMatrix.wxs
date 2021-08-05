@@ -18,6 +18,26 @@
         <File Id="fil_RelationshipMatrix_csvhelper" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)CsvHelper.dll" KeyPath="yes" />
       </Component>
 
+	  <Component Id="comp_RelationshipMatrix_AsyncInterfaces" Guid="{BD8B9F2C-2BF7-4309-9322-BEA012C5ABDD}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_RelationshipMatrix_AsyncInterfaces" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+	  </Component>
+
+	  <Component Id="comp_RelationshipMatrix_HashCode" Guid="{924F78BA-3D2F-4258-AE6E-DF30F3620B9A}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_RelationshipMatrix_HashCode" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)Microsoft.Bcl.HashCode.dll" KeyPath="yes" />
+	  </Component>
+
+	  <Component Id="comp_RelationshipMatrix_Buffers" Guid="{77D34A66-D636-40CE-9C9D-3D23B861F76E}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_RelationshipMatrix_Buffers" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)System.Buffers.dll" KeyPath="yes" />
+	  </Component>
+
+	  <Component Id="comp_RelationshipMatrix_Memory" Guid="{01887077-28C2-4051-A97F-E0FEB9429EDC}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_RelationshipMatrix_Memory" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)System.Memory.dll" KeyPath="yes" />
+	  </Component>
+
+	  <Component Id="comp_RelationshipMatrix_Vectors" Guid="{D1DC12AE-3ED4-417A-AE13-2B7E83EC6A7C}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_RelationshipMatrix_Vectors" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)System.Numerics.Vectors.dll" KeyPath="yes" />
+	  </Component>		
+
     </ComponentGroup>
 	</Fragment>
 </Wix>

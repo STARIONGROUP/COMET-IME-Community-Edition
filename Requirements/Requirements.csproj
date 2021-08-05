@@ -4,7 +4,7 @@
     <MinIMEVersion>8.1.0</MinIMEVersion>
     <RootNamespace>CDP4Requirements</RootNamespace>
     <AssemblyName>CDP4Requirements</AssemblyName>
-    <TargetFramework>net452</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4Requirements</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -169,7 +169,7 @@
     <PackageReference Include="DevExpress.Xpo" Version="20.2.7">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DotLiquid" Version="2.0.325" />
+    <PackageReference Include="DotLiquid" Version="2.2.508" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.7.4.8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
