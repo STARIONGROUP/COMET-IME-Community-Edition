@@ -87,8 +87,15 @@
     <Content Include="banner.bmp" />
     <Content Include="ThirdPartyLicense\AvalonEdit.txt" />
     <Content Include="ThirdPartyLicense\CastleCore.txt" />
+    <Content Include="ThirdPartyLicense\CDP4Common-CE.txt" />
     <Content Include="ThirdPartyLicense\CDP4Satsearch.txt" />
     <Content Include="ThirdPartyLicense\CommonServiceLocator.txt" />
+    <Content Include="ThirdPartyLicense\CDP4Dal-CE.txt" />
+    <Content Include="ThirdPartyLicense\CDP4JsonFileDal-CE.txt" />
+    <Content Include="ThirdPartyLicense\CDP4JsonSerializer-CE.txt" />
+    <Content Include="ThirdPartyLicense\CDP4RequirementsVerification-CE.txt" />
+    <Content Include="ThirdPartyLicense\CDP4ServicesDal-CE.txt" />
+    <Content Include="ThirdPartyLicense\CDP4WspDal-CE.txt" />
     <Content Include="ThirdPartyLicense\CsvHelper.txt" />
     <Content Include="ThirdPartyLicense\dotliquid.txt" />
     <Content Include="ThirdPartyLicense\DotNetZip.txt" />
@@ -97,16 +104,13 @@
     <Content Include="ThirdPartyLicense\Hardcodet.Wpf.TaskbarNotification.txt" />
     <Content Include="ThirdPartyLicense\IronPython.txt" />
     <Content Include="ThirdPartyLicense\Markdown.Xaml.txt" />
+    <Content Include="ThirdPartyLicense\Microsoft.AspNet.Mvc.txt" />
+    <Content Include="ThirdPartyLicense\Microsoft.AspNet.WebApi.Client.txt" />
+    <Content Include="ThirdPartyLicense\Microsoft.CSharp.txt" />
     <Content Include="ThirdPartyLicense\MoonSharp.txt" />
     <Content Include="ThirdPartyLicense\NetOffice.txt" />
     <Content Include="ThirdPartyLicense\Newtonsoft.Json.txt" />
     <Content Include="ThirdPartyLicense\NLog.txt" />
-    <Content Include="ThirdPartyLicense\Prism.Composition.txt" />
-    <Content Include="ThirdPartyLicense\Prism.Interactivity.txt" />
-    <Content Include="ThirdPartyLicense\Prism.MEFExtensions.txt" />
-    <Content Include="ThirdPartyLicense\Prism.Mvvm.txt" />
-    <Content Include="ThirdPartyLicense\Prism.PubSubEvents.txt" />
-    <Content Include="ThirdPartyLicense\Prism.txt" />
     <Content Include="ThirdPartyLicense\reactiveui-core.txt" />
     <Content Include="ThirdPartyLicense\reactiveui.txt" />
     <Content Include="ThirdPartyLicense\Rx-Core.txt" />
@@ -116,6 +120,9 @@
     <Content Include="ThirdPartyLicense\Rx-PlatformServices.txt" />
     <Content Include="ThirdPartyLicense\Rx-XAML.txt" />
     <Content Include="ThirdPartyLicense\Splat.txt" />
+    <Content Include="ThirdPartyLicense\System.Runtime.CompilerServices.Unsafe.txt" />
+    <Content Include="ThirdPartyLicense\System.Threading.Tasks.Extensions.txt" />
+    <Content Include="ThirdPartyLicense\System.ValueTuple.txt" />
     <Content Include="ThirdPartyLicense\System.Xml.XmlSerializer.txt" />
     <Content Include="variables.wxi" />
   </ItemGroup>

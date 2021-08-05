@@ -1,5 +1,5 @@
 ﻿name: dotliquid
-version: 2.0.298
+version: 2.2.508
 project url: http://dotliquidmarkup.org/
 license url: http://www.apache.org/licenses/LICENSE-2.0
 

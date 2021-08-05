@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
-  <Product Id="*" Name="COMET-CE" Language="1033" Version="8.1.0.3" Manufacturer="RHEA System S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
+  <Product Id="*" Name="COMET-CE" Language="1033" Version="9.0.0.0" Manufacturer="RHEA System S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
 
     <?include variables.wxi ?>
   
@@ -18,18 +18,17 @@
     <Icon Id="icon.ico" SourceFile="comet.ico"/>
     <Property Id="ARPPRODUCTICON" Value="icon.ico" />
 
-    <Property Id="WIXUI_INSTALLDIR" Value="CDP4INSTALLFOLDER" ></Property>
+    <Property Id="WIXUI_INSTALLDIR" Value="CDP4INSTALLFOLDER"></Property>
 
     <UIRef Id="WixUI_Mondo" />
 
     <WixVariable Id="WixUILicenseRtf" Value="$(var.CDP4IME-CE.ProjectDir)license.rtf" />
     <WixVariable Id="WixUIDialogBmp" Value="background.bmp" />
     <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
-    
-	  <PropertyRef Id="WIX_IS_NETFRAMEWORK_452_OR_LATER_INSTALLED" />
-	  
-    <Condition Message='This setup requires Microsoft .NET Framework 4.5.2 Full package or greater needs to be installed for this installation to continue.'>
-      <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_452_OR_LATER_INSTALLED]]>
+
+    <PropertyRef Id='WIXNETFX4RELEASEINSTALLED'/>  
+    <Condition Message='This setup requires .NET Framework 4.8 or greater to be installed.'>
+      <![CDATA[Installed OR (WIXNETFX4RELEASEINSTALLED >= "#528040")]]>
     </Condition>
 
     <Feature Id="CDP4IMEFeature" Absent="disallow" Title="COMET IME" Level="1" ConfigurableDirectory="BIN" AllowAdvertise="no" InstallDefault="local" TypicalDefault="install">

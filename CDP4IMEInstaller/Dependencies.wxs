@@ -8,9 +8,9 @@
 	<Fragment>
     <ComponentGroup Id="DEPENDENCIES" Directory="BIN">
 
-      <Component Id="comp_ExceptionReporter_WinForms" Guid="{DDBBAB53-5E15-4461-85BB-4B0456A090F6}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_ExceptionReporter_WinForms" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)ExceptionReporter.WinForms.dll" KeyPath="yes" />
-      </Component>
+	  <Component Id="comp_ExceptionReporter_WinForms" Guid="{DDBBAB53-5E15-4461-85BB-4B0456A090F6}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_ExceptionReporter_NET" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)ExceptionReporter.NET.dll" KeyPath="yes" />
+	  </Component>		
 
       <Component Id="comp_Hardcodet_Wpf_TaskbarNotification" Guid="{71968271-91D9-4BE8-9B53-0637495B0157}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_Hardcodet_Wpf_TaskbarNotification" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Hardcodet.Wpf.TaskbarNotification.dll" KeyPath="yes" />
@@ -75,7 +75,11 @@
       <Component Id="comp_System_Net_Http_Formatting" Guid="{482518C9-788F-4177-B29D-23A2DC581782}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_System_Net_Http_Formatting" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Net.Http.Formatting.dll" KeyPath="yes" />
       </Component>
-
-    </ComponentGroup>
+		
+	  <Component Id="comp_prism_ServiceLocation" Guid="{BD87EF72-75C3-49F8-B720-911947894B5C}" Location="local" Win64="$(var.Win64)">
+		<File Id="fil_prism_ServiceLocation" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.ServiceLocation.dll" KeyPath="yes" />
+	  </Component>
+		
+	</ComponentGroup>
   </Fragment>
 </Wix>
