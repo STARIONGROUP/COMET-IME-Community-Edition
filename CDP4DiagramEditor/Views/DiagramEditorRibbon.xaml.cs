@@ -35,7 +35,7 @@ namespace CDP4DiagramEditor.Views
     /// <summary>
     /// Interaction logic for CDP4DiagramEditorRibbon.xaml
     /// </summary>
-    [Export(typeof(ExtendedRibbonPage))]
+    [Export(typeof(ExtendedRibbonPageGroup))]
     public partial class CDP4DiagramEditorRibbon : IView
     {
         /// <summary>

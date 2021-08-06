@@ -14,7 +14,10 @@
     <Image x:Key="SaveIcon" x:Shared="False" Source="{dx:DXImage Image=Save_16x16.png}" Height="16" Width="16"/>
     <Image x:Key="NavigateIcon" x:Shared="False" Source="{dx:DXImage Image=Redo_16x16.png}" Height="16" Width="16"/>
     <Image x:Key="FavoriteIcon" x:Shared="False" Source="{dx:DXImage Image=NewContact_16x16.png}" Height="16" Width="16"/>
-
+    <Image x:Key="OpenIcon" x:Shared="False" Source="{dx:DXImage 'Images/Actions/Open2_16x16.png'}" Height="16" Width="16"/>
+    <Image x:Key="HideIcon" x:Shared="False" Source="{dx:DXImage 'Images/Actions/Hide_16x16.png'}" Height="16" Width="16"/>
+    <Image x:Key="ReviewIcon" x:Shared="False" Source="{dx:DXImage 'Images/Comments/ShowHideComment_16x16.png'}" Height="16" Width="16"/>
+    <Image x:Key="PublishIcon" x:Shared="False" Source="{dx:DXImage 'Images/Miscellaneous/ViewOnWeb_16x16.png'}" Height="16" Width="16"/>
     <Style TargetType="ScrollBar">
         <!-- 
         This style disables the context menu of the scrollbars, the scroll-menu conflicts with the ContextMenu style.
@@ -124,6 +127,18 @@
                         </DataTrigger>
                         <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Favorite}">
                             <Setter Property="Icon" Value="{StaticResource FavoriteIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Open}">
+                            <Setter Property="Icon" Value="{StaticResource OpenIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Hide}">
+                            <Setter Property="Icon" Value="{StaticResource HideIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Review}">
+                            <Setter Property="Icon" Value="{StaticResource ReviewIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Publish}">
+                            <Setter Property="Icon" Value="{StaticResource PublishIcon}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

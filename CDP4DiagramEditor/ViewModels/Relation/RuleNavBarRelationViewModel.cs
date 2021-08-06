@@ -77,10 +77,10 @@ namespace CDP4DiagramEditor.ViewModels.Relation
 
         /// <summary>
         /// Compute whether a <see cref="Relationship"/> can be created.
-        /// This is true only when two <see cref="NamedThingDiagramContentItem"/> with <see cref="Thing"/>s are selected or
+        /// This is true only when two <see cref="NamedThingDiagramContentItemViewModel"/> with <see cref="Thing"/>s are selected or
         /// this Rule describes a <see cref="BinaryRelationshipRule"/>.
         /// </summary>
-        /// <returns>True when two <see cref="NamedThingDiagramContentItem"/> with <see cref="Thing"/>s are selected. </returns>
+        /// <returns>True when two <see cref="NamedThingDiagramContentItemViewModel"/> with <see cref="Thing"/>s are selected. </returns>
         private bool CanCreateRelationship()
         {
             // Multi relationships require more than one item to be selected.
@@ -89,7 +89,7 @@ namespace CDP4DiagramEditor.ViewModels.Relation
                 return false;
             }
 
-            return ((DiagramEditorViewModel) this.ContainerViewModel).SelectedItems.All(x => x is NamedThingDiagramContentItem);
+            return ((DiagramEditorViewModel) this.ContainerViewModel).SelectedItems.All(x => x is NamedThingDiagramContentItemViewModel);
         }
 
         /// <summary>

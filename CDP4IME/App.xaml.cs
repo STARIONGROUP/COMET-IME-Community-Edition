@@ -59,13 +59,16 @@ namespace CDP4IME
         /// </param>
         protected override void OnStartup(StartupEventArgs e)
         {
+            logger.Info($"#############################################################################");
+            logger.Info($"Boot sequence COMET IME {Assembly.GetEntryAssembly().GetName().Version} started...");
+
             // Set the Theme of the application
             ThemeManager.ApplicationThemeName = Theme.SevenName;
             AppliedTheme.ThemeName = Theme.SevenName;
             base.OnStartup(e);
 
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
-            
+
             if (UpdateInstaller.CheckInstallAndVerifyIfTheImeShallShutdown())
             {
                 Current.Shutdown();
@@ -74,17 +77,17 @@ namespace CDP4IME
 
             DXSplashScreen.Show<Views.SplashScreenView>();
             DXSplashScreen.SetState("Starting COMET");
-            
+
 #if (DEBUG)
             RunInDebugMode();
 #else
             RunInReleaseMode();
 #endif
-            
+
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
-            
+
             DXSplashScreen.SetState("Preparing Main Window");
-            
+
             Current.MainWindow.Show();
             DXSplashScreen.Close();
         }
@@ -94,10 +97,13 @@ namespace CDP4IME
         /// </summary>
         private static void RunInDebugMode()
         {
+            logger.Info($"Running in debug mode");
+
             var bootstrapper = new CDP4IMEBootstrapper();
 
             try
             {
+                logger.Info("Running bootstrapper");
                 bootstrapper.Run();
             }
             catch (ReflectionTypeLoadException ex)
@@ -138,10 +144,12 @@ namespace CDP4IME
         private static void RunInReleaseMode()
         {
             AppDomain.CurrentDomain.UnhandledException += AppDomainUnhandledException;
-            
+
             try
             {
                 var bootstrapper = new CDP4IMEBootstrapper();
+
+                logger.Info("Running bootstrapper");
                 bootstrapper.Run();
             }
             catch (Exception ex)
@@ -195,7 +203,6 @@ namespace CDP4IME
         private void OnAppStartup_UpdateThemeName(object sender, StartupEventArgs e)
         {
             DevExpress.Xpf.Core.ApplicationThemeHelper.UpdateApplicationThemeName();
-        }        
-
+        }
     }
 }

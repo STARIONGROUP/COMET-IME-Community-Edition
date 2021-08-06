@@ -48,7 +48,7 @@ namespace CDP4Composition.Mvvm
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.ViewModels;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -56,7 +56,7 @@ namespace CDP4Composition.Mvvm
     using DevExpress.Xpf.Grid;
 
     using NLog;
-    
+
     using ReactiveUI;
 
     using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
@@ -269,7 +269,7 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public bool IsSelected
         {
-            get { return isSelected; }
+            get { return this.isSelected; }
             set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
         }
 
@@ -937,7 +937,7 @@ namespace CDP4Composition.Mvvm
                         this.ContextMenu.Add(new ContextMenuItemViewModel(string.Format("Delete this {0}", this.camelCaseToSpaceConverter.Convert(this.SelectedThing.Thing.ClassKind, null, null, null)), "", this.DeleteCommand, MenuItemKind.Delete));
                     }
                 }
-               
+
                 var categorizableThing = this.SelectedThing.Thing as ICategorizableThing;
 
                 if (categorizableThing != null && categorizableThing.Category.Any())
@@ -960,7 +960,6 @@ namespace CDP4Composition.Mvvm
                     new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
                     new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
             }
-
         }
 
         /// <summary>
@@ -1038,7 +1037,7 @@ namespace CDP4Composition.Mvvm
         /// </param>
         /// <remarks>
         /// To allow a drag to be started, the <see cref="IDragInfo.Effects"/> property on <paramref name="dragInfo"/> 
-        /// should be set to a value other than <see cref="DragDropEffects.None"/>. 
+        /// should be set to a value other than <see cref="DragDropEffects.None"/>.
         /// </remarks>
         public virtual void StartDrag(IDragInfo dragInfo)
         {

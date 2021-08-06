@@ -108,6 +108,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\ArchitectureDiagramDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
