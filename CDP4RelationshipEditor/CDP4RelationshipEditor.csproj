@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{E8BEF8CE-68CB-4AB7-93C9-70679B9B4D83}</ProjectGuid>
-    <MinIMEVersion>8.1.0</MinIMEVersion>
+    <MinIMEVersion>9.0.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4RelationshipEditor</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4RelationshipEditor</Product>
     <Description>COMET Relationship Editor Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>8.1.0.3</AssemblyVersion>
-    <FileVersion>8.1.0.3</FileVersion>
+    <AssemblyVersion>9.0.0.1</AssemblyVersion>
+    <FileVersion>9.0.0.1</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

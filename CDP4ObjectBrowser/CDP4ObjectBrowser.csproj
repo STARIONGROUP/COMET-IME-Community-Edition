@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{C6B4A2B4-5DD4-45D8-93B4-17DF82641B86}</ProjectGuid>
-    <MinIMEVersion>8.1.0</MinIMEVersion>
+    <MinIMEVersion>9.0.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ObjectBrowser</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4ObjectBrowser</Product>
     <Description>COMET Object Browser Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>8.1.0.3</AssemblyVersion>
-    <FileVersion>8.1.0.3</FileVersion>
+    <AssemblyVersion>9.0.0.1</AssemblyVersion>
+    <FileVersion>9.0.0.1</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

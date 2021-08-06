@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{3E0504F1-B0CE-4115-BCFC-7F462B14E5A1}</ProjectGuid>
-    <MinIMEVersion>8.1.0</MinIMEVersion>
+    <MinIMEVersion>9.0.0</MinIMEVersion>
     <RootNamespace>CDP4WspDalPlugin</RootNamespace>
     <AssemblyName>CDP4WspDalPlugin</AssemblyName>
     <TargetFramework>net48</TargetFramework>
@@ -11,8 +11,8 @@
     <Product>CDP4WspDal</Product>
     <Description>COMET OCDT WSP Dal Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>8.1.0.3</AssemblyVersion>
-    <FileVersion>8.1.0.3</FileVersion>
+    <AssemblyVersion>9.0.0.1</AssemblyVersion>
+    <FileVersion>9.0.0.1</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
