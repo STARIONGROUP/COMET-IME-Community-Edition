@@ -16,8 +16,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="7.5.1-rc1" />
-    <PackageReference Include="CDP4Dal-CE" Version="7.5.1-rc1" />
+    <PackageReference Include="CDP4Common-CE" Version="7.5.1-609-PR195" />
+    <PackageReference Include="CDP4Dal-CE" Version="7.5.1-609-PR195" />
     <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.9.0" />
     <PackageReference Include="DevExpress.Charts.Core" Version="20.2.8" />
     <PackageReference Include="DevExpress.CodeParser" Version="20.2.8" />
