@@ -22,7 +22,7 @@
     
         <dxb:BarSplitButtonItem Name="OpenModelDiagramBarButtonItem"
                             ActAsDropDown="True"
-                            Content="Diagram editor"
+                            Content="Diagram Editor"
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=LabelsCenter_32x32.png}"

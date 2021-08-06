@@ -30,7 +30,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Defines the interface for view models that contain <see cref="DiagramContentItemChildren"/>
     /// </summary>
-    public interface IDiagramContentItemChildren 
+    public interface IDiagramContentItemChildren
     {
         /// <summary>
         /// A list of <see cref="IDiagramContentItemChild"/> instances

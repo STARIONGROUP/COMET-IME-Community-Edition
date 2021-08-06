@@ -31,6 +31,7 @@ namespace CDP4IME
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reflection;
 
     using CDP4Composition.Events;
     using CDP4Composition.Log;
@@ -149,7 +150,7 @@ namespace CDP4IME
 
             this.dialogNavigationService = dialogNavigationService;
             this.DockViewModel = dockViewModel;
-            this.Title = "COMET IME - Community Edition";
+            this.Title = $"COMET IME {Assembly.GetEntryAssembly()?.GetName().Version} - Community Edition";
 
             this.logTarget = new MemoryEventTarget();
             this.logTarget.EventReceived += this.LogEventReceived;
@@ -217,9 +218,10 @@ namespace CDP4IME
 
             this.OnClosingCommand = ReactiveCommand.CreateAsyncTask(async x => this.OnClosing(x as CancelEventArgs), RxApp.MainThreadScheduler);
 
-            logger.Info("Welcome in the COMET Application");
+            logger.Info($"Welcome in the COMET IME version {Assembly.GetEntryAssembly()?.GetName().Version}");
+            logger.Info($"IME Shell Initialized");
         }
-        
+
         /// <summary>
         /// Executes the <see cref="CheckForUpdateCommand"/>
         /// </summary>

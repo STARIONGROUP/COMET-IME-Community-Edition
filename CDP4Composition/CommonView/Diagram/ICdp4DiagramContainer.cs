@@ -26,19 +26,18 @@
 
 namespace CDP4CommonView.Diagram
 {
-    using CDP4Composition.Diagram;
     using DevExpress.Xpf.Diagram;
     using ReactiveUI;
 
     /// <summary>
-    /// The interface that describes some of the DiagramEditorViewModel capability related to <see cref="ICdp4DiagramOrgChartBehavior"/>/>
+    /// The interface that describes some of the DiagramEditorViewModel capability related to <see cref="ICdp4DiagramBehavior"/>/>
     /// </summary>
     public interface ICdp4DiagramContainer
     {
         /// <summary>
         /// Gets or sets the behaviour.
         /// </summary>
-        ICdp4DiagramOrgChartBehavior Behavior { get; set; }
+        ICdp4DiagramBehavior Behavior { get; set; }
 
         /// <summary>
         /// Get or set the <see cref="DiagramItem"/> item that is selected.
@@ -59,11 +58,5 @@ namespace CDP4CommonView.Diagram
         /// Computes the diagram connector.
         /// </summary>
         void ComputeDiagramConnector();
-
-        /// <summary>
-        /// Redraws connectors of a specified content item.
-        /// </summary>
-        /// <param name="contentItem">The content item.</param>
-        void RedrawConnectors(ThingDiagramContentItem contentItem);
     }
 }

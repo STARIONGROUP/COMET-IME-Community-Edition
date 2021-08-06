@@ -25,7 +25,7 @@
     <lc:LayoutControl Margin="5"
                       Orientation="Vertical"
                       ScrollBars="None">
-        <lc:LayoutGroup Margin="-10,-7,-10,-5"
+        <lc:LayoutGroup Margin="-10,-7,-10,-5"  
                         Orientation="Vertical"
                         View="Tabs"
                         lc:LayoutControl.AllowHorizontalSizing="True">
@@ -65,6 +65,7 @@
             <items:AliasLayoutGroup />
             <items:DefinitionLayoutGroup />
             <items:HyperLinkLayoutGroup />
+            <items:BehaviorLayoutGroup />
             <items:AdvancedLayoutGroup />
         </lc:LayoutGroup>
         <items:UserValidationButtonsLayoutGroup />

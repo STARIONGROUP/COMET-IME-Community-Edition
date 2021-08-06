@@ -69,13 +69,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0">
+    <PackageReference Include="CDP4Common-CE" Version="9.0.0-716-PR210">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
+    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-716-PR210">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-716-PR210">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">

@@ -47,7 +47,7 @@ namespace CDP4IME.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            this.AssociatedObject.DockOperationStarting += AssociatedObject_DockOperationStarting;
+            this.AssociatedObject.DockOperationStarting += this.AssociatedObject_DockOperationStarting;
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace CDP4IME.Behaviors
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            this.AssociatedObject.DockOperationStarting -= AssociatedObject_DockOperationStarting;
+            this.AssociatedObject.DockOperationStarting -= this.AssociatedObject_DockOperationStarting;
         }
 
         /// <summary>
