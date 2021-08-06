@@ -1,0 +1,110 @@
+﻿<av:ResourceDictionary x:Class="CDP4CommonView.Resources.AttachmentTemplate"
+                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                       xmlns:av="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                       xmlns:vm="clr-namespace:CDP4Composition.CommonView.ViewModels"
+                       xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+                       xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+                       xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+                       xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                       xmlns:items="clr-namespace:CDP4CommonView.Items"
+                       mc:Ignorable="d">
+
+    <DataTemplate DataType="{x:Type vm:AttachmentViewModel}">
+        <lc:LayoutGroup Orientation="Vertical">
+            <lc:LayoutItem Label="Path:">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="31" />
+                        <ColumnDefinition Width="31" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding Path=Path}"
+                               Height="18" />
+                    <dx:SimpleButton Grid.Column="1"
+                                     Width="25"
+                                     Height="25"
+                                     Margin="3"
+                                     Name="DownloadButton"
+                                     Command="{Binding Path=DownloadFileCommand}"
+                                     ToolTip="Download"
+                                     HorizontalAlignment="Right"
+                                     Glyph="{dx:DXImage Image=Download_16x16.png}"
+                                     IsEnabled="{Binding Path=CanDownloadFile, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                    <dx:SimpleButton Grid.Column="2"
+                                     Width="25"
+                                     Height="25"
+                                     Name="UploadButton"
+                                     Margin="3"
+                                     ToolTip="Upload"
+                                     Command="{Binding Path=AddFileCommand}"
+                                     HorizontalAlignment="Right"
+                                     Glyph="{dx:DXImage Image=AddFile_16x16.png}"
+                                     IsEnabled="{Binding Path=CanAddFile, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" />
+                </Grid>
+            </lc:LayoutItem>
+            <items:NameLayoutItem />
+            <lc:LayoutItem  Label="File Types:"
+                            LabelPosition="Top">
+                <dxb:ToolBarControl Height="30"
+                                    Background="Transparent">
+                    <dxb:BarButtonItem x:Name="AddFileTypeButton"
+                                       Command="{Binding AddFileTypeCommand}"
+                                       Glyph="{dx:DXImage Image=Add_16x16.png}"
+                                       Hint="Create a File Type" />
+                    <dxb:BarButtonItem x:Name="DeleteFileTypeButton"
+                                       Command="{Binding DeleteFileTypeCommand}"
+                                       Glyph="{dx:DXImage Image=Delete_16x16.png}"
+                                       Hint="Remove the selected File Type" />
+                    <dxb:BarButtonItem x:Name="MoveUpFileTypeButton"
+                                       Command="{Binding MoveUpFileTypeCommand}"
+                                       Glyph="{dx:DXImage Image=MoveUp_16x16.png}"
+                                       Hint="Move Up a File Type." />
+                    <dxb:BarButtonItem x:Name="MoveDownFileTypeButton"
+                                       Command="{Binding MoveDownFileTypeCommand}"
+                                       Glyph="{dx:DXImage Image=MoveDown_16x16.png}"
+                                       Hint="Move Down a File Type." />
+                </dxb:ToolBarControl>
+            </lc:LayoutItem>
+            <lc:LayoutItem MinHeight="100"
+                           MaxHeight="200"
+                           MaxWidth="700">
+                <dxg:GridControl Name="FileTypesGridControl"
+                                 AllowLiveDataShaping="False"
+                                 ItemsSource="{Binding FileType}"
+                                 SelectedItem="{Binding SelectedFileType}">
+                    <dxg:GridControl.View>
+                        <dxg:TableView Name="View"
+                                       HorizontalAlignment="Stretch"
+                                       VerticalAlignment="Stretch"
+                                       AllowColumnMoving="True"
+                                       AllowEditing="False"
+                                       AllowGrouping="True"
+                                       ShowFilterPanelMode="Never"
+                                       AutoWidth="true"
+                                       IsDetailButtonVisibleBinding="{x:Null}"
+                                       ShowGroupPanel="False">
+                            <dxg:TableView.RowStyle>
+                                <Style TargetType="{x:Type dxg:RowControl}">
+                                    <Setter Property="ToolTip"
+                                            Value="{Binding Row.Tooltip}" />
+                                </Style>
+                            </dxg:TableView.RowStyle>
+                        </dxg:TableView>
+                    </dxg:GridControl.View>
+                    <dxg:GridControl.Columns>
+                        <dxg:GridColumn FieldName="Name"
+                                        Header="Name" />
+                        <dxg:GridColumn FieldName="ShortName"
+                                        Header="ShortName" />
+                        <dxg:GridColumn FieldName="Extension"
+                                        Header="Extension" />
+                    </dxg:GridControl.Columns>
+                </dxg:GridControl>
+            </lc:LayoutItem>
+        </lc:LayoutGroup>
+    </DataTemplate>
+</av:ResourceDictionary>
