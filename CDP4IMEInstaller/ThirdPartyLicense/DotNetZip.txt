@@ -1,5 +1,5 @@
 ﻿name: DotNetZip
-version: 1.13.8
+version: 1.14.0
 project url: https://github.com/haf/DotNetZip.Semverd
 license url: https://raw.githubusercontent.com/haf/DotNetZip.Semverd/master/LICENSE
 Software Licenses that apply to the DotNetZip library and tools
