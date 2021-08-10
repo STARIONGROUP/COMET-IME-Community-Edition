@@ -28,9 +28,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="7.5.1-609-PR195" />
-    <PackageReference Include="CDP4Dal-CE" Version="7.5.1-609-PR195" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.5.1-609-PR195" />
+    <PackageReference Include="CDP4Common-CE" Version="7.5.1-622-PR198" />
+    <PackageReference Include="CDP4Dal-CE" Version="7.5.1-622-PR198" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.5.1-622-PR198" />
     <PackageReference Include="CommonServiceLocator" Version="1.3" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
