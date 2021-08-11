@@ -245,7 +245,7 @@ namespace CDP4DiagramEditor.Tests
             viewModel.ComputeDiagramConnector();
 
             Assert.That(viewModel.Caption, Is.Not.Null.Or.Empty);
-            Assert.AreEqual(this.diagram.Name, viewModel.Caption);
+            Assert.AreEqual($"{this.diagram.Name} <<{this.diagram.GetType().Name}>>", viewModel.Caption);
             Assert.That(viewModel.ToolTip, Is.Not.Null.Or.Empty);
             Assert.IsNotEmpty(viewModel.ThingDiagramItems);
             Assert.IsNotEmpty(viewModel.DiagramConnectorCollection);
