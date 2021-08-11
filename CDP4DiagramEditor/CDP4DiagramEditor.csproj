@@ -23,6 +23,9 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
+    <None Remove="Views\ArchitectureDiagramDialog.xaml" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="7.5.1-622-PR198">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -108,6 +111,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\ArchitectureDiagramDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

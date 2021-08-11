@@ -82,6 +82,11 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Assertion that the associated menu item is used to save a Thing to favorites
         /// </summary>
-        Favorite = 13
+        Favorite = 13,
+
+        /// <summary>
+        /// Assertion that the associated menu item is used to open a Thing to a Editor
+        /// </summary>
+        Open = 14
     }
 }

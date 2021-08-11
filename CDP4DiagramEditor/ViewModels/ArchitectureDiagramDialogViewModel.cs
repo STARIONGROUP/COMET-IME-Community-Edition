@@ -27,9 +27,12 @@ namespace CDP4DiagramEditor.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
@@ -41,41 +44,36 @@ namespace CDP4DiagramEditor.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="DiagramCanvasDialogViewModel" /> is to allow an <see cref="DiagramCanvas" /> to
+    /// The purpose of the <see cref="ArchitectureDiagramDialogViewModel" /> is to allow an <see cref="ArchitectureDiagram" /> to
     /// be created or updated.
     /// </summary>
     /// <remarks>
-    /// The creation of an <see cref="DiagramCanvas" /> will result in an <see cref="DiagramCanvas" /> being created by
+    /// The creation of an <see cref="ArchitectureDiagram" /> will result in an <see cref="ArchitectureDiagram" /> being created by
     /// the connected data-source
     /// </remarks>
-    [ThingDialogViewModelExport(ClassKind.DiagramCanvas)]
-    public class DiagramCanvasDialogViewModel : CDP4CommonView.DiagramCanvasDialogViewModel, IThingDialogViewModel
+    [ThingDialogViewModelExport(ClassKind.ArchitectureDiagram)]
+    public class ArchitectureDiagramDialogViewModel : DiagramCanvasDialogViewModel
     {
         /// <summary>
-        /// Backing field for <see cref="Description" />
+        /// Backing field for <see cref="SelectedOwner"/>
         /// </summary>
-        private string description;
+        private DomainOfExpertise selectedOwner;
 
         /// <summary>
-        /// Backing field for <see cref="PublicationState" />
-        /// </summary>
-        private PublicationState publicationState;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DiagramCanvasDialogViewModel" /> class.
+        /// Initializes a new instance of the <see cref="ArchitectureDiagramDialogViewModel" /> class.
         /// </summary>
         /// <remarks>
         /// The default constructor is required by MEF
         /// </remarks>
-        public DiagramCanvasDialogViewModel()
+        public ArchitectureDiagramDialogViewModel()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiagramCanvasDialogViewModel" /> class.
+        /// Initializes a new instance of the <see cref="ArchitectureDiagramDialogViewModel" /> class.
         /// </summary>
         /// <param name="diagram">
-        /// The <see cref="DiagramCanvas" /> that is the subject of the current view-model. This is the object
+        /// The <see cref="ArchitectureDiagram" /> that is the subject of the current view-model. This is the object
         /// that will be either created, or edited.
         /// </param>
         /// <param name="transaction">
@@ -85,10 +83,10 @@ namespace CDP4DiagramEditor.ViewModels
         /// The <see cref="ISession" /> in which the current <see cref="Thing" /> is to be added or updated
         /// </param>
         /// <param name="isRoot">
-        /// Assert if this <see cref="DiagramCanvasDialogViewModel" /> is the root of all <see cref="IThingDialogViewModel" />
+        /// Assert if this <see cref="ArchitectureDiagramDialogViewModel" /> is the root of all <see cref="IThingDialogViewModel" />
         /// </param>
         /// <param name="dialogKind">
-        /// The kind of operation this <see cref="DiagramCanvasDialogViewModel" /> performs
+        /// The kind of operation this <see cref="ArchitectureDiagramDialogViewModel" /> performs
         /// </param>
         /// <param name="thingDialogNavigationService">
         /// The <see cref="IThingDialogNavigationService" />
@@ -99,27 +97,32 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="chainOfContainers">
         /// The optional chain of containers that contains the <paramref name="container" /> argument
         /// </param>
-        public DiagramCanvasDialogViewModel(DiagramCanvas diagram, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
+        public ArchitectureDiagramDialogViewModel(ArchitectureDiagram diagram, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(diagram, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
         }
 
         /// <summary>
-        /// Gets or sets a value that represents the Description
+        /// Gets or sets the SelectedOwner
         /// </summary>
-        public string Description
+        public virtual DomainOfExpertise SelectedOwner
         {
-            get { return this.description; }
-            set { this.RaiseAndSetIfChanged(ref this.description, value); }
+            get { return this.selectedOwner; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedOwner, value); }
         }
 
         /// <summary>
-        /// Gets or sets the PublicationState
+        /// Gets or sets the possible <see cref="DomainOfExpertise"/>s for <see cref="SelectedOwner"/>
         /// </summary>
-        public PublicationState PublicationState
+        public ReactiveList<DomainOfExpertise> PossibleOwner { get; protected set; }
+
+        /// <summary>
+        /// Initialize the dialog
+        /// </summary>
+        protected override void Initialize()
         {
-            get { return this.publicationState; }
-            set { this.RaiseAndSetIfChanged(ref this.publicationState, value); }
+            base.Initialize();
+            this.PossibleOwner = new ReactiveList<DomainOfExpertise>();
         }
 
         /// <summary>
@@ -128,8 +131,8 @@ namespace CDP4DiagramEditor.ViewModels
         protected override void UpdateProperties()
         {
             base.UpdateProperties();
-            this.Description = this.Thing.Description;
-            this.PublicationState = this.Thing.PublicationState;
+            this.SelectedOwner = ((ArchitectureDiagram)this.Thing)?.Owner;
+            this.PopulatePossibleOwner();
         }
 
         /// <summary>
@@ -139,15 +142,28 @@ namespace CDP4DiagramEditor.ViewModels
         {
             base.UpdateTransaction();
 
-            if (this.dialogKind == ThingDialogKind.Create)
+            if (!(this.Thing is ArchitectureDiagram clone))
             {
-                this.Thing.CreatedOn = DateTime.UtcNow;
+                throw new InvalidOperationException("The Thing represented by this Dialog is not of the right type.");
             }
 
-            var clone = this.Thing;
+            clone.Owner = this.SelectedOwner;
+        }
 
-            clone.Description = this.Description;
-            clone.PublicationState = this.PublicationState;
+        /// <summary>
+        /// Populates the <see cref="PossibleOwner"/>
+        /// </summary>
+        protected void PopulatePossibleOwner()
+        {
+            this.PossibleOwner.Clear();
+
+            var model = this.Container.Container as EngineeringModel;
+            if (model == null)
+            {
+                throw new InvalidOperationException("The top container is not set for this diagram");
+            }
+
+            this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name));
         }
     }
 }

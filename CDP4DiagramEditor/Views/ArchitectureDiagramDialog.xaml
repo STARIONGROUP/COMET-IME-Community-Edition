@@ -1,5 +1,6 @@
-﻿<dx:DXWindow x:Class="CDP4DiagramEditor.Views.DiagramDialog"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<dx:DXWindow
+    x:Class="CDP4DiagramEditor.Views.ArchitectureDiagramDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
@@ -27,6 +28,7 @@
                         lc:LayoutControl.AllowHorizontalSizing="True">
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
                 <items:NameLayoutItem />
+                <items:OwnerLayoutItem />
                 <lc:LayoutItem Label="Description: ">
                     <lc:LayoutItem.Resources>
                         <ResourceDictionary>

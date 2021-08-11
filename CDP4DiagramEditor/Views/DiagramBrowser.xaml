@@ -63,6 +63,9 @@
                                AutoWidth="true"
                                IsDetailButtonVisibleBinding="{x:Null}"
                                ShowGroupPanel="False">
+                    <dxmvvm:Interaction.Behaviors>
+                        <dxmvvm:EventToCommand Command="{Binding OpenCommand}" EventName="RowDoubleClick"/>
+                    </dxmvvm:Interaction.Behaviors>
                     <dxg:TableView.FocusedRow>
                         <dynamic:ExpandoObject />
                     </dxg:TableView.FocusedRow>
@@ -86,13 +89,16 @@
                     </dxg:GridColumn.DisplayTemplate>
                 </dxg:GridColumn>
                 <dxg:GridColumn FieldName="Name" />
-                <dxg:GridColumn FieldName="ShortName" Header="Short Name" />
-                <dxg:GridColumn FieldName="CreatedOn" Header="Created on" />
+                <dxg:GridColumn FieldName="Description" Header="Description" />
+                <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" />
+                <dxg:GridColumn FieldName="PublicationState" Header="Publication State" />
+                <dxg:GridColumn FieldName="CreatedOn" Header="Created On" />
             </dxg:GridControl.Columns>
 
             <dxg:GridControl.InputBindings>
                 <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
                 <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
+                <KeyBinding Gesture="CTRL+O" Command="{Binding Path=OpenCommand}"></KeyBinding>
             </dxg:GridControl.InputBindings>
         </dxg:GridControl>
     </Grid>

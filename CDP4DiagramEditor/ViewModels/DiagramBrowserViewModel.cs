@@ -1,27 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramBrowserViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//    GNU Affero General Public License for more details.
-//
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor.ViewModels
 {
@@ -35,8 +35,6 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4CommonView;
-
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
@@ -46,41 +44,43 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using CDP4DiagramEditor.ViewModels.Rows;
+
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="DiagramBrowserViewModel"/> is to represent the view-model for <see cref="Diagram"/>s
+    /// The purpose of the <see cref="DiagramBrowserViewModel" /> is to represent the view-model for <see cref="Diagram" />s
     /// </summary>
     public class DiagramBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
-        /// <summary>
-        /// Backing field for <see cref="CanCreateDiagram"/>
-        /// </summary>
-        private bool canCreateDiagram;
-
-        /// <summary>
-        /// Backing field for <see cref="CurrentModel"/>
-        /// </summary>
-        private string currentModel;
-
-        /// <summary>
-        /// Backing field for <see cref="CurrentIteration"/>
-        /// </summary>
-        private int currentIteration;
-
         /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Diagrams";
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiagramBrowserViewModel"/> class
+        /// Backing field for <see cref="CanCreateDiagram" />
         /// </summary>
-        /// <param name="iteration">The <see cref="EngineeringModel"/></param>
+        private bool canCreateDiagram;
+
+        /// <summary>
+        /// Backing field for <see cref="CurrentIteration" />
+        /// </summary>
+        private int currentIteration;
+
+        /// <summary>
+        /// Backing field for <see cref="CurrentModel" />
+        /// </summary>
+        private string currentModel;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagramBrowserViewModel" /> class
+        /// </summary>
+        /// <param name="iteration">The <see cref="EngineeringModel" /></param>
         /// <param name="session">The session</param>
-        /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
-        /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
-        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
+        /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService" /></param>
+        /// <param name="panelNavigationService">the <see cref="IPanelNavigationService" /></param>
+        /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService" /></param>
         public DiagramBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
@@ -94,17 +94,20 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Gets the view model current <see cref="EngineeringModelSetup"/>
+        /// Gets the view model current <see cref="EngineeringModelSetup" />
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
+        public EngineeringModelSetup CurrentEngineeringModelSetup
+        {
+            get { return this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>(); }
+        }
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get => this.currentModel;
-            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
+            get { return this.currentModel; }
+            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
         }
 
         /// <summary>
@@ -112,8 +115,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get => this.currentIteration;
-            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
+            get { return this.currentIteration; }
+            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
         }
 
         /// <summary>
@@ -121,14 +124,24 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public bool CanCreateDiagram
         {
-            get => this.canCreateDiagram;
-            set => this.RaiseAndSetIfChanged(ref this.canCreateDiagram, value);
+            get { return this.canCreateDiagram; }
+            set { this.RaiseAndSetIfChanged(ref this.canCreateDiagram, value); }
         }
 
         /// <summary>
         /// Gets the rows representing Diagrams
         /// </summary>
         public ReactiveList<DiagramCanvasRowViewModel> Diagrams { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the Create Architecture Diagram Command
+        /// </summary>
+        public ReactiveCommand<object> CreateArchitectureDiagramCommand { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the Open Command
+        /// </summary>
+        public ReactiveCommand<object> OpenCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -145,7 +158,7 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Initializes the <see cref="ICommand"/>s
+        /// Initializes the <see cref="ICommand" />s
         /// </summary>
         protected override void InitializeCommands()
         {
@@ -157,18 +170,23 @@ namespace CDP4DiagramEditor.ViewModels
             this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateDiagram));
             this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<DiagramCanvas>(this.Thing));
 
+            this.CreateArchitectureDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateDiagram));
+            this.CreateArchitectureDiagramCommand.Subscribe(_ => this.ExecuteCreateCommand<ArchitectureDiagram>(this.Thing));
+
             this.DeleteCommand = ReactiveCommand.Create(canDelete);
             this.DeleteCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedThing.Thing));
             this.UpdateCommand = ReactiveCommand.Create(canDelete);
             this.UpdateCommand.Subscribe(_ => this.ExecuteUpdateCommand());
+            this.OpenCommand = ReactiveCommand.Create(canDelete);
+            this.OpenCommand.Subscribe(_ => this.ExecuteOpenCommand());
             this.InspectCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null));
             this.InspectCommand.Subscribe(_ => this.ExecuteUpdateCommand());
         }
 
         /// <summary>
-        /// The <see cref="ObjectChangedEvent"/> handler
+        /// The <see cref="ObjectChangedEvent" /> handler
         /// </summary>
-        /// <param name="objectChange">The <see cref="ObjectChangedEvent"/></param>
+        /// <param name="objectChange">The <see cref="ObjectChangedEvent" /></param>
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
@@ -193,6 +211,17 @@ namespace CDP4DiagramEditor.ViewModels
         {
             base.PopulateContextMenu();
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Diagram", "", this.CreateCommand, MenuItemKind.Create, ClassKind.DiagramCanvas));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Architecture Diagram", "", this.CreateArchitectureDiagramCommand, MenuItemKind.Create, ClassKind.ArchitectureDiagram));
+
+            if (this.SelectedThing is null)
+            {
+                return;
+            }
+
+            if (this.SelectedThing.CanEditThing)
+            {
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Open Diagram", "CTRL+O", this.OpenCommand, MenuItemKind.Open));
+            }
         }
 
         /// <summary>
@@ -212,7 +241,7 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Update the <see cref="Diagrams"/> List
+        /// Update the <see cref="Diagrams" /> List
         /// </summary>
         private void UpdateDiagrams()
         {
@@ -221,10 +250,22 @@ namespace CDP4DiagramEditor.ViewModels
 
             foreach (var diagram in newDiagrams)
             {
-                var row = new DiagramCanvasRowViewModel(diagram, this.Session, this)
+                DiagramCanvasRowViewModel row;
+
+                if(diagram is ArchitectureDiagram architectureDiagram)
                 {
-                    Index = this.Thing.DiagramCanvas.IndexOf(diagram)
-                };
+                    row = new ArchitectureDiagramRowViewModel(architectureDiagram, this.Session, this)
+                    {
+                        Index = this.Thing.DiagramCanvas.IndexOf(diagram)
+                    };
+                }
+                else
+                {
+                    row = new DiagramCanvasRowViewModel(diagram, this.Session, this)
+                    {
+                        Index = this.Thing.DiagramCanvas.IndexOf(diagram)
+                    };
+                }
 
                 this.Diagrams.Add(row);
             }
@@ -292,9 +333,9 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Execute the <see cref="DiagramBrowserViewModel.UpdateCommand"/> on the <see cref="DiagramBrowserViewModel.SelectedThing"/>
+        /// Execute the <see cref="OpenCommand" /> on the <see cref="DiagramBrowserViewModel.SelectedThing" />
         /// </summary>
-        protected override void ExecuteUpdateCommand()
+        private void ExecuteOpenCommand()
         {
             if (this.SelectedThing == null)
             {

@@ -14,7 +14,7 @@
     <Image x:Key="SaveIcon" x:Shared="False" Source="{dx:DXImage Image=Save_16x16.png}" Height="16" Width="16"/>
     <Image x:Key="NavigateIcon" x:Shared="False" Source="{dx:DXImage Image=Redo_16x16.png}" Height="16" Width="16"/>
     <Image x:Key="FavoriteIcon" x:Shared="False" Source="{dx:DXImage Image=NewContact_16x16.png}" Height="16" Width="16"/>
-
+    <Image x:Key="OpenIcon" x:Shared="False" Source="{dx:DXImage 'Images/Actions/Open2_16x16.png'}" Height="16" Width="16"/>
     <Style TargetType="ScrollBar">
         <!-- 
         This style disables the context menu of the scrollbars, the scroll-menu conflicts with the ContextMenu style.
@@ -124,6 +124,9 @@
                         </DataTrigger>
                         <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Favorite}">
                             <Setter Property="Icon" Value="{StaticResource FavoriteIcon}"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Open}">
+                            <Setter Property="Icon" Value="{StaticResource OpenIcon}"/>
                         </DataTrigger>
                     </Style.Triggers>
                 </Style>

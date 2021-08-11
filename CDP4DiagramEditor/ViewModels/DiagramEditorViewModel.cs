@@ -118,7 +118,7 @@ namespace CDP4DiagramEditor.ViewModels
         public DiagramEditorViewModel(DiagramCanvas diagram, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(diagram, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = this.Thing.Name;
+            this.Caption = this.GetCaption() ;
             this.ToolTip = $"The {this.Thing.Name} diagram editor";
         }
 
@@ -285,7 +285,8 @@ namespace CDP4DiagramEditor.ViewModels
         {
             base.Initialize();
 
-            this.WhenAnyValue(x => x.IsDirty).Subscribe(x => this.Caption = $"{this.Thing.Name}{(x ? " (Dirty)" : string.Empty)}");
+            this.WhenAnyValue(x => x.IsDirty)
+                .Subscribe(x => this.Caption = this.GetCaption());
 
             this.EventPublisher = new EventPublisher();
 
@@ -357,6 +358,15 @@ namespace CDP4DiagramEditor.ViewModels
         {
             this.ComputeDiagramObject();
             this.IsDirty = false;
+        }
+
+        /// <summary>
+        /// Gets the caption for this editor.
+        /// </summary>
+        /// <returns>The string caption.</returns>
+        private string GetCaption()
+        {
+            return $"{(this.IsDirty ? "*" : string.Empty)}{this.Thing.Name} <<{this.Thing.GetType().Name}>>";
         }
 
         /// <summary>
