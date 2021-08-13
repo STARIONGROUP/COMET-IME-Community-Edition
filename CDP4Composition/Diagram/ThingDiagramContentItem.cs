@@ -126,6 +126,11 @@ namespace CDP4Composition.Diagram
         private readonly IDiagramEditorViewModel containerViewModel;
 
         /// <summary>
+        /// Backing field for <see cref="IsDirty"/>
+        /// </summary>
+        private bool isDirty;
+
+        /// <summary>
         /// Gets or sets the <see cref="IThingDiagramItem.Thing"/>.
         /// </summary>
         public Thing Thing { get; set; }
@@ -138,7 +143,11 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Gets a value indicating whether the diagram editor is dirty
         /// </summary>
-        public bool IsDirty { get; set; }
+        public bool IsDirty
+        {
+            get => this.isDirty;
+            private set => this.RaiseAndSetIfChanged(ref this.isDirty, value);
+        }
 
         /// <summary>
         /// The observable for when the position of the view object changed

@@ -25,17 +25,42 @@
 
 namespace CDP4Composition.Diagram
 {
+    using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Dal.Events;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Represents a <see cref="ThingDiagramContentItem"/> with a name and a <see cref="ClassKind"/>
     /// </summary>
     public class NamedThingDiagramContentItem : ThingDiagramContentItem
     {
+        /// <summary>
+        /// Backing field for <see cref="ClassKind"/>
+        /// </summary>
+        private string classKind;
+
+        /// <summary>
+        /// Backing field for <see cref="FullName"/>
+        /// </summary>
+        private string fullName;
+
+        /// <summary>
+        /// Backing field for <see cref="ShortName"/>
+        /// </summary>
+        private string shortName;
+
+        /// <summary>
+        /// Backing field for <see cref="Categories"/>
+        /// </summary>
+        private string categories;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
         /// </summary>
@@ -77,6 +102,11 @@ namespace CDP4Composition.Diagram
 
             this.ClassKind = $"<<{this.Thing.ClassKind}>>";
 
+            if (this.Thing is ICategorizableThing categorizableThing)
+            {
+                this.Categories = $"({string.Join(", ", categorizableThing.Category.Select(c => $"\"{c.ShortName}\""))})";
+            }
+
             // special cases
             if (this.Thing is ParameterBase parameterBaseThing)
             {
@@ -101,16 +131,37 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Gets or sets the class kind of the <see cref="NamedThingDiagramContentItem"/>
         /// </summary>
-        public string ClassKind { get; set; }
+        public string ClassKind
+        {
+            get => this.classKind;
+            private set => this.RaiseAndSetIfChanged(ref this.classKind, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the categories of the <see cref="NamedThingDiagramContentItem"/>
+        /// </summary>
+        public string Categories
+        {
+            get => this.categories;
+            private set => this.RaiseAndSetIfChanged(ref this.categories, value);
+        }
 
         /// <summary>
         /// Gets or sets the name of the <see cref="NamedThingDiagramContentItem"/>
         /// </summary>
-        public string FullName { get; set; } = string.Empty;
+        public string FullName
+        {
+            get => this.fullName;
+            private set => this.RaiseAndSetIfChanged(ref this.fullName, value);
+        }
 
         /// <summary>
         /// Gets or sets the shortname of the <see cref="NamedThingDiagramContentItem"/>
         /// </summary>
-        public string ShortName { get; set; } = string.Empty;
+        public string ShortName
+        {
+            get => this.shortName;
+            private set => this.RaiseAndSetIfChanged(ref this.shortName, value);
+        }
     }
 }
