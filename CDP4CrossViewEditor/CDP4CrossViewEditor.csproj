@@ -48,13 +48,13 @@
     <None Remove="Views\UserControls\ParameterThingSelector.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="7.5.1-622-PR198">
+    <PackageReference Include="CDP4Common-CE" Version="7.5.1-628-PR200">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="7.5.1-622-PR198">
+    <PackageReference Include="CDP4Dal-CE" Version="7.5.1-628-PR200">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.5.1-622-PR198">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.5.1-628-PR200">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">
