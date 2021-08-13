@@ -28,7 +28,9 @@ namespace CDP4DiagramEditor.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
@@ -43,8 +45,11 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using CDP4DiagramEditor.ViewModels.Rows;
+
+    using NLog;
 
     using ReactiveUI;
 
@@ -53,6 +58,11 @@ namespace CDP4DiagramEditor.ViewModels
     /// </summary>
     public class DiagramBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
+        /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -144,6 +154,21 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<object> OpenCommand { get; protected set; }
 
         /// <summary>
+        /// Gets or sets the Hide Command
+        /// </summary>
+        public ReactiveCommand<Unit> HideCommand { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the Ready For Publication Command
+        /// </summary>
+        public ReactiveCommand<Unit> ReadyForPublicationCommand { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the Publish Command
+        /// </summary>
+        public ReactiveCommand<Unit> PublishCommand { get; protected set; }
+
+        /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
@@ -181,6 +206,19 @@ namespace CDP4DiagramEditor.ViewModels
             this.OpenCommand.Subscribe(_ => this.ExecuteOpenCommand());
             this.InspectCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null));
             this.InspectCommand.Subscribe(_ => this.ExecuteUpdateCommand());
+
+            // publication of diagrams
+            this.HideCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteHideCommand(this.SelectedThing.Thing as DiagramCanvas));
+            this.HideCommand.ThrownExceptions
+                .Subscribe(this.LogAsyncException);
+
+            this.ReadyForPublicationCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteReadyForPublicationCommand(this.SelectedThing.Thing as DiagramCanvas));
+            this.ReadyForPublicationCommand.ThrownExceptions
+                .Subscribe(this.LogAsyncException);
+
+            this.PublishCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecutePublishCommand(this.SelectedThing.Thing as DiagramCanvas));
+            this.PublishCommand.ThrownExceptions
+                .Subscribe(this.LogAsyncException);
         }
 
         /// <summary>
@@ -220,6 +258,23 @@ namespace CDP4DiagramEditor.ViewModels
 
             if (this.SelectedThing.CanEditThing)
             {
+                // publication
+                switch (((DiagramCanvas)this.SelectedThing.Thing).PublicationState)
+                {
+                    case PublicationState.Hidden:
+                        this.ContextMenu.Add(new ContextMenuItemViewModel("Ready for Publication", "", this.ReadyForPublicationCommand, MenuItemKind.Review));
+                        break;
+                    case PublicationState.ReadyForPublish:
+                        this.ContextMenu.Add(new ContextMenuItemViewModel("Hide", "CTRL+H", this.HideCommand, MenuItemKind.Hide));
+                        this.ContextMenu.Add(new ContextMenuItemViewModel("Publish", "CTRL+P", this.PublishCommand, MenuItemKind.Publish));
+                        break;
+                    case PublicationState.Published:
+                        this.ContextMenu.Add(new ContextMenuItemViewModel("Hide", "CTRL+H", this.HideCommand, MenuItemKind.Hide));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Open Diagram", "CTRL+O", this.OpenCommand, MenuItemKind.Open));
             }
         }
@@ -238,6 +293,91 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 iteration.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Logs the async exception
+        /// </summary>
+        /// <param name="ex">The exception</param>
+        private void LogAsyncException(Exception ex)
+        {
+            logger.Error(ex.Message);
+            this.Feedback = ex.Message;
+        }
+
+        /// <summary>
+        /// Change the publication status of the 
+        /// </summary>
+        /// <param name="selectedThing">The selected diagram</param>
+        /// <param name="state">The state to change to.</param>
+        private async Task ChangePublicationStatus(DiagramCanvas selectedThing, PublicationState state)
+        {
+            if (selectedThing == null)
+            {
+                return;
+            }
+
+            var clone = selectedThing.Clone(false);
+
+            clone.PublicationState = state;
+
+            var transactionContext = TransactionContextResolver.ResolveContext(selectedThing);
+            var transaction = new ThingTransaction(transactionContext, clone);
+            transaction.CreateOrUpdate(clone);
+
+            try
+            {
+                this.IsBusy = true;
+                var operationContainer = transaction.FinalizeTransaction();
+
+                await this.Session.Write(operationContainer);
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Publishes the diagram
+        /// </summary>
+        /// <param name="selectedThing">The selected diagram</param>
+        private async Task ExecutePublishCommand(DiagramCanvas selectedThing)
+        {
+            if (selectedThing.PublicationState != PublicationState.ReadyForPublish)
+            {
+                return;
+            }
+
+            await this.ChangePublicationStatus(selectedThing, PublicationState.Published);
+        }
+
+        /// <summary>
+        /// Marks the diagram ready for publication
+        /// </summary>
+        /// <param name="selectedThing">The selected diagram</param>
+        private async Task ExecuteReadyForPublicationCommand(DiagramCanvas selectedThing)
+        {
+            if (selectedThing.PublicationState != PublicationState.Hidden)
+            {
+                return;
+            }
+
+            await this.ChangePublicationStatus(selectedThing, PublicationState.ReadyForPublish);
+        }
+
+        /// <summary>
+        /// Hides the diagram
+        /// </summary>
+        /// <param name="selectedThing">The selected diagram</param>
+        private async Task ExecuteHideCommand(DiagramCanvas selectedThing)
+        {
+            if (selectedThing.PublicationState == PublicationState.Hidden)
+            {
+                return;
+            }
+
+            await this.ChangePublicationStatus(selectedThing, PublicationState.Hidden);
         }
 
         /// <summary>
@@ -280,7 +420,43 @@ namespace CDP4DiagramEditor.ViewModels
                 }
             }
 
+            // filter out the unpublished diagrams that are not owned
+            foreach (var row in this.Diagrams.Where(d => d.Thing.PublicationState != PublicationState.Published).ToList())
+            {
+                if (!this.CanReadDiagram(row.Thing))
+                {
+                    this.Diagrams.Remove(row);
+                }
+            }
+
             this.Diagrams.Sort((o1, o2) => o1.Index.CompareTo(o2.Index));
+        }
+
+        /// <summary>
+        /// Evaluates whether the diagram is visible to the user
+        /// </summary>
+        /// <param name="rowThing">The <see cref="DiagramCanvas"/> to evaluate</param>
+        /// <returns>True if it should remain visible</returns>
+        private bool CanReadDiagram(DiagramCanvas rowThing)
+        {
+            var ownedDiagram = rowThing as IOwnedThing;
+
+            if (ownedDiagram is null)
+            {
+                // diagram is not owned. Can be read.
+                return true;
+            }
+
+            var currentDomain = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
+
+            // Person is owner, can read
+            if (ownedDiagram.Owner.Equals(currentDomain))
+            {
+                return true;
+            }
+
+            // Person is not owner, depends on access right kind
+            return this.Session.PermissionService.CanWrite(rowThing);
         }
 
         /// <summary>
@@ -308,6 +484,13 @@ namespace CDP4DiagramEditor.ViewModels
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(iterationSetupSubscription);
+
+            var diagramSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DiagramCanvas))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateDiagrams());
+
+            this.Disposables.Add(diagramSubscription);
         }
 
         /// <summary>

@@ -99,6 +99,8 @@
                 <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
                 <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
                 <KeyBinding Gesture="CTRL+O" Command="{Binding Path=OpenCommand}"></KeyBinding>
+                <KeyBinding Gesture="CTRL+P" Command="{Binding Path=PublishCommand}"></KeyBinding>
+                <KeyBinding Gesture="CTRL+H" Command="{Binding Path=HideCommand}"></KeyBinding>
             </dxg:GridControl.InputBindings>
         </dxg:GridControl>
     </Grid>

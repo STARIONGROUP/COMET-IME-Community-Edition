@@ -87,6 +87,21 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Assertion that the associated menu item is used to open a Thing to a Editor
         /// </summary>
-        Open = 14
+        Open = 14,
+
+        /// <summary>
+        /// Assertion that the associated menu item is used to hide a Thing to a Editor
+        /// </summary>
+        Hide = 15,
+
+        /// <summary>
+        /// Assertion that the associated menu item is used to publish a Thing to a Editor
+        /// </summary>
+        Publish = 16,
+
+        /// <summary>
+        /// Assertion that the associated menu item is used to ready a Thing for review to a Editor
+        /// </summary>
+        Review = 17
     }
 }

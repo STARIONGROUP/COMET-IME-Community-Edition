@@ -190,7 +190,8 @@
                                         ToolboxVisibility="Closed"
                                         SaveCommand="{Binding SaveDiagramCommand}"
                                         dxb:MergingProperties.ElementMergingBehavior="All"
-                                        ShowPageBreaks="True"
+                                        ShowPageBreaks="False"
+                                        CanvasSizeMode="Fill"
                                         IsManipulationEnabled="True"
                                         AllowRotateItems="False"
                                         AllowResizeItems="False"
@@ -226,63 +227,141 @@
                 </diagram:Cdp4DiagramControl.Actions>
             </diagram:Cdp4DiagramControl>
             <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <dxn:NavBarControl dx:ThemeManager.ThemeName="Seven" Margin="0,0,0,0" Background="Transparent"
+                <dxdo:LayoutPanel Caption="Palette" ShowHideButton="False" ShowCloseButton="False" ShowPinButton="False">
+                    <dxn:NavBarControl dx:ThemeManager.ThemeName="Seven" Margin="0,0,0,0" Background="Transparent"
                                    Compact="False">
-                    <dxn:NavBarControl.View>
-                        <dxn:ExplorerBarView />
-                    </dxn:NavBarControl.View>
-                    <dxn:NavBarControl.Groups>
-                        <dxn:NavBarGroup Header="Ports and Interfaces">
-                            <dxn:NavBarGroup.Items>
-                                <dxn:NavBarItem Command="{Binding CreateInterfaceCommand}">
-                                    <dxn:NavBarItem.Template>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Image Width="16"
+                        <dxn:NavBarControl.View>
+                            <dxn:ExplorerBarView />
+                        </dxn:NavBarControl.View>
+                        <dxn:NavBarControl.Groups>
+                            <dxn:NavBarGroup Header="Create">
+                                <dxn:NavBarGroup.Items>
+                                    <dxn:NavBarItem Command="{Binding CreateElementDefinitionCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
                                                        Height="16"
                                                        Margin="10"
                                                        Source="{dx:DXImage Image=LineItem_16x16.png}" />
-                                                <TextBlock Text="Draw Interface" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </dxn:NavBarItem.Template>
-                                    Binary Relationship
-                                </dxn:NavBarItem>
-                                <dxn:NavBarItem Command="{Binding CreatePortCommand}">
-                                    <dxn:NavBarItem.Template>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Image Width="16"
+                                                    <TextBlock Text="Element Definition" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Binary Relationship
+                                    </dxn:NavBarItem>
+                                    <dxn:NavBarItem Command="{Binding CreateRequirementCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
                                                        Height="16"
                                                        Margin="10"
                                                        Source="{dx:DXImage Image=DocumentMap_16x16.png}" />
-                                                <TextBlock Text="Add Output Port" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </dxn:NavBarItem.Template>
-                                    Multi Relationship
-                                </dxn:NavBarItem>
-                                <dxn:NavBarItem Command="{Binding CreatePortCommand}">
-                                    <dxn:NavBarItem.Template>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal">
-                                                <Image Width="16"
+                                                    <TextBlock Text="Requirement" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Multi Relationship
+                                    </dxn:NavBarItem>
+                                </dxn:NavBarGroup.Items>
+                            </dxn:NavBarGroup>
+                            <dxn:NavBarGroup Header="Ports and Interfaces">
+                                <dxn:NavBarGroup.Items>
+                                    <dxn:NavBarItem Command="{Binding CreateInterfaceCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                       Height="16"
+                                                       Margin="10"
+                                                       Source="{dx:DXImage Image=LineItem_16x16.png}" />
+                                                    <TextBlock Text="Draw Interface" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Binary Relationship
+                                    </dxn:NavBarItem>
+                                    <dxn:NavBarItem Command="{Binding CreatePortCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
                                                        Height="16"
                                                        Margin="10"
                                                        Source="{dx:DXImage Image=DocumentMap_16x16.png}" />
-                                                <TextBlock Text="Add Input Port" VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </dxn:NavBarItem.Template>
-                                    Multi Relationship
-                                </dxn:NavBarItem>
-                            </dxn:NavBarGroup.Items>
-                        </dxn:NavBarGroup>
-                    </dxn:NavBarControl.Groups>
-                </dxn:NavBarControl>
+                                                    <TextBlock Text="Add Output Port" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Multi Relationship
+                                    </dxn:NavBarItem>
+                                    <dxn:NavBarItem Command="{Binding CreatePortCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                       Height="16"
+                                                       Margin="10"
+                                                       Source="{dx:DXImage Image=DocumentMap_16x16.png}" />
+                                                    <TextBlock Text="Add Input Port" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Multi Relationship
+                                    </dxn:NavBarItem>
+                                </dxn:NavBarGroup.Items>
+                            </dxn:NavBarGroup>
+                            <dxn:NavBarGroup Header="Connect">
+                                <dxn:NavBarGroup.Items>
+                                    <dxn:NavBarItem Command="{Binding CreateElementUsageCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                       Height="16"
+                                                       Margin="10"
+                                                       Source="{dx:DXImage Image=LineItem_16x16.png}" />
+                                                    <TextBlock Text="Element Usage" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Binary Relationship
+                                    </dxn:NavBarItem>
+                                    <dxn:NavBarItem Command="{Binding CreateBinaryRelationshipCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                       Height="16"
+                                                       Margin="10"
+                                                       Source="{dx:DXImage Image=DocumentMap_16x16.png}" />
+                                                    <TextBlock Text="Binary Relationship" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Multi Relationship
+                                    </dxn:NavBarItem>
+                                    <dxn:NavBarItem Command="{Binding CreateSimpleConnectorCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                       Height="16"
+                                                       Margin="10"
+                                                       Source="{dx:DXImage Image=DocumentMap_16x16.png}" />
+                                                    <TextBlock Text="Simple Connector" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Multi Relationship
+                                    </dxn:NavBarItem>
+                                </dxn:NavBarGroup.Items>
+                            </dxn:NavBarGroup>
+                        </dxn:NavBarControl.Groups>
+                    </dxn:NavBarControl>
+                </dxdo:LayoutPanel>
+                
             </Grid>
         </Grid>
     </Grid>

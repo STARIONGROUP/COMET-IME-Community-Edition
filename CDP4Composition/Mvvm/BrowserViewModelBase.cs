@@ -923,7 +923,7 @@ namespace CDP4Composition.Mvvm
                         this.ContextMenu.Add(new ContextMenuItemViewModel(string.Format("Delete this {0}", this.camelCaseToSpaceConverter.Convert(this.SelectedThing.Thing.ClassKind, null, null, null)), "", this.DeleteCommand, MenuItemKind.Delete));
                     }
                 }
-               
+
                 var categorizableThing = this.SelectedThing.Thing as ICategorizableThing;
 
                 if (categorizableThing != null && categorizableThing.Category.Any())
@@ -946,7 +946,6 @@ namespace CDP4Composition.Mvvm
                     new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
                     new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
             }
-
         }
 
         /// <summary>
