@@ -248,7 +248,7 @@
                                                     <Image Width="16"
                                                        Height="16"
                                                        Margin="10"
-                                                       Source="{dx:DXImage Image=DocumentMap_16x16.png}" />
+                                                       Source="{dx:DXImage Image=Customization_16x16.png}" />
                                                     <TextBlock Text="Requirement" VerticalAlignment="Center" />
                                                 </StackPanel>
                                             </DataTemplate>
@@ -333,14 +333,79 @@
                                         </dxn:NavBarItem.Template>
                                         Multi Relationship
                                     </dxn:NavBarItem>
-                                    <dxn:NavBarItem Command="{Binding CreateSimpleConnectorCommand}">
+                                    
+                                </dxn:NavBarGroup.Items>
+                            </dxn:NavBarGroup>
+                            <dxn:NavBarGroup Header="Constraints">
+                                <dxn:NavBarGroup.Items>
+                                    <dxn:NavBarItem Command="{Binding CreateConstrainedCommand}">
                                         <dxn:NavBarItem.Template>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal">
                                                     <Image Width="16"
                                                        Height="16"
                                                        Margin="10"
-                                                       Source="{dx:DXImage Image=LineItem_16x16.png}" />
+                                                       Source="{dx:DXImage Image=IconSetRedToBlack4_16x16.png}" />
+                                                    <TextBlock Text="Constrained" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Binary Relationship
+                                    </dxn:NavBarItem>
+                                    <dxn:NavBarItem Command="{Binding CreateOptionalCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                       Height="16"
+                                                       Margin="10"
+                                                       Source="{dx:DXImage Image=AppointmentDayClock.png}" />
+                                                    <TextBlock Text="Optional" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Multi Relationship
+                                    </dxn:NavBarItem>
+                                    <dxn:NavBarItem Command="{Binding CreateRestrictedCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                       Height="16"
+                                                       Margin="10"
+                                                       Source="{dx:DXImage Image=IconSetTrafficLights4_16x16.png}" />
+                                                    <TextBlock Text="Restricted" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Multi Relationship
+                                    </dxn:NavBarItem>
+                                </dxn:NavBarGroup.Items>
+                            </dxn:NavBarGroup>
+                            <dxn:NavBarGroup Header="Simple Objects">
+                                <dxn:NavBarGroup.Items>
+                                    <dxn:NavBarItem Command="{Binding CreateFrameCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                       Height="16"
+                                                       Margin="10"
+                                                       Source="{dx:DXImage Image=BottomRightHorizontalInside_16x16.png}" />
+                                                    <TextBlock Text="Frame" VerticalAlignment="Center" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </dxn:NavBarItem.Template>
+                                        Binary Relationship
+                                    </dxn:NavBarItem>
+                                    <dxn:NavBarItem Command="{Binding CreateSimpleConnectorCommand}">
+                                        <dxn:NavBarItem.Template>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Image Width="16"
+                                                           Height="16"
+                                                           Margin="10"
+                                                           Source="{dx:DXImage Image=LineItem_16x16.png}" />
                                                     <TextBlock Text="Simple Connector" VerticalAlignment="Center" />
                                                 </StackPanel>
                                             </DataTemplate>

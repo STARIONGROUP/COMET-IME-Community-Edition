@@ -165,6 +165,13 @@ namespace CDP4Composition.Diagram
                 .Subscribe(this.ObjectChangeEventHandler);
 
             this.Disposables.Add(thingSubscription);
+
+            var thingRemoveSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+                .Where(objectChange => objectChange.EventKind == EventKind.Removed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.RemoveEventHandler);
+
+            this.Disposables.Add(thingRemoveSubscription);
         }
 
         /// <summary>
@@ -177,6 +184,18 @@ namespace CDP4Composition.Diagram
         protected virtual void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             this.RevisionNumber = objectChange.ChangedThing.RevisionNumber;
+        }
+
+        /// <summary>
+        /// The event-handler that is invoked by the subscription that listens for removes
+        /// on the <see cref="Thing"/> that is being represented by the view-model
+        /// </summary>
+        /// <param name="objectChange">
+        /// The payload of the event that is being handled
+        /// </param>
+        protected virtual void RemoveEventHandler(ObjectChangedEvent objectChange)
+        {
+            this.containerViewModel.RemoveDiagramThingItemByThing(objectChange.ChangedThing);
         }
 
         /// <summary>

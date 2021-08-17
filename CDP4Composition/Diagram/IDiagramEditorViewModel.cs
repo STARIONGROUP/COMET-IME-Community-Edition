@@ -26,6 +26,8 @@
 
 namespace CDP4Composition.Diagram
 {
+    using CDP4Common.CommonData;
+
     /// <summary>
     /// The interface that describes the dirty mechanism of DiagramEditorViewModel
     /// </summary>
@@ -46,5 +48,11 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="contentItemContent">The item to remove.</param>
         void RemoveDiagramThingItem(object contentItemContent);
+
+        /// <summary>
+        /// Removes a diagram item and its connectors by <see cref="Thing"/>.
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> by which to find and remove diagram things.</param>
+        void RemoveDiagramThingItemByThing(Thing thing);
     }
 }
