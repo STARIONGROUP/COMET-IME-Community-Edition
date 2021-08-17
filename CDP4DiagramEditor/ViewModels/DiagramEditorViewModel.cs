@@ -522,7 +522,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Executes the remove from model command
         /// </summary>
-        private async Task ExecuteDeleteFromModelCommand()
+        private async void ExecuteDeleteFromModelCommand()
         {
             var selectedDiagramObjects = this.SelectedItems.OfType<DiagramContentItem>().ToList();
 
@@ -566,7 +566,7 @@ namespace CDP4DiagramEditor.ViewModels
                 return;
             }
 
-            var oldValue = ((IDeprecatableThing)thing).IsDeprecated;
+            var oldValue = thing.IsDeprecated;
             isDeprecatedPropertyInfo.SetValue(clone, !oldValue);
 
             var context = TransactionContextResolver.ResolveContext(this.Thing);
