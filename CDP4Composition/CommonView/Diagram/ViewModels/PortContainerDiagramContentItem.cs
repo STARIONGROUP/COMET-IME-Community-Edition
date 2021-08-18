@@ -64,17 +64,18 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// <summary>
         /// Fires whenever the <see cref="PortCollection"/> gets new items added or deleted
         /// </summary>
-        /// <param name="notifyCollectionChanged"></param>
+        /// <param name="notifyCollectionChanged">Collection change event arguments</param>
         private void PortCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChanged)
         {
             // set sides for any new item
             if (notifyCollectionChanged.NewItems != null)
-            { 
+            {
                 foreach (IDiagramPortViewModel port in notifyCollectionChanged.NewItems)
                 {
                     port.PortContainerShapeSide = this.GetAvailableSide();
                 }
             }
+
             // then recalculate all the attached port position
             this.RecalculatePortsPosition();
         }

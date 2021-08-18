@@ -1076,5 +1076,19 @@ namespace CDP4CommonView.Diagram
         {
             this.AssociatedObject.ApplyMindMapTreeLayoutForSubordinates(new[] { item });
         }
+
+        /// <summary>
+        /// Selects the correct diagram item based on represented thing Iid
+        /// </summary>
+        /// <param name="selectedIid">The Iid of the <see cref="Thing"/></param>
+        public void SelectItemByThingIid(Guid? selectedIid)
+        {
+            var thingDiagramItem = this.AssociatedObject.Items.OfType<DiagramContentItem>().FirstOrDefault(c => c.Content is ElementDefinitionDiagramContentItem edc && edc.Thing.Iid.Equals(selectedIid));
+
+            if (thingDiagramItem != null)
+            {
+                this.AssociatedObject.SelectItem(thingDiagramItem);
+            }
+        }
     }
 }

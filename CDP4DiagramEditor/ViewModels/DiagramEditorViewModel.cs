@@ -52,6 +52,7 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
+    using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
     using CDP4DiagramEditor.ViewModels.Relation;
@@ -106,6 +107,16 @@ namespace CDP4DiagramEditor.ViewModels
         /// Backing field for <see cref="ThingDiagramItems" />
         /// </summary>
         private DisposableReactiveList<ThingDiagramContentItem> thingDiagramItems;
+
+        /// <summary>
+        /// Backing field for the <see cref="DiagramTopElement"/>
+        /// </summary>
+        private ArchitectureElement diagramTopElement;
+
+        /// <summary>
+        /// Backing field for the <see cref="IsTopDiagramElementSet"/>
+        /// </summary>
+        private bool isTopDiagramElementSet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramEditorViewModel" /> class
@@ -213,9 +224,19 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<object> CreatePortCommand { get; private set; }
 
         /// <summary>
-        /// Gets or sets the Create RelationShip Command
+        /// Gets or sets the Create Interface Command
         /// </summary>
         public ReactiveCommand<object> CreateInterfaceCommand { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the set as top element Command
+        /// </summary>
+        public ReactiveCommand<Unit> SetAsTopElementCommand { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the unset top element Command
+        /// </summary>
+        public ReactiveCommand<Unit> UnsetTopElementCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the Create BinaryRelationShip Command
@@ -395,7 +416,14 @@ namespace CDP4DiagramEditor.ViewModels
                     return;
                 }
 
-                var block = new DiagramObject
+                var position = new Point(convertedDropPosition.X, convertedDropPosition.Y);
+                var bounds = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+                {
+                    X = (float)position.X,
+                    Y = (float)position.Y
+                };
+
+                var block = new DiagramObject(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
                 {
                     DepictedThing = rowPayload,
                     Name = rowPayload.UserFriendlyName,
@@ -403,15 +431,23 @@ namespace CDP4DiagramEditor.ViewModels
                     Resolution = Cdp4DiagramHelper.DefaultResolution
                 };
 
-                var position = new Point(convertedDropPosition.X, convertedDropPosition.Y);
-
-                block.Bounds.Add(new Bounds { X = (float) position.X, Y = (float) position.Y });
+                block.Bounds.Add(bounds);
 
                 NamedThingDiagramContentItem diagramItem = null;
 
                 if (rowPayload is ElementDefinition elementDefinition)
                 {
-                    diagramItem = new ElementDefinitionDiagramContentItem(block, this.Session, this);
+                    var architectureBlock = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+                    {
+                        DepictedThing = rowPayload,
+                        Name = rowPayload.UserFriendlyName,
+                        Documentation = rowPayload.UserFriendlyName,
+                        Resolution = Cdp4DiagramHelper.DefaultResolution
+                    };
+
+                    architectureBlock.Bounds.Add(bounds);
+
+                    diagramItem = new ElementDefinitionDiagramContentItem(architectureBlock, this.Session, this);
                 }
                 else if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
                 {
@@ -445,6 +481,15 @@ namespace CDP4DiagramEditor.ViewModels
         {
             get { return this.isDirty; }
             set { this.RaiseAndSetIfChanged(ref this.isDirty, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the diagram has its top element set
+        /// </summary>
+        public bool IsTopDiagramElementSet
+        {
+            get { return this.isTopDiagramElementSet; }
+            set { this.RaiseAndSetIfChanged(ref this.isTopDiagramElementSet, value); }
         }
 
         /// <summary>
@@ -504,6 +549,114 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.DeleteFromModelCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
             this.DeleteFromModelCommand.Subscribe(x => this.ExecuteDeleteFromModelCommand());
+
+            this.SetAsTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.SelectedItem)
+                .Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItem }),
+                _ => this.ExecuteSetTopElementCommand(), RxApp.MainThreadScheduler);
+            this.SetAsTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
+
+            this.UnsetTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.IsTopDiagramElementSet, x => x.CanCreateDiagram, (x,y) => x && y),
+                _ => this.ExecuteUnsetTopElementCommand(), RxApp.MainThreadScheduler);
+            this.UnsetTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
+        }
+
+        /// <summary>
+        /// Executes the unset top element command
+        /// </summary>
+        /// <returns></returns>
+        private async Task ExecuteUnsetTopElementCommand()
+        {
+            if (this.Thing is ArchitectureDiagram architectureDiagram && architectureDiagram.TopArchitectureElement != null)
+            {
+                // need to save the diagram
+                var clone = architectureDiagram.Clone(false);
+                var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.Thing));
+
+                clone.TopArchitectureElement = null;
+
+                transaction.CreateOrUpdate(clone);
+                clone.DiagramElement.Clear();
+
+                var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItems.Select(x => x.DiagramThing));
+
+                foreach (var diagramObject in deletedDiagramObj)
+                {
+                    transaction.Delete(diagramObject.Clone(false));
+                }
+
+                foreach (var diagramObjectViewModel in this.ThingDiagramItems)
+                {
+                    diagramObjectViewModel.UpdateTransaction(transaction, clone);
+                }
+
+                await this.DalWrite(transaction);
+                this.IsDirty = false;
+            }
+        }
+
+        /// <summary>
+        /// Executes the set top element command.
+        /// </summary>
+        private async Task ExecuteSetTopElementCommand()
+        {
+            // need to save the diagram twice as you cannot currently guarntee that the object being set as top is persisted or not
+            if (this.IsDirty)
+            {
+                // capture the Iid of the selectedItem so we can find it again
+                var diagramContentItem = this.SelectedItem as DiagramContentItem;
+
+                Guid? selectedIid = null;
+
+                if (diagramContentItem?.Content is ElementDefinitionDiagramContentItem elementDefinitionContentItem)
+                {
+                    selectedIid = (elementDefinitionContentItem.Content as ElementDefinition)?.Iid;
+                }
+
+                await this.ExecuteSaveDiagramCommand();
+                this.UpdateProperties();
+
+                // find and select the right ED
+                if (selectedIid != null)
+                {
+                    this.Behavior.SelectItemByThingIid(selectedIid);
+                }
+            }
+
+            if (this.Thing is ArchitectureDiagram architectureDiagram)
+            {
+                var diagramContentItem = this.SelectedItem as DiagramContentItem;
+
+                var elementDefinitionDiagramContentItem = diagramContentItem?.Content as ElementDefinitionDiagramContentItem;
+
+                if (!(elementDefinitionDiagramContentItem?.DiagramThing is ArchitectureElement architectureElement))
+                {
+                    return;
+                }
+
+                // need to save the diagram
+                var clone = architectureDiagram.Clone(false);
+                var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.Thing));
+
+                clone.TopArchitectureElement = architectureElement;
+
+                transaction.CreateOrUpdate(clone);
+                clone.DiagramElement.Clear();
+
+                var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItems.Select(x => x.DiagramThing));
+
+                foreach (var diagramObject in deletedDiagramObj)
+                {
+                    transaction.Delete(diagramObject.Clone(false));
+                }
+
+                foreach (var diagramObjectViewModel in this.ThingDiagramItems)
+                {
+                    diagramObjectViewModel.UpdateTransaction(transaction, clone);
+                }
+
+                await this.DalWrite(transaction);
+                this.IsDirty = false;
+            }
         }
 
         /// <summary>
@@ -610,6 +763,15 @@ namespace CDP4DiagramEditor.ViewModels
             var generatemenudeep = new ContextMenuItemViewModel("Generate Traces (Deep)", "", this.GenerateDiagramCommandDeep, MenuItemKind.Create, ClassKind.BinaryRelationship);
             this.ContextMenu.Add(generatemenudeep);
 
+            if (this.Thing is ArchitectureDiagram achitectureDiagram)
+            {
+                var setTopElement = new ContextMenuItemViewModel("Set as Top Element for This Diagram", "", this.SetAsTopElementCommand, MenuItemKind.Edit);
+                this.ContextMenu.Add(setTopElement);
+
+                var unsetTopElement = new ContextMenuItemViewModel("Unset Top Element for This Diagram", "", this.UnsetTopElementCommand, MenuItemKind.Delete);
+                this.ContextMenu.Add(unsetTopElement);
+            }
+
             var deleteDiagram = new ContextMenuItemViewModel("Delete From Diagram", "Del", this.DeleteFromDiagramCommand, MenuItemKind.Deprecate);
             this.ContextMenu.Add(deleteDiagram);
 
@@ -654,7 +816,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                 if (diagramThing.DepictedThing is ElementDefinition)
                 {
-                    newDiagramElement = new ElementDefinitionDiagramContentItem(diagramThing, this.Session, this);
+                    newDiagramElement = new ElementDefinitionDiagramContentItem((ArchitectureElement)diagramThing, this.Session, this);
                 }
                 else
                 {
@@ -669,6 +831,54 @@ namespace CDP4DiagramEditor.ViewModels
 
                 this.Behavior.ItemPositions.Add(newDiagramElement, position);
                 this.ThingDiagramItems.Add(newDiagramElement);
+            }
+
+            this.ComputeDiagramTopElement();
+        }
+
+        /// <summary>
+        /// The event-handler that is invoked by the subscription that listens for updates
+        /// on the <see cref="ViewModelBase{T}.Thing"/> that is being represented by the view-model
+        /// </summary>
+        /// <param name="objectChange">
+        /// The payload of the event that is being handled
+        /// </param>
+        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
+        {
+            base.ObjectChangeEventHandler(objectChange);
+
+            this.ComputeDiagramTopElement();
+        }
+
+        /// <summary>
+        /// Computes the diagram top element if <see cref="ArchitectureDiagram"/>
+        /// </summary>
+        private void ComputeDiagramTopElement()
+        {
+            if (this.Thing is ArchitectureDiagram architectureDiagram)
+            {
+                // update top element selection
+                var elementDefinitionDiagramContentItems = this.ThingDiagramItems.OfType<ElementDefinitionDiagramContentItem>().ToList();
+
+                // reset all to false
+                foreach (var elementDefinitionDiagramContentItem in elementDefinitionDiagramContentItems)
+                {
+                    elementDefinitionDiagramContentItem.IsTopDiagramElement = false;
+                }
+
+                this.IsTopDiagramElementSet = false;
+
+                if (architectureDiagram.TopArchitectureElement != null)
+                {
+                    // if top element set, find and mark it
+                    var topElementDiagramItem = elementDefinitionDiagramContentItems.FirstOrDefault(e => e.DiagramThing.Equals(architectureDiagram.TopArchitectureElement));
+
+                    if (topElementDiagramItem != null)
+                    {
+                        topElementDiagramItem.IsTopDiagramElement = true;
+                        this.IsTopDiagramElementSet = true;
+                    }
+                }
             }
         }
 
@@ -702,7 +912,7 @@ namespace CDP4DiagramEditor.ViewModels
                 return null;
             }
 
-            var block = new DiagramObject
+            var block = new DiagramObject(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
                 DepictedThing = depictedThing,
                 Name = depictedThing.UserFriendlyName,
@@ -710,7 +920,7 @@ namespace CDP4DiagramEditor.ViewModels
                 Resolution = Cdp4DiagramHelper.DefaultResolution
             };
 
-            var bound = new Bounds
+            var bound = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
                 X = (float) diagramPosition.X,
                 Y = (float) diagramPosition.Y,
@@ -724,7 +934,17 @@ namespace CDP4DiagramEditor.ViewModels
 
             if (depictedThing is ElementDefinition)
             {
-                newDiagramElement = new ElementDefinitionDiagramContentItem(block, this.Session, this);
+                var archElement = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+                {
+                    DepictedThing = depictedThing,
+                    Name = depictedThing.UserFriendlyName,
+                    Documentation = depictedThing.UserFriendlyName,
+                    Resolution = Cdp4DiagramHelper.DefaultResolution
+                };
+
+                archElement.Bounds.Add(bound);
+
+                newDiagramElement = new ElementDefinitionDiagramContentItem(archElement, this.Session, this);
             }
             else
             {
@@ -757,7 +977,7 @@ namespace CDP4DiagramEditor.ViewModels
                     return;
                 }
 
-                var block = new DiagramObject
+                var block = new DiagramObject(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
                 {
                     DepictedThing = depictedThing,
                     Name = depictedThing.UserFriendlyName,
@@ -765,7 +985,7 @@ namespace CDP4DiagramEditor.ViewModels
                     Resolution = Cdp4DiagramHelper.DefaultResolution
                 };
 
-                var bound = new Bounds
+                var bound = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
                 {
                     X = (float) target.Position.X,
                     Y = (float) target.Position.Y,
@@ -797,7 +1017,7 @@ namespace CDP4DiagramEditor.ViewModels
                 return;
             }
 
-            var connector = new DiagramEdge
+            var connector = new DiagramEdge(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
                 Source = source,
                 Target = target,

@@ -26,6 +26,7 @@
 
 namespace CDP4CommonView.Diagram
 {
+    using System;
     using System.Collections.Generic;
     using System.Windows;
 
@@ -61,5 +62,11 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="item">The diagram item.</param>
         void ApplyChildLayout(DiagramItem item);
+
+        /// <summary>
+        /// Selects the correct diagram item based on represented thing Iid
+        /// </summary>
+        /// <param name="selectedIid">The Iid of the <see cref="Thing"/></param>
+        void SelectItemByThingIid(Guid? selectedIid);
     }
 }

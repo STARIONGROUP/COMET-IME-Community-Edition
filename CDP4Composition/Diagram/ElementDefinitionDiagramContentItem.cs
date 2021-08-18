@@ -51,6 +51,11 @@ namespace CDP4Composition.Diagram
         private readonly ISession session;
 
         /// <summary>
+        /// Backing fied for <see cref="IsTopDiagramElement"/>
+        /// </summary>
+        private bool isTopDiagramElement;
+
+        /// <summary>
         /// Gets or sets the Children of the <see cref="ElementDefinitionDiagramContentItem"/>
         /// </summary>
         public ReactiveList<IDiagramContentItemChild> DiagramContentItemChildren { get; set; } = new();
@@ -68,7 +73,7 @@ namespace CDP4Composition.Diagram
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public ElementDefinitionDiagramContentItem(DiagramObject diagramThing, ISession session, IDiagramEditorViewModel container)
+        public ElementDefinitionDiagramContentItem(ArchitectureElement diagramThing, ISession session, IDiagramEditorViewModel container)
             : base(diagramThing, container)
         {
             this.session = session;
@@ -79,6 +84,15 @@ namespace CDP4Composition.Diagram
             }
 
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Gets or sets the value indicating whether this is a top element of the <see cref="ArchitectureDiagram"/>
+        /// </summary>
+        public bool IsTopDiagramElement
+        {
+            get => this.isTopDiagramElement;
+            set => this.RaiseAndSetIfChanged(ref this.isTopDiagramElement, value);
         }
 
         /// <summary>
