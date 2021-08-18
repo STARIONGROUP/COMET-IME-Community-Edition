@@ -45,6 +45,7 @@ namespace CDP4DiagramEditor.Tests
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
@@ -53,6 +54,8 @@ namespace CDP4DiagramEditor.Tests
     using CDP4DiagramEditor.ViewModels;
 
     using DevExpress.Xpf.Diagram;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using Moq;
 
@@ -100,9 +103,15 @@ namespace CDP4DiagramEditor.Tests
         private RequirementsSpecification spec3;
         private BinaryRelationship link1;
 
+        private Mock<IServiceLocator> serviceLocator;
+
         [SetUp]
         public void Setup()
         {
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>()).Returns(Mock.Of<IThingCreator>());
+
             this.session = new Mock<ISession>();
             this.assembler = new Assembler(this.uri);
             this.permissionService = new Mock<IPermissionService>();
@@ -219,6 +228,7 @@ namespace CDP4DiagramEditor.Tests
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(openedIterations);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.DataSourceUri).Returns("http://example.org");
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.mockExtendedDiagramBehavior.Setup(x => x.GetDiagramPositionFromMousePosition(It.IsAny<Point>())).Returns(new Point());
             this.mockDiagramBehavior.Setup(x => x.GetDiagramPositionFromMousePosition(It.IsAny<Point>())).Returns(new Point());

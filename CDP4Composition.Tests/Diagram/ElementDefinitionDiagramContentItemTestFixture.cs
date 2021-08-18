@@ -46,7 +46,7 @@ namespace CDP4Composition.Tests.Diagram
     [Apartment(ApartmentState.STA)]
     public class ElementDefinitionDiagramContentItemTestFixture
     {
-        private DiagramObject diagramObject;
+        private ArchitectureElement diagramObject;
         private ElementDefinition elementDefinition;
         private Parameter parameter1;
         private Parameter parameter2;
@@ -61,7 +61,7 @@ namespace CDP4Composition.Tests.Diagram
             this.elementDefinition.Parameter.Add(this.parameter1);
             this.elementDefinition.Parameter.Add(this.parameter2);
 
-            this.diagramObject = new DiagramObject
+            this.diagramObject = new ArchitectureElement()
             {
                 DepictedThing = this.elementDefinition
             };
