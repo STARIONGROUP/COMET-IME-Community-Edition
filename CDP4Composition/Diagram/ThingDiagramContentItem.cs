@@ -34,6 +34,8 @@ namespace CDP4Composition.Diagram
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
 
+    using CDP4Composition.DragDrop;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -50,7 +52,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents a diagram content control class that can store a <see cref="Thing"/>.
     /// </summary>
-    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject, IDisposable
+    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject, IDisposable, IIDropTarget
     {
         /// <summary> 
         /// <see cref="ReactiveUI.PropertyChangingEventHandler"/> event
@@ -153,6 +155,11 @@ namespace CDP4Composition.Diagram
         /// The observable for when the position of the view object changed
         /// </summary>
         public IDisposable PositionObservable { get; set; }
+
+        /// <summary>
+        /// A specific class that handles the <see cref="IDropTarget"/> functionality
+        /// </summary>
+        public IDropTarget DropTarget { get; protected set; }
 
         /// <summary>
         /// Initialize subscriptions

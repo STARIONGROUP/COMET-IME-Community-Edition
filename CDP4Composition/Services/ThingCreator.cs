@@ -10,6 +10,8 @@ namespace CDP4Composition.Services
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Threading.Tasks;
+
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
@@ -70,7 +72,7 @@ namespace CDP4Composition.Services
             {
                 throw new ArgumentNullException(nameof(session), "The session may not be null");
             }
-            
+
             var parameter = new Parameter(Guid.NewGuid(), null, null)
                                 {
                                     Owner = owner,
@@ -95,7 +97,55 @@ namespace CDP4Composition.Services
             {
                 logger.Error("The parameter could not be created", ex);
                 throw ex;
-            }     
+            }
+        }
+
+        /// <summary>
+        /// Apply <see cref="Category"/> to <see cref="ICategorizableThing"/>
+        /// </summary>
+        /// <param name="category">
+        /// The <see cref="Category"/> to apply
+        /// </param>
+        /// <param name="categorizableThing">
+        /// The <see cref="ICategorizableThing"/> that the category is applied to.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the new <see cref="Category"/> application is to be added to
+        /// </param>
+        public async Task ApplyCategory<T>(Category category, T categorizableThing, ISession session) where T : Thing, ICategorizableThing
+        {
+            if (category == null)
+            {
+                throw new ArgumentNullException(nameof(category), "The category may not be null");
+            }
+
+            if (categorizableThing == null)
+            {
+                throw new ArgumentNullException(nameof(categorizableThing), "The categorizable thing may not be null");
+            }
+
+            if (session == null)
+            {
+                throw new ArgumentNullException(nameof(session), "The session may not be null");
+            }
+
+            var clone = categorizableThing.Clone(false);
+            ((ICategorizableThing)clone).Category.Add(category);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(categorizableThing);
+            var transaction = new ThingTransaction(transactionContext, clone);
+            transaction.CreateOrUpdate(clone);
+
+            try
+            {
+                var operationContainer = transaction.FinalizeTransaction();
+                await session.Write(operationContainer);
+            }
+            catch (Exception ex)
+            {
+                logger.Error("The category could not be applied", ex);
+                throw ex;
+            }
         }
 
         /// <summary>

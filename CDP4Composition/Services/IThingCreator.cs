@@ -7,6 +7,8 @@
 namespace CDP4Composition.Services
 {
     using System.Threading.Tasks;
+
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
@@ -38,6 +40,20 @@ namespace CDP4Composition.Services
         /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
         /// </param>
         Task CreateParameter(ElementDefinition elementDefinition, ParameterGroup group, ParameterType parameterType, MeasurementScale measurementScale, DomainOfExpertise owner, ISession session);
+
+        /// <summary>
+        /// Apply <see cref="Category"/> to <see cref="ICategorizableThing"/>
+        /// </summary>
+        /// <param name="category">
+        /// The <see cref="Category"/> to apply
+        /// </param>
+        /// <param name="categorizableThing">
+        /// The <see cref="ICategorizableThing"/> that the category is applied to.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the new <see cref="Category"/> application is to be added to
+        /// </param>
+        Task ApplyCategory<T>(Category category, T categorizableThing, ISession session) where T : Thing, ICategorizableThing;
 
         /// <summary>
         /// Create a new <see cref="UserRuleVerification"/>

@@ -43,7 +43,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents an <see cref="ElementDefinition"/> to be used in a Diagram
     /// </summary>
-    public class ElementDefinitionDiagramContentItem : PortContainerDiagramContentItem, IDiagramContentItemChildren, IIDropTarget
+    public class ElementDefinitionDiagramContentItem : PortContainerDiagramContentItem, IDiagramContentItemChildren
     {
         /// <summary>
         /// The <see cref="ISession"/> to be used when creating other view models
@@ -59,11 +59,6 @@ namespace CDP4Composition.Diagram
         /// Gets or sets the Children of the <see cref="ElementDefinitionDiagramContentItem"/>
         /// </summary>
         public ReactiveList<IDiagramContentItemChild> DiagramContentItemChildren { get; set; } = new();
-
-        /// <summary>
-        /// A specific class that handles the <see cref="IDropTarget"/> functionality
-        /// </summary>
-        public IDropTarget DropTarget { get; protected set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.

@@ -26,6 +26,7 @@
 namespace CDP4Composition.Tests.Diagram
 {
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.DiagramData;
@@ -101,89 +102,106 @@ namespace CDP4Composition.Tests.Diagram
         }
 
         [Test]
-        public void VerifyThatHandleDropWorksForHandledIDropTarget()
+        public async Task VerifyThatHandleDropWorksForHandledIDropTarget()
         {
             this.diagramContentItem.Content = this.dropTarget.Object;
             this.diagramDropInfo.Setup(x => x.Handled).Returns(true);
 
-            Assert.IsTrue(this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object));
+            var assertion = await this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object);
+
+            Assert.IsTrue(assertion);
 
             this.dropTarget.Verify(x => x.Drop(this.diagramDropInfo.Object), Times.Once);
         }
 
         [Test]
-        public void VerifyThatHandleDropWorksForUnhandledIDropTarget()
+        public async Task VerifyThatHandleDropWorksForUnhandledIDropTarget()
         {
             this.diagramContentItem.Content = this.dropTarget.Object;
             this.diagramDropInfo.Setup(x => x.Handled).Returns(false);
 
-            Assert.IsFalse(this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object));
+            var assertion = await this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object);
+
+            Assert.IsFalse(assertion);
 
             this.dropTarget.Verify(x => x.Drop(this.diagramDropInfo.Object), Times.Once);
         }
 
         [Test]
-        public void VerifyThatHandleDropWorksForHandledIIDropTarget()
+        public async Task VerifyThatHandleDropWorksForHandledIIDropTarget()
         {
             this.diagramContentItem.Content = this.iDropTarget.Object;
             this.diagramDropInfo.Setup(x => x.Handled).Returns(true);
 
-            Assert.IsTrue(this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object));
+            var assertion = await this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object);
+
+            Assert.IsTrue(assertion);
 
             this.dropTarget.Verify(x => x.Drop(this.diagramDropInfo.Object), Times.Once);
         }
 
         [Test]
-        public void VerifyThatHandleDropWorksForUnhandledIIDropTarget()
+        public async Task VerifyThatHandleDropWorksForUnhandledIIDropTarget()
         {
             this.diagramContentItem.Content = this.iDropTarget.Object;
             this.diagramDropInfo.Setup(x => x.Handled).Returns(false);
 
-            Assert.IsFalse(this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object));
+            var assertion = await this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object);
+
+            Assert.IsFalse(assertion);
 
             this.dropTarget.Verify(x => x.Drop(this.diagramDropInfo.Object), Times.Once);
         }
 
         [Test]
-        public void VerifyThatHandleDropWorksForUnsupportedObject()
+        public async Task VerifyThatHandleDropWorksForUnsupportedObject()
         {
             this.diagramContentItem.Content = "";
-            Assert.IsFalse(this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object));
+
+            var assertion = await this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object);
+
+            Assert.IsFalse(assertion);
 
             this.dropTarget.Verify(x => x.Drop(this.diagramDropInfo.Object), Times.Never);
         }
 
         [Test]
-        public void VerifyThatHandleDropWorksForDiagramControl()
+        public async Task VerifyThatHandleDropWorksForDiagramControl()
         {
             this.diagramControl.DataContext = this.dropTarget.Object;
             this.cdp4DiagramOrgChartBehavior.Attach(this.diagramControl);
             this.diagramDropInfo.Setup(x => x.Handled).Returns(true);
 
-            Assert.IsTrue(this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object));
+            var assertion = await this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object);
+
+            Assert.IsTrue(assertion);
 
             this.dropTarget.Verify(x => x.Drop(this.diagramDropInfo.Object), Times.Once);
         }
 
         [Test]
-        public void VerifyThatHandleDropWorksForDiagramControlWithUnhandledEvent()
+        public async Task VerifyThatHandleDropWorksForDiagramControlWithUnhandledEvent()
         {
             this.diagramControl.DataContext = this.dropTarget.Object;
             this.cdp4DiagramOrgChartBehavior.Attach(this.diagramControl);
             this.diagramDropInfo.Setup(x => x.Handled).Returns(false);
 
-            Assert.IsFalse(this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object));
+            var assertion = await this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object);
+
+            Assert.IsFalse(assertion);
 
             this.dropTarget.Verify(x => x.Drop(this.diagramDropInfo.Object), Times.Once);
         }
 
         [Test]
-        public void VerifyThatHandleDropWorksForDiagramControlWithUnsupportedDataContext()
+        public async Task VerifyThatHandleDropWorksForDiagramControlWithUnsupportedDataContext()
         {
             this.diagramControl.DataContext = "";
             this.cdp4DiagramOrgChartBehavior.Attach(this.diagramControl);
 
-            Assert.IsFalse(this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object));
+            var assertion = await this.cdp4DiagramOrgChartBehavior.HandleDrop(this.diagramContentItem, this.diagramDropInfo.Object);
+
+            Assert.IsFalse(assertion);
 
             this.dropTarget.Verify(x => x.Drop(this.diagramDropInfo.Object), Times.Never);
         }

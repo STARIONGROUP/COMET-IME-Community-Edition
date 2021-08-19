@@ -30,6 +30,7 @@ namespace CDP4CommonView.Diagram
     using System.Collections.Generic;
     using System.Collections.Specialized;
     using System.Linq;
+    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
@@ -932,7 +933,7 @@ namespace CDP4CommonView.Diagram
 
             if (source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
             {
-                controlHavingDropTarget.DropTarget.DragOver(dropInfo);
+                controlHavingDropTarget.DropTarget?.DragOver(dropInfo);
 
                 if (dropInfo.Handled)
                 {
@@ -998,11 +999,11 @@ namespace CDP4CommonView.Diagram
         /// <remarks>
         /// Occurs when the input system reports an underlying drop event with this element as the drop target.
         /// </remarks>
-        private void PreviewDrop(object sender, DragEventArgs e)
+        private async void PreviewDrop(object sender, DragEventArgs e)
         {
             var dropInfo = new DiagramDropInfo(sender, e);
 
-            e.Handled = this.HandleDrop(e.Source, dropInfo);
+            e.Handled = await this.HandleDrop(e.Source, dropInfo);
         }
 
         /// <summary>
@@ -1011,11 +1012,11 @@ namespace CDP4CommonView.Diagram
         /// <param name="source">The source <see cref="object"/> that originated the Drop action.</param>
         /// <param name="dropInfo">The <see cref="DiagramDropInfo"/> object that was created based on the Drop action.</param>
         /// <returns>true if the Drop action was handled, otherwise false</returns>
-        public virtual bool HandleDrop(object source, IDiagramDropInfo dropInfo)
+        public virtual async Task<bool> HandleDrop(object source, IDiagramDropInfo dropInfo)
         {
             if (source is DiagramContentItem { Content: IDropTarget controlDropTarget })
             {
-                controlDropTarget.Drop(dropInfo);
+                await controlDropTarget.Drop(dropInfo);
 
                 if (dropInfo.Handled)
                 {
@@ -1025,7 +1026,7 @@ namespace CDP4CommonView.Diagram
 
             if (source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
             {
-                controlHavingDropTarget.DropTarget.Drop(dropInfo);
+                await controlHavingDropTarget.DropTarget.Drop(dropInfo);
 
                 if (dropInfo.Handled)
                 {
@@ -1035,7 +1036,7 @@ namespace CDP4CommonView.Diagram
 
             if (this.AssociatedObject?.DataContext is IDropTarget vmDropTarget)
             {
-                vmDropTarget.Drop(dropInfo);
+                await vmDropTarget.Drop(dropInfo);
             }
 
             return dropInfo.Handled;

@@ -76,7 +76,7 @@
                                VerticalAlignment="Center" Margin="10,0,10,2" />
                     <TextBlock Text="{Binding ClassKind}" FontSize="12" HorizontalAlignment="Center"
                                VerticalAlignment="Center" Margin="10,0,10,2" />
-                    <TextBlock Text="{Binding Categories}" FontSize="12" HorizontalAlignment="Center"
+                    <TextBlock Text="{Binding Categories}" FontSize="12" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
                                VerticalAlignment="Center" Margin="10,0,10,10" />
                     <TextBlock Text="{Binding FullName}" TextAlignment="Center" FontWeight="Bold" FontSize="14"
                                Margin="10,0,10,10" />
