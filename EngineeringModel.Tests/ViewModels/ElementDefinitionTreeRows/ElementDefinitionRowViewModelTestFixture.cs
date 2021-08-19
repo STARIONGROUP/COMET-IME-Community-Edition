@@ -351,6 +351,23 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         /// <summary>
+        /// Apply <see cref="Category"/> to <see cref="ICategorizableThing"/>
+        /// </summary>
+        /// <param name="category">
+        /// The <see cref="Category"/> to apply
+        /// </param>
+        /// <param name="categorizableThing">
+        /// The <see cref="ICategorizableThing"/> that the category is applied to.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the new <see cref="Category"/> application is to be added to
+        /// </param>
+        public Task ApplyCategory<T>(Category category, T categorizableThing, ISession session) where T : Thing, ICategorizableThing
+        {
+            throw new Exception("The category could not be applied");
+        }
+
+        /// <summary>
         /// Create a new <see cref="UserRuleVerification"/>
         /// </summary>
         /// <param name="ruleVerificationList">
