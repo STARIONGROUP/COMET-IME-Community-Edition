@@ -102,14 +102,14 @@ namespace CDP4Composition.Diagram
             if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
             {
                 await this.ParameterDrop(dropInfo, parameterTypeAndScale);
+                dropInfo.Handled = true;
             }
 
             if (dropInfo.Payload is Category category)
             {
                 await this.CategoryDrop(dropInfo, category);
+                dropInfo.Handled = true;
             }
-
-            dropInfo.Handled = true;
         }
 
         /// <summary>

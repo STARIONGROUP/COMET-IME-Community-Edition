@@ -25,23 +25,12 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
-    using System;
-    using System.Linq;
-    using System.Reactive;
-    using System.Reactive.Linq;
-    using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Input;
-
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-
     using CDP4CommonView.Diagram;
-    using CDP4CommonView.Diagram.ViewModels;
     using CDP4CommonView.EventAggregator;
-
     using CDP4Composition;
     using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
@@ -50,18 +39,20 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
-
     using CDP4DiagramEditor.ViewModels.Palette;
     using CDP4DiagramEditor.ViewModels.Relation;
-
     using DevExpress.Xpf.Diagram;
-
     using ReactiveUI;
-
+    using System;
+    using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Input;
     using Point = System.Windows.Point;
 
     /// <summary>
@@ -230,11 +221,6 @@ namespace CDP4DiagramEditor.ViewModels
             get { return this.thingDiagramItems; }
             set { this.RaiseAndSetIfChanged(ref this.thingDiagramItems, value); }
         }
-
-        /// <summary>
-        /// Gets or sets the Create Port Command
-        /// </summary>
-        public ReactiveCommand<object> CreatePortCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the Create Interface Command
@@ -545,22 +531,19 @@ namespace CDP4DiagramEditor.ViewModels
             this.SaveDiagramCommand = ReactiveCommand.CreateAsyncTask(canExecute, x => this.ExecuteSaveDiagramCommand(), RxApp.MainThreadScheduler);
             this.SaveDiagramCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
 
-            this.GenerateDiagramCommandShallow = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
+            this.GenerateDiagramCommandShallow = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any()));
             this.GenerateDiagramCommandShallow.Subscribe(x => this.ExecuteGenerateDiagramCommand(false));
 
-            this.GenerateDiagramCommandDeep = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
+            this.GenerateDiagramCommandDeep = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any()));
             this.GenerateDiagramCommandDeep.Subscribe(x => this.ExecuteGenerateDiagramCommand(true));
-
-            this.CreatePortCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => (s as DiagramContentItem)?.Content is PortContainerDiagramContentItem));
-            this.CreatePortCommand.Subscribe(_ => this.CreatePortCommandExecute());
 
             this.CreateInterfaceCommand = ReactiveCommand.Create();
             this.CreateInterfaceCommand.Subscribe(_ => this.CreateInterfaceCommandExecute());
 
-            this.DeleteFromDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
+            this.DeleteFromDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any()));
             this.DeleteFromDiagramCommand.Subscribe(x => this.ExecuteDeleteFromDiagramCommand());
 
-            this.DeleteFromModelCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
+            this.DeleteFromModelCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any()));
             this.DeleteFromModelCommand.Subscribe(x => this.ExecuteDeleteFromModelCommand());
 
             this.SetAsTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.SelectedItem)
@@ -1023,14 +1006,6 @@ namespace CDP4DiagramEditor.ViewModels
         public void CreateInterfaceCommandExecute()
         {
             this.Behavior.ActivateConnectorTool();
-        }
-
-        /// <summary>
-        /// Create a port with a dummy with a <see cref="ElementUsage" />
-        /// </summary>
-        public void CreatePortCommandExecute()
-        {
-            //this.CreateDiagramPort();
         }
 
         /// <summary>

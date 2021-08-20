@@ -226,7 +226,6 @@
             <Grid Grid.Column="1">
                 <dxdo:LayoutPanel DataContext="{Binding PaletteViewModel}"  Caption="Palette" ShowHideButton="False" ShowCloseButton="False" ShowPinButton="False">
                     <dxdo:LayoutPanel.Resources>
-                        <palette:PaletteGroupComparer x:Key="PaletteGroupComparer"></palette:PaletteGroupComparer>
                         <CollectionViewSource x:Key="PaletteGroups" Source="{Binding Items}">
                             <CollectionViewSource.GroupDescriptions>
                                 <PropertyGroupDescription PropertyName="Group" />
@@ -238,13 +237,18 @@
                         </CollectionViewSource>
                     </dxdo:LayoutPanel.Resources>
                     <dxn:NavBarControl dx:ThemeManager.ThemeName="Seven"
-                                       
+                                       AllowSelectItem="True"
+                                       EachGroupHasSelectedItem="False"
                                        ItemsSource="{Binding Source={StaticResource PaletteGroups}}"
                                        GroupDescription="Group"
                                        
+                                       AllowDrop="False"
                                        Margin="0,0,0,0"
                                        Background="Transparent"
                                        Compact="False">
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:EventToCommand Event="PreviewMouseMove" PassEventArgsToCommand="True" Command="{Binding OnMouseMoveCommand}"></dxmvvm:EventToCommand>
+                        </dxmvvm:Interaction.Behaviors>
                         <dxn:NavBarControl.Resources>
                             
                             <DataTemplate x:Key="NavItemDataTemplate">

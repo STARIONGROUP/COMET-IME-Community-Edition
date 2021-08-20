@@ -25,12 +25,18 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
+    using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.DiagramData;
 
     using CDP4Composition.Mvvm.Types;
+
+    using DevExpress.Xpf.NavBar;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -91,6 +97,11 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         }
 
         /// <summary>
+        /// Gets or sets the on mouse move command
+        /// </summary>
+        public ReactiveCommand<object> OnMouseMoveCommand { get; private set; }
+
+        /// <summary>
         /// Initializes the palette
         /// </summary>
         private void InitializePalette()
@@ -102,6 +113,29 @@ namespace CDP4DiagramEditor.ViewModels.Palette
             {
                 paletteItemViewModel.BindEditor(this.ParentViewModel);
                 this.Items.Add(paletteItemViewModel);
+            }
+
+            this.InitializeCommands();
+        }
+
+        private void InitializeCommands()
+        {
+            this.OnMouseMoveCommand = ReactiveCommand.Create();
+            this.OnMouseMoveCommand.Subscribe(e => this.ExecuteMouseMoveCommand((MouseEventArgs)e));
+        }
+
+        private void ExecuteMouseMoveCommand(MouseEventArgs e)
+        {
+            var item = e.OriginalSource as NavBarItemControl;
+
+            if (Mouse.LeftButton == MouseButtonState.Pressed && item != null)
+            {
+                var itemViewModel = ((NavBarItem)item.Content).Content as IPaletteItemViewModel;
+
+                if(itemViewModel != null)
+                {
+                    itemViewModel.HandleMouseMove(e);
+                }
             }
         }
     }

@@ -1037,6 +1037,11 @@ namespace CDP4CommonView.Diagram
             if (this.AssociatedObject?.DataContext is IDropTarget vmDropTarget)
             {
                 await vmDropTarget.Drop(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
             }
 
             return dropInfo.Handled;
