@@ -49,7 +49,6 @@ namespace CDP4Composition.CommonView.ViewModels
     /// </summary>
     [ThingDialogViewModelExport(ClassKind.Behavior)]
     public class BehaviorDialogViewModel : DefinedThingDialogViewModel<Behavior>, IThingDialogViewModel
-
     {
         /// <summary>
         /// Backing field for the <see cref="SelectedBehavioralModelKindViewModel"/> property
@@ -111,8 +110,14 @@ namespace CDP4Composition.CommonView.ViewModels
             this.UpdateProperties();
         }
 
+        /// <summary>
+        /// List of all <see cref="BehavioralModelKind"/>s
+        /// </summary>
         public ReactiveList<BehavioralModelKind> BehavioralModelKinds { get; }
 
+        /// <summary>
+        /// The currently selected <see cref="IBehavioralModelKindViewModel"/>
+        /// </summary>
         public IBehavioralModelKindViewModel SelectedBehavioralModelKindViewModel
         {
             get => this.selectedBehavioralModelKindViewModel;
@@ -156,7 +161,7 @@ namespace CDP4Composition.CommonView.ViewModels
                     {
                         var attachment = this.Thing.Attachment.FirstOrDefault() ?? new Attachment() { ChangeKind = this.Thing.ChangeKind };
 
-                        var vm = new AttachmentViewModel(attachment, this.Session, this.Thing, this.ChainOfContainer, this.dialogKind);
+                        var vm = new AttachmentViewModel(attachment, this.Session, this.ChainOfContainer, this.dialogKind);
 
                         this.Disposables.Add(vm.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
                         this.Disposables.Add(vm.FileType.Changed.Subscribe(_ => this.UpdateOkCanExecute()));

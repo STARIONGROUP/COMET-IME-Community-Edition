@@ -90,10 +90,9 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <param name="dialogKind">
         /// The kind of operation this <see cref="DialogViewModelBase{T}"/> performs
         /// </param>
-        public AttachmentViewModel(Attachment attachment, ISession session, Thing container, List<Thing> chainOfContainer, ThingDialogKind dialogKind)
+        public AttachmentViewModel(Attachment attachment, ISession session, List<Thing> chainOfContainer, ThingDialogKind dialogKind)
             : base(attachment, session)
         {
-            this.container = container;
             this.chainOfContainer = chainOfContainer;
             this.dialogKind = dialogKind;
 
@@ -144,7 +143,6 @@ namespace CDP4Composition.CommonView.ViewModels
         /// </summary>
         public ReactiveList<FileType> PossibleFileType { get; protected set; }
 
-
         /// <summary>
         /// Initialize the <see cref="ICommand"/>s and listeners
         /// </summary>
@@ -165,7 +163,6 @@ namespace CDP4Composition.CommonView.ViewModels
             this.MoveDownFileTypeCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanMoveDownFileType));
             this.Disposables.Add(this.MoveDownFileTypeCommand.Subscribe(_ => this.MoveDownFileType()));
         }
-
 
         /// <summary>
         /// Update the transaction with the Thing represented by this Dialog
@@ -285,17 +282,12 @@ namespace CDP4Composition.CommonView.ViewModels
         private readonly IOpenSaveFileDialogService fileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 
         /// <summary>
-        /// 
-        /// </summary>
-        private readonly Thing container;
-
-        /// <summary>
-        /// 
+        /// Gets the chain of <see cref="Thing"/>s that contains the current one
         /// </summary>
         private readonly List<Thing> chainOfContainer;
 
         /// <summary>
-        /// 
+        /// The <see cref="ThingDialogKind"/> of the containing dialog
         /// </summary>
         private readonly ThingDialogKind dialogKind;
 
@@ -602,13 +594,11 @@ namespace CDP4Composition.CommonView.ViewModels
             this.UpdatePath();
         }
 
-
-
         /// <summary>
         /// Calculate the Hash of the contents of some filecontent
         /// </summary>
         /// <param name="fileContent"></param>
-        /// <returns></returns>
+        /// <returns>The <see cref="string"/> hash of the file</returns>
         private string CalculateContentHash(string filePath)
         {
             if (filePath is null)

@@ -171,6 +171,11 @@ namespace CDP4Composition.CommonView.ViewModels
             this.UpdateProperties();
         }
 
+        /// <summary>
+        /// Creates, update and write a clone in the data-source when inline-editing with a new value for one of its property
+        /// </summary>
+        /// <param name="newValue">The new value</param>
+        /// <param name="fieldName">The property name</param>
         public override void CreateCloneAndWrite(object newValue, string fieldName)
         {
         }
