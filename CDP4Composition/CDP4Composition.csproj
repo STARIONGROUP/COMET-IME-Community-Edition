@@ -374,6 +374,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CommonView\Items\BehaviorLayoutGroup.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CommonView\Items\AdvancedLayoutGroup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -534,6 +538,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CommonView\Resources\ScriptTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CommonView\Resources\AttachmentTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CommonView\Resources\ValueSetTemplates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -551,6 +563,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CommonView\Views\AnnotationTooltip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CommonView\Views\BehaviorDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -674,6 +690,8 @@
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="CommonView\Resources\AttachmentTemplate.xaml" />
+    <None Remove="CommonView\Resources\ScriptTemplate.xaml" />
     <None Remove="Resources\Images\cometlogo.png" />
     <None Remove="Resources\Images\cometlogo_48x48.png" />
     <None Remove="Views\CustomFilterEditorDialog.xaml" />
