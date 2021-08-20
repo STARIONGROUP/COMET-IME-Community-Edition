@@ -101,7 +101,11 @@ namespace CDP4Composition.CommonView.ViewModels
             this.Disposables.Add(
                 this.WhenAnyValue(d => d.SelectedBehavioralModelKind).Subscribe(_ =>
                 {
-                    this.SelectedBehavioralModelKindViewModel?.Dispose();
+                    if (this.SelectedBehavioralModelKindViewModel is IDisposable disposable)
+                    {
+                        disposable?.Dispose();
+                    }
+
                     this.SelectedBehavioralModelKindViewModel = this.CreateBehavioralModelKindViewModel(this.selectedBehavioralModelKind);
                 })
             );

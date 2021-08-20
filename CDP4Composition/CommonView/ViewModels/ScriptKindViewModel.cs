@@ -144,13 +144,6 @@ namespace CDP4Composition.CommonView.ViewModels
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public void Dispose()
-        {
-        }
-
-        /// <summary>
         /// Returns the if the OK command can be executed for this view model
         /// </summary>
         /// <returns>The ok status</returns>

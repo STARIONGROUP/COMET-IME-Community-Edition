@@ -34,7 +34,7 @@ namespace CDP4Composition.CommonView.ViewModels
     /// <summary>
     /// An interface that represents view models for <see cref="BehavioralModelKind"/> values
     /// </summary>
-    public interface IBehavioralModelKindViewModel : IDisposable
+    public interface IBehavioralModelKindViewModel
     {
         /// <summary>
         /// Returns the if the OK command can be executed for this view model
