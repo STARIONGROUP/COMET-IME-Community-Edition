@@ -32,6 +32,8 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4CommonView.Diagram.ViewModels;
 
+    using CDP4Composition.Diagram;
+
     using CDP4Dal;
 
     /// <summary>
@@ -50,7 +52,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="diagramObject"></param>
         /// <param name="session"></param>
         /// <param name="containerViewModel"></param>
-        public DiagramPortViewModel(DiagramObject diagramObject, ISession session, DiagramEditorViewModel containerViewModel) : base(diagramObject, session, containerViewModel)
+        public DiagramPortViewModel(DiagramObject diagramObject, ISession session, IDiagramEditorViewModel containerViewModel) : base(diagramObject, session, containerViewModel)
         {
             this.ContainerBounds = diagramObject.Bounds.FirstOrDefault();
             this.Position = new System.Windows.Point(this.ContainerBounds?.X ?? 0D, this.ContainerBounds?.Y ?? 0D);

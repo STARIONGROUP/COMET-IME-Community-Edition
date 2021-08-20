@@ -27,11 +27,22 @@
 namespace CDP4Composition.Diagram
 {
     using CDP4Common.CommonData;
+    using CDP4Common.DiagramData;
+
+    using CDP4CommonView.Diagram;
+    using CDP4CommonView.Diagram.ViewModels;
+
+    using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
+
+    using CDP4Dal;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The interface that describes the dirty mechanism of DiagramEditorViewModel
     /// </summary>
-    public interface IDiagramEditorViewModel
+    public interface IDiagramEditorViewModel : IViewModelBase<DiagramCanvas>, ICdp4DiagramContainer, IISession
     {
         /// <summary>
         /// Defines the method that update <see cref="IsDirty"/> property
@@ -42,6 +53,21 @@ namespace CDP4Composition.Diagram
         /// Defines the <see cref="IsDirty"/> property
         /// </summary>
         bool IsDirty { get; }
+
+        /// <summary>
+        /// Gets or sets the collection of diagram items.
+        /// </summary>
+        DisposableReactiveList<ThingDiagramContentItem> ThingDiagramItems { get; set; }
+
+        /// <summary>
+        /// Gets the collection diagramming-port to display.
+        /// </summary>
+        ReactiveList<IDiagramObjectViewModel> DiagramPortCollection { get; }
+
+        /// <summary>
+        /// Gets the collection diagramming-item to display.
+        /// </summary>
+        ReactiveList<IDiagramConnectorViewModel> DiagramConnectorCollection { get; }
 
         /// <summary>
         /// Removes a diagram item and its connectors.

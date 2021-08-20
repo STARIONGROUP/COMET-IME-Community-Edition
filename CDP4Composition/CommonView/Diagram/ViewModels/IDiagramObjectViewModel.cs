@@ -28,5 +28,10 @@ namespace CDP4CommonView.Diagram
         /// Gets or sets the width
         /// </summary>
         double Width { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value indicating whether the viewmodel is is dirty.
+        /// </summary>
+        bool IsDirty { get; set; }
     }
 }

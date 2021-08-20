@@ -55,6 +55,7 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
+    using CDP4DiagramEditor.ViewModels.Palette;
     using CDP4DiagramEditor.ViewModels.Relation;
 
     using DevExpress.Xpf.Diagram;
@@ -66,7 +67,7 @@ namespace CDP4DiagramEditor.ViewModels
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor" /> view
     /// </summary>
-    public class DiagramEditorViewModel : BrowserViewModelBase<DiagramCanvas>, IPanelViewModel, IDropTarget, ICdp4DiagramContainer, IDiagramEditorViewModel
+    public class DiagramEditorViewModel : BrowserViewModelBase<DiagramCanvas>, IPanelViewModel, IDropTarget, IDiagramEditorViewModel
     {
         /// <summary>
         /// Backing field for <see cref="CanCreateDiagram" />
@@ -109,14 +110,14 @@ namespace CDP4DiagramEditor.ViewModels
         private DisposableReactiveList<ThingDiagramContentItem> thingDiagramItems;
 
         /// <summary>
-        /// Backing field for the <see cref="DiagramTopElement"/>
-        /// </summary>
-        private ArchitectureElement diagramTopElement;
-
-        /// <summary>
         /// Backing field for the <see cref="IsTopDiagramElementSet"/>
         /// </summary>
         private bool isTopDiagramElementSet;
+
+        /// <summary>
+        /// Backing field for <see cref="PaletteViewModel"/>
+        /// </summary>
+        private DiagramPaletteViewModel paletteViewModel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramEditorViewModel" /> class
@@ -130,7 +131,19 @@ namespace CDP4DiagramEditor.ViewModels
             : base(diagram, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = this.GetCaption();
-            this.ToolTip = $"The {this.Thing.Name} diagram editor";
+            this.ToolTip = $"The {this.Thing.Name} Diagram Editor";
+
+            // initialize palette
+            this.PaletteViewModel = new DiagramPaletteViewModel(diagram, this);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DiagramPaletteViewModel"/>
+        /// </summary>
+        public DiagramPaletteViewModel PaletteViewModel
+        {
+            get { return this.paletteViewModel; }
+            private set { this.RaiseAndSetIfChanged(ref this.paletteViewModel, value); }
         }
 
         /// <summary>
@@ -154,12 +167,12 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets the collection diagramming-port to display.
         /// </summary>
-        public ReactiveList<DiagramPortViewModel> DiagramPortCollection { get; private set; }
+        public ReactiveList<IDiagramObjectViewModel> DiagramPortCollection { get; private set; }
 
         /// <summary>
         /// Gets the collection diagramming-item to display.
         /// </summary>
-        public ReactiveList<DiagramEdgeViewModel> DiagramConnectorCollection { get; private set; }
+        public ReactiveList<IDiagramConnectorViewModel> DiagramConnectorCollection { get; private set; }
 
         /// <summary>
         /// The <see cref="IEventPublisher" /> that allows view/view-model communication
@@ -516,8 +529,8 @@ namespace CDP4DiagramEditor.ViewModels
             this.ThingDiagramItems = new DisposableReactiveList<ThingDiagramContentItem> { ChangeTrackingEnabled = true };
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
 
-            this.DiagramPortCollection = new ReactiveList<DiagramPortViewModel> { ChangeTrackingEnabled = true };
-            this.DiagramConnectorCollection = new ReactiveList<DiagramEdgeViewModel> { ChangeTrackingEnabled = true };
+            this.DiagramPortCollection = new ReactiveList<IDiagramObjectViewModel> { ChangeTrackingEnabled = true };
+            this.DiagramConnectorCollection = new ReactiveList<IDiagramConnectorViewModel> { ChangeTrackingEnabled = true };
         }
 
         /// <summary>
@@ -962,47 +975,6 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// create a <see cref="PortContainerDiagramContentItem" />
-        /// </summary>
-        /// <param name="depictedThing">The dropped <see cref="Thing" /></param>
-        /// <returns>The <see cref="DiagramObjectViewModel" /> instantiated</returns>
-        private void CreateDiagramPort(Thing depictedThing)
-        {
-            if (this.SelectedItem is DiagramContentItem { Content: PortContainerDiagramContentItem container } target)
-            {
-                var row = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing.DepictedThing == depictedThing);
-
-                if (row != null)
-                {
-                    return;
-                }
-
-                var block = new DiagramObject(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
-                {
-                    DepictedThing = depictedThing,
-                    Name = depictedThing.UserFriendlyName,
-                    Documentation = depictedThing.UserFriendlyName,
-                    Resolution = Cdp4DiagramHelper.DefaultResolution
-                };
-
-                var bound = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
-                {
-                    X = (float) target.Position.X,
-                    Y = (float) target.Position.Y,
-                    Height = (float) target.ActualHeight,
-                    Width = (float) target.ActualWidth
-                };
-
-                block.Bounds.Add(bound);
-                var diagramItem = new DiagramPortViewModel(block, this.Session, this);
-                container.PortCollection.Add(diagramItem);
-
-                this.DiagramPortCollection.Add(diagramItem);
-                this.UpdateIsDirty();
-            }
-        }
-
-        /// <summary>
         /// Create a <see cref="DiagramEdge" /> from a <see cref="BinaryRelationship" />
         /// </summary>
         /// <param name="binaryRelationship">The <see cref="BinaryRelationship" /></param>
@@ -1058,7 +1030,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public void CreatePortCommandExecute()
         {
-            this.CreateDiagramPort(new ElementUsage { Name = "WhyNot", ShortName = "WhyNot" });
+            //this.CreateDiagramPort();
         }
 
         /// <summary>
