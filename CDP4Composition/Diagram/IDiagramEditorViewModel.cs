@@ -30,7 +30,6 @@ namespace CDP4Composition.Diagram
     using CDP4Common.DiagramData;
 
     using CDP4CommonView.Diagram;
-    using CDP4CommonView.Diagram.ViewModels;
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
@@ -80,5 +79,13 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> by which to find and remove diagram things.</param>
         void RemoveDiagramThingItemByThing(Thing thing);
+
+        /// <summary>
+        /// Initiate the create command of a certain Thing represented by T
+        /// </summary>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="container">The contaier of the object to be created</param>
+        /// <typeparam name="TThing">The type of Thing to be creates</typeparam>
+        TThing Create<TThing>(object sender, Thing container = null) where TThing : Thing, new();
     }
 }

@@ -90,6 +90,16 @@ namespace CDP4Composition.Diagram
         /// </summary>
         private void UpdateProperties()
         {
+            if (this.Thing == null)
+            {
+                this.FullName = "Missing Thing";
+                this.ShortName = "No model element found.";
+                this.ClassKind = "<<Unknown>>";
+                this.Categories = string.Empty;
+
+                return;
+            }
+
             if (this.Thing is INamedThing namedThing)
             {
                 this.FullName = namedThing.Name;

@@ -35,6 +35,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using CDP4Common.DiagramData;
 
     using CDP4Composition.Mvvm.Types;
+    using CDP4Composition.Navigation;
 
     using DevExpress.Xpf.NavBar;
 
@@ -111,31 +112,36 @@ namespace CDP4DiagramEditor.ViewModels.Palette
 
             foreach (var paletteItemViewModel in relevantItems)
             {
-                paletteItemViewModel.BindEditor(this.ParentViewModel);
+                paletteItemViewModel.BindEditor(this.ParentViewModel, this);
                 this.Items.Add(paletteItemViewModel);
             }
 
             this.InitializeCommands();
         }
 
+        /// <summary>
+        /// Initialize commands
+        /// </summary>
         private void InitializeCommands()
         {
             this.OnMouseMoveCommand = ReactiveCommand.Create();
             this.OnMouseMoveCommand.Subscribe(e => this.ExecuteMouseMoveCommand((MouseEventArgs)e));
         }
 
+        /// <summary>
+        /// Execute mousemove command
+        /// </summary>
+        /// <param name="e">MOuse move event args</param>
         private void ExecuteMouseMoveCommand(MouseEventArgs e)
         {
-            var item = e.OriginalSource as NavBarItemControl;
-
-            if (Mouse.LeftButton == MouseButtonState.Pressed && item != null)
+            if (Mouse.LeftButton != MouseButtonState.Pressed || e.OriginalSource is not NavBarItemControl item)
             {
-                var itemViewModel = ((NavBarItem)item.Content).Content as IPaletteItemViewModel;
+                return;
+            }
 
-                if(itemViewModel != null)
-                {
-                    itemViewModel.HandleMouseMove(e);
-                }
+            if(((NavBarItem)item.Content).Content is IPaletteDroppableItemViewModel itemViewModel)
+            {
+                itemViewModel.HandleMouseMove(e);
             }
         }
     }

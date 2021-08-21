@@ -48,6 +48,11 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         protected IDiagramEditorViewModel editorViewModel;
 
         /// <summary>
+        /// The viewmodel of the palette viewmodel
+        /// </summary>
+        protected DiagramPaletteViewModel paletteViewModel;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PaletteItemBaseViewModel" /> class
         /// </summary>
         protected PaletteItemBaseViewModel()
@@ -107,21 +112,14 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         public abstract Task ExecuteAsyncCommand();
 
         /// <summary>
-        /// Handle mouse move when dragging
-        /// </summary>
-        /// <param name="mouseEventArgs">The mouse event args.</param>
-        public virtual void HandleMouseMove(MouseEventArgs mouseEventArgs)
-        {
-            mouseEventArgs.Handled = true;
-        }
-
-        /// <summary>
         /// Binds the editor viewmodel to the palette item.
         /// </summary>
         /// <param name="editor">The editor viewmodel.</param>
-        public void BindEditor(IDiagramEditorViewModel editor)
+        /// <param name="palette">The palette</param>
+        public void BindEditor(IDiagramEditorViewModel editor, DiagramPaletteViewModel palette)
         {
             this.editorViewModel = editor ?? throw new ArgumentNullException(nameof(editor), $"Diagram editor may not be null");
+            this.paletteViewModel = palette ?? throw new ArgumentNullException(nameof(palette), $"Palette may not be null");
         }
 
         /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>

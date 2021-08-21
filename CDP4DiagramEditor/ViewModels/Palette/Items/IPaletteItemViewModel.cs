@@ -29,7 +29,8 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using System.Windows.Input;
+
+    using CDP4Composition.Navigation;
 
     /// <summary>
     /// Interface for a a palette item (button)
@@ -61,18 +62,17 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// </summary>
         List<Type> SupportedDiagramTypes { get; }
 
-        void BindEditor(IDiagramEditorViewModel editor);
+        /// <summary>
+        /// Binds the editor and palette to the item
+        /// </summary>
+        /// <param name="editor">The editor</param>
+        /// <param name="palette">The palette</param>
+        void BindEditor(IDiagramEditorViewModel editor, DiagramPaletteViewModel palette);
 
         /// <summary>
         /// Executes the command of this <see cref="IPaletteItemViewModel" />
         /// </summary>
         /// <returns>Anempty task</returns>
         Task ExecuteAsyncCommand();
-
-        /// <summary>
-        /// Handle mouse move when dragging
-        /// </summary>
-        /// <param name="mouseEventArgs">The mouse event args.</param>
-        void HandleMouseMove(MouseEventArgs mouseEventArgs);
     }
 }

@@ -25,16 +25,20 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
+    using System;
     using System.ComponentModel.Composition;
     using System.Threading.Tasks;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.DragDrop;
 
     /// <summary>
     /// Diagram palette button responsible for creating new <see cref="Requirement" />
     /// </summary>
     [Export(typeof(IPaletteItemViewModel))]
-    public class RequirementCreatePaletteItemViewModel : PaletteItemBaseViewModel
+    public class RequirementCreatePaletteItemViewModel : PaletteDroppableItemBaseViewModel
     {
         /// <summary>
         /// Gets the label text
@@ -61,11 +65,12 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         }
 
         /// <summary>
-        /// Executes the command of this <see cref="IPaletteItemViewModel" />
+        /// Handle mouse move when dropping
         /// </summary>
-        /// <returns>Anempty task</returns>
-        public override async Task ExecuteAsyncCommand()
+        /// <param name="dropInfo">The mouse event args.</param>
+        public override async Task<Thing> HandleMouseDrop(IDropInfo dropInfo)
         {
+            throw new NotImplementedException();
         }
     }
 }

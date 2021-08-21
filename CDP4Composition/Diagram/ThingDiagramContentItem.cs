@@ -214,6 +214,7 @@ namespace CDP4Composition.Diagram
 
             this.IsDirty = this.Parent is DiagramContentItem parent
                            && parent.Position != default
+                           && this.Thing != null
                            && (this.Thing.Iid == Guid.Empty
                                || (float)parent.Position.X != bound.X
                                || (float)parent.Position.Y != bound.Y);
@@ -228,6 +229,11 @@ namespace CDP4Composition.Diagram
         /// <param name="container">The container</param>
         public void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container)
         {
+            if (this.Thing == null)
+            {
+                return;
+            }
+
             if (this.Thing.Iid == Guid.Empty)
             {
                 var bound = this.DiagramThing.Bounds.Single();

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionCreatePaletteItemViewModel.cs" company="RHEA System S.A.">
+// <copyright file="PaletteDroppableItemBaseViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -25,38 +25,44 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
-    using System.ComponentModel.Composition;
     using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.DragDrop;
 
-    using CDP4Dal;
-    using CDP4Dal.Events;
-
     /// <summary>
-    /// Diagram palette button responsible for creating new <see cref="ElementDefinition" />
+    /// Base class for drag/droppable palette items
     /// </summary>
-    [Export(typeof(IPaletteItemViewModel))]
-    public class ElementDefinitionCreatePaletteItemViewModel : PaletteDroppableItemBaseViewModel
+    public abstract class PaletteDroppableItemBaseViewModel : PaletteItemBaseViewModel, IPaletteDroppableItemViewModel
     {
         /// <summary>
-        /// Gets the label text
+        /// Handle mouse move when dragging
         /// </summary>
-        public override string Text
+        /// <param name="mouseEventArgs">The mouse event args.</param>
+        public virtual void HandleMouseMove(MouseEventArgs mouseEventArgs)
         {
-            get { return "Element Definition"; }
+            if (mouseEventArgs?.Source is DependencyObject dependencyObject)
+            {
+                // initiate drag/drop payload
+                DragDrop.DoDragDrop(dependencyObject, (IPaletteDroppableItemViewModel)this, DragDropEffects.All);
+            }
+        }
+
+        /// <summary>
+        /// Executes the command of this <see cref="IPaletteItemViewModel" />
+        /// </summary>
+        /// <returns>Anempty task</returns>
+        public override async Task ExecuteAsyncCommand()
+        {
         }
 
         /// <summary>
         /// Handle mouse move when dropping
         /// </summary>
         /// <param name="dropInfo">The mouse event args.</param>
-        public override async Task<Thing> HandleMouseDrop(IDropInfo dropInfo)
-        {
-            return this.editorViewModel.Create<ElementDefinition>(this);
-        }
+        public abstract Task<Thing> HandleMouseDrop(IDropInfo dropInfo);
     }
 }

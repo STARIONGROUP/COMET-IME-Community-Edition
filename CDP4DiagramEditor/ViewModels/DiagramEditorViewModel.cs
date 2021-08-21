@@ -53,6 +53,9 @@ namespace CDP4DiagramEditor.ViewModels
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
+
+    using CDP4Common.Types;
+
     using Point = System.Windows.Point;
 
     /// <summary>
@@ -352,6 +355,26 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
+        /// Initiate the create command of a certain Thing represented by TThing
+        /// </summary>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="container">The contaier of the object to be created</param>
+        /// <typeparam name="TThing">The type of Thing to be creates</typeparam>
+        public TThing Create<TThing>(object sender, Thing container = null) where TThing : Thing, new()
+        {
+            var thing = new TThing();
+
+            this.ExecuteCreateCommand(thing, (Iteration)this.Thing.Container);
+
+            if (this.Thing.Cache.TryGetValue(thing.CacheKey, out var returnedThing))
+            {
+                return (TThing)returnedThing.Value;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Update this <see cref="IsDirty" /> property
         /// </summary>
         public void UpdateIsDirty()
@@ -404,25 +427,68 @@ namespace CDP4DiagramEditor.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            var rowPayload = dropInfo.Payload as Thing;
-
             var convertedDropPosition = this.Behavior.GetDiagramPositionFromMousePosition(dropInfo.DropPosition);
 
-            if (rowPayload != null)
+            // handle existing thing creation
+
+            if (dropInfo.Payload is Thing rowPayload)
             {
-                if (this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.Thing).Contains(rowPayload))
+                this.CreateThingShape(dropInfo, rowPayload, convertedDropPosition);
+                return;
+            }
+
+            // handle things being dropped from palette
+            if (dropInfo.Payload is DataObject dataObject)
+            {
+                var formats = dataObject.GetFormats(true);
+
+                if (formats != null && formats.Any())
                 {
-                    return;
+                    if (dataObject.GetData(formats.First()) is IPaletteDroppableItemViewModel palettePayload)
+                    {
+                        var thing = await palettePayload.HandleMouseDrop(dropInfo);
+                        this.CreateThingShape(dropInfo, thing, convertedDropPosition);
+                    }
                 }
+            }
+        }
 
-                var position = new Point(convertedDropPosition.X, convertedDropPosition.Y);
-                var bounds = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
-                {
-                    X = (float)position.X,
-                    Y = (float)position.Y
-                };
+        /// <summary>
+        /// Creates the shape for the shape
+        /// </summary>
+        /// <param name="dropInfo">The <see cref="IDropInfo"/> containing drag drop object</param>
+        /// <param name="rowPayload">The <see cref="Thing"/> ti draw the shape for.</param>
+        /// <param name="convertedDropPosition">The drop position.</param>
+        private void CreateThingShape(IDropInfo dropInfo, Thing rowPayload, Point convertedDropPosition)
+        {
+            if (this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.Thing).Contains(rowPayload))
+            {
+                return;
+            }
 
-                var block = new DiagramObject(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+            var position = new Point(convertedDropPosition.X, convertedDropPosition.Y);
+
+            var bounds = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+            {
+                X = (float) position.X,
+                Y = (float) position.Y
+            };
+
+            var block = new DiagramObject(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+            {
+                DepictedThing = rowPayload,
+                Name = rowPayload.UserFriendlyName,
+                Documentation = rowPayload.UserFriendlyName,
+                Resolution = Cdp4DiagramHelper.DefaultResolution
+            };
+
+            block.Bounds.Add(bounds);
+
+            NamedThingDiagramContentItem diagramItem = null;
+
+            if (rowPayload is ElementDefinition elementDefinition)
+            {
+                var architectureBlock = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
                 {
                     DepictedThing = rowPayload,
                     Name = rowPayload.UserFriendlyName,
@@ -430,44 +496,29 @@ namespace CDP4DiagramEditor.ViewModels
                     Resolution = Cdp4DiagramHelper.DefaultResolution
                 };
 
-                block.Bounds.Add(bounds);
+                architectureBlock.Bounds.Add(bounds);
 
-                NamedThingDiagramContentItem diagramItem = null;
-
-                if (rowPayload is ElementDefinition elementDefinition)
-                {
-                    var architectureBlock = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
-                    {
-                        DepictedThing = rowPayload,
-                        Name = rowPayload.UserFriendlyName,
-                        Documentation = rowPayload.UserFriendlyName,
-                        Resolution = Cdp4DiagramHelper.DefaultResolution
-                    };
-
-                    architectureBlock.Bounds.Add(bounds);
-
-                    diagramItem = new ElementDefinitionDiagramContentItem(architectureBlock, this.Session, this);
-                }
-                else if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
-                {
-                    block.DepictedThing = tuplePayload.Item1;
-                    diagramItem = new NamedThingDiagramContentItem(block, this);
-                }
-                else
-                {
-                    diagramItem = new NamedThingDiagramContentItem(block, this);
-                }
-
-                diagramItem.Position = position;
-
-                this.Behavior.ItemPositions.Add(diagramItem, convertedDropPosition);
-                this.ThingDiagramItems.Add(diagramItem);
-
-                this.ComputeDiagramConnector(diagramItem);
-
-                this.IsDirty = true;
-                this.UpdateIsDirty();
+                diagramItem = new ElementDefinitionDiagramContentItem(architectureBlock, this.Session, this);
             }
+            else if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
+            {
+                block.DepictedThing = tuplePayload.Item1;
+                diagramItem = new NamedThingDiagramContentItem(block, this);
+            }
+            else
+            {
+                diagramItem = new NamedThingDiagramContentItem(block, this);
+            }
+
+            diagramItem.Position = position;
+
+            this.Behavior.ItemPositions.Add(diagramItem, convertedDropPosition);
+            this.ThingDiagramItems.Add(diagramItem);
+
+            this.ComputeDiagramConnector(diagramItem);
+
+            this.IsDirty = true;
+            this.UpdateIsDirty();
         }
 
         /// <summary>

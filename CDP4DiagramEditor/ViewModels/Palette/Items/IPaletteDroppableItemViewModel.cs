@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionCreatePaletteItemViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IPaletteDroppableItemViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -25,38 +25,28 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
-    using System.ComponentModel.Composition;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.DragDrop;
 
-    using CDP4Dal;
-    using CDP4Dal.Events;
-
     /// <summary>
-    /// Diagram palette button responsible for creating new <see cref="ElementDefinition" />
+    /// Interface for a a palette item drag drop
     /// </summary>
-    [Export(typeof(IPaletteItemViewModel))]
-    public class ElementDefinitionCreatePaletteItemViewModel : PaletteDroppableItemBaseViewModel
+    public interface IPaletteDroppableItemViewModel
     {
         /// <summary>
-        /// Gets the label text
+        /// Handle mouse move when dragging
         /// </summary>
-        public override string Text
-        {
-            get { return "Element Definition"; }
-        }
+        /// <param name="mouseEventArgs">The mouse event args.</param>
+        void HandleMouseMove(MouseEventArgs mouseEventArgs);
 
         /// <summary>
         /// Handle mouse move when dropping
         /// </summary>
         /// <param name="dropInfo">The mouse event args.</param>
-        public override async Task<Thing> HandleMouseDrop(IDropInfo dropInfo)
-        {
-            return this.editorViewModel.Create<ElementDefinition>(this);
-        }
+        Task<Thing> HandleMouseDrop(IDropInfo dropInfo);
     }
 }
