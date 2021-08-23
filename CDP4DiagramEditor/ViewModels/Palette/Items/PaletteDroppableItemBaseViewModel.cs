@@ -52,14 +52,6 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         }
 
         /// <summary>
-        /// Executes the command of this <see cref="IPaletteItemViewModel" />
-        /// </summary>
-        /// <returns>An empty task</returns>
-        public override async Task ExecuteAsyncCommand()
-        {
-        }
-
-        /// <summary>
         /// Handle mouse move when dropping
         /// </summary>
         /// <param name="dropInfo">The mouse event args.</param>

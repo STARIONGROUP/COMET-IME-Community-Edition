@@ -29,7 +29,6 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using System.Collections.Generic;
     using System.Reactive;
     using System.Threading.Tasks;
-    using System.Windows.Input;
 
     using CDP4Common.DiagramData;
 
@@ -108,8 +107,11 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// <summary>
         /// Executes the command of this <see cref="IPaletteItemViewModel" />
         /// </summary>
-        /// <returns>Anempty task</returns>
-        public abstract Task ExecuteAsyncCommand();
+        /// <returns>An empty task</returns>
+        public virtual Task ExecuteAsyncCommand()
+        {
+            return Task.CompletedTask;
+        }
 
         /// <summary>
         /// Binds the editor viewmodel to the palette item.

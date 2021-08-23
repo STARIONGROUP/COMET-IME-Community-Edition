@@ -78,13 +78,5 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         {
             get { return "BO_Transition.png"; }
         }
-
-        /// <summary>
-        /// Executes the command of this <see cref="IPaletteItemViewModel" />
-        /// </summary>
-        /// <returns>An empty task</returns>
-        public override async Task ExecuteAsyncCommand()
-        {
-        }
     }
 }
