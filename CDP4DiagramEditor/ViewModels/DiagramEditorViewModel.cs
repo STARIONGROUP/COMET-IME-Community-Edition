@@ -447,7 +447,10 @@ namespace CDP4DiagramEditor.ViewModels
                     if (dataObject.GetData(formats.First()) is IPaletteDroppableItemViewModel palettePayload)
                     {
                         var thing = await palettePayload.HandleMouseDrop(dropInfo);
-                        this.CreateThingShape(dropInfo, thing, convertedDropPosition);
+                        if (thing is not null)
+                        {
+                            this.CreateThingShape(dropInfo, thing, convertedDropPosition);
+                        }
                     }
                 }
             }
