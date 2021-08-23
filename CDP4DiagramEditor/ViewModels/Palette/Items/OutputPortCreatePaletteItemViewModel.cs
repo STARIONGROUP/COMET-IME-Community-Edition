@@ -82,7 +82,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// <summary>
         /// Executes the command of this <see cref="IPaletteItemViewModel" />
         /// </summary>
-        /// <returns>Anempty task</returns>
+        /// <returns>An empty task</returns>
         public override async Task ExecuteAsyncCommand()
         {
             await this.CreatePort(InterfaceEndKind.OUTPUT);
