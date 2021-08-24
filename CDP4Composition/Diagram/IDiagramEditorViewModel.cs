@@ -26,9 +26,10 @@
 
 namespace CDP4Composition.Diagram
 {
+    using System.Collections.Generic;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
-
     using CDP4CommonView.Diagram;
 
     using CDP4Composition.Mvvm;
@@ -87,5 +88,11 @@ namespace CDP4Composition.Diagram
         /// <param name="container">The contaier of the object to be created</param>
         /// <typeparam name="TThing">The type of Thing to be creates</typeparam>
         TThing Create<TThing>(object sender, Thing container = null) where TThing : Thing, new();
+
+        /// <summary>
+        /// Shows a context menu in the diagram at the current mouse position with the specified options
+        /// </summary>
+        /// <param name="contextMenuItems">The menu options to display</param>
+        void ShowDropContextMenuOptions(IEnumerable<ContextMenuItemViewModel> contextMenuItems);
     }
 }

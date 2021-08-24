@@ -25,6 +25,7 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
+    using System;
     using System.ComponentModel.Composition;
     using System.Threading.Tasks;
 
@@ -32,9 +33,6 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.DragDrop;
-
-    using CDP4Dal;
-    using CDP4Dal.Events;
 
     /// <summary>
     /// Diagram palette button responsible for creating new <see cref="ElementDefinition" />
@@ -54,9 +52,18 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// Handle mouse move when dropping
         /// </summary>
         /// <param name="dropInfo">The mouse event args.</param>
-        public override async Task<Thing> HandleMouseDrop(IDropInfo dropInfo)
+        /// <param name="createCallback">Callback operation which creates the content</param>
+        /// <returns>The <see cref="Task{Thing}"/></returns>
+        public override Task<Thing> HandleMouseDrop(IDropInfo dropInfo, Action<Thing> createCallback = null)
         {
-            return this.editorViewModel.Create<ElementDefinition>(this);
+            var elementDefinition = this.editorViewModel.Create<ElementDefinition>(this);
+
+            if (elementDefinition is not null)
+            {
+                createCallback?.Invoke(elementDefinition);
+            }
+
+            return Task.FromResult<Thing>(elementDefinition);
         }
     }
 }

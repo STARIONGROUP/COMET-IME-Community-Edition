@@ -25,6 +25,7 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
+    using System;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
@@ -47,7 +48,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
             if (mouseEventArgs?.Source is DependencyObject dependencyObject)
             {
                 // initiate drag/drop payload
-                DragDrop.DoDragDrop(dependencyObject, (IPaletteDroppableItemViewModel)this, DragDropEffects.All);
+                DragDrop.DoDragDrop(dependencyObject, this, DragDropEffects.All);
             }
         }
 
@@ -55,6 +56,9 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// Handle mouse move when dropping
         /// </summary>
         /// <param name="dropInfo">The mouse event args.</param>
-        public abstract Task<Thing> HandleMouseDrop(IDropInfo dropInfo);
+        /// <param name="createCallback">Callback operation which creates the content</param>
+        /// <returns>The <see cref="Task{Thing}"/></returns>
+
+        abstract public Task<Thing> HandleMouseDrop(IDropInfo dropInfo, Action<Thing> createCallback = null);
     }
 }

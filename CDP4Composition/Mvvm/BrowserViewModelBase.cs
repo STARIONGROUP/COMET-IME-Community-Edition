@@ -264,7 +264,7 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public bool IsSelected
         {
-            get { return isSelected; }
+            get { return this.isSelected; }
             set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
         }
 

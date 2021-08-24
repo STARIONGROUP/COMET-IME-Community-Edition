@@ -25,12 +25,23 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView.Diagram;
     using CDP4CommonView.EventAggregator;
+
     using CDP4Composition;
     using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
@@ -39,23 +50,17 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
+
     using CDP4DiagramEditor.ViewModels.Palette;
     using CDP4DiagramEditor.ViewModels.Relation;
+
     using DevExpress.Xpf.Diagram;
+
     using ReactiveUI;
-    using System;
-    using System.Linq;
-    using System.Reactive;
-    using System.Reactive.Linq;
-    using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Input;
-
-    using CDP4Common.Types;
-
     using Point = System.Windows.Point;
 
     /// <summary>
@@ -114,6 +119,16 @@ namespace CDP4DiagramEditor.ViewModels
         private DiagramPaletteViewModel paletteViewModel;
 
         /// <summary>
+        /// Backing field for <see cref="DropContextMenuIsOpen"/>
+        /// </summary>
+        private bool dropContextMenuIsOpen;
+
+        /// <summary>
+        /// Gets the drop context Menu for the diagram
+        /// </summary>
+        public ReactiveList<ContextMenuItemViewModel> DropContextMenuItems { get; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DiagramEditorViewModel" /> class
         /// </summary>
         /// <param name="diagram">The diagram of the <see cref="Thing" />s to display</param>
@@ -129,6 +144,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             // initialize palette
             this.PaletteViewModel = new DiagramPaletteViewModel(diagram, this);
+
+            this.DropContextMenuItems = new ReactiveList<ContextMenuItemViewModel>();
         }
 
         /// <summary>
@@ -364,7 +381,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             var thing = new TThing();
 
-            this.ExecuteCreateCommand(thing, (Iteration)this.Thing.Container);
+            this.ExecuteCreateCommand(thing, container ?? this.Thing.Container);
 
             if (this.Thing.Cache.TryGetValue(thing.CacheKey, out var returnedThing))
             {
@@ -446,11 +463,7 @@ namespace CDP4DiagramEditor.ViewModels
                 {
                     if (dataObject.GetData(formats.First()) is IPaletteDroppableItemViewModel palettePayload)
                     {
-                        var thing = await palettePayload.HandleMouseDrop(dropInfo);
-                        if (thing is not null)
-                        {
-                            this.CreateThingShape(dropInfo, thing, convertedDropPosition);
-                        }
+                        await palettePayload.HandleMouseDrop(dropInfo, t => this.CreateThingShape(dropInfo, t, convertedDropPosition));
                     }
                 }
             }
@@ -473,8 +486,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             var bounds = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
-                X = (float) position.X,
-                Y = (float) position.Y
+                X = (float)position.X,
+                Y = (float)position.Y
             };
 
             var block = new DiagramObject(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
@@ -489,28 +502,41 @@ namespace CDP4DiagramEditor.ViewModels
 
             NamedThingDiagramContentItem diagramItem = null;
 
-            if (rowPayload is ElementDefinition elementDefinition)
+            switch (rowPayload)
             {
-                var architectureBlock = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
-                {
-                    DepictedThing = rowPayload,
-                    Name = rowPayload.UserFriendlyName,
-                    Documentation = rowPayload.UserFriendlyName,
-                    Resolution = Cdp4DiagramHelper.DefaultResolution
-                };
+                case ElementDefinition elementDefinition:
+                    {
+                        var architectureBlock = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+                        {
+                            DepictedThing = rowPayload,
+                            Name = rowPayload.UserFriendlyName,
+                            Documentation = rowPayload.UserFriendlyName,
+                            Resolution = Cdp4DiagramHelper.DefaultResolution
+                        };
 
-                architectureBlock.Bounds.Add(bounds);
+                        architectureBlock.Bounds.Add(bounds);
 
-                diagramItem = new ElementDefinitionDiagramContentItem(architectureBlock, this.Session, this);
-            }
-            else if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
-            {
-                block.DepictedThing = tuplePayload.Item1;
-                diagramItem = new NamedThingDiagramContentItem(block, this);
-            }
-            else
-            {
-                diagramItem = new NamedThingDiagramContentItem(block, this);
+                        diagramItem = new ElementDefinitionDiagramContentItem(architectureBlock, this.Session, this);
+                        break;
+                    }
+
+                case Requirement requirement:
+                    {
+                        diagramItem = new RequirementDiagramContentItem(block, this.Session, this);
+                        break;
+                    }
+                default:
+                    if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
+                    {
+                        block.DepictedThing = tuplePayload.Item1;
+                        diagramItem = new NamedThingDiagramContentItem(block, this);
+                    }
+                    else
+                    {
+                        diagramItem = new NamedThingDiagramContentItem(block, this);
+                    }
+
+                    break;
             }
 
             diagramItem.Position = position;
@@ -549,6 +575,15 @@ namespace CDP4DiagramEditor.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
+
+        /// <summary>
+        /// Gets or sets the context menu for optional selections when an item is dropped on to the diagram
+        /// </summary>
+        public bool DropContextMenuIsOpen
+        { 
+            get => this.dropContextMenuIsOpen; 
+            set => this.RaiseAndSetIfChanged(ref this.dropContextMenuIsOpen, value);
+        }
 
         /// <summary>
         /// Initialize the browser
@@ -605,7 +640,7 @@ namespace CDP4DiagramEditor.ViewModels
                 _ => this.ExecuteSetTopElementCommand(), RxApp.MainThreadScheduler);
             this.SetAsTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
 
-            this.UnsetTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.IsTopDiagramElementSet, x => x.CanCreateDiagram, (x,y) => x && y),
+            this.UnsetTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.IsTopDiagramElementSet, x => x.CanCreateDiagram, (x, y) => x && y),
                 _ => this.ExecuteUnsetTopElementCommand(), RxApp.MainThreadScheduler);
             this.UnsetTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
         }
@@ -864,13 +899,17 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 NamedThingDiagramContentItem newDiagramElement = null;
 
-                if (diagramThing.DepictedThing is ElementDefinition)
+                switch (diagramThing.DepictedThing)
                 {
-                    newDiagramElement = new ElementDefinitionDiagramContentItem((ArchitectureElement)diagramThing, this.Session, this);
-                }
-                else
-                {
-                    newDiagramElement = new NamedThingDiagramContentItem(diagramThing, this);
+                    case ElementDefinition:
+                        newDiagramElement = new ElementDefinitionDiagramContentItem((ArchitectureElement)diagramThing, this.Session, this);
+                        break;
+                    case Requirement:
+                        newDiagramElement = new RequirementDiagramContentItem(diagramThing, this.Session, this);
+                        break;
+                    default:
+                        newDiagramElement = new NamedThingDiagramContentItem(diagramThing, this);
+                        break;
                 }
 
                 var bound = diagramThing.Bounds.Single();
@@ -972,8 +1011,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             var bound = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
-                X = (float) diagramPosition.X,
-                Y = (float) diagramPosition.Y,
+                X = (float)diagramPosition.X,
+                Y = (float)diagramPosition.Y,
                 Height = Cdp4DiagramHelper.DefaultHeight,
                 Width = Cdp4DiagramHelper.DefaultWidth
             };
@@ -982,23 +1021,30 @@ namespace CDP4DiagramEditor.ViewModels
 
             NamedThingDiagramContentItem newDiagramElement = null;
 
-            if (depictedThing is ElementDefinition)
+            switch (depictedThing)
             {
-                var archElement = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
-                {
-                    DepictedThing = depictedThing,
-                    Name = depictedThing.UserFriendlyName,
-                    Documentation = depictedThing.UserFriendlyName,
-                    Resolution = Cdp4DiagramHelper.DefaultResolution
-                };
+                case ElementDefinition:
+                    {
+                        var archElement = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+                        {
+                            DepictedThing = depictedThing,
+                            Name = depictedThing.UserFriendlyName,
+                            Documentation = depictedThing.UserFriendlyName,
+                            Resolution = Cdp4DiagramHelper.DefaultResolution
+                        };
 
-                archElement.Bounds.Add(bound);
+                        archElement.Bounds.Add(bound);
 
-                newDiagramElement = new ElementDefinitionDiagramContentItem(archElement, this.Session, this);
-            }
-            else
-            {
-                newDiagramElement = new NamedThingDiagramContentItem(block, this);
+                        newDiagramElement = new ElementDefinitionDiagramContentItem(archElement, this.Session, this);
+                        break;
+                    }
+
+                case Requirement:
+                    newDiagramElement = new RequirementDiagramContentItem(block, this.Session, this);
+                    break;
+                default:
+                    newDiagramElement = new NamedThingDiagramContentItem(block, this);
+                    break;
             }
 
             var position = new Point { X = bound.X, Y = bound.Y };
@@ -1074,7 +1120,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="shouldAddMissingThings">True if missing things should be added to diagram.</param>
         public void GenerateRelationshipDiagramElements(ThingDiagramContentItem item, bool extendDeep, bool shouldAddMissingThings = true)
         {
-            var iteration = (Iteration) this.Thing.Container;
+            var iteration = (Iteration)this.Thing.Container;
 
             var depictedThing = item.DiagramThing.DepictedThing;
 
@@ -1181,6 +1227,17 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             this.UpdateIsDirty();
+        }
+
+        /// <summary>
+        /// Shows a context menu in the diagram at the current mouse position with the specified options
+        /// </summary>
+        /// <param name="contextMenuItems">The menu options to display</param>
+        public void ShowDropContextMenuOptions(IEnumerable<ContextMenuItemViewModel> contextMenuItems)
+        {            
+            this.DropContextMenuItems.Clear();
+            this.DropContextMenuItems.AddRange(contextMenuItems);
+            this.DropContextMenuIsOpen = true;
         }
     }
 }

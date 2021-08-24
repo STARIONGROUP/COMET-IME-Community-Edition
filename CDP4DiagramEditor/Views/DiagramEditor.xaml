@@ -24,67 +24,117 @@
              xmlns:palette="clr-namespace:CDP4DiagramEditor.ViewModels.Palette"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
-             d:DesignHeight="300" d:DesignWidth="650">
+             d:DesignHeight="300"
+             d:DesignWidth="650">
     <dxmvvm:Interaction.Behaviors>
         <behaviours:RibbonCategoryBehavior CategoryName="DiagramCategory" />
     </dxmvvm:Interaction.Behaviors>
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary
-                    Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <cdp4Composition:StringToIconUriConverter x:Key="StringToIconUriConverter" />
             <dx:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></dx:BooleanToVisibilityConverter>
             <dxmvvm:EnumToStringConverter x:Key="EnumToStringConverter"></dxmvvm:EnumToStringConverter>
             <Style TargetType="{x:Type dxb:BarButtonItem}">
-                <Setter Property="Content" Value="{Binding Header}" />
-                <Setter Property="Command" Value="{Binding MenuCommand}" />
-                <Setter Property="GlyphSize" Value="Small" />
+                <Setter Property="Content"
+                        Value="{Binding Header}" />
+                <Setter Property="Command"
+                        Value="{Binding MenuCommand}" />
+                <Setter Property="GlyphSize"
+                        Value="Small" />
                 <Style.Triggers>
-                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Edit}">
-                        <Setter Property="Glyph" Value="{dx:DXImage Image=EditName_16x16.png}" />
+                    <DataTrigger Binding="{Binding MenuItemKind}"
+                                 Value="{x:Static mvvm:MenuItemKind.Edit}">
+                        <Setter Property="Glyph"
+                                Value="{dx:DXImage Image=EditName_16x16.png}" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Inspect}">
-                        <Setter Property="Glyph" Value="{dx:DXImage Image=Find_16x16.png}" />
+                    <DataTrigger Binding="{Binding MenuItemKind}"
+                                 Value="{x:Static mvvm:MenuItemKind.Inspect}">
+                        <Setter Property="Glyph"
+                                Value="{dx:DXImage Image=Find_16x16.png}" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Delete}">
-                        <Setter Property="Glyph" Value="{dx:DXImage Image=Delete_16x16.png}" />
+                    <DataTrigger Binding="{Binding MenuItemKind}"
+                                 Value="{x:Static mvvm:MenuItemKind.Delete}">
+                        <Setter Property="Glyph"
+                                Value="{dx:DXImage Image=Delete_16x16.png}" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Deprecate}">
-                        <Setter Property="Glyph" Value="{dx:DXImage Image=Delete_16x16.png}" />
+                    <DataTrigger Binding="{Binding MenuItemKind}"
+                                 Value="{x:Static mvvm:MenuItemKind.Deprecate}">
+                        <Setter Property="Glyph"
+                                Value="{dx:DXImage Image=Delete_16x16.png}" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Create}">
-                        <Setter Property="Glyph" Value="{dx:DXImage Image=Add_16x16.png}" />
+                    <DataTrigger Binding="{Binding MenuItemKind}"
+                                 Value="{x:Static mvvm:MenuItemKind.Create}">
+                        <Setter Property="Glyph"
+                                Value="{dx:DXImage Image=Add_16x16.png}" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Highlight}">
-                        <Setter Property="Glyph" Value="{dx:DXImage Image=HighlightField_16x16.png}" />
+                    <DataTrigger Binding="{Binding MenuItemKind}"
+                                 Value="{x:Static mvvm:MenuItemKind.Highlight}">
+                        <Setter Property="Glyph"
+                                Value="{dx:DXImage Image=HighlightField_16x16.png}" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Copy}">
-                        <Setter Property="Glyph" Value="{dx:DXImage Image=Copy_16x16.png}" />
+                    <DataTrigger Binding="{Binding MenuItemKind}"
+                                 Value="{x:Static mvvm:MenuItemKind.Copy}">
+                        <Setter Property="Glyph"
+                                Value="{dx:DXImage Image=Copy_16x16.png}" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Save}">
-                        <Setter Property="Glyph" Value="{dx:DXImage Image=Save_16x16.png}" />
+                    <DataTrigger Binding="{Binding MenuItemKind}"
+                                 Value="{x:Static mvvm:MenuItemKind.Save}">
+                        <Setter Property="Glyph"
+                                Value="{dx:DXImage Image=Save_16x16.png}" />
                     </DataTrigger>
-                    <DataTrigger Binding="{Binding MenuItemKind}" Value="{x:Static mvvm:MenuItemKind.Navigate}">
-                        <Setter Property="Glyph" Value="{dx:DXImage Image=Redo_16x16.png}" />
+                    <DataTrigger Binding="{Binding MenuItemKind}"
+                                 Value="{x:Static mvvm:MenuItemKind.Navigate}">
+                        <Setter Property="Glyph"
+                                Value="{dx:DXImage Image=Redo_16x16.png}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
 
+            <DataTemplate DataType="{x:Type mvvm:ContextMenuItemViewModel}">
+                <ContentControl>
+                    <dxb:BarButtonItem Command="{Binding MenuCommand}"
+                                       Content="{Binding Header}" />
+                </ContentControl>
+            </DataTemplate>
+
             <DataTemplate x:Key="ElementBaseDiagramItemTemplate">
-                <StackPanel Margin="10,10" Background="Transparent" Orientation="Vertical" HorizontalAlignment="Center"
+                <StackPanel Margin="10,10"
+                            Background="Transparent"
+                            Orientation="Vertical"
+                            HorizontalAlignment="Center"
                             Width="200">
-                    <TextBlock Text="Diagram Top Element" FontSize="10" HorizontalAlignment="Center" FontStyle="Italic" Visibility="{Binding IsTopDiagramElement, Converter={StaticResource BooleanToVisibilityConverter}}"
-                               VerticalAlignment="Center" Margin="10,0,10,2" />
-                    <TextBlock Text="{Binding ClassKind}" FontSize="12" HorizontalAlignment="Center"
-                               VerticalAlignment="Center" Margin="10,0,10,2" />
-                    <TextBlock Text="{Binding Categories}" FontSize="12" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
-                               VerticalAlignment="Center" Margin="10,0,10,10" />
-                    <TextBlock Text="{Binding FullName}" TextAlignment="Center" FontWeight="Bold" FontSize="14"
+                    <TextBlock Text="Diagram Top Element"
+                               FontSize="10"
+                               HorizontalAlignment="Center"
+                               FontStyle="Italic"
+                               Visibility="{Binding IsTopDiagramElement, Converter={StaticResource BooleanToVisibilityConverter}}"
+                               VerticalAlignment="Center"
+                               Margin="10,0,10,2" />
+                    <TextBlock Text="{Binding ClassKind}"
+                               FontSize="12"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="10,0,10,2" />
+                    <TextBlock Text="{Binding Categories}"
+                               FontSize="12"
+                               HorizontalAlignment="Center"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"
                                Margin="10,0,10,10" />
-                    <TextBlock Text="{Binding ShortName}" TextAlignment="Center" FontStyle="Italic" FontSize="11"
+                    <TextBlock Text="{Binding FullName}"
+                               TextAlignment="Center"
+                               FontWeight="Bold"
+                               FontSize="14"
+                               Margin="10,0,10,10" />
+                    <TextBlock Text="{Binding ShortName}"
+                               TextAlignment="Center"
+                               FontStyle="Italic"
+                               FontSize="11"
                                Margin="10,0,10,10" />
                     <dxlc:LayoutGroup Header="Parameters"
                                       View="GroupBox"
@@ -97,20 +147,22 @@
                                       GroupBoxDisplayMode="Light"
                                       Margin="3,0,3,0">
                         <dxlc:LayoutGroup.Resources>
-                            <Style TargetType="dxlc:GroupBox" >
-                                <Setter Property="BorderThickness" Value="0, 0.2,0,0"/>
+                            <Style TargetType="dxlc:GroupBox">
+                                <Setter Property="BorderThickness"
+                                        Value="0, 0.2,0,0" />
                             </Style>
                         </dxlc:LayoutGroup.Resources>
                         <dxlc:LayoutGroup.HeaderTemplate>
                             <DataTemplate>
                                 <Grid HorizontalAlignment="Center">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding}"  FontStyle="Italic" />
+                                        <TextBlock Text="{Binding}"
+                                                   FontStyle="Italic" />
                                     </StackPanel>
                                 </Grid>
                             </DataTemplate>
                         </dxlc:LayoutGroup.HeaderTemplate>
-                        <ItemsControl ItemsSource="{Binding DiagramContentItemChildren}" 
+                        <ItemsControl ItemsSource="{Binding DiagramContentItemChildren}"
                                       HorizontalContentAlignment="Stretch">
                             <ItemsControl.Template>
                                 <ControlTemplate>
@@ -125,7 +177,8 @@
                             </ItemsControl.Template>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Margin="0,2,0,2" TextWrapping="Wrap"
+                                    <TextBlock Margin="0,2,0,2"
+                                               TextWrapping="Wrap"
                                                Text="{Binding DiagramContentItemChildString}" />
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
@@ -135,15 +188,100 @@
             </DataTemplate>
 
             <DataTemplate x:Key="GenericDiagramItemTemplate">
-                <StackPanel Margin="10,10" Background="Transparent" Grid.Row="0" Grid.RowSpan="2" Orientation="Vertical"
+                <StackPanel Margin="10,10"
+                            Background="Transparent"
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Orientation="Vertical"
                             HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding ClassKind}" FontSize="12" HorizontalAlignment="Center"
-                               VerticalAlignment="Center" Margin="10,0,10,10" />
-                    <TextBlock Text="{Binding FullName}" TextAlignment="Center" FontWeight="Bold" FontSize="14"
+                    <TextBlock Text="{Binding ClassKind}"
+                               FontSize="12"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
                                Margin="10,0,10,10" />
-                    <TextBlock Text="{Binding ShortName}" TextAlignment="Center" FontStyle="Italic" FontSize="11"
+                    <TextBlock Text="{Binding FullName}"
+                               TextAlignment="Center"
+                               FontWeight="Bold"
+                               FontSize="14"
+                               Margin="10,0,10,10" />
+                    <TextBlock Text="{Binding ShortName}"
+                               TextAlignment="Center"
+                               FontStyle="Italic"
+                               FontSize="11"
                                Margin="10,0,10,10" />
                 </StackPanel>
+            </DataTemplate>
+
+            <DataTemplate x:Key="RequirementDiagramItemTemplate">
+                <StackPanel Margin="10,10"
+                            Background="Transparent"
+                            Grid.Row="0"
+                            Grid.RowSpan="2"
+                            Orientation="Vertical"
+                            HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding ClassKind}"
+                               FontSize="12"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="10,0,10,10" />
+                    <TextBlock Text="{Binding FullName}"
+                               TextAlignment="Center"
+                               FontWeight="Bold"
+                               FontSize="14"
+                               Margin="10,0,10,10" />
+                    <TextBlock Text="{Binding ShortName}"
+                               TextAlignment="Center"
+                               FontStyle="Italic"
+                               FontSize="11"
+                               Margin="10,0,10,10" />
+                    <dxlc:LayoutGroup Header="Categories"
+                                      View="GroupBox"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
+                                      IsCollapsible="True"
+                                      IsCollapsed="True"
+                                      Orientation="Vertical"
+                                      ScrollBars="Auto"
+                                      GroupBoxDisplayMode="Light"
+                                      Margin="3,0,3,0">
+                        <dxlc:LayoutGroup.Resources>
+                            <Style TargetType="dxlc:GroupBox">
+                                <Setter Property="BorderThickness"
+                                        Value="0, 0.2,0,0" />
+                            </Style>
+                        </dxlc:LayoutGroup.Resources>
+                        <dxlc:LayoutGroup.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding}"
+                                                   FontStyle="Italic" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </dxlc:LayoutGroup.HeaderTemplate>
+                        <ItemsControl ItemsSource="{Binding DiagramContentItemChildren}"
+                                      HorizontalContentAlignment="Stretch">
+                            <ItemsControl.Template>
+                                <ControlTemplate>
+                                    <!-- 
+                                        Don't change the ScrollViewer's property related to horizontal alignment or horizontal scrollbar visibility, 
+                                        because that messes up dragging visually.
+                                    -->
+                                    <ScrollViewer x:Name="ScrollViewer">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="0,2,0,2"
+                                               TextWrapping="Wrap"
+                                               Text="{Binding DiagramContentItemChildString}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </dxlc:LayoutGroup>                </StackPanel>
             </DataTemplate>
 
             <DataTemplate x:Key="DiagramPortTemplate">
@@ -162,6 +300,7 @@
             </DataTemplate>
 
             <viewModels:DiagramItemDataTemplateSelector x:Key="DiagramItemDataTemplateSelector"
+                                                        RequirementDiagramItemTemplate="{StaticResource RequirementDiagramItemTemplate}"
                                                         ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
                                                         GenericDiagramItemDataTemplate="{StaticResource GenericDiagramItemTemplate}"
                                                         DiagramPortTemplate="{StaticResource DiagramPortTemplate}" />
@@ -194,6 +333,11 @@
                                         AllowResizeItems="False"
                                         AllowApplyAutomaticLayoutForSubordinates="True"
                                         AllowApplyAutomaticLayout="True">
+                <dxb:BarManager.DXContextMenu>
+                    <dxb:PopupMenu IsOpen="{Binding DropContextMenuIsOpen}"
+                                   Placement="Mouse"
+                                   ItemLinksSource="{Binding DropContextMenuItems}" />
+                </dxb:BarManager.DXContextMenu>
                 <dxmvvm:Interaction.Behaviors>
                     <diagram:Cdp4DiagramOrgChartBehavior x:Name="orgChartBehavior"
                                                          PageMargin="45"
@@ -211,28 +355,33 @@
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.OpenFile}" />
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.NewFile}" />
 
-                    <dxb:UpdateAction
-                        ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}"
-                        PropertyName="Caption"
-                        Value="Tools" />
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}"
+                                      PropertyName="Caption"
+                                      Value="Tools" />
 
-                    <dxb:UpdateAction
-                        ElementName="{x:Static dxdiag:DefaultBarItemNames.DefaultPageCategory}"
-                        Property="dxr:RibbonDefaultPageCategory.MergeType"
-                        Value="Remove" />
+                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DefaultPageCategory}"
+                                      Property="dxr:RibbonDefaultPageCategory.MergeType"
+                                      Value="Remove" />
 
                 </diagram:Cdp4DiagramControl.Actions>
             </diagram:Cdp4DiagramControl>
             <Grid Grid.Column="1">
-                <dxdo:LayoutPanel DataContext="{Binding PaletteViewModel}"  Caption="Palette" ShowHideButton="False" ShowCloseButton="False" ShowPinButton="False">
+                <dxdo:LayoutPanel DataContext="{Binding PaletteViewModel}"
+                                  Caption="Palette"
+                                  ShowHideButton="False"
+                                  ShowCloseButton="False"
+                                  ShowPinButton="False">
                     <dxdo:LayoutPanel.Resources>
-                        <CollectionViewSource x:Key="PaletteGroups" Source="{Binding Items}">
+                        <CollectionViewSource x:Key="PaletteGroups"
+                                              Source="{Binding Items}">
                             <CollectionViewSource.GroupDescriptions>
                                 <PropertyGroupDescription PropertyName="Group" />
                             </CollectionViewSource.GroupDescriptions>
                             <CollectionViewSource.SortDescriptions>
-                                <componentModel:SortDescription PropertyName="Group" Direction="Ascending" />
-                                <componentModel:SortDescription PropertyName="GroupSortOrder" Direction="Ascending" />
+                                <componentModel:SortDescription PropertyName="Group"
+                                                                Direction="Ascending" />
+                                <componentModel:SortDescription PropertyName="GroupSortOrder"
+                                                                Direction="Ascending" />
                             </CollectionViewSource.SortDescriptions>
                         </CollectionViewSource>
                     </dxdo:LayoutPanel.Resources>
@@ -241,28 +390,36 @@
                                        EachGroupHasSelectedItem="False"
                                        ItemsSource="{Binding Source={StaticResource PaletteGroups}}"
                                        GroupDescription="Group"
-                                       
                                        AllowDrop="False"
                                        Margin="0,0,0,0"
                                        Background="Transparent"
                                        Compact="False">
                         <dxmvvm:Interaction.Behaviors>
-                            <dxmvvm:EventToCommand Event="PreviewMouseMove" PassEventArgsToCommand="True" Command="{Binding OnMouseMoveCommand}"></dxmvvm:EventToCommand>
+                            <dxmvvm:EventToCommand Event="PreviewMouseMove"
+                                                   PassEventArgsToCommand="True"
+                                                   Command="{Binding OnMouseMoveCommand}"></dxmvvm:EventToCommand>
                         </dxmvvm:Interaction.Behaviors>
                         <dxn:NavBarControl.Resources>
-                            
+
                             <DataTemplate x:Key="NavItemDataTemplate">
                                 <StackPanel Orientation="Horizontal">
-                                    <Image Width="16" Height="16" Margin="10"  Source="{Binding Image, Converter={StaticResource StringToIconUriConverter}}"/>
-                                    <TextBlock Text="{Binding Text}" VerticalAlignment="Center" />
+                                    <Image Width="16"
+                                           Height="16"
+                                           Margin="10"
+                                           Source="{Binding Image, Converter={StaticResource StringToIconUriConverter}}" />
+                                    <TextBlock Text="{Binding Text}"
+                                               VerticalAlignment="Center" />
                                 </StackPanel>
                             </DataTemplate>
                             <Style TargetType="dxn:NavBarGroup">
-                                <Setter Property="Header" Value="{Binding}"/>
+                                <Setter Property="Header"
+                                        Value="{Binding}" />
                             </Style>
                             <Style TargetType="dxn:NavBarItem">
-                                <Setter Property="Command" Value="{Binding AsyncCommand}"/>
-                                <Setter Property="Template" Value="{StaticResource NavItemDataTemplate}"/>
+                                <Setter Property="Command"
+                                        Value="{Binding AsyncCommand}" />
+                                <Setter Property="Template"
+                                        Value="{StaticResource NavItemDataTemplate}" />
                             </Style>
                         </dxn:NavBarControl.Resources>
                         <dxn:NavBarControl.View>
@@ -270,7 +427,7 @@
                         </dxn:NavBarControl.View>
                     </dxn:NavBarControl>
                 </dxdo:LayoutPanel>
-                
+
             </Grid>
         </Grid>
     </Grid>

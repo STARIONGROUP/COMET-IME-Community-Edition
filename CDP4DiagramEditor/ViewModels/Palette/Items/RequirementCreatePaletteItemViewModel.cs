@@ -27,12 +27,14 @@ namespace CDP4DiagramEditor.ViewModels.Palette
 {
     using System;
     using System.ComponentModel.Composition;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Mvvm;
 
     /// <summary>
     /// Diagram palette button responsible for creating new <see cref="Requirement" />
@@ -68,9 +70,38 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// Handle mouse move when dropping
         /// </summary>
         /// <param name="dropInfo">The mouse event args.</param>
-        public override async Task<Thing> HandleMouseDrop(IDropInfo dropInfo)
+        /// <param name="createCallback">Callback operation which creates the content</param>
+        /// <returns>The callback to be invoked after drop has been handled</returns>
+        public override async Task<Thing> HandleMouseDrop(IDropInfo dropInfo, Action<Thing> createCallback = null)
         {
-            throw new NotImplementedException();
+            var contextMenuItems = this.editorViewModel.Thing.GetContainerOfType<Iteration>().RequirementsSpecification
+                                                             .Select(s => new ContextMenuItemViewModel(s.Name, string.Empty, t => this.MenuItemCommand(t, createCallback), s, true));
+
+            this.editorViewModel.ShowDropContextMenuOptions(contextMenuItems);
+
+            return await Task.FromResult(default(Thing));
+        }
+
+        /// <summary>
+        /// Method to be invoked when a manu item is selected by the user.
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> associated with the menu item</param>
+        /// <param name="createCallback">The callback to be invoked when a requirement has been specified</param>
+        private void MenuItemCommand(Thing thing, Action<Thing> createCallback)
+        {
+            if (thing is null)
+            {
+                return;
+            }
+
+            var requirement = this.editorViewModel.Create<Requirement>(this, thing);
+
+            if(requirement is null)
+            {
+                return;
+            }
+
+            createCallback?.Invoke(requirement);
         }
     }
 }
