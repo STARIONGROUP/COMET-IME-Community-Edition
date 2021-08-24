@@ -431,12 +431,13 @@ namespace CDP4CommonView.Diagram
             if (vm != null)
             {
                 vm.SelectedItems.Clear();
-                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
 
                 foreach (var controlSelectedItem in controlSelectedItems)
                 {
                     vm.SelectedItems.Add(controlSelectedItem);
                 }
+
+                vm.SelectedItem = controlSelectedItems.FirstOrDefault();
             }
         }
 
@@ -1037,6 +1038,11 @@ namespace CDP4CommonView.Diagram
             if (this.AssociatedObject?.DataContext is IDropTarget vmDropTarget)
             {
                 await vmDropTarget.Drop(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
             }
 
             return dropInfo.Handled;

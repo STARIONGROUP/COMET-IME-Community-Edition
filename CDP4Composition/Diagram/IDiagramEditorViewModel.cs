@@ -27,11 +27,21 @@
 namespace CDP4Composition.Diagram
 {
     using CDP4Common.CommonData;
+    using CDP4Common.DiagramData;
+
+    using CDP4CommonView.Diagram;
+
+    using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
+
+    using CDP4Dal;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The interface that describes the dirty mechanism of DiagramEditorViewModel
     /// </summary>
-    public interface IDiagramEditorViewModel
+    public interface IDiagramEditorViewModel : IViewModelBase<DiagramCanvas>, ICdp4DiagramContainer, IISession
     {
         /// <summary>
         /// Defines the method that update <see cref="IsDirty"/> property
@@ -44,6 +54,21 @@ namespace CDP4Composition.Diagram
         bool IsDirty { get; }
 
         /// <summary>
+        /// Gets or sets the collection of diagram items.
+        /// </summary>
+        DisposableReactiveList<ThingDiagramContentItem> ThingDiagramItems { get; set; }
+
+        /// <summary>
+        /// Gets the collection diagramming-port to display.
+        /// </summary>
+        ReactiveList<IDiagramObjectViewModel> DiagramPortCollection { get; }
+
+        /// <summary>
+        /// Gets the collection diagramming-item to display.
+        /// </summary>
+        ReactiveList<IDiagramConnectorViewModel> DiagramConnectorCollection { get; }
+
+        /// <summary>
         /// Removes a diagram item and its connectors.
         /// </summary>
         /// <param name="contentItemContent">The item to remove.</param>
@@ -54,5 +79,13 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> by which to find and remove diagram things.</param>
         void RemoveDiagramThingItemByThing(Thing thing);
+
+        /// <summary>
+        /// Initiate the create command of a certain Thing represented by T
+        /// </summary>
+        /// <param name="sender">The sender object.</param>
+        /// <param name="container">The contaier of the object to be created</param>
+        /// <typeparam name="TThing">The type of Thing to be creates</typeparam>
+        TThing Create<TThing>(object sender, Thing container = null) where TThing : Thing, new();
     }
 }

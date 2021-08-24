@@ -45,6 +45,8 @@ namespace CDP4DiagramEditor.Tests
 
     using CDP4DiagramEditor.ViewModels;
 
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
 
     using NUnit.Framework;
@@ -62,6 +64,8 @@ namespace CDP4DiagramEditor.Tests
         private IterationSetup iterationsetup;
         private Person person;
         private Participant participant;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IThingDialogNavigationService> navigation;
         private EngineeringModel model;
         private Iteration iteration;
         private DiagramCanvas diagram;
@@ -72,6 +76,9 @@ namespace CDP4DiagramEditor.Tests
         public void Setup()
         {
             this.session = new Mock<ISession>();
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.navigation = new Mock<IThingDialogNavigationService>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();

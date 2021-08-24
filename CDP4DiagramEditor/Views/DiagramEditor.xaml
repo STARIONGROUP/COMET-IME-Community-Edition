@@ -20,6 +20,8 @@
              xmlns:engineeringModelData="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:palette="clr-namespace:CDP4DiagramEditor.ViewModels.Palette"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300" d:DesignWidth="650">
@@ -33,7 +35,9 @@
                     Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+            <cdp4Composition:StringToIconUriConverter x:Key="StringToIconUriConverter" />
             <dx:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></dx:BooleanToVisibilityConverter>
+            <dxmvvm:EnumToStringConverter x:Key="EnumToStringConverter"></dxmvvm:EnumToStringConverter>
             <Style TargetType="{x:Type dxb:BarButtonItem}">
                 <Setter Property="Content" Value="{Binding Header}" />
                 <Setter Property="Command" Value="{Binding MenuCommand}" />
@@ -176,7 +180,7 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="180" />
             </Grid.ColumnDefinitions>
             <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
                                         ToolboxVisibility="Closed"
@@ -220,203 +224,50 @@
                 </diagram:Cdp4DiagramControl.Actions>
             </diagram:Cdp4DiagramControl>
             <Grid Grid.Column="1">
-                <dxdo:LayoutPanel Caption="Palette" ShowHideButton="False" ShowCloseButton="False" ShowPinButton="False">
-                    <dxn:NavBarControl dx:ThemeManager.ThemeName="Seven" Margin="0,0,0,0" Background="Transparent"
-                                   Compact="False">
+                <dxdo:LayoutPanel DataContext="{Binding PaletteViewModel}"  Caption="Palette" ShowHideButton="False" ShowCloseButton="False" ShowPinButton="False">
+                    <dxdo:LayoutPanel.Resources>
+                        <CollectionViewSource x:Key="PaletteGroups" Source="{Binding Items}">
+                            <CollectionViewSource.GroupDescriptions>
+                                <PropertyGroupDescription PropertyName="Group" />
+                            </CollectionViewSource.GroupDescriptions>
+                            <CollectionViewSource.SortDescriptions>
+                                <componentModel:SortDescription PropertyName="Group" Direction="Ascending" />
+                                <componentModel:SortDescription PropertyName="GroupSortOrder" Direction="Ascending" />
+                            </CollectionViewSource.SortDescriptions>
+                        </CollectionViewSource>
+                    </dxdo:LayoutPanel.Resources>
+                    <dxn:NavBarControl dx:ThemeManager.ThemeName="Seven"
+                                       AllowSelectItem="True"
+                                       EachGroupHasSelectedItem="False"
+                                       ItemsSource="{Binding Source={StaticResource PaletteGroups}}"
+                                       GroupDescription="Group"
+                                       
+                                       AllowDrop="False"
+                                       Margin="0,0,0,0"
+                                       Background="Transparent"
+                                       Compact="False">
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:EventToCommand Event="PreviewMouseMove" PassEventArgsToCommand="True" Command="{Binding OnMouseMoveCommand}"></dxmvvm:EventToCommand>
+                        </dxmvvm:Interaction.Behaviors>
+                        <dxn:NavBarControl.Resources>
+                            
+                            <DataTemplate x:Key="NavItemDataTemplate">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="16" Height="16" Margin="10"  Source="{Binding Image, Converter={StaticResource StringToIconUriConverter}}"/>
+                                    <TextBlock Text="{Binding Text}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                            <Style TargetType="dxn:NavBarGroup">
+                                <Setter Property="Header" Value="{Binding}"/>
+                            </Style>
+                            <Style TargetType="dxn:NavBarItem">
+                                <Setter Property="Command" Value="{Binding AsyncCommand}"/>
+                                <Setter Property="Template" Value="{StaticResource NavItemDataTemplate}"/>
+                            </Style>
+                        </dxn:NavBarControl.Resources>
                         <dxn:NavBarControl.View>
                             <dxn:ExplorerBarView />
                         </dxn:NavBarControl.View>
-                        <dxn:NavBarControl.Groups>
-                            <dxn:NavBarGroup Header="Create">
-                                <dxn:NavBarGroup.Items>
-                                    <dxn:NavBarItem Command="{Binding CreateElementDefinitionCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=Product_16x16.png}" />
-                                                    <TextBlock Text="Element Definition" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Binary Relationship
-                                    </dxn:NavBarItem>
-                                    <dxn:NavBarItem Command="{Binding CreateRequirementCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=Customization_16x16.png}" />
-                                                    <TextBlock Text="Requirement" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Multi Relationship
-                                    </dxn:NavBarItem>
-                                </dxn:NavBarGroup.Items>
-                            </dxn:NavBarGroup>
-                            <dxn:NavBarGroup Header="Ports and Interfaces">
-                                <dxn:NavBarGroup.Items>
-                                    <dxn:NavBarItem Command="{Binding CreateInterfaceCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=ExistLink_16x16.png}" />
-                                                    <TextBlock Text="Draw Interface" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Binary Relationship
-                                    </dxn:NavBarItem>
-                                    <dxn:NavBarItem Command="{Binding CreatePortCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=GoToNextHeaderFooter_16x16.png}" />
-                                                    <TextBlock Text="Add Output Port" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Multi Relationship
-                                    </dxn:NavBarItem>
-                                    <dxn:NavBarItem Command="{Binding CreatePortCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=GoToPreviousHeaderFooter_16x16.png}" />
-                                                    <TextBlock Text="Add Input Port" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Multi Relationship
-                                    </dxn:NavBarItem>
-                                </dxn:NavBarGroup.Items>
-                            </dxn:NavBarGroup>
-                            <dxn:NavBarGroup Header="Connect">
-                                <dxn:NavBarGroup.Items>
-                                    <dxn:NavBarItem Command="{Binding CreateElementUsageCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=Version_16x16.png}" />
-                                                    <TextBlock Text="Element Usage" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Binary Relationship
-                                    </dxn:NavBarItem>
-                                    <dxn:NavBarItem Command="{Binding CreateBinaryRelationshipCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=BO_Transition.png}" />
-                                                    <TextBlock Text="Binary Relationship" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Multi Relationship
-                                    </dxn:NavBarItem>
-                                    
-                                </dxn:NavBarGroup.Items>
-                            </dxn:NavBarGroup>
-                            <dxn:NavBarGroup Header="Constraints">
-                                <dxn:NavBarGroup.Items>
-                                    <dxn:NavBarItem Command="{Binding CreateConstrainedCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=IconSetRedToBlack4_16x16.png}" />
-                                                    <TextBlock Text="Constrained" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Binary Relationship
-                                    </dxn:NavBarItem>
-                                    <dxn:NavBarItem Command="{Binding CreateOptionalCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=AppointmentDayClock.png}" />
-                                                    <TextBlock Text="Optional" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Multi Relationship
-                                    </dxn:NavBarItem>
-                                    <dxn:NavBarItem Command="{Binding CreateRestrictedCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=IconSetTrafficLights4_16x16.png}" />
-                                                    <TextBlock Text="Restricted" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Multi Relationship
-                                    </dxn:NavBarItem>
-                                </dxn:NavBarGroup.Items>
-                            </dxn:NavBarGroup>
-                            <dxn:NavBarGroup Header="Simple Objects">
-                                <dxn:NavBarGroup.Items>
-                                    <dxn:NavBarItem Command="{Binding CreateFrameCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                       Height="16"
-                                                       Margin="10"
-                                                       Source="{dx:DXImage Image=BottomRightHorizontalInside_16x16.png}" />
-                                                    <TextBlock Text="Frame" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Binary Relationship
-                                    </dxn:NavBarItem>
-                                    <dxn:NavBarItem Command="{Binding CreateSimpleConnectorCommand}">
-                                        <dxn:NavBarItem.Template>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Image Width="16"
-                                                           Height="16"
-                                                           Margin="10"
-                                                           Source="{dx:DXImage Image=LineItem_16x16.png}" />
-                                                    <TextBlock Text="Simple Connector" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </dxn:NavBarItem.Template>
-                                        Multi Relationship
-                                    </dxn:NavBarItem>
-                                </dxn:NavBarGroup.Items>
-                            </dxn:NavBarGroup>
-                        </dxn:NavBarControl.Groups>
                     </dxn:NavBarControl>
                 </dxdo:LayoutPanel>
                 
