@@ -25,6 +25,7 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
+    using System;
     using System.Threading.Tasks;
     using System.Windows.Input;
 
@@ -47,6 +48,8 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// Handle mouse move when dropping
         /// </summary>
         /// <param name="dropInfo">The mouse event args.</param>
-        Task<Thing> HandleMouseDrop(IDropInfo dropInfo);
+        /// <param name="createCallback">Callback operation which creates the content</param>
+        /// <returns>The <see cref="Task{Thing}"/></returns>
+        Task<Thing> HandleMouseDrop(IDropInfo dropInfo, Action<Thing> createCallback = null);
     }
 }

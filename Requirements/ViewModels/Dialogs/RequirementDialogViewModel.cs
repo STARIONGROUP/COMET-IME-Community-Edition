@@ -201,8 +201,8 @@ namespace CDP4Requirements.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            var iteration = (Iteration)this.Container.Container ?? this.ChainOfContainer.OfType<Iteration>().Single();
-            var model = (EngineeringModel)iteration.Container;
+
+            EngineeringModel model = this.Container.GetContainerOfType<EngineeringModel>() ?? this.ChainOfContainer.OfType<Iteration>().Single().Container as EngineeringModel;
             this.mRdl = model.EngineeringModelSetup.RequiredRdl.Single();
             this.SimpleParameterValue = new DisposableReactiveList<SimpleParameterValueRowViewModel>();
             this.ParametricConstraintExpression = new DisposableReactiveList<IRowViewModelBase<BooleanExpression>>();
