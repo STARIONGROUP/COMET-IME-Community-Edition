@@ -36,9 +36,9 @@ namespace CDP4Composition.Diagram
     using ReactiveUI;
 
     /// <summary>
-    /// Represents an <see cref="Requirement"/> to be used in a Diagram    
+    /// Represents an <see cref="Requirement"/> to be used in a Diagram
     /// </summary>
-    public class RequirementDiagramContentItem : NamedThingDiagramContentItem, IDiagramContentItemChildren    
+    public class RequirementDiagramContentItem : NamedThingDiagramContentItem, IDiagramContentItemChildren
     {
         /// <summary>
         /// The <see cref="ISession"/> to be used when creating other view models
@@ -55,6 +55,11 @@ namespace CDP4Composition.Diagram
             : base(diagramThing, container)
         {
             this.session = session;
+
+            if (diagramThing.DepictedThing is Requirement requirement)
+            {
+                this.DropTarget = new RequirementDropTarget(requirement, this.session);
+            }
 
             this.UpdateProperties();
         }

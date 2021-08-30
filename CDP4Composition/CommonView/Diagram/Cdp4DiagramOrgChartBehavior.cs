@@ -108,7 +108,7 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Gets or sets the diagram editor viewmodel
         /// </summary>
-        public ICdp4DiagramContainer ViewModel { get; set; }
+        public IDiagramEditorViewModel ViewModel { get; set; }
 
         /// <summary>
         /// The dependency property that allows setting the source to the view-model representing a diagram object
@@ -448,7 +448,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The arguments</param>
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (this.AssociatedObject.DataContext is ICdp4DiagramContainer viewModel && viewModel.Behavior == null)
+            if (this.AssociatedObject.DataContext is IDiagramEditorViewModel viewModel && viewModel.Behavior == null)
             {
                 this.ViewModel = viewModel;
                 viewModel.Behavior = this;
@@ -485,6 +485,31 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.Unloaded += this.Unloaded;
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
             this.AssociatedObject.ItemsDeleting += this.ItemsDeleting;
+
+            this.AssociatedObject.AddingNewItem += this.AddingNewItem;
+        }
+
+        /// <summary>
+        /// Event handler to capture adding of new items
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The arguments.</param>
+        private async void AddingNewItem(object sender, DiagramAddingNewItemEventArgs e)
+        {
+            if (e.Item is not IDrawnConnector connector)
+            {
+                return;
+            }
+
+            // initiate conector tool create algorythm
+            var tool = connector.Tool;
+
+            if (tool != null)
+            {
+                await tool.ExecuteCreate(connector, this);
+            }
+
+            this.ResetTool();
         }
 
         /// <summary>
@@ -637,6 +662,10 @@ namespace CDP4CommonView.Diagram
         {
             if (sender is DiagramDesignerControl && this.mergeCategory != null)
             {
+                (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.ThingDiagramItems.ClearAndDispose();
+                (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.DiagramConnectorCollection.ClearAndDispose();
+                (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.DiagramPortCollection.ClearAndDispose();
+
                 // clean up merged category
                 this.ClearCategory();
             }
@@ -1067,12 +1096,20 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
+        /// Activates a new <see cref="ConnectorTool"/> of type <see cref="TTool"/>in the Diagram control.
+        /// </summary>
+        public void ActivateConnectorTool<TTool>() where TTool : DiagramTool, IConnectorTool, new()
+        {
+            this.AssociatedObject.ActiveTool = new TTool();
+        }
+
+        /// <summary>
         /// Resets the active tool.
         /// </summary>
         /// 
         public void ResetTool()
         {
-            this.AssociatedObject.ActiveTool = null;
+            this.AssociatedObject.ActiveTool = new PointerTool();
         }
 
         /// <summary>
@@ -1096,6 +1133,15 @@ namespace CDP4CommonView.Diagram
             {
                 this.AssociatedObject.SelectItem(thingDiagramItem);
             }
+        }
+
+        /// <summary>
+        /// Removes the specified item from the diagram collection.
+        /// </summary>
+        /// <param name="item">The <see cref="DiagramItem"/> to remove.</param>
+        public void RemoveItem(DiagramItem item)
+        {
+            this.AssociatedObject.Items.Remove(item);
         }
     }
 }

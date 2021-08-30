@@ -33,12 +33,22 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4DiagramEditor.ViewModels.Tools;
+
     /// <summary>
     /// Diagram palette button responsible for creating new <see cref="Requirement" />
     /// </summary>
     [Export(typeof(IPaletteItemViewModel))]
-    public class ElementUsageCreatePaletteItemViewModel : PaletteItemBaseViewModel
+    public class ElementUsageCreatePaletteItemViewModel : ConnectorCreatePaletteItemBaseViewModel
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ElementUsageCreatePaletteItemViewModel"/> class.
+        /// </summary>
+        public ElementUsageCreatePaletteItemViewModel()
+        {
+            this.ConnectorTool = new ElementUsageConnectorTool();
+        }
+
         /// <summary>
         /// Gets the label text
         /// </summary>
@@ -77,6 +87,16 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         public override string Image
         {
             get { return "Version_16x16.png"; }
+        }
+
+        /// <summary>
+        /// Executes the command of this <see cref="IPaletteItemViewModel" />
+        /// </summary>
+        /// <returns>An empty task</returns>
+        public override async Task ExecuteAsyncCommand()
+        {
+            // activate tool
+            await this.editorViewModel.ActivateConnectorTool<ElementUsageConnectorTool>(this);
         }
     }
 }

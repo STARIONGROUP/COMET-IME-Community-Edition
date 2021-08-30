@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDiagramConnectorViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ElementUsageConnector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,54 +23,37 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4CommonView.Diagram
+namespace CDP4DiagramEditor.ViewModels.Tools.Connectors
 {
-    using System;
-    using System.Collections.Generic;
+    using CDP4Common.EngineeringModelData;
 
-    using CDP4Common.CommonData;
-    using CDP4Common.DiagramData;
+    using CDP4Composition.Diagram;
 
-    using Point = System.Windows.Point;
+    using DevExpress.Xpf.Diagram;
 
     /// <summary>
-    /// The interface that shall be realized by view-models representing a <see cref="DiagramEdge" />
+    /// The connector for ElementUsages
     /// </summary>
-    public interface IDiagramConnectorViewModel : IDisposable
+    public class ElementUsageConnector : ThingDiagramConnector, IDrawnConnector
     {
         /// <summary>
-        /// Gets the connection points for the represented <see cref="DiagramEdge" />
+        /// Initializes a new instance of the <see cref="ElementUsageConnector"/> class.
         /// </summary>
-        List<Point> ConnectingPoints { get; }
+        public ElementUsageConnector(IConnectorTool tool) : base(null, null)
+        {
+            this.Tool = tool;
+        }
 
         /// <summary>
-        /// Gets the source of the <see cref="DiagramEdge" />
+        /// Initializes a new instance of the <see cref="ElementUsageConnector"/> class.
         /// </summary>
-        DiagramElementThing Source { get; set; }
+        public ElementUsageConnector(ElementUsage thing, DiagramConnector baseConnector = null) : base(thing, baseConnector)
+        {
+        }
 
         /// <summary>
-        /// Gets the target of the <see cref="DiagramEdge" />
+        /// Gets the tool that drew the connector 
         /// </summary>
-        DiagramElementThing Target { get; set; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        string DisplayedText { get; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        Thing Thing { get; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="CDP4Common.CommonData.Thing"/> representing the diagram with all of its diagram elements
-        /// </summary>
-        DiagramElementThing DiagramThing { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the diagram editor is dirty
-        /// </summary>
-        bool IsDirty { get; }
+        public IConnectorTool Tool { get; }
     }
 }

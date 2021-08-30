@@ -30,6 +30,8 @@ namespace CDP4CommonView.Diagram
     using System.Collections.Generic;
     using System.Windows;
 
+    using CDP4Composition.Diagram;
+
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
 
@@ -39,6 +41,11 @@ namespace CDP4CommonView.Diagram
         /// Gets a dictionary of saved diagram item positions.
         /// </summary>
         Dictionary<object, Point> ItemPositions { get; }
+
+        /// <summary>
+        /// The diagram editor view model
+        /// </summary>
+        IDiagramEditorViewModel ViewModel { get; set; }
 
         /// <summary>
         /// Converts control coordinates into document coordinates.
@@ -51,6 +58,11 @@ namespace CDP4CommonView.Diagram
         /// Activates a new <see cref="ConnectorTool"/> in the Diagram control.
         /// </summary>
         void ActivateConnectorTool();
+
+        /// <summary>
+        /// Activates a new <see cref="ConnectorTool"/> of type <see cref="TTool"/>in the Diagram control.
+        /// </summary>
+        void ActivateConnectorTool<TTool>() where TTool : DiagramTool, IConnectorTool, new();
 
         /// <summary>
         /// Resets the active tool.
@@ -68,5 +80,6 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="selectedIid">The Iid of the <see cref="Thing"/></param>
         void SelectItemByThingIid(Guid? selectedIid);
+        void RemoveItem(DiagramItem item);
     }
 }

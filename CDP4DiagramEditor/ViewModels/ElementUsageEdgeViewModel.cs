@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDiagramConnectorViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ElementUsageEdgeViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,54 +23,24 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4CommonView.Diagram
+namespace CDP4DiagramEditor.ViewModels
 {
-    using System;
-    using System.Collections.Generic;
-
-    using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
 
-    using Point = System.Windows.Point;
+    using CDP4Composition.Diagram;
 
     /// <summary>
-    /// The interface that shall be realized by view-models representing a <see cref="DiagramEdge" />
+    /// View model for a ElementUsage diagram edge
     /// </summary>
-    public interface IDiagramConnectorViewModel : IDisposable
+    public class ElementUsageEdgeViewModel : DiagramEdgeViewModel
     {
         /// <summary>
-        /// Gets the connection points for the represented <see cref="DiagramEdge" />
+        /// Initializes a new instance of the <see cref="ElementUsageEdgeViewModel" /> class
         /// </summary>
-        List<Point> ConnectingPoints { get; }
-
-        /// <summary>
-        /// Gets the source of the <see cref="DiagramEdge" />
-        /// </summary>
-        DiagramElementThing Source { get; set; }
-
-        /// <summary>
-        /// Gets the target of the <see cref="DiagramEdge" />
-        /// </summary>
-        DiagramElementThing Target { get; set; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        string DisplayedText { get; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        Thing Thing { get; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="CDP4Common.CommonData.Thing"/> representing the diagram with all of its diagram elements
-        /// </summary>
-        DiagramElementThing DiagramThing { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the diagram editor is dirty
-        /// </summary>
-        bool IsDirty { get; }
+        /// <param name="diagramEdge">The associated <see cref="DiagramEdge" /></param>
+        /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
+        public ElementUsageEdgeViewModel(DiagramEdge diagramEdge, IDiagramEditorViewModel container) : base(diagramEdge, container)
+        {
+        }
     }
 }

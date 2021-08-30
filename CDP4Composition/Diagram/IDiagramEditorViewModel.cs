@@ -27,6 +27,7 @@
 namespace CDP4Composition.Diagram
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
@@ -36,6 +37,8 @@ namespace CDP4Composition.Diagram
     using CDP4Composition.Mvvm.Types;
 
     using CDP4Dal;
+
+    using DevExpress.Diagram.Core;
 
     using ReactiveUI;
 
@@ -62,12 +65,12 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Gets the collection diagramming-port to display.
         /// </summary>
-        ReactiveList<IDiagramObjectViewModel> DiagramPortCollection { get; }
+        DisposableReactiveList<IDiagramObjectViewModel> DiagramPortCollection { get; }
 
         /// <summary>
         /// Gets the collection diagramming-item to display.
         /// </summary>
-        ReactiveList<IDiagramConnectorViewModel> DiagramConnectorCollection { get; }
+        DisposableReactiveList<IDiagramConnectorViewModel> DiagramConnectorCollection { get; }
 
         /// <summary>
         /// Removes a diagram item and its connectors.
@@ -89,6 +92,14 @@ namespace CDP4Composition.Diagram
         /// <typeparam name="TThing">The type of Thing to be creates</typeparam>
         TThing Create<TThing>(object sender, Thing container = null) where TThing : Thing, new();
 
+        /// <summary>
+        /// Activate a connector tool.
+        /// </summary>
+        /// <typeparam name="TTool">The type of tool</typeparam>
+        /// <param name="sender">The sender object.</param>
+        /// <returns>An empty task</returns>
+        Task ActivateConnectorTool<TTool>(object sender) where TTool : DiagramTool, IConnectorTool, new();
+        
         /// <summary>
         /// Shows a context menu in the diagram at the current mouse position with the specified options
         /// </summary>
