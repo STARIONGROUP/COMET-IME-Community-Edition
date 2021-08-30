@@ -8,13 +8,13 @@
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software{colon} you can redistribute it and/or
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
-//    License as published by the Free Software Foundation{colon} either
+//    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY{colon} without even the implied warranty of
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
@@ -152,7 +152,8 @@ namespace CDP4Composition.CommonView.ViewModels
                 case BehavioralModelKind.Other:
                     {
                         var elementDefinition = this.Container as ElementDefinition;
-                        var vm = new ScriptKindViewModel(this.Thing.BehavioralParameter, this.Thing.Script, this.Session, this, elementDefinition?.Parameter);
+                        var parameterClones = this.Thing.BehavioralParameter.Select(t => t.Clone(false));
+                        var vm = new ScriptKindViewModel(parameterClones, this.Thing.Script, this.Session, this, elementDefinition?.Parameter);
 
                         this.Disposables.Add(vm.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
                         this.Disposables.Add(vm.BehaviorParameter.Changed.Subscribe(_ => this.UpdateOkCanExecute()));

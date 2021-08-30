@@ -31,11 +31,11 @@
                     <dxb:BarButtonItem x:Name="AddParameterButton"
                                        Command="{Binding AddParameterCommand}"
                                        Glyph="{dx:DXImage Image=Add_16x16.png}"
-                                       Hint="Create a File Type" />
+                                       Hint="Create a Parameter mapping" />
                     <dxb:BarButtonItem x:Name="DeleteParameterButton"
                                        Command="{Binding DeleteParameterCommand}"
                                        Glyph="{dx:DXImage Image=Delete_16x16.png}"
-                                       Hint="Remove the selected File Type" />
+                                       Hint="Remove the selected Parameter mapping" />
                 </dxb:ToolBarControl>
             </lc:LayoutItem>
             <lc:LayoutItem MinHeight="100"

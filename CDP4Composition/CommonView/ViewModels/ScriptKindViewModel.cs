@@ -8,13 +8,13 @@
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software{colon} you can redistribute it and/or
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
-//    License as published by the Free Software Foundation{colon} either
+//    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
-//    but WITHOUT ANY WARRANTY{colon} without even the implied warranty of
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
@@ -71,16 +71,16 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">The <see cref="BehaviorDialogViewModel" container of this view model/></param>
         /// <param name="parameter">The selectable <see cref="Parameter"/>s</param>
-        public ScriptKindViewModel(ContainerList<BehavioralParameter> behavioralParameters, string script, ISession session, BehaviorDialogViewModel containerViewModel, ContainerList<Parameter> parameter)
+        public ScriptKindViewModel(IEnumerable<BehavioralParameter> behavioralParameters, string script, ISession session, BehaviorDialogViewModel containerViewModel, ContainerList<Parameter> parameter)
         {
             this.BehaviorParameter = new ReactiveList<BehavioralParameterRowViewModel>();
             this.BehaviorParameter.ChangeTrackingEnabled = true;
-            
+
             this.BehaviorParameter.AddRange(behavioralParameters
                 .Select(p => new BehavioralParameterRowViewModel(p, session, containerViewModel)));
 
             var canExecuteAddParameterCommand = this.WhenAnyValue(vm => vm.IsReadOnly, vm => vm.Parameters, (r, p) => !r && p.Any());
-            this.AddParameterCommand = ReactiveCommand.Create(canExecuteAddParameterCommand);                        
+            this.AddParameterCommand = ReactiveCommand.Create(canExecuteAddParameterCommand);
             this.AddParameterCommand.Subscribe(_ => this.AddParameter());
 
             var canExecuteDeleteParameterCommand = this.WhenAnyValue(vm => vm.IsReadOnly, vm => vm.Parameters, vm => vm.SelectedBehaviorParameter, (r, p, s) => !r && p.Any() && s is not null);
