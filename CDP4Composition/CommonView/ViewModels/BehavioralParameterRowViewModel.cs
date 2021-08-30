@@ -111,7 +111,7 @@ namespace CDP4Composition.CommonView.ViewModels
             switch (columnName)
             {
                 case nameof(this.VariableName):
-                    error = string.IsNullOrWhiteSpace(newValue.ToString()) ? "Variable Name cannot be empty" : null;
+                    error = string.IsNullOrWhiteSpace(newValue?.ToString()) ? "Variable Name cannot be empty" : null;
                     break;
                 case nameof(this.Parameter):
                     error = newValue is null ? "A parameter must be selected" : null;

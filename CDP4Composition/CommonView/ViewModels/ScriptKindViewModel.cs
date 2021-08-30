@@ -71,16 +71,16 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">The <see cref="BehaviorDialogViewModel" container of this view model/></param>
         /// <param name="parameter">The selectable <see cref="Parameter"/>s</param>
-        public ScriptKindViewModel(ContainerList<BehavioralParameter> behavioralParameters, string script, ISession session, BehaviorDialogViewModel containerViewModel, ContainerList<Parameter> parameter)
+        public ScriptKindViewModel(IEnumerable<BehavioralParameter> behavioralParameters, string script, ISession session, BehaviorDialogViewModel containerViewModel, ContainerList<Parameter> parameter)
         {
             this.BehaviorParameter = new ReactiveList<BehavioralParameterRowViewModel>();
             this.BehaviorParameter.ChangeTrackingEnabled = true;
-            
+
             this.BehaviorParameter.AddRange(behavioralParameters
                 .Select(p => new BehavioralParameterRowViewModel(p, session, containerViewModel)));
 
             var canExecuteAddParameterCommand = this.WhenAnyValue(vm => vm.IsReadOnly, vm => vm.Parameters, (r, p) => !r && p.Any());
-            this.AddParameterCommand = ReactiveCommand.Create(canExecuteAddParameterCommand);                        
+            this.AddParameterCommand = ReactiveCommand.Create(canExecuteAddParameterCommand);
             this.AddParameterCommand.Subscribe(_ => this.AddParameter());
 
             var canExecuteDeleteParameterCommand = this.WhenAnyValue(vm => vm.IsReadOnly, vm => vm.Parameters, vm => vm.SelectedBehaviorParameter, (r, p, s) => !r && p.Any() && s is not null);

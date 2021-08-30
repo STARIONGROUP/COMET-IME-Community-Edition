@@ -152,7 +152,7 @@ namespace CDP4Composition.CommonView.ViewModels
                 case BehavioralModelKind.Other:
                     {
                         var elementDefinition = this.Container as ElementDefinition;
-                        var vm = new ScriptKindViewModel(this.Thing.BehavioralParameter, this.Thing.Script, this.Session, this, elementDefinition?.Parameter);
+                        var vm = new ScriptKindViewModel(this.Thing.BehavioralParameter.Select( t => t.Clone(false)), this.Thing.Script, this.Session, this, elementDefinition?.Parameter);
 
                         this.Disposables.Add(vm.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
                         this.Disposables.Add(vm.BehaviorParameter.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
