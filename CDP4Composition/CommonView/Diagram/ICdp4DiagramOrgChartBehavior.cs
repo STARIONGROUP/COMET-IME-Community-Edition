@@ -80,6 +80,17 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="selectedIid">The Iid of the <see cref="Thing"/></param>
         void SelectItemByThingIid(Guid? selectedIid);
+
+        /// <summary>
+        /// Removes a diagram item
+        /// </summary>
+        /// <param name="item">The item to remove</param>
         void RemoveItem(DiagramItem item);
+
+        /// <summary>
+        /// Gets the associated diagram control
+        /// </summary>
+        /// <returns>The associated diagram control</returns>
+        DiagramControl GetDiagramControl();
     }
 }

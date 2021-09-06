@@ -42,5 +42,14 @@ namespace CDP4DiagramEditor.ViewModels
         public ElementUsageEdgeViewModel(DiagramEdge diagramEdge, IDiagramEditorViewModel container) : base(diagramEdge, container)
         {
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ElementUsageEdgeViewModel" /> class
+        /// </summary>
+        /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
+        public ElementUsageEdgeViewModel(IConnectorTool tool) : base(tool)
+        {
+
+        }
     }
 }

@@ -29,9 +29,11 @@ namespace CDP4CommonView.Diagram
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Data;
-    
+
     using CDP4Common.CommonData;
-    
+
+    using CDP4Composition.Diagram;
+
     using DevExpress.Xpf.Diagram;
 
     /// <summary>
@@ -56,7 +58,7 @@ namespace CDP4CommonView.Diagram
         /// The <see cref="IDiagramObjectViewModel"/> data-context
         /// </param>
         /// <param name="behaviour">The <see cref="Cdp4DiagramOrgChartBehavior"/></param>
-        public Cdp4DiagramContentItem(IDiagramObjectViewModel datacontext, Cdp4DiagramOrgChartBehavior behaviour)
+        public Cdp4DiagramContentItem(ThingDiagramContentItem datacontext, Cdp4DiagramOrgChartBehavior behaviour)
         {
             this.DataContext = datacontext;
             this.behaviour = behaviour;

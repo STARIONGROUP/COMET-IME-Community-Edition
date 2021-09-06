@@ -42,7 +42,7 @@ namespace CDP4DiagramEditor.ViewModels
     /// <summary>
     /// The view-model representing a <see cref="DiagramEdge" />
     /// </summary>
-    public class DiagramEdgeViewModel : ThingDiagramContentItem, IDiagramConnectorViewModel
+    public class DiagramEdgeViewModel : ThingDiagramConnector, IDiagramConnectorViewModel, IDrawnConnector
     {
         /// <summary>
         /// Backing field for <see cref="ConnectingPoints" />
@@ -66,6 +66,15 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="DiagramEdgeViewModel" /> class
+        /// </summary>
+        /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
+        public DiagramEdgeViewModel(IConnectorTool tool) : base(null, null)
+        {
+            this.Tool = tool;
+        }
+
+        /// <summary>
         /// Gets the target of the <see cref="DiagramEdge" />
         /// </summary>
         public DiagramElementThing Target { get; set; }
@@ -78,6 +87,16 @@ namespace CDP4DiagramEditor.ViewModels
             get { return this.displayedText; }
             private set { this.RaiseAndSetIfChanged(ref this.displayedText, value); }
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the diagram editor is dirty
+        /// </summary>
+        public bool IsDirty { get; }
+
+        /// <summary>
+        /// Get the creator connector tool
+        /// </summary>
+        public IConnectorTool Tool { get; }
 
         /// <summary>
         /// Gets or sets the collection of connecting <see cref="Point" />

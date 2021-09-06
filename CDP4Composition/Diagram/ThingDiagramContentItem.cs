@@ -52,7 +52,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents a diagram content control class that can store a <see cref="Thing"/>.
     /// </summary>
-    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject, IDisposable, IIDropTarget
+    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject, IIDropTarget
     {
         /// <summary> 
         /// <see cref="ReactiveUI.PropertyChangingEventHandler"/> event

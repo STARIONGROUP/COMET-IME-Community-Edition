@@ -31,12 +31,14 @@ namespace CDP4CommonView.Diagram
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
 
+    using CDP4Composition.Diagram;
+
     using Point = System.Windows.Point;
 
     /// <summary>
     /// The interface that shall be realized by view-models representing a <see cref="DiagramEdge" />
     /// </summary>
-    public interface IDiagramConnectorViewModel : IDisposable
+    public interface IDiagramConnectorViewModel
     {
         /// <summary>
         /// Gets the connection points for the represented <see cref="DiagramEdge" />
@@ -64,13 +66,13 @@ namespace CDP4CommonView.Diagram
         Thing Thing { get; }
 
         /// <summary>
-        /// Gets or sets the <see cref="CDP4Common.CommonData.Thing"/> representing the diagram with all of its diagram elements
-        /// </summary>
-        DiagramElementThing DiagramThing { get; }
-
-        /// <summary>
         /// Gets a value indicating whether the diagram editor is dirty
         /// </summary>
         bool IsDirty { get; }
+
+        /// <summary>
+        /// Get the creator connector tool
+        /// </summary>
+        IConnectorTool Tool { get; }
     }
 }

@@ -60,17 +60,12 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Gets or sets the collection of diagram items.
         /// </summary>
-        DisposableReactiveList<ThingDiagramContentItem> ThingDiagramItems { get; set; }
+        DisposableReactiveList<IThingDiagramItem> ThingDiagramItems { get; set; }
 
         /// <summary>
         /// Gets the collection diagramming-port to display.
         /// </summary>
         DisposableReactiveList<IDiagramObjectViewModel> DiagramPortCollection { get; }
-
-        /// <summary>
-        /// Gets the collection diagramming-item to display.
-        /// </summary>
-        DisposableReactiveList<IDiagramConnectorViewModel> DiagramConnectorCollection { get; }
 
         /// <summary>
         /// Removes a diagram item and its connectors.
@@ -99,7 +94,7 @@ namespace CDP4Composition.Diagram
         /// <param name="sender">The sender object.</param>
         /// <returns>An empty task</returns>
         Task ActivateConnectorTool<TTool>(object sender) where TTool : DiagramTool, IConnectorTool, new();
-        
+
         /// <summary>
         /// Shows a context menu in the diagram at the current mouse position with the specified options
         /// </summary>

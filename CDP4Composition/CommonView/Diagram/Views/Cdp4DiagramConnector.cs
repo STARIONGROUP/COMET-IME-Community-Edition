@@ -126,7 +126,7 @@ namespace CDP4CommonView.Diagram
             {
                 this.CopyConnectorsettings(baseConnector);
             }
-            
+
             this.Initialize();
         }
 
@@ -147,7 +147,6 @@ namespace CDP4CommonView.Diagram
             get { return this.GetValue(TargetProperty); }
             set { this.SetValue(TargetProperty, value); }
         }
-        
 
         /// <summary>
         /// Set the <see cref="Cdp4DiagramConnector.BeginItem"/> from the view-model
@@ -184,7 +183,7 @@ namespace CDP4CommonView.Diagram
             }
             return diagramObject;
         }
-        
+
         /// <summary>
         /// Initializes the component
         /// </summary>

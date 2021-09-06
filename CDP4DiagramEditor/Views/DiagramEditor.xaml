@@ -93,7 +93,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-
+            
             <DataTemplate DataType="{x:Type mvvm:ContextMenuItemViewModel}">
                 <ContentControl>
                     <dxb:BarButtonItem Command="{Binding MenuCommand}"
@@ -261,8 +261,11 @@
 
             <DataTemplate x:Key="ElementUsageConnectorTemplate">
                 <dxdiag:DiagramConnector EndArrow="FilledDiamond"
-                                         EndArrowSize="10,10"
+                                         EndArrowSize="12,7"
                                          BeginArrow="Open90"
+                                         BeginItem="{Binding BeginItem}"
+                                         EndItem="{Binding EndItem}"
+                                         Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}"
                     />
             </DataTemplate>
 
@@ -310,11 +313,9 @@
                     <diagram:Cdp4DiagramOrgChartBehavior x:Name="orgChartBehavior"
                                                          PageMargin="45"
                                                          RibbonMergeCategoryName="DiagramCategory"
-                                                         ConnectorTemplateSelector="{StaticResource DiagramItemDataTemplateSelector}"
                                                          ItemTemplateSelector="{StaticResource DiagramItemDataTemplateSelector}"
                                                          ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}"
                                                          EventPublisher="{Binding EventPublisher, Mode=OneWay}"
-                                                         DiagramConnectorSource="{Binding DiagramConnectorCollection}"
                                                          DiagramPortSource="{Binding DiagramPortCollection}" />
                 </dxmvvm:Interaction.Behaviors>
                 <diagram:Cdp4DiagramControl.Actions>

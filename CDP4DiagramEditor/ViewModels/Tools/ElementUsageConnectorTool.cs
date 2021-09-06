@@ -37,12 +37,12 @@ namespace CDP4DiagramEditor.ViewModels.Tools
     using CDP4Composition.Diagram;
     using CDP4Composition.Services;
 
-    using CDP4DiagramEditor.ViewModels.Tools.Connectors;
-
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
 
     using Microsoft.Practices.ServiceLocation;
+
+    using NLog;
 
     /// <summary>
     /// A connector tool to create Element Usages
@@ -50,32 +50,46 @@ namespace CDP4DiagramEditor.ViewModels.Tools
     public class ElementUsageConnectorTool : ConnectorTool, IConnectorTool
     {
         /// <summary>
-        /// The backing field for <see cref="ThingCreator"/>
+        /// The NLog logger
+        /// </summary>
+        protected static Logger Logger;
+
+        /// <summary>
+        /// The backing field for <see cref="ThingCreator" />
         /// </summary>
         private IThingCreator thingCreator;
 
         /// <summary>
         /// Gets the tool name
         /// </summary>
-        public override string ToolName => "Element Usage Tool";
+        public override string ToolName
+        {
+            get { return "Element Usage Tool"; }
+        }
 
         /// <summary>
         /// Gets the tool Id.
         /// </summary>
-        public override string ToolId => nameof(ElementUsageConnectorTool);
+        public override string ToolId
+        {
+            get { return nameof(ElementUsageConnectorTool); }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IThingCreator" /> that is used to create different <see cref="Things" />.
+        /// </summary>
+        public IThingCreator ThingCreator
+        {
+            get { return this.thingCreator ??= ServiceLocator.Current.GetInstance<IThingCreator>(); }
+            set { this.thingCreator = value; }
+        }
 
         /// <summary>
         /// Gets the type of connector to be created
         /// </summary>
-        public IDiagramConnector GetConnector => new ElementUsageConnector(this);
-
-        /// <summary>
-        /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
-        /// </summary>
-        public IThingCreator ThingCreator
+        public IDiagramConnector GetConnector
         {
-            get => this.thingCreator ??= ServiceLocator.Current.GetInstance<IThingCreator>();
-            set => this.thingCreator = value;
+            get { return new ElementUsageEdgeViewModel(this); }
         }
 
         /// <summary>
@@ -87,32 +101,31 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         {
             var connectorConnector = connector as DiagramConnector;
 
-            var beginItemContent = ((DiagramContentItem)connectorConnector?.BeginItem)?.Content as ElementDefinitionDiagramContentItem;
-            var endItemContent = ((DiagramContentItem)connectorConnector?.EndItem)?.Content as ElementDefinitionDiagramContentItem;
+            var beginItemContent = ((DiagramContentItem) connectorConnector?.BeginItem)?.Content as ElementDefinitionDiagramContentItem;
+            var endItemContent = ((DiagramContentItem) connectorConnector?.EndItem)?.Content as ElementDefinitionDiagramContentItem;
 
             if (beginItemContent == null || endItemContent == null)
             {
                 // connector was drawn with either the source or target missing or incorrect
                 // remove the dummy connector
-                behavior.RemoveItem((DiagramItem)connector);
+                behavior.RemoveItem((DiagramItem) connector);
                 behavior.ResetTool();
                 return;
             }
 
             try
             {
-                var usage = await this.ThingCreator.CreateAndGetElementUsage(endItemContent.Thing as ElementDefinition, beginItemContent.Thing as ElementDefinition, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration)behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
-                this.CreateElementUsageConnector(usage, (DiagramObject)beginItemContent.DiagramThing, (DiagramObject)endItemContent.DiagramThing, behavior);
+                var usage = await this.ThingCreator.CreateAndGetElementUsage(endItemContent.Content as ElementDefinition, beginItemContent.Content as ElementDefinition, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration) behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
+                this.CreateElementUsageConnector(usage, (DiagramObject) beginItemContent.DiagramThing, (DiagramObject) endItemContent.DiagramThing, behavior);
             }
             catch (Exception ex)
             {
-                //logger.Error(ex.Message);
-                //this.ErrorMsg = ex.Message;
+                Logger.Error(ex.Message);
             }
             finally
             {
                 // remove the dummy connector
-                behavior.RemoveItem((DiagramItem)connector);
+                behavior.RemoveItem((DiagramItem) connector);
                 behavior.ResetTool();
             }
         }
@@ -126,7 +139,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <param name="behavior">The diagram bahavior</param>
         private void CreateElementUsageConnector(ElementUsage usage, DiagramObject source, DiagramObject target, ICdp4DiagramOrgChartBehavior behavior)
         {
-            var connectorItem = behavior.ViewModel.DiagramConnectorCollection.SingleOrDefault(x => x.Thing == usage);
+            var connectorItem = behavior.ViewModel.ThingDiagramItems.SingleOrDefault(x => x.Thing == usage);
 
             if (connectorItem != null)
             {
@@ -142,7 +155,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             };
 
             connectorItem = new ElementUsageEdgeViewModel(edge, behavior.ViewModel);
-            behavior.ViewModel.DiagramConnectorCollection.Add(connectorItem);
+            behavior.ViewModel.ThingDiagramItems.Add(connectorItem);
 
             behavior.ViewModel.UpdateIsDirty();
         }
