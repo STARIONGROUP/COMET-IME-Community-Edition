@@ -118,7 +118,7 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <summary>
         /// Gets or sets the ContentHash    
         /// </summary>
-        public virtual string ContentHash
+        public string ContentHash
         {
             get { return this.contentHash; }
             set { this.RaiseAndSetIfChanged(ref this.contentHash, value); }
@@ -526,7 +526,7 @@ namespace CDP4Composition.CommonView.ViewModels
         {
             var result = this.fileDialogService.GetOpenFileDialog(false, false, false, string.Empty, string.Empty, string.Empty, 1);
 
-            if (result.Length != 1)
+            if (result?.Length != 1)
             {
                 return;
             }
@@ -537,7 +537,7 @@ namespace CDP4Composition.CommonView.ViewModels
             this.LocalPath = currentPath;
             this.FileType.Clear();
 
-            if (fileName != null)
+            if (fileName is not null)
             {
                 var extensionArray = fileName.Split(new[] { "." }, StringSplitOptions.None);
                 var fileTypes = new List<FileType>();
@@ -546,7 +546,7 @@ namespace CDP4Composition.CommonView.ViewModels
                 {
                     var fileType = this.PossibleFileType.FirstOrDefault(x => x.Extension.ToLower().Equals(extensionArray[i].ToLower()));
 
-                    if (fileType == null)
+                    if (fileType is null)
                     {
                         break;
                     }

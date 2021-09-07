@@ -76,6 +76,11 @@ namespace CDP4Composition.CommonView.ViewModels
             this.BehaviorParameter = new ReactiveList<BehavioralParameterRowViewModel>();
             this.BehaviorParameter.ChangeTrackingEnabled = true;
 
+            this.Script = script;
+            this.session = session;
+            this.containerViewModel = containerViewModel;
+            this.Parameters = parameter;
+
             this.BehaviorParameter.AddRange(behavioralParameters
                 .Select(p => new BehavioralParameterRowViewModel(p, session, containerViewModel)));
 
@@ -86,11 +91,6 @@ namespace CDP4Composition.CommonView.ViewModels
             var canExecuteDeleteParameterCommand = this.WhenAnyValue(vm => vm.IsReadOnly, vm => vm.Parameters, vm => vm.SelectedBehaviorParameter, (r, p, s) => !r && p.Any() && s is not null);
             this.DeleteParameterCommand = ReactiveCommand.Create(canExecuteDeleteParameterCommand);
             this.DeleteParameterCommand.Subscribe(_ => this.DeleteParameter());
-
-            this.Script = script;
-            this.session = session;
-            this.containerViewModel = containerViewModel;
-            this.Parameters = parameter;
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <returns>The ok status</returns>
         public bool OkCanExecute()
         {
-            return !string.IsNullOrEmpty(this.Script) && this.BehaviorParameter.All(p => p.IsValid);
+            return !string.IsNullOrWhiteSpace(this.Script) && this.BehaviorParameter.All(p => p.IsValid);
         }
 
         /// <summary>

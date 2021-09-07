@@ -26,6 +26,7 @@
 namespace CDP4CommonView.Views
 {
     using CDP4Common.CommonData;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 

@@ -25,8 +25,6 @@
 
 namespace CDP4Composition.CommonView.ViewModels
 {
-    using System;
-
     using CDP4Common.EngineeringModelData;
 
     using CDP4Dal.Operations;
