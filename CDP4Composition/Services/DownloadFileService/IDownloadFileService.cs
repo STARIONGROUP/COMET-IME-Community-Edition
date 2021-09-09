@@ -52,6 +52,14 @@ namespace CDP4Composition.Services
         Task ExecuteDownloadFile(IDownloadFileViewModel downloadFileViewModel, FileRevision fileRevision);
 
         /// <summary>
+        /// Executes a file download for a <see cref="Attachment"/>
+        /// </summary>
+        /// <param name="downloadFileViewModel">The <see cref="IDownloadFileViewModel"/></param>
+        /// <param name="attachment">The <see cref="Attachment"/></param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        Task ExecuteDownloadFile(IDownloadFileViewModel downloadFileViewModel, Attachment attachment);
+
+        /// <summary>
         /// Cancels a file download
         /// </summary>
         /// <param name="downloadFileViewModel">The <see cref="IDownloadFileViewModel"/></param>

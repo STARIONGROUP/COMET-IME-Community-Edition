@@ -68,7 +68,6 @@ namespace CDP4Composition.CommonView.ViewModels
         /// </remarks>
         public BehaviorDialogViewModel()
         {
-
         }
 
         /// <summary>
@@ -106,9 +105,11 @@ namespace CDP4Composition.CommonView.ViewModels
                         disposable?.Dispose();
                     }
 
-                    this.SelectedBehavioralModelKindViewModel = this.CreateBehavioralModelKindViewModel(this.selectedBehavioralModelKind);
-                })
-            );
+                    this.CreateBehavioralModelKindViewModel(this.selectedBehavioralModelKind);
+                }));
+
+            this.Disposables.Add(
+                this.WhenAnyValue(d => d.SelectedBehavioralModelKindViewModel).Subscribe(_ => this.UpdateOkCanExecute()));
 
             this.BehavioralModelKinds = new ReactiveList<BehavioralModelKind>(Enum.GetValues(typeof(BehavioralModelKind)) as BehavioralModelKind[]);
             this.UpdateProperties();
@@ -141,8 +142,7 @@ namespace CDP4Composition.CommonView.ViewModels
         /// Facrtory method for creating a <see cref="IBehavioralModelKindViewModel"/> of the required type for a <see cref="BehavioralModelKind"/>
         /// </summary>
         /// <param name="behavioralModelKind">The <see cref="BehavioralModelKind"/> for which to create a <see cref="IBehavioralModelKindViewModel"/></param>
-        /// <returns>A <see cref="IBehavioralModelKindViewModel"/></returns>
-        private IBehavioralModelKindViewModel CreateBehavioralModelKindViewModel(BehavioralModelKind behavioralModelKind)
+        private void CreateBehavioralModelKindViewModel(BehavioralModelKind behavioralModelKind)
         {
             switch (behavioralModelKind)
             {
@@ -157,10 +157,14 @@ namespace CDP4Composition.CommonView.ViewModels
 
                         this.Disposables.Add(vm.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
                         this.Disposables.Add(vm.BehaviorParameter.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
+                        
                         this.Disposables.Add(vm.BehaviorParameter.ItemChanged
                                                                  .Where(i => i.PropertyName == nameof(BehavioralParameterRowViewModel.IsValid))
                                                                  .Subscribe(_ => this.UpdateOkCanExecute()));
-                        return vm;
+
+                        this.SelectedBehavioralModelKindViewModel = vm;
+
+                        break;
                     }
                 case BehavioralModelKind.File:
                     {
@@ -170,7 +174,10 @@ namespace CDP4Composition.CommonView.ViewModels
 
                         this.Disposables.Add(vm.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
                         this.Disposables.Add(vm.FileType.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
-                        return vm;
+
+                        this.SelectedBehavioralModelKindViewModel = vm;
+
+                        break;
                     }
                 default:
                     throw new ArgumentException($"Value {behavioralModelKind} is not currently supported.", nameof(behavioralModelKind));
@@ -215,7 +222,7 @@ namespace CDP4Composition.CommonView.ViewModels
             base.UpdateProperties();
             this.Name = this.Thing.Name;
             this.SelectedBehavioralModelKind = this.Thing.BehavioralModelKind;
-            this.SelectedBehavioralModelKindViewModel = this.CreateBehavioralModelKindViewModel(this.Thing.BehavioralModelKind);
+            this.CreateBehavioralModelKindViewModel(this.Thing.BehavioralModelKind);
         }
     }
 }

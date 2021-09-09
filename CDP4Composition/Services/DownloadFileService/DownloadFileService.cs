@@ -112,6 +112,48 @@ namespace CDP4Composition.Services
         }
 
         /// <summary>
+        /// Executes a file download for an <see cref="Attachment"/>
+        /// </summary>
+        /// <param name="downloadFileViewModel">The <see cref="IDownloadFileViewModel"/></param>
+        /// <param name="attachment">The <see cref="Attachment"/></param>
+        /// <returns>An awaitable <see cref="Task"/></returns>
+        public async Task ExecuteDownloadFile(IDownloadFileViewModel downloadFileViewModel, Attachment attachment)
+        {
+            if (attachment != null)
+            {
+                downloadFileViewModel.LoadingMessage = "Downloading";
+                var cancelEnabledInterval = Observable.Interval(TimeSpan.FromMilliseconds(250));
+                var subscription = cancelEnabledInterval.Subscribe(_ => { downloadFileViewModel.IsCancelButtonVisible = downloadFileViewModel.Session.CanCancel(); });
+
+                downloadFileViewModel.IsBusy = true;
+
+                try
+                {
+                    await attachment.DownloadFile(downloadFileViewModel.Session);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is OperationCanceledException || ex.InnerException is TaskCanceledException)
+                    {
+                        this.messageBoxService.Show($"Downloading {attachment.FileName} was cancelled", "Download cancelled", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    }
+                    else
+                    {
+                        Logger.Error(ex, $"Downloading {attachment.FileName} caused an error");
+                        this.messageBoxService.Show($"Downloading {attachment.FileName} caused an error: {ex.Message}", "Download failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                finally
+                {
+                    subscription.Dispose();
+                    downloadFileViewModel.LoadingMessage = "";
+                    downloadFileViewModel.IsCancelButtonVisible = false;
+                    downloadFileViewModel.IsBusy = false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Cancels a file download
         /// </summary>
         /// <param name="downloadFileViewModel">The <see cref="IDownloadFileViewModel"/></param>
