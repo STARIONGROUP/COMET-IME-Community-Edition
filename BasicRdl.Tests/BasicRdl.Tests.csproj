@@ -28,9 +28,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="7.5.2-636-PR203" />
-    <PackageReference Include="CDP4Dal-CE" Version="7.5.2-636-PR203" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.5.2-636-PR203" />
+    <PackageReference Include="CDP4Common-CE" Version="7.5.2-640-PR204" />
+    <PackageReference Include="CDP4Dal-CE" Version="7.5.2-640-PR204" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="7.5.2-640-PR204" />
     <PackageReference Include="CommonServiceLocator" Version="1.3" />
     <PackageReference Include="DotLiquid" Version="2.2.508" />
     <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
