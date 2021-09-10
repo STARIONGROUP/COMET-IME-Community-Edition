@@ -16,8 +16,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="7.5.1-628-PR200" />
-    <PackageReference Include="CDP4Dal-CE" Version="7.5.1-628-PR200" />
+    <PackageReference Include="CDP4Common-CE" Version="7.5.2-640-PR204" />
+    <PackageReference Include="CDP4Dal-CE" Version="7.5.2-640-PR204" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />

@@ -307,7 +307,7 @@ namespace CDP4Composition.Tests.CommonView.ViewModels
             vm.SelectedBehavioralModelKind = BehavioralModelKind.File;
             var attachmentViewModel = (AttachmentViewModel)vm.SelectedBehavioralModelKindViewModel;
 
-            attachmentViewModel.Name = "SomePath";
+            attachmentViewModel.FileName = "SomePath";
             attachmentViewModel.ContentHash = "$$HASH$$";
             attachmentViewModel.LocalPath = this.localPath;
             attachmentViewModel.FileType.Add(new FileType(Guid.NewGuid(), null, null));
@@ -325,7 +325,7 @@ namespace CDP4Composition.Tests.CommonView.ViewModels
             vm.SelectedBehavioralModelKind = BehavioralModelKind.File;
             var attachmentViewModel = (AttachmentViewModel)vm.SelectedBehavioralModelKindViewModel;
 
-            attachmentViewModel.Name = "SomePath";
+            attachmentViewModel.FileName = "SomePath";
             attachmentViewModel.AddFileTypeCommand.Execute(null);
 
             Assert.That(attachmentViewModel.FileType, Is.EquivalentTo(new[] { this.fileType1 }));
@@ -346,7 +346,7 @@ namespace CDP4Composition.Tests.CommonView.ViewModels
 
             attachmentViewModel.AddFileCommand.Execute(null);
 
-            Assert.That(attachmentViewModel.Name, Is.EqualTo("attachment"));
+            Assert.That(attachmentViewModel.FileName, Is.EqualTo("attachment"));
             Assert.That(attachmentViewModel.LocalPath, Is.EqualTo(this.localPath));
         }
 

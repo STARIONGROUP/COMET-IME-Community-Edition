@@ -26,6 +26,7 @@
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Threading.Tasks;
@@ -45,26 +46,17 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// <summary>
         /// Gets the label text
         /// </summary>
-        public override string Text
-        {
-            get { return "Requirement"; }
-        }
+        public override string Text => "Requirement";
 
         /// <summary>
         /// Gets the group sort order.Lower number = higher in the group.
         /// </summary>
-        public override int GroupSortOrder
-        {
-            get { return 2000; }
-        }
+        public override int GroupSortOrder => 2000;
 
         /// <summary>
         /// Gets the button Icon string
         /// </summary>
-        public override string Image
-        {
-            get { return "Customization_16x16.png"; }
-        }
+        public override string Image => "Customization_16x16.png";
 
         /// <summary>
         /// Handle mouse move when dropping
@@ -74,8 +66,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// <returns>The callback to be invoked after drop has been handled</returns>
         public override async Task<Thing> HandleMouseDrop(IDropInfo dropInfo, Action<Thing> createCallback = null)
         {
-            var contextMenuItems = this.editorViewModel.Thing.GetContainerOfType<Iteration>().RequirementsSpecification
-                                                             .Select(s => new ContextMenuItemViewModel(s.Name, string.Empty, t => this.MenuItemCommand(t, createCallback), s, true));
+            var contextMenuItems = this.GetContextMenuItems(createCallback);
 
             this.editorViewModel.ShowDropContextMenuOptions(contextMenuItems);
 
@@ -83,7 +74,45 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         }
 
         /// <summary>
-        /// Method to be invoked when a manu item is selected by the user.
+        /// Create a new RequirementSpecification, followed by the creation of a Requirement
+        /// </summary>
+        /// <param name="createCallback">Callback operation which creates the content</param>
+        private void CreateRequirementsSpecification(Action<Thing> createCallback)
+        {
+            var requirementsSpecification = this.editorViewModel.Create<RequirementsSpecification>(this);
+
+            if (requirementsSpecification != null)
+            {
+                this.MenuItemCommand(requirementsSpecification, createCallback);
+            }
+        }
+
+        /// <summary>
+        /// Gets all necessary ContextMenu items
+        /// </summary>
+        /// <param name="createCallback">Callback operation which creates the content</param>
+        /// <returns>A <see cref="List{T}"/> of type <see cref="ContextMenuItemViewModel"/></returns>
+        private List<ContextMenuItemViewModel> GetContextMenuItems(Action<Thing> createCallback)
+        {
+            var contextMenuItems = this.editorViewModel.Thing.GetContainerOfType<Iteration>().RequirementsSpecification
+                .Where(x => !x.IsDeprecated)
+                .Select(s =>
+                    new ContextMenuItemViewModel(s.Name, string.Empty, t => this.MenuItemCommand(t, createCallback), s, true))
+                .ToList();
+
+            contextMenuItems.Insert(0,
+                new ContextMenuItemViewModel(
+                    "[Create new RequirementsSpecification]",
+                    string.Empty,
+                    _ => this.CreateRequirementsSpecification(createCallback),
+                    true
+                ));
+
+            return contextMenuItems;
+        }
+
+        /// <summary>
+        /// Method to be invoked when a menu item is selected by the user.
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> associated with the menu item</param>
         /// <param name="createCallback">The callback to be invoked when a requirement has been specified</param>
@@ -96,7 +125,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
 
             var requirement = this.editorViewModel.Create<Requirement>(this, thing);
 
-            if(requirement is null)
+            if (requirement is null)
             {
                 return;
             }

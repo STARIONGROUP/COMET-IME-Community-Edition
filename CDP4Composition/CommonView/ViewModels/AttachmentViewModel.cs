@@ -29,8 +29,8 @@ namespace CDP4Composition.CommonView.ViewModels
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -38,6 +38,7 @@ namespace CDP4Composition.CommonView.ViewModels
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
@@ -46,30 +47,37 @@ namespace CDP4Composition.CommonView.ViewModels
 
     using ReactiveUI;
 
+    using CDP4Composition.Views;
+
     /// <summary>
     /// A view model that represents an <see cref="Attachment"/>
     /// </summary>
-    public class AttachmentViewModel : ViewModelBase<Attachment>, IBehavioralModelKindViewModel
+    public class AttachmentViewModel : ViewModelBase<Attachment>, IBehavioralModelKindViewModel, IDownloadFileViewModel
     {
+        /// <summary>
+        /// The (injected) <see cref="IDownloadFileService"/>
+        /// </summary>
+        private readonly IDownloadFileService downloadFileService = ServiceLocator.Current.GetInstance<IDownloadFileService>();
+
+        /// <summary>
+        /// Backing field for <see cref="IsCancelButtonVisible"/>
+        /// </summary>
+        private bool isCancelButtonVisible;
+
+        /// <summary>
+        /// Backing field for <see cref="LoadingMessage"/>
+        /// </summary>
+        private string loadingMessage;
+
         /// <summary>
         /// Backing field for <see cref="ContentHash"/>
         /// </summary>
         private string contentHash;
 
         /// <summary>
-        /// Backing field for <see cref="Name"/>
+        /// Backing field for <see cref="FileName"/>
         /// </summary>
-        private string name;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AttachmentViewModel"/> class.
-        /// </summary>
-        /// <remarks>
-        /// The default constructor is required by MEF
-        /// </remarks>
-        public AttachmentViewModel()
-        {
-        }
+        private string fileName;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AttachmentViewModel"/> class
@@ -81,11 +89,8 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <param name="session">
         /// The <see cref="ISession"/> in which the current <see cref="Thing"/> is to be added or updated
         /// </param>
-        /// <param name="container">
-        /// The <see cref="Thing"/> that contains the created <see cref="Thing"/> in this Dialog
-        /// </param>
-        /// <param name="chainOfContainers">
-        /// The optional chain of containers that contains the <paramref name="container"/> argument
+        /// <param name="chainOfContainer">
+        /// The optional chain of containers
         /// </param>
         /// <param name="dialogKind">
         /// The kind of operation this <see cref="DialogViewModelBase{T}"/> performs
@@ -98,21 +103,20 @@ namespace CDP4Composition.CommonView.ViewModels
 
             this.Initialize();
             this.InitializeCommands();
+
             this.UpdateProperties();
 
-            this.Disposables.Add(this.WhenAnyValue(x => x.Name, x => x.ContentHash).Subscribe(_ => this.UpdatePath()));
+            this.Disposables.Add(this.WhenAnyValue(x => x.FileName).Subscribe(_ => this.UpdatePath()));
 
-            this.Disposables.Add
-            (
-                this.WhenAnyValue(x => x.SelectedFileType, x => x.FileType).Subscribe(_ =>
-                {
-                    this.CanDeleteFileType = !this.IsReadOnly && this.SelectedFileType is not null;
-                    this.AfterUpdateFileType();
-                })
-            );
+            this.Disposables.Add(
+                this.WhenAnyValue(x => x.SelectedFileType, x => x.FileType).Subscribe(
+                    _ =>
+                    {
+                        this.CanDeleteFileType = !this.IsReadOnly && this.SelectedFileType is not null;
+                        this.AfterUpdateFileType();
+                    }));
 
             this.Disposables.Add(this.FileType.Changed.Subscribe(_ => this.AfterUpdateFileType()));
-            this.Disposables.Add(this.WhenAnyValue(x => x.LocalPath).Subscribe(_ => this.SetContentHash()));
         }
 
         /// <summary>
@@ -120,8 +124,26 @@ namespace CDP4Composition.CommonView.ViewModels
         /// </summary>
         public string ContentHash
         {
-            get { return this.contentHash; }
-            set { this.RaiseAndSetIfChanged(ref this.contentHash, value); }
+            get => this.contentHash;
+            set => this.RaiseAndSetIfChanged(ref this.contentHash, value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the Cancel button is visible on the <see cref="LoadingControl"/>
+        /// </summary>
+        public bool IsCancelButtonVisible
+        {
+            get => this.isCancelButtonVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isCancelButtonVisible, value);
+        }
+
+        /// <summary>
+        /// Gets a value the message text on the <see cref="LoadingControl"/>
+        /// </summary>
+        public string LoadingMessage
+        {
+            get => this.loadingMessage;
+            set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
         }
 
         /// <summary>
@@ -134,8 +156,8 @@ namespace CDP4Composition.CommonView.ViewModels
         /// </summary>
         public ReactiveList<FileType> FileType
         {
-            get { return this.fileType; }
-            set { this.RaiseAndSetIfChanged(ref this.fileType, value); }
+            get => this.fileType;
+            set => this.RaiseAndSetIfChanged(ref this.fileType, value);
         }
 
         /// <summary>
@@ -148,6 +170,13 @@ namespace CDP4Composition.CommonView.ViewModels
         /// </summary>
         protected void InitializeCommands()
         {
+            this.DownloadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDownloadFile));
+            this.Disposables.Add(this.DownloadFileCommand.Subscribe(_ => 
+                this.downloadFileService.ExecuteDownloadFile(this, this.Thing)));
+
+            this.CancelDownloadCommand = ReactiveCommand.Create();
+            this.Disposables.Add(this.CancelDownloadCommand.Subscribe(_ => this.downloadFileService.CancelDownloadFile(this)));
+
             this.AddFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanAddFile));
             this.Disposables.Add(this.AddFileCommand.Subscribe(_ => this.AddFile()));
 
@@ -167,36 +196,36 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <summary>
         /// Update the transaction with the Thing represented by this Dialog
         /// </summary>
-        private void UpdateThing()
+        private void UpdateThing(Attachment thing)
         {
-            var clone = this.Thing;
-            clone.ContentHash = this.ContentHash;
-            clone.LocalPath = this.LocalPath;
-            clone.FileName = this.Name;
+            thing.ContentHash = this.ContentHash;
+            thing.LocalPath = this.LocalPath;
+            thing.FileName = this.FileName;
 
-            if (!clone.FileType.SequenceEqual(this.FileType))
+            if (!thing.FileType.SequenceEqual(this.FileType))
             {
                 var fileTypeCount = this.FileType.Count;
+
                 for (var i = 0; i < fileTypeCount; i++)
                 {
                     var item = this.FileType[i];
-                    var currentIndex = clone.FileType.IndexOf(item);
+                    var currentIndex = thing.FileType.IndexOf(item);
 
                     if (currentIndex != -1 && currentIndex != i)
                     {
-                        clone.FileType[i] = item;
+                        thing.FileType[i] = item;
                     }
                     else if (currentIndex == -1)
                     {
-                        clone.FileType.Insert(i, item);
+                        thing.FileType.Insert(i, item);
                     }
                 }
 
                 // remove items that are no longer referenced
-                for (var i = fileTypeCount; i < clone.FileType.Count; i++)
+                for (var i = fileTypeCount; i < thing.FileType.Count; i++)
                 {
-                    var toRemove = clone.FileType[i];
-                    clone.FileType.Remove(toRemove);
+                    var toRemove = thing.FileType[i];
+                    thing.FileType.Remove(toRemove);
                 }
             }
         }
@@ -212,6 +241,8 @@ namespace CDP4Composition.CommonView.ViewModels
 
             this.CanAddFile = !this.IsReadOnly;
             this.CanAddFileType = !this.IsReadOnly;
+
+            this.CanDownloadFile = (this.Thing != null) && (this.dialogKind != ThingDialogKind.Create) && this.PermissionService.CanRead(this.Thing);
         }
 
         /// <summary>
@@ -220,9 +251,9 @@ namespace CDP4Composition.CommonView.ViewModels
         protected void UpdateProperties()
         {
             this.ContentHash = this.Thing.ContentHash;
-            this.Name = this.Thing.FileName;
+            this.FileName = this.Thing.FileName;
+            this.Path = this.Thing.Path;
 
-            this.localPath = this.Thing.LocalPath;
             this.PopulateFileType();
         }
 
@@ -294,10 +325,10 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <summary>
         /// Gets or sets the Name
         /// </summary>
-        public string Name
+        public string FileName
         {
-            get => this.name;
-            set => this.RaiseAndSetIfChanged(ref this.name, value);
+            get => this.fileName;
+            set => this.RaiseAndSetIfChanged(ref this.fileName, value);
         }
 
         /// <summary>
@@ -306,8 +337,9 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <returns>An awaitable <see cref="Task"/></returns>
         private void SetContentHash()
         {
-            this.ContentHash = null;
-            this.ContentHash = this.CalculateContentHash(this.localPath);
+            this.ContentHash = this.localPath == null
+                ? this.Thing.ContentHash
+                : this.CalculateContentHash(this.localPath);
         }
 
         /// <summary>
@@ -437,29 +469,10 @@ namespace CDP4Composition.CommonView.ViewModels
         private void UpdatePath()
         {
             var clone = this.Thing.Clone(false);
-            clone.FileName = this.GetFileName();
+            clone.FileName = this.FileName;
             clone.FileType.Clear();
             clone.FileType.AddRange(this.FileType);
-            this.Path = clone.FileName;
-        }
-
-        /// <summary>
-        /// Gets the file name including extensions
-        /// </summary>
-        /// <returns></returns>
-        private string GetFileName()
-        {
-            var path = new StringBuilder();
-
-            path.Append(this.Name);
-
-            foreach (var fileType in this.FileType.Where(x => !string.IsNullOrWhiteSpace(x.Extension)))
-            {
-                path.Append(".");
-                path.Append(fileType.Extension);
-            }
-
-            return path.ToString();
+            this.Path = clone.Path;
         }
 
         /// <summary>
@@ -558,7 +571,9 @@ namespace CDP4Composition.CommonView.ViewModels
                 this.FileType.AddRange(fileTypes);
             }
 
-            this.Name = fileName;
+            this.FileName = fileName;
+
+            this.SetContentHash();
         }
 
         /// <summary>
@@ -595,13 +610,13 @@ namespace CDP4Composition.CommonView.ViewModels
         }
 
         /// <summary>
-        /// Calculate the Hash of the contents of some filecontent
+        /// Calculate the Hash of the contents of some file content
         /// </summary>
-        /// <param name="fileContent"></param>
+        /// <param name="filePath">The path to the physical file</param>
         /// <returns>The <see cref="string"/> hash of the file</returns>
         private string CalculateContentHash(string filePath)
         {
-            if (filePath is null)
+            if (filePath == null)
             {
                 return null;
             }
@@ -618,10 +633,9 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <returns>The ok status</returns>
         public bool OkCanExecute()
         {
-            return !string.IsNullOrWhiteSpace(this.Name)
+            return !string.IsNullOrWhiteSpace(this.FileName)
                    && this.FileType.Any()
-                   && this.ContentHash is not null
-                   && this.LocalPath is not null;
+                   && this.ContentHash is not null;
         }
 
         /// <summary>
@@ -629,12 +643,20 @@ namespace CDP4Composition.CommonView.ViewModels
         /// </summary>
         /// <param name="transaction">The transaction for the <see cref="Thing"/></param>
         /// <param name="clone">The <see cref="Behavior"/> for which to update the <see cref="IThingTransaction"/></param>
-        public void UpdateTransaction(IThingTransaction transaction, Behavior thing)
+        public void UpdateTransaction(IThingTransaction transaction, Behavior clone)
         {
-            thing.Script = null;
-            this.UpdateThing();
-            transaction.CreateOrUpdate(this.Thing);
-            thing.Attachment.Add(this.Thing);
+            clone.Script = null;
+
+            if (this.Thing.ContentHash != this.ContentHash
+                || this.Thing.FileName != this.FileName
+                || !this.Thing.FileType.SequenceEqual(this.FileType))
+            {
+                var newThing = new Attachment();
+                this.UpdateThing(newThing);
+                transaction.CreateOrUpdate(newThing);
+                clone.Attachment.Clear();
+                clone.Attachment.Add(newThing);
+            }
         }
     }
 }
