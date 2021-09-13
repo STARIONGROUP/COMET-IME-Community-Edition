@@ -59,7 +59,7 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Create appropriate connector
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A <see cref="DiagramConnector"/></returns>
         protected override DiagramConnector CreateConnector()
         {
             if (this.ActiveTool is IConnectorTool tool)
