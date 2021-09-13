@@ -46,7 +46,6 @@
     <Compile Include="CDP4LogInfoPlugin.wxs" />
     <Compile Include="CDP4ObjectBrowserPlugin.wxs" />
     <Compile Include="CDP4PropertyGridPlugin.wxs" />
-    <Compile Include="CDP4RelationshipEditor.wxs" />
     <Compile Include="CDP4RelationshipMatrix.wxs" />
     <Compile Include="CDP4Scripting.wxs" />
     <Compile Include="CDP4SiteDirectoryPlugin.wxs" />
