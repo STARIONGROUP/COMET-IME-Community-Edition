@@ -13,7 +13,6 @@
     <assembly path="CDP4OfficeInfrastructure.Tests/bin/Debug/net48/CDP4OfficeInfrastructure.Tests.dll" />
     <assembly path="CDP4ParameterSheetGenerator.Tests/bin/Debug/net48/CDP4ParameterSheetGenerator.Tests.dll" />
     <assembly path="CDP4PropertyGrid.Tests/bin/Debug/net48/CDP4PropertyGrid.Tests.dll" />
-    <assembly path="CDP4RelationshipEditor.Tests/bin/Debug/net48/CDP4RelationshipEditor.Tests.dll" />
     <assembly path="CDP4Scripting.Tests/bin/Debug/net48/CDP4Scripting.Tests.dll" />
     <assembly path="CDP4ShellDialogsTestFixture/bin/Debug/net48/CDP4ShellDialogs.Tests.dll" />
     <assembly path="CDP4SiteDirectory.Tests/bin/Debug/net48/CDP4SiteDirectory.Tests.dll" />
@@ -43,7 +42,6 @@
     <assembly path="CDP4OfficeInfrastructure.Tests/bin/Release/net48/CDP4OfficeInfrastructure.Tests.dll" />
     <assembly path="CDP4ParameterSheetGenerator.Tests/bin/Release/net48/CDP4ParameterSheetGenerator.Tests.dll" />
     <assembly path="CDP4PropertyGrid.Tests/bin/Release/net48/CDP4PropertyGrid.Tests.dll" />
-    <assembly path="CDP4RelationshipEditor.Tests/bin/Release/net48/CDP4RelationshipEditor.Tests.dll" />
     <assembly path="CDP4Scripting.Tests/bin/Release/net48/CDP4Scripting.Tests.dll" />
     <assembly path="CDP4ShellDialogsTestFixture/bin/Release/net48/CDP4ShellDialogs.Tests.dll" />
     <assembly path="CDP4SiteDirectory.Tests/bin/Release/net48/CDP4SiteDirectory.Tests.dll" />
