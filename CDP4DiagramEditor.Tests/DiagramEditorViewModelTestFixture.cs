@@ -40,7 +40,7 @@ namespace CDP4DiagramEditor.Tests
     using CDP4Common.Types;
 
     using CDP4CommonView.Diagram;
-
+    using CDP4Composition.Diagram;
     using CDP4Composition.Mvvm.Behaviours;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -116,7 +116,7 @@ namespace CDP4DiagramEditor.Tests
             this.assembler = new Assembler(this.uri);
             this.permissionService = new Mock<IPermissionService>();
             this.mockExtendedDiagramBehavior = new Mock<IExtendedDiagramOrgChartBehavior>();
-            this.mockDiagramBehavior = new Mock<ICdp4DiagramOrgChartBehavior>(MockBehavior.Strict);
+            this.mockDiagramBehavior = new Mock<ICdp4DiagramOrgChartBehavior>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -258,7 +258,6 @@ namespace CDP4DiagramEditor.Tests
             Assert.AreEqual($"{this.diagram.Name} <<{this.diagram.GetType().Name}>>", viewModel.Caption);
             Assert.That(viewModel.ToolTip, Is.Not.Null.Or.Empty);
             Assert.IsNotEmpty(viewModel.ThingDiagramItems);
-            Assert.IsNotEmpty(viewModel.DiagramConnectorCollection);
             Assert.IsFalse(viewModel.CanCreateDiagram);
             viewModel.Dispose();
         }
@@ -332,7 +331,7 @@ namespace CDP4DiagramEditor.Tests
 
             viewModel.SaveDiagramCommand.Execute(null);
             this.cache.TryAdd(new CacheKey(this.diagram.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.diagram));
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => op.Operations.Count() == 5)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => op.Operations.Count() == 6)));
             viewModel.Dispose();
         }
         
@@ -367,8 +366,7 @@ namespace CDP4DiagramEditor.Tests
             viewModel.SelectedItems.Add(contentItem);
 
             viewModel.ExecuteGenerateDiagramCommand(false);
-            Assert.AreEqual(2, viewModel.ThingDiagramItems.Count);
-            Assert.AreEqual(2, viewModel.DiagramConnectorCollection.Count);
+            Assert.AreEqual(4, viewModel.ThingDiagramItems.Count);
             viewModel.Dispose();
         }
 
@@ -403,8 +401,7 @@ namespace CDP4DiagramEditor.Tests
             viewModel.SelectedItems.Add(contentItem);
 
             viewModel.ExecuteGenerateDiagramCommand(true);
-            Assert.AreEqual(3, viewModel.ThingDiagramItems.Count);
-            Assert.AreEqual(3, viewModel.DiagramConnectorCollection.Count);
+            Assert.AreEqual(6, viewModel.ThingDiagramItems.Count);
             viewModel.Dispose();
         }
 
@@ -474,7 +471,7 @@ namespace CDP4DiagramEditor.Tests
             };
             viewModel.UpdateProperties();
             viewModel.ComputeDiagramConnector();
-            Assert.IsNotEmpty(viewModel.DiagramConnectorCollection);
+            Assert.IsNotEmpty(viewModel.ThingDiagramItems);
             viewModel.Dispose();
         }
 
@@ -495,12 +492,12 @@ namespace CDP4DiagramEditor.Tests
             };
             viewModel.UpdateProperties();
             viewModel.ComputeDiagramConnector();
-            Assert.IsEmpty(viewModel.DiagramConnectorCollection);
+            Assert.IsEmpty(viewModel.ThingDiagramItems.OfType<ThingDiagramConnector>());
             var drop = new Mock<IDiagramDropInfo>();
             drop.Setup(x => x.Payload).Returns(this.diagramObject2.DepictedThing);
             drop.Setup(x => x.DiagramDropPoint).Returns(new Point(1, 1));
             await viewModel.Drop(drop.Object);
-            Assert.IsNotEmpty(viewModel.DiagramConnectorCollection);
+            Assert.IsNotEmpty(viewModel.ThingDiagramItems.OfType<ThingDiagramConnector>());
             viewModel.Dispose();
         }
     }

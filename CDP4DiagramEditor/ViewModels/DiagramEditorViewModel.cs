@@ -328,28 +328,8 @@ namespace CDP4DiagramEditor.ViewModels
 
                 this.ThingDiagramItems.Add(newDiagramElement);
             }
-        }
 
-        /// <summary>
-        /// Redraws the connectors of a specified item.
-        /// </summary>
-        /// <param name="contentItem">The content item.</param>
-        public void RedrawConnectors(ThingDiagramContentItem contentItem)
-        {
-            var depictedThing = contentItem.DiagramThing;
-
-            // cleanup existing and redraw them.
-            var existingConnectors = this.ThingDiagramItems.OfType<ThingDiagramConnector>().Where(x => ((DiagramEdge)x.DiagramThing).Source.DepictedThing.Iid.Equals(depictedThing.DepictedThing.Iid) ||
-                                                                                                       ((DiagramEdge)x.DiagramThing).Target.DepictedThing.Iid.Equals(depictedThing.DepictedThing.Iid)).ToList();
-
-
-            foreach (var diagramEdgeViewModel in existingConnectors)
-            {
-                this.ThingDiagramItems.RemoveAndDispose(diagramEdgeViewModel);
-            }
-
-            // simply readd them
-            this.ThingDiagramItems.AddRange(existingConnectors);
+            this.UpdateIsDirty();
         }
 
         /// <summary>
@@ -421,15 +401,14 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public void UpdateIsDirty()
         {
-            var currentObject = this.Thing.DiagramElement.OfType<DiagramObject>().ToArray();
-            var displayedObjects = this.ThingDiagramItems.Select(x => (x as NamedThingDiagramContentItem)?.DiagramThing).ToArray();
+            var currentObjects = this.Thing.DiagramElement.OfType<DiagramObject>().ToArray();
+            var displayedObjects = this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.DiagramThing).ToArray();
+
+            var removedItem = currentObjects.Except(displayedObjects).Count();
+            var addedItem = displayedObjects.Except(currentObjects).Count();
 
             var currentEdges = this.Thing.DiagramElement.OfType<DiagramEdge>().ToArray();
-
             var displayedEdges = this.ThingDiagramItems.OfType<ThingDiagramConnector>().Select(x => x.DiagramThing).ToArray();
-
-            var removedItem = currentObject.Except(displayedObjects).Count();
-            var addedItem = displayedObjects.Except(currentObject).Count();
 
             var removedEdges = currentEdges.Except(displayedEdges).Count();
             var addedEdges = displayedEdges.Except(currentEdges).Count();
@@ -581,7 +560,6 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.ComputeDiagramConnector(diagramItem);
 
-            this.IsDirty = true;
             this.UpdateIsDirty();
         }
 
@@ -1099,7 +1077,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="target">The <see cref="DiagramObject" /> target</param>
         private void CreateDiagramConnector(Thing thing, DiagramObject source, DiagramObject target)
         {
-            var connectorItem = this.ThingDiagramItems.OfType<ThingDiagramConnector>().SingleOrDefault(x => ((DiagramEdge)x.Thing)?.DepictedThing == thing);
+            var connectorItem = this.ThingDiagramItems.OfType<ThingDiagramConnector>().SingleOrDefault(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == thing);
             
             if (connectorItem != null)
             {
@@ -1166,7 +1144,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             foreach (var binaryRelationship in relationships)
             {
-                if (this.ThingDiagramItems.OfType<ThingDiagramConnector>().Any(x => ((DiagramEdge)x.Thing)?.DepictedThing == binaryRelationship))
+                if (this.ThingDiagramItems.OfType<ThingDiagramConnector>().Any(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == binaryRelationship))
                 {
                     continue;
                 }
@@ -1240,11 +1218,6 @@ namespace CDP4DiagramEditor.ViewModels
             foreach (var diagramObjectViewModel in this.ThingDiagramItems)
             {
                 diagramObjectViewModel.UpdateTransaction(transaction, clone);
-            }
-
-            foreach (var diagramEdgeViewModel in this.ThingDiagramItems.OfType<ThingDiagramConnector>())
-            {
-                diagramEdgeViewModel.UpdateTransaction(transaction, clone);
             }
 
             await this.DalWrite(transaction);

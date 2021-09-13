@@ -535,8 +535,6 @@ namespace CDP4CommonView.Diagram
 
                 this.ItemPositions[namedThingDiagramContentItem.Content] = content.NewDiagramPosition;
                 namedThingDiagramContentItem.Position = content.NewDiagramPosition;
-
-                this.ViewModel.RedrawConnectors((ThingDiagramContentItem)namedThingDiagramContentItem.Content);
             }
         }
 
@@ -661,9 +659,6 @@ namespace CDP4CommonView.Diagram
         {
             if (sender is DiagramDesignerControl && this.mergeCategory != null)
             {
-                (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.ThingDiagramItems.ClearAndDispose();
-                (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.DiagramPortCollection.ClearAndDispose();
-
                 // clean up merged category
                 this.ClearCategory();
             }
@@ -684,7 +679,7 @@ namespace CDP4CommonView.Diagram
 
             if (!this.hasFirstLoadHappened)
             {
-                (this.AssociatedObject.DataContext as ICdp4DiagramContainer)?.ComputeDiagramConnector();
+                this.ViewModel?.ComputeDiagramConnector();
                 this.hasFirstLoadHappened = true;
             }
         }

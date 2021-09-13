@@ -59,11 +59,5 @@ namespace CDP4CommonView.Diagram
         /// Computes the diagram connector.
         /// </summary>
         void ComputeDiagramConnector();
-
-        /// <summary>
-        /// Redraws connectors of a specified content item.
-        /// </summary>
-        /// <param name="contentItem">The content item.</param>
-        void RedrawConnectors(ThingDiagramContentItem contentItem);
     }
 }

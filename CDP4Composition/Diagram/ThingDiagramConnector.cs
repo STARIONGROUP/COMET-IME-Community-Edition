@@ -40,7 +40,6 @@ namespace CDP4Composition.Diagram
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
-    using DevExpress.Diagram.Core.Native;
     using DevExpress.Xpf.Diagram;
 
     using NLog;
