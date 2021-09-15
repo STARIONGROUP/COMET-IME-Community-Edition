@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDiagramConnectorViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IConnectorTool.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,56 +23,29 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4CommonView.Diagram
+namespace CDP4Composition.Diagram
 {
-    using System;
-    using System.Collections.Generic;
+    using System.Threading.Tasks;
 
-    using CDP4Common.CommonData;
-    using CDP4Common.DiagramData;
+    using CDP4CommonView.Diagram;
 
-    using CDP4Composition.Diagram;
-
-    using Point = System.Windows.Point;
+    using DevExpress.Diagram.Core;
 
     /// <summary>
-    /// The interface that shall be realized by view-models representing a <see cref="DiagramEdge" />
+    /// Interface for all connector tools
     /// </summary>
-    public interface IDiagramConnectorViewModel
+    public interface IConnectorTool
     {
         /// <summary>
-        /// Gets the connection points for the represented <see cref="DiagramEdge" />
+        /// Gets the type of connector to be created
         /// </summary>
-        List<Point> ConnectingPoints { get; }
+        IDiagramConnector GetConnector { get; }
 
         /// <summary>
-        /// Gets the source of the <see cref="DiagramEdge" />
+        /// Executes the creation of the objects conveyed by the tool
         /// </summary>
-        DiagramElementThing Source { get; set; }
-
-        /// <summary>
-        /// Gets the target of the <see cref="DiagramEdge" />
-        /// </summary>
-        DiagramElementThing Target { get; set; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        string DisplayedText { get; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        Thing Thing { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the diagram editor is dirty
-        /// </summary>
-        bool IsDirty { get; }
-
-        /// <summary>
-        /// Get the creator connector tool
-        /// </summary>
-        IConnectorTool Tool { get; }
+        /// <param name="connector">The temporary connector</param>
+        /// <param name="behavior">The behavior</param>
+        Task ExecuteCreate(IDrawnConnector connector, ICdp4DiagramOrgChartBehavior behavior);
     }
 }

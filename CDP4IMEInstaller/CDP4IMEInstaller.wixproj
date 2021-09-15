@@ -46,7 +46,6 @@
     <Compile Include="CDP4LogInfoPlugin.wxs" />
     <Compile Include="CDP4ObjectBrowserPlugin.wxs" />
     <Compile Include="CDP4PropertyGridPlugin.wxs" />
-    <Compile Include="CDP4RelationshipEditor.wxs" />
     <Compile Include="CDP4RelationshipMatrix.wxs" />
     <Compile Include="CDP4Scripting.wxs" />
     <Compile Include="CDP4SiteDirectoryPlugin.wxs" />
@@ -242,14 +241,6 @@
     <ProjectReference Include="..\CDP4ReferenceDataMapper\CDP4ReferenceDataMapper.csproj">
       <Name>CDP4ReferenceDataMapper</Name>
       <Project>{fc0997a4-f981-4002-9bdc-bc2ffa6df552}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\CDP4RelationshipEditor\CDP4RelationshipEditor.csproj">
-      <Name>CDP4RelationshipEditor</Name>
-      <Project>{e8bef8ce-68cb-4ab7-93c9-70679b9b4d83}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>

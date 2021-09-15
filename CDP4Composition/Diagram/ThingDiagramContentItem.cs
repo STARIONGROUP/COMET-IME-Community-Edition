@@ -52,7 +52,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents a diagram content control class that can store a <see cref="Thing"/>.
     /// </summary>
-    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject, IDisposable, IIDropTarget
+    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject, IIDropTarget
     {
         /// <summary> 
         /// <see cref="ReactiveUI.PropertyChangingEventHandler"/> event
@@ -98,7 +98,7 @@ namespace CDP4Composition.Diagram
         /// The diagramThing contained</param>
         /// <param name="containerViewModel">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        protected ThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel containerViewModel)
+        protected ThingDiagramContentItem(DiagramElementThing diagramThing, IDiagramEditorViewModel containerViewModel)
         {
             this.containerViewModel = containerViewModel;
             this.Thing = diagramThing.DepictedThing;
@@ -140,7 +140,7 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Gets or sets the <see cref="CDP4Common.CommonData.Thing"/> representing the diagram with all of its diagram elements
         /// </summary>
-        public DiagramObject DiagramThing { get; set; }
+        public DiagramElementThing DiagramThing { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the diagram editor is dirty
@@ -236,26 +236,33 @@ namespace CDP4Composition.Diagram
 
             if (this.Thing.Iid == Guid.Empty)
             {
-                var bound = this.DiagramThing.Bounds.Single();
-                this.UpdateBound(bound);
+                if (!(this.DiagramThing is DiagramEdge))
+                {
+                    var bound = this.DiagramThing.Bounds.Single();
+                    this.UpdateBound(bound);
+                    transaction.Create(bound);
+                }
 
                 container.DiagramElement.Add(this.DiagramThing);
-                transaction.Create(bound);
                 transaction.Create(this.Thing);
             }
             else
             {
                 var clone = this.DiagramThing.Clone(true);
-                var bound = clone.Bounds.SingleOrDefault();
 
-                if (bound != null)
+                if (!(this.DiagramThing is DiagramEdge))
                 {
-                    this.UpdateBound(bound);
+                    var bound = clone.Bounds.SingleOrDefault();
+                    if (bound != null)
+                    {
+                        this.UpdateBound(bound);
+                    }
+
+                    transaction.CreateOrUpdate(bound);
                 }
 
                 container.DiagramElement.Add(clone);
                 transaction.CreateOrUpdate(clone);
-                transaction.CreateOrUpdate(bound);
             }
         }
 

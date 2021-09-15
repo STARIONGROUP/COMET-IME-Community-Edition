@@ -27,16 +27,37 @@
 
 namespace CDP4Composition.Diagram
 {
+    using System;
+
     using CDP4Common.CommonData;
+    using CDP4Common.DiagramData;
+    using CDP4Dal.Operations;
 
     /// <summary>
     /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
     /// </summary>
-    public interface IThingDiagramItem
+    public interface IThingDiagramItem : IDisposable
     {
         /// <summary>
         /// Gets or sets the <see cref="Thing"/>.
         /// </summary>
         Thing Thing { get; set; }
+
+        /// <summary>
+        /// Gets the value indicating whether the item is dirty
+        /// </summary>
+        bool IsDirty { get; }
+
+        /// <summary>
+        /// The diagram thing
+        /// </summary>
+        DiagramElementThing DiagramThing { get; set; }
+
+        /// <summary>
+        /// Update the transaction with the data contained in this view-model
+        /// </summary>
+        /// <param name="transaction">The transaction to update</param>
+        /// <param name="container">The container</param>
+        void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container);
     }
 }

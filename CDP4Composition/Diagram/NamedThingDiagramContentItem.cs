@@ -79,7 +79,7 @@ namespace CDP4Composition.Diagram
         /// The diagramThing contained</param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public NamedThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel container) 
+        public NamedThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel container)
             : base(diagramThing, container)
         {
             this.UpdateProperties();

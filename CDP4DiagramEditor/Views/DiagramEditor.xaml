@@ -93,7 +93,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-
+            
             <DataTemplate DataType="{x:Type mvvm:ContextMenuItemViewModel}">
                 <ContentControl>
                     <dxb:BarButtonItem Command="{Binding MenuCommand}"
@@ -224,6 +224,13 @@
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                Margin="10,0,10,10" />
+                    <TextBlock Text="{Binding Categories}"
+                               FontSize="12"
+                               HorizontalAlignment="Center"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"
+                               Margin="10,0,10,10" />
                     <TextBlock Text="{Binding FullName}"
                                TextAlignment="Center"
                                FontWeight="Bold"
@@ -234,54 +241,7 @@
                                FontStyle="Italic"
                                FontSize="11"
                                Margin="10,0,10,10" />
-                    <dxlc:LayoutGroup Header="Categories"
-                                      View="GroupBox"
-                                      HorizontalAlignment="Stretch"
-                                      VerticalAlignment="Stretch"
-                                      IsCollapsible="True"
-                                      IsCollapsed="True"
-                                      Orientation="Vertical"
-                                      ScrollBars="Auto"
-                                      GroupBoxDisplayMode="Light"
-                                      Margin="3,0,3,0">
-                        <dxlc:LayoutGroup.Resources>
-                            <Style TargetType="dxlc:GroupBox">
-                                <Setter Property="BorderThickness"
-                                        Value="0, 0.2,0,0" />
-                            </Style>
-                        </dxlc:LayoutGroup.Resources>
-                        <dxlc:LayoutGroup.HeaderTemplate>
-                            <DataTemplate>
-                                <Grid HorizontalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding}"
-                                                   FontStyle="Italic" />
-                                    </StackPanel>
-                                </Grid>
-                            </DataTemplate>
-                        </dxlc:LayoutGroup.HeaderTemplate>
-                        <ItemsControl ItemsSource="{Binding DiagramContentItemChildren}"
-                                      HorizontalContentAlignment="Stretch">
-                            <ItemsControl.Template>
-                                <ControlTemplate>
-                                    <!-- 
-                                        Don't change the ScrollViewer's property related to horizontal alignment or horizontal scrollbar visibility, 
-                                        because that messes up dragging visually.
-                                    -->
-                                    <ScrollViewer x:Name="ScrollViewer">
-                                        <ItemsPresenter />
-                                    </ScrollViewer>
-                                </ControlTemplate>
-                            </ItemsControl.Template>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Margin="0,2,0,2"
-                                               TextWrapping="Wrap"
-                                               Text="{Binding DiagramContentItemChildString}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </dxlc:LayoutGroup>                </StackPanel>
+                    </StackPanel>
             </DataTemplate>
 
             <DataTemplate x:Key="DiagramPortTemplate">
@@ -299,10 +259,20 @@
                                      BorderThickness="1" />
             </DataTemplate>
 
+            <DataTemplate x:Key="ElementUsageConnectorTemplate">
+                <dxdiag:DiagramConnector EndArrow="FilledDiamond"
+                                         EndArrowSize="12,7"
+                                         BeginArrow="Open90"
+                                         BeginItem="{Binding BeginItem}"
+                                         EndItem="{Binding EndItem}"
+                                         Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+
             <viewModels:DiagramItemDataTemplateSelector x:Key="DiagramItemDataTemplateSelector"
                                                         RequirementDiagramItemTemplate="{StaticResource RequirementDiagramItemTemplate}"
                                                         ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
                                                         GenericDiagramItemDataTemplate="{StaticResource GenericDiagramItemTemplate}"
+                                                        ElementUsageConnectorDataTemplate="{StaticResource ElementUsageConnectorTemplate}"
                                                         DiagramPortTemplate="{StaticResource DiagramPortTemplate}" />
         </ResourceDictionary>
 
@@ -345,7 +315,6 @@
                                                          ItemTemplateSelector="{StaticResource DiagramItemDataTemplateSelector}"
                                                          ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}"
                                                          EventPublisher="{Binding EventPublisher, Mode=OneWay}"
-                                                         DiagramConnectorSource="{Binding DiagramConnectorCollection}"
                                                          DiagramPortSource="{Binding DiagramPortCollection}" />
                 </dxmvvm:Interaction.Behaviors>
                 <diagram:Cdp4DiagramControl.Actions>

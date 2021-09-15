@@ -1,27 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Cdp4DiagramOrgChartBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//    GNU Affero General Public License for more details.
-//
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView.Diagram
 {
@@ -52,9 +52,9 @@ namespace CDP4CommonView.Diagram
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="Cdp4DiagramOrgChartBehavior"/> is to handle events from 
-    /// the attached view of type <see cref="Cdp4DiagramControl"/>  and to relay relatable
-    /// data from and to the viewModel of type <see cref="IDiagramEditorViewModel"/>
+    /// The purpose of the <see cref="Cdp4DiagramOrgChartBehavior" /> is to handle events from
+    /// the attached view of type <see cref="Cdp4DiagramControl" />  and to relay relatable
+    /// data from and to the viewModel of type <see cref="IDiagramEditorViewModel" />
     /// </summary>
     /// <remarks>
     /// This behavior is meant to be attached to the DiagramEditor view from CDP4DiagramEditor plugin
@@ -67,7 +67,27 @@ namespace CDP4CommonView.Diagram
         public static readonly DataFormat DataFormat = DataFormats.GetDataFormat("CDP4.DragDrop");
 
         /// <summary>
-        /// The <see cref="IDragInfo"/> object that contains information about the drag operation.
+        /// The dependency property that allows setting the source to the view-model representing a diagram object
+        /// </summary>
+        public static readonly DependencyProperty DiagramObjectSourceProperty = DependencyProperty.Register("DiagramObjectSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramObjectSourceChanged));
+
+        /// <summary>
+        /// The dependency property that allows setting the source to the view-model representing a diagram port
+        /// </summary>
+        public static readonly DependencyProperty DiagramPortSourceProperty = DependencyProperty.Register("DiagramPortSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramPortSourceChanged));
+
+        /// <summary>
+        /// The dependency property that allows setting the <see cref="IEventPublisher" />
+        /// </summary>
+        public static readonly DependencyProperty EventPublisherProperty = DependencyProperty.Register("EventPublisher", typeof(IEventPublisher), typeof(Cdp4DiagramOrgChartBehavior));
+
+        /// <summary>
+        /// The dependency property that allows setting the RibbonMergeCategoryName
+        /// </summary>
+        public static readonly DependencyProperty RibbonMergeCategoryNameProperty = DependencyProperty.Register("RibbonMergeCategoryName", typeof(string), typeof(Cdp4DiagramOrgChartBehavior));
+
+        /// <summary>
+        /// The <see cref="IDragInfo" /> object that contains information about the drag operation.
         /// </summary>
         private IDragInfo dragInfo;
 
@@ -75,6 +95,17 @@ namespace CDP4CommonView.Diagram
         /// A value indicating whether a drag operation is currently in progress
         /// </summary>
         private bool dragInProgress;
+
+        /// <summary>
+        /// Holds the value whether the view has loaded for the first time or it has appeared
+        /// <remarks>
+        /// Since the <see cref="Loaded" /> event handler gets called whenever the view reappears from not being active within its
+        /// tabgroup
+        /// and then reappears, the value of <see cref="hasFirstLoadHappened" /> is used as a condition to draw the connector when
+        /// the view did loaded for first time
+        /// </remarks>
+        /// </summary>
+        private bool hasFirstLoadHappened;
 
         /// <summary>
         /// The ribbon merge category stored for cleanup.
@@ -92,13 +123,49 @@ namespace CDP4CommonView.Diagram
         private RibbonControl parentRibbon;
 
         /// <summary>
-        /// Holds the value whether the view has loaded for the first time or it has appeared
-        /// <remarks>
-        /// Since the <see cref="Loaded"/> event handler gets called whenever the view reappears from not being active within its tabgroup
-        /// and then reappears, the value of <see cref="hasFirstLoadHappened"/> is used as a condition to draw the connector when the view did loaded for first time
-        /// </remarks>
+        /// Initializes static members of the <see cref="Cdp4DiagramOrgChartBehavior" /> class.
         /// </summary>
-        private bool hasFirstLoadHappened;
+        static Cdp4DiagramOrgChartBehavior()
+        {
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="INotifyCollectionChanged" /> containing the view-momdel for the
+        /// <see cref="DiagramContentItem" />
+        /// </summary>
+        public INotifyCollectionChanged DiagramObjectSource
+        {
+            get { return (INotifyCollectionChanged)this.GetValue(DiagramObjectSourceProperty); }
+            set { this.SetValue(DiagramObjectSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="INotifyCollectionChanged" /> containing the view-momdel for the
+        /// <see cref="DiagramContentItem" />
+        /// </summary>
+        public INotifyCollectionChanged DiagramPortSource
+        {
+            get { return (INotifyCollectionChanged)this.GetValue(DiagramPortSourceProperty); }
+            set { this.SetValue(DiagramPortSourceProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IEventPublisher" />
+        /// </summary>
+        public IEventPublisher EventPublisher
+        {
+            get { return (IEventPublisher)this.GetValue(EventPublisherProperty); }
+            set { this.SetValue(EventPublisherProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the custom Ribbon Category to merge the diagram ribbon to.
+        /// </summary>
+        public string RibbonMergeCategoryName
+        {
+            get { return (string)this.GetValue(RibbonMergeCategoryNameProperty); }
+            set { this.SetValue(RibbonMergeCategoryNameProperty, value); }
+        }
 
         /// <summary>
         /// Gets a dictionary of saved diagram item positions.
@@ -108,90 +175,88 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Gets or sets the diagram editor viewmodel
         /// </summary>
-        public ICdp4DiagramContainer ViewModel { get; set; }
-
+        public IDiagramEditorViewModel ViewModel { get; set; }
+        
         /// <summary>
-        /// The dependency property that allows setting the source to the view-model representing a diagram object
+        /// Converts control coordinates into document coordinates.
         /// </summary>
-        public static readonly DependencyProperty DiagramObjectSourceProperty = DependencyProperty.Register("DiagramObjectSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramObjectSourceChanged));
-
-        /// <summary>
-        /// The dependency property that allows setting the source to the view-model representing a diagram port
-        /// </summary>
-        public static readonly DependencyProperty DiagramPortSourceProperty = DependencyProperty.Register("DiagramPortSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramPortSourceChanged));
-
-        ///// <summary>
-        ///// The dependency property that allows setting the source to the view-model representing a diagram connector
-        ///// </summary>
-        public static readonly DependencyProperty DiagramConnectorSourceProperty = DependencyProperty.Register("DiagramConnectorSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramConnectorSourceChanged));
-
-        /// <summary>
-        /// The dependency property that allows setting the <see cref="IEventPublisher"/>
-        /// </summary>
-        public static readonly DependencyProperty EventPublisherProperty = DependencyProperty.Register("EventPublisher", typeof(IEventPublisher), typeof(Cdp4DiagramOrgChartBehavior));
-
-        /// <summary>
-        /// The dependency property that allows setting the RibbonMergeCategoryName
-        /// </summary>
-        public static readonly DependencyProperty RibbonMergeCategoryNameProperty = DependencyProperty.Register("RibbonMergeCategoryName", typeof(string), typeof(Cdp4DiagramOrgChartBehavior));
-
-        /// <summary>
-        /// Initializes static members of the <see cref="Cdp4DiagramOrgChartBehavior"/> class.
-        /// </summary>
-        static Cdp4DiagramOrgChartBehavior()
+        /// <param name="dropPosition">The control <see cref="System.Windows.Point" /> where the drop occurs.</param>
+        /// <returns>The document drop position.</returns>
+        public Point GetDiagramPositionFromMousePosition(Point dropPosition)
         {
+            return this.AssociatedObject.PointToDocument(dropPosition);
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="INotifyCollectionChanged"/> containing the view-momdel for the <see cref="DiagramContentItem"/>
+        /// Activates a new <see cref="ConnectorTool" /> in the Diagram control.
         /// </summary>
-        public INotifyCollectionChanged DiagramObjectSource
+        public void ActivateConnectorTool()
         {
-            get => (INotifyCollectionChanged)this.GetValue(DiagramObjectSourceProperty);
-            set => this.SetValue(DiagramObjectSourceProperty, value);
+            this.AssociatedObject.ActiveTool = new ConnectorTool();
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="INotifyCollectionChanged"/> containing the view-momdel for the <see cref="DiagramContentItem"/>
+        /// Activates a new <see cref="ConnectorTool" /> of type <see cref="TTool" />in the Diagram control.
         /// </summary>
-        public INotifyCollectionChanged DiagramPortSource
+        public void ActivateConnectorTool<TTool>() where TTool : DiagramTool, IConnectorTool, new()
         {
-            get => (INotifyCollectionChanged)this.GetValue(DiagramPortSourceProperty);
-            set => this.SetValue(DiagramPortSourceProperty, value);
+            this.AssociatedObject.ActiveTool = new TTool();
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="INotifyCollectionChanged"/> containing the view-model for the <see cref="DiagramConnector"/>
+        /// Resets the active tool.
         /// </summary>
-        public INotifyCollectionChanged DiagramConnectorSource
+        public void ResetTool()
         {
-            get => (INotifyCollectionChanged)this.GetValue(DiagramConnectorSourceProperty);
-            set => this.SetValue(DiagramConnectorSourceProperty, value);
+            this.AssociatedObject.ActiveTool = new PointerTool();
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="IEventPublisher"/>
+        /// Applied the automatic layout to children of the item.
         /// </summary>
-        public IEventPublisher EventPublisher
+        /// <param name="item">The diagram item.</param>
+        public void ApplyChildLayout(DiagramItem item)
         {
-            get => (IEventPublisher)this.GetValue(EventPublisherProperty);
-            set => this.SetValue(EventPublisherProperty, value);
+            this.AssociatedObject.ApplyMindMapTreeLayoutForSubordinates(new[] { item });
         }
 
         /// <summary>
-        /// Gets or sets the name of the custom Ribbon Category to merge the diagram ribbon to.
+        /// Selects the correct diagram item based on represented thing Iid
         /// </summary>
-        public string RibbonMergeCategoryName
+        /// <param name="selectedIid">The Iid of the <see cref="Thing" /></param>
+        public void SelectItemByThingIid(Guid? selectedIid)
         {
-            get => (string)this.GetValue(RibbonMergeCategoryNameProperty);
-            set => this.SetValue(RibbonMergeCategoryNameProperty, value);
+            var thingDiagramItem = this.AssociatedObject.Items.OfType<DiagramContentItem>().FirstOrDefault(c => c.Content is ElementDefinitionDiagramContentItem edc && edc.Thing.Iid.Equals(selectedIid));
+
+            if (thingDiagramItem != null)
+            {
+                this.AssociatedObject.SelectItem(thingDiagramItem);
+            }
         }
 
         /// <summary>
-        /// Called when the <see cref="DiagramObjectSource"/> is changed
+        /// Removes the specified item from the diagram collection.
+        /// </summary>
+        /// <param name="item">The <see cref="DiagramItem" /> to remove.</param>
+        public void RemoveItem(DiagramItem item)
+        {
+            this.AssociatedObject.Items.Remove(item);
+        }
+
+        /// <summary>
+        /// Gets the associated diagram control
+        /// </summary>
+        /// <returns>The associated diagram control</returns>
+        public DiagramControl GetDiagramControl()
+        {
+            return this.AssociatedObject;
+        }
+
+        /// <summary>
+        /// Called when the <see cref="DiagramObjectSource" /> is changed
         /// </summary>
         /// <param name="caller">The source of the call.</param>
-        /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs" /> instance containing the event data.</param>
         private static void DiagramObjectSourceChanged(DependencyObject caller, DependencyPropertyChangedEventArgs e)
         {
             var diagramBehavior = (Cdp4DiagramOrgChartBehavior)caller;
@@ -203,10 +268,10 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Called when the <see cref="DiagramPortSource"/> is changed
+        /// Called when the <see cref="DiagramPortSource" /> is changed
         /// </summary>
         /// <param name="caller">The source of the call.</param>
-        /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
+        /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs" /> instance containing the event data.</param>
         private static void DiagramPortSourceChanged(DependencyObject caller, DependencyPropertyChangedEventArgs e)
         {
             var diagramBehavior = (Cdp4DiagramOrgChartBehavior)caller;
@@ -215,21 +280,6 @@ namespace CDP4CommonView.Diagram
             var oldlist = e.OldValue as IList;
             var newlist = e.NewValue as IList;
             diagramBehavior.ComputeOldNewDiagramPort(oldlist, newlist);
-        }
-
-        /// <summary>
-        /// Called when the <see cref="DiagramConnectorSource"/> is changed
-        /// </summary>
-        /// <param name="caller">The source of the call.</param>
-        /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs"/> instance containing the event data.</param>
-        private static void DiagramConnectorSourceChanged(DependencyObject caller, DependencyPropertyChangedEventArgs e)
-        {
-            var diagramBehavior = (Cdp4DiagramOrgChartBehavior)caller;
-            diagramBehavior.InitializeConnectorSourceChanged(e.OldValue, e.NewValue);
-
-            var oldlist = e.OldValue as IList;
-            var newlist = e.NewValue as IList;
-            diagramBehavior.ComputeOldNewDiagramConnector(oldlist, newlist);
         }
 
         /// <summary>
@@ -277,72 +327,10 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Initialize the Event-Handler to subscribe on changes on the Diagram-connector source collection
-        /// </summary>
-        /// <param name="oldValue">The old collection</param>
-        /// <param name="newValue">The new collection</param>
-        /// <exception cref="InvalidOperationException">If the reference is changed</exception>
-        private void InitializeConnectorSourceChanged(object oldValue, object newValue)
-        {
-            var oldList = oldValue as INotifyCollectionChanged;
-            var newList = newValue as INotifyCollectionChanged;
-
-            if (oldList == null && newList != null)
-            {
-                newList.CollectionChanged += this.OnDiagramConnectorSourceCollectionChanged;
-            }
-
-            if (oldList != null && newList != null)
-            {
-                throw new InvalidOperationException("The reference to the collection should not be changed");
-            }
-        }
-
-        /// <summary>
         /// Add or Remove associated views.
         /// </summary>
         /// <param name="sender">The caller</param>
-        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/></param>
-        private void OnDiagramConnectorSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            this.ComputeOldNewDiagramConnector(e.OldItems, e.NewItems);
-        }
-
-        /// <summary>
-        /// Computes the diagram connectors.
-        /// </summary>
-        /// <param name="oldDiagramConnectors">The collection of old connectors.</param>
-        /// <param name="newDiagramConnectors">The collection of new connectors.</param>
-        private void ComputeOldNewDiagramConnector(IList oldDiagramConnectors, IList newDiagramConnectors)
-        {
-            if (oldDiagramConnectors != null)
-            {
-                foreach (IDiagramConnectorViewModel item in oldDiagramConnectors)
-                {
-                    var diagramObj = this.AssociatedObject.Items.SingleOrDefault(x => x.DataContext == item);
-
-                    if (diagramObj != null)
-                    {
-                        this.AssociatedObject.Items.Remove(diagramObj);
-                    }
-                }
-            }
-
-            if (newDiagramConnectors != null)
-            {
-                foreach (IDiagramConnectorViewModel item in newDiagramConnectors)
-                {
-                    var diagramObj = new Cdp4DiagramConnector(item, this);
-                    this.AssociatedObject.Items.Add(diagramObj);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Add or Remove associated views.
-        /// </summary>
-        /// <param name="sender">The caller</param>
-        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/></param>
+        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs" /></param>
         private void OnDiagramObjectSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             this.ComputeOldNewDiagramObject(e.OldItems, e.NewItems);
@@ -352,24 +340,24 @@ namespace CDP4CommonView.Diagram
         /// Add or Remove associated views.
         /// </summary>
         /// <param name="sender">The caller</param>
-        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/></param>
+        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs" /></param>
         private void OnDiagramPortSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             this.ComputeOldNewDiagramPort(e.OldItems, e.NewItems);
         }
 
-        ///<summary>
-        ///Compute the Diagram-objects
-        ///</summary>
-        ///<param name = "oldDiagramItems" > The collection containing the old objects</param>
-        ///<param name = "newDiagramItems" > The collection containing the new objects</param>
+        /// <summary>
+        /// Compute the Diagram-objects
+        /// </summary>
+        /// <param name="oldDiagramItems"> The collection containing the old objects</param>
+        /// <param name="newDiagramItems"> The collection containing the new objects</param>
         private void ComputeOldNewDiagramObject(IList oldDiagramItems, IList newDiagramItems)
         {
             if (oldDiagramItems != null)
             {
-                foreach (IDiagramObjectViewModel item in oldDiagramItems)
+                foreach (IThingDiagramItem item in oldDiagramItems)
                 {
-                    var diagramObj = this.AssociatedObject.Items.SingleOrDefault(x => x.DataContext == item);
+                    var diagramObj = this.AssociatedObject.Items.SingleOrDefault(x => x == item || x.DataContext == item);
 
                     if (diagramObj != null)
                     {
@@ -380,19 +368,28 @@ namespace CDP4CommonView.Diagram
 
             if (newDiagramItems != null)
             {
-                foreach (IDiagramObjectViewModel item in newDiagramItems)
+                foreach (IThingDiagramItem item in newDiagramItems)
                 {
-                    var diagramObj = new Cdp4DiagramContentItem(item, this);
-                    this.AssociatedObject.Items.Add(diagramObj);
+                    if (item is ThingDiagramConnector connector)
+                    {
+                        this.AssociatedObject.Items.Add(connector);
+                        continue;
+                    }
+
+                    if (item is ThingDiagramContentItem objectViewModel)
+                    {
+                        var diagramObj = new Cdp4DiagramContentItem(objectViewModel, this);
+                        this.AssociatedObject.Items.Add(diagramObj);
+                    }
                 }
             }
         }
 
-        ///<summary>
-        ///Compute the Diagram-objects
-        ///</summary>
-        ///<param name = "oldValue" > The collection containing the old objects</param>
-        ///<param name = "newValue" > The collection containing the new objects</param>
+        /// <summary>
+        /// Compute the Diagram-objects
+        /// </summary>
+        /// <param name="oldValue"> The collection containing the old objects</param>
+        /// <param name="newValue"> The collection containing the new objects</param>
         private void ComputeOldNewDiagramPort(IList oldValue, IList newValue)
         {
             if (oldValue != null)
@@ -442,13 +439,13 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// The event-handler for the <see cref="DiagramControl.Items"/> collection change
+        /// The event-handler for the <see cref="DiagramControl.Items" /> collection change
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The arguments</param>
         private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (this.AssociatedObject.DataContext is ICdp4DiagramContainer viewModel && viewModel.Behavior == null)
+            if (this.AssociatedObject.DataContext is IDiagramEditorViewModel viewModel && viewModel.Behavior == null)
             {
                 this.ViewModel = viewModel;
                 viewModel.Behavior = this;
@@ -485,6 +482,31 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.Unloaded += this.Unloaded;
             this.AssociatedObject.ItemsChanged += this.ItemsChanged;
             this.AssociatedObject.ItemsDeleting += this.ItemsDeleting;
+
+            this.AssociatedObject.AddingNewItem += this.AddingNewItem;
+        }
+
+        /// <summary>
+        /// Event handler to capture adding of new items
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The arguments.</param>
+        private async void AddingNewItem(object sender, DiagramAddingNewItemEventArgs e)
+        {
+            if (e.Item is not IDrawnConnector connector)
+            {
+                return;
+            }
+
+            // initiate conector tool create algorythm
+            var tool = connector.Tool;
+
+            if (tool != null)
+            {
+                await tool.ExecuteCreate(connector, this);
+            }
+
+            this.ResetTool();
         }
 
         /// <summary>
@@ -513,16 +535,15 @@ namespace CDP4CommonView.Diagram
 
                 this.ItemPositions[namedThingDiagramContentItem.Content] = content.NewDiagramPosition;
                 namedThingDiagramContentItem.Position = content.NewDiagramPosition;
-
-                this.ViewModel.RedrawConnectors((ThingDiagramContentItem)namedThingDiagramContentItem.Content);
             }
         }
 
         /// <summary>
-        /// Remove a <see cref="DiagramContentItem"/> from the ViewModel and delete its related port shapes whenever a <see cref="DiagramContentItem"/> gets deleted
+        /// Remove a <see cref="DiagramContentItem" /> from the ViewModel and delete its related port shapes whenever a
+        /// <see cref="DiagramContentItem" /> gets deleted
         /// </summary>
         /// <param name="sender">The sender</param>
-        /// <param name="e">The <see cref="DiagramItemsDeletingEventArgs"/></param>
+        /// <param name="e">The <see cref="DiagramItemsDeletingEventArgs" /></param>
         private void ItemsDeleting(object sender, DiagramItemsDeletingEventArgs e)
         {
             foreach (var item in e.Items)
@@ -603,7 +624,8 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// update the position of diagramContentItem according to position they have been assigned through <see cref="Cdp4DiagramOrgChartBehavior.ItemPositions"/>
+        /// update the position of diagramContentItem according to position they have been assigned through
+        /// <see cref="Cdp4DiagramOrgChartBehavior.ItemPositions" />
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The arguments</param>
@@ -657,7 +679,7 @@ namespace CDP4CommonView.Diagram
 
             if (!this.hasFirstLoadHappened)
             {
-                (this.AssociatedObject.DataContext as ICdp4DiagramContainer)?.ComputeDiagramConnector();
+                this.ViewModel?.ComputeDiagramConnector();
                 this.hasFirstLoadHappened = true;
             }
         }
@@ -754,17 +776,19 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.ItemsChanged -= this.ItemsChanged;
             this.AssociatedObject.ItemsDeleting -= this.ItemsDeleting;
 
+            this.AssociatedObject.AddingNewItem -= this.AddingNewItem;
+
             base.OnDetaching();
         }
 
         /// <summary>
-        /// Event handler for the <see cref="PreviewMouseLeftButtonDown"/> event
+        /// Event handler for the <see cref="PreviewMouseLeftButtonDown" /> event
         /// </summary>
         /// <remarks>
         /// Occurs when the left mouse button is pressed while the mouse pointer is over this element.
         /// </remarks>
         /// <param name="sender">the sender of the event</param>
-        /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
+        /// <param name="e">the <see cref="MouseButtonEventArgs" /> associated to the event</param>
         private void PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (!this.IsMovable(e.Source))
@@ -783,13 +807,13 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Event handler for the <see cref="PreviewMouseLeftButtonUp"/> event
+        /// Event handler for the <see cref="PreviewMouseLeftButtonUp" /> event
         /// </summary>
         /// <remarks>
         /// Occurs when the left mouse button is released while the mouse pointer is over this element.
         /// </remarks>
         /// <param name="sender">the sender of the event</param>
-        /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
+        /// <param name="e">the <see cref="MouseButtonEventArgs" /> associated to the event</param>
         private void PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             if (!this.IsMovable(e.Source))
@@ -811,13 +835,13 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Event handler for the <see cref="PreviewMouseMove"/> event
+        /// Event handler for the <see cref="PreviewMouseMove" /> event
         /// </summary>
         /// <remarks>
         /// Occurs when the mouse pointer moves while the mouse pointer is over this element.
         /// </remarks>
         /// <param name="sender">the sender of the event</param>
-        /// <param name="e">the <see cref="MouseButtonEventArgs"/> associated to the event</param>
+        /// <param name="e">the <see cref="MouseButtonEventArgs" /> associated to the event</param>
         private void PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton != MouseButtonState.Pressed)
@@ -870,10 +894,10 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Event handler for the <see cref="PreviewDragEnter"/> event
+        /// Event handler for the <see cref="PreviewDragEnter" /> event
         /// </summary>
         /// <param name="sender">the sender of the event</param>
-        /// <param name="e">the <see cref="DragEventArgs"/> associated to the event</param>
+        /// <param name="e">the <see cref="DragEventArgs" /> associated to the event</param>
         /// <remarks>
         /// Occurs when the input system reports an underlying drag event with this element as the drag target.
         /// </remarks>
@@ -883,17 +907,17 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Event handler for the <see cref="PreviewDragOver"/> event
+        /// Event handler for the <see cref="PreviewDragOver" /> event
         /// </summary>
         /// <param name="sender">the sender of the event</param>
-        /// <param name="e">the <see cref="DragEventArgs"/> associated to the event</param>
+        /// <param name="e">the <see cref="DragEventArgs" /> associated to the event</param>
         /// <remarks>
         /// Occurs when the input system reports an underlying drag event with this element as the potential drop target.
         /// </remarks>
         private void PreviewDragOver(object sender, DragEventArgs e)
         {
             //If the sender is a port and its element definition is not selected
-            if (((DiagramControl) sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
+            if (((DiagramControl)sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
             {
                 return;
             }
@@ -917,8 +941,8 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Handles the PreviewDragOver event
         /// </summary>
-        /// <param name="source">The source <see cref="object"/> that originated the DragOver action.</param>
-        /// <param name="dropInfo">The <see cref="DiagramDropInfo"/> object that was created based on the DragOver action.</param>
+        /// <param name="source">The source <see cref="object" /> that originated the DragOver action.</param>
+        /// <param name="dropInfo">The <see cref="DiagramDropInfo" /> object that was created based on the DragOver action.</param>
         /// <returns>true if the DragOver action was handled, otherwise false</returns>
         public bool HandleDragOver(object source, IDiagramDropInfo dropInfo)
         {
@@ -954,13 +978,13 @@ namespace CDP4CommonView.Diagram
         /// Scrolls the target of the drop.
         /// </summary>
         /// <param name="dependencyObject">
-        /// The <see cref="DependencyObject"/> that needs to be scrolled.
+        /// The <see cref="DependencyObject" /> that needs to be scrolled.
         /// </param>
         /// <param name="e">
         /// The drag event.
         /// </param>
         /// <remarks>
-        /// Any <see cref="DependencyObject"/> can be a target.
+        /// Any <see cref="DependencyObject" /> can be a target.
         /// </remarks>
         private void Scroll(DependencyObject dependencyObject, DragEventArgs e)
         {
@@ -993,10 +1017,10 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Event handler for the <see cref="PreviewDrop"/> event
+        /// Event handler for the <see cref="PreviewDrop" /> event
         /// </summary>
         /// <param name="sender">the sender of the event</param>
-        /// <param name="e">the <see cref="DragEventArgs"/> associated to the event</param>
+        /// <param name="e">the <see cref="DragEventArgs" /> associated to the event</param>
         /// <remarks>
         /// Occurs when the input system reports an underlying drop event with this element as the drop target.
         /// </remarks>
@@ -1010,8 +1034,8 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Handles the PreviewDrop event
         /// </summary>
-        /// <param name="source">The source <see cref="object"/> that originated the Drop action.</param>
-        /// <param name="dropInfo">The <see cref="DiagramDropInfo"/> object that was created based on the Drop action.</param>
+        /// <param name="source">The source <see cref="object" /> that originated the Drop action.</param>
+        /// <param name="dropInfo">The <see cref="DiagramDropInfo" /> object that was created based on the Drop action.</param>
         /// <returns>true if the Drop action was handled, otherwise false</returns>
         public virtual async Task<bool> HandleDrop(object source, IDiagramDropInfo dropInfo)
         {
@@ -1046,56 +1070,6 @@ namespace CDP4CommonView.Diagram
             }
 
             return dropInfo.Handled;
-        }
-
-        /// <summary>
-        /// Converts control coordinates into document coordinates.
-        /// </summary>
-        /// <param name="dropPosition">The control <see cref="System.Windows.Point"/> where the drop occurs.</param>
-        /// <returns>The document drop position.</returns>
-        public Point GetDiagramPositionFromMousePosition(Point dropPosition)
-        {
-            return this.AssociatedObject.PointToDocument(dropPosition);
-        }
-
-        /// <summary>
-        /// Activates a new <see cref="ConnectorTool"/> in the Diagram control.
-        /// </summary>
-        public void ActivateConnectorTool()
-        {
-            this.AssociatedObject.ActiveTool = new ConnectorTool();
-        }
-
-        /// <summary>
-        /// Resets the active tool.
-        /// </summary>
-        /// 
-        public void ResetTool()
-        {
-            this.AssociatedObject.ActiveTool = null;
-        }
-
-        /// <summary>
-        /// Applied the automatic layout to children of the item.
-        /// </summary>
-        /// <param name="item">The diagram item.</param>
-        public void ApplyChildLayout(DiagramItem item)
-        {
-            this.AssociatedObject.ApplyMindMapTreeLayoutForSubordinates(new[] { item });
-        }
-
-        /// <summary>
-        /// Selects the correct diagram item based on represented thing Iid
-        /// </summary>
-        /// <param name="selectedIid">The Iid of the <see cref="Thing"/></param>
-        public void SelectItemByThingIid(Guid? selectedIid)
-        {
-            var thingDiagramItem = this.AssociatedObject.Items.OfType<DiagramContentItem>().FirstOrDefault(c => c.Content is ElementDefinitionDiagramContentItem edc && edc.Thing.Iid.Equals(selectedIid));
-
-            if (thingDiagramItem != null)
-            {
-                this.AssociatedObject.SelectItem(thingDiagramItem);
-            }
         }
     }
 }

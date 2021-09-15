@@ -323,6 +323,74 @@ namespace CDP4Composition.Services
         }
 
         /// <summary>
+        /// Create and return a new <see cref="ElementUsage"/>
+        /// </summary>
+        /// <param name="container">
+        /// The container <see cref="ElementDefinition"/> of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="referencedDefinition">
+        /// The referenced <see cref="ElementDefinition"/> of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="owner">
+        /// The <see cref="DomainOfExpertise"/> that is the owner of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
+        /// </param>
+        public async Task<ElementUsage> CreateAndGetElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session)
+        {
+            if (container == null)
+            {
+                throw new ArgumentNullException(nameof(container), "The container must not be null");
+            }
+
+            if (referencedDefinition == null)
+            {
+                throw new ArgumentNullException(nameof(referencedDefinition), "The referencedDefinition must not be null");
+            }
+
+            if (owner == null)
+            {
+                throw new ArgumentNullException(nameof(owner), "The owner must not be null");
+            }
+
+            if (session == null)
+            {
+                throw new ArgumentNullException(nameof(session), "The session may not be null");
+            }
+
+            var clone = container.Clone(false);
+            var usage = new ElementUsage
+            {
+                Name = referencedDefinition.Name,
+                ShortName = referencedDefinition.ShortName,
+                Owner = owner,
+                ElementDefinition = referencedDefinition
+            };
+
+            clone.ContainedElement.Add(usage);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(container);
+            var transaction = new ThingTransaction(transactionContext, clone);
+            transaction.Create(usage);
+
+            try
+            {
+                var operationContainer = transaction.FinalizeTransaction();
+                await session.Write(operationContainer);
+
+                container.Cache.TryGetValue(usage.CacheKey, out var createdUsage);
+
+                return (ElementUsage)createdUsage?.Value;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("The ElementUsage could not be created", ex);
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// Method for creating a <see cref="BinaryRelationship"/> for requirement verification between a <see cref="ParameterOrOverrideBase"/> and a <see cref="RelationalExpression"/>.
         /// </summary>
         /// <param name="session">The <see cref="Session"/> for which the <see cref="BinaryRelationship"/> will be created</param>

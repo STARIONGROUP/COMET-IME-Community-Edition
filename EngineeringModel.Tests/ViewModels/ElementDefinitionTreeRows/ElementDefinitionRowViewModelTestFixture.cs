@@ -448,5 +448,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             return false;
         }
+
+        public Task<ElementUsage> CreateAndGetElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session)
+        {
+            return Task.FromResult(default(ElementUsage));
+        }
     }
 }
