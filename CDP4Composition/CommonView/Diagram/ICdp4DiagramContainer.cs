@@ -59,5 +59,10 @@ namespace CDP4CommonView.Diagram
         /// Computes the diagram connector.
         /// </summary>
         void ComputeDiagramConnector();
+
+        /// <summary>
+        /// Computes the diagram port.
+        /// </summary>
+        void ComputeDiagramPort();
     }
 }

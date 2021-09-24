@@ -61,12 +61,10 @@ namespace CDP4DiagramEditor.ViewModels.Palette
                     return;
                 }
 
-                var block = new DiagramObject(Guid.NewGuid(), this.editorViewModel.Thing.Cache, new Uri(this.editorViewModel.Session.DataSourceUri))
+                var block = new DiagramPort(Guid.NewGuid(), this.editorViewModel.Thing.Cache, new Uri(this.editorViewModel.Session.DataSourceUri))
                 {
                     DepictedThing = depictedThing,
                     Name = depictedThing.UserFriendlyName,
-                    Documentation = depictedThing.UserFriendlyName,
-                    Resolution = Cdp4DiagramHelper.DefaultResolution
                 };
 
                 var bound = new Bounds(Guid.NewGuid(), this.editorViewModel.Thing.Cache, new Uri(this.editorViewModel.Session.DataSourceUri))
@@ -77,11 +75,12 @@ namespace CDP4DiagramEditor.ViewModels.Palette
                     Width = (float)target.ActualWidth
                 };
 
+                DiagramPort port = new DiagramPort();
                 block.Bounds.Add(bound);
-                var diagramItem = new DiagramPortViewModel(block, this.editorViewModel.Session, this.editorViewModel);
+                var diagramItem = new DiagramPortViewModel(block, this.editorViewModel.Session, this.editorViewModel, kind);
                 container.PortCollection.Add(diagramItem);
 
-                this.editorViewModel.DiagramPortCollection.Add(diagramItem);
+                this.editorViewModel.ThingDiagramItems.Add(diagramItem);
                 this.editorViewModel.UpdateIsDirty();
             }
         }

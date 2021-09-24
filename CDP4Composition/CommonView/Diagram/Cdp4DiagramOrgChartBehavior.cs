@@ -554,11 +554,7 @@ namespace CDP4CommonView.Diagram
                 {
                     if (contentItem.Content is PortContainerDiagramContentItem portContainer)
                     {
-                        foreach (var portViewModel in portContainer.PortCollection.ToList())
-                        {
-                            this.AssociatedObject.Items.Remove(this.AssociatedObject.Items.OfType<DiagramPortShape>().FirstOrDefault(i => (IDiagramPortViewModel)i.DataContext == portViewModel));
-                        }
-
+                        this.ViewModel.ThingDiagramItems.RemoveAllAndDispose(portContainer.PortCollection.OfType<IThingDiagramItem>());
                         portContainer.PortCollection.Clear();
                     }
 
@@ -680,6 +676,7 @@ namespace CDP4CommonView.Diagram
             if (!this.hasFirstLoadHappened)
             {
                 this.ViewModel?.ComputeDiagramConnector();
+                this.ViewModel?.ComputeDiagramPort();
                 this.hasFirstLoadHappened = true;
             }
         }

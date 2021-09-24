@@ -29,18 +29,11 @@ namespace CDP4CommonView.Diagram.ViewModels
 
     using CDP4Common.DiagramData;
 
-    using CDP4Composition.Mvvm;
-
     /// <summary>
     /// Defines a DiagramPortViewModel that shall be bound to a <see cref="PortContainerDiagramContentItem"/>
     /// </summary>
-    public interface IDiagramPortViewModel : IRowViewModelBase<DiagramObject>
+    public interface IDiagramPortViewModel
     {
-        /// <summary>
-        /// Event handler that fires when the port position has been recalculated
-        /// </summary>
-        event EventHandler WhenPositionIsUpdated;
-
         /// <summary>
         /// Gets or sets the position
         /// </summary>

@@ -22,6 +22,7 @@
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:palette="clr-namespace:CDP4DiagramEditor.ViewModels.Palette"
+             xmlns:DiagramViews="clr-namespace:CDP4CommonView.Diagram.Views;assembly=CDP4Composition"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300"
@@ -245,18 +246,7 @@
             </DataTemplate>
 
             <DataTemplate x:Key="DiagramPortTemplate">
-                <dxdiag:DiagramShape Shape="BasicShapes.Rectangle"
-                                     Height="25"
-                                     Width="25"
-                                     Anchors="Bottom"
-                                     SnapsToDevicePixels="False"
-                                     CanSnapToOtherItems="False"
-                                     CanSnapToThisItem="False"
-                                     CanMove="True"
-                                     ConnectionPoints="0.5,1"
-                                     Background="Gray"
-                                     BorderBrush="Gray"
-                                     BorderThickness="1" />
+                <DiagramViews:DiagramPortShape />
             </DataTemplate>
 
             <DataTemplate x:Key="ElementUsageConnectorTemplate">

@@ -63,11 +63,6 @@ namespace CDP4Composition.Diagram
         DisposableReactiveList<IThingDiagramItem> ThingDiagramItems { get; set; }
 
         /// <summary>
-        /// Gets the collection diagramming-port to display.
-        /// </summary>
-        DisposableReactiveList<IDiagramObjectViewModel> DiagramPortCollection { get; }
-
-        /// <summary>
         /// Removes a diagram item and its connectors.
         /// </summary>
         /// <param name="contentItemContent">The item to remove.</param>

@@ -64,6 +64,7 @@ namespace CDP4DiagramEditor.ViewModels
     using ReactiveUI;
 
     using Point = System.Windows.Point;
+    using CDP4CommonView.Diagram.ViewModels;
 
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor" /> view
@@ -178,11 +179,6 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Gets the collection diagramming-port to display.
-        /// </summary>
-        public DisposableReactiveList<IDiagramObjectViewModel> DiagramPortCollection { get; private set; }
-
-        /// <summary>
         /// The <see cref="IEventPublisher" /> that allows view/view-model communication
         /// </summary>
         public IEventPublisher EventPublisher { get; private set; }
@@ -290,6 +286,51 @@ namespace CDP4DiagramEditor.ViewModels
             this.ComputeDiagramObject();
             this.IsDirty = false;
         }
+
+        /// <summary>
+        /// Compute the <see cref="DiagramEdge" /> to show
+        /// </summary>
+        public void ComputeDiagramPort()
+        {
+            var updatedItems = this.Thing.DiagramElement.OfType<DiagramPort>().ToList();
+            var currentItems = this.ThingDiagramItems.OfType<DiagramPortViewModel>().Select(x => x.DiagramThing).ToList();
+
+            var newItems = updatedItems.Except(currentItems);
+            var oldItems = currentItems.Except(updatedItems);
+
+            foreach (var diagramThing in oldItems)
+            {
+                var item = this.ThingDiagramItems.OfType<DiagramPortViewModel>().SingleOrDefault(x => x.DiagramThing == diagramThing);
+
+                if (item != null)
+                {
+                    this.ThingDiagramItems.RemoveAndDispose(item);
+                }
+            }
+
+            foreach (var diagramThing in newItems)
+            {
+                DiagramPortViewModel newDiagramElement = null;
+
+                switch (diagramThing.DepictedThing)
+                {
+                    case ElementUsage elementUsage:                                                
+                        newDiagramElement = new DiagramPortViewModel((DiagramPort)diagramThing, this.Session, this, elementUsage.InterfaceEnd);
+                        var container = this.ThingDiagramItems.OfType<PortContainerDiagramContentItem>().First(i => i.Thing == elementUsage.Container);
+                        container.PortCollection.Add(newDiagramElement);
+                        
+                        break;
+                    default:
+                        //newDiagramElement = new DiagramEdgeViewModel((DiagramEdge)diagramThing, this);
+                        break;
+                }
+
+                this.ThingDiagramItems.Add(newDiagramElement);
+            }
+
+            this.UpdateIsDirty();
+        }
+
 
         /// <summary>
         /// Compute the <see cref="DiagramEdge" /> to show
@@ -417,7 +458,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.IsDirty |= addedItem > 0;
 
-            this.IsDirty |= this.DiagramPortCollection.Any(x => x.IsDirty) || removedItem > 0;
+            //this.IsDirty |= this.DiagramPortCollection.Any(x => x.IsDirty) || removedItem > 0;
 
             this.IsDirty |= addedEdges > 0;
             this.IsDirty |= this.ThingDiagramItems.OfType<ThingDiagramConnector>().Any(x => x.IsDirty) || removedEdges > 0;
@@ -515,6 +556,7 @@ namespace CDP4DiagramEditor.ViewModels
             block.Bounds.Add(bounds);
 
             NamedThingDiagramContentItem diagramItem = null;
+            List<IDiagramPortViewModel> ports = new List<IDiagramPortViewModel>();
 
             switch (rowPayload)
             {
@@ -530,7 +572,19 @@ namespace CDP4DiagramEditor.ViewModels
 
                         architectureBlock.Bounds.Add(bounds);
 
-                        diagramItem = new ElementDefinitionDiagramContentItem(architectureBlock, this.Session, this);
+                        PortContainerDiagramContentItem portContainer = new ElementDefinitionDiagramContentItem(architectureBlock, this.Session, this);
+
+                        foreach(var usage in elementDefinition.ContainedElement.Where(u => u.ElementDefinition.Category.Any(c => c.Name == "Ports")))
+                        {
+                            var port = this.CreatePort(usage.InterfaceEnd, portContainer, usage);
+                            if (port is not null)
+                            {
+                                ports.Add(port);
+                                portContainer.PortCollection.Add(port);
+                            }
+                        }
+
+                        diagramItem = portContainer;
                         break;
                     }
 
@@ -559,8 +613,37 @@ namespace CDP4DiagramEditor.ViewModels
             this.ThingDiagramItems.Add(diagramItem);
 
             this.ComputeDiagramConnector(diagramItem);
+            this.ThingDiagramItems.AddRange(ports.OfType<IThingDiagramItem>());
 
             this.UpdateIsDirty();
+        }
+
+        private IDiagramPortViewModel CreatePort(InterfaceEndKind kind, PortContainerDiagramContentItem diagramItem, ElementUsage portElementUsage)
+        {
+            var row = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing.DepictedThing == portElementUsage);
+
+            if (row is not null)
+            {
+                return null;
+            }
+
+            var block = new DiagramPort(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+            {
+                DepictedThing = portElementUsage,
+                Name = portElementUsage.UserFriendlyName,
+            };
+
+            var bound = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+            {
+                X = (float)diagramItem.Position.X,
+                Y = (float)diagramItem.Position.Y,
+                Height = (float)diagramItem.ActualHeight,
+                Width = (float)diagramItem.ActualWidth,
+                Name = "aname",
+            };
+
+            block.Bounds.Add(bound);
+            return new DiagramPortViewModel(block, this.Session, this, kind);
         }
 
         /// <summary>
@@ -616,8 +699,6 @@ namespace CDP4DiagramEditor.ViewModels
             this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel> { ChangeTrackingEnabled = true };
             this.ThingDiagramItems = new DisposableReactiveList<IThingDiagramItem> { ChangeTrackingEnabled = true };
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
-
-            this.DiagramPortCollection = new DisposableReactiveList<IDiagramObjectViewModel> { ChangeTrackingEnabled = true };
         }
 
         /// <summary>
@@ -891,7 +972,7 @@ namespace CDP4DiagramEditor.ViewModels
         private void ComputeDiagramObject()
         {
             var updatedItems = this.Thing.DiagramElement.OfType<DiagramObject>().ToList();
-            var currentItems = this.ThingDiagramItems.Select(x => x.DiagramThing).ToList();
+            var currentItems = this.ThingDiagramItems.Select(x => x.DiagramThing).OfType<DiagramObject>().ToList();
 
             var newItems = updatedItems.Except(currentItems);
             var oldItems = currentItems.Except(updatedItems);
@@ -914,13 +995,13 @@ namespace CDP4DiagramEditor.ViewModels
                 switch (diagramThing.DepictedThing)
                 {
                     case ElementDefinition:
-                        newDiagramElement = new ElementDefinitionDiagramContentItem((ArchitectureElement)diagramThing, this.Session, this);
+                        newDiagramElement = new ElementDefinitionDiagramContentItem((ArchitectureElement)diagramThing, this.Session, this);                        
                         break;
                     case Requirement:
-                        newDiagramElement = new RequirementDiagramContentItem((DiagramObject)diagramThing, this.Session, this);
+                        newDiagramElement = new RequirementDiagramContentItem(diagramThing, this.Session, this);
                         break;
                     default:
-                        newDiagramElement = new NamedThingDiagramContentItem((DiagramObject)diagramThing, this);
+                        newDiagramElement = new NamedThingDiagramContentItem(diagramThing, this);
                         break;
                 }
 
@@ -1046,7 +1127,7 @@ namespace CDP4DiagramEditor.ViewModels
                         };
 
                         archElement.Bounds.Add(bound);
-
+                        
                         newDiagramElement = new ElementDefinitionDiagramContentItem(archElement, this.Session, this);
                         break;
                     }
