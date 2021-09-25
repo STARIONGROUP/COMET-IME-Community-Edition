@@ -258,6 +258,15 @@
                                          Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
+            <DataTemplate x:Key="ElementUsageConnectorTemplate">
+                <dxdiag:DiagramConnector EndArrow="FilledDiamond"
+                                         EndArrowSize="12,7"
+                                         BeginArrow="Open90"
+                                         BeginItem="{Binding BeginItem}"
+                                         EndItem="{Binding EndItem}"
+                                         Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+
             <viewModels:DiagramItemDataTemplateSelector x:Key="DiagramItemDataTemplateSelector"
                                                         RequirementDiagramItemTemplate="{StaticResource RequirementDiagramItemTemplate}"
                                                         ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
