@@ -88,7 +88,7 @@
                         </ControlTemplate>
                     </dxg:GridColumn.DisplayTemplate>
                 </dxg:GridColumn>
-                <dxg:GridColumn FieldName="Name" />
+                <dxg:GridColumn FieldName="Name" SortOrder="Ascending" />
                 <dxg:GridColumn FieldName="Description" Header="Description" />
                 <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" />
                 <dxg:GridColumn FieldName="PublicationState" Header="Publication State" />

@@ -127,7 +127,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.DisplayedText = this.Thing.UserFriendlyName;
+            this.DisplayedText = this.Thing?.UserFriendlyName;
             this.Source = ((DiagramEdge) this.DiagramThing)?.Source;
             this.Target = ((DiagramEdge) this.DiagramThing)?.Target;
         }

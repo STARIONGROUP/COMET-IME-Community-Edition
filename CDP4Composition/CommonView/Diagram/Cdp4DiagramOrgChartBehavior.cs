@@ -41,11 +41,13 @@ namespace CDP4CommonView.Diagram
     using CDP4CommonView.Diagram.Views;
     using CDP4CommonView.EventAggregator;
 
+    using CDP4Composition;
     using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
 
     using DevExpress.Diagram.Core;
     using DevExpress.Mvvm.UI;
+    using DevExpress.Utils.Controls;
     using DevExpress.Xpf.Diagram;
     using DevExpress.Xpf.Ribbon;
 
@@ -65,16 +67,6 @@ namespace CDP4CommonView.Diagram
         /// The name of the data format used for drag-n-drop operations
         /// </summary>
         public static readonly DataFormat DataFormat = DataFormats.GetDataFormat("CDP4.DragDrop");
-
-        /// <summary>
-        /// The dependency property that allows setting the source to the view-model representing a diagram object
-        /// </summary>
-        public static readonly DependencyProperty DiagramObjectSourceProperty = DependencyProperty.Register("DiagramObjectSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramObjectSourceChanged));
-
-        /// <summary>
-        /// The dependency property that allows setting the source to the view-model representing a diagram port
-        /// </summary>
-        public static readonly DependencyProperty DiagramPortSourceProperty = DependencyProperty.Register("DiagramPortSource", typeof(INotifyCollectionChanged), typeof(Cdp4DiagramOrgChartBehavior), new FrameworkPropertyMetadata(DiagramPortSourceChanged));
 
         /// <summary>
         /// The dependency property that allows setting the <see cref="IEventPublisher" />
@@ -130,26 +122,6 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="INotifyCollectionChanged" /> containing the view-momdel for the
-        /// <see cref="DiagramContentItem" />
-        /// </summary>
-        public INotifyCollectionChanged DiagramObjectSource
-        {
-            get { return (INotifyCollectionChanged)this.GetValue(DiagramObjectSourceProperty); }
-            set { this.SetValue(DiagramObjectSourceProperty, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the <see cref="INotifyCollectionChanged" /> containing the view-momdel for the
-        /// <see cref="DiagramContentItem" />
-        /// </summary>
-        public INotifyCollectionChanged DiagramPortSource
-        {
-            get { return (INotifyCollectionChanged)this.GetValue(DiagramPortSourceProperty); }
-            set { this.SetValue(DiagramPortSourceProperty, value); }
-        }
-
-        /// <summary>
         /// Gets or sets the <see cref="IEventPublisher" />
         /// </summary>
         public IEventPublisher EventPublisher
@@ -176,7 +148,7 @@ namespace CDP4CommonView.Diagram
         /// Gets or sets the diagram editor viewmodel
         /// </summary>
         public IDiagramEditorViewModel ViewModel { get; set; }
-        
+
         /// <summary>
         /// Converts control coordinates into document coordinates.
         /// </summary>
@@ -250,169 +222,6 @@ namespace CDP4CommonView.Diagram
         public DiagramControl GetDiagramControl()
         {
             return this.AssociatedObject;
-        }
-
-        /// <summary>
-        /// Called when the <see cref="DiagramObjectSource" /> is changed
-        /// </summary>
-        /// <param name="caller">The source of the call.</param>
-        /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs" /> instance containing the event data.</param>
-        private static void DiagramObjectSourceChanged(DependencyObject caller, DependencyPropertyChangedEventArgs e)
-        {
-            var diagramBehavior = (Cdp4DiagramOrgChartBehavior)caller;
-            diagramBehavior.InitializeDiagramObjectSource(e.OldValue, e.NewValue);
-
-            var oldlist = e.OldValue as IList;
-            var newlist = e.NewValue as IList;
-            diagramBehavior.ComputeOldNewDiagramObject(oldlist, newlist);
-        }
-
-        /// <summary>
-        /// Called when the <see cref="DiagramPortSource" /> is changed
-        /// </summary>
-        /// <param name="caller">The source of the call.</param>
-        /// <param name="e">The <see cref="DependencyPropertyChangedEventArgs" /> instance containing the event data.</param>
-        private static void DiagramPortSourceChanged(DependencyObject caller, DependencyPropertyChangedEventArgs e)
-        {
-            var diagramBehavior = (Cdp4DiagramOrgChartBehavior)caller;
-            diagramBehavior.InitializeDiagramPortSource(e.OldValue, e.NewValue);
-
-            var oldlist = e.OldValue as IList;
-            var newlist = e.NewValue as IList;
-            diagramBehavior.ComputeOldNewDiagramPort(oldlist, newlist);
-        }
-
-        /// <summary>
-        /// Initialize the Event-Handler to subscribe on changes on the Diagram-object source collection
-        /// </summary>
-        /// <param name="oldValue">The old collection</param>
-        /// <param name="newValue">The new collection</param>
-        /// <exception cref="InvalidOperationException">If the reference is changed</exception>
-        private void InitializeDiagramObjectSource(object oldValue, object newValue)
-        {
-            var oldList = oldValue as INotifyCollectionChanged;
-            var newList = newValue as INotifyCollectionChanged;
-
-            if (oldList == null && newList != null)
-            {
-                newList.CollectionChanged += this.OnDiagramObjectSourceCollectionChanged;
-            }
-
-            if (oldList != null && newList != null)
-            {
-                throw new InvalidOperationException("The reference to the collection should not be changed");
-            }
-        }
-
-        /// <summary>
-        /// Initialize the Event-Handler to subscribe on changes on the Diagram-object source collection
-        /// </summary>
-        /// <param name="oldValue">The old collection</param>
-        /// <param name="newValue">The new collection</param>
-        /// <exception cref="InvalidOperationException">If the reference is changed</exception>
-        private void InitializeDiagramPortSource(object oldValue, object newValue)
-        {
-            var oldList = oldValue as INotifyCollectionChanged;
-            var newList = newValue as INotifyCollectionChanged;
-
-            if (oldList == null && newList != null)
-            {
-                newList.CollectionChanged += this.OnDiagramPortSourceCollectionChanged;
-            }
-
-            if (oldList != null && newList != null)
-            {
-                throw new InvalidOperationException("The reference to the collection should not be changed");
-            }
-        }
-
-        /// <summary>
-        /// Add or Remove associated views.
-        /// </summary>
-        /// <param name="sender">The caller</param>
-        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs" /></param>
-        private void OnDiagramObjectSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            this.ComputeOldNewDiagramObject(e.OldItems, e.NewItems);
-        }
-
-        /// <summary>
-        /// Add or Remove associated views.
-        /// </summary>
-        /// <param name="sender">The caller</param>
-        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs" /></param>
-        private void OnDiagramPortSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            this.ComputeOldNewDiagramPort(e.OldItems, e.NewItems);
-        }
-
-        /// <summary>
-        /// Compute the Diagram-objects
-        /// </summary>
-        /// <param name="oldDiagramItems"> The collection containing the old objects</param>
-        /// <param name="newDiagramItems"> The collection containing the new objects</param>
-        private void ComputeOldNewDiagramObject(IList oldDiagramItems, IList newDiagramItems)
-        {
-            if (oldDiagramItems != null)
-            {
-                foreach (IThingDiagramItem item in oldDiagramItems)
-                {
-                    var diagramObj = this.AssociatedObject.Items.SingleOrDefault(x => x == item || x.DataContext == item);
-
-                    if (diagramObj != null)
-                    {
-                        this.AssociatedObject.Items.Remove(diagramObj);
-                    }
-                }
-            }
-
-            if (newDiagramItems != null)
-            {
-                foreach (IThingDiagramItem item in newDiagramItems)
-                {
-                    if (item is ThingDiagramConnector connector)
-                    {
-                        this.AssociatedObject.Items.Add(connector);
-                        continue;
-                    }
-
-                    if (item is ThingDiagramContentItem objectViewModel)
-                    {
-                        var diagramObj = new Cdp4DiagramContentItem(objectViewModel, this);
-                        this.AssociatedObject.Items.Add(diagramObj);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Compute the Diagram-objects
-        /// </summary>
-        /// <param name="oldValue"> The collection containing the old objects</param>
-        /// <param name="newValue"> The collection containing the new objects</param>
-        private void ComputeOldNewDiagramPort(IList oldValue, IList newValue)
-        {
-            if (oldValue != null)
-            {
-                foreach (IDiagramPortViewModel item in oldValue)
-                {
-                    var diagramObj = this.AssociatedObject.Items.SingleOrDefault(x => x.DataContext == item);
-
-                    if (diagramObj != null)
-                    {
-                        this.AssociatedObject.Items.Remove(diagramObj);
-                    }
-                }
-            }
-
-            if (newValue != null)
-            {
-                foreach (IDiagramPortViewModel viewModel in newValue)
-                {
-                    var diagramObj = new DiagramPortShape(viewModel);
-                    this.AssociatedObject.Items.Add(diagramObj);
-                }
-            }
         }
 
         /// <summary>
@@ -653,10 +462,13 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">Event arguments.</param>
         private void Unloaded(object sender, RoutedEventArgs e)
         {
-            if (sender is DiagramDesignerControl && this.mergeCategory != null)
+            if (sender is DiagramDesignerControl diagramDesignerControl)
             {
-                // clean up merged category
-                this.ClearCategory();
+                if (this.mergeCategory != null)
+                {
+                    // clean up merged category
+                    this.ClearCategory();
+                }
             }
         }
 
@@ -676,7 +488,6 @@ namespace CDP4CommonView.Diagram
             if (!this.hasFirstLoadHappened)
             {
                 this.ViewModel?.ComputeDiagramConnector();
-                this.ViewModel?.ComputeDiagramPort();
                 this.hasFirstLoadHappened = true;
             }
         }
@@ -913,7 +724,7 @@ namespace CDP4CommonView.Diagram
         /// </remarks>
         private void PreviewDragOver(object sender, DragEventArgs e)
         {
-            //If the sender is a port and its element definition is not selected
+            // If the sender is a port and its element definition is not selected
             if (((DiagramControl)sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
             {
                 return;

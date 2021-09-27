@@ -26,16 +26,20 @@
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
     using System;
-    using System.Linq;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4CommonView.Diagram;
     using CDP4CommonView.Diagram.ViewModels;
 
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
+
     using DevExpress.Xpf.Diagram;
+
+    using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
     /// Base class for all port creation palette items
@@ -43,45 +47,50 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     public abstract class PortCreateBasePaletteItemViewModel : PaletteItemBaseViewModel
     {
         /// <summary>
+        /// The <see cref="IThingSelectorDialogService"/>
+        /// </summary>
+        private readonly IThingSelectorDialogService thingSelectorDialogService = ServiceLocator.Current.GetInstance<IThingSelectorDialogService>();
+
+        /// <summary>
+        /// The <see cref="IThingCreator"/>
+        /// </summary>
+        private readonly IThingCreator thingCreator = ServiceLocator.Current.GetInstance<IThingCreator>();
+
+        /// <summary>
+        /// Gets the palette group this item belongs to
+        /// </summary>
+        public override PaletteGroup Group
+        {
+            get { return PaletteGroup.PortsAndInterfaces; }
+        }
+
+        /// <summary>
+        /// Gets the list of supported diagram types. When a supertype is listed all subtypes are also supported.
+        /// </summary>
+        public override List<Type> SupportedDiagramTypes
+        {
+            get { return new() { typeof(ArchitectureDiagram) }; }
+        }
+
+        /// <summary>
         /// Creates a port of a certain kind
         /// </summary>
         /// <param name="kind">The <see cref="InterfaceEndKind"/> of the port</param>
         /// <returns>Empty task</returns>
         protected async Task CreatePort(InterfaceEndKind kind)
         {
-            // TODO: Replace with proper EU
-            var depictedThing = new ElementUsage { Name = "WhyNot", ShortName = "WhyNot" };
-
             if (this.editorViewModel.SelectedItem is DiagramContentItem { Content: PortContainerDiagramContentItem container } target)
             {
-                var row = this.editorViewModel.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing.DepictedThing == depictedThing);
+                var iteration = (Iteration) this.editorViewModel.Thing.Container;
 
-                if (row != null)
+                // grab the ED from which to make a port from
+                var result = this.thingSelectorDialogService.SelectThing(iteration.Element,
+                    new List<string> { "Name", "ShortName" });
+
+                if (result != null)
                 {
-                    return;
+                    await this.thingCreator.CreateElementUsage((ElementDefinition)container.Thing, result, this.editorViewModel.Session.QuerySelectedDomainOfExpertise(iteration), this.editorViewModel.Session, kind);
                 }
-
-                var block = new DiagramPort(Guid.NewGuid(), this.editorViewModel.Thing.Cache, new Uri(this.editorViewModel.Session.DataSourceUri))
-                {
-                    DepictedThing = depictedThing,
-                    Name = depictedThing.UserFriendlyName,
-                };
-
-                var bound = new Bounds(Guid.NewGuid(), this.editorViewModel.Thing.Cache, new Uri(this.editorViewModel.Session.DataSourceUri))
-                {
-                    X = (float)target.Position.X,
-                    Y = (float)target.Position.Y,
-                    Height = (float)target.ActualHeight,
-                    Width = (float)target.ActualWidth
-                };
-
-                DiagramPort port = new DiagramPort();
-                block.Bounds.Add(bound);
-                var diagramItem = new DiagramPortViewModel(block, this.editorViewModel.Session, this.editorViewModel, kind);
-                container.PortCollection.Add(diagramItem);
-
-                this.editorViewModel.ThingDiagramItems.Add(diagramItem);
-                this.editorViewModel.UpdateIsDirty();
             }
         }
     }

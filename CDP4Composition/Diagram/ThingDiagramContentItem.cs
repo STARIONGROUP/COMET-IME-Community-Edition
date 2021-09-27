@@ -125,7 +125,7 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// The <see cref="IDiagramEditorViewModel"/> container
         /// </summary>
-        private readonly IDiagramEditorViewModel containerViewModel;
+        protected readonly IDiagramEditorViewModel containerViewModel;
 
         /// <summary>
         /// Backing field for <see cref="IsDirty"/>

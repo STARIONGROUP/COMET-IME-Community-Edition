@@ -30,8 +30,6 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    using CDP4Composition.Navigation;
-
     /// <summary>
     /// Interface for a a palette item (button)
     /// </summary>

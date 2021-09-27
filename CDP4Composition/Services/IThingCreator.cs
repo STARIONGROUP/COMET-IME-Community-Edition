@@ -101,6 +101,24 @@ namespace CDP4Composition.Services
         Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session);
 
         /// <summary>
+        /// Create a new <see cref="ElementUsage"/> with InterfaceEndKind
+        /// </summary>
+        /// <param name="container">
+        /// The container <see cref="ElementDefinition"/> of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="referencedDefinition">
+        /// The referenced <see cref="ElementDefinition"/> of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="owner">
+        /// The <see cref="DomainOfExpertise"/> that is the owner of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
+        /// </param>
+        /// <param name="interfaceEndKind">The <see cref="InterfaceEndKind"/> to create with</param>
+        Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session, InterfaceEndKind interfaceEndKind);
+
+        /// <summary>
         /// Method for creating a <see cref="BinaryRelationship"/> for requirement verification between a <see cref="ParameterOrOverrideBase"/> and a <see cref="RelationalExpression"/>.
         /// </summary>
         /// <param name="session">The <see cref="Session"/> for which the <see cref="BinaryRelationship"/> will be created</param>
@@ -134,5 +152,23 @@ namespace CDP4Composition.Services
         /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
         /// </param>
         Task<ElementUsage> CreateAndGetElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session);
+
+        /// <summary>
+        /// Create and return a new Interface between two <see cref="ElementUsage"/>
+        /// </summary>
+        /// <param name="output">
+        /// The source <see cref="ElementUsage"/> of the interface
+        /// </param>
+        /// <param name="input">
+        /// The target <see cref="ElementUsage"/> of the interface
+        /// </param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
+        /// <param name="owner">
+        /// The <see cref="DomainOfExpertise"/> that is the owner of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
+        /// </param>
+        Task<BinaryRelationship> CreateAndGetInterface(ElementUsage output, ElementUsage input, Iteration iteration, DomainOfExpertise owner, ISession session);
     }
 }

@@ -25,12 +25,9 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
-    using System;
-    using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Threading.Tasks;
 
-    using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
     /// <summary>
@@ -48,27 +45,11 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         }
 
         /// <summary>
-        /// Gets the list of supported diagram types. When a supertype is listed all subtypes are also supported.
-        /// </summary>
-        public override List<Type> SupportedDiagramTypes
-        {
-            get { return new() { typeof(ArchitectureDiagram) }; }
-        }
-
-        /// <summary>
         /// Gets the group sort order.Lower number = higher in the group.
         /// </summary>
         public override int GroupSortOrder
         {
             get { return 2000; }
-        }
-
-        /// <summary>
-        /// Gets the palette group this item belongs to
-        /// </summary>
-        public override PaletteGroup Group
-        {
-            get { return PaletteGroup.PortsAndInterfaces; }
         }
 
         /// <summary>

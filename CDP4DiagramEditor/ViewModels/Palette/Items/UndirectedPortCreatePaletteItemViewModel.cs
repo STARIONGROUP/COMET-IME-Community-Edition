@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementUsageCreatePaletteItemViewModel.cs" company="RHEA System S.A.">
+// <copyright file="UndirectedPortCreatePaletteItemViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -25,60 +25,31 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
-    using System;
-    using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Threading.Tasks;
 
-    using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
-    using CDP4DiagramEditor.ViewModels.Tools;
-
     /// <summary>
-    /// Diagram palette button responsible for creating new <see cref="ElementUsage" />
+    /// Diagram palette button responsible for creating new Undirected port
     /// </summary>
     [Export(typeof(IPaletteItemViewModel))]
-    public class ElementUsageCreatePaletteItemViewModel : ConnectorCreatePaletteItemBaseViewModel
+    public class UndirectedPortCreatePaletteItemViewModel : PortCreateBasePaletteItemViewModel
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ElementUsageCreatePaletteItemViewModel"/> class.
-        /// </summary>
-        public ElementUsageCreatePaletteItemViewModel()
-        {
-            this.ConnectorTool = new ElementUsageConnectorTool();
-        }
-
         /// <summary>
         /// Gets the label text
         /// </summary>
         public override string Text
         {
-            get { return "Element Usage"; }
+            get { return "Undirected Port"; }
         }
 
         /// <summary>
-        /// Gets the list of supported diagram types. When a supertype is listed all subtypes are also supported.
-        /// </summary>
-        public override List<Type> SupportedDiagramTypes
-        {
-            get { return new() { typeof(DiagramCanvas) }; }
-        }
-
-        /// <summary>
-        /// Gets the group sort order. Lower number = higher in the group.
+        /// Gets the group sort order.Lower number = higher in the group.
         /// </summary>
         public override int GroupSortOrder
         {
-            get { return 1000; }
-        }
-
-        /// <summary>
-        /// Gets the palette group this item belongs to
-        /// </summary>
-        public override PaletteGroup Group
-        {
-            get { return PaletteGroup.Connect; }
+            get { return 4000; }
         }
 
         /// <summary>
@@ -86,7 +57,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// </summary>
         public override string Image
         {
-            get { return "Version_16x16.png"; }
+            get { return "Header_16x16.png"; }
         }
 
         /// <summary>
@@ -95,8 +66,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// <returns>An empty task</returns>
         public override async Task ExecuteAsyncCommand()
         {
-            // activate tool
-            await this.editorViewModel.ActivateConnectorTool<ElementUsageConnectorTool>(this);
+            await this.CreatePort(InterfaceEndKind.UNDIRECTED);
         }
     }
 }

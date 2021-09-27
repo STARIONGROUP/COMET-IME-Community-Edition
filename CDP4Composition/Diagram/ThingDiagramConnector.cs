@@ -30,6 +30,7 @@ namespace CDP4Composition.Diagram
     using System.ComponentModel;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Windows.Controls;
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
@@ -306,7 +307,7 @@ namespace CDP4Composition.Diagram
                 return null;
             }
 
-            var diagramObject = diagramControl.Items.OfType<DiagramContentItem>().SingleOrDefault(x => ((NamedThingDiagramContentItem)x.Content).DiagramThing == source);
+            var diagramObject = diagramControl.Items.OfType<DiagramContentItem>().SingleOrDefault(x => (x.Content as NamedThingDiagramContentItem)?.DiagramThing == source || ((x.Content as ContentPresenter)?.DataContext as NamedThingDiagramContentItem)?.DiagramThing == source);
             if (diagramObject == null)
             {
                 throw new InvalidOperationException("DiagramContentItem could not be found.");

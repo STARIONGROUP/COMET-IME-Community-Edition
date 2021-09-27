@@ -18,7 +18,6 @@ namespace CDP4CommonView.Diagram
     /// </summary>
     public class Cdp4DiagramConnector : DiagramConnector
     {
-        #region DependencyProperties
         /// <summary>
         /// The dependency property that allows setting the source to the view-model representing a diagram object
         /// </summary>
@@ -28,7 +27,6 @@ namespace CDP4CommonView.Diagram
         /// The dependency property that allows setting the source to the view-model representing a diagram object
         /// </summary>
         public static readonly DependencyProperty TargetProperty = DependencyProperty.Register("Target", typeof(object), typeof(Cdp4DiagramConnector), new FrameworkPropertyMetadata(DiagramTargetChanged));
-
 
         /// <summary>
         /// Initializes static members of the <see cref="Cdp4DiagramConnector"/> class.
@@ -107,9 +105,6 @@ namespace CDP4CommonView.Diagram
             }
         }
 
-        #endregion
-
-
         /// <summary>
         /// The <see cref="Cdp4DiagramOrgChartBehavior"/> that manages the creation of the views
         /// </summary>
@@ -171,8 +166,8 @@ namespace CDP4CommonView.Diagram
         /// to be set either as <see cref="Cdp4DiagramConnector.BeginItem"/> or <see cref="Cdp4DiagramConnector.EndItem"/>
         /// by <see cref="Cdp4DiagramConnector.SetSource"/> or <see cref="Cdp4DiagramConnector.SetTarget"/>
         /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
+        /// <param name="source">The source item</param>
+        /// <returns>The source diagram item</returns>
         private DiagramContentItem GetDiagramContentItemToConnectTo(object source)
         {
             var diagramControl = (DiagramControl)this.behaviour.AssociatedObject;

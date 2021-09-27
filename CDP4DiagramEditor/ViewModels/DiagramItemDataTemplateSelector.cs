@@ -63,6 +63,11 @@ namespace CDP4DiagramEditor.ViewModels
         public DataTemplate ElementUsageConnectorDataTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> for a DiagramContentItem that represents an <see cref="ElementUsage"/>
+        /// </summary>
+        public DataTemplate InterfaceConnectorDataTemplate { get; set; }
+
+        /// <summary>
         /// Selects the template for a <see cref="NamedThingDiagramContentItem"/>
         /// </summary>
         /// <param name="item">The <see cref="NamedThingDiagramContentItem"/></param>
@@ -74,9 +79,10 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 ElementDefinitionDiagramContentItem => this.ElementBaseDiagramItemTemplate,
                 RequirementDiagramContentItem => this.RequirementDiagramItemTemplate,
+                DiagramPortDiagramContentItem => this.DiagramPortTemplate,
                 NamedThingDiagramContentItem => this.GenericDiagramItemDataTemplate,
-                DiagramPortViewModel => this.DiagramPortTemplate,
                 ElementUsageEdgeViewModel => this.ElementUsageConnectorDataTemplate,
+                InterfaceEdgeViewModel => this.InterfaceConnectorDataTemplate,
                 _ => base.SelectTemplate(item, container)
             };
         }

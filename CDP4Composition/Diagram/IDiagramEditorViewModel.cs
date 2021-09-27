@@ -40,8 +40,6 @@ namespace CDP4Composition.Diagram
 
     using DevExpress.Diagram.Core;
 
-    using ReactiveUI;
-
     /// <summary>
     /// The interface that describes the dirty mechanism of DiagramEditorViewModel
     /// </summary>

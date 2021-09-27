@@ -8,20 +8,22 @@
                            xmlns:cdp4Composition="clr-namespace:CDP4Composition"
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                            xmlns:vm="clr-namespace:CDP4CommonView.Diagram.ViewModels"
+                           xmlns:views="clr-namespace:CDP4CommonView.Diagram.Views"
                            mc:Ignorable="d"
                            Height="20"
                            Width="20"
                            Anchors="Bottom"
                            SnapsToDevicePixels="False"
                            CanSnapToOtherItems="False"
-                           CanSnapToThisItem="False"
-                           CanMove="True"
-                           Background="LightGray"
-                           BorderBrush="LightGray"
+                           CanSnapToThisItem="True"
+                           CanMove="False"
+                           Background="AliceBlue"
+                           BorderBrush="Black"
                            BorderThickness="1"
                            d:DesignHeight="300"
                            d:DesignWidth="300"
                            Position="{Binding Position}"
+                           
                            ConnectionPoints="{Binding ConnectionPoints}">
 
     <dxdiag:DiagramContentItem.Resources>
@@ -30,11 +32,12 @@
                TargetType="{x:Type ContentPresenter}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Direction}"
+                             
                              Value="{x:Static vm:PortContainerShapeSide.Left}">
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <dx:DXImage Source="{dx:DXImage SvgImages/DiagramIcons/PreviousPage.svg}" />
+                                <Image Width="14" Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}" />
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
@@ -44,11 +47,13 @@
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <dx:DXImage Source="{dx:DXImage SvgImages/DiagramIcons/PreviousPage.svg}" RenderTransformOrigin="0.5,0.5">
-                                    <dx:DXImage.RenderTransform>
+                                <Image 
+                                    Width="14" Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}" RenderTransformOrigin="0.5,0.5">
+                                    <Image.RenderTransform>
                                         <RotateTransform Angle="90" />
-                                    </dx:DXImage.RenderTransform>
-                                </dx:DXImage>
+                                    </Image.RenderTransform>
+                                </Image>
+                                
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
@@ -58,12 +63,13 @@
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <dx:DXImage Source="{dx:DXImage SvgImages/DiagramIcons/PreviousPage.svg}"
-                                            RenderTransformOrigin="0.5,0.5">
-                                    <dx:DXImage.RenderTransform>
+                                <Image Width="14" Height="14" Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}"
+                                       RenderTransformOrigin="0.5,0.5">
+                                    <Image.RenderTransform>
                                         <RotateTransform Angle="180" />
-                                    </dx:DXImage.RenderTransform>
-                                </dx:DXImage>
+                                    </Image.RenderTransform>
+                                </Image>
+                                
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
@@ -73,12 +79,12 @@
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <dx:DXImage Source="{dx:DXImage SvgImages/DiagramIcons/PreviousPage.svg}"
-                                            RenderTransformOrigin="0.5,0.5">
-                                    <dx:DXImage.RenderTransform>
+                                <Image Width="14" Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}"
+                                       RenderTransformOrigin="0.5,0.5">
+                                    <Image.RenderTransform>
                                         <RotateTransform Angle="270" />
-                                    </dx:DXImage.RenderTransform>
-                                </dx:DXImage>
+                                    </Image.RenderTransform>
+                                </Image>
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>

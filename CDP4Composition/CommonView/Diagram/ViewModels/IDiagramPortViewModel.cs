@@ -25,8 +25,6 @@
 
 namespace CDP4CommonView.Diagram.ViewModels
 {
-    using System;
-
     using CDP4Common.DiagramData;
 
     /// <summary>
@@ -58,6 +56,11 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// Gets or sets its Parent bound
         /// </summary>
         Bounds ContainerBounds { get; set; }
+
+        /// <summary>
+        /// Determines the orientation of theport connector
+        /// </summary>
+        void DeterminePortConnectorRotation();
 
         /// <summary>
         /// public invoker of <see cref="WhenPositionIsUpdated"/> that is fired when its position is updated

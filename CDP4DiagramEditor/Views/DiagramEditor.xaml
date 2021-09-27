@@ -258,10 +258,9 @@
                                          Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
-            <DataTemplate x:Key="ElementUsageConnectorTemplate">
-                <dxdiag:DiagramConnector EndArrow="FilledDiamond"
-                                         EndArrowSize="12,7"
-                                         BeginArrow="Open90"
+            <DataTemplate x:Key="InterfaceConnectorTemplate">
+                <dxdiag:DiagramConnector EndArrow="(none)"
+                                         BeginArrow="(none)"
                                          BeginItem="{Binding BeginItem}"
                                          EndItem="{Binding EndItem}"
                                          Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
@@ -272,6 +271,7 @@
                                                         ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
                                                         GenericDiagramItemDataTemplate="{StaticResource GenericDiagramItemTemplate}"
                                                         ElementUsageConnectorDataTemplate="{StaticResource ElementUsageConnectorTemplate}"
+                                                        InterfaceConnectorDataTemplate="{StaticResource InterfaceConnectorTemplate}"
                                                         DiagramPortTemplate="{StaticResource DiagramPortTemplate}" />
         </ResourceDictionary>
 
@@ -313,8 +313,7 @@
                                                          RibbonMergeCategoryName="DiagramCategory"
                                                          ItemTemplateSelector="{StaticResource DiagramItemDataTemplateSelector}"
                                                          ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}"
-                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}"
-                                                         DiagramPortSource="{Binding DiagramPortCollection}" />
+                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}"/>
                 </dxmvvm:Interaction.Behaviors>
                 <diagram:Cdp4DiagramControl.Actions>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.Save}" />

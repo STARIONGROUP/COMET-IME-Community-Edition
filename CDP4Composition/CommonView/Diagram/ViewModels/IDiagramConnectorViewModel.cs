@@ -25,7 +25,6 @@
 
 namespace CDP4CommonView.Diagram
 {
-    using System;
     using System.Collections.Generic;
 
     using CDP4Common.CommonData;

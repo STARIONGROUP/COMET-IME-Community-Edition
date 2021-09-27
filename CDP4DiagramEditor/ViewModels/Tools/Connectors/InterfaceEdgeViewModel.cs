@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PaletteDroppableItemBaseViewModel.cs" company="RHEA System S.A.">
+// <copyright file="InterfaceEdgeViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,41 +23,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4DiagramEditor.ViewModels.Palette
+namespace CDP4DiagramEditor.ViewModels
 {
-    using System;
-    using System.Threading.Tasks;
-    using System.Windows;
-    using System.Windows.Input;
+    using CDP4Common.DiagramData;
 
-    using CDP4Common.CommonData;
-
-    using CDP4Composition.DragDrop;
+    using CDP4Composition.Diagram;
 
     /// <summary>
-    /// Base class for drag/droppable palette items
+    /// View model for a Interface diagram edge
     /// </summary>
-    public abstract class PaletteDroppableItemBaseViewModel : PaletteItemBaseViewModel, IPaletteDroppableItemViewModel
+    public class InterfaceEdgeViewModel : DiagramEdgeViewModel
     {
         /// <summary>
-        /// Handle mouse move when dragging
+        /// Initializes a new instance of the <see cref="CDP4DiagramEditor.ViewModels.InterfaceEdgeViewModel" /> class
         /// </summary>
-        /// <param name="mouseEventArgs">The mouse event args.</param>
-        public virtual void HandleMouseMove(MouseEventArgs mouseEventArgs)
+        /// <param name="diagramEdge">The associated <see cref="DiagramEdge" /></param>
+        /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
+        public InterfaceEdgeViewModel(DiagramEdge diagramEdge, IDiagramEditorViewModel container) : base(diagramEdge, container)
         {
-            if (mouseEventArgs?.Source is DependencyObject dependencyObject)
-            {
-                // initiate drag/drop payload
-                DragDrop.DoDragDrop(dependencyObject, this, DragDropEffects.All);
-            }
         }
 
         /// <summary>
-        /// Handle mouse move when dropping
+        /// Initializes a new instance of the <see cref="CDP4DiagramEditor.ViewModels.InterfaceEdgeViewModel" /> class
         /// </summary>
-        /// <param name="dropInfo">The mouse event args.</param>
-        /// <param name="createCallback">Callback operation which creates the content</param>
-        /// <returns>The <see cref="Task{Thing}"/></returns>
-        abstract public Task<Thing> HandleMouseDrop(IDropInfo dropInfo, Action<Thing> createCallback = null);
+        /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
+        public InterfaceEdgeViewModel(IConnectorTool tool) : base(tool)
+        {
+
+        }
     }
 }

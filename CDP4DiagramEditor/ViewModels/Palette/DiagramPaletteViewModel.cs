@@ -28,14 +28,11 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive;
-    using System.Windows;
     using System.Windows.Input;
 
     using CDP4Common.DiagramData;
 
     using CDP4Composition.Mvvm.Types;
-    using CDP4Composition.Navigation;
 
     using DevExpress.Xpf.NavBar;
 
@@ -70,7 +67,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
             this.Diagram = diagram;
             this.ParentViewModel = parent;
 
-            this.Items = new DisposableReactiveList<IPaletteItemViewModel>()
+            this.Items = new DisposableReactiveList<IPaletteItemViewModel>
             {
                 ChangeTrackingEnabled = true
             };
@@ -125,7 +122,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         private void InitializeCommands()
         {
             this.OnMouseMoveCommand = ReactiveCommand.Create();
-            this.OnMouseMoveCommand.Subscribe(e => this.ExecuteMouseMoveCommand((MouseEventArgs)e));
+            this.OnMouseMoveCommand.Subscribe(e => this.ExecuteMouseMoveCommand((MouseEventArgs) e));
         }
 
         /// <summary>
@@ -139,7 +136,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
                 return;
             }
 
-            if(((NavBarItem)item.Content).Content is IPaletteDroppableItemViewModel itemViewModel)
+            if (((NavBarItem) item.Content).Content is IPaletteDroppableItemViewModel itemViewModel)
             {
                 itemViewModel.HandleMouseMove(e);
             }

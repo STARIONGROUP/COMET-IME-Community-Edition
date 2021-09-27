@@ -46,11 +46,6 @@ namespace CDP4Composition.Diagram
     public class ElementDefinitionDiagramContentItem : PortContainerDiagramContentItem, IDiagramContentItemChildren
     {
         /// <summary>
-        /// The <see cref="ISession"/> to be used when creating other view models
-        /// </summary>
-        private readonly ISession session;
-
-        /// <summary>
         /// Backing fied for <see cref="IsTopDiagramElement"/>
         /// </summary>
         private bool isTopDiagramElement;
@@ -78,7 +73,7 @@ namespace CDP4Composition.Diagram
                 this.DropTarget = new ElementDefinitionDropTarget(elementDefinition, this.session);
             }
 
-            this.UpdateProperties();
+            this.UpdateProperties(true);
         }
 
         /// <summary>
@@ -93,7 +88,7 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Sets <see cref="ElementDefinitionDiagramContentItem.Thing"/> related properties
         /// </summary>
-        private void UpdateProperties()
+        private void UpdateProperties(bool skipPortUpdate = false)
         {
             if (this.Thing is ElementDefinition elementDefinition)
             {
@@ -103,6 +98,11 @@ namespace CDP4Composition.Diagram
                 {
                     var parameterRowViewModel = new DiagramContentItemParameterRowViewModel(parameter, this.session, null);
                     this.DiagramContentItemChildren.Add(parameterRowViewModel);
+                }
+
+                if (!skipPortUpdate)
+                {
+                    this.UpdatePorts(elementDefinition);
                 }
             }
         }

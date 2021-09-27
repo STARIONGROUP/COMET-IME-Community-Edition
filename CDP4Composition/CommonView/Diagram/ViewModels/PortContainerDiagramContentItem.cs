@@ -25,14 +25,15 @@
 
 namespace CDP4CommonView.Diagram.ViewModels
 {
-    using System;
-    using System.Collections.Specialized;
     using System.Linq;
     using System.Windows;
 
     using CDP4Common.DiagramData;
+    using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Diagram;
+
+    using CDP4Dal;
 
     using DevExpress.Xpf.Diagram;
 
@@ -43,6 +44,11 @@ namespace CDP4CommonView.Diagram.ViewModels
     /// </summary>
     public class PortContainerDiagramContentItem : NamedThingDiagramContentItem
     {
+        /// <summary>
+        /// The <see cref="ISession"/> to be used when creating other view models
+        /// </summary>
+        protected ISession session;
+
         /// <summary>
         /// Gets or sets the port collection
         /// </summary>
@@ -58,33 +64,22 @@ namespace CDP4CommonView.Diagram.ViewModels
         public PortContainerDiagramContentItem(DiagramObject thing, IDiagramEditorViewModel container) : base(thing, container)
         {
             this.PortCollection = new ReactiveList<IDiagramPortViewModel>();
-            this.PortCollection.Changed.Subscribe(this.PortCollectionChanged);
-        }
-
-        /// <summary>
-        /// Fires whenever the <see cref="PortCollection"/> gets new items added or deleted
-        /// </summary>
-        /// <param name="notifyCollectionChanged">Collection change event arguments</param>
-        private void PortCollectionChanged(NotifyCollectionChangedEventArgs notifyCollectionChanged)
-        {
-            // set sides for any new item
-            if (notifyCollectionChanged.NewItems != null)
-            {
-                foreach (IDiagramPortViewModel port in notifyCollectionChanged.NewItems)
-                {
-                    port.PortContainerShapeSide = this.GetAvailableSide();
-                }
-            }
-
-            // then recalculate all the attached port position
-            this.RecalculatePortsPosition();
         }
 
         /// <summary>
         /// Recalculate all Ports position then fires <see cref="IDiagramPortViewModel.WhenPositionIsUpdatedInvoke"/>
         /// </summary>
-        private void RecalculatePortsPosition()
+        public void RecalculatePortsPosition()
         {
+            var lastPosition = PortContainerShapeSide.Bottom;
+
+            foreach (var port in this.PortCollection)
+            {
+                port.PortContainerShapeSide = this.GetAvailableSide(lastPosition);
+                port.DeterminePortConnectorRotation();
+                lastPosition = port.PortContainerShapeSide;
+            }
+
             var diagramItem = this.Parent as DiagramItem;
 
             if (diagramItem == null)
@@ -137,16 +132,16 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// Calculate the next available side where a port can join
         /// </summary>
         /// <returns>Returns a <see cref="PortContainerShapeSide"/></returns>
-        private PortContainerShapeSide GetAvailableSide()
+        private PortContainerShapeSide GetAvailableSide(PortContainerShapeSide lastPosition)
         {
-            return (PortContainerShapeSide)(this.PortCollection.Count(p => p.PortContainerShapeSide > PortContainerShapeSide.Undefined) % 4);
+            return (PortContainerShapeSide)(((int)lastPosition + 1) % 4);
         }
 
         /// <summary>
         /// Determine the length of a side portion
         /// </summary>
-        /// <param name="side"></param>
-        /// <returns></returns>
+        /// <param name="side">The previous location</param>
+        /// <returns>A position of the new port</returns>
         private double CalculatePortion(PortContainerShapeSide side)
         {
             var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == side);
@@ -161,6 +156,58 @@ namespace CDP4CommonView.Diagram.ViewModels
         public void UpdatePortLayout()
         {
             this.RecalculatePortsPosition();
+        }
+
+        /// <summary>
+        /// Update the ports
+        /// </summary>
+        public void UpdatePorts()
+        {
+            if (this.Thing is ElementDefinition elementDefinition)
+            {
+                this.UpdatePorts(elementDefinition);
+            }
+        }
+
+        /// <summary>
+        /// Updates the ports
+        /// </summary>
+        protected void UpdatePorts(ElementDefinition elementDefinition)
+        {
+            // clean up
+            this.PortCollection.Clear();
+
+            var existingPorts = this.containerViewModel.ThingDiagramItems.OfType<DiagramPortDiagramContentItem>().Where(p => p.Container == this).ToList();
+
+            foreach (var diagramPortDiagramContentItem in existingPorts)
+            {
+                this.containerViewModel.ThingDiagramItems.RemoveAndDispose(diagramPortDiagramContentItem);
+            }
+
+            // find the relevant usages
+            var usages = elementDefinition.ContainedElement.Where(eu => eu.InterfaceEnd != InterfaceEndKind.NONE).ToList();
+
+            // clean up any usage connectors that reference these EU, ports are only represented by boxes
+            var existingElementUsageEdges = this.containerViewModel.ThingDiagramItems.OfType<ThingDiagramConnector>().Where(c => c.Thing is ElementUsage).ToList();
+
+            foreach (var elementUsage in usages)
+            {
+                var relevantEdges = existingElementUsageEdges.Where(e => e.Thing == elementUsage);
+
+                foreach (var edge in relevantEdges)
+                {
+                    this.containerViewModel.RemoveDiagramThingItem(edge);
+                }
+            }
+
+            // for every EU with directionality create the port
+            foreach (var port in usages.Select(usage => DiagramPortDiagramContentItem.CreatePort(usage, this, this.session, this.containerViewModel)).Where(port => port is not null))
+            {
+                this.PortCollection.Add(port);
+                this.containerViewModel.ThingDiagramItems.Add((IThingDiagramItem)port);
+            }
+
+            this.UpdatePortLayout();
         }
     }
 }
