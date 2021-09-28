@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4EngineeringModel.Converters"
+             xmlns:compositionConverters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
@@ -18,7 +19,6 @@
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:commonData="clr-namespace:CDP4Common.CommonData;assembly=CDP4Common"
              xmlns:behaviors="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
-             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              d:DesignHeight="400"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
@@ -35,7 +35,8 @@
             <converters:ElementUsageOptionsConverter x:Key="ElementUsageOptionsConverter" />
             <converters:DataTypeConverter x:Key="DataTypeConverter" />
             <converters:ElementUsageTypeToVisibilityConverter x:Key="ElementUsageTypeToVisibilityConverter" />
-            
+            <compositionConverters:CategoryListConverter x:Key="CategoryListConverter" />
+
             <HierarchicalDataTemplate DataType="{x:Type viewModels:ElementDefinitionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
@@ -386,6 +387,9 @@
                         <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
                         <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
                         <dxg:TreeListColumn FieldName="IsObfuscated" Header="IsObfuscated" Visible ="False"/>
+                        <dxg:TreeListColumn Binding="{Binding Category, Converter={StaticResource CategoryListConverter} }"
+                                            AllowColumnFiltering="False"
+                                            Header="Category" />
                         <dxg:TreeListColumn FieldName="Category" Header="Category" Visible ="False" ShowInColumnChooser="False">
                             <dxmvvm:Interaction.Behaviors>
                                 <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Category" ItemsSource="{Binding ElementDefinitionRowViewModels}"/>
