@@ -35,7 +35,7 @@ namespace CDP4Composition.Tests.Converters
     using NUnit.Framework;
 
     [TestFixture]
-    public class CategoryListConverterTest
+    public class CategoryListConverterTestFixture
     {
         /// <summary>
         /// the <see cref="CategoryListConverter"/> under test

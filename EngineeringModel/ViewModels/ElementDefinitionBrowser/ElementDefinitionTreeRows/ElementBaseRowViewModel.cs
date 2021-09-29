@@ -184,7 +184,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public IEnumerable<Category> Category
         {
-            get { return this.Thing.Category; }
+            get { return this.Thing?.Category; }
         }
 
         /// <summary>
