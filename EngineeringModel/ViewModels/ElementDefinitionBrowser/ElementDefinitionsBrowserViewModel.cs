@@ -952,7 +952,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
             catch (Exception exception)
             {
-                logger.Error(exception, "An error occured when creating a copy of an Element Definition");
+                logger.Error(exception, "An error occured when deleting a copy of an Element Definition");
             }
             finally
             {
