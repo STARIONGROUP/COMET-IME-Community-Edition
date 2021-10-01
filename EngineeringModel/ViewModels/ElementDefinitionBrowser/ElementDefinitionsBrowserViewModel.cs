@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -35,14 +35,9 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-
-    using CDP4Dal.Operations;
-
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
-
     using CDP4CommonView.ViewModels;
-
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
@@ -51,14 +46,17 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels.Dialogs;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using NLog;
 
@@ -88,6 +86,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// The <see cref="IChangeOwnershipBatchService"/> used to change the ownership of multiple <see cref="IOwnedThing"/>s in a batch operation
         /// </summary>
         private readonly IChangeOwnershipBatchService changeOwnershipBatchService;
+
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> used to show user messages.
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService;
 
         /// <summary>
         /// The <see cref="IObfuscationService"/> used to determine if rows should be hidden based on obfuscation
@@ -123,6 +126,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="CanCreateBatchSubscriptions"/>
         /// </summary>
         private bool canCreateBatchSubscriptions;
+
+        /// <summary>
+        /// Backing field for <see cref="CanDeleteBatchSubscriptions"/>
+        /// </summary>
+        private bool canDeleteBatchSubscriptions;
 
         /// <summary>
         /// Backing field for <see cref="CanCreateOverride"/>
@@ -162,6 +170,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
             this.changeOwnershipBatchService = changeOwnershipBatchService;
+            this.messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
             this.obfuscationService = new ObfuscationService();
             this.obfuscationService.Initialize(this.Thing, this.Session);
@@ -237,6 +246,15 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the batch delete subscription command shall be enabled
+        /// </summary>
+        public bool CanDeleteBatchSubscriptions
+        {
+            get { return this.canDeleteBatchSubscriptions; }
+            private set { this.RaiseAndSetIfChanged(ref this.canDeleteBatchSubscriptions, value); }
+        }
+       
+        /// <summary>
         /// Gets a value indicating whether the create override command shall be enabled
         /// </summary>
         public bool CanCreateOverride
@@ -284,6 +302,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to create multiple <see cref="ParameterSubscription"/>s in batch operation mode
         /// </summary>
         public ReactiveCommand<object> BatchCreateSubscriptionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to delete multiple <see cref="ParameterSubscription"/>s in batch operation mode
+        /// </summary>
+        public ReactiveCommand<object> BatchDeleteSubscriptionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to change the ownership of an <see cref="IOwnedThing"/> and its contained items
@@ -463,6 +486,9 @@ namespace CDP4EngineeringModel.ViewModels
             this.BatchCreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
             this.BatchCreateSubscriptionCommand.Subscribe(_ => this.ExecuteBatchCreateSubscriptionCommand());
 
+            this.BatchDeleteSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDeleteBatchSubscriptions));
+            this.BatchDeleteSubscriptionCommand.Subscribe(_ => this.ExecuteBatchDeleteSubscriptionCommand());
+
             this.ChangeOwnershipCommand = ReactiveCommand.Create();
             this.ChangeOwnershipCommand.Subscribe(_ => this.ExecuteChangeOwnershipCommand());
 
@@ -539,6 +565,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Subscriptions", "", this.BatchCreateSubscriptionCommand, MenuItemKind.Create, ClassKind.NotThing));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Delete Multiple Subscriptions", "", this.BatchDeleteSubscriptionCommand, MenuItemKind.Delete, ClassKind.NotThing));
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
@@ -815,6 +842,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.CanCreateElementDefinition = this.PermissionService.CanWrite(ClassKind.ElementDefinition, this.Thing);
             this.CanCreateParameterGroup = this.PermissionService.CanWrite(ClassKind.ParameterGroup, this.Thing);
             this.CanCreateBatchSubscriptions = this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.Thing);
+            this.CanDeleteBatchSubscriptions = this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.Thing);
         }
 
         /// <summary>
@@ -924,7 +952,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
             catch (Exception exception)
             {
-                logger.Error(exception, "An error occured when creating a copy of an Element Definition");
+                logger.Error(exception, "An error occured when deleting a copy of an Element Definition");
             }
             finally
             {
@@ -971,6 +999,68 @@ namespace CDP4EngineeringModel.ViewModels
                 this.IsBusy = false;
             }
         }
+
+        /// <summary>
+        /// Execute the <see cref="ExecuteBatchDeleteSubscriptionCommand"/>
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ExecuteBatchDeleteSubscriptionCommand()
+        {
+            var owner = Session.QuerySelectedDomainOfExpertise(this.Thing);
+            var filteredParameterTypes = this.Thing.Element.SelectMany(e => e.Parameter)
+                                                           .Where(p => p.Owner != owner && p.ParameterSubscription.Any())
+                                                           .Select(p => p.ParameterType).Distinct();
+
+            if(!filteredParameterTypes.Any())
+            {
+                this.messageBoxService.Show("No parameters have been subscribed to", "Delete Subscriptions", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var subscribedElements = this.Thing.Element.Where(e => e.Parameter.Any(p => p.Owner != owner && p.ParameterSubscription.Any()));
+            var filteredCategories = subscribedElements.SelectMany(e => e.Category).Distinct();
+            var filteredDomainOfExpertises = this.Thing.Element.SelectMany(e => e.Parameter)
+                                               .Where(p => p.Owner != owner && p.ParameterSubscription.Any())
+                                               .Select(p => p.Owner).Distinct();
+
+            var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(filteredParameterTypes, filteredCategories, filteredDomainOfExpertises);
+            var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
+
+            if (result == null || !result.Result.HasValue || !result.Result.Value)
+            {
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+
+                Func<IEnumerable<Parameter>, bool> confirmationCallBack = p =>                                                
+                                                    this.messageBoxService.Show($"{p.Count()} Parameter Subscriptions will be deleted. Are you sure?",
+                                                                                "Delete Subscriptions",
+                                                                                MessageBoxButton.OKCancel,
+                                                                                MessageBoxImage.Information) == MessageBoxResult.OK;
+                                                
+                await this.parameterSubscriptionBatchService.Delete(this.Session,
+                                                                    this.Thing,
+                                                                    result.IsUncategorizedIncluded,
+                                                                    result.Categories,
+                                                                    result.DomainOfExpertises,
+                                                                    result.ParameterTypes,
+                                                                    confirmationCallBack);
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "An error occured when creating ParameterSubscriptions in a batch operation");
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
 
         /// <summary>
         /// Executes the <see cref="SetAsTopElementDefinitionCommand"/>

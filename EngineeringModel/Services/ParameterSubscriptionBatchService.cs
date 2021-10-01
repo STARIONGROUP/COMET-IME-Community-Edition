@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSubscriptionBatchService.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -33,6 +33,7 @@ namespace CDP4EngineeringModel.Services
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
@@ -47,13 +48,13 @@ namespace CDP4EngineeringModel.Services
     public class ParameterSubscriptionBatchService : IParameterSubscriptionBatchService
     {
         /// <summary>
-        /// Creates multiple subscriptions in one batch operation
+        /// Updates multiple subscriptions in one batch operation
         /// </summary>
         /// <param name="session">
         /// The <see cref="ISession"/> that is used to communicate with the selected data source
         /// </param>
         /// <param name="iteration">
-        /// The container <see cref="Iteration"/> in which the subscriptions are to be created
+        /// The container <see cref="Iteration"/> in which the subscriptions are to be updated
         /// </param>
         /// <param name="isUncategorizedIncluded">
         /// A value indication whether <see cref="Parameter"/>s contained by <see cref="ElementDefinition"/>s that are
@@ -61,19 +62,29 @@ namespace CDP4EngineeringModel.Services
         /// </param>
         /// <param name="categories">
         /// An <see cref="IEnumerable{Category}"/> that is a selection criteria to select the <see cref="Parameter"/>s to which
-        /// <see cref="ParameterSubscription"/>s need to be created
+        /// <see cref="ParameterSubscription"/>s need to be updated
         /// </param>
         /// <param name="domainOfExpertises"></param>
         /// An <see cref="IEnumerable{DomainOfExpertise}"/> that is a selection criteria to select the <see cref="Parameter"/>s to which
-        /// <see cref="ParameterSubscription"/>s need to be created
+        /// <see cref="ParameterSubscription"/>s need to be updated
         /// <param name="parameterTypes">
         /// An <see cref="IEnumerable{ParameterType}"/> that is a selection criteria to select the <see cref="Parameter"/>s to which
-        /// <see cref="ParameterSubscription"/>s need to be created
+        /// <see cref="ParameterSubscription"/>s need to be updated
         /// </param>
+        /// <param name="updateAction">
+        /// An <see cref="Action{IThingTransaction, ParameterOrOverrideBase, ParameterSubscription}"/> that specified that update action to be performed
+        /// </param>        
         /// <returns>
         /// an awaitable <see cref="Task"/>
         /// </returns>
-        public async Task Create(ISession session, Iteration iteration, bool isUncategorizedIncluded, IEnumerable<Category> categories, IEnumerable<DomainOfExpertise> domainOfExpertises, IEnumerable<ParameterType> parameterTypes)
+        private async Task Update(ISession session,
+                                  Iteration iteration,
+                                  bool isUncategorizedIncluded,
+                                  IEnumerable<Category> categories,
+                                  IEnumerable<DomainOfExpertise> domainOfExpertises,
+                                  IEnumerable<ParameterType> parameterTypes,
+                                  Action<IThingTransaction, ParameterOrOverrideBase, ParameterSubscription> updateAction,
+                                  Func<IEnumerable<Parameter>,bool> confirmationCallBack = null)
         {
             if (session == null)
             {
@@ -106,16 +117,114 @@ namespace CDP4EngineeringModel.Services
 
             if (!parameters.Any())
             {
+                return;                 
+            }
+
+            if (confirmationCallBack?.Invoke(parameters.Where(p => p.ParameterSubscription.Any(s => s.Owner == owner))) == false)
+            {
                 return;
             }
 
             var transactionContext = TransactionContextResolver.ResolveContext(iteration);
             var transaction = new ThingTransaction(transactionContext);
 
-            this.UpdateTransactionWithParameterSubscriptions(transaction, owner, parameters);
+            this.UpdateTransactionWithParameterSubscriptions(transaction, owner, parameters, updateAction);
 
             var updateOperationContainer = transaction.FinalizeTransaction();
+
+
             await session.Write(updateOperationContainer);
+            
+        }
+
+        /// <summary>
+        /// Creates multiple subscriptions in one batch operation
+        /// </summary>
+        /// <param name="session">
+        /// The <see cref="ISession"/> that is used to communicate with the selected data source
+        /// </param>
+        /// <param name="iteration">
+        /// The container <see cref="Iteration"/> in which the subscriptions are to be created
+        /// </param>
+        /// <param name="isUncategorizedIncluded">
+        /// A value indication whether <see cref="Parameter"/>s contained by <see cref="ElementDefinition"/>s that are
+        /// not a member of a <see cref="Category"/> shall be included or not
+        /// </param>
+        /// <param name="categories">
+        /// An <see cref="IEnumerable{Category}"/> that is a selection criteria to select the <see cref="Parameter"/>s to which
+        /// <see cref="ParameterSubscription"/>s need to be created
+        /// </param>
+        /// <param name="domainOfExpertises"></param>
+        /// An <see cref="IEnumerable{DomainOfExpertise}"/> that is a selection criteria to select the <see cref="Parameter"/>s to which
+        /// <see cref="ParameterSubscription"/>s need to be created
+        /// <param name="parameterTypes">
+        /// An <see cref="IEnumerable{ParameterType}"/> that is a selection criteria to select the <see cref="Parameter"/>s to which
+        /// <see cref="ParameterSubscription"/>s need to be created
+        /// </param>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>      
+        public async Task Create(ISession session, Iteration iteration, bool isUncategorizedIncluded, IEnumerable<Category> categories, IEnumerable<DomainOfExpertise> domainOfExpertises, IEnumerable<ParameterType> parameterTypes)
+        {
+            Action<IThingTransaction, ParameterOrOverrideBase, ParameterSubscription> addSubscription = (transaction, clone, subscription) =>
+            {
+                clone.ParameterSubscription.Add(subscription);
+                transaction.CreateOrUpdate(clone);
+                transaction.Create(subscription);
+            };
+
+            await this.Update(session, iteration, isUncategorizedIncluded, categories, domainOfExpertises, parameterTypes, addSubscription);
+        }
+
+        /// <summary>
+        /// Deletes multiple subscriptions in one batch operation
+        /// </summary>
+        /// <param name="session">
+        /// The <see cref="ISession"/> that is used to communicate with the selected data source
+        /// </param>
+        /// <param name="iteration">
+        /// The container <see cref="Iteration"/> in which the subscriptions are to be deleted
+        /// </param>
+        /// <param name="isUncategorizedIncluded">
+        /// A value indication whether <see cref="Parameter"/>s contained by <see cref="ElementDefinition"/>s that are
+        /// not a member of a <see cref="Category"/> shall be included or not
+        /// </param>
+        /// <param name="categories">
+        /// An <see cref="IEnumerable{Category}"/> that is a selection criteria to select the <see cref="Parameter"/>s to which
+        /// <see cref="ParameterSubscription"/>s need to be deleted
+        /// </param>
+        /// <param name="domainOfExpertises"></param>
+        /// An <see cref="IEnumerable{DomainOfExpertise}"/> that is a selection criteria to select the <see cref="Parameter"/>s to which
+        /// <see cref="ParameterSubscription"/>s need to be deleted
+        /// <param name="parameterTypes">
+        /// An <see cref="IEnumerable{ParameterType}"/> that is a selection criteria to select the <see cref="Parameter"/>s to which
+        /// <see cref="ParameterSubscription"/>s need to be deleted
+        /// </param>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>       
+
+        public async Task Delete(ISession session,
+                                 Iteration iteration,
+                                 bool isUncategorizedIncluded,
+                                 IEnumerable<Category> categories,
+                                 IEnumerable<DomainOfExpertise> domainOfExpertises,
+                                 IEnumerable<ParameterType> parameterTypes,
+                                 Func<IEnumerable<Parameter>, bool> confirmationCallBack)
+        {
+            Action<IThingTransaction, ParameterOrOverrideBase, ParameterSubscription> deleteSubscription = (transaction, clone, subscription) =>
+            {
+                var remove = clone.ParameterSubscription.SingleOrDefault(s => s.Owner == subscription.Owner);
+                if (remove != null)
+                {
+                    var removeClone = remove.Clone(false);
+                    clone.ParameterSubscription.Remove(remove);
+                    transaction.CreateOrUpdate(clone);
+                    transaction.Delete(removeClone);
+                }
+            };
+
+            await this.Update(session, iteration, isUncategorizedIncluded, categories, domainOfExpertises, parameterTypes, deleteSubscription, confirmationCallBack);
         }
 
         /// <summary>
@@ -192,9 +301,9 @@ namespace CDP4EngineeringModel.Services
         /// not be the owner of the <see cref="Parameter"/>s or <see cref="ParameterOverride"/>s that are subscribed to
         /// </param>
         /// <param name="parameterOrOverrides">
-        /// An <see cref="IEnumerable{ParameterOrOverrideBase}"/> for which new <see cref="ParameterSubscription"/>s will be created.
+        /// An <see cref="Action{IThingTransaction, ParameterOrOverrideBase, ParameterSubscription}"/> for which new <see cref="ParameterSubscription"/>s will be created.
         /// </param>
-        private void UpdateTransactionWithParameterSubscriptions(IThingTransaction transaction, DomainOfExpertise owner, IEnumerable<ParameterOrOverrideBase> parameterOrOverrides)
+        private void UpdateTransactionWithParameterSubscriptions(IThingTransaction transaction, DomainOfExpertise owner, IEnumerable<ParameterOrOverrideBase> parameterOrOverrides, Action<IThingTransaction, ParameterOrOverrideBase, ParameterSubscription> updateAction)
         {
             foreach (var parameterOrOverride in parameterOrOverrides)
             {
@@ -204,9 +313,7 @@ namespace CDP4EngineeringModel.Services
                 };
 
                 var clone = parameterOrOverride.Clone(false);
-                clone.ParameterSubscription.Add(subscription);
-                transaction.CreateOrUpdate(clone);
-                transaction.Create(subscription);
+                updateAction(transaction, clone, subscription);
             }
         }
     }

@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSubscriptionBatchServiceTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -19,15 +19,15 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.Services
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Collections.Concurrent;    
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
@@ -83,6 +83,11 @@ namespace CDP4EngineeringModel.Tests.Services
             this.iteration.Element.Add(elementDefinition);
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri) { Owner = this.powerEngineering, ParameterType = this.simpleQuantityKind };
             elementDefinition.Parameter.Add(parameter);
+            var parameterSubscription = new ParameterSubscription(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Owner = this.systemEngineering
+            };
+            parameter.ParameterSubscription.Add(parameterSubscription);
 
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.systemEngineering);
@@ -91,9 +96,9 @@ namespace CDP4EngineeringModel.Tests.Services
         }
 
         [Test]
-        public async Task Verify_that_Create_throws_ArgumentNullExceptions()
+        public void Verify_that_Create_throws_ArgumentNullExceptions()
         {
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.parameterSubscriptionBatchService.Create(null, null, false,null, null, null));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.parameterSubscriptionBatchService.Create(null, null, false, null, null, null));
             Assert.ThrowsAsync<ArgumentNullException>(async () => await this.parameterSubscriptionBatchService.Create(this.session.Object, null, false, null, null, null));
             Assert.ThrowsAsync<ArgumentNullException>(async () => await this.parameterSubscriptionBatchService.Create(this.session.Object, this.iteration, false, null, null, null));
             Assert.ThrowsAsync<ArgumentNullException>(async () => await this.parameterSubscriptionBatchService.Create(this.session.Object, this.iteration, false, new List<Category>(), null, null));
@@ -108,6 +113,18 @@ namespace CDP4EngineeringModel.Tests.Services
             var parameterTypes = new List<ParameterType> { this.simpleQuantityKind };
 
             await this.parameterSubscriptionBatchService.Create(this.session.Object, this.iteration, false, categories, domains, parameterTypes);
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
+        }
+
+        [Test]
+        public async Task Verify_that_Delete_Executes()
+        {
+            var categories = new List<Category> { this.equipments };
+            var domains = new List<DomainOfExpertise> { this.powerEngineering };
+            var parameterTypes = new List<ParameterType> { this.simpleQuantityKind };
+
+            await this.parameterSubscriptionBatchService.Delete(this.session.Object, this.iteration, false, categories, domains, parameterTypes, x => true); ;
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
         }
