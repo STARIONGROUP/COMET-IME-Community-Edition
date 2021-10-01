@@ -24,7 +24,8 @@
     </UserControl.Resources>
 
     <dxb:ToolBarControl Height="30">
-        <dxb:BarSplitButtonItem Glyph="{dx:DXImage Image=Add_16x16.png}" 
+        <dxb:BarSplitButtonItem Command="{Binding CreateCommand}"
+                                Glyph="{dx:DXImage Image=Add_16x16.png}" 
                                 Hint="Create an Item."
                                 IsEnabled="{Binding IsAddButtonEnabled, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
             <dxb:BarSplitButtonItem.PopupControl>
