@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -43,14 +43,17 @@ namespace CDP4EngineeringModel.Tests
     using CDP4Composition.Events;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.Services;
-    using CDP4EngineeringModel.ViewModels;    
+    using CDP4EngineeringModel.ViewModels;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using Moq;
     
@@ -72,6 +75,8 @@ namespace CDP4EngineeringModel.Tests
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IParameterSubscriptionBatchService> parameterSubscriptionBatchService;
         private Mock<IChangeOwnershipBatchService> changeOwnershipBatchService;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IMessageBoxService> messageBoxService;
         private Mock<IObfuscationService> obfuscationService;
 
         private SiteDirectory sitedir;
@@ -177,6 +182,11 @@ namespace CDP4EngineeringModel.Tests
 
             this.parameterSubscriptionBatchService = new Mock<IParameterSubscriptionBatchService>();
             this.changeOwnershipBatchService = new Mock<IChangeOwnershipBatchService>();
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.messageBoxService = new Mock<IMessageBoxService>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
         }
 
         [TearDown]
@@ -594,15 +604,15 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = defRow;
             vm.PopulateContextMenu();
-            Assert.AreEqual(17, vm.ContextMenu.Count);
+            Assert.AreEqual(18, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[0];
             vm.PopulateContextMenu();
-            Assert.AreEqual(11, vm.ContextMenu.Count);
+            Assert.AreEqual(12, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[1];
             vm.PopulateContextMenu();
-            Assert.AreEqual(10, vm.ContextMenu.Count);
+            Assert.AreEqual(11, vm.ContextMenu.Count);
 
             var usageRow = defRow.ContainedRows[2];
             var usage2Row = defRow.ContainedRows[3];
@@ -613,11 +623,11 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = usageRow.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(11, vm.ContextMenu.Count);
+            Assert.AreEqual(12, vm.ContextMenu.Count);
 
             vm.SelectedThing = usage2Row.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(11, vm.ContextMenu.Count);
+            Assert.AreEqual(12, vm.ContextMenu.Count);
 
             vm.Dispose();
         }
@@ -787,7 +797,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public async Task Verify_that_ExecuteBatchCreateSubscriptionCommand_works_as_expected()
+        public void Verify_that_ExecuteBatchCreateSubscriptionCommand_works_as_expected()
         {
             var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.CategoryDomainParameterTypeSelectorResult(true, false, Enumerable.Empty<ParameterType>(), Enumerable.Empty<Category>(), Enumerable.Empty<DomainOfExpertise>());
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
@@ -805,7 +815,27 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public async Task Verify_that_ExecuteBatchChangeOwnershipElementDefinition_works_as_expected()
+        public void Verify_that_ExecuteBatchDeleteSubscriptionCommand_works_as_expected()
+        {
+            this.messageBoxService.Setup(m => m.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>())).Returns(MessageBoxResult.OK);
+
+            var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.CategoryDomainParameterTypeSelectorResult(true, false, Enumerable.Empty<ParameterType>(), Enumerable.Empty<Category>(), Enumerable.Empty<DomainOfExpertise>());
+            this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, null);
+            vm.PopulateContextMenu();
+
+            Assert.AreEqual(2, vm.ContextMenu.Count);
+
+            vm.BatchDeleteSubscriptionCommand.Execute(null);
+
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Exactly(1));
+
+            this.parameterSubscriptionBatchService.Verify(x => x.Delete(this.session.Object, this.iteration, false, It.IsAny<IEnumerable<Category>>(), It.IsAny<IEnumerable<DomainOfExpertise>>(), It.IsAny<IEnumerable<ParameterType>>(), It.IsAny<Func<IEnumerable<Parameter>, bool>>()), Times.Exactly(1));
+        }
+
+        [Test]
+        public void Verify_that_ExecuteBatchChangeOwnershipElementDefinition_works_as_expected()
         {
             var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.ChangeOwnershipSelectionResult(true, this.domain, true);
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
