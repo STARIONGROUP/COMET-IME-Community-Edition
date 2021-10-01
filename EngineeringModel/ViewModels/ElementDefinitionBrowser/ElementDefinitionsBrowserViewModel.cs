@@ -1015,7 +1015,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if(!filteredParameterTypes.Any())
             {
-                this.messageBoxService.Show("No parameters have been subscribed to","Delete Subscriptions", MessageBoxButton.OK, MessageBoxImage.Information);
+                this.messageBoxService.Show("No parameters have been subscribed to", "Delete Subscriptions", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
             }
 

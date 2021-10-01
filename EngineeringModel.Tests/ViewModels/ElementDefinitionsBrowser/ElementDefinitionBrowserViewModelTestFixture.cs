@@ -822,6 +822,16 @@ namespace CDP4EngineeringModel.Tests
             var dialogResult = new CDP4EngineeringModel.ViewModels.Dialogs.CategoryDomainParameterTypeSelectorResult(true, false, Enumerable.Empty<ParameterType>(), Enumerable.Empty<Category>(), Enumerable.Empty<DomainOfExpertise>());
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
 
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Container = this.elementDef,
+                ParameterType = this.pt,
+            };
+
+            parameter.ParameterSubscription.Add(new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain });
+            this.elementDef.Parameter.Add(parameter);
+            this.iteration.Element.Add(this.elementDef);
+
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, null);
             vm.PopulateContextMenu();
 
