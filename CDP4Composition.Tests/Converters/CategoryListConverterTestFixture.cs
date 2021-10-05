@@ -49,9 +49,9 @@ namespace CDP4Composition.Tests.Converters
         }
 
         [Test]
-        public void VerifyThatConvertProvidesTheExpectedString()
+        public void VerifyThatObjectNotOfCorrectTypeReturnsAnEmptyString()
         {            
-            Assert.Throws<ArgumentException>(() => this.converter.Convert(new object(), null, null, null));
+            Assert.That(this.converter.Convert(new object(), null, null, null), Is.EqualTo(string.Empty));
         }
 
         [Test]

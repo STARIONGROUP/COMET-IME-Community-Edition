@@ -50,7 +50,7 @@ namespace CDP4Composition.Converters
         {
             if (value is not IEnumerable<Category> categories)
             {
-                throw new ArgumentException($"Parameter {nameof(value)} is not of type {nameof(IEnumerable<Category>)}", nameof(value));
+                return string.Empty;
             }
 
             return string.Join(", ", categories.Select(c => c.Name));
