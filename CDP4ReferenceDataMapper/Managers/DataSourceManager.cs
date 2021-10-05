@@ -2,9 +2,9 @@
 // <copyright file="DataSourceManager.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -200,6 +200,15 @@ namespace CDP4ReferenceDataMapper.Managers
         }
 
         /// <summary>
+        /// Gets all <see cref="ActualFiniteStateKind.MANDATORY"/> <see cref="ActualFiniteState"/>s from <see cref="actualFiniteStateList"/>
+        /// </summary>
+        /// <returns><see cref="IEnumerable{ActualFiniteState}"/> of the mandatory finite states</returns>
+        private IEnumerable<ActualFiniteState> GetMandatoryFiniteStates()
+        {
+            return this.actualFiniteStateList.ActualState.Where(x => x.Kind == ActualFiniteStateKind.MANDATORY);
+        }
+
+        /// <summary>
         /// Initialize this instance of <see cref="DataSourceManager"/>
         /// </summary>
         private void Initialize()
@@ -280,7 +289,7 @@ namespace CDP4ReferenceDataMapper.Managers
             }
 
             var newActualFiniteStates = 
-                this.actualFiniteStateList.ActualState
+                this.GetMandatoryFiniteStates()
                     .Except(this.Columns.OfType<ActualStateDataGridColumn>().Select(x => x.ActualFiniteState))
                     .ToList();
 
@@ -354,13 +363,13 @@ namespace CDP4ReferenceDataMapper.Managers
                             $"{elementUsage.Name} [{elementUsage.ModelCode()}]",
                             elementUsage);
 
-                    foreach (var actualState in this.actualFiniteStateList.ActualState)
+                    foreach (var actualState in this.GetMandatoryFiniteStates())
                     {
                         elementUsageRow[actualState.ShortName] = $"{actualState.ShortName}";
                     }
 
                     var valueParameters =
-                        elementUsage.ParameterOverride.Cast<ParameterOrOverrideBase>()
+                        elementUsage.ParameterOverride
                             .Where(x => x.ParameterType == this.targetValueParameterType);
 
                     foreach (var valueParameter in valueParameters)
@@ -392,7 +401,7 @@ namespace CDP4ReferenceDataMapper.Managers
                                         $"{valueParameter.ParameterType?.Name} [{valueParameter.ParameterType?.ShortName}]",
                                         valueParameter);
 
-                                foreach (var currentValueSet in valueParameter.ValueSets)
+                                foreach (var currentValueSet in valueParameter.ValueSets.Where(x => x.ActualState.Kind == ActualFiniteStateKind.MANDATORY))
                                 {
                                     var columnName = currentValueSet.ActualState.ShortName;
                                     var mappingParameterValue = mappingParameter.ValueSets.FirstOrDefault()?.Computed[0];
@@ -549,7 +558,7 @@ namespace CDP4ReferenceDataMapper.Managers
             dataRow[TypeColumnName] = type;
             dataRow[LabelColumnName] = label;
 
-            foreach (var actualFiniteState in this.actualFiniteStateList.ActualState)
+            foreach (var actualFiniteState in this.GetMandatoryFiniteStates())
             {
                 dataRow[actualFiniteState.ShortName] = string.Empty;
             }
@@ -817,7 +826,7 @@ namespace CDP4ReferenceDataMapper.Managers
         /// <param name="dataRow">The <see cref="DataRow"/></param>
         private void CopyCurrentValuesToOrgValueColumns(DataRow dataRow)
         {
-            foreach (var actualState in this.actualFiniteStateList.ActualState)
+            foreach (var actualState in this.GetMandatoryFiniteStates())
             {
                 dataRow[this.GetOrgValueColumnName(actualState.ShortName)] = dataRow[actualState.ShortName];
                 dataRow[this.GetOrgValueColumnName(this.GetShortNameColumnName(actualState.ShortName))] = dataRow[this.GetShortNameColumnName(actualState.ShortName)];
@@ -868,7 +877,7 @@ namespace CDP4ReferenceDataMapper.Managers
         /// <returns>true is the <see cref="DataRow"/> was changed, otherwise false.</returns>
         private bool RowHasChanges(DataRow dataRow)
         {
-            foreach (var actualState in this.actualFiniteStateList.ActualState)
+            foreach (var actualState in this.GetMandatoryFiniteStates())
             {
                 var columnName = actualState.ShortName;
 
@@ -903,7 +912,7 @@ namespace CDP4ReferenceDataMapper.Managers
                     continue;
                 }
 
-                foreach (var actualState in this.actualFiniteStateList.ActualState)
+                foreach (var actualState in this.GetMandatoryFiniteStates())
                 {
                     if (dataRow[actualState.ShortName].ToString() == dataRow[this.GetOrgValueColumnName(actualState.ShortName)].ToString())
                     {
@@ -954,7 +963,7 @@ namespace CDP4ReferenceDataMapper.Managers
                 {
                     hasChanges = true;
 
-                    foreach (var actualState in this.actualFiniteStateList.ActualState)
+                    foreach (var actualState in this.GetMandatoryFiniteStates())
                     {
                         if (mappingRow[actualState.ShortName] == DBNull.Value || string.IsNullOrEmpty(mappingRow[actualState.ShortName].ToString()))
                         {
