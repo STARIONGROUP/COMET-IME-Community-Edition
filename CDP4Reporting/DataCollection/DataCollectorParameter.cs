@@ -33,6 +33,7 @@ namespace CDP4Reporting.DataCollection
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     /// <summary>
     /// Abstract base class from which all parameter columns for a <see cref="DataCollectorRow"/> need to derive.
@@ -112,20 +113,27 @@ namespace CDP4Reporting.DataCollection
         /// <summary>
         /// Get the correct value of a <see cref="IValueSet"/>.
         /// </summary>
-        /// <param name="valueSet">The <see cref="IValueSet"/></param>
+        /// <param name="valueSet">
+        /// The <see cref="IValueSet"/>
+        /// </param>
+        /// <param name="position">
+        /// Position of the expected value within the <see cref="IValueSet"/>
+        /// </param>
         /// <returns>The correct value of the <see cref="IValueSet"/></returns>
-        public TValue GetValueSetValue(IValueSet valueSet)
+        public TValue GetValueSetValue(IValueSet valueSet, int position = 0)
         {
+            ValueArray<string> valueArray = null;
+
             if (valueSet is ParameterSubscriptionValueSet valueSetSubscription)
             {
                 if (this.ParameterSubscriptionValueContext == ParameterValueContext.ActualValue)
                 {
-                    return this.Parse(valueSet.ActualValue.FirstOrDefault()) ?? default;
+                    valueArray = valueSet.ActualValue;
                 }
 
                 if (this.ParameterSubscriptionValueContext == ParameterValueContext.PublishedValue)
                 {
-                    return this.Parse(valueSetSubscription.Computed.FirstOrDefault()) ?? default;
+                    valueArray = valueSetSubscription.Computed;
                 }
             }
 
@@ -133,13 +141,23 @@ namespace CDP4Reporting.DataCollection
             {
                 if (this.ParameterValueContext == ParameterValueContext.ActualValue)
                 {
-                    return this.Parse(valueSet.ActualValue.FirstOrDefault()) ?? default;
+                    valueArray = valueSetBase.ActualValue;
                 }
 
                 if (this.ParameterValueContext == ParameterValueContext.PublishedValue)
                 {
-                    return this.Parse(valueSetBase.Published.FirstOrDefault()) ?? default;
+                    valueArray = valueSetBase.Published;
                 }
+            }
+
+            if (valueArray != null)
+            {
+                if (position == 0)
+                {
+                    return this.Parse(valueArray.FirstOrDefault()) ?? default;
+                }
+
+                return this.Parse(valueArray[position]) ?? default; 
             }
 
             return default;
