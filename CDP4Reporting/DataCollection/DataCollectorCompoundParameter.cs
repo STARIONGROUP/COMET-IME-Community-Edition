@@ -55,9 +55,9 @@ namespace CDP4Reporting.DataCollection
                 {
                     var valueSet = this.ValueSets.Distinct().FirstOrDefault();
                 
-                    foreach (ParameterTypeComponent childParameter in compoundParameterType.Component)
+                    foreach (ParameterTypeComponent containedparameterTypeComponent in compoundParameterType.Component)
                     {
-                        var columnName = this.FieldName + "_" + childParameter.ShortName;
+                        var columnName = this.FieldName + "_" + containedparameterTypeComponent.ShortName;
 
                         if (!table.Columns.Contains(columnName))
                         {
