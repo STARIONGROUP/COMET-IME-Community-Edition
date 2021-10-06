@@ -265,7 +265,7 @@ namespace CDP4Reporting.DataCollection
         /// </param>
         private void CheckDataColumnsForStateDependentPerRowParameters(DataTable table)
         {
-            foreach (var rowField in this.stateDependentColumns)
+            foreach (var rowField in this.allColumns)
             {
                 var column = rowField.Key.GetValue(this.GetRowRepresentation()) as IDataCollectorStateDependentPerRowParameter;
                 column?.InitializeColumns(table);
