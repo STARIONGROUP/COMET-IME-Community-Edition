@@ -41,13 +41,14 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
     using CDP4EngineeringModel.Comparers;
-    
+    using CDP4EngineeringModel.ViewModels.PublicationBrowser;
+
     using ReactiveUI;
 
     /// <summary>
@@ -74,6 +75,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="CanCreatePublication"/>
         /// </summary>
         private bool canCreatePublication;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectAll"/>
+        /// </summary>
+        private bool? selectAll = false;
 
         /// <summary>
         /// The Panel Caption
@@ -106,6 +112,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets or sets the Create Command
         /// </summary>
         public ReactiveCommand<object> PublishCommand { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the select all command
+        /// </summary>
+        public ReactiveCommand<object> SelectAllCommand { get; private set; }
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -153,6 +164,15 @@ namespace CDP4EngineeringModel.ViewModels
         public DisposableReactiveList<PublicationDomainOfExpertiseRowViewModel> Domains { get; private set; }
 
         /// <summary>
+        /// Gets or sets the select all property
+        /// </summary>
+        public bool? SelectAll 
+        { 
+            get { return this.selectAll; }
+            set { this.RaiseAndSetIfChanged(ref this.selectAll, value); } 
+        }
+
+        /// <summary>
         /// Gets all parameter rows.
         /// </summary>
         public IEnumerable<PublicationParameterOrOverrideRowViewModel> Parameters
@@ -167,6 +187,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
+
+        /// <summary>
+        /// Gets or sets the PulbicationRowCheckedCommand
+        /// </summary>
+        public ReactiveCommand<object> PulbicationRowCheckedCommand { get; private set; }
 
         /// <summary>
         /// Initializes the browser
@@ -187,6 +212,50 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.PublishCommand = ReactiveCommand.Create();
             this.PublishCommand.Subscribe(_ => this.ExecutePublishCommand());
+
+            this.SelectAllCommand = ReactiveCommand.Create();
+            this.SelectAllCommand.Subscribe(x => this.ExecuteSelectAllCommand((bool?)x));
+
+            this.PulbicationRowCheckedCommand = ReactiveCommand.Create();
+            this.PulbicationRowCheckedCommand.Subscribe(_ => this.ExecutePulbicationRowCheckedCommand());
+        }
+
+        /// <summary>
+        /// Updates the select all status when a row checked status is changed
+        /// </summary>
+        private void ExecutePulbicationRowCheckedCommand()
+        {
+            var totalCount = Domains.Count() + Parameters.Count();
+            var toBePublishedCount = Domains.Count(d => d.ToBePublished) + Parameters.Count(p => p.ToBePublished);
+
+            if (toBePublishedCount == totalCount)
+            {
+                SelectAll = true;
+                return;
+            }
+
+            if (toBePublishedCount == 0)
+            {
+                SelectAll = false;
+                return;
+            }
+
+            SelectAll = null;
+        }
+
+        /// <summary>
+        /// Updates selection status of domain rows in response to select all toggle
+        /// </summary>
+        /// <param name="isChecked"></param>
+        private void ExecuteSelectAllCommand(bool? isChecked)
+        {
+            if(isChecked.HasValue)
+            {
+                foreach(var domain in this.Domains)
+                {
+                    domain.ToBePublished = isChecked.Value;
+                }
+            }
         }
 
         /// <summary>

@@ -54,7 +54,14 @@
                                 </Image.Source>
                             </Image>
                         </dx:PixelSnapper>
-                        <CheckBox IsChecked="{Binding Row.ToBePublished, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        <CheckBox IsChecked="{Binding Row.ToBePublished, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <dxmvvm:Interaction.Behaviors>
+                                <dxmvvm:EventToCommand EventName="Checked"
+                                                       Command="{Binding DataContext.PulbicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
+                                <dxmvvm:EventToCommand EventName="Unchecked"
+                                                       Command="{Binding DataContext.PulbicationRowCheckedCommand, ElementName=TreeListToBePublished}" />                                
+                            </dxmvvm:Interaction.Behaviors>
+                        </CheckBox>
                         <ContentPresenter x:Name="defaultRowPresenter"
                                           Content="{Binding}"
                                           ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
@@ -74,7 +81,15 @@
                                 </Image.Source>
                             </Image>
                         </dx:PixelSnapper>
-                        <CheckBox IsChecked="{Binding Row.ToBePublished, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding Row.IsCheckable, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                        <CheckBox IsChecked="{Binding Row.ToBePublished, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                  Visibility="{Binding Row.IsCheckable, Converter={StaticResource BooleanToVisibilityConverter}}" >
+                            <dxmvvm:Interaction.Behaviors>
+                                <dxmvvm:EventToCommand EventName="Checked"
+                                                       Command="{Binding DataContext.PulbicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
+                                <dxmvvm:EventToCommand EventName="Unchecked"
+                                                       Command="{Binding DataContext.PulbicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
+                            </dxmvvm:Interaction.Behaviors>
+                        </CheckBox>
                         <ContentPresenter x:Name="defaultRowPresenter"
                                           Content="{Binding}"
                                           ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
@@ -169,7 +184,26 @@
                         <dragDrop:FrameworkElementDragBehavior />
                     </i:Interaction.Behaviors>
                     <dxg:TreeListControl.Columns>
-                        <dxg:TreeListColumn FieldName="Name" Header="Domain" />
+                        <dxg:TreeListColumn FieldName="Name"
+                                            ShowCheckBoxInHeader="True">
+                            <dxg:TreeListColumn.HeaderTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal"
+                                                DataContext="{Binding DataContext, ElementName=TreeListToBePublished}">
+                                        <TextBlock VerticalAlignment="Center">Domain</TextBlock>
+                                        <CheckBox Margin="5,0,0,0"
+                                                  Command="{Binding SelectAllCommand}"
+                                                  CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=IsChecked}"
+                                                  IsChecked="{Binding SelectAll}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </dxg:TreeListColumn.HeaderTemplate>
+                            <dxg:TreeListColumn.FilterEditorHeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock>Domain</TextBlock>
+                                </DataTemplate>
+                            </dxg:TreeListColumn.FilterEditorHeaderTemplate>
+                        </dxg:TreeListColumn>
                         <dxg:TreeListColumn FieldName="Value" Header="New Value" />
                         <dxg:TreeListColumn FieldName="Published" Header="Old Value" />
                         <dxg:TreeListColumn FieldName="PercentageChange" Header="% Changed" />
