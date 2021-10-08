@@ -292,7 +292,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             viewmodel.SelectAllCommand.Execute(true);
 
             viewmodel.Domains.First().ToBePublished = false;
-            viewmodel.PulbicationRowCheckedCommand.Execute(null);
+            viewmodel.PublicationRowCheckedCommand.Execute(null);
 
             Assert.That(viewmodel.SelectAll, Is.Null);
             Assert.That(viewmodel.Domains[0].ToBePublished, Is.False);

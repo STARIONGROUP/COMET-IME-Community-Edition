@@ -57,9 +57,9 @@
                         <CheckBox IsChecked="{Binding Row.ToBePublished, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <dxmvvm:Interaction.Behaviors>
                                 <dxmvvm:EventToCommand EventName="Checked"
-                                                       Command="{Binding DataContext.PulbicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
+                                                       Command="{Binding DataContext.PublicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
                                 <dxmvvm:EventToCommand EventName="Unchecked"
-                                                       Command="{Binding DataContext.PulbicationRowCheckedCommand, ElementName=TreeListToBePublished}" />                                
+                                                       Command="{Binding DataContext.PublicationRowCheckedCommand, ElementName=TreeListToBePublished}" />                                
                             </dxmvvm:Interaction.Behaviors>
                         </CheckBox>
                         <ContentPresenter x:Name="defaultRowPresenter"
@@ -85,9 +85,9 @@
                                   Visibility="{Binding Row.IsCheckable, Converter={StaticResource BooleanToVisibilityConverter}}" >
                             <dxmvvm:Interaction.Behaviors>
                                 <dxmvvm:EventToCommand EventName="Checked"
-                                                       Command="{Binding DataContext.PulbicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
+                                                       Command="{Binding DataContext.PublicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
                                 <dxmvvm:EventToCommand EventName="Unchecked"
-                                                       Command="{Binding DataContext.PulbicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
+                                                       Command="{Binding DataContext.PublicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
                             </dxmvvm:Interaction.Behaviors>
                         </CheckBox>
                         <ContentPresenter x:Name="defaultRowPresenter"

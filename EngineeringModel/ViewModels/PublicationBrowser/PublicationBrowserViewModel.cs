@@ -189,9 +189,9 @@ namespace CDP4EngineeringModel.ViewModels
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
-        /// Gets or sets the PulbicationRowCheckedCommand
+        /// Gets or sets the PublicationRowCheckedCommand
         /// </summary>
-        public ReactiveCommand<object> PulbicationRowCheckedCommand { get; private set; }
+        public ReactiveCommand<object> PublicationRowCheckedCommand { get; private set; }
 
         /// <summary>
         /// Initializes the browser
@@ -216,14 +216,14 @@ namespace CDP4EngineeringModel.ViewModels
             this.SelectAllCommand = ReactiveCommand.Create();
             this.SelectAllCommand.Subscribe(x => this.ExecuteSelectAllCommand((bool?)x));
 
-            this.PulbicationRowCheckedCommand = ReactiveCommand.Create();
-            this.PulbicationRowCheckedCommand.Subscribe(_ => this.ExecutePulbicationRowCheckedCommand());
+            this.PublicationRowCheckedCommand = ReactiveCommand.Create();
+            this.PublicationRowCheckedCommand.Subscribe(_ => this.ExecutePublicationRowCheckedCommand());
         }
 
         /// <summary>
         /// Updates the select all status when a row checked status is changed
         /// </summary>
-        private void ExecutePulbicationRowCheckedCommand()
+        private void ExecutePublicationRowCheckedCommand()
         {
             var totalCount = Domains.Count() + Parameters.Count();
             var toBePublishedCount = Domains.Count(d => d.ToBePublished) + Parameters.Count(p => p.ToBePublished);
