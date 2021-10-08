@@ -184,8 +184,7 @@
                         <dragDrop:FrameworkElementDragBehavior />
                     </i:Interaction.Behaviors>
                     <dxg:TreeListControl.Columns>
-                        <dxg:TreeListColumn FieldName="Name"
-                                            ShowCheckBoxInHeader="True">
+                        <dxg:TreeListColumn FieldName="Name">
                             <dxg:TreeListColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal"
