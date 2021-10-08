@@ -169,7 +169,7 @@ namespace CDP4EngineeringModel.ViewModels
         public bool? SelectAll 
         { 
             get { return this.selectAll; }
-            set { this.RaiseAndSetIfChanged(ref this.selectAll, value); } 
+            private set { this.RaiseAndSetIfChanged(ref this.selectAll, value); } 
         }
 
         /// <summary>
@@ -249,6 +249,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="isChecked"></param>
         private void ExecuteSelectAllCommand(bool? isChecked)
         {
+            SelectAll = isChecked;
+
             if(isChecked.HasValue)
             {
                 foreach(var domain in this.Domains)

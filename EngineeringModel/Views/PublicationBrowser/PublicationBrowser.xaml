@@ -193,7 +193,7 @@
                                         <CheckBox Margin="5,0,0,0"
                                                   Command="{Binding SelectAllCommand}"
                                                   CommandParameter="{Binding RelativeSource={RelativeSource Self}, Path=IsChecked}"
-                                                  IsChecked="{Binding SelectAll}" />
+                                                  IsChecked="{Binding SelectAll, Mode=OneWay}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </dxg:TreeListColumn.HeaderTemplate>
