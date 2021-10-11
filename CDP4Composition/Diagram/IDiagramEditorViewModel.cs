@@ -58,7 +58,8 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Gets or sets the collection of diagram items.
         /// </summary>
-        DisposableReactiveList<IThingDiagramItem> ThingDiagramItems { get; set; }
+        DisposableReactiveList<IThingDiagramItemViewModel> ThingDiagramItemViewModels { get; set; }
+        DisposableReactiveList<IDiagramConnectorViewModel> ConnectorViewModels { get; set; }
 
         /// <summary>
         /// Removes a diagram item and its connectors.

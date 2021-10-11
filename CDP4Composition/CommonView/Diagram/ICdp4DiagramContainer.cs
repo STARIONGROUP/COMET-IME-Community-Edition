@@ -30,14 +30,14 @@ namespace CDP4CommonView.Diagram
     using ReactiveUI;
 
     /// <summary>
-    /// The interface that describes some of the DiagramEditorViewModel capability related to <see cref="ICdp4DiagramOrgChartBehavior"/>/>
+    /// The interface that describes some of the DiagramEditorViewModel capability related to <see cref="ICdp4DiagramBehavior"/>/>
     /// </summary>
     public interface ICdp4DiagramContainer
     {
         /// <summary>
         /// Gets or sets the behaviour.
         /// </summary>
-        ICdp4DiagramOrgChartBehavior Behavior { get; set; }
+        ICdp4DiagramBehavior Behavior { get; set; }
 
         /// <summary>
         /// Get or set the <see cref="DiagramItem"/> item that is selected.

@@ -37,9 +37,9 @@ namespace CDP4Composition.Diagram
     using ReactiveUI;
 
     /// <summary>
-    /// Represents a <see cref="ThingDiagramContentItem"/> with a name and a <see cref="ClassKind"/>
+    /// Represents a <see cref="ThingDiagramContentItemViewModel"/> with a name and a <see cref="ClassKind"/>
     /// </summary>
-    public class NamedThingDiagramContentItem : ThingDiagramContentItem
+    public class NamedThingDiagramContentItemViewModel : ThingDiagramContentItemViewModel
     {
         /// <summary>
         /// Backing field for <see cref="ClassKind"/>
@@ -62,31 +62,31 @@ namespace CDP4Composition.Diagram
         private string categories;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
+        /// Initializes a new instance of the <see cref="NamedThingDiagramContentItemViewModel"/> class.
         /// </summary>
         /// <param name="thing">
         /// The thing.
         /// </param>
-        public NamedThingDiagramContentItem(Thing thing) : base(thing)
+        public NamedThingDiagramContentItemViewModel(Thing thing) : base(thing)
         {
             this.UpdateProperties();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
+        /// Initializes a new instance of the <see cref="NamedThingDiagramContentItemViewModel"/> class.
         /// </summary>
         /// <param name="diagramThing">
         /// The diagramThing contained</param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public NamedThingDiagramContentItem(DiagramElementThing diagramThing, IDiagramEditorViewModel container)
+        public NamedThingDiagramContentItemViewModel(DiagramElementThing diagramThing, IDiagramEditorViewModel container)
             : base(diagramThing, container)
         {
             this.UpdateProperties();
         }
 
         /// <summary>
-        /// Sets <see cref="NamedThingDiagramContentItem.Thing"/> related property used to display
+        /// Sets <see cref="NamedThingDiagramContentItemViewModel.Thing"/> related property used to display
         /// </summary>
         private void UpdateProperties()
         {
@@ -139,7 +139,7 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets or sets the class kind of the <see cref="NamedThingDiagramContentItem"/>
+        /// Gets or sets the class kind of the <see cref="NamedThingDiagramContentItemViewModel"/>
         /// </summary>
         public string ClassKind
         {
@@ -148,7 +148,7 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets or sets the categories of the <see cref="NamedThingDiagramContentItem"/>
+        /// Gets or sets the categories of the <see cref="NamedThingDiagramContentItemViewModel"/>
         /// </summary>
         public string Categories
         {
@@ -157,7 +157,7 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets or sets the name of the <see cref="NamedThingDiagramContentItem"/>
+        /// Gets or sets the name of the <see cref="NamedThingDiagramContentItemViewModel"/>
         /// </summary>
         public string FullName
         {
@@ -166,7 +166,7 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets or sets the shortname of the <see cref="NamedThingDiagramContentItem"/>
+        /// Gets or sets the shortname of the <see cref="NamedThingDiagramContentItemViewModel"/>
         /// </summary>
         public string ShortName
         {

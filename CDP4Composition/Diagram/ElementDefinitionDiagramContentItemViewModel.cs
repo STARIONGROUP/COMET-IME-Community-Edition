@@ -43,7 +43,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents an <see cref="ElementDefinition"/> to be used in a Diagram
     /// </summary>
-    public class ElementDefinitionDiagramContentItem : PortContainerDiagramContentItem, IDiagramContentItemChildren
+    public class ElementDefinitionDiagramContentItemViewModel : PortContainerDiagramContentItemViewModel, IDiagramContentItemChildren
     {
         /// <summary>
         /// Backing fied for <see cref="IsTopDiagramElement"/>
@@ -51,19 +51,19 @@ namespace CDP4Composition.Diagram
         private bool isTopDiagramElement;
 
         /// <summary>
-        /// Gets or sets the Children of the <see cref="ElementDefinitionDiagramContentItem"/>
+        /// Gets or sets the Children of the <see cref="ElementDefinitionDiagramContentItemViewModel"/>
         /// </summary>
         public ReactiveList<IDiagramContentItemChild> DiagramContentItemChildren { get; set; } = new();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="NamedThingDiagramContentItem"/> class.
+        /// Initializes a new instance of the <see cref="NamedThingDiagramContentItemViewModel"/> class.
         /// </summary>
         /// <param name="diagramThing">
         /// The diagramThing contained</param>
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public ElementDefinitionDiagramContentItem(ArchitectureElement diagramThing, ISession session, IDiagramEditorViewModel container)
+        public ElementDefinitionDiagramContentItemViewModel(ArchitectureElement diagramThing, ISession session, IDiagramEditorViewModel container)
             : base(diagramThing, container)
         {
             this.session = session;
@@ -86,7 +86,7 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Sets <see cref="ElementDefinitionDiagramContentItem.Thing"/> related properties
+        /// Sets <see cref="ElementDefinitionDiagramContentItemViewModel.Thing"/> related properties
         /// </summary>
         private void UpdateProperties(bool skipPortUpdate = false)
         {

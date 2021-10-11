@@ -38,7 +38,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents an <see cref="Requirement"/> to be used in a Diagram
     /// </summary>
-    public class RequirementDiagramContentItem : NamedThingDiagramContentItem, IDiagramContentItemChildren
+    public class RequirementDiagramContentItemViewModel : NamedThingDiagramContentItemViewModel, IDiagramContentItemChildren
     {
         /// <summary>
         /// The <see cref="ISession"/> to be used when creating other view models
@@ -46,12 +46,12 @@ namespace CDP4Composition.Diagram
         private readonly ISession session;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RequirementDiagramContentItem"/> class.
+        /// Initializes a new instance of the <see cref="RequirementDiagramContentItemViewModel"/> class.
         /// </summary>
         /// <param name="diagramThing">The diagram thing contained</param>
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public RequirementDiagramContentItem(DiagramObject diagramThing, ISession session, IDiagramEditorViewModel container)
+        public RequirementDiagramContentItemViewModel(DiagramObject diagramThing, ISession session, IDiagramEditorViewModel container)
             : base(diagramThing, container)
         {
             this.session = session;
@@ -65,7 +65,7 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Sets <see cref="RequirementDiagramContentItem.Thing"/> related properties
+        /// Sets <see cref="RequirementDiagramContentItemViewModel.Thing"/> related properties
         /// </summary>
         private void UpdateProperties()
         {
@@ -82,7 +82,7 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets or sets the Children of the <see cref="RequirementDiagramContentItem"/>
+        /// Gets or sets the Children of the <see cref="RequirementDiagramContentItemViewModel"/>
         /// </summary>
         public ReactiveList<IDiagramContentItemChild> DiagramContentItemChildren { get; set; } = new();
 

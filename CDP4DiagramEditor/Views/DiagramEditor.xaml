@@ -33,12 +33,13 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <cdp4Composition:StringToIconUriConverter x:Key="StringToIconUriConverter" />
-            <dx:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></dx:BooleanToVisibilityConverter>
-            <dxmvvm:EnumToStringConverter x:Key="EnumToStringConverter"></dxmvvm:EnumToStringConverter>
+            <dx:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <dxmvvm:EnumToStringConverter x:Key="EnumToStringConverter" />
             <Style TargetType="{x:Type dxb:BarButtonItem}">
                 <Setter Property="Content"
                         Value="{Binding Header}" />
@@ -94,7 +95,7 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
-            
+
             <DataTemplate DataType="{x:Type mvvm:ContextMenuItemViewModel}">
                 <ContentControl>
                     <dxb:BarButtonItem Command="{Binding MenuCommand}"
@@ -242,7 +243,7 @@
                                FontStyle="Italic"
                                FontSize="11"
                                Margin="10,0,10,10" />
-                    </StackPanel>
+                </StackPanel>
             </DataTemplate>
 
             <DataTemplate x:Key="DiagramPortTemplate">
@@ -250,29 +251,31 @@
             </DataTemplate>
 
             <DataTemplate x:Key="ElementUsageConnectorTemplate">
-                <dxdiag:DiagramConnector EndArrow="FilledDiamond"
+                <!--<dxdiag:DiagramConnector EndArrow="FilledDiamond"
                                          EndArrowSize="12,7"
                                          BeginArrow="Open90"
                                          BeginItem="{Binding BeginItem}"
                                          EndItem="{Binding EndItem}"
-                                         Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
+                                         Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />-->
             </DataTemplate>
 
             <DataTemplate x:Key="InterfaceConnectorTemplate">
-                <dxdiag:DiagramConnector EndArrow="(none)"
+                <!--<dxdiag:DiagramConnector EndArrow="(none)"
                                          BeginArrow="(none)"
                                          BeginItem="{Binding BeginItem}"
                                          EndItem="{Binding EndItem}"
-                                         Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
+                                         Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />-->
             </DataTemplate>
 
-            <viewModels:DiagramItemDataTemplateSelector x:Key="DiagramItemDataTemplateSelector"
-                                                        RequirementDiagramItemTemplate="{StaticResource RequirementDiagramItemTemplate}"
-                                                        ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
-                                                        GenericDiagramItemDataTemplate="{StaticResource GenericDiagramItemTemplate}"
-                                                        ElementUsageConnectorDataTemplate="{StaticResource ElementUsageConnectorTemplate}"
-                                                        InterfaceConnectorDataTemplate="{StaticResource InterfaceConnectorTemplate}"
-                                                        DiagramPortTemplate="{StaticResource DiagramPortTemplate}" />
+            <viewModels:DiagramItemViewModelTemplateSelector x:Key="DiagramItemViewModelTemplateSelector"
+                                                             RequirementDiagramItemTemplate="{StaticResource RequirementDiagramItemTemplate}"
+                                                             ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
+                                                             GenericDiagramItemDataTemplate="{StaticResource GenericDiagramItemTemplate}"
+                                                             DiagramPortTemplate="{StaticResource DiagramPortTemplate}" />
+
+            <viewModels:ConnectorViewModelTemplateSelector x:Key="ConnectorViewModelTemplateSelector"
+                                                           ElementUsageConnectorDataTemplate="{StaticResource ElementUsageConnectorTemplate}"
+                                                           InterfaceConnectorDataTemplate="{StaticResource InterfaceConnectorTemplate}" />
         </ResourceDictionary>
 
     </UserControl.Resources>
@@ -308,12 +311,15 @@
                                    ItemLinksSource="{Binding DropContextMenuItems}" />
                 </dxb:BarManager.DXContextMenu>
                 <dxmvvm:Interaction.Behaviors>
-                    <diagram:Cdp4DiagramOrgChartBehavior x:Name="orgChartBehavior"
-                                                         PageMargin="45"
-                                                         RibbonMergeCategoryName="DiagramCategory"
-                                                         ItemTemplateSelector="{StaticResource DiagramItemDataTemplateSelector}"
-                                                         ItemsSource="{Binding ThingDiagramItems, UpdateSourceTrigger=PropertyChanged}"
-                                                         EventPublisher="{Binding EventPublisher, Mode=OneWay}"/>
+                    <diagram:Cdp4DiagramBehavior x:Name="orgChartBehavior"
+                                                 RibbonMergeCategoryName="DiagramCategory"
+                                                 ItemTemplateSelector="{StaticResource DiagramItemViewModelTemplateSelector}"
+                                                 ConnectorTemplateSelector="{StaticResource ConnectorViewModelTemplateSelector}"
+                                                 ConnectorsSource="{Binding ConnectorViewModels}"
+                                                 ConnectorFromMember="BeginItem"
+                                                 ConnectorToMember="EndItem"
+                                                 ItemsSource="{Binding ThingDiagramItemViewModels, UpdateSourceTrigger=PropertyChanged}"
+                                                 EventPublisher="{Binding EventPublisher, Mode=OneWay}" />
                 </dxmvvm:Interaction.Behaviors>
                 <diagram:Cdp4DiagramControl.Actions>
                     <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.Save}" />
@@ -364,7 +370,7 @@
                         <dxmvvm:Interaction.Behaviors>
                             <dxmvvm:EventToCommand Event="PreviewMouseMove"
                                                    PassEventArgsToCommand="True"
-                                                   Command="{Binding OnMouseMoveCommand}"></dxmvvm:EventToCommand>
+                                                   Command="{Binding OnMouseMoveCommand}" />
                         </dxmvvm:Interaction.Behaviors>
                         <dxn:NavBarControl.Resources>
 

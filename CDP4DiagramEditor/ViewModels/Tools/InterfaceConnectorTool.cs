@@ -87,7 +87,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// Gets the type of connector to be created
         /// </summary>
-        public IDiagramConnector GetConnector
+        public IDiagramConnectorViewModel GetConnector
         {
             get { return new InterfaceEdgeViewModel(this); }
         }
@@ -97,25 +97,23 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// </summary>
         /// <param name="connector">The supplied temp connector</param>
         /// <param name="behavior">The behavior</param>
-        public async Task ExecuteCreate(IDrawnConnector connector, ICdp4DiagramOrgChartBehavior behavior)
+        public async Task ExecuteCreate(IDrawnConnector connector, ICdp4DiagramBehavior behavior)
         {
-            var connectorConnector = connector as DiagramConnector;
-
-            var beginItemContent = ((DiagramContentItem)connectorConnector?.BeginItem)?.DataContext as DiagramPortDiagramContentItem;
-            var endItemContent = ((DiagramContentItem)connectorConnector?.EndItem)?.DataContext as DiagramPortDiagramContentItem;
+            var beginItemContent = ((IDiagramConnectorViewModel)connector).BeginItem as DiagramPortDiagramContentItemViewModel;
+            var endItemContent = ((IDiagramConnectorViewModel)connector).EndItem as DiagramPortDiagramContentItemViewModel;
 
             if (beginItemContent == null || endItemContent == null)
             {
                 // connector was drawn with either the source or target missing or incorrect
                 // remove the dummy connector
-                behavior.RemoveItem((DiagramItem)connector);
+                behavior.ViewModel.RemoveDiagramThingItem(connector);
                 behavior.ResetTool();
                 return;
             }
 
             try
             {
-                var relationship = await this.ThingCreator.CreateAndGetInterface(endItemContent.Content as ElementUsage, beginItemContent.Content as ElementUsage, (Iteration)behavior.ViewModel.Thing.Container, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration)behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
+                var relationship = await this.ThingCreator.CreateAndGetInterface(endItemContent.Thing as ElementUsage, beginItemContent.Thing as ElementUsage, (Iteration)behavior.ViewModel.Thing.Container, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration)behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
 
                 this.CreateInterfaceConnector(relationship, (DiagramPort)beginItemContent.DiagramThing, (DiagramPort)endItemContent.DiagramThing, behavior);
             }
@@ -126,7 +124,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             finally
             {
                 // remove the dummy connector
-                behavior.RemoveItem((DiagramItem)connector);
+                behavior.ViewModel.RemoveDiagramThingItem(connector);
                 behavior.ResetTool();
             }
         }
@@ -138,9 +136,9 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <param name="source">The <see cref="DiagramObject" /> source</param>
         /// <param name="target">The <see cref="DiagramObject" /> target</param>
         /// <param name="behavior">The diagram bahavior</param>
-        private void CreateInterfaceConnector(BinaryRelationship relationship, DiagramPort source, DiagramPort target, ICdp4DiagramOrgChartBehavior behavior)
+        private void CreateInterfaceConnector(BinaryRelationship relationship, DiagramPort source, DiagramPort target, ICdp4DiagramBehavior behavior)
         {
-            var connectorItem = behavior.ViewModel.ThingDiagramItems.SingleOrDefault(x => x.Thing == relationship);
+            var connectorItem = behavior.ViewModel.ConnectorViewModels.SingleOrDefault(x => x.Thing == relationship);
 
             if (connectorItem != null)
             {
@@ -156,7 +154,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             };
 
             connectorItem = new InterfaceEdgeViewModel(edge, behavior.ViewModel);
-            behavior.ViewModel.ThingDiagramItems.Add(connectorItem);
+            behavior.ViewModel.ConnectorViewModels.Add(connectorItem);
 
             behavior.ViewModel.UpdateIsDirty();
         }

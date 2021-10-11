@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Cdp4DiagramOrgChartBehavior.cs" company="RHEA System S.A.">
+// <copyright file="Cdp4DiagramBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -54,14 +54,14 @@ namespace CDP4CommonView.Diagram
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="Cdp4DiagramOrgChartBehavior" /> is to handle events from
+    /// The purpose of the <see cref="Cdp4DiagramBehavior" /> is to handle events from
     /// the attached view of type <see cref="Cdp4DiagramControl" />  and to relay relatable
     /// data from and to the viewModel of type <see cref="IDiagramEditorViewModel" />
     /// </summary>
     /// <remarks>
     /// This behavior is meant to be attached to the DiagramEditor view from CDP4DiagramEditor plugin
     /// </remarks>
-    public class Cdp4DiagramOrgChartBehavior : DiagramOrgChartBehavior, ICdp4DiagramOrgChartBehavior
+    public class Cdp4DiagramBehavior : DiagramDataBindingBehavior, ICdp4DiagramBehavior
     {
         /// <summary>
         /// The name of the data format used for drag-n-drop operations
@@ -71,12 +71,12 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// The dependency property that allows setting the <see cref="IEventPublisher" />
         /// </summary>
-        public static readonly DependencyProperty EventPublisherProperty = DependencyProperty.Register("EventPublisher", typeof(IEventPublisher), typeof(Cdp4DiagramOrgChartBehavior));
+        public static readonly DependencyProperty EventPublisherProperty = DependencyProperty.Register("EventPublisher", typeof(IEventPublisher), typeof(Cdp4DiagramBehavior));
 
         /// <summary>
         /// The dependency property that allows setting the RibbonMergeCategoryName
         /// </summary>
-        public static readonly DependencyProperty RibbonMergeCategoryNameProperty = DependencyProperty.Register("RibbonMergeCategoryName", typeof(string), typeof(Cdp4DiagramOrgChartBehavior));
+        public static readonly DependencyProperty RibbonMergeCategoryNameProperty = DependencyProperty.Register("RibbonMergeCategoryName", typeof(string), typeof(Cdp4DiagramBehavior));
 
         /// <summary>
         /// The <see cref="IDragInfo" /> object that contains information about the drag operation.
@@ -115,9 +115,9 @@ namespace CDP4CommonView.Diagram
         private RibbonControl parentRibbon;
 
         /// <summary>
-        /// Initializes static members of the <see cref="Cdp4DiagramOrgChartBehavior" /> class.
+        /// Initializes static members of the <see cref="Cdp4DiagramBehavior" /> class.
         /// </summary>
-        static Cdp4DiagramOrgChartBehavior()
+        static Cdp4DiagramBehavior()
         {
         }
 
@@ -198,7 +198,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="selectedIid">The Iid of the <see cref="Thing" /></param>
         public void SelectItemByThingIid(Guid? selectedIid)
         {
-            var thingDiagramItem = this.AssociatedObject.Items.OfType<DiagramContentItem>().FirstOrDefault(c => c.Content is ElementDefinitionDiagramContentItem edc && edc.Thing.Iid.Equals(selectedIid));
+            var thingDiagramItem = this.AssociatedObject.Items.OfType<DiagramContentItem>().FirstOrDefault(c => c.Content is ElementDefinitionDiagramContentItemViewModel edc && edc.Thing.Iid.Equals(selectedIid));
 
             if (thingDiagramItem != null)
             {
@@ -206,14 +206,32 @@ namespace CDP4CommonView.Diagram
             }
         }
 
-        /// <summary>
-        /// Removes the specified item from the diagram collection.
-        /// </summary>
-        /// <param name="item">The <see cref="DiagramItem" /> to remove.</param>
-        public void RemoveItem(DiagramItem item)
-        {
-            this.AssociatedObject.Items.Remove(item);
-        }
+        ///// <summary>
+        ///// Removes a diagram item
+        ///// </summary>
+        ///// <param name = "item" > The item to remove</param>
+        ////public void RemoveItem(IThingDiagramItemViewModel item)
+        ////{
+        ////    throw new NotImplementedException();
+        ////}
+
+        ///// <summary>
+        ///// Removes a diagram connector
+        ///// </summary>
+        ///// <param name = "item" > The connector to remove</param>
+        ////public void RemoveConnector(IDiagramConnectorViewModel connector)
+        ////{
+        ////    throw new NotImplementedException();
+        ////}
+
+        ///// <summary>
+        ///// Removes the specified item from the diagram collection.
+        ///// </summary>
+        ///// <param name = "item" > The < see cref= "DiagramItem" /> to remove.</param>
+        ////public void RemoveItem(DiagramItem item)
+        ////{
+        ////    this.AssociatedObject.Items.Remove(item);
+        ////}
 
         /// <summary>
         /// Gets the associated diagram control
@@ -361,9 +379,9 @@ namespace CDP4CommonView.Diagram
 
                 if (item is DiagramContentItem contentItem)
                 {
-                    if (contentItem.Content is PortContainerDiagramContentItem portContainer)
+                    if (contentItem.Content is PortContainerDiagramContentItemViewModel portContainer)
                     {
-                        this.ViewModel.ThingDiagramItems.RemoveAllAndDispose(portContainer.PortCollection.OfType<IThingDiagramItem>());
+                        this.ViewModel.ThingDiagramItemViewModels.RemoveAllAndDispose(portContainer.PortCollection.OfType<IThingDiagramItemViewModel>());
                         portContainer.PortCollection.Clear();
                     }
 
@@ -374,7 +392,7 @@ namespace CDP4CommonView.Diagram
 
                     element = contentItem.Content;
                 }
-                else if (item is Cdp4DiagramConnector connector)
+                else if (item is DiagramConnector connector)
                 {
                     element = connector.DataContext;
                 }
@@ -393,7 +411,7 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The arguments</param>
         private void LayoutUpdated(object sender, EventArgs e)
         {
-            foreach (var portContainer in this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content as PortContainerDiagramContentItem))
+            foreach (var portContainer in this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content as PortContainerDiagramContentItemViewModel))
             {
                 portContainer?.UpdatePortLayout();
             }
@@ -406,13 +424,13 @@ namespace CDP4CommonView.Diagram
         /// <param name="e">The arguments</param>
         private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
-            var thingDiagramContentItem = (e.Item as DiagramContentItem)?.Content as ThingDiagramContentItem;
+            var thingDiagramContentItem = (e.Item as DiagramContentItem)?.Content as ThingDiagramContentItemViewModel;
 
             if (e.Action == ItemsChangedAction.Removed)
             {
                 if (e.Item is DiagramItem port)
                 {
-                    var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content).OfType<PortContainerDiagramContentItem>().FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
+                    var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content).OfType<PortContainerDiagramContentItemViewModel>().FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
                     container?.PortCollection.Remove(container.PortCollection.FirstOrDefault(i => i == port.DataContext));
                 }
 
@@ -422,6 +440,8 @@ namespace CDP4CommonView.Diagram
             {
                 if (thingDiagramContentItem != null && thingDiagramContentItem.PositionObservable is null)
                 {
+                    thingDiagramContentItem.DiagramRepresentation = e.Item;
+
                     // If you watch multiple values it will fires multiple times CAREFULL
                     thingDiagramContentItem.PositionObservable = e.Item.WhenAnyValue(x => x.Position).Subscribe(x => thingDiagramContentItem.SetDirty());
                 }
@@ -430,7 +450,7 @@ namespace CDP4CommonView.Diagram
 
         /// <summary>
         /// update the position of diagramContentItem according to position they have been assigned through
-        /// <see cref="Cdp4DiagramOrgChartBehavior.ItemPositions" />
+        /// <see cref="Cdp4DiagramBehavior.ItemPositions" />
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The arguments</param>
@@ -443,7 +463,7 @@ namespace CDP4CommonView.Diagram
 
             foreach (var item in e.Items)
             {
-                if (item is DiagramContentItem { Content: ThingDiagramContentItem thingDiagramContentItem })
+                if (item is DiagramContentItem { Content: ThingDiagramContentItemViewModel thingDiagramContentItem })
                 {
                     if (this.ItemPositions.TryGetValue(thingDiagramContentItem, out var itemPosition))
                     {
@@ -725,7 +745,7 @@ namespace CDP4CommonView.Diagram
         private void PreviewDragOver(object sender, DragEventArgs e)
         {
             // If the sender is a port and its element definition is not selected
-            if (((DiagramControl)sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItem))
+            if (((DiagramControl)sender).PrimarySelection is DiagramPortShape && !this.AssociatedObject.SelectedItems.OfType<DiagramContentItem>().Any(s => s.Content is PortContainerDiagramContentItemViewModel))
             {
                 return;
             }

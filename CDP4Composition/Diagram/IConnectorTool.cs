@@ -39,13 +39,13 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Gets the type of connector to be created
         /// </summary>
-        IDiagramConnector GetConnector { get; }
+        IDiagramConnectorViewModel GetConnector { get; }
 
         /// <summary>
         /// Executes the creation of the objects conveyed by the tool
         /// </summary>
         /// <param name="connector">The temporary connector</param>
         /// <param name="behavior">The behavior</param>
-        Task ExecuteCreate(IDrawnConnector connector, ICdp4DiagramOrgChartBehavior behavior);
+        Task ExecuteCreate(IDrawnConnector connector, ICdp4DiagramBehavior behavior);
     }
 }

@@ -25,6 +25,7 @@
 
 namespace CDP4CommonView.Diagram
 {
+    using System;
     using System.Collections.Generic;
 
     using CDP4Common.CommonData;
@@ -37,7 +38,7 @@ namespace CDP4CommonView.Diagram
     /// <summary>
     /// The interface that shall be realized by view-models representing a <see cref="DiagramEdge" />
     /// </summary>
-    public interface IDiagramConnectorViewModel
+    public interface IDiagramConnectorViewModel : IDisposable
     {
         /// <summary>
         /// Gets the connection points for the represented <see cref="DiagramEdge" />
@@ -55,6 +56,21 @@ namespace CDP4CommonView.Diagram
         DiagramElementThing Target { get; set; }
 
         /// <summary>
+        /// Gets the source <see cref="IThingDiagramItemViewModel"/>
+        /// </summary>
+        IThingDiagramItemViewModel BeginItem { get; set; }
+
+        /// <summary>
+        /// Gets the target <see cref="IThingDiagramItemViewModel" />
+        /// </summary>
+        IThingDiagramItemViewModel EndItem { get; set; }
+
+        /// <summary>
+        /// The diagram thing
+        /// </summary>
+        DiagramElementThing DiagramThing { get; set; }
+
+        /// <summary>
         /// Gets the text to display
         /// </summary>
         string DisplayedText { get; }
@@ -68,10 +84,5 @@ namespace CDP4CommonView.Diagram
         /// Gets a value indicating whether the diagram editor is dirty
         /// </summary>
         bool IsDirty { get; }
-
-        /// <summary>
-        /// Get the creator connector tool
-        /// </summary>
-        IConnectorTool Tool { get; }
     }
 }

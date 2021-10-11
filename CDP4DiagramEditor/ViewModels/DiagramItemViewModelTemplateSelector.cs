@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DiagramItemDataTemplateSelector.cs" company="RHEA System S.A.">
+// <copyright file="DiagramItemViewModelTemplateSelector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
@@ -33,9 +33,9 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Composition.Diagram;
 
     /// <summary>
-    /// The <see cref="DataTemplateSelector"/> to select a <see cref="DataTemplate"/> depending on the kind of budget to compute
+    /// The <see cref="DataTemplateSelector"/> to select a <see cref="DataTemplate"/> depending on the kind of <see cref="IThingDiagramItemViewModel"/>
     /// </summary>
-    public class DiagramItemDataTemplateSelector : DataTemplateSelector
+    public class DiagramItemViewModelTemplateSelector : DataTemplateSelector
     {
         /// <summary>
         /// Gets or sets the <see cref="DataTemplate"/> for a normal DiagramContentItem
@@ -58,31 +58,19 @@ namespace CDP4DiagramEditor.ViewModels
         public DataTemplate RequirementDiagramItemTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="DataTemplate"/> for a DiagramContentItem that represents an <see cref="ElementUsage"/>
+        /// Selects the template for a <see cref="NamedThingDiagramContentItemViewModel"/>
         /// </summary>
-        public DataTemplate ElementUsageConnectorDataTemplate { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="DataTemplate"/> for a DiagramContentItem that represents an <see cref="ElementUsage"/>
-        /// </summary>
-        public DataTemplate InterfaceConnectorDataTemplate { get; set; }
-
-        /// <summary>
-        /// Selects the template for a <see cref="NamedThingDiagramContentItem"/>
-        /// </summary>
-        /// <param name="item">The <see cref="NamedThingDiagramContentItem"/></param>
+        /// <param name="item">The <see cref="NamedThingDiagramContentItemViewModel"/></param>
         /// <param name="container">the dependency-object</param>
         /// <returns>The <see cref="DataTemplate"/> to use</returns>
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             return item switch
             {
-                ElementDefinitionDiagramContentItem => this.ElementBaseDiagramItemTemplate,
-                RequirementDiagramContentItem => this.RequirementDiagramItemTemplate,
-                DiagramPortDiagramContentItem => this.DiagramPortTemplate,
-                NamedThingDiagramContentItem => this.GenericDiagramItemDataTemplate,
-                ElementUsageEdgeViewModel => this.ElementUsageConnectorDataTemplate,
-                InterfaceEdgeViewModel => this.InterfaceConnectorDataTemplate,
+                ElementDefinitionDiagramContentItemViewModel => this.ElementBaseDiagramItemTemplate,
+                RequirementDiagramContentItemViewModel => this.RequirementDiagramItemTemplate,
+                DiagramPortDiagramContentItemViewModel => this.DiagramPortTemplate,
+                NamedThingDiagramContentItemViewModel => this.GenericDiagramItemDataTemplate,
                 _ => base.SelectTemplate(item, container)
             };
         }

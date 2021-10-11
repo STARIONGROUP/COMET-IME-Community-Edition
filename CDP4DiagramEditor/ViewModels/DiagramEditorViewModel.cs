@@ -107,9 +107,14 @@ namespace CDP4DiagramEditor.ViewModels
         private ReactiveList<DiagramItem> selectedItems;
 
         /// <summary>
-        /// Backing field for <see cref="ThingDiagramItems" />
+        /// Backing field for <see cref="ThingDiagramItemViewModels" />
         /// </summary>
-        private DisposableReactiveList<IThingDiagramItem> thingDiagramItems;
+        private DisposableReactiveList<IThingDiagramItemViewModel> thingDiagramItemViewModels;
+
+        /// <summary>
+        /// Backing field for <see cref="ConnectorViewModels" />
+        /// </summary>
+        private DisposableReactiveList<IDiagramConnectorViewModel> connectorViewModels;
 
         /// <summary>
         /// Backing field for the <see cref="IsTopDiagramElementSet"/>
@@ -229,10 +234,19 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets or sets the collection of diagram items.
         /// </summary>
-        public DisposableReactiveList<IThingDiagramItem> ThingDiagramItems
+        public DisposableReactiveList<IThingDiagramItemViewModel> ThingDiagramItemViewModels
         {
-            get { return this.thingDiagramItems; }
-            set { this.RaiseAndSetIfChanged(ref this.thingDiagramItems, value); }
+            get { return this.thingDiagramItemViewModels; }
+            set { this.RaiseAndSetIfChanged(ref this.thingDiagramItemViewModels, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the collection of diagram connectors.
+        /// </summary>
+        public DisposableReactiveList<IDiagramConnectorViewModel> ConnectorViewModels
+        {
+            get { return this.connectorViewModels; }
+            set { this.RaiseAndSetIfChanged(ref this.connectorViewModels, value); }
         }
 
         /// <summary>
@@ -276,7 +290,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// gets or sets the behavior.
         /// </summary>
-        public ICdp4DiagramOrgChartBehavior Behavior { get; set; }
+        public ICdp4DiagramBehavior Behavior { get; set; }
 
         /// <summary>
         /// Update this view-model
@@ -293,24 +307,24 @@ namespace CDP4DiagramEditor.ViewModels
         public void ComputeDiagramConnector()
         {
             var updatedItems = this.Thing.DiagramElement.OfType<DiagramEdge>().ToList();
-            var currentItems = this.ThingDiagramItems.OfType<ThingDiagramConnector>().Select(x => x.DiagramThing).ToList();
+            var currentItems = this.ConnectorViewModels.Select(x => x.DiagramThing).ToList();
 
             var newItems = updatedItems.Except(currentItems);
             var oldItems = currentItems.Except(updatedItems);
 
             foreach (var diagramThing in oldItems)
             {
-                var item = this.ThingDiagramItems.OfType<ThingDiagramConnector>().SingleOrDefault(x => x.DiagramThing == diagramThing);
+                var item = this.ConnectorViewModels.SingleOrDefault(x => x.DiagramThing == diagramThing);
 
                 if (item != null)
                 {
-                    this.ThingDiagramItems.RemoveAndDispose(item);
+                    this.ConnectorViewModels.RemoveAndDispose(item);
                 }
             }
 
             foreach (var diagramThing in newItems)
             {
-                DiagramEdgeViewModel newDiagramElement = null;
+                DrawnDiagramEdgeViewModel newDrawnDiagramElement = null;
 
                 if (diagramThing.DepictedThing == null)
                 {
@@ -320,40 +334,40 @@ namespace CDP4DiagramEditor.ViewModels
                 switch (diagramThing.DepictedThing)
                 {
                     case ElementUsage:
-                        newDiagramElement = new ElementUsageEdgeViewModel((DiagramEdge)diagramThing, this);
+                        newDrawnDiagramElement = new ElementUsageEdgeViewModel((DiagramEdge)diagramThing, this);
                         break;
                     default:
-                        newDiagramElement = new DiagramEdgeViewModel((DiagramEdge)diagramThing, this);
+                        newDrawnDiagramElement = new DrawnDiagramEdgeViewModel((DiagramEdge)diagramThing, this);
                         break;
                 }
 
-                this.ThingDiagramItems.Add(newDiagramElement);
+                this.ConnectorViewModels.Add(newDrawnDiagramElement);
             }
 
             this.UpdateIsDirty();
         }
 
         /// <summary>
-        /// Occurs when a <see cref="ThingDiagramContentItem" /> gets removed
+        /// Occurs when a <see cref="ThingDiagramContentItemViewModel" /> gets removed
         /// </summary>
         /// <param name="contentItemContent">The removed object</param>
         public void RemoveDiagramThingItem(object contentItemContent)
         {
             switch (contentItemContent)
             {
-                case DiagramEdgeViewModel connector:
-                    this.ThingDiagramItems.RemoveAndDispose(connector);
+                case DrawnDiagramEdgeViewModel connector:
+                    this.ConnectorViewModels.RemoveAndDispose(connector);
                     break;
-                case ThingDiagramContentItem item:
+                case ThingDiagramContentItemViewModel item:
                 {
-                    this.ThingDiagramItems.RemoveAndDispose(item);
+                    this.ThingDiagramItemViewModels.RemoveAndDispose(item);
                     this.Behavior.ItemPositions.Remove(item);
 
-                    var connectors = this.ThingDiagramItems.OfType<ThingDiagramConnector>().Where(x => ((DiagramEdge)x.DiagramThing).Source.DepictedThing == item.DiagramThing.DepictedThing || ((DiagramEdge)x.DiagramThing).Target.DepictedThing == item.DiagramThing.DepictedThing).ToArray();
+                    var connectors = this.ConnectorViewModels.Where(x => ((DiagramEdge)x.DiagramThing).Source.DepictedThing == item.DiagramThing.DepictedThing || ((DiagramEdge)x.DiagramThing).Target.DepictedThing == item.DiagramThing.DepictedThing).ToArray();
 
                     foreach (var diagramEdgeViewModel in connectors)
                     {
-                        this.ThingDiagramItems.RemoveAndDispose(diagramEdgeViewModel);
+                        this.ConnectorViewModels.RemoveAndDispose(diagramEdgeViewModel);
                     }
 
                     break;
@@ -369,7 +383,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="thing">The <see cref="Thing" /> by which to find and remove diagram things.</param>
         public void RemoveDiagramThingItemByThing(Thing thing)
         {
-            var diagramItems = this.ThingDiagramItems.Where(di => di.Thing.Equals(thing)).ToList();
+            var diagramItems = this.ThingDiagramItemViewModels.Where(di => di.Thing.Equals(thing)).ToList();
 
             foreach (var thingDiagramContentItem in diagramItems)
             {
@@ -403,23 +417,23 @@ namespace CDP4DiagramEditor.ViewModels
         public void UpdateIsDirty()
         {
             var currentObjects = this.Thing.DiagramElement.OfType<DiagramObject>().ToArray();
-            var displayedObjects = this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.DiagramThing).ToArray();
+            var displayedObjects = this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().Select(x => x.DiagramThing).ToArray();
 
             var removedItem = currentObjects.Except(displayedObjects).Count();
             var addedItem = displayedObjects.Except(currentObjects).Count();
 
             var currentEdges = this.Thing.DiagramElement.OfType<DiagramEdge>().ToArray();
-            var displayedEdges = this.ThingDiagramItems.OfType<ThingDiagramConnector>().Select(x => x.DiagramThing).ToArray();
+            var displayedEdges = this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().Select(x => x.DiagramThing).ToArray();
 
             var removedEdges = currentEdges.Except(displayedEdges).Count();
             var addedEdges = displayedEdges.Except(currentEdges).Count();
 
-            this.IsDirty = this.ThingDiagramItems.Any(x => x.IsDirty) || removedItem > 0;
+            this.IsDirty = this.ThingDiagramItemViewModels.Any(x => x.IsDirty) || removedItem > 0;
 
             this.IsDirty |= addedItem > 0;
-            
+
             this.IsDirty |= addedEdges > 0;
-            this.IsDirty |= this.ThingDiagramItems.OfType<ThingDiagramConnector>().Any(x => x.IsDirty) || removedEdges > 0;
+            this.IsDirty |= this.ConnectorViewModels.Any(x => x.IsDirty) || removedEdges > 0;
         }
 
         /// <summary>
@@ -437,7 +451,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             switch (dropInfo.Payload)
             {
-                case Thing rowPayload when !this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.Thing).Contains(rowPayload):
+                case Thing rowPayload when !this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().Select(x => x.Thing).Contains(rowPayload):
                     dropInfo.Effects = DragDropEffects.Copy;
                     return;
                 case Tuple<ParameterType, MeasurementScale> tuplePayload:
@@ -489,7 +503,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="convertedDropPosition">The drop position.</param>
         private void CreateThingShape(IDropInfo dropInfo, Thing rowPayload, Point convertedDropPosition)
         {
-            if (this.ThingDiagramItems.OfType<NamedThingDiagramContentItem>().Select(x => x.Thing).Contains(rowPayload))
+            if (this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().Select(x => x.Thing).Contains(rowPayload))
             {
                 return;
             }
@@ -499,7 +513,8 @@ namespace CDP4DiagramEditor.ViewModels
             var bounds = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
                 X = (float)position.X,
-                Y = (float)position.Y
+                Y = (float)position.Y,
+                Name = rowPayload.UserFriendlyName
             };
 
             var block = new DiagramObject(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
@@ -512,7 +527,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             block.Bounds.Add(bounds);
 
-            NamedThingDiagramContentItem diagramItem = null;
+            NamedThingDiagramContentItemViewModel diagramItemViewModel = null;
 
             switch (rowPayload)
             {
@@ -528,39 +543,39 @@ namespace CDP4DiagramEditor.ViewModels
 
                         architectureBlock.Bounds.Add(bounds);
 
-                        PortContainerDiagramContentItem portContainer = new ElementDefinitionDiagramContentItem(architectureBlock, this.Session, this);
+                        PortContainerDiagramContentItemViewModel portContainer = new ElementDefinitionDiagramContentItemViewModel(architectureBlock, this.Session, this);
 
-                        diagramItem = portContainer;
+                        diagramItemViewModel = portContainer;
                         break;
                     }
 
                 case Requirement requirement:
                     {
-                        diagramItem = new RequirementDiagramContentItem(block, this.Session, this);
+                        diagramItemViewModel = new RequirementDiagramContentItemViewModel(block, this.Session, this);
                         break;
                     }
                 default:
                     if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
                     {
                         block.DepictedThing = tuplePayload.Item1;
-                        diagramItem = new NamedThingDiagramContentItem(block, this);
+                        diagramItemViewModel = new NamedThingDiagramContentItemViewModel(block, this);
                     }
                     else
                     {
-                        diagramItem = new NamedThingDiagramContentItem(block, this);
+                        diagramItemViewModel = new NamedThingDiagramContentItemViewModel(block, this);
                     }
 
                     break;
             }
 
-            diagramItem.Position = position;
+            //diagramItemViewModel.Position = position;
 
-            this.Behavior.ItemPositions.Add(diagramItem, convertedDropPosition);
-            this.ThingDiagramItems.Add(diagramItem);
+            this.Behavior.ItemPositions.Add(diagramItemViewModel, convertedDropPosition);
+            this.ThingDiagramItemViewModels.Add(diagramItemViewModel);
 
-            (diagramItem as PortContainerDiagramContentItem)?.UpdatePorts();
+            (diagramItemViewModel as PortContainerDiagramContentItemViewModel)?.UpdatePorts();
 
-            this.ComputeDiagramConnector(diagramItem);
+            this.ComputeDiagramConnector(diagramItemViewModel);
 
             this.UpdateIsDirty();
         }
@@ -616,7 +631,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.Disposables.Add(deleteObservable);
             this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel> { ChangeTrackingEnabled = true };
-            this.ThingDiagramItems = new DisposableReactiveList<IThingDiagramItem> { ChangeTrackingEnabled = true };
+            this.ThingDiagramItemViewModels = new DisposableReactiveList<IThingDiagramItemViewModel> { ChangeTrackingEnabled = true };
+            this.ConnectorViewModels = new DisposableReactiveList<IDiagramConnectorViewModel> { ChangeTrackingEnabled = true };
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
         }
 
@@ -648,7 +664,7 @@ namespace CDP4DiagramEditor.ViewModels
             this.DeleteFromModelCommand.Subscribe(x => this.ExecuteDeleteFromModelCommand());
 
             this.SetAsTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.SelectedItem)
-                .Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItem }),
+                .Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItemViewModel }),
                 _ => this.ExecuteSetTopElementCommand(), RxApp.MainThreadScheduler);
             this.SetAsTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
 
@@ -673,14 +689,14 @@ namespace CDP4DiagramEditor.ViewModels
                 transaction.CreateOrUpdate(clone);
                 clone.DiagramElement.Clear();
 
-                var deletedDiagramObj = this.Thing.DiagramElement.Except(this.ThingDiagramItems.Select(x => x.DiagramThing));
+                var deletedDiagramObj = this.Thing.DiagramElement.Except(this.ThingDiagramItemViewModels.Select(x => x.DiagramThing));
 
                 foreach (var diagramObject in deletedDiagramObj)
                 {
                     transaction.Delete(diagramObject.Clone(false));
                 }
 
-                foreach (var diagramObjectViewModel in this.ThingDiagramItems)
+                foreach (var diagramObjectViewModel in this.ThingDiagramItemViewModels)
                 {
                     diagramObjectViewModel.UpdateTransaction(transaction, clone);
                 }
@@ -703,9 +719,9 @@ namespace CDP4DiagramEditor.ViewModels
 
                 Guid? selectedIid = null;
 
-                if (diagramContentItem?.Content is ElementDefinitionDiagramContentItem elementDefinitionContentItem)
+                if (diagramContentItem?.Content is ElementDefinitionDiagramContentItemViewModel elementDefinitionContentItem)
                 {
-                    selectedIid = (elementDefinitionContentItem.Content as ElementDefinition)?.Iid;
+                    selectedIid = (elementDefinitionContentItem.Thing as ElementDefinition)?.Iid;
                 }
 
                 await this.ExecuteSaveDiagramCommand();
@@ -722,7 +738,7 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 var diagramContentItem = this.SelectedItem as DiagramContentItem;
 
-                var elementDefinitionDiagramContentItem = diagramContentItem?.Content as ElementDefinitionDiagramContentItem;
+                var elementDefinitionDiagramContentItem = diagramContentItem?.Content as ElementDefinitionDiagramContentItemViewModel;
 
                 if (!(elementDefinitionDiagramContentItem?.DiagramThing is ArchitectureElement architectureElement))
                 {
@@ -738,14 +754,14 @@ namespace CDP4DiagramEditor.ViewModels
                 transaction.CreateOrUpdate(clone);
                 clone.DiagramElement.Clear();
 
-                var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItems.Select(x => x.DiagramThing));
+                var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItemViewModels.Select(x => x.DiagramThing));
 
                 foreach (var diagramObject in deletedDiagramObj)
                 {
                     transaction.Delete(diagramObject.Clone(false));
                 }
 
-                foreach (var diagramObjectViewModel in this.ThingDiagramItems)
+                foreach (var diagramObjectViewModel in this.ThingDiagramItemViewModels)
                 {
                     diagramObjectViewModel.UpdateTransaction(transaction, clone);
                 }
@@ -777,7 +793,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             foreach (var selectedThing in selectedDiagramObjects.Select(s => s.Content))
             {
-                if (selectedThing is ThingDiagramContentItem thingContentItem)
+                if (selectedThing is ThingDiagramContentItemViewModel thingContentItem)
                 {
                     if (thingContentItem.Thing != null)
                     {
@@ -890,36 +906,36 @@ namespace CDP4DiagramEditor.ViewModels
         private void ComputeDiagramObject()
         {
             var updatedItems = this.Thing.DiagramElement.OfType<DiagramObject>().ToList();
-            var currentItems = this.ThingDiagramItems.Select(x => x.DiagramThing).OfType<DiagramObject>().ToList();
+            var currentItems = this.ThingDiagramItemViewModels.Select(x => x.DiagramThing).OfType<DiagramObject>().ToList();
 
             var newItems = updatedItems.Except(currentItems);
             var oldItems = currentItems.Except(updatedItems);
 
             foreach (var diagramThing in oldItems)
             {
-                var item = this.ThingDiagramItems.SingleOrDefault(x => x.DiagramThing == diagramThing);
+                var item = this.ThingDiagramItemViewModels.SingleOrDefault(x => x.DiagramThing == diagramThing);
 
                 if (item != null)
                 {
-                    this.ThingDiagramItems.RemoveAndDispose(item);
+                    this.ThingDiagramItemViewModels.RemoveAndDispose(item);
                     this.Behavior.ItemPositions.Remove(item);
                 }
             }
 
             foreach (var diagramThing in newItems)
             {
-                NamedThingDiagramContentItem newDiagramElement = null;
+                NamedThingDiagramContentItemViewModel newDiagramElement = null;
 
                 switch (diagramThing.DepictedThing)
                 {
                     case ElementDefinition:
-                        newDiagramElement = new ElementDefinitionDiagramContentItem((ArchitectureElement)diagramThing, this.Session, this);                        
+                        newDiagramElement = new ElementDefinitionDiagramContentItemViewModel((ArchitectureElement)diagramThing, this.Session, this);                        
                         break;
                     case Requirement:
-                        newDiagramElement = new RequirementDiagramContentItem(diagramThing, this.Session, this);
+                        newDiagramElement = new RequirementDiagramContentItemViewModel(diagramThing, this.Session, this);
                         break;
                     default:
-                        newDiagramElement = new NamedThingDiagramContentItem(diagramThing, this);
+                        newDiagramElement = new NamedThingDiagramContentItemViewModel(diagramThing, this);
                         break;
                 }
 
@@ -927,12 +943,12 @@ namespace CDP4DiagramEditor.ViewModels
 
                 var position = new Point { X = bound.X, Y = bound.Y };
 
-                newDiagramElement.Position = position;
+                //newDiagramElement.Position = position;
 
                 this.Behavior.ItemPositions.Add(newDiagramElement, position);
-                this.ThingDiagramItems.Add(newDiagramElement);
+                this.ThingDiagramItemViewModels.Add(newDiagramElement);
 
-                (newDiagramElement as PortContainerDiagramContentItem)?.UpdatePorts();
+                (newDiagramElement as PortContainerDiagramContentItemViewModel)?.UpdatePorts();
             }
 
             this.ComputeDiagramTopElement();
@@ -960,7 +976,7 @@ namespace CDP4DiagramEditor.ViewModels
             if (this.Thing is ArchitectureDiagram architectureDiagram)
             {
                 // update top element selection
-                var elementDefinitionDiagramContentItems = this.ThingDiagramItems.OfType<ElementDefinitionDiagramContentItem>().ToList();
+                var elementDefinitionDiagramContentItems = this.ThingDiagramItemViewModels.OfType<ElementDefinitionDiagramContentItemViewModel>().ToList();
 
                 // reset all to false
                 foreach (var elementDefinitionDiagramContentItem in elementDefinitionDiagramContentItems)
@@ -987,10 +1003,10 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Compute the <see cref="DiagramEdge" /> to show
         /// </summary>
-        /// <param name="diagramItem">The diagram item.</param>
-        private void ComputeDiagramConnector(ThingDiagramContentItem diagramItem)
+        /// <param name="diagramItemViewModel">The diagram item.</param>
+        private void ComputeDiagramConnector(ThingDiagramContentItemViewModel diagramItemViewModel)
         {
-            this.GenerateRelationshipDiagramElements(diagramItem, false, false);
+            this.GenerateRelationshipDiagramElements(diagramItemViewModel, false, false);
         }
 
         /// <summary>
@@ -1000,9 +1016,9 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="diagramPosition">The position of the <see cref="DiagramObject" /></param>
         /// <param name="shouldAddMissingThings">Indicates if missing things should be added</param>
         /// <returns>The <see cref="DiagramObjectViewModel" /> instantiated</returns>
-        private ThingDiagramContentItem CreateDiagramObject(Thing depictedThing, Point diagramPosition, bool shouldAddMissingThings = true)
+        private ThingDiagramContentItemViewModel CreateDiagramObject(Thing depictedThing, Point diagramPosition, bool shouldAddMissingThings = true)
         {
-            var row = this.ThingDiagramItems.OfType<ThingDiagramContentItem>().SingleOrDefault(x => x.DiagramThing.DepictedThing == depictedThing);
+            var row = this.ThingDiagramItemViewModels.OfType<ThingDiagramContentItemViewModel>().SingleOrDefault(x => x.DiagramThing.DepictedThing == depictedThing);
 
             if (row != null)
             {
@@ -1032,7 +1048,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             block.Bounds.Add(bound);
 
-            NamedThingDiagramContentItem newDiagramElement = null;
+            NamedThingDiagramContentItemViewModel newDiagramElement = null;
 
             switch (depictedThing)
             {
@@ -1048,24 +1064,24 @@ namespace CDP4DiagramEditor.ViewModels
 
                         archElement.Bounds.Add(bound);
 
-                        newDiagramElement = new ElementDefinitionDiagramContentItem(archElement, this.Session, this);
+                        newDiagramElement = new ElementDefinitionDiagramContentItemViewModel(archElement, this.Session, this);
                         break;
                     }
 
                 case Requirement:
-                    newDiagramElement = new RequirementDiagramContentItem(block, this.Session, this);
+                    newDiagramElement = new RequirementDiagramContentItemViewModel(block, this.Session, this);
                     break;
                 default:
-                    newDiagramElement = new NamedThingDiagramContentItem(block, this);
+                    newDiagramElement = new NamedThingDiagramContentItemViewModel(block, this);
                     break;
             }
 
             var position = new Point { X = bound.X, Y = bound.Y };
 
-            newDiagramElement.Position = position;
+            //newDiagramElement.Position = position;
 
             this.Behavior.ItemPositions.Add(newDiagramElement, position);
-            this.ThingDiagramItems.Add(newDiagramElement);
+            this.ThingDiagramItemViewModels.Add(newDiagramElement);
 
             return newDiagramElement;
         }
@@ -1078,7 +1094,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="target">The <see cref="DiagramObject" /> target</param>
         private void CreateDiagramConnector(Thing thing, DiagramObject source, DiagramObject target)
         {
-            var connectorItem = this.ThingDiagramItems.OfType<ThingDiagramConnector>().SingleOrDefault(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == thing);
+            var connectorItem = this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().SingleOrDefault(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == thing);
 
             if (connectorItem != null)
             {
@@ -1092,9 +1108,9 @@ namespace CDP4DiagramEditor.ViewModels
                 DepictedThing = thing
             };
 
-            connectorItem = new DiagramEdgeViewModel(connector, this);
+            connectorItem = new DrawnDiagramEdgeViewModel(connector, this);
 
-            this.ThingDiagramItems.Add(connectorItem);
+            this.ConnectorViewModels.Add(connectorItem);
         }
 
         /// <summary>
@@ -1104,7 +1120,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             foreach (var item in this.SelectedItems)
             {
-                if ((item as DiagramContentItem)?.Content is not ThingDiagramContentItem content)
+                if ((item as DiagramContentItem)?.Content is not ThingDiagramContentItemViewModel content)
                 {
                     continue;
                 }
@@ -1126,17 +1142,17 @@ namespace CDP4DiagramEditor.ViewModels
         /// Generate the diagram connectors from the <see cref="BinaryRelationship" /> associated to the depicted
         /// <see cref="Thing" />
         /// </summary>
-        /// <param name="item">The <see cref="ThingDiagramContentItem" /> to start from</param>
+        /// <param name="itemViewModel">The <see cref="ThingDiagramContentItemViewModel" /> to start from</param>
         /// <param name="extendDeep">
         /// Indicates whether the process shall keep going for the related
         /// <see cref="DiagramObjectViewModel" />
         /// </param>
         /// <param name="shouldAddMissingThings">True if missing things should be added to diagram.</param>
-        public void GenerateRelationshipDiagramElements(ThingDiagramContentItem item, bool extendDeep, bool shouldAddMissingThings = true)
+        public void GenerateRelationshipDiagramElements(ThingDiagramContentItemViewModel itemViewModel, bool extendDeep, bool shouldAddMissingThings = true)
         {
             var iteration = (Iteration)this.Thing.Container;
 
-            var depictedThing = item.DiagramThing.DepictedThing;
+            var depictedThing = itemViewModel.DiagramThing.DepictedThing;
 
             var relationships =
                 iteration.Relationship
@@ -1145,12 +1161,12 @@ namespace CDP4DiagramEditor.ViewModels
 
             foreach (var binaryRelationship in relationships)
             {
-                if (this.ThingDiagramItems.OfType<ThingDiagramConnector>().Any(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == binaryRelationship))
+                if (this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().Any(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == binaryRelationship))
                 {
                     continue;
                 }
 
-                var associatedViewModel = this.GenerateRelationshipDiagramObjectAndConnector(item, binaryRelationship, shouldAddMissingThings);
+                var associatedViewModel = this.GenerateRelationshipDiagramObjectAndConnector(itemViewModel, binaryRelationship, shouldAddMissingThings);
 
                 if (extendDeep && associatedViewModel != null)
                 {
@@ -1162,36 +1178,36 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Generate DiagramObject and DiagramConnectors for a <see cref="BinaryRelationship" />
         /// </summary>
-        /// <param name="item">The <see cref="ThingDiagramContentItem" /> to start from</param>
+        /// <param name="itemViewModel">The <see cref="ThingDiagramContentItemViewModel" /> to start from</param>
         /// <param name="binaryRelationship">The <see cref="BinaryRelationship" /></param>
         /// <param name="shouldAddMissingThings">True if missing things should be added to diagram.</param>
-        /// <returns>The newly created <see cref="ThingDiagramContentItem" /> that is connected to  the <paramref name="item" />.</returns>
-        private ThingDiagramContentItem GenerateRelationshipDiagramObjectAndConnector(ThingDiagramContentItem item, BinaryRelationship binaryRelationship, bool shouldAddMissingThings)
+        /// <returns>The newly created <see cref="ThingDiagramContentItemViewModel" /> that is connected to  the <paramref name="itemViewModel" />.</returns>
+        private ThingDiagramContentItemViewModel GenerateRelationshipDiagramObjectAndConnector(ThingDiagramContentItemViewModel itemViewModel, BinaryRelationship binaryRelationship, bool shouldAddMissingThings)
         {
-            var depictedThing = item.DiagramThing.DepictedThing;
+            var depictedThing = itemViewModel.DiagramThing.DepictedThing;
 
             if (binaryRelationship.Source == depictedThing)
             {
-                var associatedViewModel = this.CreateDiagramObject(binaryRelationship.Target, new Point(item.Position.X + Cdp4DiagramHelper.DefaultSeparation, item.Position.Y), shouldAddMissingThings);
+                var associatedViewModel = this.CreateDiagramObject(binaryRelationship.Target, new Point(itemViewModel.DiagramRepresentation.Position.X + Cdp4DiagramHelper.DefaultSeparation, itemViewModel.DiagramRepresentation.Position.Y), shouldAddMissingThings);
 
                 if (associatedViewModel == null)
                 {
                     return null;
                 }
 
-                this.CreateDiagramConnector(binaryRelationship, (DiagramObject)item.DiagramThing, (DiagramObject)associatedViewModel.DiagramThing);
+                this.CreateDiagramConnector(binaryRelationship, (DiagramObject)itemViewModel.DiagramThing, (DiagramObject)associatedViewModel.DiagramThing);
                 return associatedViewModel;
             }
             else
             {
-                var associatedViewModel = this.CreateDiagramObject(binaryRelationship.Source, new Point(item.Position.X - Cdp4DiagramHelper.DefaultSeparation, item.Position.Y), shouldAddMissingThings);
+                var associatedViewModel = this.CreateDiagramObject(binaryRelationship.Source, new Point(itemViewModel.DiagramRepresentation.Position.X - Cdp4DiagramHelper.DefaultSeparation, itemViewModel.DiagramRepresentation.Position.Y), shouldAddMissingThings);
 
                 if (associatedViewModel == null)
                 {
                     return null;
                 }
 
-                this.CreateDiagramConnector(binaryRelationship, (DiagramObject)associatedViewModel.DiagramThing, (DiagramObject)item.DiagramThing);
+                this.CreateDiagramConnector(binaryRelationship, (DiagramObject)associatedViewModel.DiagramThing, (DiagramObject)itemViewModel.DiagramThing);
                 return associatedViewModel;
             }
         }
@@ -1208,15 +1224,15 @@ namespace CDP4DiagramEditor.ViewModels
             transaction.CreateOrUpdate(clone);
             clone.DiagramElement.Clear();
 
-            var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItems.OfType<ThingDiagramContentItem>().Select(x => x.DiagramThing)).ToList();
-            var deletedDiagramObjAndEdges = deletedDiagramObj.Except(this.ThingDiagramItems.OfType<ThingDiagramConnector>().Select(x => x.Thing));
+            var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItemViewModels.OfType<ThingDiagramContentItemViewModel>().Select(x => x.DiagramThing)).ToList();
+            var deletedDiagramObjAndEdges = deletedDiagramObj.Except(this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().Select(x => x.Thing));
 
             foreach (var diagramObject in deletedDiagramObjAndEdges)
             {
                 transaction.Delete(diagramObject.Clone(false));
             }
 
-            foreach (var diagramObjectViewModel in this.ThingDiagramItems)
+            foreach (var diagramObjectViewModel in this.ThingDiagramItemViewModels)
             {
                 diagramObjectViewModel.UpdateTransaction(transaction, clone);
             }
@@ -1231,14 +1247,14 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="deleteEvent">The <see cref="DiagramDeleteEvent" /></param>
         private void OnDiagramDeleteEvent(DiagramDeleteEvent deleteEvent)
         {
-            if (deleteEvent.ViewModel is ThingDiagramConnector connectorViewModel)
+            if (deleteEvent.ViewModel is ThingDiagramConnectorViewModel connectorViewModel)
             {
-                this.ThingDiagramItems.RemoveAndDispose(connectorViewModel);
+                this.ConnectorViewModels.RemoveAndDispose(connectorViewModel);
             }
 
-            if (deleteEvent.ViewModel is ThingDiagramContentItem diagramObjViewModel)
+            if (deleteEvent.ViewModel is ThingDiagramContentItemViewModel diagramObjViewModel)
             {
-                this.ThingDiagramItems.RemoveAndDispose(diagramObjViewModel);
+                this.ThingDiagramItemViewModels.RemoveAndDispose(diagramObjViewModel);
             }
 
             this.UpdateIsDirty();
@@ -1274,7 +1290,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </param>
         protected override void Dispose(bool disposing)
         {
-            this.ThingDiagramItems.ClearAndDispose();
+            this.ThingDiagramItemViewModels.ClearAndDispose();
 
             base.Dispose(disposing);
         }

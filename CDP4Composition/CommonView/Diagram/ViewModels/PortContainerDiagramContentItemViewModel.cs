@@ -40,9 +40,9 @@ namespace CDP4CommonView.Diagram.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// Define an <see cref="NamedThingDiagramContentItem"/> kind that allows attaching <see cref="IDiagramPortViewModel"/> to it
+    /// Define an <see cref="NamedThingDiagramContentItemViewModel"/> kind that allows attaching <see cref="IDiagramPortViewModel"/> to it
     /// </summary>
-    public class PortContainerDiagramContentItem : NamedThingDiagramContentItem
+    public class PortContainerDiagramContentItemViewModel : NamedThingDiagramContentItemViewModel
     {
         /// <summary>
         /// The <see cref="ISession"/> to be used when creating other view models
@@ -55,13 +55,13 @@ namespace CDP4CommonView.Diagram.ViewModels
         public ReactiveList<IDiagramPortViewModel> PortCollection { get; private set; }
 
         /// <summary>
-        /// Initialize a new <see cref="PortContainerDiagramContentItem"/>
+        /// Initialize a new <see cref="PortContainerDiagramContentItemViewModel"/>
         /// </summary>
         /// <param name="thing">
         /// The diagramThing contained</param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public PortContainerDiagramContentItem(DiagramObject thing, IDiagramEditorViewModel container) : base(thing, container)
+        public PortContainerDiagramContentItemViewModel(DiagramObject thing, IDiagramEditorViewModel container) : base(thing, container)
         {
             this.PortCollection = new ReactiveList<IDiagramPortViewModel>();
         }
@@ -80,7 +80,7 @@ namespace CDP4CommonView.Diagram.ViewModels
                 lastPosition = port.PortContainerShapeSide;
             }
 
-            var diagramItem = this.Parent as DiagramItem;
+            var diagramItem = this.DiagramRepresentation;
 
             if (diagramItem == null)
             {
@@ -145,7 +145,7 @@ namespace CDP4CommonView.Diagram.ViewModels
         private double CalculatePortion(PortContainerShapeSide side)
         {
             var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == side);
-            var sideLength = side == PortContainerShapeSide.Left || side == PortContainerShapeSide.Right ? (this.Parent as DiagramItem).ActualHeight : (this.Parent as DiagramItem).ActualWidth;
+            var sideLength = side == PortContainerShapeSide.Left || side == PortContainerShapeSide.Right ? (this.DiagramRepresentation as DiagramItem).ActualHeight : (this.DiagramRepresentation as DiagramItem).ActualWidth;
             var portion = ((100 / (presentPort + 1)) / 100) * sideLength;
             return portion;
         }
@@ -177,18 +177,18 @@ namespace CDP4CommonView.Diagram.ViewModels
             // clean up
             this.PortCollection.Clear();
 
-            var existingPorts = this.containerViewModel.ThingDiagramItems.OfType<DiagramPortDiagramContentItem>().Where(p => p.Container == this).ToList();
+            var existingPorts = this.containerViewModel.ThingDiagramItemViewModels.OfType<DiagramPortDiagramContentItemViewModel>().Where(p => p.Container == this).ToList();
 
             foreach (var diagramPortDiagramContentItem in existingPorts)
             {
-                this.containerViewModel.ThingDiagramItems.RemoveAndDispose(diagramPortDiagramContentItem);
+                this.containerViewModel.ThingDiagramItemViewModels.RemoveAndDispose(diagramPortDiagramContentItem);
             }
 
             // find the relevant usages
             var usages = elementDefinition.ContainedElement.Where(eu => eu.InterfaceEnd != InterfaceEndKind.NONE).ToList();
 
             // clean up any usage connectors that reference these EU, ports are only represented by boxes
-            var existingElementUsageEdges = this.containerViewModel.ThingDiagramItems.OfType<ThingDiagramConnector>().Where(c => c.Thing is ElementUsage).ToList();
+            var existingElementUsageEdges = this.containerViewModel.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().Where(c => c.Thing is ElementUsage).ToList();
 
             foreach (var elementUsage in usages)
             {
@@ -201,10 +201,10 @@ namespace CDP4CommonView.Diagram.ViewModels
             }
 
             // for every EU with directionality create the port
-            foreach (var port in usages.Select(usage => DiagramPortDiagramContentItem.CreatePort(usage, this, this.session, this.containerViewModel)).Where(port => port is not null))
+            foreach (var port in usages.Select(usage => DiagramPortDiagramContentItemViewModel.CreatePort(usage, this, this.session, this.containerViewModel)).Where(port => port is not null))
             {
                 this.PortCollection.Add(port);
-                this.containerViewModel.ThingDiagramItems.Add((IThingDiagramItem)port);
+                this.containerViewModel.ThingDiagramItemViewModels.Add((IThingDiagramItemViewModel)port);
             }
 
             this.UpdatePortLayout();

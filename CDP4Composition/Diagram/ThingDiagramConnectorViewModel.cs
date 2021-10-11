@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ThingDiagramConnector.cs" company="RHEA System S.A.">
+// <copyright file="ThingDiagramConnectorViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -35,6 +35,8 @@ namespace CDP4Composition.Diagram
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
 
+    using CDP4CommonView.Diagram;
+
     using CDP4Composition.DragDrop;
 
     using CDP4Dal;
@@ -47,13 +49,14 @@ namespace CDP4Composition.Diagram
 
     using ReactiveUI;
 
+    using Point = System.Windows.Point;
     using PropertyChangingEventArgs = ReactiveUI.PropertyChangingEventArgs;
     using PropertyChangingEventHandler = ReactiveUI.PropertyChangingEventHandler;
 
     /// <summary>
     /// Represents a diagram connector control class that can store a <see cref="Thing" />.
     /// </summary>
-    public abstract class ThingDiagramConnector : DiagramConnector, IThingDiagramItem, IReactiveObject, IIDropTarget
+    public abstract class ThingDiagramConnectorViewModel : IDiagramConnectorViewModel, IReactiveObject, IIDropTarget
     {
         /// <summary>
         /// The NLog logger
@@ -81,9 +84,19 @@ namespace CDP4Composition.Diagram
         private int revisionNumber;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ThingDiagramConnector" /> class.
+        /// Backing field for <see cref="ConnectingPoints" />
         /// </summary>
-        public ThingDiagramConnector(DiagramEdge diagramThing, IDiagramEditorViewModel containerViewModel, DiagramConnector baseConnector = null)
+        private List<Point> connectingPoints;
+
+        /// <summary>
+        /// Backing field for <see cref="DisplayedText" />
+        /// </summary>
+        private string displayedText;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ThingDiagramConnectorViewModel" /> class.
+        /// </summary>
+        public ThingDiagramConnectorViewModel(DiagramEdge diagramThing, IDiagramEditorViewModel containerViewModel)
         {
             if (diagramThing == null || containerViewModel == null)
             {
@@ -97,13 +110,46 @@ namespace CDP4Composition.Diagram
             this.SetSource(((DiagramEdge)this.DiagramThing).Source);
             this.SetTarget(((DiagramEdge)this.DiagramThing).Target);
 
-            if (baseConnector != null)
-            {
-                this.CopyConnectorsettings(baseConnector);
-            }
-
             this.InitializeSubscriptions();
         }
+
+        /// <summary>
+        /// Gets the target of the <see cref="DiagramEdge" />
+        /// </summary>
+        public DiagramElementThing Target { get; set; }
+
+        /// <summary>
+        /// Gets the displayed text
+        /// </summary>
+        public string DisplayedText
+        {
+            get { return this.displayedText; }
+            protected set { this.RaiseAndSetIfChanged(ref this.displayedText, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the collection of connecting <see cref="Point" />
+        /// </summary>
+        public List<Point> ConnectingPoints
+        {
+            get { return this.connectingPoints; }
+            set { this.RaiseAndSetIfChanged(ref this.connectingPoints, value); }
+        }
+
+        /// <summary>
+        /// Gets the source of the <see cref="DiagramEdge" />
+        /// </summary>
+        public DiagramElementThing Source { get; set; }
+
+        /// <summary>
+        /// Gets the source <see cref="IThingDiagramItemViewModel"/>
+        /// </summary>
+        public IThingDiagramItemViewModel BeginItem { get; set; }
+
+        /// <summary>
+        /// Gets the target <see cref="IThingDiagramItemViewModel" />
+        /// </summary>
+        public IThingDiagramItemViewModel EndItem { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="CDP4Common.CommonData.Thing" /> representing the diagram with all of its diagram elements
@@ -192,7 +238,7 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="IThingDiagramItem.Thing" />.
+        /// Gets or sets the <see cref="IThingDiagramItemViewModel.Thing" />.
         /// </summary>
         public Thing Thing { get; set; }
 
@@ -223,12 +269,12 @@ namespace CDP4Composition.Diagram
         {
             var bound = this.DiagramThing.Bounds.Single();
 
-            this.IsDirty = this.Parent is DiagramContentItem parent
-                           && parent.Position != default
-                           && this.Thing != null
-                           && (this.Thing.Iid == Guid.Empty
-                               || (float)parent.Position.X != bound.X
-                               || (float)parent.Position.Y != bound.Y);
+            //this.IsDirty = this.Parent is DiagramContentItem parent
+            //               && parent.Position != default
+            //               && this.Thing != null
+            //               && (this.Thing.Iid == Guid.Empty
+            //                   || (float)parent.Position.X != bound.X
+            //                   || (float)parent.Position.Y != bound.Y);
 
             this.containerViewModel?.UpdateIsDirty();
         }
@@ -258,23 +304,6 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Copies the properties of the drawn connector.
-        /// </summary>
-        /// <param name="baseConnector">The <see cref="DiagramConnector" /> that this control is based on.</param>
-        private void CopyConnectorsettings(DiagramConnector baseConnector)
-        {
-            this.Anchors = baseConnector.Anchors;
-            this.Angle = baseConnector.Angle;
-            this.BeginItem = baseConnector.BeginItem;
-            this.BeginItemPointIndex = baseConnector.BeginItemPointIndex;
-            this.BeginPoint = baseConnector.BeginPoint;
-            this.ConnectionPoints = baseConnector.ConnectionPoints;
-            this.EndItemPointIndex = baseConnector.EndItemPointIndex;
-            this.EndPoint = baseConnector.EndPoint;
-            this.EndItem = baseConnector.EndItem;
-        }
-
-        /// <summary>
         /// Set the <see cref="BeginItem"/> from the view-model
         /// </summary>
         /// <param name="source">The source <see cref="IDiagramObjectViewModel"/></param>
@@ -296,22 +325,17 @@ namespace CDP4Composition.Diagram
         /// Get the the target <see cref="DiagramContentItem"/>
         /// to be set either as <see cref="BeginItem"/> or <see cref="EndItem"/>
         /// </summary>
-        /// <param name="source">The <see cref="DiagramContentItem"/> to find</param>
+        /// <param name="diagramThing">The <see cref="DiagramContentItem"/> to find</param>
         /// <returns>The <see cref="DiagramContentItem"/></returns>
-        private DiagramContentItem GetDiagramContentItemToConnectTo(object source)
+        private IThingDiagramItemViewModel GetDiagramContentItemToConnectTo(object diagramThing)
         {
-            var diagramControl = this.containerViewModel.Behavior.GetDiagramControl();
-
-            if (diagramControl == null)
-            {
-                return null;
-            }
-
-            var diagramObject = diagramControl.Items.OfType<DiagramContentItem>().SingleOrDefault(x => (x.Content as NamedThingDiagramContentItem)?.DiagramThing == source || ((x.Content as ContentPresenter)?.DataContext as NamedThingDiagramContentItem)?.DiagramThing == source);
+            var diagramObject = this.containerViewModel.ThingDiagramItemViewModels.SingleOrDefault(x => x.DiagramThing == diagramThing);
+            
             if (diagramObject == null)
             {
                 throw new InvalidOperationException("DiagramContentItem could not be found.");
             }
+
             return diagramObject;
         }
 

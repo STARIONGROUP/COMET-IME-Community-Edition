@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DiagramEdgeViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DrawnDiagramEdgeViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -29,88 +29,41 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4Common.DiagramData;
 
-    using CDP4CommonView.Diagram;
-
     using CDP4Composition.Diagram;
 
     using CDP4Dal.Events;
-
-    using ReactiveUI;
 
     using Point = System.Windows.Point;
 
     /// <summary>
     /// The view-model representing a <see cref="DiagramEdge" />
     /// </summary>
-    public class DiagramEdgeViewModel : ThingDiagramConnector, IDiagramConnectorViewModel, IDrawnConnector
+    public class DrawnDiagramEdgeViewModel : ThingDiagramConnectorViewModel, IDrawnConnector
     {
         /// <summary>
-        /// Backing field for <see cref="ConnectingPoints" />
-        /// </summary>
-        private List<Point> connectingPoints;
-
-        /// <summary>
-        /// Backing field for <see cref="DisplayedText" />
-        /// </summary>
-        private string displayedText;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DiagramEdgeViewModel" /> class
+        /// Initializes a new instance of the <see cref="DrawnDiagramEdgeViewModel" /> class
         /// </summary>
         /// <param name="diagramEdge">The associated <see cref="DiagramEdge" /></param>
-        /// <param name="container">The <see cref="IDiagramEditorViewModel"/> containing this edge</param>
-        public DiagramEdgeViewModel(DiagramEdge diagramEdge, IDiagramEditorViewModel container) : base(diagramEdge, container)
+        /// <param name="container">The <see cref="IDiagramEditorViewModel" /> containing this edge</param>
+        public DrawnDiagramEdgeViewModel(DiagramEdge diagramEdge, IDiagramEditorViewModel container) : base(diagramEdge, container)
         {
             this.ConnectingPoints = new List<Point>();
             this.UpdateProperties();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DiagramEdgeViewModel" /> class
+        /// Initializes a new instance of the <see cref="DrawnDiagramEdgeViewModel" /> class
         /// </summary>
         /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
-        public DiagramEdgeViewModel(IConnectorTool tool) : base(null, null)
+        public DrawnDiagramEdgeViewModel(IConnectorTool tool) : base(null, null)
         {
             this.Tool = tool;
         }
 
         /// <summary>
-        /// Gets the target of the <see cref="DiagramEdge" />
-        /// </summary>
-        public DiagramElementThing Target { get; set; }
-
-        /// <summary>
-        /// Gets the displayed text
-        /// </summary>
-        public string DisplayedText
-        {
-            get { return this.displayedText; }
-            private set { this.RaiseAndSetIfChanged(ref this.displayedText, value); }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the diagram editor is dirty
-        /// </summary>
-        public bool IsDirty { get; }
-
-        /// <summary>
         /// Get the creator connector tool
         /// </summary>
-        public IConnectorTool Tool { get; }
-
-        /// <summary>
-        /// Gets or sets the collection of connecting <see cref="Point" />
-        /// </summary>
-        public List<Point> ConnectingPoints
-        {
-            get { return this.connectingPoints; }
-            set { this.RaiseAndSetIfChanged(ref this.connectingPoints, value); }
-        }
-
-        /// <summary>
-        /// Gets the source of the <see cref="DiagramEdge" />
-        /// </summary>
-        public DiagramElementThing Source { get; set; }
+        public IConnectorTool Tool { get; protected set; }
 
         /// <summary>
         /// The <see cref="ObjectChangedEvent" /> event-handler

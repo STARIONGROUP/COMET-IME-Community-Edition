@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ICdp4DiagramOrgChartBehavior.cs" company="RHEA System S.A.">
+// <copyright file="ICdp4DiagramBehavior.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -35,7 +35,7 @@ namespace CDP4CommonView.Diagram
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
 
-    public interface ICdp4DiagramOrgChartBehavior
+    public interface ICdp4DiagramBehavior
     {
         /// <summary>
         /// Gets a dictionary of saved diagram item positions.
@@ -81,11 +81,17 @@ namespace CDP4CommonView.Diagram
         /// <param name="selectedIid">The Iid of the <see cref="Thing"/></param>
         void SelectItemByThingIid(Guid? selectedIid);
 
-        /// <summary>
-        /// Removes a diagram item
-        /// </summary>
-        /// <param name="item">The item to remove</param>
-        void RemoveItem(DiagramItem item);
+        ///// <summary>
+        ///// Removes a diagram item
+        ///// </summary>
+        ///// <param name="item">The item to remove</param>
+        //void RemoveItem(IThingDiagramItemViewModel item);
+
+        ///// <summary>
+        ///// Removes a diagram connector
+        ///// </summary>
+        ///// <param name="item">The connector to remove</param>
+        //void RemoveConnector(IDiagramConnectorViewModel connector);
 
         /// <summary>
         /// Gets the associated diagram control

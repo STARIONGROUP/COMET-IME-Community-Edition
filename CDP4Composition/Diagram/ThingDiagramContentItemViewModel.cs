@@ -52,7 +52,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents a diagram content control class that can store a <see cref="Thing"/>.
     /// </summary>
-    public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject, IIDropTarget
+    public abstract class ThingDiagramContentItemViewModel : IThingDiagramItemViewModel, IReactiveObject, IIDropTarget
     {
         /// <summary> 
         /// <see cref="ReactiveUI.PropertyChangingEventHandler"/> event
@@ -80,29 +80,27 @@ namespace CDP4Composition.Diagram
         private int revisionNumber;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ThingDiagramContentItem"/> class.
+        /// Initializes a new instance of the <see cref="ThingDiagramContentItemViewModel"/> class.
         /// </summary>
         /// <param name="thing">
         /// The thing represented.</param>
-        protected ThingDiagramContentItem(Thing thing)
+        protected ThingDiagramContentItemViewModel(Thing thing)
         {
             this.Thing = thing;
-            this.Content = thing;
             this.InitializeSubscriptions();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ThingDiagramContentItem"/> class.
+        /// Initializes a new instance of the <see cref="ThingDiagramContentItemViewModel"/> class.
         /// </summary>
         /// <param name="diagramThing">
         /// The diagramThing contained</param>
         /// <param name="containerViewModel">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        protected ThingDiagramContentItem(DiagramElementThing diagramThing, IDiagramEditorViewModel containerViewModel)
+        protected ThingDiagramContentItemViewModel(DiagramElementThing diagramThing, IDiagramEditorViewModel containerViewModel)
         {
             this.containerViewModel = containerViewModel;
             this.Thing = diagramThing.DepictedThing;
-            this.Content = diagramThing.DepictedThing;
             this.DiagramThing = diagramThing;
             this.InitializeSubscriptions();
         }
@@ -133,7 +131,7 @@ namespace CDP4Composition.Diagram
         private bool isDirty;
 
         /// <summary>
-        /// Gets or sets the <see cref="IThingDiagramItem.Thing"/>.
+        /// Gets or sets the <see cref="IThingDiagramItemViewModel.Thing"/>.
         /// </summary>
         public Thing Thing { get; set; }
 
@@ -141,6 +139,11 @@ namespace CDP4Composition.Diagram
         /// Gets or sets the <see cref="CDP4Common.CommonData.Thing"/> representing the diagram with all of its diagram elements
         /// </summary>
         public DiagramElementThing DiagramThing { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DiagramItem"/> that represents this viewmodel on the convas
+        /// </summary>
+        public DiagramItem DiagramRepresentation { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether the diagram editor is dirty
@@ -212,7 +215,7 @@ namespace CDP4Composition.Diagram
         {
             var bound = this.DiagramThing.Bounds.Single();
 
-            this.IsDirty = this.Parent is DiagramContentItem parent
+            this.IsDirty = this.DiagramRepresentation is DiagramContentItem parent
                            && parent.Position != default
                            && this.Thing != null
                            && (this.Thing.Iid == Guid.Empty
@@ -272,7 +275,7 @@ namespace CDP4Composition.Diagram
         /// <param name="bound">The <see cref="Bounds"/> to update</param>
         private void UpdateBound(Bounds bound)
         {
-            if (this.Parent is DiagramContentItem parent)
+            if (this.DiagramRepresentation is DiagramContentItem parent)
             {
                 bound.Height = (float)parent.ActualHeight;
                 bound.Width = (float)parent.ActualWidth;

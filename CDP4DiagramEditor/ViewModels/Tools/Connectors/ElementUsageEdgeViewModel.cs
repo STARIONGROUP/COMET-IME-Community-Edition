@@ -32,7 +32,7 @@ namespace CDP4DiagramEditor.ViewModels
     /// <summary>
     /// View model for a ElementUsage diagram edge
     /// </summary>
-    public class ElementUsageEdgeViewModel : DiagramEdgeViewModel
+    public class ElementUsageEdgeViewModel : DrawnDiagramEdgeViewModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageEdgeViewModel" /> class

@@ -44,9 +44,9 @@ namespace CDP4Composition.Diagram
     using Point = System.Windows.Point;
 
     /// <summary>
-    /// The view model representing a diagram port that shall be bound to a <see cref="PortContainerDiagramContentItem" />
+    /// The view model representing a diagram port that shall be bound to a <see cref="PortContainerDiagramContentItemViewModel" />
     /// </summary>
-    public class DiagramPortDiagramContentItem : NamedThingDiagramContentItem, IDiagramPortViewModel
+    public class DiagramPortDiagramContentItemViewModel : NamedThingDiagramContentItemViewModel, IDiagramPortViewModel
     {
         /// <summary>
         /// Backing field for <see cref="EndKind"/>
@@ -62,10 +62,10 @@ namespace CDP4Composition.Diagram
         /// Initialize a new DiagramPortViewModel
         /// </summary>
         /// <param name="diagramPort">The port diagrma object</param>
-        /// <param name="container">The container <see cref="PortContainerDiagramContentItem" /></param>
+        /// <param name="container">The container <see cref="PortContainerDiagramContentItemViewModel" /></param>
         /// <param name="session">The session</param>
         /// <param name="containerViewModel">The container viewmodel</param>
-        public DiagramPortDiagramContentItem(DiagramPort diagramPort, PortContainerDiagramContentItem container, ISession session, IDiagramEditorViewModel containerViewModel)
+        public DiagramPortDiagramContentItemViewModel(DiagramPort diagramPort, PortContainerDiagramContentItemViewModel container, ISession session, IDiagramEditorViewModel containerViewModel)
             : base(diagramPort, containerViewModel)
         {
             this.ContainerBounds = diagramPort.Bounds.FirstOrDefault();
@@ -81,9 +81,14 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets the container <see cref="ElementDefinitionDiagramContentItem" />
+        /// Getsor sets the position
         /// </summary>
-        public PortContainerDiagramContentItem Container { get; }
+        public Point Position { get; set; }
+
+        /// <summary>
+        /// Gets the container <see cref="ElementDefinitionDiagramContentItemViewModel" />
+        /// </summary>
+        public PortContainerDiagramContentItemViewModel Container { get; }
 
         /// <summary>
         /// Gets and sets the <see cref="InterfaceEndKind"/> of this port
@@ -139,13 +144,13 @@ namespace CDP4Composition.Diagram
             switch (this.PortContainerShapeSide)
             {
                 case PortContainerShapeSide.Top:
-                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.5, 0) });
+                    //this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.5, 0) });
                     break;
                 case PortContainerShapeSide.Left:
-                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0, 0.5) });
+                    ////this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0, 0.5) });
                     break;
                 case PortContainerShapeSide.Right:
-                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(1, 0.5) });
+                    //this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(1, 0.5) });
                     break;
                 case PortContainerShapeSide.Bottom:
                     break;
@@ -182,7 +187,7 @@ namespace CDP4Composition.Diagram
         /// <param name="session">The session</param>
         /// <param name="editorViewModel">The <see cref="IDiagramEditorViewModel" /></param>
         /// <returns>A new port instance</returns>
-        public static IDiagramPortViewModel CreatePort(ElementUsage portElementUsage, PortContainerDiagramContentItem container, ISession session, IDiagramEditorViewModel editorViewModel)
+        public static IDiagramPortViewModel CreatePort(ElementUsage portElementUsage, PortContainerDiagramContentItemViewModel container, ISession session, IDiagramEditorViewModel editorViewModel)
         {
             var portThing = new DiagramPort(Guid.NewGuid(), container.DiagramThing.Cache, container.DiagramThing.IDalUri)
             {
@@ -192,15 +197,15 @@ namespace CDP4Composition.Diagram
 
             var bound = new Bounds(Guid.NewGuid(), container.DiagramThing.Cache, container.DiagramThing.IDalUri)
             {
-                X = (float)container.Position.X,
-                Y = (float)container.Position.Y,
-                Height = (float)container.ActualHeight,
-                Width = (float)container.ActualWidth,
-                Name = $"bounds_port_{container.Name}_{portElementUsage.ShortName}"
+                //X = (float)container.Position.X,
+                //Y = (float)container.Position.Y,
+                //Height = (float)container.ActualHeight,
+                //Width = (float)container.ActualWidth,
+                Name = $"bounds_port_{container.ShortName}_{portElementUsage.ShortName}"
             };
 
             portThing.Bounds.Add(bound);
-            return new DiagramPortDiagramContentItem(portThing, container, session, editorViewModel);
+            return new DiagramPortDiagramContentItemViewModel(portThing, container, session, editorViewModel);
         }
 
         /// <summary>
@@ -217,7 +222,7 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Sets <see cref="NamedThingDiagramContentItem.Thing" /> related property used to display
+        /// Sets <see cref="NamedThingDiagramContentItemViewModel.Thing" /> related property used to display
         /// </summary>
         private void UpdateProperties()
         {

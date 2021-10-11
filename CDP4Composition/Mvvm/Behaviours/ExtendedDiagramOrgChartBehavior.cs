@@ -142,7 +142,7 @@ namespace CDP4Composition.Mvvm.Behaviours
 
             foreach (var item in e.Items)
             {
-                if (item is DiagramContentItem { Content: NamedThingDiagramContentItem namedThingDiagramContentItem })
+                if (item is DiagramContentItem { Content: NamedThingDiagramContentItemViewModel namedThingDiagramContentItem })
                 {
                     if (this.ItemPositions.TryGetValue(namedThingDiagramContentItem, out var itemPosition))
                     {

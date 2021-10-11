@@ -40,7 +40,7 @@ namespace CDP4Composition.Tests.Diagram
     using NUnit.Framework;
 
     /// <summary>
-    /// Suite of tests for the <see cref="ElementDefinitionDiagramContentItem"/> class
+    /// Suite of tests for the <see cref="ElementDefinitionDiagramContentItemViewModel"/> class
     /// </summary>
     [TestFixture]
     [Apartment(ApartmentState.STA)]
@@ -72,10 +72,9 @@ namespace CDP4Composition.Tests.Diagram
         [Test]
         public void VerifyThatElementDefinitionDiagramContentItemCanBeConstructed()
         {
-            var elementDefinitionDiagramContentItem = new ElementDefinitionDiagramContentItem(this.diagramObject, this.session, null);
+            var elementDefinitionDiagramContentItem = new ElementDefinitionDiagramContentItemViewModel(this.diagramObject, this.session, null);
 
             Assert.AreEqual(this.elementDefinition, elementDefinitionDiagramContentItem.Thing);
-            Assert.AreEqual(this.elementDefinition, elementDefinitionDiagramContentItem.Content);
             Assert.AreEqual(2, elementDefinitionDiagramContentItem.DiagramContentItemChildren.Count);
         }
     }

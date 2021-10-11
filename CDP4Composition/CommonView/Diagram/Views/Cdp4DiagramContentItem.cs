@@ -42,9 +42,9 @@ namespace CDP4CommonView.Diagram
     public class Cdp4DiagramContentItem : DiagramShape
     {
         /// <summary>
-        /// The <see cref="Cdp4DiagramOrgChartBehavior"/> that manages the creation of the views
+        /// The <see cref="Cdp4DiagramBehavior"/> that manages the creation of the views
         /// </summary>
-        private readonly Cdp4DiagramOrgChartBehavior behaviour;
+        private readonly Cdp4DiagramBehavior behaviour;
 
         /// <summary>
         /// The dependency property that allows setting the content object
@@ -57,8 +57,8 @@ namespace CDP4CommonView.Diagram
         /// <param name="datacontext">
         /// The <see cref="IDiagramObjectViewModel"/> data-context
         /// </param>
-        /// <param name="behaviour">The <see cref="Cdp4DiagramOrgChartBehavior"/></param>
-        public Cdp4DiagramContentItem(ThingDiagramContentItem datacontext, Cdp4DiagramOrgChartBehavior behaviour)
+        /// <param name="behaviour">The <see cref="Cdp4DiagramBehavior"/></param>
+        public Cdp4DiagramContentItem(ThingDiagramContentItemViewModel datacontext, Cdp4DiagramBehavior behaviour)
         {
             this.DataContext = datacontext;
             this.behaviour = behaviour;

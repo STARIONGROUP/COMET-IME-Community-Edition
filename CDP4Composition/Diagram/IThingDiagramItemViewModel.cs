@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IThingDiagramItem.cs" company="RHEA System S.A.">
+// <copyright file="IThingDiagramItemViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
@@ -33,10 +33,12 @@ namespace CDP4Composition.Diagram
     using CDP4Common.DiagramData;
     using CDP4Dal.Operations;
 
+    using DevExpress.Xpf.Diagram;
+
     /// <summary>
     /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
     /// </summary>
-    public interface IThingDiagramItem : IDisposable
+    public interface IThingDiagramItemViewModel : IDisposable
     {
         /// <summary>
         /// Gets or sets the <see cref="Thing"/>.
@@ -52,6 +54,11 @@ namespace CDP4Composition.Diagram
         /// The diagram thing
         /// </summary>
         DiagramElementThing DiagramThing { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DiagramItem"/> that represents this viewmodel on the convas
+        /// </summary>
+        DiagramItem DiagramRepresentation { get; set; }
 
         /// <summary>
         /// Update the transaction with the data contained in this view-model

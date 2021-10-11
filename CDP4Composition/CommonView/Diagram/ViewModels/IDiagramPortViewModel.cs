@@ -28,7 +28,7 @@ namespace CDP4CommonView.Diagram.ViewModels
     using CDP4Common.DiagramData;
 
     /// <summary>
-    /// Defines a DiagramPortViewModel that shall be bound to a <see cref="PortContainerDiagramContentItem"/>
+    /// Defines a DiagramPortViewModel that shall be bound to a <see cref="PortContainerDiagramContentItemViewModel"/>
     /// </summary>
     public interface IDiagramPortViewModel
     {
@@ -42,15 +42,15 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// </summary>
         PortContainerShapeSide PortContainerShapeSide { get; set; }
 
-        /// <summary>
-        /// Gets or sets the height
-        /// </summary>
-        double Height { get; set; }
+        ///// <summary>
+        ///// Gets or sets the height
+        ///// </summary>
+        //double Height { get; set; }
 
-        /// <summary>
-        /// Gets or sets the width
-        /// </summary>
-        double Width { get; set; }
+        ///// <summary>
+        ///// Gets or sets the width
+        ///// </summary>
+        //double Width { get; set; }
 
         /// <summary>
         /// Gets or sets its Parent bound

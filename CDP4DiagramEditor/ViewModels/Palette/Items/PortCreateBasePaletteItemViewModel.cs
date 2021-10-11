@@ -79,7 +79,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// <returns>Empty task</returns>
         protected async Task CreatePort(InterfaceEndKind kind)
         {
-            if (this.editorViewModel.SelectedItem is DiagramContentItem { Content: PortContainerDiagramContentItem container } target)
+            if (this.editorViewModel.SelectedItem is DiagramContentItem { Content: PortContainerDiagramContentItemViewModel container } target)
             {
                 var iteration = (Iteration) this.editorViewModel.Thing.Container;
 
