@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition. 
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -114,7 +114,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ClassKind"/> of the <see cref="ParameterType"/> that is represented by the current row-view-model
         /// </summary>
-        public string Type => this.Thing.ClassKind.ToString();
+        public string Type { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="QuantityKind"/> that is represented by the current row-view-model is base
@@ -139,6 +139,8 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
+            this.Type = this.Thing.ClassKind.ToString();
+
             this.CreateDefaultScaleUpdateSubscription();
             var container = this.Thing.Container as ReferenceDataLibrary;
             this.ContainerRdl = container == null ? string.Empty : container.ShortName;

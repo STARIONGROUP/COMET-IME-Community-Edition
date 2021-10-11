@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationalExpressionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of COMET-IME Community Edition. 
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
@@ -54,10 +73,10 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationalExpressionRowViewModel"/> class
         /// </summary>
-        /// <param name="notExpression">The <see cref="RelationalExpression"/> associated with this row</param>
+        /// <param name="relationalExpression">The <see cref="RelationalExpression"/> associated with this row</param>
         /// <param name="session">The session</param>
         /// <param name="containerViewModel">The <see cref="IViewModelBase{T}"/> that is the container of this <see cref="IRowViewModelBase{Thing}"/></param>
-        public RelationalExpressionRowViewModel(RelationalExpression notExpression, ISession session, IViewModelBase<Thing> containerViewModel) : base(notExpression, session, containerViewModel)
+        public RelationalExpressionRowViewModel(RelationalExpression relationalExpression, ISession session, IViewModelBase<Thing> containerViewModel) : base(relationalExpression, session, containerViewModel)
         {
             this.UpdateProperties();
             this.SetRequirementStateOfComplianceChangedEventSubscription(this.Thing, this.Disposables);
@@ -82,19 +101,19 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Gets the short string representation of the current RelationalExpression
+        /// Gets the short string representation of the current <see cref="RelationalExpression"/>
         /// </summary>
-        public string ShortName => this.Thing.StringValue;
+        public string ShortName => this.Thing != null ? this.Thing.StringValue : string.Empty;
 
         /// <summary>
         /// Gets the parameter type name of the current RelationalExpression
         /// </summary>
-        public string Name => this.Thing.ParameterType?.Name;
+        public string Name => this.Thing?.ParameterType != null ? this.Thing.ParameterType.Name : string.Empty;
 
         /// <summary>
         /// Gets the value of the current RelationalExpression
         /// </summary>
-        public string Definition => string.Join(", ", this.Thing.Value);
+        public string Definition => this.Thing != null ? string.Join(", ", this.Thing.Value) : string.Empty;
 
         /// <summary>
         /// Gets or sets the IsDeprecated

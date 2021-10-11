@@ -1,24 +1,47 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SimpleParameterValueRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of COMET-IME Community Edition. 
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
-    /// The simple parameter value row view model.
+    /// The <see cref="SimpleParameterValue"/> row view model.
     /// </summary>
     public class SimpleParameterValueRowViewModel : CDP4CommonView.SimpleParameterValueRowViewModel, IDeprecatableThing
     {
@@ -82,19 +105,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string ShortName
         {
-            get
-            {
-
-                if (this.Scale != null)
-                {
-                    return $"{this.shortName} [{this.Scale.ShortName}]";
-                }
-                else
-                {
-                    return this.shortName;
-                }
-
-            }
+            get { return this.Scale != null ? $"{this.shortName} [{this.Scale.ShortName}]" : this.shortName; }
             set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
         }
 
