@@ -765,7 +765,7 @@ namespace CDP4Requirements.ViewModels
                     this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService,
                     this.PluginSettingsService);
                 this.openRequirementsSpecificationEditorViewModels.Add(vm);
-                this.PanelNavigationService.OpenInAddIn(vm);
+                this.PanelNavigationService.OpenInDock(vm);
             }
         }
 
