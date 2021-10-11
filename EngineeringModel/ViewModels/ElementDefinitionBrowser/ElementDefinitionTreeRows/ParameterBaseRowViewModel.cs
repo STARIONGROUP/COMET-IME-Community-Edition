@@ -1,8 +1,8 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -19,16 +19,16 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------------
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.Comparers;
@@ -40,9 +40,11 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -321,28 +323,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateThingStatus();
             this.ModelCode = this.Thing.ModelCode();
             this.Name = this.Thing.ParameterType.Name;
-
-            var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
-
-            var categories = new HashSet<Category>();
-
-            if (elementBase != null)
-            {
-                foreach (var category in elementBase.Category)
-                {
-                    categories.Add(category);
-                }
-
-                if (elementBase is ElementUsage elementUsage)
-                {
-                    foreach (var category in elementUsage.ElementDefinition.Category)
-                    {
-                        categories.Add(category);
-                    }
-                }
-            }
-
-            this.Category = categories.ToList();
+            this.Category = this.Thing.ParameterType.Category;
 
             this.ClearValues();
             // clear the listener on the unique value set represented
