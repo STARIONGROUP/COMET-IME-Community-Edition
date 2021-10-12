@@ -247,6 +247,59 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         }
 
         [Test]
+        public void VerifySelectAllTrue()
+        {
+            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            var domain2 = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain2", ShortName = "DM2" };
+            this.sitedir.Domain.Add(domain2);
+            this.publication.Domain.Add(domain2);
+            this.modelsetup.ActiveDomain.Add(domain2);
+
+            viewmodel.SelectAllCommand.Execute(true);
+
+            Assert.That(viewmodel.SelectAll, Is.True);
+            Assert.That(viewmodel.Domains, Is.All.Matches<PublicationDomainOfExpertiseRowViewModel>(d => d.ToBePublished));
+        }
+
+        [Test]
+        public void VerifySelectAllFalse()
+        {
+            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            var domain2 = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain2", ShortName = "DM2"};
+            this.sitedir.Domain.Add(domain2);
+            this.publication.Domain.Add(domain2);
+            this.modelsetup.ActiveDomain.Add(domain2);
+
+            viewmodel.SelectAllCommand.Execute(true);
+            viewmodel.SelectAllCommand.Execute(false);
+
+            Assert.That(viewmodel.SelectAll, Is.False);
+            Assert.That(viewmodel.Domains, Is.All.Matches<PublicationDomainOfExpertiseRowViewModel>(d => !d.ToBePublished));
+        }
+
+        [Test]
+        public void VerifyPartialSelection()
+        {
+            var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            var domain2 = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain2", ShortName = "DM2" };
+            this.sitedir.Domain.Add(domain2);
+            this.publication.Domain.Add(domain2);
+            this.modelsetup.ActiveDomain.Add(domain2);
+
+            viewmodel.SelectAllCommand.Execute(true);
+
+            viewmodel.Domains.First().ToBePublished = false;
+            viewmodel.PublicationRowCheckedCommand.Execute(null);
+
+            Assert.That(viewmodel.SelectAll, Is.Null);
+            Assert.That(viewmodel.Domains[0].ToBePublished, Is.False);
+            Assert.That(viewmodel.Domains[1].ToBePublished, Is.True);
+        }
+
+        [Test]
         public void VerifyThatParameterRowsAreAddedAndRemoved()
         {
             var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
@@ -285,7 +338,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             Assert.AreEqual(2, viewmodel.Domains[0].ContainedRows.Count);
 
             // verify that ownership of the parameter is changed
-            this.parameter1.Owner = otherDomain;
+            this.parameter1.Owner = this.otherDomain;
             CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
             Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
             Assert.AreEqual(1, viewmodel.Domains[1].ContainedRows.Count);

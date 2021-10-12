@@ -26,7 +26,7 @@ configuration: Debug
 
 install:
   - choco install opencover.portable --version=4.7.1221
-  - choco install "sonarscanner-msbuild-net46" -y
+  - choco install "sonarscanner-msbuild-net46" -y --version=5.2.1.31210
 
 before_build:
   - cmd: nuget install NUnit.Console -Version 3.12.0 -OutputDirectory testrunner
