@@ -206,33 +206,6 @@ namespace CDP4CommonView.Diagram
             }
         }
 
-        ///// <summary>
-        ///// Removes a diagram item
-        ///// </summary>
-        ///// <param name = "item" > The item to remove</param>
-        ////public void RemoveItem(IThingDiagramItemViewModel item)
-        ////{
-        ////    throw new NotImplementedException();
-        ////}
-
-        ///// <summary>
-        ///// Removes a diagram connector
-        ///// </summary>
-        ///// <param name = "item" > The connector to remove</param>
-        ////public void RemoveConnector(IDiagramConnectorViewModel connector)
-        ////{
-        ////    throw new NotImplementedException();
-        ////}
-
-        ///// <summary>
-        ///// Removes the specified item from the diagram collection.
-        ///// </summary>
-        ///// <param name = "item" > The < see cref= "DiagramItem" /> to remove.</param>
-        ////public void RemoveItem(DiagramItem item)
-        ////{
-        ////    this.AssociatedObject.Items.Remove(item);
-        ////}
-
         /// <summary>
         /// Gets the associated diagram control
         /// </summary>
@@ -240,6 +213,15 @@ namespace CDP4CommonView.Diagram
         public DiagramControl GetDiagramControl()
         {
             return this.AssociatedObject;
+        }
+
+        /// <summary>
+        /// Removed the connector directly from the associated objects item collection.
+        /// </summary>
+        /// <param name="connector">The connector to remove</param>
+        public void RemoveConnector(DiagramConnector connector)
+        {
+            this.AssociatedObject.Items.Remove(connector);
         }
 
         /// <summary>
@@ -330,7 +312,7 @@ namespace CDP4CommonView.Diagram
 
             if (tool != null)
             {
-                await tool.ExecuteCreate(connector, this);
+                await tool.ExecuteCreate((DiagramConnector)connector, this);
             }
 
             this.ResetTool();
@@ -433,6 +415,8 @@ namespace CDP4CommonView.Diagram
                     var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content).OfType<PortContainerDiagramContentItemViewModel>().FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
                     container?.PortCollection.Remove(container.PortCollection.FirstOrDefault(i => i == port.DataContext));
                 }
+
+                this.ViewModel.UpdateIsDirty();
 
                 e.Handled = true;
             }

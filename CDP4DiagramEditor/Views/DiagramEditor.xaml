@@ -251,20 +251,19 @@
             </DataTemplate>
 
             <DataTemplate x:Key="ElementUsageConnectorTemplate">
-                <!--<dxdiag:DiagramConnector EndArrow="FilledDiamond"
+                <dxdiag:DiagramConnector EndArrow="FilledDiamond"
                                          EndArrowSize="12,7"
                                          BeginArrow="Open90"
-                                         BeginItem="{Binding BeginItem}"
-                                         EndItem="{Binding EndItem}"
-                                         Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />-->
+                                         Type="OrgChart"
+                                         TextAlignment="Center"
+                                         Content="{Binding DataItem.DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
             <DataTemplate x:Key="InterfaceConnectorTemplate">
-                <!--<dxdiag:DiagramConnector EndArrow="(none)"
+                <dxdiag:DiagramConnector EndArrow="(none)"
                                          BeginArrow="(none)"
-                                         BeginItem="{Binding BeginItem}"
-                                         EndItem="{Binding EndItem}"
-                                         Content="{Binding DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />-->
+                                         Type="OrgChart"
+                                         Content="{Binding DataItem.DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
             <viewModels:DiagramItemViewModelTemplateSelector x:Key="DiagramItemViewModelTemplateSelector"

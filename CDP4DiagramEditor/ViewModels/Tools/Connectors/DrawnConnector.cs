@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IConnectorTool.cs" company="RHEA System S.A.">
+// <copyright file="DrawnConnector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,34 +23,29 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Diagram
+namespace CDP4DiagramEditor.ViewModels
 {
-    using System.Threading.Tasks;
-
-    using CDP4CommonView.Diagram;
+    using CDP4Composition.Diagram;
 
     using DevExpress.Xpf.Diagram;
 
     /// <summary>
-    /// Interface for all connector tools
+    /// Represents a drawn connector
     /// </summary>
-    public interface IConnectorTool
+    public abstract class DrawnConnector : DiagramConnector, IDrawnConnector
     {
         /// <summary>
-        /// Gets the type of connector viewmodel to be created
+        /// Initializes a new instance of the <see cref="DrawnConnector" /> class
         /// </summary>
-        IDiagramConnectorViewModel GetConnectorViewModel { get; }
+        /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
+        public DrawnConnector(IConnectorTool tool)
+        {
+            this.Tool = tool;
+        }
 
         /// <summary>
-        /// Gets the type of <see cref="DiagramConnector"/> to be created
+        /// Gets the tool that drew the connector
         /// </summary>
-        DiagramConnector GetConnector { get; }
-
-        /// <summary>
-        /// Executes the creation of the objects conveyed by the tool
-        /// </summary>
-        /// <param name="connector">The temporary connector</param>
-        /// <param name="behavior">The behavior</param>
-        Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior);
+        public IConnectorTool Tool { get; }
     }
 }

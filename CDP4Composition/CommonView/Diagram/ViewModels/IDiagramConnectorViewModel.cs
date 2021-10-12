@@ -32,7 +32,7 @@ namespace CDP4CommonView.Diagram
     using CDP4Common.DiagramData;
 
     using CDP4Composition.Diagram;
-
+    using CDP4Dal.Operations;
     using Point = System.Windows.Point;
 
     /// <summary>
@@ -84,5 +84,7 @@ namespace CDP4CommonView.Diagram
         /// Gets a value indicating whether the diagram editor is dirty
         /// </summary>
         bool IsDirty { get; }
+
+        void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container);
     }
 }

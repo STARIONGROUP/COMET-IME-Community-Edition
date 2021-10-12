@@ -87,20 +87,23 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// Gets the type of connector to be created
         /// </summary>
-        public IDiagramConnectorViewModel GetConnector
-        {
-            get { return new ElementUsageEdgeViewModel(this); }
-        }
+        public IDiagramConnectorViewModel GetConnectorViewModel => new ElementUsageEdgeViewModel(null, null);
+
+
+        /// <summary>
+        /// Gets the type of <see cref="DiagramConnector"/> to be created
+        /// </summary>
+        public DiagramConnector GetConnector => new ElementUsageConnector(this);
 
         /// <summary>
         /// Executes the creation of the objects conveyed by the tool
         /// </summary>
         /// <param name="connector">The supplied temp connector</param>
         /// <param name="behavior">The behavior</param>
-        public async Task ExecuteCreate(IDrawnConnector connector, ICdp4DiagramBehavior behavior)
+        public async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
         {
-            var beginItemContent = ((IDiagramConnectorViewModel)connector).BeginItem as ElementDefinitionDiagramContentItemViewModel;
-            var endItemContent = ((IDiagramConnectorViewModel)connector).EndItem as ElementDefinitionDiagramContentItemViewModel;
+            var beginItemContent = ((DiagramContentItem)connector.BeginItem)?.Content as ElementDefinitionDiagramContentItemViewModel;
+            var endItemContent = ((DiagramContentItem)connector.EndItem)?.Content as ElementDefinitionDiagramContentItemViewModel;
 
             if (beginItemContent == null || endItemContent == null)
             {

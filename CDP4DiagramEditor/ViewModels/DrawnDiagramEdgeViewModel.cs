@@ -38,7 +38,7 @@ namespace CDP4DiagramEditor.ViewModels
     /// <summary>
     /// The view-model representing a <see cref="DiagramEdge" />
     /// </summary>
-    public class DrawnDiagramEdgeViewModel : ThingDiagramConnectorViewModel, IDrawnConnector
+    public class DrawnDiagramEdgeViewModel : ThingDiagramConnectorViewModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DrawnDiagramEdgeViewModel" /> class
@@ -51,19 +51,6 @@ namespace CDP4DiagramEditor.ViewModels
             this.UpdateProperties();
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DrawnDiagramEdgeViewModel" /> class
-        /// </summary>
-        /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
-        public DrawnDiagramEdgeViewModel(IConnectorTool tool) : base(null, null)
-        {
-            this.Tool = tool;
-        }
-
-        /// <summary>
-        /// Get the creator connector tool
-        /// </summary>
-        public IConnectorTool Tool { get; protected set; }
 
         /// <summary>
         /// The <see cref="ObjectChangedEvent" /> event-handler

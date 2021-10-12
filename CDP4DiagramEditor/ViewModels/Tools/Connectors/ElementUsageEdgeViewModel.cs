@@ -25,9 +25,15 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
+    using System.Linq;
+    using System.Text;
+
     using CDP4Common.DiagramData;
+    using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Diagram;
+
+    using CDP4Dal.Events;
 
     /// <summary>
     /// View model for a ElementUsage diagram edge
@@ -41,15 +47,36 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
         public ElementUsageEdgeViewModel(DiagramEdge diagramEdge, IDiagramEditorViewModel container) : base(diagramEdge, container)
         {
+            this.UpdateProperties();
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ElementUsageEdgeViewModel" /> class
+        /// The <see cref="ObjectChangedEvent" /> event-handler
         /// </summary>
-        /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
-        public ElementUsageEdgeViewModel(IConnectorTool tool) : base(tool)
+        /// <param name="objectChange">The <see cref="ObjectChangedEvent" /></param>
+        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
+            base.ObjectChangeEventHandler(objectChange);
+            this.UpdateProperties();
+        }
 
+        /// <summary>
+        /// Updates the properties of this view-model
+        /// </summary>
+        private void UpdateProperties()
+        {
+            var categories = (this.Thing as ElementUsage)?.Category;
+
+            var sb = new StringBuilder();
+
+            if (categories != null && categories.Any())
+            {
+                sb.AppendLine($"({string.Join(", ", categories.Select(c => $"\"{c.ShortName}\""))})");
+            }
+
+            sb.AppendLine($"{this.Thing?.UserFriendlyName} ({this.Thing?.UserFriendlyShortName})");
+
+            this.DisplayedText = sb.ToString().Trim();
         }
     }
 }

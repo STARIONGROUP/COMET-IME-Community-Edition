@@ -169,7 +169,7 @@
                         <dragDrop:FrameworkElementDragBehavior />
                     </i:Interaction.Behaviors>
                     <dxg:TreeListControl.Columns>
-                        <dxg:TreeListColumn FieldName="Name" Header="Domain"  Show />
+                        <dxg:TreeListColumn FieldName="Name" Header="Domain" />
                         <dxg:TreeListColumn FieldName="Value" Header="New Value" />
                         <dxg:TreeListColumn FieldName="Published" Header="Old Value" />
                         <dxg:TreeListColumn FieldName="PercentageChange" Header="% Changed" />

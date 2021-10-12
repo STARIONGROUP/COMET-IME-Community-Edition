@@ -355,8 +355,11 @@ namespace CDP4DiagramEditor.ViewModels
         {
             switch (contentItemContent)
             {
-                case DrawnDiagramEdgeViewModel connector:
-                    this.ConnectorViewModels.RemoveAndDispose(connector);
+                case DiagramConnector connector:
+                    this.Behavior.RemoveConnector(connector);
+                    break;
+                case DrawnDiagramEdgeViewModel connectorViewModel:
+                    this.ConnectorViewModels.RemoveAndDispose(connectorViewModel);
                     break;
                 case ThingDiagramContentItemViewModel item:
                 {
@@ -388,6 +391,13 @@ namespace CDP4DiagramEditor.ViewModels
             foreach (var thingDiagramContentItem in diagramItems)
             {
                 this.RemoveDiagramThingItem(thingDiagramContentItem);
+            }
+
+            var connectors = this.ConnectorViewModels.Where(c => c.Thing.Equals(thing)).ToList();
+
+            foreach (var connector in connectors)
+            {
+                this.RemoveDiagramThingItem(connector);
             }
         }
 
@@ -657,10 +667,10 @@ namespace CDP4DiagramEditor.ViewModels
             this.CreateInterfaceCommand = ReactiveCommand.Create();
             this.CreateInterfaceCommand.Subscribe(_ => this.CreateInterfaceCommandExecute());
 
-            this.DeleteFromDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any()));
+            this.DeleteFromDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.Any()));
             this.DeleteFromDiagramCommand.Subscribe(x => this.ExecuteDeleteFromDiagramCommand());
 
-            this.DeleteFromModelCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any()));
+            this.DeleteFromModelCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.Any()));
             this.DeleteFromModelCommand.Subscribe(x => this.ExecuteDeleteFromModelCommand());
 
             this.SetAsTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.SelectedItem)
@@ -777,10 +787,16 @@ namespace CDP4DiagramEditor.ViewModels
         private void ExecuteDeleteFromDiagramCommand()
         {
             var selectedDiagramObjects = this.SelectedItems.OfType<DiagramContentItem>().ToList();
+            var selectedConnectors = this.SelectedItems.OfType<DiagramConnector>().ToList();
 
             foreach (var selectedDiagramObject in selectedDiagramObjects)
             {
                 this.RemoveDiagramThingItem(selectedDiagramObject.Content);
+            }
+
+            foreach (var selectedConnector in selectedConnectors)
+            {
+                this.RemoveDiagramThingItem((selectedConnector.DataContext as Connection)?.DataItem);
             }
         }
 
@@ -813,6 +829,36 @@ namespace CDP4DiagramEditor.ViewModels
                     {
                         // no Thing connected, just remove the item
                         this.RemoveDiagramThingItem(selectedThing);
+                    }
+                }
+            }
+
+            var selectedConnectors = this.SelectedItems.OfType<DiagramConnector>().ToList();
+
+            foreach (var selectedConnector in selectedConnectors.Select(s => s.DataContext))
+            {
+                var dataItem = (selectedConnector as Connection)?.DataItem;
+                
+                if (dataItem is ThingDiagramConnectorViewModel connectorViewModel)
+                {
+                    if (connectorViewModel.Thing != null)
+                    {
+                        // if the thing is deprecatable, deprecate it instead and remove the object from diagram
+                        if (connectorViewModel.Thing is IDeprecatableThing deprecatableThing)
+                        {
+                            this.DeprecateThing(deprecatableThing);
+                            this.RemoveDiagramThingItem(selectedConnector);
+                        }
+                        else
+                        {
+                            // if not execute delete and response will remove the diagram object by itself
+                            this.ExecuteDeleteCommand(connectorViewModel.Thing);
+                        }
+                    }
+                    else
+                    {
+                        // no Thing connected, just remove the item
+                        this.RemoveDiagramThingItem(selectedConnector);
                     }
                 }
             }
@@ -1225,7 +1271,7 @@ namespace CDP4DiagramEditor.ViewModels
             clone.DiagramElement.Clear();
 
             var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItemViewModels.OfType<ThingDiagramContentItemViewModel>().Select(x => x.DiagramThing)).ToList();
-            var deletedDiagramObjAndEdges = deletedDiagramObj.Except(this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().Select(x => x.Thing));
+            var deletedDiagramObjAndEdges = deletedDiagramObj.Except(this.ConnectorViewModels.Select(x => x.DiagramThing));
 
             foreach (var diagramObject in deletedDiagramObjAndEdges)
             {
@@ -1235,6 +1281,11 @@ namespace CDP4DiagramEditor.ViewModels
             foreach (var diagramObjectViewModel in this.ThingDiagramItemViewModels)
             {
                 diagramObjectViewModel.UpdateTransaction(transaction, clone);
+            }
+
+            foreach (var connectorViewModel in this.ConnectorViewModels)
+            {
+                connectorViewModel.UpdateTransaction(transaction, clone);
             }
 
             await this.DalWrite(transaction);
@@ -1291,6 +1342,7 @@ namespace CDP4DiagramEditor.ViewModels
         protected override void Dispose(bool disposing)
         {
             this.ThingDiagramItemViewModels.ClearAndDispose();
+            this.ConnectorViewModels.ClearAndDispose();
 
             base.Dispose(disposing);
         }

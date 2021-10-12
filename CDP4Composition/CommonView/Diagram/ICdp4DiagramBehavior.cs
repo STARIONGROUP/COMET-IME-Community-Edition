@@ -98,5 +98,11 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <returns>The associated diagram control</returns>
         DiagramControl GetDiagramControl();
+
+        /// <summary>
+        /// Removed the connector directly from the associated objects item collection.
+        /// </summary>
+        /// <param name="connector">The connector to remove</param>
+        void RemoveConnector(DiagramConnector connector);
     }
 }

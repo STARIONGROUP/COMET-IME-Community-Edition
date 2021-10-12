@@ -32,6 +32,8 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4Composition.Diagram;
 
+    using DevExpress.Xpf.Diagram;
+
     /// <summary>
     /// The <see cref="DataTemplateSelector"/> to select a <see cref="DataTemplate"/> depending on the kind of <see cref="IDiagramConnectorViewModel"/>
     /// </summary>
@@ -60,7 +62,14 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>The <see cref="DataTemplate"/> to use</returns>
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            return item switch
+            var dataItem = (item as Connection)?.DataItem as DrawnDiagramEdgeViewModel;
+
+            if (dataItem == null)
+            {
+                return base.SelectTemplate(item, container);
+            }
+
+            return dataItem switch
             {
                 ElementUsageEdgeViewModel => this.ElementUsageConnectorDataTemplate,
                 InterfaceEdgeViewModel => this.InterfaceConnectorDataTemplate,

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IConnectorTool.cs" company="RHEA System S.A.">
+// <copyright file="ElementUsageConnector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,34 +23,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Diagram
+namespace CDP4DiagramEditor.ViewModels
 {
-    using System.Threading.Tasks;
-
-    using CDP4CommonView.Diagram;
-
-    using DevExpress.Xpf.Diagram;
+    using CDP4Composition.Diagram;
 
     /// <summary>
-    /// Interface for all connector tools
+    /// The connector representing <see cref="ElementUsage"/>
     /// </summary>
-    public interface IConnectorTool
+    public class ElementUsageConnector : DrawnConnector
     {
         /// <summary>
-        /// Gets the type of connector viewmodel to be created
+        /// Initializes a new instance of the <see cref="ElementUsageConnector" /> class
         /// </summary>
-        IDiagramConnectorViewModel GetConnectorViewModel { get; }
-
-        /// <summary>
-        /// Gets the type of <see cref="DiagramConnector"/> to be created
-        /// </summary>
-        DiagramConnector GetConnector { get; }
-
-        /// <summary>
-        /// Executes the creation of the objects conveyed by the tool
-        /// </summary>
-        /// <param name="connector">The temporary connector</param>
-        /// <param name="behavior">The behavior</param>
-        Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior);
+        /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
+        public ElementUsageConnector(IConnectorTool tool) : base(tool)
+        {
+        }
     }
 }
