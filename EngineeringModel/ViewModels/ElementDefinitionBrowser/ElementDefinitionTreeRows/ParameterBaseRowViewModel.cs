@@ -90,11 +90,6 @@ namespace CDP4EngineeringModel.ViewModels
         private IEnumerable<Category> category;
 
         /// <summary>
-        /// Backing field for <see cref="ElementCategory"/>
-        /// </summary>
-        private IEnumerable<Category> elementCategory;
-
-        /// <summary>
         /// Backing field for <see cref="DisplayCategory"/>
         /// </summary>
         private string displayCategory;

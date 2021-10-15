@@ -404,7 +404,7 @@ namespace CDP4ProductTree.ViewModels
                 .AddCategories("ED", this.Thing.Category);
 
             this.DisplayCategory = builder.Build();
-            this.Category = builder.GetCategories().Distinct(); ;
+            this.Category = builder.GetCategories().Distinct();
         }
 
         /// <summary>

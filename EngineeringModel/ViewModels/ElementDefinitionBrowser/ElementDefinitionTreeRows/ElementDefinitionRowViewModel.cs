@@ -47,6 +47,11 @@ namespace CDP4EngineeringModel.ViewModels
         private IThingCreator thingCreator;
 
         /// <summary>
+        /// Backing field for <see cref="DisplayCategory"/>
+        /// </summary>
+        private string displayCategory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionRowViewModel"/> class
         /// </summary>
         /// <param name="elementDefinition">The associated <see cref="ElementDefinition"/></param>
@@ -80,21 +85,12 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets the Categories in display format
+        /// Gets or sets the Categories in display format
         /// </summary>
         public string DisplayCategory
         {
-            get
-            {
-                if(this.Thing is null)
-                {
-                    return string.Empty;
-                }
-
-                return new CategoryStringBuilder()
-                            .AddCategories("ED", this.Thing.Category)
-                            .Build();
-            }
+            get => this.displayCategory;
+            set => this.RaiseAndSetIfChanged(ref this.displayCategory, value);
         }
 
         /// <summary>
@@ -223,6 +219,17 @@ namespace CDP4EngineeringModel.ViewModels
             this.PopulateParameterGroups();
             this.PopulateParameters();
             this.PopulateElemenUsages();
+            this.UpdateCategories();
+        }
+
+        /// <summary>
+        /// Gets the Categories in display format
+        /// </summary>
+        private void UpdateCategories()
+        {
+            DisplayCategory = new CategoryStringBuilder()
+                        .AddCategories("ED", this.Thing.Category)
+                        .Build();
         }
 
         /// <summary>

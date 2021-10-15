@@ -39,12 +39,12 @@ namespace CDP4Composition.Builders
         /// <summary>
         /// The individual parts per added category
         /// </summary>
-        private List<string> parts = new();
+        private readonly List<string> parts = new();
 
         /// <summary>
         /// Stores the categories
         /// </summary>
-        private List<Category> categories = new();
+        private readonly List<Category> categories = new();
 
         /// <summary>
         /// Adds a set of categories with a prefix to the builder
@@ -54,7 +54,7 @@ namespace CDP4Composition.Builders
         /// <returns></returns>
         public CategoryStringBuilder AddCategories(string prefix, List<Category> categories)
         {
-            if (categories.Count() == 0)
+            if (!categories.Any())
             {
                 return this;
             }
