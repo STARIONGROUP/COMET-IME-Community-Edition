@@ -642,6 +642,62 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementUsage1()
+        {
+            this.elementDefinitionForUsage1.Parameter.Add(this.parameter1);
+
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1,
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementUsage2()
+        {
+            this.elementDefinitionForUsage2.Parameter.Add(this.parameter1);
+
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage2, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
+
+            Assert.AreEqual(3, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1,
+                this.category2,
+                this.category1,
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementDefinition()
+        {
+            var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementDefinitionRow, false);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category2,
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
         public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage1()
         {
             this.elementDefinitionForUsage1.Parameter.Add(this.parameter1);
@@ -649,10 +705,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
 
-            Assert.AreEqual(1, row.Category.Count());
+            Assert.AreEqual(2, row.Category.Count());
 
             var expectedCategories = new List<Category>
             {
+                this.category1,
                 this.category1
             };
 
@@ -667,11 +724,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage2, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
 
-            Assert.AreEqual(1, row.Category.Count());
+            Assert.AreEqual(3, row.Category.Count());
 
             var expectedCategories = new List<Category>
             {
                 this.category1,
+                this.category2,
+                this.category1
             };
 
             CollectionAssert.AreEquivalent(expectedCategories, row.Category);
@@ -683,11 +742,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementDefinitionRow, false);
 
-            Assert.AreEqual(1, row.Category.Count());
+            Assert.AreEqual(2, row.Category.Count());
 
             var expectedCategories = new List<Category>
             {
-                this.category1
+                this.category1,
+                this.category2
             };
 
             CollectionAssert.AreEquivalent(expectedCategories, row.Category);

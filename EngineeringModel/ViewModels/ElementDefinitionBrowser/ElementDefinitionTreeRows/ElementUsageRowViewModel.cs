@@ -36,6 +36,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Builders;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
@@ -79,6 +80,11 @@ namespace CDP4EngineeringModel.ViewModels
         private bool? hasExcludes;
 
         /// <summary>
+        /// Backing field for <see cref="DisplayCategory"/>
+        /// </summary>
+        private string displayCategory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageRowViewModel"/> class
         /// </summary>
         /// <param name="elementUsage">The associated <see cref="ElementUsage"/></param>
@@ -93,7 +99,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.AllOptions = new ReactiveList<Option>();
             this.ExcludedOptions = new ReactiveList<Option>();
             this.SelectedOptions = new ReactiveList<Option>();
-
+            
             this.WhenAnyValue(vm => vm.SelectedOptions).Subscribe(_ => this.ExcludedOptions = new ReactiveList<Option>(this.AllOptions.Except(this.SelectedOptions)));
 
             this.WhenAnyValue(vm => vm.ExcludedOptions).Subscribe(
@@ -181,6 +187,15 @@ namespace CDP4EngineeringModel.ViewModels
         public new IEnumerable<Category> Category => this.Thing.Category.Union(this.Thing.ElementDefinition.Category).Distinct();
 
         /// <summary>
+        /// Gets or sets the Categories in display format
+        /// </summary>
+        public string DisplayCategory
+        {
+            get => this.displayCategory;
+            set => this.RaiseAndSetIfChanged(ref this.displayCategory, value);
+        }
+
+        /// <summary>
         /// Update the children rows of the current row
         /// </summary>
         public void UpdateChildren()
@@ -243,6 +258,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateThingStatus();
             this.UpdateOptionLists();
             this.PopulateParameters();
+            this.UpdateCategories();
         }
 
         /// <summary>
@@ -253,6 +269,18 @@ namespace CDP4EngineeringModel.ViewModels
             this.PopulateParameterGroups();
             this.PopulateParameters();
             this.UpdateTooltip();
+            this.UpdateCategories();
+        }
+
+        /// <summary>
+        /// Updates the view model categories with 
+        /// </summary>
+        private void UpdateCategories()
+        {
+            this.DisplayCategory = new CategoryStringBuilder()
+                .AddCategories("EU", this.Thing.Category)
+                .AddCategories("ED", this.Thing.ElementDefinition.Category)
+                .Build();
         }
 
         /// <summary>

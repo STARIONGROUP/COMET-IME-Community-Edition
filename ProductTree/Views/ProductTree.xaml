@@ -232,8 +232,8 @@
                         <behaviours:FilterOperatorBehavior CustomFilterOperatorType="Category" ItemsSource="{Binding TopElement}" />
                     </dxmvvm:Interaction.Behaviors>
                 </dxg:TreeListColumn>
-                <dxg:TreeListColumn Binding="{Binding Category, Converter={StaticResource CategoryListConverter} }"     
-                                    AllowColumnFiltering="False"
+                <dxg:TreeListColumn FieldName="DisplayCategory"
+                                    AllowColumnFiltering="false"
                                     Header="Category" />
                 <dxg:TreeListColumn FieldName="ParameterTypeName" Header="ParameterTypeName" Visible ="False" ShowInColumnChooser="False" />
             </dxg:TreeListControl.Columns>

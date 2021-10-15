@@ -36,6 +36,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Builders;
     using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
@@ -89,6 +90,16 @@ namespace CDP4EngineeringModel.ViewModels
         private IEnumerable<Category> category;
 
         /// <summary>
+        /// Backing field for <see cref="ElementCategory"/>
+        /// </summary>
+        private IEnumerable<Category> elementCategory;
+
+        /// <summary>
+        /// Backing field for <see cref="DisplayCategory"/>
+        /// </summary>
+        private string displayCategory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}"/> class. 
         /// </summary>
         /// <param name="parameterBase">
@@ -129,6 +140,15 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return this.category; }
             private set { this.RaiseAndSetIfChanged(ref this.category, value); }
+        }
+
+        /// <summary>
+        /// Gets the Categories in display format
+        /// </summary>
+        public string DisplayCategory
+        {
+            get => this.displayCategory;
+            protected set => this.RaiseAndSetIfChanged(ref this.displayCategory, value);
         }
 
         /// <summary>
@@ -323,7 +343,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateThingStatus();
             this.ModelCode = this.Thing.ModelCode();
             this.Name = this.Thing.ParameterType.Name;
-            this.Category = this.Thing.ParameterType.Category;
+            this.UpdateCategories();
 
             this.ClearValues();
             // clear the listener on the unique value set represented
@@ -372,6 +392,33 @@ namespace CDP4EngineeringModel.ViewModels
                     elementBaseRow.UpdateParameterBasePosition(this.Thing);
                 }
             }
+        }
+
+        /// <summary>
+        /// Formats the categories for this view model to a single string
+        /// </summary>
+        /// <returns>The string formatted categories</returns>
+        private void UpdateCategories()
+        {
+            var builder = new CategoryStringBuilder()
+                                .AddCategories("PT", this.Thing.ParameterType.Category);
+
+            var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
+            if (elementBase != null)
+            {
+                if (elementBase is ElementUsage elementUsage)
+                {
+                    builder.AddCategories("EU", elementBase.Category);
+                    builder.AddCategories("ED", elementUsage.ElementDefinition.Category);
+                }
+                else
+                {
+                    builder.AddCategories("ED", elementBase.Category);
+                }
+            }
+
+            this.Category = builder.GetCategories();
+            this.DisplayCategory = builder.Build();
         }
 
         /// <summary>

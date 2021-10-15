@@ -36,6 +36,8 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Builders;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
@@ -112,6 +114,11 @@ namespace CDP4ProductTree.ViewModels
         private IEnumerable<Category> category;
 
         /// <summary>
+        /// Backing field for <see cref="DisplayCategory"/>
+        /// </summary>
+        private string displayCategory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageRowViewModel"/> class
         /// </summary>
         /// <param name="elementUsage">
@@ -147,6 +154,15 @@ namespace CDP4ProductTree.ViewModels
         {
             get => this.category;
             private set => this.RaiseAndSetIfChanged(ref this.category, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Categories in display format
+        /// </summary>
+        public string DisplayCategory
+        {
+            get => this.displayCategory;
+            set => this.RaiseAndSetIfChanged(ref this.displayCategory, value);
         }
 
         /// <summary>
@@ -417,7 +433,13 @@ namespace CDP4ProductTree.ViewModels
             this.Name = this.Thing.Name + " : " + this.ElementDefinition.Name;
             this.ShortName = this.Thing.ShortName + " : " + this.ElementDefinition.ShortName;
             this.ModelCode = this.Thing.ModelCode();
-            this.Category = this.Thing.Category.Union(this.Thing.ElementDefinition.Category).Distinct().ToList();
+
+            var builder = new CategoryStringBuilder()
+                                .AddCategories("EU", this.Thing.Category)
+                                .AddCategories("ED", this.Thing.ElementDefinition.Category);
+
+            this.Category = builder.GetCategories().Distinct();
+            this.DisplayCategory = builder.Build();
 
             this.UpdateOwnerNameAndShortName();
 

@@ -589,16 +589,50 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         }
 
         [Test]
-        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage1()
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementUsage1()
         {
             var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.option, this.session.Object, null);
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, elementUsageRow);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1,
+                this.category2
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementDefinition()
+        {
+            var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementdef1, this.option, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, elementDefinitionRow);
 
             Assert.AreEqual(1, row.Category.Count());
 
             var expectedCategories = new List<Category>
             {
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage1()
+        {
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.option, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, elementUsageRow);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
                 this.category1,
+                this.category2,
             };
 
             CollectionAssert.AreEquivalent(expectedCategories, row.Category);

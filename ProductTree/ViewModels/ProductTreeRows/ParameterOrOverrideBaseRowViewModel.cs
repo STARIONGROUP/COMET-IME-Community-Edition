@@ -36,6 +36,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Builders;
     using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
@@ -104,6 +105,11 @@ namespace CDP4ProductTree.ViewModels
         private IEnumerable<Category> category;
 
         /// <summary>
+        /// Backing field for <see cref="DisplayCategory"/>
+        /// </summary>
+        private string displayCategory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOrOverrideBaseRowViewModel"/> class
         /// </summary>
         /// <param name="parameterOrOverride">The <see cref="ParameterOrOverrideBase"/></param>
@@ -163,6 +169,42 @@ namespace CDP4ProductTree.ViewModels
         {
             get => this.category;
             protected set => this.RaiseAndSetIfChanged(ref this.category, value);
+        }
+
+        /// <summary>
+        /// Gets the Categories in display format
+        /// </summary>
+        public string DisplayCategory
+        {
+            get => this.displayCategory;
+            protected set => this.RaiseAndSetIfChanged(ref this.displayCategory, value);
+        }
+
+        /// <summary>
+        /// Formats the categories for this view model to a single string
+        /// </summary>
+        /// <returns>The string formatted categories</returns>
+        private void UpdateCategories()
+        {
+            var builder = new CategoryStringBuilder()
+                                .AddCategories("PT", this.Thing.ParameterType.Category);
+
+            var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
+            if (elementBase != null)
+            {
+                if (elementBase is ElementUsage elementUsage)
+                {
+                    builder.AddCategories("EU", elementBase.Category);
+                    builder.AddCategories("ED", elementUsage.ElementDefinition.Category);
+                }
+                else
+                {
+                    builder.AddCategories("ED", elementBase.Category);
+                }
+            }
+
+            this.Category = builder.GetCategories().Distinct();
+            this.DisplayCategory = builder.Build();
         }
 
         /// <summary>
@@ -247,7 +289,7 @@ namespace CDP4ProductTree.ViewModels
             this.IsPublishable = false;
             this.UpdateOwnerNameAndShortName();
             this.ModelCode = this.Thing.ModelCode();
-            this.Category = this.Thing.ParameterType.Category;
+            this.UpdateCategories();
 
             if (this.StateDependence != this.Thing.StateDependence)
             {

@@ -36,8 +36,10 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView.ViewModels;
 
+    using CDP4Composition.Builders;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
@@ -113,6 +115,11 @@ namespace CDP4ProductTree.ViewModels
         private IEnumerable<Category> category;
 
         /// <summary>
+        /// Backing field for <see cref="DisplayCategory"/>
+        /// </summary>
+        private string displayCategory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionRowViewModel"/> class
         /// </summary>
         /// <param name="elementDefinition">The <see cref="ElementDefinition"/> associated with this row</param>
@@ -138,6 +145,15 @@ namespace CDP4ProductTree.ViewModels
         {
             get => this.category;
             private set => this.RaiseAndSetIfChanged(ref this.category, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Categories in display format
+        /// </summary>
+        public string DisplayCategory
+        {
+            get => this.displayCategory;
+            set => this.RaiseAndSetIfChanged(ref this.displayCategory, value);
         }
 
         /// <summary>
@@ -204,10 +220,10 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
-            /// Update the row containment associated to a <see cref="ParameterGroup"/>
-            /// </summary>
-            /// <param name="parameterGroup">The <see cref="ParameterGroup"/></param>
-            public void UpdateParameterGroupPosition(ParameterGroup parameterGroup)
+        /// Update the row containment associated to a <see cref="ParameterGroup"/>
+        /// </summary>
+        /// <param name="parameterGroup">The <see cref="ParameterGroup"/></param>
+        public void UpdateParameterGroupPosition(ParameterGroup parameterGroup)
         {
             var oldContainer = this.parameterGroupContainment[parameterGroup];
             var newContainer = parameterGroup.ContainingGroup;
@@ -371,13 +387,24 @@ namespace CDP4ProductTree.ViewModels
         private void UpdateProperties()
         {
             this.UpdateThingStatus();
-
-            this.Category = this.Thing.Category;
+            this.UpdateCategories();
             this.UpdateOwnerNameAndShortName();
             this.PopulateElementUsages();
             this.PopulateParameterGroups();
             this.PopulateParameter();
             this.ModelCode = this.Thing.ModelCode();
+        }
+
+        /// <summary>
+        /// Updates the view model categories with 
+        /// </summary>
+        private void UpdateCategories()
+        {
+            var builder = new CategoryStringBuilder()
+                .AddCategories("ED", this.Thing.Category);
+
+            this.DisplayCategory = builder.Build();
+            this.Category = builder.GetCategories().Distinct(); ;
         }
 
         /// <summary>
