@@ -11,14 +11,19 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Builders;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4EngineeringModel.Services;
 
     using Microsoft.Practices.ServiceLocation;
@@ -40,6 +45,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// The backing field for <see cref="ThingCreator"/>
         /// </summary>
         private IThingCreator thingCreator;
+
+        /// <summary>
+        /// Backing field for <see cref="DisplayCategory"/>
+        /// </summary>
+        private string displayCategory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionRowViewModel"/> class
@@ -72,6 +82,15 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get => this.thingCreator = this.thingCreator ?? ServiceLocator.Current.GetInstance<IThingCreator>();
             set => this.thingCreator = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the Categories in display format
+        /// </summary>
+        public string DisplayCategory
+        {
+            get => this.displayCategory;
+            set => this.RaiseAndSetIfChanged(ref this.displayCategory, value);
         }
 
         /// <summary>
@@ -200,6 +219,17 @@ namespace CDP4EngineeringModel.ViewModels
             this.PopulateParameterGroups();
             this.PopulateParameters();
             this.PopulateElemenUsages();
+            this.UpdateCategories();
+        }
+
+        /// <summary>
+        /// Gets the Categories in display format
+        /// </summary>
+        private void UpdateCategories()
+        {
+            DisplayCategory = new CategoryStringBuilder()
+                        .AddCategories("ED", this.Thing.Category)
+                        .Build();
         }
 
         /// <summary>

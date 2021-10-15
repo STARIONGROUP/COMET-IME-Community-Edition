@@ -1,8 +1,8 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -19,16 +19,16 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------------
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.Comparers;
@@ -36,13 +36,16 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Builders;
     using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using ReactiveUI;
 
     /// <summary>
@@ -87,6 +90,11 @@ namespace CDP4EngineeringModel.ViewModels
         private IEnumerable<Category> category;
 
         /// <summary>
+        /// Backing field for <see cref="DisplayCategory"/>
+        /// </summary>
+        private string displayCategory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}"/> class. 
         /// </summary>
         /// <param name="parameterBase">
@@ -127,6 +135,15 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return this.category; }
             private set { this.RaiseAndSetIfChanged(ref this.category, value); }
+        }
+
+        /// <summary>
+        /// Gets the Categories in display format
+        /// </summary>
+        public string DisplayCategory
+        {
+            get => this.displayCategory;
+            protected set => this.RaiseAndSetIfChanged(ref this.displayCategory, value);
         }
 
         /// <summary>
@@ -321,28 +338,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateThingStatus();
             this.ModelCode = this.Thing.ModelCode();
             this.Name = this.Thing.ParameterType.Name;
-
-            var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
-
-            var categories = new HashSet<Category>();
-
-            if (elementBase != null)
-            {
-                foreach (var category in elementBase.Category)
-                {
-                    categories.Add(category);
-                }
-
-                if (elementBase is ElementUsage elementUsage)
-                {
-                    foreach (var category in elementUsage.ElementDefinition.Category)
-                    {
-                        categories.Add(category);
-                    }
-                }
-            }
-
-            this.Category = categories.ToList();
+            this.UpdateCategories();
 
             this.ClearValues();
             // clear the listener on the unique value set represented
@@ -391,6 +387,33 @@ namespace CDP4EngineeringModel.ViewModels
                     elementBaseRow.UpdateParameterBasePosition(this.Thing);
                 }
             }
+        }
+
+        /// <summary>
+        /// Formats the categories for this view model to a single string
+        /// </summary>
+        /// <returns>The string formatted categories</returns>
+        private void UpdateCategories()
+        {
+            var builder = new CategoryStringBuilder()
+                                .AddCategories("PT", this.Thing.ParameterType.Category);
+
+            var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
+            if (elementBase != null)
+            {
+                if (elementBase is ElementUsage elementUsage)
+                {
+                    builder.AddCategories("EU", elementBase.Category);
+                    builder.AddCategories("ED", elementUsage.ElementDefinition.Category);
+                }
+                else
+                {
+                    builder.AddCategories("ED", elementBase.Category);
+                }
+            }
+
+            this.Category = builder.GetCategories();
+            this.DisplayCategory = builder.Build();
         }
 
         /// <summary>

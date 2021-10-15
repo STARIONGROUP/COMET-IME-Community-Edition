@@ -1,11 +1,10 @@
-﻿// ------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft,
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -20,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -37,6 +36,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Builders;
     using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
@@ -105,6 +105,11 @@ namespace CDP4ProductTree.ViewModels
         private IEnumerable<Category> category;
 
         /// <summary>
+        /// Backing field for <see cref="DisplayCategory"/>
+        /// </summary>
+        private string displayCategory;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterOrOverrideBaseRowViewModel"/> class
         /// </summary>
         /// <param name="parameterOrOverride">The <see cref="ParameterOrOverrideBase"/></param>
@@ -164,6 +169,42 @@ namespace CDP4ProductTree.ViewModels
         {
             get => this.category;
             protected set => this.RaiseAndSetIfChanged(ref this.category, value);
+        }
+
+        /// <summary>
+        /// Gets the Categories in display format
+        /// </summary>
+        public string DisplayCategory
+        {
+            get => this.displayCategory;
+            protected set => this.RaiseAndSetIfChanged(ref this.displayCategory, value);
+        }
+
+        /// <summary>
+        /// Formats the categories for this view model to a single string
+        /// </summary>
+        /// <returns>The string formatted categories</returns>
+        private void UpdateCategories()
+        {
+            var builder = new CategoryStringBuilder()
+                                .AddCategories("PT", this.Thing.ParameterType.Category);
+
+            var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
+            if (elementBase != null)
+            {
+                if (elementBase is ElementUsage elementUsage)
+                {
+                    builder.AddCategories("EU", elementBase.Category);
+                    builder.AddCategories("ED", elementUsage.ElementDefinition.Category);
+                }
+                else
+                {
+                    builder.AddCategories("ED", elementBase.Category);
+                }
+            }
+
+            this.Category = builder.GetCategories().Distinct();
+            this.DisplayCategory = builder.Build();
         }
 
         /// <summary>
@@ -248,28 +289,7 @@ namespace CDP4ProductTree.ViewModels
             this.IsPublishable = false;
             this.UpdateOwnerNameAndShortName();
             this.ModelCode = this.Thing.ModelCode();
-
-            var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
-
-            var categories = new HashSet<Category>();
-
-            if (elementBase != null)
-            {
-                foreach (var category in elementBase.Category)
-                {
-                    categories.Add(category);
-                }
-
-                if (elementBase is ElementUsage elementUsage)
-                {
-                    foreach (var category in elementUsage.ElementDefinition.Category)
-                    {
-                        categories.Add(category);
-                    }
-                }
-            }
-
-            this.Category = categories.ToList();
+            this.UpdateCategories();
 
             if (this.StateDependence != this.Thing.StateDependence)
             {

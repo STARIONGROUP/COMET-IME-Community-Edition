@@ -35,8 +35,7 @@
             <converters:ElementUsageOptionsConverter x:Key="ElementUsageOptionsConverter" />
             <converters:DataTypeConverter x:Key="DataTypeConverter" />
             <converters:ElementUsageTypeToVisibilityConverter x:Key="ElementUsageTypeToVisibilityConverter" />
-            <compositionConverters:CategoryListConverter x:Key="CategoryListConverter" />
-
+            
             <HierarchicalDataTemplate DataType="{x:Type viewModels:ElementDefinitionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
@@ -384,8 +383,8 @@
                                             CellTemplateSelector="{StaticResource ReferenceValueCellTemplateSelector}"
                                             FieldName="Reference" />
                         <dxg:TreeListColumn FieldName="Formula" />
-                        <dxg:TreeListColumn Binding="{Binding Category, Converter={StaticResource CategoryListConverter} }"
-                                            AllowColumnFiltering="False"
+                        <dxg:TreeListColumn FieldName="DisplayCategory"
+                                            AllowColumnFiltering="false"
                                             Header="Category" />
                         <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
                         <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />

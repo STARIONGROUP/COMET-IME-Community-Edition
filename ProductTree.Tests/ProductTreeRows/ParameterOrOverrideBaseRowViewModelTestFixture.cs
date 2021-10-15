@@ -1,8 +1,27 @@
-﻿// ------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ProductTree.Tests.ProductTreeRows
 {
@@ -87,7 +106,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
                 ShortName = "Def1",
                 Owner = this.domain
             };
-            
+
             this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
             {
                 ShortName = "Usage1",
@@ -110,7 +129,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             this.iteration.Option.Add(this.option);
             this.iteration.Element.Add(this.elementdef1);
 
-            this.parameterType1 = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "pt1" };
+            this.parameterType1 = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "pt1", Category = new List<Category>() { this.category1 } };
             this.parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.parameterType1, Owner = this.domain };
             this.stateList = new ActualFiniteStateList(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
             this.state1 = new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri);
@@ -570,7 +589,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         }
 
         [Test]
-        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage1()
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementUsage1()
         {
             var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.option, this.session.Object, null);
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, elementUsageRow);
@@ -581,6 +600,39 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             {
                 this.category1,
                 this.category2
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementDefinition()
+        {
+            var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementdef1, this.option, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, elementDefinitionRow);
+
+            Assert.AreEqual(1, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage1()
+        {
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.option, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, elementUsageRow);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1,
+                this.category2,
             };
 
             CollectionAssert.AreEquivalent(expectedCategories, row.Category);

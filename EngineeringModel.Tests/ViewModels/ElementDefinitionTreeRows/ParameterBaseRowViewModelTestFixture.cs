@@ -1,8 +1,8 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -19,27 +19,32 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -93,8 +98,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.obfuscationService = new Mock<IObfuscationService>();
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri){ Name = "option1"};
-            this.option2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "option2"};
+            this.option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "option1" };
+            this.option2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "option2" };
 
             this.stateList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.state1 = new PossibleFiniteState(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "state1" };
@@ -119,13 +124,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.stateList.PossibleFiniteStateList.Add(this.posStateList);
 
-            this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "active", ShortName = "active"};
+            this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "active", ShortName = "active" };
             this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "other", ShortName = "other" };
 
             this.qqParamType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "PTName",
-                ShortName = "PTShortName"
+                ShortName = "PTShortName",
             };
 
             this.boolPt = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -172,6 +177,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.category1 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.category2 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            this.qqParamType.Category = new List<Category>() { this.category1 };
 
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
@@ -227,7 +234,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter1 = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ParameterType = this.qqParamType,
-                Owner = this.activeDomain
+                Owner = this.activeDomain,
             };
 
             this.parameter5ForSubscription = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -336,7 +343,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             // *******************
 
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
-        
+
             Assert.AreEqual("PTName", row.Name);
             Assert.AreEqual("active", row.OwnerName);
             Assert.AreEqual("manual", row.Manual);
@@ -554,7 +561,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [Test]
         public void VerifyThatParameterSubscriptionHasRightOwnerValue()
         {
-            this.parameter5Subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri){Owner = this.activeDomain};
+            this.parameter5Subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.activeDomain };
             this.parameter5ForSubscription.ParameterSubscription.Add(this.parameter5Subscription);
 
             var valueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -594,9 +601,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.parameter1.ParameterType = this.boolPt;
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
-            
-            Assert.That(row.ValidateProperty("Manual", "12,45"), Is.Not.Null.Or.Empty);            
-            Assert.That(row.ValidateProperty("Reference", "12,45"), Is.Not.Null.Or.Empty);            
+
+            Assert.That(row.ValidateProperty("Manual", "12,45"), Is.Not.Null.Or.Empty);
+            Assert.That(row.ValidateProperty("Reference", "12,45"), Is.Not.Null.Or.Empty);
             Assert.That(row.ValidateProperty("Manual", true), Is.Null.Or.Empty);
             Assert.That(row.ValidateProperty("Reference", null), Is.Null.Or.Empty);
         }
@@ -635,6 +642,62 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementUsage1()
+        {
+            this.elementDefinitionForUsage1.Parameter.Add(this.parameter1);
+
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1,
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementUsage2()
+        {
+            this.elementDefinitionForUsage2.Parameter.Add(this.parameter1);
+
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage2, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
+
+            Assert.AreEqual(3, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category1,
+                this.category2,
+                this.category1,
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
+        public void VerifyThatElementCategoryIsCollectedCorrectlyForElementDefinition()
+        {
+            var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementDefinitionRow, false);
+
+            Assert.AreEqual(2, row.Category.Count());
+
+            var expectedCategories = new List<Category>
+            {
+                this.category2,
+                this.category1
+            };
+
+            CollectionAssert.AreEquivalent(expectedCategories, row.Category);
+        }
+
+        [Test]
         public void VerifyThatCategoryIsCollectedCorrectlyForElementUsage1()
         {
             this.elementDefinitionForUsage1.Parameter.Add(this.parameter1);
@@ -642,10 +705,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
 
-            Assert.AreEqual(1, row.Category.Count());
+            Assert.AreEqual(2, row.Category.Count());
 
             var expectedCategories = new List<Category>
             {
+                this.category1,
                 this.category1
             };
 
@@ -660,12 +724,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage2, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementUsageRow, false);
 
-            Assert.AreEqual(2, row.Category.Count());
+            Assert.AreEqual(3, row.Category.Count());
 
             var expectedCategories = new List<Category>
             {
                 this.category1,
-                this.category2
+                this.category2,
+                this.category1
             };
 
             CollectionAssert.AreEquivalent(expectedCategories, row.Category);
@@ -677,10 +742,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var elementDefinitionRow = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, elementDefinitionRow, false);
 
-            Assert.AreEqual(1, row.Category.Count());
+            Assert.AreEqual(2, row.Category.Count());
 
             var expectedCategories = new List<Category>
             {
+                this.category1,
                 this.category2
             };
 
