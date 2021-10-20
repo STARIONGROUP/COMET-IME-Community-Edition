@@ -87,7 +87,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// Gets the type of connector to be created
         /// </summary>
-        public IDiagramConnectorViewModel GetConnectorViewModel => new ElementUsageEdgeViewModel(null, null);
+        public IDiagramConnectorViewModel GetConnectorViewModel => new ElementUsageEdgeViewModel(null, null, null);
 
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             try
             {
                 var usage = await this.ThingCreator.CreateAndGetElementUsage(endItemContent.Thing as ElementDefinition, beginItemContent.Thing as ElementDefinition, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration) behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
-                this.CreateElementUsageConnector(usage, (DiagramObject) beginItemContent.DiagramThing, (DiagramObject) endItemContent.DiagramThing, behavior);
+                CreateElementUsageConnector(usage, (DiagramObject) beginItemContent.DiagramThing, (DiagramObject) endItemContent.DiagramThing, behavior);
             }
             catch (Exception ex)
             {
@@ -138,7 +138,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <param name="source">The <see cref="DiagramObject" /> source</param>
         /// <param name="target">The <see cref="DiagramObject" /> target</param>
         /// <param name="behavior">The diagram bahavior</param>
-        private void CreateElementUsageConnector(ElementUsage usage, DiagramObject source, DiagramObject target, ICdp4DiagramBehavior behavior)
+        public static void CreateElementUsageConnector(ElementUsage usage, DiagramObject source, DiagramObject target, ICdp4DiagramBehavior behavior)
         {
             var connectorItem = behavior.ViewModel.ConnectorViewModels.SingleOrDefault(x => x.Thing == usage);
 
@@ -155,7 +155,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
                 Name = source.Name
             };
 
-            connectorItem = new ElementUsageEdgeViewModel(edge, behavior.ViewModel);
+            connectorItem = new ElementUsageEdgeViewModel(edge, behavior.ViewModel.Session, behavior.ViewModel);
             behavior.ViewModel.ConnectorViewModels.Add(connectorItem);
 
             behavior.ViewModel.UpdateIsDirty();

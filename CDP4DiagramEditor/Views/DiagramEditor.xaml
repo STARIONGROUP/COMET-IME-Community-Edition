@@ -247,7 +247,7 @@
             </DataTemplate>
 
             <DataTemplate x:Key="DiagramPortTemplate">
-                <DiagramViews:DiagramPortShape />
+                    <DiagramViews:DiagramPortShape />
             </DataTemplate>
 
             <DataTemplate x:Key="ElementUsageConnectorTemplate">
@@ -299,6 +299,7 @@
                                         dxb:MergingProperties.ElementMergingBehavior="All"
                                         ShowPageBreaks="False"
                                         CanvasSizeMode="Fill"
+                                        ConnectorsSeparationMode="AllLines"
                                         IsManipulationEnabled="True"
                                         AllowRotateItems="False"
                                         AllowResizeItems="False"

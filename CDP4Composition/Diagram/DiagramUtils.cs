@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="InterfaceEdgeViewModel.cs" company="RHEA System S.A.">
+// <copyright file="DiagramUtils.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,27 +23,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4DiagramEditor.ViewModels
+namespace CDP4Composition.Diagram
 {
-    using CDP4Common.DiagramData;
+    using CDP4CommonView.Diagram;
 
-    using CDP4Composition.Diagram;
-
-    using CDP4Dal;
+    using DevExpress.Xpf.Diagram;
 
     /// <summary>
-    /// View model for a Interface diagram edge
+    /// Utility extensions for diagramming controls
     /// </summary>
-    public class InterfaceEdgeViewModel : DrawnDiagramEdgeViewModel, IGeneratedConnector
+    public static class DiagramUtils
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CDP4DiagramEditor.ViewModels.InterfaceEdgeViewModel" /> class
+        /// Gets viewmodel from a <see cref="DiagramConnector"/>
         /// </summary>
-        /// <param name="diagramEdge">The associated <see cref="DiagramEdge" /></param>
-        /// <param name="session">The <see cref="ISession"/></param>
-        /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
-        public InterfaceEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
+        /// <param name="diagramConnector">The connector to extract the viewmodel from</param>
+        /// <returns></returns>
+        public static IDiagramConnectorViewModel GetViewModel(this DiagramConnector diagramConnector)
         {
+            if (diagramConnector?.DataContext is Connection connection)
+            {
+                if (connection.DataItem is IDiagramConnectorViewModel viewmodel)
+                {
+                    return viewmodel;
+                }
+            }
+
+            return null;
         }
     }
 }

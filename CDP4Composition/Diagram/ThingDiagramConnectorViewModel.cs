@@ -59,6 +59,11 @@ namespace CDP4Composition.Diagram
     public abstract class ThingDiagramConnectorViewModel : IDiagramConnectorViewModel, IReactiveObject, IIDropTarget
     {
         /// <summary>
+        /// The <see cref="ISession"/> to be used when creating other view models
+        /// </summary>
+        protected ISession session;
+
+        /// <summary>
         /// The NLog logger
         /// </summary>
         protected static Logger Logger;
@@ -96,12 +101,14 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Initializes a new instance of the <see cref="ThingDiagramConnectorViewModel" /> class.
         /// </summary>
-        public ThingDiagramConnectorViewModel(DiagramEdge diagramThing, IDiagramEditorViewModel containerViewModel)
+        public ThingDiagramConnectorViewModel(DiagramEdge diagramThing, ISession session, IDiagramEditorViewModel containerViewModel)
         {
             if (diagramThing == null || containerViewModel == null)
             {
                 return;
             }
+
+            this.session = session;
 
             this.DiagramThing = diagramThing;
             this.containerViewModel = containerViewModel;
@@ -193,7 +200,7 @@ namespace CDP4Composition.Diagram
         /// functionality
         /// for the class that this interface is applied to.
         /// </summary>
-        public IDropTarget DropTarget { get; }
+        public IDropTarget DropTarget { get; protected set; }
 
         /// <summary>
         /// <see cref="ReactiveUI.PropertyChangingEventHandler" /> event

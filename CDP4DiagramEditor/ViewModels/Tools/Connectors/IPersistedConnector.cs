@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="InterfaceEdgeViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IPersistedConnector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -25,25 +25,12 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
-    using CDP4Common.DiagramData;
-
-    using CDP4Composition.Diagram;
-
-    using CDP4Dal;
+    using CDP4CommonView.Diagram;
 
     /// <summary>
-    /// View model for a Interface diagram edge
+    /// A type of connector that is persisted
     /// </summary>
-    public class InterfaceEdgeViewModel : DrawnDiagramEdgeViewModel, IGeneratedConnector
+    public interface IPersistedConnector : IDiagramConnectorViewModel
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CDP4DiagramEditor.ViewModels.InterfaceEdgeViewModel" /> class
-        /// </summary>
-        /// <param name="diagramEdge">The associated <see cref="DiagramEdge" /></param>
-        /// <param name="session">The <see cref="ISession"/></param>
-        /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
-        public InterfaceEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
-        {
-        }
     }
 }

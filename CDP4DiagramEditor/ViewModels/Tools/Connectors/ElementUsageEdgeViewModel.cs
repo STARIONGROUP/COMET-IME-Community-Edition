@@ -33,20 +33,27 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4Composition.Diagram;
 
+    using CDP4Dal;
     using CDP4Dal.Events;
 
     /// <summary>
     /// View model for a ElementUsage diagram edge
     /// </summary>
-    public class ElementUsageEdgeViewModel : DrawnDiagramEdgeViewModel
+    public class ElementUsageEdgeViewModel : DrawnDiagramEdgeViewModel, IPersistedConnector
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementUsageEdgeViewModel" /> class
         /// </summary>
         /// <param name="diagramEdge">The associated <see cref="DiagramEdge" /></param>
+        /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
-        public ElementUsageEdgeViewModel(DiagramEdge diagramEdge, IDiagramEditorViewModel container) : base(diagramEdge, container)
+        public ElementUsageEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
         {
+            if (diagramEdge.DepictedThing is ElementUsage elementUsage)
+            {
+                this.DropTarget = new ElementUsageDropTarget(elementUsage, this.session);
+            }
+
             this.UpdateProperties();
         }
 

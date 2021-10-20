@@ -54,6 +54,11 @@ namespace CDP4Composition.Diagram
     /// </summary>
     public abstract class ThingDiagramContentItemViewModel : IThingDiagramItemViewModel, IReactiveObject, IIDropTarget
     {
+        /// <summary>
+        /// The <see cref="ISession"/> to be used when creating other view models
+        /// </summary>
+        protected ISession session;
+
         /// <summary> 
         /// <see cref="ReactiveUI.PropertyChangingEventHandler"/> event
         /// </summary>
@@ -95,10 +100,13 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="diagramThing">
         /// The diagramThing contained</param>
+        /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        protected ThingDiagramContentItemViewModel(DiagramElementThing diagramThing, IDiagramEditorViewModel containerViewModel)
+        protected ThingDiagramContentItemViewModel(DiagramElementThing diagramThing, ISession session, IDiagramEditorViewModel containerViewModel)
         {
+            this.session = session;
+
             this.containerViewModel = containerViewModel;
             this.Thing = diagramThing.DepictedThing;
             this.DiagramThing = diagramThing;
@@ -131,6 +139,11 @@ namespace CDP4Composition.Diagram
         private bool isDirty;
 
         /// <summary>
+        /// Backing field for <see cref="DisplayText"/>
+        /// </summary>
+        private string displayText;
+
+        /// <summary>
         /// Gets or sets the <see cref="IThingDiagramItemViewModel.Thing"/>.
         /// </summary>
         public Thing Thing { get; set; }
@@ -152,6 +165,15 @@ namespace CDP4Composition.Diagram
         {
             get => this.isDirty;
             private set => this.RaiseAndSetIfChanged(ref this.isDirty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the text
+        /// </summary>
+        public string DisplayText
+        {
+            get => this.displayText;
+            protected set => this.RaiseAndSetIfChanged(ref this.displayText, value);
         }
 
         /// <summary>

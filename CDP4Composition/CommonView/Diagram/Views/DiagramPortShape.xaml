@@ -9,21 +9,21 @@
                            xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                            xmlns:vm="clr-namespace:CDP4CommonView.Diagram.ViewModels"
                            xmlns:views="clr-namespace:CDP4CommonView.Diagram.Views"
+                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                            mc:Ignorable="d"
-                           Height="20"
-                           Width="20"
+
                            Anchors="Bottom"
                            SnapsToDevicePixels="False"
                            CanSnapToOtherItems="False"
                            CanSnapToThisItem="True"
+                           CanDelete="False"
                            CanMove="False"
-                           Background="AliceBlue"
-                           BorderBrush="Black"
-                           BorderThickness="1"
+                           Background="Transparent"
+                           BorderThickness="0"
                            d:DesignHeight="300"
+                           ClipToBounds="False"
                            d:DesignWidth="300"
                            Position="{Binding Position}"
-                           
                            ConnectionPoints="{Binding ConnectionPoints}">
 
     <dxdiag:DiagramContentItem.Resources>
@@ -32,12 +32,26 @@
                TargetType="{x:Type ContentPresenter}">
             <Style.Triggers>
                 <DataTrigger Binding="{Binding Direction}"
-                             
                              Value="{x:Static vm:PortContainerShapeSide.Left}">
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <Image Width="14" Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}" />
+                                <Grid Background="Transparent" ShowGridLines="False" ClipToBounds="False"
+                                      HorizontalAlignment="Left">
+                                    <Rectangle Fill="AliceBlue" Width="20" Height="20" StrokeThickness="1"
+                                               Stroke="Black" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                               RenderTransformOrigin="0,0">
+                                        <Rectangle.RenderTransform>
+                                            <TranslateTransform X="0" Y="0" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <Image Width="14" HorizontalAlignment="Left"
+                                           Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}">
+                                        <Image.RenderTransform>
+                                            <TranslateTransform X="3" Y="0" />
+                                        </Image.RenderTransform>
+                                    </Image>
+                                </Grid>
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
@@ -47,13 +61,24 @@
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <Image 
-                                    Width="14" Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}" RenderTransformOrigin="0.5,0.5">
-                                    <Image.RenderTransform>
-                                        <RotateTransform Angle="90" />
-                                    </Image.RenderTransform>
-                                </Image>
-                                
+                                <Grid Background="Transparent" ShowGridLines="False" ClipToBounds="False"
+                                      HorizontalAlignment="Left">
+                                    <Rectangle Fill="AliceBlue" Width="20" Height="20" StrokeThickness="1"
+                                               Stroke="Black" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                               RenderTransformOrigin="0,0">
+                                        <Rectangle.RenderTransform>
+                                            <TranslateTransform X="0" Y="0" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <Image
+                                        Width="14"
+                                        Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}"
+                                        RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <RotateTransform Angle="90" />
+                                        </Image.RenderTransform>
+                                    </Image>
+                                </Grid>
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
@@ -63,13 +88,23 @@
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <Image Width="14" Height="14" Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}"
-                                       RenderTransformOrigin="0.5,0.5">
-                                    <Image.RenderTransform>
-                                        <RotateTransform Angle="180" />
-                                    </Image.RenderTransform>
-                                </Image>
-                                
+                                <Grid Background="Transparent" ShowGridLines="False" ClipToBounds="False"
+                                      HorizontalAlignment="Left">
+                                    <Rectangle Fill="AliceBlue" Width="20" Height="20" StrokeThickness="1"
+                                               Stroke="Black" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                               RenderTransformOrigin="0,0">
+                                        <Rectangle.RenderTransform>
+                                            <TranslateTransform X="0" Y="0" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <Image Width="14" Height="14"
+                                           Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}"
+                                           RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <RotateTransform Angle="180" />
+                                        </Image.RenderTransform>
+                                    </Image>
+                                </Grid>
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
@@ -79,21 +114,103 @@
                     <Setter Property="ContentTemplate">
                         <Setter.Value>
                             <DataTemplate>
-                                <Image Width="14" Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}"
-                                       RenderTransformOrigin="0.5,0.5">
-                                    <Image.RenderTransform>
-                                        <RotateTransform Angle="270" />
-                                    </Image.RenderTransform>
-                                </Image>
+                                <Grid Background="Transparent" ShowGridLines="False" ClipToBounds="False"
+                                      HorizontalAlignment="Left">
+                                    <Rectangle Fill="AliceBlue" Width="20" Height="20" StrokeThickness="1"
+                                               Stroke="Black" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                               RenderTransformOrigin="0,0">
+                                        <Rectangle.RenderTransform>
+                                            <TranslateTransform X="0" Y="0" />
+                                        </Rectangle.RenderTransform>
+                                    </Rectangle>
+                                    <Image Width="14"
+                                           Source="{Binding Path=DataContext.IconPath ,  RelativeSource={RelativeSource TemplatedParent}, Converter={StaticResource StringToIconUriConverter}}"
+                                           RenderTransformOrigin="0.5,0.5">
+                                        <Image.RenderTransform>
+                                            <RotateTransform Angle="270" />
+                                        </Image.RenderTransform>
+                                    </Image>
+                                </Grid>
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
-            </Style.Triggers>            
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="Label"
+               TargetType="{x:Type ContentPresenter}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Direction}"
+                             Value="{x:Static vm:PortContainerShapeSide.Left}">
+                    <Setter Property="ContentTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayText}" Background="Transparent" FontSize="9"
+                                           TextAlignment="Right" Margin="-200, 0,25,0">
+                                    <TextBlock.RenderTransform>
+                                        <TranslateTransform X="-2" Y="20" />
+                                    </TextBlock.RenderTransform>
+                                </TextBlock>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Direction}"
+                             Value="{x:Static vm:PortContainerShapeSide.Top}">
+                    <Setter Property="ContentTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayText}" Background="Transparent" FontSize="9"
+                                           TextAlignment="Right" Margin="-200, 0,25,0">
+                                    <TextBlock.RenderTransform>
+                                        <TranslateTransform X="-2" Y="-10" />
+                                    </TextBlock.RenderTransform>
+                                </TextBlock>
+
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Direction}"
+                             Value="{x:Static vm:PortContainerShapeSide.Right}">
+                    <Setter Property="ContentTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayText}" Background="Transparent" FontSize="9"
+                                           TextAlignment="Left" Margin="0, 0,0,0">
+                                    <TextBlock.RenderTransform>
+                                        <TranslateTransform X="25" Y="-15" />
+                                    </TextBlock.RenderTransform>
+                                </TextBlock>
+
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Direction}"
+                             Value="{x:Static vm:PortContainerShapeSide.Bottom}">
+                    <Setter Property="ContentTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DisplayText}" Background="Transparent" FontSize="9"
+                                           TextAlignment="Right" Margin="-200, 0,25,0">
+                                    <TextBlock.RenderTransform>
+                                        <TranslateTransform X="-2" Y="15" />
+                                    </TextBlock.RenderTransform>
+                                </TextBlock>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </dxdiag:DiagramContentItem.Resources>
 
     <dxdiag:DiagramContentItem.Content>
-        <ContentPresenter Style="{StaticResource Arrow}" Content="{Binding}" />
+        <Grid>
+            <ContentPresenter Style="{StaticResource Arrow}" Content="{Binding}" />
+            <ContentPresenter Style="{StaticResource Label}" Content="{Binding}" />
+        </Grid>
+
     </dxdiag:DiagramContentItem.Content>
 </dxdiag:DiagramContentItem>

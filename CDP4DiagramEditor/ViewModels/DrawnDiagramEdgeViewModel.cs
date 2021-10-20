@@ -31,6 +31,7 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4Composition.Diagram;
 
+    using CDP4Dal;
     using CDP4Dal.Events;
 
     using Point = System.Windows.Point;
@@ -45,12 +46,11 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         /// <param name="diagramEdge">The associated <see cref="DiagramEdge" /></param>
         /// <param name="container">The <see cref="IDiagramEditorViewModel" /> containing this edge</param>
-        public DrawnDiagramEdgeViewModel(DiagramEdge diagramEdge, IDiagramEditorViewModel container) : base(diagramEdge, container)
+        public DrawnDiagramEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
         {
             this.ConnectingPoints = new List<Point>();
             this.UpdateProperties();
         }
-
 
         /// <summary>
         /// The <see cref="ObjectChangedEvent" /> event-handler

@@ -41,18 +41,13 @@ namespace CDP4Composition.Diagram
     public class RequirementDiagramContentItemViewModel : NamedThingDiagramContentItemViewModel, IDiagramContentItemChildren
     {
         /// <summary>
-        /// The <see cref="ISession"/> to be used when creating other view models
-        /// </summary>
-        private readonly ISession session;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="RequirementDiagramContentItemViewModel"/> class.
         /// </summary>
         /// <param name="diagramThing">The diagram thing contained</param>
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
         public RequirementDiagramContentItemViewModel(DiagramObject diagramThing, ISession session, IDiagramEditorViewModel container)
-            : base(diagramThing, container)
+            : base(diagramThing, session, container)
         {
             this.session = session;
 

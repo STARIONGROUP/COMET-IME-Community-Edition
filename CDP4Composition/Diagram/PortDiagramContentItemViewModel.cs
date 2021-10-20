@@ -37,8 +37,6 @@ namespace CDP4Composition.Diagram
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using DevExpress.Diagram.Core;
-
     using ReactiveUI;
 
     using Point = System.Windows.Point;
@@ -46,7 +44,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// The view model representing a diagram port that shall be bound to a <see cref="PortContainerDiagramContentItemViewModel" />
     /// </summary>
-    public class DiagramPortDiagramContentItemViewModel : NamedThingDiagramContentItemViewModel, IDiagramPortViewModel
+    public class PortDiagramContentItemViewModel : ThingDiagramContentItemViewModel, IDiagramPortViewModel
     {
         /// <summary>
         /// Backing field for <see cref="EndKind"/>
@@ -59,14 +57,19 @@ namespace CDP4Composition.Diagram
         private string iconPath;
 
         /// <summary>
+        /// The position.
+        /// </summary>
+        private Point position;
+
+        /// <summary>
         /// Initialize a new DiagramPortViewModel
         /// </summary>
         /// <param name="diagramPort">The port diagrma object</param>
         /// <param name="container">The container <see cref="PortContainerDiagramContentItemViewModel" /></param>
         /// <param name="session">The session</param>
         /// <param name="containerViewModel">The container viewmodel</param>
-        public DiagramPortDiagramContentItemViewModel(DiagramPort diagramPort, PortContainerDiagramContentItemViewModel container, ISession session, IDiagramEditorViewModel containerViewModel)
-            : base(diagramPort, containerViewModel)
+        public PortDiagramContentItemViewModel(DiagramPort diagramPort, PortContainerDiagramContentItemViewModel container, ISession session, IDiagramEditorViewModel containerViewModel)
+            : base(diagramPort, session, containerViewModel)
         {
             this.ContainerBounds = diagramPort.Bounds.FirstOrDefault();
             this.Position = new Point(this.ContainerBounds?.X ?? 0D, this.ContainerBounds?.Y ?? 0D);
@@ -76,6 +79,12 @@ namespace CDP4Composition.Diagram
 
             this.EndKind = ((ElementUsage)this.Thing).InterfaceEnd;
             this.IconPath = this.SetIconPath();
+            this.DisplayText = this.Thing?.UserFriendlyShortName ?? "n/a";
+
+            if (diagramPort.DepictedThing is ElementUsage elementUsage)
+            {
+                this.DropTarget = new ElementUsageDropTarget(elementUsage, this.session);
+            }
 
             this.DeterminePortConnectorRotation();
         }
@@ -83,7 +92,11 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Getsor sets the position
         /// </summary>
-        public Point Position { get; set; }
+        public Point Position
+        {
+            get { return this.position; }
+            set { this.RaiseAndSetIfChanged(ref this.position, value); }
+        }
 
         /// <summary>
         /// Gets the container <see cref="ElementDefinitionDiagramContentItemViewModel" />
@@ -128,6 +141,15 @@ namespace CDP4Composition.Diagram
         public void WhenPositionIsUpdatedInvoke()
         {
             this.WhenPositionIsUpdated?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ElementUsage"/> of this port.
+        /// </summary>
+        /// <returns>The <see cref="ElementUsage"/></returns>
+        public ElementUsage GetElementUsage()
+        {
+            return this.Thing as ElementUsage;
         }
 
         /// <summary>
@@ -197,15 +219,11 @@ namespace CDP4Composition.Diagram
 
             var bound = new Bounds(Guid.NewGuid(), container.DiagramThing.Cache, container.DiagramThing.IDalUri)
             {
-                //X = (float)container.Position.X,
-                //Y = (float)container.Position.Y,
-                //Height = (float)container.ActualHeight,
-                //Width = (float)container.ActualWidth,
                 Name = $"bounds_port_{container.ShortName}_{portElementUsage.ShortName}"
             };
 
             portThing.Bounds.Add(bound);
-            return new DiagramPortDiagramContentItemViewModel(portThing, container, session, editorViewModel);
+            return new PortDiagramContentItemViewModel(portThing, container, session, editorViewModel);
         }
 
         /// <summary>
@@ -227,7 +245,7 @@ namespace CDP4Composition.Diagram
         private void UpdateProperties()
         {
             this.EndKind = ((ElementUsage)this.Thing).InterfaceEnd;
-
+            this.DisplayText = this.Thing?.UserFriendlyShortName ?? "n/a";
             this.IconPath = this.SetIconPath();
             this.Direction = this.SetDirection();
         }

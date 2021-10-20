@@ -26,9 +26,7 @@
 namespace CDP4CommonView.Diagram
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.Specialized;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -41,13 +39,11 @@ namespace CDP4CommonView.Diagram
     using CDP4CommonView.Diagram.Views;
     using CDP4CommonView.EventAggregator;
 
-    using CDP4Composition;
     using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
 
     using DevExpress.Diagram.Core;
     using DevExpress.Mvvm.UI;
-    using DevExpress.Utils.Controls;
     using DevExpress.Xpf.Diagram;
     using DevExpress.Xpf.Ribbon;
 
@@ -91,7 +87,7 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Holds the value whether the view has loaded for the first time or it has appeared
         /// <remarks>
-        /// Since the <see cref="Loaded" /> event handler gets called whenever the view reappears from not being active within its
+        /// Since the <see cref="OnLoaded" /> event handler gets called whenever the view reappears from not being active within its
         /// tabgroup
         /// and then reappears, the value of <see cref="hasFirstLoadHappened" /> is used as a condition to draw the connector when
         /// the view did loaded for first time
@@ -148,6 +144,74 @@ namespace CDP4CommonView.Diagram
         /// Gets or sets the diagram editor viewmodel
         /// </summary>
         public IDiagramEditorViewModel ViewModel { get; set; }
+
+        /// <summary>
+        /// The on attached event handler
+        /// </summary>
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+            this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
+
+            this.AssociatedObject.SelectionChanged += this.OnControlSelectionChanged;
+
+            this.AssociatedObject.LayoutUpdated += this.OnLayoutUpdated;
+            this.AssociatedObject.ItemsMoving += this.OnItemsMoving;
+            this.AssociatedObject.ItemBoundsChanged += this.OnBoundsChanged;
+
+            this.CustomLayoutItems += this.OnCustomLayoutItems;
+
+            this.AssociatedObject.PreviewMouseLeftButtonDown += this.PreviewMouseLeftButtonDown;
+            this.AssociatedObject.PreviewMouseLeftButtonUp += this.PreviewMouseLeftButtonUp;
+            this.AssociatedObject.PreviewMouseMove += this.PreviewMouseMove;
+
+            this.AssociatedObject.AllowDrop = true;
+            this.AssociatedObject.PreviewDragEnter += this.PreviewDragEnter;
+            this.AssociatedObject.PreviewDragOver += this.PreviewDragOver;
+            this.AssociatedObject.PreviewDrop += this.PreviewDrop;
+
+            this.AssociatedObject.Loaded += this.OnLoaded;
+            this.AssociatedObject.Unloaded += this.OnUnloaded;
+
+            this.AssociatedObject.ItemsChanged += this.OnItemsChanged;
+            this.AssociatedObject.ItemsDeleting += this.OnItemsDeleting;
+
+            this.AssociatedObject.AddingNewItem += this.OnAddingNewItem;
+        }
+
+        /// <summary>
+        /// Unsubscribes eventhandlers when detaching.
+        /// </summary>
+        protected override void OnDetaching()
+        {
+            this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
+
+            this.AssociatedObject.SelectionChanged -= this.OnControlSelectionChanged;
+
+            this.AssociatedObject.LayoutUpdated -= this.OnLayoutUpdated;
+            this.AssociatedObject.ItemsMoving -= this.OnItemsMoving;
+            this.AssociatedObject.ItemBoundsChanged -= this.OnBoundsChanged;
+
+            this.CustomLayoutItems -= this.OnCustomLayoutItems;
+
+            this.AssociatedObject.PreviewMouseLeftButtonDown -= this.PreviewMouseLeftButtonDown;
+            this.AssociatedObject.PreviewMouseLeftButtonUp -= this.PreviewMouseLeftButtonUp;
+            this.AssociatedObject.PreviewMouseMove -= this.PreviewMouseMove;
+
+            this.AssociatedObject.PreviewDragEnter -= this.PreviewDragEnter;
+            this.AssociatedObject.PreviewDragOver -= this.PreviewDragOver;
+            this.AssociatedObject.PreviewDrop -= this.PreviewDrop;
+
+            this.AssociatedObject.Loaded -= this.OnLoaded;
+            this.AssociatedObject.Unloaded -= this.OnUnloaded;
+
+            this.AssociatedObject.ItemsChanged -= this.OnItemsChanged;
+            this.AssociatedObject.ItemsDeleting -= this.OnItemsDeleting;
+
+            this.AssociatedObject.AddingNewItem -= this.OnAddingNewItem;
+
+            base.OnDetaching();
+        }
 
         /// <summary>
         /// Converts control coordinates into document coordinates.
@@ -265,34 +329,21 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// The on attached event handler
+        /// Recompute port positions if the bounds of the item have changed
         /// </summary>
-        protected override void OnAttached()
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The arguments.</param>
+        private void OnBoundsChanged(object sender, DiagramItemBoundsChangedEventArgs e)
         {
-            base.OnAttached();
-            this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
+            if (e.Item is not DiagramContentItem namedThingDiagramContentItem)
+            {
+                return;
+            }
 
-            this.AssociatedObject.SelectionChanged += this.OnControlSelectionChanged;
-
-            this.AssociatedObject.LayoutUpdated += this.LayoutUpdated;
-            this.AssociatedObject.ItemsMoving += this.AssociatedObjectOnItemsMoving;
-
-            this.CustomLayoutItems += this.OnCustomLayoutItems;
-
-            this.AssociatedObject.PreviewMouseLeftButtonDown += this.PreviewMouseLeftButtonDown;
-            this.AssociatedObject.PreviewMouseLeftButtonUp += this.PreviewMouseLeftButtonUp;
-            this.AssociatedObject.PreviewMouseMove += this.PreviewMouseMove;
-
-            this.AssociatedObject.AllowDrop = true;
-            this.AssociatedObject.PreviewDragEnter += this.PreviewDragEnter;
-            this.AssociatedObject.PreviewDragOver += this.PreviewDragOver;
-            this.AssociatedObject.PreviewDrop += this.PreviewDrop;
-            this.AssociatedObject.Loaded += this.Loaded;
-            this.AssociatedObject.Unloaded += this.Unloaded;
-            this.AssociatedObject.ItemsChanged += this.ItemsChanged;
-            this.AssociatedObject.ItemsDeleting += this.ItemsDeleting;
-
-            this.AssociatedObject.AddingNewItem += this.AddingNewItem;
+            if (namedThingDiagramContentItem.Content is PortContainerDiagramContentItemViewModel portContainer)
+            {
+                portContainer.UpdatePortLayout();
+            }
         }
 
         /// <summary>
@@ -300,7 +351,7 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The arguments.</param>
-        private async void AddingNewItem(object sender, DiagramAddingNewItemEventArgs e)
+        private async void OnAddingNewItem(object sender, DiagramAddingNewItemEventArgs e)
         {
             if (e.Item is not IDrawnConnector connector)
             {
@@ -323,7 +374,7 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The arguments</param>
-        private void AssociatedObjectOnItemsMoving(object sender, DiagramItemsMovingEventArgs e)
+        private void OnItemsMoving(object sender, DiagramItemsMovingEventArgs e)
         {
             if (e.Stage != DiagramActionStage.Finished)
             {
@@ -344,6 +395,11 @@ namespace CDP4CommonView.Diagram
 
                 this.ItemPositions[namedThingDiagramContentItem.Content] = content.NewDiagramPosition;
                 namedThingDiagramContentItem.Position = content.NewDiagramPosition;
+
+                if (namedThingDiagramContentItem.Content is PortContainerDiagramContentItemViewModel portContainer)
+                {
+                    portContainer.UpdatePortLayout();
+                }
             }
         }
 
@@ -353,20 +409,14 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The <see cref="DiagramItemsDeletingEventArgs" /></param>
-        private void ItemsDeleting(object sender, DiagramItemsDeletingEventArgs e)
+        private void OnItemsDeleting(object sender, DiagramItemsDeletingEventArgs e)
         {
-            foreach (var item in e.Items)
+            foreach (var item in e.Items.ToList())
             {
                 object element = null;
 
                 if (item is DiagramContentItem contentItem)
                 {
-                    if (contentItem.Content is PortContainerDiagramContentItemViewModel portContainer)
-                    {
-                        this.ViewModel.ThingDiagramItemViewModels.RemoveAllAndDispose(portContainer.PortCollection.OfType<IThingDiagramItemViewModel>());
-                        portContainer.PortCollection.Clear();
-                    }
-
                     foreach (var selected in this.AssociatedObject.SelectedItems.ToList())
                     {
                         this.AssociatedObject.UnselectItem(selected);
@@ -391,12 +441,8 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The arguments</param>
-        private void LayoutUpdated(object sender, EventArgs e)
+        private void OnLayoutUpdated(object sender, EventArgs e)
         {
-            foreach (var portContainer in this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content as PortContainerDiagramContentItemViewModel))
-            {
-                portContainer?.UpdatePortLayout();
-            }
         }
 
         /// <summary>
@@ -404,16 +450,21 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The arguments</param>
-        private void ItemsChanged(object sender, DiagramItemsChangedEventArgs e)
+        private void OnItemsChanged(object sender, DiagramItemsChangedEventArgs e)
         {
             var thingDiagramContentItem = (e.Item as DiagramContentItem)?.Content as ThingDiagramContentItemViewModel;
 
+            if (e.Item is DiagramPortShape portShape)
+            {
+                thingDiagramContentItem = portShape.DataContext as ThingDiagramContentItemViewModel;
+            }
+
             if (e.Action == ItemsChangedAction.Removed)
             {
-                if (e.Item is DiagramItem port)
+                if (e.Item is DiagramPortShape port)
                 {
                     var container = this.AssociatedObject.Items.OfType<DiagramContentItem>().Select(i => i.Content).OfType<PortContainerDiagramContentItemViewModel>().FirstOrDefault(c => c.PortCollection.FirstOrDefault(p => p == port.DataContext) != null);
-                    container?.PortCollection.Remove(container.PortCollection.FirstOrDefault(i => i == port.DataContext));
+                    container?.PortCollection.RemoveAndDispose(container.PortCollection.FirstOrDefault(i => i == port.DataContext));
                 }
 
                 this.ViewModel.UpdateIsDirty();
@@ -428,6 +479,16 @@ namespace CDP4CommonView.Diagram
 
                     // If you watch multiple values it will fires multiple times CAREFULL
                     thingDiagramContentItem.PositionObservable = e.Item.WhenAnyValue(x => x.Position).Subscribe(x => thingDiagramContentItem.SetDirty());
+
+                    if (thingDiagramContentItem is PortContainerDiagramContentItemViewModel portContainer)
+                    {
+                        //portContainer.UpdatePorts();
+                    }
+
+                    if (thingDiagramContentItem is PortDiagramContentItemViewModel port)
+                    {
+                        port.Container?.UpdatePortLayout();
+                    }
                 }
             }
         }
@@ -460,11 +521,11 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// On Unloaded event handler.
+        /// On OnUnloaded event handler.
         /// </summary>
         /// <param name="sender">The sender diagram design control.</param>
         /// <param name="e">Event arguments.</param>
-        private void Unloaded(object sender, RoutedEventArgs e)
+        private void OnUnloaded(object sender, RoutedEventArgs e)
         {
             if (sender is DiagramDesignerControl diagramDesignerControl)
             {
@@ -477,11 +538,11 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
-        /// On Loaded event handler.
+        /// On OnLoaded event handler.
         /// </summary>
         /// <param name="sender">The sender diagram design control.</param>
         /// <param name="e">Event arguments.</param>
-        private void Loaded(object sender, RoutedEventArgs e)
+        private void OnLoaded(object sender, RoutedEventArgs e)
         {
             if (sender is DiagramDesignerControl designControl && !string.IsNullOrWhiteSpace(this.RibbonMergeCategoryName))
             {
@@ -561,36 +622,6 @@ namespace CDP4CommonView.Diagram
 
             // store category for cleanup
             this.mergeCategory = category;
-        }
-
-        /// <summary>
-        /// Unsubscribes eventhandlers when detaching.
-        /// </summary>
-        protected override void OnDetaching()
-        {
-            this.AssociatedObject.SelectionChanged -= this.OnControlSelectionChanged;
-
-            this.CustomLayoutItems -= this.OnCustomLayoutItems;
-
-            this.AssociatedObject.PreviewMouseLeftButtonDown -= this.PreviewMouseLeftButtonDown;
-            this.AssociatedObject.PreviewMouseLeftButtonUp -= this.PreviewMouseLeftButtonUp;
-            this.AssociatedObject.PreviewMouseMove -= this.PreviewMouseMove;
-
-            this.AssociatedObject.PreviewDragEnter -= this.PreviewDragEnter;
-            this.AssociatedObject.PreviewDragOver -= this.PreviewDragOver;
-            this.AssociatedObject.PreviewDrop -= this.PreviewDrop;
-            this.AssociatedObject.Loaded -= this.Loaded;
-            this.AssociatedObject.Unloaded -= this.Unloaded;
-
-            this.AssociatedObject.LayoutUpdated -= this.LayoutUpdated;
-            this.AssociatedObject.ItemsMoving -= this.AssociatedObjectOnItemsMoving;
-
-            this.AssociatedObject.ItemsChanged -= this.ItemsChanged;
-            this.AssociatedObject.ItemsDeleting -= this.ItemsDeleting;
-
-            this.AssociatedObject.AddingNewItem -= this.AddingNewItem;
-
-            base.OnDetaching();
         }
 
         /// <summary>
@@ -768,9 +799,31 @@ namespace CDP4CommonView.Diagram
                 }
             }
 
+            if (source is ContentPresenter { Content: IIDropTarget portDropTarget })
+            {
+                portDropTarget.DropTarget?.DragOver(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
+            }
+
             if (source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
             {
                 controlHavingDropTarget.DropTarget?.DragOver(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
+            }
+
+            if (source is DiagramConnector connector)
+            {
+                var connectorHavingDropTarget = connector.GetViewModel() as IIDropTarget;
+
+                connectorHavingDropTarget?.DropTarget?.DragOver(dropInfo);
 
                 if (dropInfo.Handled)
                 {
@@ -861,9 +914,34 @@ namespace CDP4CommonView.Diagram
                 }
             }
 
+            if (source is ContentPresenter { Content: IIDropTarget porTarget })
+            {
+                await porTarget.DropTarget.Drop(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
+            }
+
             if (source is DiagramContentItem { Content: IIDropTarget controlHavingDropTarget })
             {
                 await controlHavingDropTarget.DropTarget.Drop(dropInfo);
+
+                if (dropInfo.Handled)
+                {
+                    return true;
+                }
+            }
+
+            if (source is DiagramConnector connector)
+            {
+                if (!(connector.GetViewModel() is IIDropTarget connectorHavingDropTarget))
+                {
+                    return dropInfo.Handled;
+                }
+
+                await connectorHavingDropTarget.DropTarget.Drop(dropInfo);
 
                 if (dropInfo.Handled)
                 {

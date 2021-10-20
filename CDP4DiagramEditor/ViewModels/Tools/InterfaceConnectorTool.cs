@@ -87,7 +87,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// Gets the type of connector to be created
         /// </summary>
-        public IDiagramConnectorViewModel GetConnectorViewModel => new InterfaceEdgeViewModel(null, null);
+        public IDiagramConnectorViewModel GetConnectorViewModel => new InterfaceEdgeViewModel(null, null, null);
 
         /// <summary>
         /// Gets the type of <see cref="DiagramConnector"/> to be created
@@ -101,8 +101,8 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <param name="behavior">The behavior</param>
         public async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
         {
-            var beginItemContent = connector.BeginItem?.DataContext as DiagramPortDiagramContentItemViewModel;
-            var endItemContent = connector.EndItem?.DataContext as DiagramPortDiagramContentItemViewModel;
+            var beginItemContent = connector.BeginItem?.DataContext as PortDiagramContentItemViewModel;
+            var endItemContent = connector.EndItem?.DataContext as PortDiagramContentItemViewModel;
 
             if (beginItemContent == null || endItemContent == null)
             {
@@ -155,7 +155,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
                 Name = source.Name
             };
 
-            connectorItem = new InterfaceEdgeViewModel(edge, behavior.ViewModel);
+            connectorItem = new InterfaceEdgeViewModel(edge, behavior.ViewModel.Session, behavior.ViewModel);
             behavior.ViewModel.ConnectorViewModels.Add(connectorItem);
 
             behavior.ViewModel.UpdateIsDirty();

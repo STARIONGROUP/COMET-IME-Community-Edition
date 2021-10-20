@@ -32,6 +32,7 @@ namespace CDP4CommonView.Diagram.ViewModels
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Diagram;
+    using CDP4Composition.Mvvm.Types;
 
     using CDP4Dal;
 
@@ -45,25 +46,21 @@ namespace CDP4CommonView.Diagram.ViewModels
     public class PortContainerDiagramContentItemViewModel : NamedThingDiagramContentItemViewModel
     {
         /// <summary>
-        /// The <see cref="ISession"/> to be used when creating other view models
-        /// </summary>
-        protected ISession session;
-
-        /// <summary>
         /// Gets or sets the port collection
         /// </summary>
-        public ReactiveList<IDiagramPortViewModel> PortCollection { get; private set; }
+        public DisposableReactiveList<IDiagramPortViewModel> PortCollection { get; private set; }
 
         /// <summary>
         /// Initialize a new <see cref="PortContainerDiagramContentItemViewModel"/>
         /// </summary>
         /// <param name="thing">
         /// The diagramThing contained</param>
+        /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public PortContainerDiagramContentItemViewModel(DiagramObject thing, IDiagramEditorViewModel container) : base(thing, container)
+        public PortContainerDiagramContentItemViewModel(DiagramObject thing, ISession session, IDiagramEditorViewModel container) : base(thing, session, container)
         {
-            this.PortCollection = new ReactiveList<IDiagramPortViewModel>();
+            this.PortCollection = new DisposableReactiveList<IDiagramPortViewModel>();
         }
 
         /// <summary>
@@ -174,40 +171,50 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// </summary>
         protected void UpdatePorts(ElementDefinition elementDefinition)
         {
-            // clean up
-            this.PortCollection.Clear();
-
-            var existingPorts = this.containerViewModel.ThingDiagramItemViewModels.OfType<DiagramPortDiagramContentItemViewModel>().Where(p => p.Container == this).ToList();
-
-            foreach (var diagramPortDiagramContentItem in existingPorts)
-            {
-                this.containerViewModel.ThingDiagramItemViewModels.RemoveAndDispose(diagramPortDiagramContentItem);
-            }
-
             // find the relevant usages
             var usages = elementDefinition.ContainedElement.Where(eu => eu.InterfaceEnd != InterfaceEndKind.NONE).ToList();
 
-            // clean up any usage connectors that reference these EU, ports are only represented by boxes
-            var existingElementUsageEdges = this.containerViewModel.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().Where(c => c.Thing is ElementUsage).ToList();
+            // find added and removed eus
+            var existingPorts = this.PortCollection.Select(p => p.GetElementUsage()).ToList();
 
-            foreach (var elementUsage in usages)
+            var added = usages.Except(existingPorts);
+            var removed = existingPorts.Except(usages);
+
+            // remove old ports
+            foreach (var elementUsage in removed.ToList())
             {
-                var relevantEdges = existingElementUsageEdges.Where(e => e.Thing == elementUsage);
+                var port = this.PortCollection.FirstOrDefault(p => p.GetElementUsage() == elementUsage);
 
-                foreach (var edge in relevantEdges)
+                if (port == null)
                 {
-                    this.containerViewModel.RemoveDiagramThingItem(edge);
+                    continue;
                 }
+
+                this.PortCollection.RemoveAndDispose(port);
+                this.containerViewModel.ThingDiagramItemViewModels.RemoveAndDispose((IThingDiagramItemViewModel)port);
             }
 
+            // add new ports
             // for every EU with directionality create the port
-            foreach (var port in usages.Select(usage => DiagramPortDiagramContentItemViewModel.CreatePort(usage, this, this.session, this.containerViewModel)).Where(port => port is not null))
+            foreach (var port in added.Select(usage => PortDiagramContentItemViewModel.CreatePort(usage, this, this.session, this.containerViewModel)).Where(port => port is not null))
             {
                 this.PortCollection.Add(port);
-                this.containerViewModel.ThingDiagramItemViewModels.Add((IThingDiagramItemViewModel)port);
+                this.containerViewModel.AddPortToItems(port);
             }
 
             this.UpdatePortLayout();
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// a value indicating whether the class is being disposed of
+        /// </param>
+        protected override void Dispose(bool disposing)
+        {
+            this.PortCollection.ClearAndDispose();
+            base.Dispose(disposing);
         }
     }
 }

@@ -69,7 +69,7 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 ElementDefinitionDiagramContentItemViewModel => this.ElementBaseDiagramItemTemplate,
                 RequirementDiagramContentItemViewModel => this.RequirementDiagramItemTemplate,
-                DiagramPortDiagramContentItemViewModel => this.DiagramPortTemplate,
+                PortDiagramContentItemViewModel => this.DiagramPortTemplate,
                 NamedThingDiagramContentItemViewModel => this.GenericDiagramItemDataTemplate,
                 _ => base.SelectTemplate(item, container)
             };

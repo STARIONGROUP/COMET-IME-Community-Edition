@@ -25,12 +25,16 @@
 
 namespace CDP4CommonView.Diagram.ViewModels
 {
-    using CDP4Common.DiagramData;
+    using System;
+
+    using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.Diagram;
 
     /// <summary>
     /// Defines a DiagramPortViewModel that shall be bound to a <see cref="PortContainerDiagramContentItemViewModel"/>
     /// </summary>
-    public interface IDiagramPortViewModel
+    public interface IDiagramPortViewModel : IThingDiagramItemViewModel
     {
         /// <summary>
         /// Gets or sets the position
@@ -42,21 +46,6 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// </summary>
         PortContainerShapeSide PortContainerShapeSide { get; set; }
 
-        ///// <summary>
-        ///// Gets or sets the height
-        ///// </summary>
-        //double Height { get; set; }
-
-        ///// <summary>
-        ///// Gets or sets the width
-        ///// </summary>
-        //double Width { get; set; }
-
-        /// <summary>
-        /// Gets or sets its Parent bound
-        /// </summary>
-        Bounds ContainerBounds { get; set; }
-
         /// <summary>
         /// Determines the orientation of theport connector
         /// </summary>
@@ -66,5 +55,11 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// public invoker of <see cref="WhenPositionIsUpdated"/> that is fired when its position is updated
         /// </summary>
         void WhenPositionIsUpdatedInvoke();
+
+        /// <summary>
+        /// Returns the <see cref="ElementUsage"/> of this port.
+        /// </summary>
+        /// <returns>The <see cref="ElementUsage"/></returns>
+        ElementUsage GetElementUsage();
     }
 }

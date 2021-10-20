@@ -32,6 +32,7 @@ namespace CDP4Composition.Diagram
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Dal;
     using CDP4Dal.Events;
 
     using ReactiveUI;
@@ -77,10 +78,11 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="diagramThing">
         /// The diagramThing contained</param>
+        /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public NamedThingDiagramContentItemViewModel(DiagramElementThing diagramThing, IDiagramEditorViewModel container)
-            : base(diagramThing, container)
+        public NamedThingDiagramContentItemViewModel(DiagramElementThing diagramThing, ISession session, IDiagramEditorViewModel container)
+            : base(diagramThing, session, container)
         {
             this.UpdateProperties();
         }

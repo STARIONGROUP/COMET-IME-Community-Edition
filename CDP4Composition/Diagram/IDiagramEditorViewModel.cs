@@ -32,6 +32,7 @@ namespace CDP4Composition.Diagram
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4CommonView.Diagram;
+    using CDP4CommonView.Diagram.ViewModels;
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
@@ -59,6 +60,10 @@ namespace CDP4Composition.Diagram
         /// Gets or sets the collection of diagram items.
         /// </summary>
         DisposableReactiveList<IThingDiagramItemViewModel> ThingDiagramItemViewModels { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of connectors.
+        /// </summary>
         DisposableReactiveList<IDiagramConnectorViewModel> ConnectorViewModels { get; set; }
 
         /// <summary>
@@ -94,5 +99,11 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="contextMenuItems">The menu options to display</param>
         void ShowDropContextMenuOptions(IEnumerable<ContextMenuItemViewModel> contextMenuItems);
+
+        /// <summary>
+        /// Adds a port to the items collection
+        /// </summary>
+        /// <param name="port">The port view model</param>
+        void AddPortToItems(IDiagramPortViewModel port);
     }
 }
