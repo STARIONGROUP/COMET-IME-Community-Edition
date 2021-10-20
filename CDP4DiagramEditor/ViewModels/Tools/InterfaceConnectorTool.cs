@@ -29,6 +29,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
     using System.Linq;
     using System.Threading.Tasks;
 
+    using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
@@ -116,8 +117,6 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             try
             {
                 var relationship = await this.ThingCreator.CreateAndGetInterface(endItemContent.Thing as ElementUsage, beginItemContent.Thing as ElementUsage, (Iteration)behavior.ViewModel.Thing.Container, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration)behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
-
-                this.CreateInterfaceConnector(relationship, (DiagramPort)beginItemContent.DiagramThing, (DiagramPort)endItemContent.DiagramThing, behavior);
             }
             catch (Exception ex)
             {
@@ -138,7 +137,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <param name="source">The <see cref="DiagramObject" /> source</param>
         /// <param name="target">The <see cref="DiagramObject" /> target</param>
         /// <param name="behavior">The diagram bahavior</param>
-        private void CreateInterfaceConnector(BinaryRelationship relationship, DiagramPort source, DiagramPort target, ICdp4DiagramBehavior behavior)
+        public static void CreateConnector(BinaryRelationship relationship, DiagramPort source, DiagramPort target, ICdp4DiagramBehavior behavior)
         {
             var connectorItem = behavior.ViewModel.ConnectorViewModels.SingleOrDefault(x => x.Thing == relationship);
 
@@ -159,6 +158,24 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             behavior.ViewModel.ConnectorViewModels.Add(connectorItem);
 
             behavior.ViewModel.UpdateIsDirty();
+        }
+
+        /// <summary>
+        /// Checks whether a <see cref="Thing"/> is an Interface End
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> to check</param>
+        /// <returns>True if it is an <see cref="ElementUsage"/> with an InterfaceEnd kind set to non-null</returns>
+        public static bool IsThingAnInterfaceEnd(Thing thing)
+        {
+            if (thing is ElementUsage usage)
+            {
+                if (usage.InterfaceEnd != InterfaceEndKind.NONE)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

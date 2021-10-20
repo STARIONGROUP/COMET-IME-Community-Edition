@@ -262,7 +262,8 @@
             <DataTemplate x:Key="InterfaceConnectorTemplate">
                 <dxdiag:DiagramConnector EndArrow="(none)"
                                          BeginArrow="(none)"
-                                         Type="OrgChart"
+                                         Type="RightAngle"
+                                         Stroke="IndianRed"
                                          Content="{Binding DataItem.DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 

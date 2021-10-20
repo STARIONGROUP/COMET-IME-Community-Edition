@@ -160,6 +160,25 @@ namespace CDP4DiagramEditor.ViewModels
             this.PaletteViewModel = new DiagramPaletteViewModel(diagram, this);
 
             this.DropContextMenuItems = new ReactiveList<ContextMenuItemViewModel>();
+
+            // initialize listeners
+            this.InitializeListeners();
+        }
+
+        /// <summary>
+        /// Initializes listeners for object change events related to creation/removal of generated elements
+        /// </summary>
+        private void InitializeListeners()
+        {
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
+                .Where(objectChange => objectChange.EventKind != EventKind.Removed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.ComputeGeneratedConnectors()));
+
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
+                .Where(objectChange => objectChange.EventKind == EventKind.Removed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.RemoveGeneratedConnector));
         }
 
         /// <summary>
@@ -289,6 +308,7 @@ namespace CDP4DiagramEditor.ViewModels
         public void UpdateProperties()
         {
             this.ComputeDiagramObject();
+            this.ComputeGeneratedConnectors();
             this.IsDirty = false;
         }
 
@@ -771,6 +791,57 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
+        /// Compute and draw the auto-generated connectors
+        /// </summary>
+        private void ComputeGeneratedConnectors()
+        {
+            var existingConnectors = this.ConnectorViewModels.OfType<IGeneratedConnector>().ToList();
+
+            // interfaces
+            var binaryRelationships = (this.Thing.Container as Iteration)?.Relationship?.OfType<BinaryRelationship>().ToList();
+
+            if (binaryRelationships is not null)
+            {
+                // interfaces are bunary relationships between two EUs with interface end kind set to not NONE
+                var interfaces = binaryRelationships.Where(br => InterfaceConnectorTool.IsThingAnInterfaceEnd(br.Source) && InterfaceConnectorTool.IsThingAnInterfaceEnd(br.Target));
+
+                foreach (var iface in interfaces)
+                {
+                    if (existingConnectors.Any(c => c.Thing.Equals(iface)))
+                    {
+                        continue;
+                    }
+
+                    // only draw if both source and target are on the canvas
+                    var existingPorts = this.ThingDiagramItemViewModels.OfType<IDiagramPortViewModel>().ToList();
+                    var source = existingPorts.FirstOrDefault(p => p.Thing.Equals(iface.Source));
+                    var target = existingPorts.FirstOrDefault(p => p.Thing.Equals(iface.Target));
+
+                    if (source == null || target == null)
+                    {
+                        continue;
+                    }
+
+                    InterfaceConnectorTool.CreateConnector(iface, (DiagramPort)source.DiagramThing, (DiagramPort)target.DiagramThing, this.Behavior);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes a generated connector based on a <see cref="ObjectChangedEvent"/>
+        /// </summary>
+        /// <param name="objectChangedEvent">The removing <see cref="ObjectChangedEvent"/></param>
+        private void RemoveGeneratedConnector(ObjectChangedEvent objectChangedEvent)
+        {
+            var existingConnector = this.ConnectorViewModels.OfType<IGeneratedConnector>().FirstOrDefault(c => c.Thing.Equals(objectChangedEvent.ChangedThing));
+
+            if(existingConnector != null)
+            {
+                this.ConnectorViewModels.RemoveAndDispose(existingConnector);
+            }
+        }
+
+        /// <summary>
         /// Adds ElementUsages to the selected element definitions
         /// </summary>
         private void ExecuteAddUsagesToDiagramCommand()
@@ -827,7 +898,7 @@ namespace CDP4DiagramEditor.ViewModels
                     var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is ElementDefinition).First(vm => vm.Thing.Equals(elementUsage.ElementDefinition)).DiagramThing as ArchitectureElement;
                     var target = diagramContentItem.DiagramThing as ArchitectureElement;
 
-                    ElementUsageConnectorTool.CreateElementUsageConnector(elementUsage, source, target, this.Behavior);
+                    ElementUsageConnectorTool.CreateConnector(elementUsage, source, target, this.Behavior);
                 }
             }
         }
@@ -843,6 +914,15 @@ namespace CDP4DiagramEditor.ViewModels
             if (this.SelectedItems.All(s => s is DiagramPortShape))
             {
                 return false;
+            }
+
+            if (this.SelectedItem is DiagramConnector connector)
+            {
+                // generated connectors cannot be removed from diagram
+                if((connector.DataContext as Connection)?.DataItem is IGeneratedConnector)
+                {
+                    return false;
+                }
             }
 
             return selectedDiagramItem != null && this.SelectedItems.Any();
@@ -923,6 +1003,11 @@ namespace CDP4DiagramEditor.ViewModels
 
             foreach (var selectedConnector in selectedConnectors)
             {
+                if (selectedConnector.DataContext is IGeneratedConnector)
+                {
+                    continue;
+                }
+
                 this.RemoveDiagramThingItem(selectedConnector.GetViewModel());
             }
         }
@@ -1383,14 +1468,19 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             transaction.CreateOrUpdate(clone);
-            clone.DiagramElement.Clear();
 
             var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().Select(x => x.DiagramThing)).ToList();
-            var deletedDiagramObjAndEdges = deletedDiagramObj.Except(this.ConnectorViewModels.OfType<IPersistedConnector>().Select(x => x.DiagramThing));
 
-            foreach (var diagramObject in deletedDiagramObjAndEdges)
+            var deletedEdges = this.Thing.DiagramElement.OfType<DiagramEdge>().Except(this.ConnectorViewModels.OfType<IPersistedConnector>().Select(x => x.DiagramThing));
+
+            foreach (var diagramObject in deletedDiagramObj)
             {
                 transaction.Delete(diagramObject.Clone(false));
+            }
+
+            foreach (var diagramEdge in deletedEdges)
+            {
+                transaction.Delete(diagramEdge.Clone(false));
             }
 
             foreach (var diagramObjectViewModel in this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>())
