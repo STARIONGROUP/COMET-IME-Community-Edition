@@ -26,6 +26,7 @@
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300"
+             
              d:DesignWidth="650">
     <dxmvvm:Interaction.Behaviors>
         <behaviours:RibbonCategoryBehavior CategoryName="DiagramCategory" />
@@ -263,7 +264,7 @@
                 <dxdiag:DiagramConnector EndArrow="(none)"
                                          BeginArrow="(none)"
                                          Type="RightAngle"
-                                         Stroke="IndianRed"
+                                         Stroke="RoyalBlue"
                                          TextAlignment="Center"
                                          Content="{Binding DataItem.DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>

@@ -123,6 +123,8 @@ namespace CDP4CommonView.Diagram.ViewModels
                 rightSide[index].Position = System.Windows.Point.Add(diagramItem.Position, new Vector(diagramItem.ActualWidth - (10), vector));
                 rightSide[index].WhenPositionIsUpdatedInvoke();
             }
+
+            this.containerViewModel.Behavior.RerouteConnectors();
         }
 
         /// <summary>

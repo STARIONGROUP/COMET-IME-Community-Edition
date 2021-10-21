@@ -83,7 +83,7 @@ namespace CDP4DiagramEditor.ViewModels
                 sb.AppendLine($"({string.Join(", ", categories.Select(c => $"\"{c.ShortName}\""))})");
             }
             sb.AppendLine($"{relationship?.Name}");
-            sb.AppendLine($"{relationship?.Source.UserFriendlyShortName} -> {relationship?.Source.UserFriendlyShortName}");
+            sb.AppendLine($"{relationship?.Source.UserFriendlyShortName} -> {relationship?.Target.UserFriendlyShortName}");
 
             this.DisplayedText = sb.ToString().Trim();
         }

@@ -87,7 +87,8 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// Holds the value whether the view has loaded for the first time or it has appeared
         /// <remarks>
-        /// Since the <see cref="OnLoaded" /> event handler gets called whenever the view reappears from not being active within its
+        /// Since the <see cref="OnLoaded" /> event handler gets called whenever the view reappears from not being active within
+        /// its
         /// tabgroup
         /// and then reappears, the value of <see cref="hasFirstLoadHappened" /> is used as a condition to draw the connector when
         /// the view did loaded for first time
@@ -144,76 +145,6 @@ namespace CDP4CommonView.Diagram
         /// Gets or sets the diagram editor viewmodel
         /// </summary>
         public IDiagramEditorViewModel ViewModel { get; set; }
-
-        /// <summary>
-        /// The on attached event handler
-        /// </summary>
-        protected override void OnAttached()
-        {
-            base.OnAttached();
-            this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
-
-            this.AssociatedObject.SelectionChanged += this.OnControlSelectionChanged;
-
-            this.AssociatedObject.LayoutUpdated += this.OnLayoutUpdated;
-            this.AssociatedObject.ItemsMoving += this.OnItemsMoving;
-            this.AssociatedObject.ItemBoundsChanged += this.OnBoundsChanged;
-
-            this.CustomLayoutItems += this.OnCustomLayoutItems;
-
-            this.AssociatedObject.PreviewMouseLeftButtonDown += this.PreviewMouseLeftButtonDown;
-            this.AssociatedObject.PreviewMouseLeftButtonUp += this.PreviewMouseLeftButtonUp;
-            this.AssociatedObject.PreviewMouseMove += this.PreviewMouseMove;
-
-            this.AssociatedObject.AllowDrop = true;
-            this.AssociatedObject.PreviewDragEnter += this.PreviewDragEnter;
-            this.AssociatedObject.PreviewDragOver += this.PreviewDragOver;
-            this.AssociatedObject.PreviewDrop += this.PreviewDrop;
-
-            this.AssociatedObject.Loaded += this.OnLoaded;
-            this.AssociatedObject.Unloaded += this.OnUnloaded;
-
-            this.AssociatedObject.ItemsChanged += this.OnItemsChanged;
-            this.AssociatedObject.ItemsDeleting += this.OnItemsDeleting;
-
-            this.AssociatedObject.AddingNewItem += this.OnAddingNewItem;
-            this.AssociatedObject.QueryConnectionPoints += this.OnQueryConnectionPoints;
-        }
-
-        /// <summary>
-        /// Unsubscribes eventhandlers when detaching.
-        /// </summary>
-        protected override void OnDetaching()
-        {
-            this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
-
-            this.AssociatedObject.SelectionChanged -= this.OnControlSelectionChanged;
-
-            this.AssociatedObject.LayoutUpdated -= this.OnLayoutUpdated;
-            this.AssociatedObject.ItemsMoving -= this.OnItemsMoving;
-            this.AssociatedObject.ItemBoundsChanged -= this.OnBoundsChanged;
-
-            this.CustomLayoutItems -= this.OnCustomLayoutItems;
-
-            this.AssociatedObject.PreviewMouseLeftButtonDown -= this.PreviewMouseLeftButtonDown;
-            this.AssociatedObject.PreviewMouseLeftButtonUp -= this.PreviewMouseLeftButtonUp;
-            this.AssociatedObject.PreviewMouseMove -= this.PreviewMouseMove;
-
-            this.AssociatedObject.PreviewDragEnter -= this.PreviewDragEnter;
-            this.AssociatedObject.PreviewDragOver -= this.PreviewDragOver;
-            this.AssociatedObject.PreviewDrop -= this.PreviewDrop;
-
-            this.AssociatedObject.Loaded -= this.OnLoaded;
-            this.AssociatedObject.Unloaded -= this.OnUnloaded;
-
-            this.AssociatedObject.ItemsChanged -= this.OnItemsChanged;
-            this.AssociatedObject.ItemsDeleting -= this.OnItemsDeleting;
-
-            this.AssociatedObject.AddingNewItem -= this.OnAddingNewItem;
-            this.AssociatedObject.QueryConnectionPoints -= this.OnQueryConnectionPoints;
-
-            base.OnDetaching();
-        }
 
         /// <summary>
         /// Converts control coordinates into document coordinates.
@@ -303,6 +234,74 @@ namespace CDP4CommonView.Diagram
             }
 
             this.AssociatedObject.UpdateConnectorsRoute(connectors);
+        }
+
+        /// <summary>
+        /// The on attached event handler
+        /// </summary>
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+            this.AssociatedObject.DataContextChanged += this.OnDataContextChanged;
+
+            this.AssociatedObject.SelectionChanged += this.OnControlSelectionChanged;
+
+            this.AssociatedObject.ItemsMoving += this.OnItemsMoving;
+            this.AssociatedObject.ItemBoundsChanged += this.OnBoundsChanged;
+
+            this.CustomLayoutItems += this.OnCustomLayoutItems;
+
+            this.AssociatedObject.PreviewMouseLeftButtonDown += this.PreviewMouseLeftButtonDown;
+            this.AssociatedObject.PreviewMouseLeftButtonUp += this.PreviewMouseLeftButtonUp;
+            this.AssociatedObject.PreviewMouseMove += this.PreviewMouseMove;
+
+            this.AssociatedObject.AllowDrop = true;
+            this.AssociatedObject.PreviewDragEnter += this.PreviewDragEnter;
+            this.AssociatedObject.PreviewDragOver += this.PreviewDragOver;
+            this.AssociatedObject.PreviewDrop += this.PreviewDrop;
+
+            this.AssociatedObject.Loaded += this.OnLoaded;
+            this.AssociatedObject.Unloaded += this.OnUnloaded;
+
+            this.AssociatedObject.ItemsChanged += this.OnItemsChanged;
+            this.AssociatedObject.ItemsDeleting += this.OnItemsDeleting;
+
+            this.AssociatedObject.AddingNewItem += this.OnAddingNewItem;
+            this.AssociatedObject.QueryConnectionPoints += this.OnQueryConnectionPoints;
+        }
+
+        /// <summary>
+        /// Unsubscribes eventhandlers when detaching.
+        /// </summary>
+        protected override void OnDetaching()
+        {
+            this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
+
+            this.AssociatedObject.SelectionChanged -= this.OnControlSelectionChanged;
+
+            this.AssociatedObject.ItemsMoving -= this.OnItemsMoving;
+            this.AssociatedObject.ItemBoundsChanged -= this.OnBoundsChanged;
+
+            this.CustomLayoutItems -= this.OnCustomLayoutItems;
+
+            this.AssociatedObject.PreviewMouseLeftButtonDown -= this.PreviewMouseLeftButtonDown;
+            this.AssociatedObject.PreviewMouseLeftButtonUp -= this.PreviewMouseLeftButtonUp;
+            this.AssociatedObject.PreviewMouseMove -= this.PreviewMouseMove;
+
+            this.AssociatedObject.PreviewDragEnter -= this.PreviewDragEnter;
+            this.AssociatedObject.PreviewDragOver -= this.PreviewDragOver;
+            this.AssociatedObject.PreviewDrop -= this.PreviewDrop;
+
+            this.AssociatedObject.Loaded -= this.OnLoaded;
+            this.AssociatedObject.Unloaded -= this.OnUnloaded;
+
+            this.AssociatedObject.ItemsChanged -= this.OnItemsChanged;
+            this.AssociatedObject.ItemsDeleting -= this.OnItemsDeleting;
+
+            this.AssociatedObject.AddingNewItem -= this.OnAddingNewItem;
+            this.AssociatedObject.QueryConnectionPoints -= this.OnQueryConnectionPoints;
+
+            base.OnDetaching();
         }
 
         /// <summary>
@@ -466,6 +465,8 @@ namespace CDP4CommonView.Diagram
                     portContainer.UpdatePortLayout();
                 }
             }
+
+            this.RerouteConnectors();
         }
 
         /// <summary>
@@ -499,15 +500,6 @@ namespace CDP4CommonView.Diagram
                     (this.AssociatedObject.DataContext as IDiagramEditorViewModel)?.RemoveDiagramThingItem(element);
                 }
             }
-        }
-
-        /// <summary>
-        /// Update ports position according to their element definition new position
-        /// </summary>
-        /// <param name="sender">The sender</param>
-        /// <param name="e">The arguments</param>
-        private void OnLayoutUpdated(object sender, EventArgs e)
-        {
         }
 
         /// <summary>
@@ -620,8 +612,6 @@ namespace CDP4CommonView.Diagram
                 this.ViewModel?.ComputeDiagramConnector();
                 this.hasFirstLoadHappened = true;
             }
-
-            this.RerouteConnectors();
         }
 
         /// <summary>

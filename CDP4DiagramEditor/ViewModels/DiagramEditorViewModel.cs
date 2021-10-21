@@ -34,13 +34,14 @@ namespace CDP4DiagramEditor.ViewModels
     using System.Windows;
     using System.Windows.Input;
 
-    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.Diagram;
+    using CDP4CommonView.Diagram.ViewModels;
+    using CDP4CommonView.Diagram.Views;
     using CDP4CommonView.EventAggregator;
 
     using CDP4Composition;
@@ -58,19 +59,14 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4DiagramEditor.ViewModels.Palette;
     using CDP4DiagramEditor.ViewModels.Relation;
-
-    using DevExpress.Xpf.Diagram;
+    using CDP4DiagramEditor.ViewModels.Tools;
 
     using DevExpress.Diagram.Core;
+    using DevExpress.Xpf.Diagram;
+
     using ReactiveUI;
 
     using Point = System.Windows.Point;
-    using CDP4CommonView.Diagram.ViewModels;
-    using CDP4CommonView.Diagram.Views;
-
-    using CDP4DiagramEditor.ViewModels.Tools;
-
-    using DevExpress.Data.Helpers;
 
     /// <summary>
     /// The view-model for the <see cref="CDP4DiagramEditor" /> view
@@ -83,6 +79,11 @@ namespace CDP4DiagramEditor.ViewModels
         private bool canCreateDiagram;
 
         /// <summary>
+        /// Backing field for <see cref="ConnectorViewModels" />
+        /// </summary>
+        private DisposableReactiveList<IDiagramConnectorViewModel> connectorViewModels;
+
+        /// <summary>
         /// Backing field for <see cref="CurrentIteration" />
         /// </summary>
         private int currentIteration;
@@ -93,9 +94,24 @@ namespace CDP4DiagramEditor.ViewModels
         private string currentModel;
 
         /// <summary>
+        /// Backing field for <see cref="DropContextMenuIsOpen" />
+        /// </summary>
+        private bool dropContextMenuIsOpen;
+
+        /// <summary>
         /// Backing field for <see cref="IsDirty" />
         /// </summary>
         private bool isDirty;
+
+        /// <summary>
+        /// Backing field for the <see cref="IsTopDiagramElementSet" />
+        /// </summary>
+        private bool isTopDiagramElementSet;
+
+        /// <summary>
+        /// Backing field for <see cref="PaletteViewModel" />
+        /// </summary>
+        private DiagramPaletteViewModel paletteViewModel;
 
         /// <summary>
         /// Backing field for <see cref="RelationshipRules" />
@@ -116,31 +132,6 @@ namespace CDP4DiagramEditor.ViewModels
         /// Backing field for <see cref="ThingDiagramItemViewModels" />
         /// </summary>
         private DisposableReactiveList<IThingDiagramItemViewModel> thingDiagramItemViewModels;
-
-        /// <summary>
-        /// Backing field for <see cref="ConnectorViewModels" />
-        /// </summary>
-        private DisposableReactiveList<IDiagramConnectorViewModel> connectorViewModels;
-
-        /// <summary>
-        /// Backing field for the <see cref="IsTopDiagramElementSet"/>
-        /// </summary>
-        private bool isTopDiagramElementSet;
-
-        /// <summary>
-        /// Backing field for <see cref="PaletteViewModel"/>
-        /// </summary>
-        private DiagramPaletteViewModel paletteViewModel;
-
-        /// <summary>
-        /// Backing field for <see cref="DropContextMenuIsOpen"/>
-        /// </summary>
-        private bool dropContextMenuIsOpen;
-
-        /// <summary>
-        /// Gets the drop context Menu for the diagram
-        /// </summary>
-        public ReactiveList<ContextMenuItemViewModel> DropContextMenuItems { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramEditorViewModel" /> class
@@ -166,41 +157,12 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Initializes listeners for object change events related to creation/removal of generated elements
+        /// Gets the drop context Menu for the diagram
         /// </summary>
-        private void InitializeListeners()
-        {
-            this.Disposables.Add(CDPMessageBus.Current.Listen<SessionEvent>()
-                .Where(sessionEvent => sessionEvent.Status == SessionStatus.Closed && sessionEvent.Session.Equals(this.Session))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.ClosePanel()));
-
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
-                .Where(objectChange => objectChange.EventKind == EventKind.Removed)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.ClosePanel()));
-
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
-                .Where(objectChange => objectChange.EventKind != EventKind.Removed)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.ComputeGeneratedConnectors()));
-
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
-                .Where(objectChange => objectChange.EventKind == EventKind.Removed)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.RemoveGeneratedConnector));
-        }
+        public ReactiveList<ContextMenuItemViewModel> DropContextMenuItems { get; }
 
         /// <summary>
-        /// Close this panel on session close
-        /// </summary>
-        private void ClosePanel()
-        {
-            this.PanelNavigationService.CloseInDock(this);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="DiagramPaletteViewModel"/>
+        /// Gets the <see cref="DiagramPaletteViewModel" />
         /// </summary>
         public DiagramPaletteViewModel PaletteViewModel
         {
@@ -270,6 +232,34 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the set as top element Command
+        /// </summary>
+        public ReactiveCommand<Unit> SetAsTopElementCommand { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the unset top element Command
+        /// </summary>
+        public ReactiveCommand<Unit> UnsetTopElementCommand { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the diagram has its top element set
+        /// </summary>
+        public bool IsTopDiagramElementSet
+        {
+            get { return this.isTopDiagramElementSet; }
+            set { this.RaiseAndSetIfChanged(ref this.isTopDiagramElementSet, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the context menu for optional selections when an item is dropped on to the diagram
+        /// </summary>
+        public bool DropContextMenuIsOpen
+        {
+            get { return this.dropContextMenuIsOpen; }
+            set { this.RaiseAndSetIfChanged(ref this.dropContextMenuIsOpen, value); }
+        }
+
+        /// <summary>
         /// Gets or sets the collection of diagram items.
         /// </summary>
         public DisposableReactiveList<IThingDiagramItemViewModel> ThingDiagramItemViewModels
@@ -286,16 +276,6 @@ namespace CDP4DiagramEditor.ViewModels
             get { return this.connectorViewModels; }
             set { this.RaiseAndSetIfChanged(ref this.connectorViewModels, value); }
         }
-
-        /// <summary>
-        /// Gets or sets the set as top element Command
-        /// </summary>
-        public ReactiveCommand<Unit> SetAsTopElementCommand { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the unset top element Command
-        /// </summary>
-        public ReactiveCommand<Unit> UnsetTopElementCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the collection of <see cref="DiagramItem" /> items that are selected.
@@ -363,10 +343,10 @@ namespace CDP4DiagramEditor.ViewModels
                 switch (diagramThing.DepictedThing)
                 {
                     case ElementUsage:
-                        newDrawnDiagramElement = new ElementUsageEdgeViewModel((DiagramEdge)diagramThing, this.Session, this);
+                        newDrawnDiagramElement = new ElementUsageEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
                         break;
                     default:
-                        newDrawnDiagramElement = new DrawnDiagramEdgeViewModel((DiagramEdge)diagramThing, this.Session, this);
+                        newDrawnDiagramElement = new DrawnDiagramEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
                         break;
                 }
 
@@ -397,14 +377,14 @@ namespace CDP4DiagramEditor.ViewModels
                     {
                         foreach (var diagramPortViewModel in portContainer.PortCollection)
                         {
-                            this.ThingDiagramItemViewModels.RemoveAndDispose((IThingDiagramItemViewModel)diagramPortViewModel);
+                            this.ThingDiagramItemViewModels.RemoveAndDispose(diagramPortViewModel);
                         }
                     }
 
                     this.ThingDiagramItemViewModels.RemoveAndDispose(item);
                     this.Behavior.ItemPositions.Remove(item);
 
-                    var connectors = this.ConnectorViewModels.Where(x => ((DiagramEdge)x.DiagramThing).Source.DepictedThing == item.DiagramThing.DepictedThing || ((DiagramEdge)x.DiagramThing).Target.DepictedThing == item.DiagramThing.DepictedThing).ToArray();
+                    var connectors = this.ConnectorViewModels.Where(x => ((DiagramEdge) x.DiagramThing).Source.DepictedThing == item.DiagramThing.DepictedThing || ((DiagramEdge) x.DiagramThing).Target.DepictedThing == item.DiagramThing.DepictedThing).ToArray();
 
                     foreach (var diagramEdgeViewModel in connectors)
                     {
@@ -453,74 +433,10 @@ namespace CDP4DiagramEditor.ViewModels
 
             if (this.Thing.Cache.TryGetValue(thing.CacheKey, out var returnedThing))
             {
-                return (TThing)returnedThing.Value;
+                return (TThing) returnedThing.Value;
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Execute the <see cref="UpdateCommand"/> on the <see cref="SelectedThing"/>
-        /// </summary>
-        protected override void ExecuteUpdateCommand()
-        {
-            if (this.SelectedItem == null)
-            {
-                return;
-            }
-
-            var thing = this.GetThingFromSelectedItem();
-
-            if (thing == null)
-            {
-                return;
-            }
-
-            this.ExecuteUpdateCommand(thing);
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Thing"/> from <see cref="SelectedItem"/>
-        /// </summary>
-        /// <returns>The <see cref="Thing"/> or null</returns>
-        private Thing GetThingFromSelectedItem()
-        {
-            Thing thing = null;
-
-            switch (this.SelectedItem)
-            {
-                case DiagramPortShape ps:
-                    thing = (ps.DataContext as IDiagramPortViewModel)?.Thing;
-                    break;
-                case DiagramConnector connector:
-                    thing = connector.GetViewModel()?.Thing;
-                    break;
-                case DiagramContentItem ci:
-                    thing = (ci.Content as ThingDiagramContentItemViewModel)?.Thing;
-                    break;
-            }
-
-            return thing;
-        }
-
-        /// <summary>
-        /// Execute the <see cref="InspectCommand"/>
-        /// </summary>
-        protected override void ExecuteInspectCommand()
-        {
-            if (this.SelectedItem == null)
-            {
-                return;
-            }
-
-            var thing = this.GetThingFromSelectedItem();
-
-            if (thing == null)
-            {
-                return;
-            }
-
-            this.ExecuteInspectCommand(thing);
         }
 
         /// <summary>
@@ -547,6 +463,37 @@ namespace CDP4DiagramEditor.ViewModels
             this.IsDirty |= addedItem > 0;
             this.IsDirty |= addedEdges > 0;
             this.IsDirty |= persistedConnectors.Any(x => x.IsDirty) || removedEdges > 0;
+        }
+
+        /// <summary>
+        /// Shows a context menu in the diagram at the current mouse position with the specified options
+        /// </summary>
+        /// <param name="contextMenuItems">The menu options to display</param>
+        public void ShowDropContextMenuOptions(IEnumerable<ContextMenuItemViewModel> contextMenuItems)
+        {
+            this.DropContextMenuItems.Clear();
+            this.DropContextMenuItems.AddRange(contextMenuItems);
+            this.DropContextMenuIsOpen = true;
+        }
+
+        /// <summary>
+        /// Adds a port to the items collection
+        /// </summary>
+        /// <param name="port">The port view model</param>
+        public void AddPortToItems(IDiagramPortViewModel port)
+        {
+            this.ThingDiagramItemViewModels.Add(port);
+        }
+
+        /// <summary>
+        /// Activate a connector tool.
+        /// </summary>
+        /// <typeparam name="TTool">The type of tool</typeparam>
+        /// <param name="sender">The sender object.</param>
+        /// <returns>An empty task</returns>
+        public async Task ActivateConnectorTool<TTool>(object sender) where TTool : DiagramTool, IConnectorTool, new()
+        {
+            this.Behavior.ActivateConnectorTool<TTool>();
         }
 
         /// <summary>
@@ -609,10 +556,125 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the diagram editor is dirty
+        /// </summary>
+        /// <remarks>
+        /// This is set by the children view-models
+        /// </remarks>
+        public override bool IsDirty
+        {
+            get { return this.isDirty; }
+            set { this.RaiseAndSetIfChanged(ref this.isDirty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the dock layout group target name to attach this panel to on opening
+        /// </summary>
+        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
+
+        /// <summary>
+        /// Initializes listeners for object change events related to creation/removal of generated elements
+        /// </summary>
+        private void InitializeListeners()
+        {
+            this.Disposables.Add(CDPMessageBus.Current.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Status == SessionStatus.Closed && sessionEvent.Session.Equals(this.Session))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.ClosePanel()));
+
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
+                .Where(objectChange => objectChange.EventKind == EventKind.Removed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.ClosePanel()));
+
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
+                .Where(objectChange => objectChange.EventKind != EventKind.Removed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.ComputeGeneratedConnectors()));
+
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
+                .Where(objectChange => objectChange.EventKind == EventKind.Removed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.RemoveGeneratedConnector));
+        }
+
+        /// <summary>
+        /// Close this panel on session close
+        /// </summary>
+        private void ClosePanel()
+        {
+            this.PanelNavigationService.CloseInDock(this);
+        }
+
+        /// <summary>
+        /// Execute the <see cref="UpdateCommand" /> on the <see cref="SelectedThing" />
+        /// </summary>
+        protected override void ExecuteUpdateCommand()
+        {
+            if (this.SelectedItem == null)
+            {
+                return;
+            }
+
+            var thing = this.GetThingFromSelectedItem();
+
+            if (thing == null)
+            {
+                return;
+            }
+
+            this.ExecuteUpdateCommand(thing);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Thing" /> from <see cref="SelectedItem" />
+        /// </summary>
+        /// <returns>The <see cref="Thing" /> or null</returns>
+        private Thing GetThingFromSelectedItem()
+        {
+            Thing thing = null;
+
+            switch (this.SelectedItem)
+            {
+                case DiagramPortShape ps:
+                    thing = (ps.DataContext as IDiagramPortViewModel)?.Thing;
+                    break;
+                case DiagramConnector connector:
+                    thing = connector.GetViewModel()?.Thing;
+                    break;
+                case DiagramContentItem ci:
+                    thing = (ci.Content as ThingDiagramContentItemViewModel)?.Thing;
+                    break;
+            }
+
+            return thing;
+        }
+
+        /// <summary>
+        /// Execute the <see cref="InspectCommand" />
+        /// </summary>
+        protected override void ExecuteInspectCommand()
+        {
+            if (this.SelectedItem == null)
+            {
+                return;
+            }
+
+            var thing = this.GetThingFromSelectedItem();
+
+            if (thing == null)
+            {
+                return;
+            }
+
+            this.ExecuteInspectCommand(thing);
+        }
+
+        /// <summary>
         /// Creates the shape for the shape
         /// </summary>
-        /// <param name="dropInfo">The <see cref="IDropInfo"/> containing drag drop object</param>
-        /// <param name="rowPayload">The <see cref="Thing"/> ti draw the shape for.</param>
+        /// <param name="dropInfo">The <see cref="IDropInfo" /> containing drag drop object</param>
+        /// <param name="rowPayload">The <see cref="Thing" /> ti draw the shape for.</param>
         /// <param name="convertedDropPosition">The drop position.</param>
         private void CreateThingShape(IDropInfo dropInfo, Thing rowPayload, Point convertedDropPosition)
         {
@@ -625,8 +687,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             var bounds = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
-                X = (float)position.X,
-                Y = (float)position.Y,
+                X = (float) position.X,
+                Y = (float) position.Y,
                 Name = rowPayload.UserFriendlyName
             };
 
@@ -645,28 +707,28 @@ namespace CDP4DiagramEditor.ViewModels
             switch (rowPayload)
             {
                 case ElementDefinition elementDefinition:
+                {
+                    var architectureBlock = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
                     {
-                        var architectureBlock = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
-                        {
-                            DepictedThing = rowPayload,
-                            Name = rowPayload.UserFriendlyName,
-                            Documentation = rowPayload.UserFriendlyName,
-                            Resolution = Cdp4DiagramHelper.DefaultResolution
-                        };
+                        DepictedThing = rowPayload,
+                        Name = rowPayload.UserFriendlyName,
+                        Documentation = rowPayload.UserFriendlyName,
+                        Resolution = Cdp4DiagramHelper.DefaultResolution
+                    };
 
-                        architectureBlock.Bounds.Add(bounds);
+                    architectureBlock.Bounds.Add(bounds);
 
-                        PortContainerDiagramContentItemViewModel portContainer = new ElementDefinitionDiagramContentItemViewModel(architectureBlock, this.Session, this);
+                    PortContainerDiagramContentItemViewModel portContainer = new ElementDefinitionDiagramContentItemViewModel(architectureBlock, this.Session, this);
 
-                        diagramItemViewModel = portContainer;
-                        break;
-                    }
+                    diagramItemViewModel = portContainer;
+                    break;
+                }
 
                 case Requirement requirement:
-                    {
-                        diagramItemViewModel = new RequirementDiagramContentItemViewModel(block, this.Session, this);
-                        break;
-                    }
+                {
+                    diagramItemViewModel = new RequirementDiagramContentItemViewModel(block, this.Session, this);
+                    break;
+                }
                 default:
                     if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
                     {
@@ -684,44 +746,9 @@ namespace CDP4DiagramEditor.ViewModels
             this.Behavior.ItemPositions.Add(diagramItemViewModel, convertedDropPosition);
             this.ThingDiagramItemViewModels.Add(diagramItemViewModel);
 
-            this.ComputeDiagramConnector(diagramItemViewModel);
             (diagramItemViewModel as PortContainerDiagramContentItemViewModel)?.UpdatePorts();
+            this.ComputeGeneratedConnectors();
             this.UpdateIsDirty();
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the diagram editor is dirty
-        /// </summary>
-        /// <remarks>
-        /// This is set by the children view-models
-        /// </remarks>
-        public override bool IsDirty
-        {
-            get { return this.isDirty; }
-            set { this.RaiseAndSetIfChanged(ref this.isDirty, value); }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the diagram has its top element set
-        /// </summary>
-        public bool IsTopDiagramElementSet
-        {
-            get { return this.isTopDiagramElementSet; }
-            set { this.RaiseAndSetIfChanged(ref this.isTopDiagramElementSet, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the dock layout group target name to attach this panel to on opening
-        /// </summary>
-        public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
-
-        /// <summary>
-        /// Gets or sets the context menu for optional selections when an item is dropped on to the diagram
-        /// </summary>
-        public bool DropContextMenuIsOpen
-        {
-            get => this.dropContextMenuIsOpen;
-            set => this.RaiseAndSetIfChanged(ref this.dropContextMenuIsOpen, value);
         }
 
         /// <summary>
@@ -773,12 +800,14 @@ namespace CDP4DiagramEditor.ViewModels
             this.AddUsagesToDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToDiagramCommand());
 
             this.SetAsTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.SelectedItem)
-                .Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItemViewModel }),
+                    .Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItemViewModel }),
                 _ => this.ExecuteSetTopElementCommand(), RxApp.MainThreadScheduler);
+
             this.SetAsTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
 
             this.UnsetTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.IsTopDiagramElementSet, x => x.CanCreateDiagram, (x, y) => x && y),
                 _ => this.ExecuteUnsetTopElementCommand(), RxApp.MainThreadScheduler);
+
             this.UnsetTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
         }
 
@@ -841,20 +870,20 @@ namespace CDP4DiagramEditor.ViewModels
                         continue;
                     }
 
-                    InterfaceConnectorTool.CreateConnector(iface, (DiagramPort)source.DiagramThing, (DiagramPort)target.DiagramThing, this.Behavior);
+                    InterfaceConnectorTool.CreateConnector(iface, (DiagramPort) source.DiagramThing, (DiagramPort) target.DiagramThing, this.Behavior);
                 }
             }
         }
 
         /// <summary>
-        /// Removes a generated connector based on a <see cref="ObjectChangedEvent"/>
+        /// Removes a generated connector based on a <see cref="ObjectChangedEvent" />
         /// </summary>
-        /// <param name="objectChangedEvent">The removing <see cref="ObjectChangedEvent"/></param>
+        /// <param name="objectChangedEvent">The removing <see cref="ObjectChangedEvent" /></param>
         private void RemoveGeneratedConnector(ObjectChangedEvent objectChangedEvent)
         {
             var existingConnector = this.ConnectorViewModels.OfType<IGeneratedConnector>().FirstOrDefault(c => c.Thing.Equals(objectChangedEvent.ChangedThing));
 
-            if(existingConnector != null)
+            if (existingConnector != null)
             {
                 this.ConnectorViewModels.RemoveAndDispose(existingConnector);
             }
@@ -892,7 +921,7 @@ namespace CDP4DiagramEditor.ViewModels
                 var startPosition = diagramContentItem.DiagramRepresentation.Position;
                 var totalWidth = count * width + (count - 1) * horizontalGap;
 
-                var position = new Point((startPosition.X + 0.5 * width) - 0.5 * totalWidth, startPosition.Y + height + verticalGap);
+                var position = new Point(startPosition.X + 0.5 * width - 0.5 * totalWidth, startPosition.Y + height + verticalGap);
 
                 foreach (var elementDefinitionToCreate in definitionsToCreate)
                 {
@@ -938,7 +967,7 @@ namespace CDP4DiagramEditor.ViewModels
             if (this.SelectedItem is DiagramConnector connector)
             {
                 // generated connectors cannot be removed from diagram
-                if((connector.DataContext as Connection)?.DataItem is IGeneratedConnector)
+                if ((connector.DataContext as Connection)?.DataItem is IGeneratedConnector)
                 {
                     return false;
                 }
@@ -1104,13 +1133,14 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Deprecates the provided <see cref="Thing"/>
+        /// Deprecates the provided <see cref="Thing" />
         /// </summary>
         private async void DeprecateThing(IDeprecatableThing thing)
         {
-            var clone = ((Thing)thing).Clone(false);
+            var clone = ((Thing) thing).Clone(false);
 
             var isDeprecatedPropertyInfo = clone.GetType().GetProperty("IsDeprecated");
+
             if (isDeprecatedPropertyInfo == null)
             {
                 return;
@@ -1130,7 +1160,7 @@ namespace CDP4DiagramEditor.ViewModels
             }
             catch (Exception ex)
             {
-                logger.Error("An error was produced when (un)deprecating {0}: {1}", ((Thing)thing).ClassKind, ex.Message);
+                logger.Error("An error was produced when (un)deprecating {0}: {1}", ((Thing) thing).ClassKind, ex.Message);
                 this.Feedback = ex.Message;
             }
         }
@@ -1182,7 +1212,7 @@ namespace CDP4DiagramEditor.ViewModels
                 switch (diagramThing.DepictedThing)
                 {
                     case ElementDefinition:
-                        newDiagramElement = new ElementDefinitionDiagramContentItemViewModel((ArchitectureElement)diagramThing, this.Session, this);
+                        newDiagramElement = new ElementDefinitionDiagramContentItemViewModel((ArchitectureElement) diagramThing, this.Session, this);
                         break;
                     case Requirement:
                         newDiagramElement = new RequirementDiagramContentItemViewModel(diagramThing, this.Session, this);
@@ -1207,7 +1237,7 @@ namespace CDP4DiagramEditor.ViewModels
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
-        /// on the <see cref="ViewModelBase{T}.Thing"/> that is being represented by the view-model
+        /// on the <see cref="ViewModelBase{T}.Thing" /> that is being represented by the view-model
         /// </summary>
         /// <param name="objectChange">
         /// The payload of the event that is being handled
@@ -1220,7 +1250,7 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Computes the diagram top element if <see cref="ArchitectureDiagram"/>
+        /// Computes the diagram top element if <see cref="ArchitectureDiagram" />
         /// </summary>
         private void ComputeDiagramTopElement()
         {
@@ -1291,8 +1321,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             var bound = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
-                X = (float)diagramPosition.X,
-                Y = (float)diagramPosition.Y,
+                X = (float) diagramPosition.X,
+                Y = (float) diagramPosition.Y,
                 Height = Cdp4DiagramHelper.DefaultHeight,
                 Width = Cdp4DiagramHelper.DefaultWidth
             };
@@ -1304,20 +1334,20 @@ namespace CDP4DiagramEditor.ViewModels
             switch (depictedThing)
             {
                 case ElementDefinition:
+                {
+                    var archElement = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
                     {
-                        var archElement = new ArchitectureElement(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
-                        {
-                            DepictedThing = depictedThing,
-                            Name = depictedThing.UserFriendlyName,
-                            Documentation = depictedThing.UserFriendlyName,
-                            Resolution = Cdp4DiagramHelper.DefaultResolution
-                        };
+                        DepictedThing = depictedThing,
+                        Name = depictedThing.UserFriendlyName,
+                        Documentation = depictedThing.UserFriendlyName,
+                        Resolution = Cdp4DiagramHelper.DefaultResolution
+                    };
 
-                        archElement.Bounds.Add(bound);
+                    archElement.Bounds.Add(bound);
 
-                        newDiagramElement = new ElementDefinitionDiagramContentItemViewModel(archElement, this.Session, this);
-                        break;
-                    }
+                    newDiagramElement = new ElementDefinitionDiagramContentItemViewModel(archElement, this.Session, this);
+                    break;
+                }
 
                 case Requirement:
                     newDiagramElement = new RequirementDiagramContentItemViewModel(block, this.Session, this);
@@ -1345,7 +1375,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="target">The <see cref="DiagramObject" /> target</param>
         private void CreateDiagramConnector(Thing thing, DiagramObject source, DiagramObject target)
         {
-            var connectorItem = this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().SingleOrDefault(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == thing);
+            var connectorItem = this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().SingleOrDefault(x => ((DiagramEdge) x.DiagramThing)?.DepictedThing == thing);
 
             if (connectorItem != null)
             {
@@ -1401,7 +1431,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="shouldAddMissingThings">True if missing things should be added to diagram.</param>
         public void GenerateRelationshipDiagramElements(ThingDiagramContentItemViewModel itemViewModel, bool extendDeep, bool shouldAddMissingThings = true)
         {
-            var iteration = (Iteration)this.Thing.Container;
+            var iteration = (Iteration) this.Thing.Container;
 
             var depictedThing = itemViewModel.DiagramThing.DepictedThing;
 
@@ -1412,7 +1442,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             foreach (var binaryRelationship in relationships)
             {
-                if (this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().Any(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == binaryRelationship))
+                if (this.ConnectorViewModels.OfType<ThingDiagramConnectorViewModel>().Any(x => ((DiagramEdge) x.DiagramThing)?.DepictedThing == binaryRelationship))
                 {
                     continue;
                 }
@@ -1432,7 +1462,10 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="itemViewModel">The <see cref="ThingDiagramContentItemViewModel" /> to start from</param>
         /// <param name="binaryRelationship">The <see cref="BinaryRelationship" /></param>
         /// <param name="shouldAddMissingThings">True if missing things should be added to diagram.</param>
-        /// <returns>The newly created <see cref="ThingDiagramContentItemViewModel" /> that is connected to  the <paramref name="itemViewModel" />.</returns>
+        /// <returns>
+        /// The newly created <see cref="ThingDiagramContentItemViewModel" /> that is connected to  the
+        /// <paramref name="itemViewModel" />.
+        /// </returns>
         private ThingDiagramContentItemViewModel GenerateRelationshipDiagramObjectAndConnector(ThingDiagramContentItemViewModel itemViewModel, BinaryRelationship binaryRelationship, bool shouldAddMissingThings)
         {
             var depictedThing = itemViewModel.DiagramThing.DepictedThing;
@@ -1446,7 +1479,7 @@ namespace CDP4DiagramEditor.ViewModels
                     return null;
                 }
 
-                this.CreateDiagramConnector(binaryRelationship, (DiagramObject)itemViewModel.DiagramThing, (DiagramObject)associatedViewModel.DiagramThing);
+                this.CreateDiagramConnector(binaryRelationship, (DiagramObject) itemViewModel.DiagramThing, (DiagramObject) associatedViewModel.DiagramThing);
                 return associatedViewModel;
             }
             else
@@ -1458,7 +1491,7 @@ namespace CDP4DiagramEditor.ViewModels
                     return null;
                 }
 
-                this.CreateDiagramConnector(binaryRelationship, (DiagramObject)associatedViewModel.DiagramThing, (DiagramObject)itemViewModel.DiagramThing);
+                this.CreateDiagramConnector(binaryRelationship, (DiagramObject) associatedViewModel.DiagramThing, (DiagramObject) itemViewModel.DiagramThing);
                 return associatedViewModel;
             }
         }
@@ -1542,37 +1575,6 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             this.UpdateIsDirty();
-        }
-
-        /// <summary>
-        /// Shows a context menu in the diagram at the current mouse position with the specified options
-        /// </summary>
-        /// <param name="contextMenuItems">The menu options to display</param>
-        public void ShowDropContextMenuOptions(IEnumerable<ContextMenuItemViewModel> contextMenuItems)
-        {
-            this.DropContextMenuItems.Clear();
-            this.DropContextMenuItems.AddRange(contextMenuItems);
-            this.DropContextMenuIsOpen = true;
-        }
-
-        /// <summary>
-        /// Adds a port to the items collection
-        /// </summary>
-        /// <param name="port">The port view model</param>
-        public void AddPortToItems(IDiagramPortViewModel port)
-        {
-            this.ThingDiagramItemViewModels.Add(port);
-        }
-
-        /// <summary>
-        /// Activate a connector tool.
-        /// </summary>
-        /// <typeparam name="TTool">The type of tool</typeparam>
-        /// <param name="sender">The sender object.</param>
-        /// <returns>An empty task</returns>
-        public async Task ActivateConnectorTool<TTool>(object sender) where TTool : DiagramTool, IConnectorTool, new()
-        {
-            this.Behavior.ActivateConnectorTool<TTool>();
         }
 
         /// <summary>
