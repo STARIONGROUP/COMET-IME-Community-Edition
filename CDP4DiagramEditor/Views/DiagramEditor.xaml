@@ -264,6 +264,7 @@
                                          BeginArrow="(none)"
                                          Type="RightAngle"
                                          Stroke="IndianRed"
+                                         TextAlignment="Center"
                                          Content="{Binding DataItem.DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 

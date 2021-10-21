@@ -25,11 +25,16 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
+    using System.Linq;
+    using System.Text;
+
     using CDP4Common.DiagramData;
+    using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Diagram;
 
     using CDP4Dal;
+    using CDP4Dal.Events;
 
     /// <summary>
     /// View model for a Interface diagram edge
@@ -44,6 +49,43 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
         public InterfaceEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
         {
+            if (diagramEdge.DepictedThing is BinaryRelationship relationship)
+            {
+                this.DropTarget = new BinaryRelationshipDropTarget(relationship, this.session);
+            }
+
+            this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// The <see cref="ObjectChangedEvent" /> event-handler
+        /// </summary>
+        /// <param name="objectChange">The <see cref="ObjectChangedEvent" /></param>
+        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
+        {
+            base.ObjectChangeEventHandler(objectChange);
+            this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Updates the properties of this view-model
+        /// </summary>
+        private void UpdateProperties()
+        {
+            var relationship = this.Thing as BinaryRelationship;
+
+            var categories = relationship?.Category;
+
+            var sb = new StringBuilder();
+
+            if (categories != null && categories.Any())
+            {
+                sb.AppendLine($"({string.Join(", ", categories.Select(c => $"\"{c.ShortName}\""))})");
+            }
+            sb.AppendLine($"{relationship?.Name}");
+            sb.AppendLine($"{relationship?.Source.UserFriendlyShortName} -> {relationship?.Source.UserFriendlyShortName}");
+
+            this.DisplayedText = sb.ToString().Trim();
         }
     }
 }

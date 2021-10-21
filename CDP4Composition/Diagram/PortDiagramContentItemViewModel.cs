@@ -37,6 +37,8 @@ namespace CDP4Composition.Diagram
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using DevExpress.Diagram.Core;
+
     using ReactiveUI;
 
     using Point = System.Windows.Point;
@@ -60,6 +62,11 @@ namespace CDP4Composition.Diagram
         /// The position.
         /// </summary>
         private Point position;
+
+        /// <summary>
+        /// Backing field for <see cref="ConnectionPoints"/>
+        /// </summary>
+        private DiagramPointCollection connectionPoints;
 
         /// <summary>
         /// Initialize a new DiagramPortViewModel
@@ -136,6 +143,48 @@ namespace CDP4Composition.Diagram
         public Bounds ContainerBounds { get; set; }
 
         /// <summary>
+        /// Gets or sets the side of the container where the PortShape is allowed to be drawn
+        /// </summary>
+        public PortContainerShapeSide PortContainerShapeSide { get; set; }
+
+        /// <summary>
+        /// Gets or sets the connection points
+        /// </summary>
+        public DiagramPointCollection ConnectionPoints
+        {
+            get { return this.connectionPoints; }
+            set { this.RaiseAndSetIfChanged(ref this.connectionPoints, value); }
+        }
+
+        /// <summary>
+        /// Event handler that fires when the port position has been recalculated
+        /// </summary>
+        public event EventHandler WhenPositionIsUpdated;
+
+        /// <summary>
+        /// Method use to set the correction orientation of the associate object connection point based on which side of the
+        /// container it belongs
+        /// </summary>
+        public void DeterminePortConnectorRotation()
+        {
+            switch (this.PortContainerShapeSide)
+            {
+                case PortContainerShapeSide.Top:
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.5, 0) });
+                    break;
+                case PortContainerShapeSide.Left:
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0, 0.5) });
+                    break;
+                case PortContainerShapeSide.Right:
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(1, 0.5) });
+                    break;
+                case PortContainerShapeSide.Bottom:
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.5, 1) });
+                    break;
+            }
+        }
+
+        /// <summary>
         /// public invoker of <see cref="WhenPositionIsUpdated" /> that is fired when its position is updated
         /// </summary>
         public void WhenPositionIsUpdatedInvoke()
@@ -153,37 +202,10 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets or sets the side of the container where the PortShape is allowed to be drawn
+        /// Flips the side
         /// </summary>
-        public PortContainerShapeSide PortContainerShapeSide { get; set; }
-
-        /// <summary>
-        /// Method use to set the correction orientation of the associate object connection point based on which side of the
-        /// container it belongs
-        /// </summary>
-        public void DeterminePortConnectorRotation()
-        {
-            switch (this.PortContainerShapeSide)
-            {
-                case PortContainerShapeSide.Top:
-                    //this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.5, 0) });
-                    break;
-                case PortContainerShapeSide.Left:
-                    ////this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0, 0.5) });
-                    break;
-                case PortContainerShapeSide.Right:
-                    //this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(1, 0.5) });
-                    break;
-                case PortContainerShapeSide.Bottom:
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// Event handler that fires when the port position has been recalculated
-        /// </summary>
-        public event EventHandler WhenPositionIsUpdated;
-
+        /// <param name="portContainerShapeSide">The side to flip from</param>
+        /// <returns>The opposite side</returns>
         private PortContainerShapeSide FlipSide(PortContainerShapeSide portContainerShapeSide)
         {
             switch (portContainerShapeSide)

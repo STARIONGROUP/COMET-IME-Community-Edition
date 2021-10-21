@@ -170,6 +170,16 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         private void InitializeListeners()
         {
+            this.Disposables.Add(CDPMessageBus.Current.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Status == SessionStatus.Closed && sessionEvent.Session.Equals(this.Session))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.ClosePanel()));
+
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
+                .Where(objectChange => objectChange.EventKind == EventKind.Removed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.ClosePanel()));
+
             this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
                 .Where(objectChange => objectChange.EventKind != EventKind.Removed)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -179,6 +189,14 @@ namespace CDP4DiagramEditor.ViewModels
                 .Where(objectChange => objectChange.EventKind == EventKind.Removed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.RemoveGeneratedConnector));
+        }
+
+        /// <summary>
+        /// Close this panel on session close
+        /// </summary>
+        private void ClosePanel()
+        {
+            this.PanelNavigationService.CloseInDock(this);
         }
 
         /// <summary>
@@ -511,23 +529,24 @@ namespace CDP4DiagramEditor.ViewModels
         public void UpdateIsDirty()
         {
             var currentObjects = this.Thing.DiagramElement.OfType<DiagramObject>().ToArray();
-            var displayedObjects = this.ThingDiagramItemViewModels.Select(x => x.DiagramThing).ToArray();
+            var namedThingDiagramContentItemViewModels = this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().ToList();
+            var displayedObjects = namedThingDiagramContentItemViewModels.Select(x => x.DiagramThing).ToArray();
 
             var removedItem = currentObjects.Except(displayedObjects).Count();
             var addedItem = displayedObjects.Except(currentObjects).Count();
 
             var currentEdges = this.Thing.DiagramElement.OfType<DiagramEdge>().ToArray();
-            var displayedEdges = this.ConnectorViewModels.Select(x => x.DiagramThing).ToArray();
+            var persistedConnectors = this.ConnectorViewModels.OfType<IPersistedConnector>().ToList();
+
+            var displayedEdges = persistedConnectors.Select(x => x.DiagramThing).ToArray();
 
             var removedEdges = currentEdges.Except(displayedEdges).Count();
             var addedEdges = displayedEdges.Except(currentEdges).Count();
 
-            this.IsDirty = this.ThingDiagramItemViewModels.Any(x => x.IsDirty) || removedItem > 0;
-
+            this.IsDirty = namedThingDiagramContentItemViewModels.Any(x => x.IsDirty) || removedItem > 0;
             this.IsDirty |= addedItem > 0;
-
             this.IsDirty |= addedEdges > 0;
-            this.IsDirty |= this.ConnectorViewModels.Any(x => x.IsDirty) || removedEdges > 0;
+            this.IsDirty |= persistedConnectors.Any(x => x.IsDirty) || removedEdges > 0;
         }
 
         /// <summary>
@@ -857,7 +876,7 @@ namespace CDP4DiagramEditor.ViewModels
                     continue;
                 }
 
-                var elementUsages = elementDefinition.ContainedElement;
+                var elementUsages = elementDefinition.ContainedElement.Where(e => e.InterfaceEnd == InterfaceEndKind.NONE).ToList();
                 var underlyingDefinitions = elementUsages.Select(eu => eu.ElementDefinition);
 
                 // create missing ED boxes. important to be distinct
@@ -1493,7 +1512,16 @@ namespace CDP4DiagramEditor.ViewModels
                 connectorViewModel.UpdateTransaction(transaction, clone);
             }
 
-            await this.DalWrite(transaction);
+            try
+            {
+                await this.DalWrite(transaction);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                return;
+            }
+
             this.IsDirty = false;
         }
 

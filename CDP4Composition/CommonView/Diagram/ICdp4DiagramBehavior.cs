@@ -104,5 +104,10 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="connector">The connector to remove</param>
         void RemoveConnector(DiagramConnector connector);
+
+        /// <summary>
+        /// Updates connector routes
+        /// </summary>
+        void RerouteConnectors();
     }
 }

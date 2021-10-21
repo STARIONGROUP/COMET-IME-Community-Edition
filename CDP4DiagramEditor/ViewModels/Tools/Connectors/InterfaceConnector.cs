@@ -25,7 +25,11 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
+    using CDP4CommonView.Diagram.Views;
+
     using CDP4Composition.Diagram;
+
+    using DevExpress.Xpf.Diagram;
 
     /// <summary>
     /// The connector representing <see cref="BinaryRelationship"/> set as an interface
@@ -38,6 +42,26 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
         public InterfaceConnector(IConnectorTool tool) : base(tool)
         {
+        }
+
+        /// <summary>
+        /// Checks whether the provided diagramItem can be used to draw from for this connector
+        /// </summary>
+        /// <param name="item">The diagramitem</param>
+        /// <returns>True if allowed</returns>
+        public override bool CanDrawFrom(DiagramItem item)
+        {
+            return (item is DiagramPortShape);
+        }
+
+        /// <summary>
+        /// Checks whether the provided diagramItem can be used to draw to for this connector
+        /// </summary>
+        /// <param name="item">The diagramitem</param>
+        /// <returns>True if allowed</returns>
+        public override bool CanDrawTo(DiagramItem item)
+        {
+            return (item is DiagramPortShape);
         }
     }
 }

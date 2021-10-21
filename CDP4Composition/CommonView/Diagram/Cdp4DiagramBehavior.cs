@@ -177,6 +177,7 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.ItemsDeleting += this.OnItemsDeleting;
 
             this.AssociatedObject.AddingNewItem += this.OnAddingNewItem;
+            this.AssociatedObject.QueryConnectionPoints += this.OnQueryConnectionPoints;
         }
 
         /// <summary>
@@ -209,6 +210,7 @@ namespace CDP4CommonView.Diagram
             this.AssociatedObject.ItemsDeleting -= this.OnItemsDeleting;
 
             this.AssociatedObject.AddingNewItem -= this.OnAddingNewItem;
+            this.AssociatedObject.QueryConnectionPoints -= this.OnQueryConnectionPoints;
 
             base.OnDetaching();
         }
@@ -289,6 +291,59 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
+        /// Updates connector routes
+        /// </summary>
+        public void RerouteConnectors()
+        {
+            var connectors = this.AssociatedObject.Items.OfType<DiagramConnector>().ToList();
+
+            if (connectors.Count == 0)
+            {
+                return;
+            }
+
+            this.AssociatedObject.UpdateConnectorsRoute(connectors);
+        }
+
+        /// <summary>
+        /// Eventhandler for querying connection point states and setting certain elements as unconnectable
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">Arguments</param>
+        private void OnQueryConnectionPoints(object sender, DiagramQueryConnectionPointsEventArgs e)
+        {
+            var connector = e.Connector as IDrawnConnector;
+
+            if (connector == null)
+            {
+                return;
+            }
+
+            var canDraw = false;
+
+            if (e.OppositeItem == null)
+            {
+                // starting position
+                canDraw = connector.CanDrawFrom(e.HoveredItem);
+            }
+            else
+            {
+                // ending position
+                canDraw = connector.CanDrawTo(e.HoveredItem);
+            }
+
+            if (!canDraw)
+            {
+                e.ItemConnectionBorderState = ConnectionElementState.Hidden;
+
+                foreach (var p in e.ItemConnectionPointStates)
+                {
+                    p.State = ConnectionElementState.Hidden;
+                }
+            }
+        }
+
+        /// <summary>
         /// Reinitializes the viewmodel selection collection when the control collection changed.
         /// </summary>
         /// <param name="sender">The sender object.</param>
@@ -355,6 +410,16 @@ namespace CDP4CommonView.Diagram
         {
             if (e.Item is not IDrawnConnector connector)
             {
+                return;
+            }
+
+            if ((connector as DiagramConnector)?.BeginItem == null || (connector as DiagramConnector).EndItem == null)
+            {
+                e.Cancel = true;
+                e.Handled = true;
+
+                this.ResetTool();
+
                 return;
             }
 
@@ -555,6 +620,8 @@ namespace CDP4CommonView.Diagram
                 this.ViewModel?.ComputeDiagramConnector();
                 this.hasFirstLoadHappened = true;
             }
+
+            this.RerouteConnectors();
         }
 
         /// <summary>

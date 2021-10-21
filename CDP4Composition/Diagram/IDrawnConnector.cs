@@ -25,6 +25,8 @@
 
 namespace CDP4Composition.Diagram
 {
+    using DevExpress.Xpf.Diagram;
+
     /// <summary>
     /// Interface connecting all diagram drawn connectors.
     /// </summary>
@@ -34,5 +36,19 @@ namespace CDP4Composition.Diagram
         /// Gets the tool that drew the connector
         /// </summary>
         IConnectorTool Tool { get; }
+
+        /// <summary>
+        /// Checks whether the provided diagramItem can be used to draw from for this connector
+        /// </summary>
+        /// <param name="item">The diagramitem</param>
+        /// <returns>True if allowed</returns>
+        bool CanDrawFrom(DiagramItem item);
+
+        /// <summary>
+        /// Checks whether the provided diagramItem can be used to draw to for this connector
+        /// </summary>
+        /// <param name="item">The diagramitem</param>
+        /// <returns>True if allowed</returns>
+        bool CanDrawTo(DiagramItem item);
     }
 }

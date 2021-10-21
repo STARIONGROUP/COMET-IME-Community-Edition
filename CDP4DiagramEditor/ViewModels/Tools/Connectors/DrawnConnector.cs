@@ -47,5 +47,25 @@ namespace CDP4DiagramEditor.ViewModels
         /// Gets the tool that drew the connector
         /// </summary>
         public IConnectorTool Tool { get; }
+
+        /// <summary>
+        /// Checks whether the provided diagramItem can be used to draw from for this connector
+        /// </summary>
+        /// <param name="item">The diagramitem</param>
+        /// <returns>True if allowed</returns>
+        public virtual bool CanDrawFrom(DiagramItem item)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Checks whether the provided diagramItem can be used to draw to for this connector
+        /// </summary>
+        /// <param name="item">The diagramitem</param>
+        /// <returns>True if allowed</returns>
+        public virtual bool CanDrawTo(DiagramItem item)
+        {
+            return false;
+        }
     }
 }
