@@ -270,23 +270,6 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Sets the <see cref="IsDirty" /> property
-        /// </summary>
-        public void SetDirty()
-        {
-            var bound = this.DiagramThing.Bounds.Single();
-
-            //this.IsDirty = this.Parent is DiagramContentItem parent
-            //               && parent.Position != default
-            //               && this.Thing != null
-            //               && (this.Thing.Iid == Guid.Empty
-            //                   || (float)parent.Position.X != bound.X
-            //                   || (float)parent.Position.Y != bound.Y);
-
-            this.containerViewModel?.UpdateIsDirty();
-        }
-
-        /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing" /> that is being represented by the view-model
         /// </summary>
@@ -337,7 +320,7 @@ namespace CDP4Composition.Diagram
         private IThingDiagramItemViewModel GetDiagramContentItemToConnectTo(object diagramThing)
         {
             var diagramObject = this.containerViewModel.ThingDiagramItemViewModels.SingleOrDefault(x => x.DiagramThing == diagramThing);
-            
+
             if (diagramObject == null)
             {
                 throw new InvalidOperationException("DiagramContentItem could not be found.");

@@ -125,7 +125,6 @@ namespace CDP4Composition.Diagram
         public PortContainerShapeSide Direction
         {
             get { return this.SetDirection(); }
-            set { }
         }
 
         /// <summary>

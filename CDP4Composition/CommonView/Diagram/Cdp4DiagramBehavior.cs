@@ -537,11 +537,6 @@ namespace CDP4CommonView.Diagram
                     // If you watch multiple values it will fires multiple times CAREFULL
                     thingDiagramContentItem.PositionObservable = e.Item.WhenAnyValue(x => x.Position).Subscribe(x => thingDiagramContentItem.SetDirty());
 
-                    if (thingDiagramContentItem is PortContainerDiagramContentItemViewModel portContainer)
-                    {
-                        //portContainer.UpdatePorts();
-                    }
-
                     if (thingDiagramContentItem is PortDiagramContentItemViewModel port)
                     {
                         port.Container?.UpdatePortLayout();
