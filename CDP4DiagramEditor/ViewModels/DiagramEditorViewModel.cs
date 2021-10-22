@@ -949,6 +949,8 @@ namespace CDP4DiagramEditor.ViewModels
                     ElementUsageConnectorTool.CreateConnector(elementUsage, source, target, this.Behavior);
                 }
             }
+
+            this.ComputeGeneratedConnectors();
         }
 
         /// <summary>
