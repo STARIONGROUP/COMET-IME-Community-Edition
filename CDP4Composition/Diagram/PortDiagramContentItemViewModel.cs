@@ -268,7 +268,6 @@ namespace CDP4Composition.Diagram
             this.EndKind = ((ElementUsage)this.Thing).InterfaceEnd;
             this.DisplayText = this.Thing?.UserFriendlyShortName ?? "n/a";
             this.IconPath = this.SetIconPath();
-            this.Direction = this.SetDirection();
         }
 
         /// <summary>
