@@ -242,7 +242,7 @@ namespace CDP4ProductTree.ViewModels
             var parameterTypeListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.PopulateValueSetProperty());
+                .Subscribe(x => this.UpdateProperties());
 
             this.Disposables.Add(parameterTypeListener);
         }
