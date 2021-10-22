@@ -25,8 +25,10 @@ for:
 configuration: Debug
 
 install:
-  - choco install opencover.portable --version=4.7.922
-  - choco install "sonarscanner-msbuild-net46" -y --version=5.2.1.31210
+  # - choco install opencover.portable --version=4.7.922
+  - choco install opencover.portable
+  #- choco install "sonarscanner-msbuild-net46" -y --version=5.2.1.31210
+  - choco install "sonarscanner-msbuild-net46" -y
 
 
 before_build:
