@@ -6,7 +6,7 @@ environment:
   TEST_RESULT:    'TestResult.xml'
   TEST_COVERAGE:  'CoverResults.xml'
 
-skip_branch_with_pr: true
+skip_branch_with_pr: false
 for:
 # configuration for "master" branch, build in Release mode
 -
@@ -24,11 +24,14 @@ for:
 # no "branches" section defined
 configuration: Debug
 
+
 install:
-  - choco install opencover.portable
-  - choco install "sonarscanner-msbuild-net46" -y
+  - choco install opencover.portable --version=4.7.922
+  - choco install sonarscanner-msbuild-net46 --version=5.1.0.28487
+
 
 before_build:
+  - cmd: echo %DEVEXPRESS_API%
   - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
   - cmd: nuget install NUnit.Runners -Version 3.11.1 -OutputDirectory testrunner
   - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
@@ -41,6 +44,9 @@ before_build:
       if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
         Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER Branch $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
+      } elseif ($env:APPVEYOR_REPO_BRANCH -like "*coverage*") {
+        Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
+        SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
       } elseif ($env:APPVEYOR_REPO_BRANCH -eq "development") {
         Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.branch.name=$env:APPVEYOR_REPO_BRANCH /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
@@ -52,8 +58,9 @@ before_build:
       }
 
 build:
+  parallel: true
   project: '%PROJECT_MAIN%.sln'
-  verbosity: minimal
+  verbosity: quiet
 
 test_script:
     - >
@@ -69,6 +76,6 @@ test_script:
       -excludebyattribute:*.ExcludeFromCodeCoverageAttribute
 after_test:
     - ps: >-
-        if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master") {
+        if ($env:APPVEYOR_PULL_REQUEST_NUMBER -Or $env:APPVEYOR_REPO_BRANCH -eq "development" -Or $env:APPVEYOR_REPO_BRANCH -eq "master" -Or $env:APPVEYOR_REPO_BRANCH -like "*coverage*") {
           SonarScanner.MSBuild.exe end /d:"sonar.login=$env:SONARCLOUD_TOKEN"
         }
