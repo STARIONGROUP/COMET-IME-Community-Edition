@@ -24,6 +24,7 @@ for:
 # no "branches" section defined
 configuration: Debug
 
+
 install:
   - choco install opencover.portable --version=4.7.922
   - choco install sonarscanner-msbuild-net46 --version=5.1.0.28487
