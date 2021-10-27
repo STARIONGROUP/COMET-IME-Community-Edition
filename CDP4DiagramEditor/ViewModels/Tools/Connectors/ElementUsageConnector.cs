@@ -64,6 +64,11 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>True if allowed</returns>
         public override bool CanDrawTo(DiagramItem item)
         {
+            if (item == this.BeginItem)
+            {
+                return false;
+            }
+
             return (((item as DiagramContentItem)?.Content as ElementDefinitionDiagramContentItemViewModel)?.Thing is ElementDefinition);
         }
     }

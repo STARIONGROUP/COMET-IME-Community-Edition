@@ -318,18 +318,7 @@ namespace CDP4CommonView.Diagram
                 return;
             }
 
-            var canDraw = false;
-
-            if (e.OppositeItem == null)
-            {
-                // starting position
-                canDraw = connector.CanDrawFrom(e.HoveredItem);
-            }
-            else
-            {
-                // ending position
-                canDraw = connector.CanDrawTo(e.HoveredItem);
-            }
+            var canDraw = e.Connector?.BeginItem is null ? connector.CanDrawFrom(e.HoveredItem) : connector.CanDrawTo(e.HoveredItem);
 
             if (!canDraw)
             {
