@@ -25,6 +25,12 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView.Diagram.Views;
 
     using CDP4Composition.Diagram;
@@ -61,7 +67,18 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>True if allowed</returns>
         public override bool CanDrawTo(DiagramItem item)
         {
-            return (item is DiagramPortShape);
+            if (this.BeginItem?.DataContext is not PortDiagramContentItemViewModel { Thing: ElementUsage sourceElementUsage })
+            {
+                return false;
+            }
+
+            if (item is not DiagramPortShape || item.DataContext is not PortDiagramContentItemViewModel { Thing: ElementUsage targetElementUsage })
+            {
+                return false;
+            }
+
+            // mismatching Categories on Ports
+            return new HashSet<Category>(targetElementUsage.GetAllCategories()).SetEquals(sourceElementUsage.GetAllCategories());
         }
     }
 }

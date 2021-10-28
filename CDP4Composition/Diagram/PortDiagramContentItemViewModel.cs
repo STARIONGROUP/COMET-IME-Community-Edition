@@ -31,6 +31,7 @@ namespace CDP4Composition.Diagram
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.Diagram.ViewModels;
 
@@ -86,7 +87,7 @@ namespace CDP4Composition.Diagram
 
             this.EndKind = ((ElementUsage)this.Thing).InterfaceEnd;
             this.IconPath = this.SetIconPath();
-            this.DisplayText = this.Thing?.UserFriendlyShortName ?? "n/a";
+            this.DisplayText = this.GetPortDisplayName();
 
             if (diagramPort.DepictedThing is ElementUsage elementUsage)
             {
@@ -261,12 +262,30 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
+        /// Computes the port display name
+        /// </summary>
+        /// <returns>The port display name</returns>
+        private string GetPortDisplayName()
+        {
+            var categories = (this.Thing as ElementUsage)?.GetAllCategories().ToList();
+
+            var categoryListing = string.Empty;
+
+            if (categories != null && categories.Any())
+            {
+                categoryListing = $" ({string.Join(", ", categories.Select(c => c.UserFriendlyShortName))})";
+            }
+
+            return this.Thing?.UserFriendlyShortName == null ? "n/a" : $"{this.Thing.UserFriendlyShortName}{categoryListing}";
+        }
+
+        /// <summary>
         /// Sets <see cref="NamedThingDiagramContentItemViewModel.Thing" /> related property used to display
         /// </summary>
         private void UpdateProperties()
         {
             this.EndKind = ((ElementUsage)this.Thing).InterfaceEnd;
-            this.DisplayText = this.Thing?.UserFriendlyShortName ?? "n/a";
+            this.DisplayText = this.GetPortDisplayName();
             this.IconPath = this.SetIconPath();
         }
 

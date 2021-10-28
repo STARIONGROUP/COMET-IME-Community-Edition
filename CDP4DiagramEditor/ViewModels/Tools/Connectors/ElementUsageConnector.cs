@@ -25,10 +25,7 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-
-    using CDP4CommonView.Diagram.Views;
 
     using CDP4Composition.Diagram;
 
