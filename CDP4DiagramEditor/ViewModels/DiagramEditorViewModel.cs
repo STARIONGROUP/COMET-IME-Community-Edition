@@ -345,6 +345,9 @@ namespace CDP4DiagramEditor.ViewModels
                     case ElementUsage:
                         newDrawnDiagramElement = new ElementUsageEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
                         break;
+                    case BinaryRelationship:
+                        newDrawnDiagramElement = new BinaryRelationshipEdgeViewModel((DiagramEdge)diagramThing, this.Session, this);
+                        break;
                     default:
                         newDrawnDiagramElement = new DrawnDiagramEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
                         break;

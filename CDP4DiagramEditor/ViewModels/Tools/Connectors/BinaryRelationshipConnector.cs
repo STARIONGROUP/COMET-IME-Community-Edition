@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="InterfaceConnector.cs" company="RHEA System S.A.">
+// <copyright file="BinaryRelationshipConnector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -25,11 +25,7 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4CommonView.Diagram.Views;
 
@@ -38,15 +34,15 @@ namespace CDP4DiagramEditor.ViewModels
     using DevExpress.Xpf.Diagram;
 
     /// <summary>
-    /// The connector representing <see cref="BinaryRelationship"/> set as an interface
+    /// The connector representing <see cref="BinaryRelationship"/>
     /// </summary>
-    public class InterfaceConnector : DrawnConnector
+    public class BinaryRelationshipConnector : DrawnConnector
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="InterfaceConnector" /> class
+        /// Initializes a new instance of the <see cref="BinaryRelationshipConnector" /> class
         /// </summary>
         /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
-        public InterfaceConnector(IConnectorTool tool) : base(tool)
+        public BinaryRelationshipConnector(IConnectorTool tool) : base(tool)
         {
         }
 
@@ -57,7 +53,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>True if allowed</returns>
         public override bool CanDrawFrom(DiagramItem item)
         {
-            return (item is DiagramPortShape);
+            return item is not DiagramPortShape;
         }
 
         /// <summary>
@@ -67,18 +63,12 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>True if allowed</returns>
         public override bool CanDrawTo(DiagramItem item)
         {
-            if (this.BeginItem?.DataContext is not PortDiagramContentItemViewModel { Thing: ElementUsage sourceElementUsage })
+            if (item == this.BeginItem)
             {
                 return false;
             }
 
-            if (item == this.BeginItem || item is not DiagramPortShape || item.DataContext is not PortDiagramContentItemViewModel { Thing: ElementUsage targetElementUsage })
-            {
-                return false;
-            }
-
-            // mismatching Categories on Ports
-            return new HashSet<Category>(targetElementUsage.GetAllCategories()).SetEquals(sourceElementUsage.GetAllCategories());
+            return item is not DiagramPortShape;
         }
     }
 }

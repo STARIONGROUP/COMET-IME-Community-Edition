@@ -269,6 +269,16 @@
                                          Content="{Binding DataItem.DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
+            <DataTemplate x:Key="BinaryRelationshipConnectorTemplate">
+                <dxdiag:DiagramConnector EndArrow="Open90"
+                                         BeginArrow="(none)"
+                                         StrokeDashArray="2,6"
+                                         Type="Curved"
+                                         Stroke="Black"
+                                         TextAlignment="Center"
+                                         Content="{Binding DataItem.DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+
             <viewModels:DiagramItemViewModelTemplateSelector x:Key="DiagramItemViewModelTemplateSelector"
                                                              RequirementDiagramItemTemplate="{StaticResource RequirementDiagramItemTemplate}"
                                                              ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
@@ -277,6 +287,7 @@
 
             <viewModels:ConnectorViewModelTemplateSelector x:Key="ConnectorViewModelTemplateSelector"
                                                            ElementUsageConnectorDataTemplate="{StaticResource ElementUsageConnectorTemplate}"
+                                                           BinaryRelationshipDataTemplate="{StaticResource BinaryRelationshipConnectorTemplate}"
                                                            InterfaceConnectorDataTemplate="{StaticResource InterfaceConnectorTemplate}" />
         </ResourceDictionary>
 

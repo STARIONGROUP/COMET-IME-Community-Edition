@@ -55,6 +55,11 @@ namespace CDP4DiagramEditor.ViewModels
         public DataTemplate InterfaceConnectorDataTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> for a DiagramContentItem that represents an <see cref="BinaryRelationship"/>
+        /// </summary>
+        public DataTemplate BinaryRelationshipDataTemplate { get; set; }
+
+        /// <summary>
         /// Selects the template for a <see cref="NamedThingDiagramContentItemViewModel"/>
         /// </summary>
         /// <param name="item">The <see cref="NamedThingDiagramContentItemViewModel"/></param>
@@ -73,6 +78,7 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 ElementUsageEdgeViewModel => this.ElementUsageConnectorDataTemplate,
                 InterfaceEdgeViewModel => this.InterfaceConnectorDataTemplate,
+                BinaryRelationshipEdgeViewModel => this.BinaryRelationshipDataTemplate,
                 _ => base.SelectTemplate(item, container)
             };
         }

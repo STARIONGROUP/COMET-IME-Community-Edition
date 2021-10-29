@@ -170,5 +170,24 @@ namespace CDP4Composition.Services
         /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
         /// </param>
         Task<BinaryRelationship> CreateAndGetInterface(ElementUsage output, ElementUsage input, Iteration iteration, DomainOfExpertise owner, ISession session);
+
+        /// <summary>
+        /// Create and return a new BinaryRelationship between two <see cref="Thing"/>
+        /// </summary>
+        /// <param name="output">
+        /// The source <see cref="Thing"/> of the relationship
+        /// </param>
+        /// <param name="input">
+        /// The target <see cref="Thing"/> of the relationship
+        /// </param>
+        /// <param name="category">Applied <see cref="Category"/></param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
+        /// <param name="owner">
+        /// The <see cref="DomainOfExpertise"/> that is the owner of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
+        /// </param>
+        Task<BinaryRelationship> CreateAndGetBinaryRelationship(Thing output, Thing input, Category category, Iteration iteration, DomainOfExpertise owner, ISession session);
     }
 }

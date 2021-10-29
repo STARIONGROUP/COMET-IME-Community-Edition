@@ -33,11 +33,13 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4DiagramEditor.ViewModels.Tools;
+
     /// <summary>
     /// Diagram palette button responsible for creating new <see cref="Requirement" />
     /// </summary>
     [Export(typeof(IPaletteItemViewModel))]
-    public class BinaryRelationshipCreatePaletteItemViewModel : PaletteItemBaseViewModel
+    public class BinaryRelationshipCreatePaletteItemViewModel : ConnectorCreatePaletteItemBaseViewModel
     {
         /// <summary>
         /// Gets the label text
@@ -77,6 +79,16 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         public override string Image
         {
             get { return "BO_Transition.png"; }
+        }
+
+        /// <summary>
+        /// Executes the command of this <see cref="IPaletteItemViewModel" />
+        /// </summary>
+        /// <returns>An empty task</returns>
+        public override async Task ExecuteAsyncCommand()
+        {
+            // activate tool
+            await this.editorViewModel.ActivateConnectorTool<BinaryRelationshipConnectorTool>(this);
         }
     }
 }

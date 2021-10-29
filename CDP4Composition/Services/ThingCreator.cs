@@ -485,6 +485,61 @@ namespace CDP4Composition.Services
         }
 
         /// <summary>
+        /// Create and return a new BinaryRelationship between two <see cref="Thing"/>
+        /// </summary>
+        /// <param name="output">
+        /// The source <see cref="Thing"/> of the relationship
+        /// </param>
+        /// <param name="input">
+        /// The target <see cref="Thing"/> of the relationship
+        /// </param>
+        /// <param name="category">Applied <see cref="Category"/></param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
+        /// <param name="owner">
+        /// The <see cref="DomainOfExpertise"/> that is the owner of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
+        /// </param>
+        public async Task<BinaryRelationship> CreateAndGetBinaryRelationship(Thing output, Thing input, Category category, Iteration iteration, DomainOfExpertise owner, ISession session)
+        {
+            var binaryRelationship = new BinaryRelationship(Guid.NewGuid(), null, null) { Owner = owner };
+
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(iteration));
+
+            binaryRelationship.Container = iteration;
+            binaryRelationship.Source = output;
+            binaryRelationship.Target = input;
+
+            if (category != null)
+            {
+                binaryRelationship.Category.Add(category);
+            }
+
+            var iterationClone = iteration.Clone(false);
+
+            iterationClone.Relationship.Add(binaryRelationship);
+
+            transaction.CreateOrUpdate(iterationClone);
+            transaction.Create(binaryRelationship);
+
+            try
+            {
+                var operationContainer = transaction.FinalizeTransaction();
+                await session.Write(operationContainer);
+
+                output.Cache.TryGetValue(binaryRelationship.CacheKey, out var createdInterface);
+
+                return (BinaryRelationship)createdInterface?.Value;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("The BinaryRelationship could not be created", ex);
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// Method for creating a <see cref="BinaryRelationship" /> for requirement verification between a
         /// <see cref="ParameterOrOverrideBase" /> and a <see cref="RelationalExpression" />.
         /// </summary>
