@@ -158,8 +158,8 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// Create a <see cref="DiagramEdge" /> from a <see cref="BinaryRelationship" />
         /// </summary>
         /// <param name="relationship">The <see cref="BinaryRelationship" /></param>
-        /// <param name="source">The <see cref="DiagramObject" /> source</param>
-        /// <param name="target">The <see cref="DiagramObject" /> target</param>
+        /// <param name="source">The <see cref="DiagramShape" /> source</param>
+        /// <param name="target">The <see cref="DiagramShape" /> target</param>
         /// <param name="behavior">The diagram bahavior</param>
         public static void CreateConnector(BinaryRelationship relationship, DiagramShape source, DiagramShape target, ICdp4DiagramBehavior behavior)
         {
@@ -187,6 +187,10 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// Gets all necessary ContextMenu items
         /// </summary>
+        /// <param name="connector">The supplied temp connector</param>
+        /// <param name="behavior">The behavior</param>
+        /// <param name="beginItemContent">The begin item content</param>
+        /// <param name="endItemContent">The end item content</param>
         /// <returns>A <see cref="List{T}"/> of type <see cref="ContextMenuItemViewModel"/></returns>
         private List<ContextMenuItemViewModel> GetContextMenuItems(DiagramConnector connector, ICdp4DiagramBehavior behavior, ThingDiagramContentItemViewModel beginItemContent, ThingDiagramContentItemViewModel endItemContent)
         {
