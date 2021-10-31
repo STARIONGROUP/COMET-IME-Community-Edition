@@ -72,7 +72,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             var viewModel = new OptionBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
             stopWatch.Stop();
-            Logger.Info("Open OptionBrowserViewModel took {0}", stopWatch.Elapsed);
+            Logger.Info("The Option Browser opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
             return viewModel;
         }
     }

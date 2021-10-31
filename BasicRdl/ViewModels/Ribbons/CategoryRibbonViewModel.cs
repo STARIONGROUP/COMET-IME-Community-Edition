@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CategoryRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -34,7 +34,7 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.PluginSettingService;
     
     using CDP4Dal;
-    
+
     using NLog;
 
     /// <summary>
@@ -68,7 +68,7 @@ namespace BasicRdl.ViewModels
             var stopWatch = Stopwatch.StartNew();
             var viewModel = new CategoryBrowserViewModel(session, session.RetrieveSiteDirectory(), thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
             stopWatch.Stop();
-            Logger.Info("The CategoryBrowserViewModel opened in {0} [ms]", stopWatch.Elapsed);
+            Logger.Info("The Category Browser opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
             return viewModel;
         }
     }

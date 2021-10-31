@@ -74,7 +74,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             var viewModel = new RelationshipBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
             stopWatch.Stop();
-            Logger.Info("Open RelationshipBrowserViewModel took {0}", stopWatch.Elapsed);
+            Logger.Info("The Relationship Browser opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
             return viewModel;
         }
     }

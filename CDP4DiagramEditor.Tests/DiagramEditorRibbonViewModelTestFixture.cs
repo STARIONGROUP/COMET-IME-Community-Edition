@@ -141,7 +141,7 @@ namespace CDP4DiagramEditor.Tests
         }
 
         [Test]
-        public void VerifyPanel()
+        public void Verify_That_InstantiatePanelViewModel_Returns_Expected_ViewModel()
         {
             var viewmodel = DiagramEditorRibbonViewModel.InstantiatePanelViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.navigationService.Object, null, null);
             Assert.IsInstanceOf<DiagramBrowserViewModel>(viewmodel);

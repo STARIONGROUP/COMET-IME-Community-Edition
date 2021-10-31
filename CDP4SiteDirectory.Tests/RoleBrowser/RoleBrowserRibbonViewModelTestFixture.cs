@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RoleBrowserRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -35,6 +35,8 @@ namespace CDP4SiteDirectory.Tests
 
     using CDP4Composition;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -59,7 +61,10 @@ namespace CDP4SiteDirectory.Tests
         private Uri uri;
         private Person person;
         private Mock<IServiceLocator> serviceLocator;
+        private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> navigationService;
+        private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
@@ -73,7 +78,10 @@ namespace CDP4SiteDirectory.Tests
             this.uri = new Uri("http://www.rheagroup.com");
             this.session = new Mock<ISession>();
             this.serviceLocator = new Mock<IServiceLocator>();
+            this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.navigationService = new Mock<IPanelNavigationService>();
+            this.dialogNavigationService = new Mock<IDialogNavigationService>();
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
             this.permissionService = new Mock<IPermissionService>();
 
             var siteDirectory = new SiteDirectory(Guid.NewGuid(), null, null);
@@ -128,6 +136,25 @@ namespace CDP4SiteDirectory.Tests
 
             vm.OpenSingleBrowserCommand.Execute(null);
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
+        }
+
+        [Test]
+        public void Verify_That_RibbonViewModel_Can_Be_Constructed()
+        {
+            Assert.DoesNotThrow(() => new RoleBrowserRibbonViewModel());
+        }
+
+        [Test]
+        public void Verify_That_InstantiatePanelViewModel_Returns_Expected_ViewModel()
+        {
+            var viewmodel = RoleBrowserRibbonViewModel.InstantiatePanelViewModel(
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.navigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object);
+
+            Assert.IsInstanceOf<RoleBrowserViewModel>(viewmodel);
         }
     }
 }

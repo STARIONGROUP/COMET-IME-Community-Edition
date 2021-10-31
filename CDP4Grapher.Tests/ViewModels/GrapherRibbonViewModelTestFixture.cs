@@ -143,16 +143,23 @@ namespace CDP4Grapher.Tests.ViewModels
         }
         
         [Test]
-        public void VerifyStaticConstructor()
-        {
-            Assert.IsNotNull(GrapherRibbonViewModel.InstantiatePanelViewModel(this.option, this.session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object));
-        }
-
-        [Test]
-        public void VerifyConstructor()
+        public void Verify_That_RibbonViewModel_Can_Be_Constructed()
         {
             var vm = new GrapherRibbonViewModel();
             Assert.IsNotNull(vm);
+        }
+
+        [Test]
+        public void Verify_That_InstantiatePanelViewModel_Returns_Expected_ViewModel()
+        {
+            var viewModel = GrapherRibbonViewModel.InstantiatePanelViewModel(
+                this.option, 
+                this.session.Object, 
+                this.thingNavigationService.Object, 
+                this.panelNavigationService.Object, 
+                this.dialogNavigationService.Object, 
+                this.pluginSettingService.Object);
+            Assert.IsInstanceOf<GrapherViewModel>(viewModel);
         }
     }
 }

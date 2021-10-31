@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShowDeprecatedBrowserRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -28,12 +28,16 @@ namespace CDP4SiteDirectory.ViewModels
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Composition;
     using CDP4Composition.Events;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using Microsoft.Practices.ServiceLocation;
+
     using ReactiveUI;
 
     /// <summary>

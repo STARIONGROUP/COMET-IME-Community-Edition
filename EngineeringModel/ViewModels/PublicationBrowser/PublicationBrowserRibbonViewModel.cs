@@ -73,7 +73,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             var viewModel = new PublicationBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
             stopWatch.Stop();
-            Logger.Info("Open PublicationBrowserViewModel took {0}", stopWatch.Elapsed);
+            Logger.Info("The Publication Browser opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
             return viewModel;
         }
     }

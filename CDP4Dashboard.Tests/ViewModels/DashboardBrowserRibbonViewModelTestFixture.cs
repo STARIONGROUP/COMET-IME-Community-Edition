@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CategoryRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="DashboardBrowserRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -23,15 +23,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace BasicRdl.Tests.ViewModels.Ribbons
+namespace CDP4Dashboard.Tests.ViewModels
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Reactive.Concurrency;
-
-    using BasicRdl.ViewModels;
+    using System.Threading;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
@@ -42,6 +43,8 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
     using CDP4Dal;
     using CDP4Dal.Permission;
 
+    using CDP4Dashboard.ViewModels;
+
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
@@ -51,10 +54,11 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
     using ReactiveUI;
 
     /// <summary>
-    /// Suite of tests for the <see cref="CategoryRibbonViewModel"/> class
+    /// Suite of tests for the <see cref="DashboardBrowserRibbonViewModel"/> class
     /// </summary>
     [TestFixture]
-    public class CategoryRibbonViewModelTestFixture
+    [Apartment(ApartmentState.STA)]
+    public class DashboardBrowserRibbonViewModelTestFixture
     {
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
@@ -66,8 +70,15 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private Mock<IServiceLocator> serviceLocator;
         private Assembler assembler;
+
         private SiteDirectory sitedir;
+        private EngineeringModelSetup modelsetup;
+        private IterationSetup iterationsetup;
         private Person person;
+        private Participant participant;
+        private EngineeringModel model;
+        private Iteration iteration;
+        private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [SetUp]
@@ -83,6 +94,7 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
+
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
 
@@ -93,11 +105,22 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
             this.serviceLocator.Setup(x => x.GetInstance<IPluginSettingsService>()).Returns(this.pluginSettingsService.Object);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
-            
+            this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
+            this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
-            
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
+            this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person, SelectedDomain = this.domain };
+
+            this.sitedir.Model.Add(this.modelsetup);
             this.sitedir.Person.Add(this.person);
-            
+            this.sitedir.Domain.Add(this.domain);
+            this.modelsetup.IterationSetup.Add(this.iterationsetup);
+            this.modelsetup.Participant.Add(this.participant);
+
+            this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.modelsetup };
+            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationsetup };
+            this.model.Iteration.Add(this.iteration);
+
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
@@ -108,6 +131,11 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
+            var openIterations = new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>();
+            openIterations.Add(this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant));
+
+            this.session.Setup(x => x.OpenIterations).Returns(openIterations);
         }
 
         [TearDown]
@@ -119,20 +147,21 @@ namespace BasicRdl.Tests.ViewModels.Ribbons
         [Test]
         public void Verify_That_RibbonViewModel_Can_Be_Constructed()
         {
-            Assert.DoesNotThrow(() => new CategoryRibbonViewModel());
+            Assert.DoesNotThrow(() => new DashboardBrowserRibbonViewModel());
         }
 
         [Test]
         public void Verify_That_InstantiatePanelViewModel_Returns_Expected_ViewModel()
         {
-            var viewmodel = CategoryRibbonViewModel.InstantiatePanelViewModel(
+            var viewmodel = DashboardBrowserRibbonViewModel.InstantiatePanelViewModel(
+                this.iteration,
                 this.session.Object,
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
                 this.dialogNavigationService.Object,
                 this.pluginSettingsService.Object);
 
-            Assert.IsInstanceOf<CategoryBrowserViewModel>(viewmodel);
+            Assert.IsInstanceOf<DashboardBrowserViewModel>(viewmodel);
         }
     }
 }

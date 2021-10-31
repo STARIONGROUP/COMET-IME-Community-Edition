@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramEditorRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
 //
@@ -23,16 +23,19 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using CDP4Composition.PluginSettingService;
-
 namespace CDP4DiagramEditor.ViewModels
 {
     using System.Diagnostics;
+
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.PluginSettingService;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+
     using NLog;
 
     /// <summary>
@@ -65,7 +68,7 @@ namespace CDP4DiagramEditor.ViewModels
             var stopWatch = Stopwatch.StartNew();
             var viewModel = new DiagramBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
             stopWatch.Stop();
-            Logger.Info("The DiagramBrowserViewModel opened in {0} [ms]", stopWatch.Elapsed);
+            Logger.Info("The Diagram Browser opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
             return viewModel;
         }
     }

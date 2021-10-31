@@ -81,7 +81,7 @@ namespace CDP4EngineeringModel.ViewModels
             var stopWatch = Stopwatch.StartNew();
             var viewModel = new DomainFileStoreBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
             stopWatch.Stop();
-            Logger.Info("Open DomainFileStoreBrowserViewModel took {0}", stopWatch.Elapsed);
+            Logger.Info("The Domain File Store Browser opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
             return viewModel;
         }
     }

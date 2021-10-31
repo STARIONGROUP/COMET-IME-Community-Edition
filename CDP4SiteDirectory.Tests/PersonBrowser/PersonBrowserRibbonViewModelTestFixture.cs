@@ -33,6 +33,8 @@ namespace CDP4SiteDirectory.Tests
 
     using CDP4Composition;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -57,7 +59,10 @@ namespace CDP4SiteDirectory.Tests
         private Uri uri;
         private Person person;
         private Mock<IServiceLocator> serviceLocator;
+        private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> navigationService;
+        private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
 
@@ -68,7 +73,11 @@ namespace CDP4SiteDirectory.Tests
             this.uri = new Uri("http://www.rheagroup.com");
             this.session = new Mock<ISession>();
             this.serviceLocator = new Mock<IServiceLocator>();
+            this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.navigationService = new Mock<IPanelNavigationService>();
+            this.dialogNavigationService = new Mock<IDialogNavigationService>();
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
+
 
             var siteDirectory = new SiteDirectory(Guid.NewGuid(), null, null);
             this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "John", Surname = "Doe" };
@@ -125,6 +134,25 @@ namespace CDP4SiteDirectory.Tests
 
             vm.OpenSingleBrowserCommand.Execute(null);
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
+        }
+
+        [Test]
+        public void Verify_That_RibbonViewModel_Can_Be_Constructed()
+        {
+            Assert.DoesNotThrow(() => new PersonBrowserRibbonViewModel());
+        }
+
+        [Test]
+        public void Verify_That_InstantiatePanelViewModel_Returns_Expected_ViewModel()
+        {
+            var viewmodel = PersonBrowserRibbonViewModel.InstantiatePanelViewModel(
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.navigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object);
+
+            Assert.IsInstanceOf<PersonBrowserViewModel>(viewmodel);
         }
     }
 }

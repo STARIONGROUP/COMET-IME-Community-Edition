@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 {
@@ -10,22 +29,30 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
     using System.Reflection;
+
     using CDP4Common.CommonData;    
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
+
     using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
-    
+
     /// <summary>
     /// Suite of tests for the <see cref="RuleVerificationListRibbonViewModel"/> class
     /// </summary>
@@ -73,8 +100,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
-
-
+            
             this.serviceLocator.Setup(x => x.GetInstance<IPermissionService>()).Returns(this.permissionService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.thingDialogNavigationService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(this.panelNavigationService.Object);
@@ -103,8 +129,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+
+            this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
         }
 
         [TearDown]
@@ -148,6 +179,26 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
             Assert.IsFalse(viewmodel.HasModels);
+        }
+
+        [Test]
+        public void Verify_That_RibbonViewModel_Can_Be_Constructed()
+        {
+            Assert.DoesNotThrow(() => new RuleVerificationListRibbonViewModel());
+        }
+
+        [Test]
+        public void Verify_That_InstantiatePanelViewModel_Returns_Expected_ViewModel()
+        {
+            var viewmodel = RuleVerificationListRibbonViewModel.InstantiatePanelViewModel(
+                this.iteration,
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.panelNavigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object);
+
+            Assert.That(viewmodel, Is.InstanceOf<RuleVerificationListBrowserViewModel>());
         }
     }
 }

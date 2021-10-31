@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationBrowserRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -33,6 +33,8 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
 
     using CDP4Composition;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -53,7 +55,10 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
     {
         private Uri uri;
         private Mock<IServiceLocator> serviceLocator;
+        private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> navigationService;
+        private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
         private Person person;
@@ -74,18 +79,25 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(siteDirectory);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
-
-            ServiceLocator.SetLocatorProvider(new ServiceLocatorProvider(() => this.serviceLocator.Object));
-
-            this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>())
-                .Returns(this.navigationService.Object);
-
+            
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
+            this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
+            this.dialogNavigationService = new Mock<IDialogNavigationService>();
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
+
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+
+            ServiceLocator.SetLocatorProvider(new ServiceLocatorProvider(() => this.serviceLocator.Object));
+
+            this.serviceLocator.Setup(x => x.GetInstance<IPermissionService>()).Returns(this.permissionService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.thingDialogNavigationService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(this.navigationService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IDialogNavigationService>()).Returns(this.dialogNavigationService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IPluginSettingsService>()).Returns(this.pluginSettingsService.Object);
         }
 
         [TearDown]
@@ -121,6 +133,25 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
 
             vm.OpenSingleBrowserCommand.Execute(null);
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
+        }
+
+        [Test]
+        public void Verify_That_RibbonViewModel_Can_Be_Constructed()
+        {
+            Assert.DoesNotThrow(() => new OrganizationBrowserRibbonViewModel());
+        }
+
+        [Test]
+        public void Verify_That_InstantiatePanelViewModel_Returns_Expected_ViewModel()
+        {
+            var viewmodel = OrganizationBrowserRibbonViewModel.InstantiatePanelViewModel(
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.navigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object);
+
+            Assert.IsInstanceOf<OrganizationBrowserViewModel>(viewmodel);
         }
     }
 }
