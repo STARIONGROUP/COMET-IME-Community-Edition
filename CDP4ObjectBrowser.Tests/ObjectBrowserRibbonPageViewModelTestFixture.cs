@@ -2,7 +2,7 @@
 // <copyright file="ObjectBrowserRibbonPageViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -33,6 +33,8 @@ namespace CDP4ObjectBrowser.Tests
 
     using CDP4Composition;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -52,6 +54,9 @@ namespace CDP4ObjectBrowser.Tests
     public class ObjectBrowserRibbonPageViewModelTestFixture
     {
         private Mock<IPanelNavigationService> navigationService;
+        private Mock<IThingDialogNavigationService> thingNavigationService;
+        private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IPluginSettingsService> pluginSettingService;
         private Mock<IServiceLocator> servicelocator;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
@@ -76,6 +81,10 @@ namespace CDP4ObjectBrowser.Tests
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
 
             this.navigationService = new Mock<IPanelNavigationService>();
+            this.thingNavigationService = new Mock<IThingDialogNavigationService>();
+            this.dialogNavigationService = new Mock<IDialogNavigationService>();
+            this.pluginSettingService = new Mock<IPluginSettingsService>();
+
             this.servicelocator = new Mock<IServiceLocator>();
 
             this.permissionService = new Mock<IPermissionService>();
@@ -112,6 +121,25 @@ namespace CDP4ObjectBrowser.Tests
 
             vm.OpenSingleBrowserCommand.Execute(null);
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
+        }
+
+        [Test]
+        public void Verify_That_RibbonViewModel_Can_Be_Constructed()
+        {
+            var vm = new ObjectBrowserRibbonPageViewModel();
+            Assert.IsNotNull(vm);
+        }
+
+        [Test]
+        public void Verify_That_InstantiatePanelViewModel_Returns_Expected_ViewModel()
+        {
+            var viewModel = ObjectBrowserRibbonPageViewModel.InstantiatePanelViewModel(
+                this.session.Object,
+                this.thingNavigationService.Object,
+                this.navigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginSettingService.Object);
+            Assert.IsInstanceOf<ObjectBrowserViewModel>(viewModel);
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -25,6 +25,8 @@
 
 namespace CDP4Grapher.ViewModels
 {
+    using System.Diagnostics;
+
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Mvvm;
@@ -34,11 +36,18 @@ namespace CDP4Grapher.ViewModels
 
     using CDP4Dal;
 
+    using NLog;
+
     /// <summary>
     /// The view-model for the Grapher ribbon controls
     /// </summary>
     public class GrapherRibbonViewModel : RibbonButtonOptionDependentViewModel
     {
+        /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RibbonButtonIterationDependentViewModel"/> class
         /// </summary>
@@ -60,7 +69,12 @@ namespace CDP4Grapher.ViewModels
         /// <returns>An instance of <see cref="GrapherViewModel"/></returns>
         public static GrapherViewModel InstantiatePanelViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            return new GrapherViewModel(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
+            var stopWatch = Stopwatch.StartNew();
+            var viewModel = new GrapherViewModel(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
+            stopWatch.Stop();
+            Logger.Info("The Grapher opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
+
+            return viewModel;
         }
     }
 }

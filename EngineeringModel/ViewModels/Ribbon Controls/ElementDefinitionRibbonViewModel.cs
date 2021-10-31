@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
@@ -76,7 +76,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             var viewModel = new ElementDefinitionsBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService, parameterSubscriptionBatchService, changeOwnershipBatchService);
             stopWatch.Stop();
-            Logger.Info("Open ElementDefinitionsBrowserViewModel took {0}", stopWatch.Elapsed);
+            Logger.Info("The Element Definitions Browser opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
             return viewModel;
         }
     }

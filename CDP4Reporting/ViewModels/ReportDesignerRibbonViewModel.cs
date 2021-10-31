@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReportDesignerRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
@@ -26,6 +26,7 @@
 namespace CDP4Reporting.ViewModels
 {
     using System;
+    using System.Diagnostics;
 
     using CDP4Common.EngineeringModelData;
 
@@ -38,11 +39,18 @@ namespace CDP4Reporting.ViewModels
 
     using CDP4Reporting.Views;
 
+    using NLog;
+
     /// <summary>
     /// The view-model for the <see cref="ReportDesignerRibbon"/> view
     /// </summary>
     public class ReportDesignerRibbonViewModel : RibbonButtonIterationDependentViewModel
     {
+        /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportDesignerRibbonViewModel"/> class.
         /// </summary>
@@ -83,7 +91,12 @@ namespace CDP4Reporting.ViewModels
                 throw new InvalidOperationException("The Participant in an engineering model cannot be null");
             }
 
-            return new ReportDesignerViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
+            var stopWatch = Stopwatch.StartNew();
+            var viewModel = new ReportDesignerViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
+            stopWatch.Stop();
+            Logger.Info("The Report Designer opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
+
+            return viewModel;
         }
     }
 }

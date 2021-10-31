@@ -25,6 +25,8 @@
 
 namespace CDP4ReferenceDataMapper.ViewModels
 {
+    using System.Diagnostics;
+
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Mvvm;
@@ -34,11 +36,18 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
     using CDP4Dal;
 
+    using NLog;
+
     /// <summary>
     /// The view-model of the <see cref="CDP4ReferenceDataMapper.Views.StateToParameterTypeMapperRibbon"/> view
     /// </summary>
     public class StateToParameterTypeMapperRibbonViewModel : RibbonButtonIterationDependentViewModel
     {
+        /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StateToParameterTypeMapperRibbonViewModel"/> class
         /// </summary>
@@ -70,7 +79,12 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// <returns>An instance of <see cref="StateToParameterTypeMapperBrowserViewModel"/></returns>
         public static StateToParameterTypeMapperBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            return new StateToParameterTypeMapperBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
+            var stopWatch = Stopwatch.StartNew();
+            var viewModel = new StateToParameterTypeMapperBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
+            stopWatch.Stop();
+            Logger.Info("The State To ParameterType Mapper opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
+
+            return viewModel;
         }
     }
 }

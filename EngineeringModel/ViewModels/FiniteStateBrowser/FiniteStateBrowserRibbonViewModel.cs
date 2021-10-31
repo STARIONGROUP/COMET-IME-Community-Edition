@@ -25,6 +25,7 @@
 
 namespace CDP4EngineeringModel.ViewModels
 {
+    using System;
     using System.Diagnostics;
 
     using CDP4Common.EngineeringModelData;
@@ -80,7 +81,8 @@ namespace CDP4EngineeringModel.ViewModels
 
             var viewModel = new FiniteStateBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService, parameterActualFiniteStateListApplicationBatchService);
             stopWatch.Stop();
-            Logger.Info("Open FiniteStateBrowserViewModel took {0}", stopWatch.Elapsed);
+
+            Logger.Info("The Finite State Browser opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
             return viewModel;
         }
     }

@@ -37,11 +37,14 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Net.Http" />
@@ -49,5 +52,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4BudgetViewer\CDP4Budget.csproj" />
+    <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
   </ItemGroup>
 </Project>

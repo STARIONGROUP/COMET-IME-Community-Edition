@@ -2,7 +2,7 @@
 // <copyright file="ProductTreeRibbonViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -74,7 +74,7 @@ namespace CDP4ProductTree.ViewModels
 
             var viewModel = new ProductTreeViewModel(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
             stopWatch.Stop();
-            Logger.Info("Open ProductTreeViewModel took {0}", stopWatch.Elapsed);
+            Logger.Info("The Product Tree opened in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
             return viewModel;
         }
     }

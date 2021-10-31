@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MatrixViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -33,18 +33,26 @@ namespace CDP4RelationshipMatrix.ViewModels
     using System.Reactive.Linq;
     using System.Text;
     using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Extensions;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Operations;
+
     using CDP4RelationshipMatrix.DataTypes;
     using CDP4RelationshipMatrix.Settings;
+
     using DevExpress.Xpf.Grid;
+
     using Microsoft.Practices.ServiceLocation;
+
     using NLog;
+
     using ReactiveUI;
 
     /// <summary>
