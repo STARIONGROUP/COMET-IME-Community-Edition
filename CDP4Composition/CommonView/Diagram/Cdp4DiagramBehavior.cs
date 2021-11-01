@@ -419,6 +419,8 @@ namespace CDP4CommonView.Diagram
                 await tool.ExecuteCreate((DiagramConnector)connector, this);
             }
 
+            ((DiagramConnector)connector).Visibility = Visibility.Hidden;
+
             this.ResetTool();
         }
 
@@ -481,7 +483,7 @@ namespace CDP4CommonView.Diagram
                 }
                 else if (item is DiagramConnector connector)
                 {
-                    element = connector.DataContext;
+                    element = connector.DataContext as IDiagramConnectorViewModel;
                 }
 
                 if (element != null)
@@ -530,6 +532,10 @@ namespace CDP4CommonView.Diagram
                     {
                         port.Container?.UpdatePortLayout();
                     }
+                }
+                else if (e.Item is DiagramConnector connector && connector.DataContext == this.ViewModel)
+                {
+                    connector.Visibility = Visibility.Hidden;
                 }
             }
         }

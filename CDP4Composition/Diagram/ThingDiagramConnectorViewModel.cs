@@ -336,23 +336,10 @@ namespace CDP4Composition.Diagram
         /// <param name="container">The container</param>
         public void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container)
         {
-            if (this.Thing == null)
-            {
-                return;
-            }
+            var clone = this.DiagramThing.Clone(true);
 
-            if (this.Thing.Iid == Guid.Empty)
-            {
-                container.DiagramElement.Add(this.DiagramThing);
-                transaction.Create(this.Thing);
-            }
-            else
-            {
-                var clone = this.DiagramThing.Clone(true);
-
-                container.DiagramElement.Add(clone);
-                transaction.CreateOrUpdate(clone);
-            }
+            container.DiagramElement.Add(clone);
+            transaction.CreateOrUpdate(clone);
         }
 
         /// <summary>

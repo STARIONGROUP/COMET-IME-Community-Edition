@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BinaryRelationshipConnector.cs" company="RHEA System S.A.">
+// <copyright file="SimpleConnector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -35,17 +35,17 @@ namespace CDP4DiagramEditor.ViewModels
     using DevExpress.Xpf.Diagram;
 
     /// <summary>
-    /// The connector representing <see cref="BinaryRelationship"/>
+    /// The connector representing <see cref="ElementUsage" />
     /// </summary>
-    public class BinaryRelationshipConnector : DrawnConnector
+    public class SimpleConnector : DrawnConnector
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BinaryRelationshipConnector" /> class
+        /// Initializes a new instance of the <see cref="SimpleConnector" /> class
         /// </summary>
         /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
-        public BinaryRelationshipConnector(IConnectorTool tool) : base(tool)
+        public SimpleConnector(IConnectorTool tool) : base(tool)
         {
-            this.Type = ConnectorType.Curved;
+            this.Type = ConnectorType.Straight;
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BinaryRelationshipConnector.cs" company="RHEA System S.A.">
+// <copyright file="SimpleEdgeViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -25,52 +25,25 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
-    using CDP4Common.EngineeringModelData;
-
-    using CDP4CommonView.Diagram.Views;
+    using CDP4Common.DiagramData;
 
     using CDP4Composition.Diagram;
 
-    using DevExpress.Diagram.Core;
-    using DevExpress.Xpf.Diagram;
+    using CDP4Dal;
 
     /// <summary>
-    /// The connector representing <see cref="BinaryRelationship"/>
+    /// View model for a Simple diagram edge
     /// </summary>
-    public class BinaryRelationshipConnector : DrawnConnector
+    public class SimpleEdgeViewModel : DrawnDiagramEdgeViewModel, IPersistedConnector
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="BinaryRelationshipConnector" /> class
+        /// Initializes a new instance of the <see cref="SimpleEdgeViewModel" /> class
         /// </summary>
-        /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
-        public BinaryRelationshipConnector(IConnectorTool tool) : base(tool)
+        /// <param name="diagramEdge">The associated <see cref="DiagramEdge" /></param>
+        /// <param name="session">The <see cref="ISession" /></param>
+        /// <param name="container">The container <see cref="IDiagramEditorViewModel" /></param>
+        public SimpleEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
         {
-            this.Type = ConnectorType.Curved;
-        }
-
-        /// <summary>
-        /// Checks whether the provided diagramItem can be used to draw from for this connector
-        /// </summary>
-        /// <param name="item">The diagramitem</param>
-        /// <returns>True if allowed</returns>
-        public override bool CanDrawFrom(DiagramItem item)
-        {
-            return item is not DiagramPortShape;
-        }
-
-        /// <summary>
-        /// Checks whether the provided diagramItem can be used to draw to for this connector
-        /// </summary>
-        /// <param name="item">The diagramitem</param>
-        /// <returns>True if allowed</returns>
-        public override bool CanDrawTo(DiagramItem item)
-        {
-            if (item == this.BeginItem)
-            {
-                return false;
-            }
-
-            return item is not DiagramPortShape;
         }
     }
 }

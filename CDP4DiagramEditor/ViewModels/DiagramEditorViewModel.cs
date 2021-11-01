@@ -335,11 +335,6 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 DrawnDiagramEdgeViewModel newDrawnDiagramElement = null;
 
-                if (diagramThing.DepictedThing == null)
-                {
-                    continue;
-                }
-
                 switch (diagramThing.DepictedThing)
                 {
                     case ElementUsage:
@@ -348,8 +343,12 @@ namespace CDP4DiagramEditor.ViewModels
                     case BinaryRelationship:
                         newDrawnDiagramElement = new BinaryRelationshipEdgeViewModel((DiagramEdge)diagramThing, this.Session, this);
                         break;
-                    default:
-                        newDrawnDiagramElement = new DrawnDiagramEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
+                    case null:
+                        if (diagramThing is DiagramEdge edge)
+                        {
+                            newDrawnDiagramElement = new SimpleEdgeViewModel(edge, this.Session, this);
+                        }
+
                         break;
                 }
 
@@ -796,7 +795,7 @@ namespace CDP4DiagramEditor.ViewModels
             this.DeleteFromDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(this.CanDeleteFromDiagram));
             this.DeleteFromDiagramCommand.Subscribe(x => this.ExecuteDeleteFromDiagramCommand());
 
-            this.DeleteFromModelCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.Any()));
+            this.DeleteFromModelCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(this.CanDeleteFromModel));
             this.DeleteFromModelCommand.Subscribe(x => this.ExecuteDeleteFromModelCommand());
 
             this.AddUsagesToDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
@@ -975,6 +974,25 @@ namespace CDP4DiagramEditor.ViewModels
                 if ((connector.DataContext as Connection)?.DataItem is IGeneratedConnector)
                 {
                     return false;
+                }
+            }
+
+            return selectedDiagramItem != null && this.SelectedItems.Any();
+        }
+
+        /// <summary>
+        /// Check whether the selection can be deleted from model
+        /// </summary>
+        /// <param name="selectedDiagramItem">The selected item</param>
+        /// <returns>True if delete is possible</returns>
+        private bool CanDeleteFromModel(DiagramItem selectedDiagramItem)
+        {
+            if (this.SelectedItem is DiagramConnector connector)
+            {
+                // conenctors without a Thing cannot be deleted
+                if ((connector.DataContext as Connection)?.DataItem is IDiagramConnectorViewModel connectorViewModel)
+                {
+                    return connectorViewModel.Thing != null ;
                 }
             }
 

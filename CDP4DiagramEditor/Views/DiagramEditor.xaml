@@ -279,6 +279,14 @@
                                          Content="{Binding DataItem.DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
+            <DataTemplate x:Key="SimpleConnectorTemplate">
+                <dxdiag:DiagramConnector EndArrow="Open90"
+                                         BeginArrow="Open90"
+                                         StrokeDashArray="3,1,3"
+                                         Type="Straight"
+                                         Stroke="Magenta" />
+            </DataTemplate>
+
             <viewModels:DiagramItemViewModelTemplateSelector x:Key="DiagramItemViewModelTemplateSelector"
                                                              RequirementDiagramItemTemplate="{StaticResource RequirementDiagramItemTemplate}"
                                                              ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
@@ -288,6 +296,7 @@
             <viewModels:ConnectorViewModelTemplateSelector x:Key="ConnectorViewModelTemplateSelector"
                                                            ElementUsageConnectorDataTemplate="{StaticResource ElementUsageConnectorTemplate}"
                                                            BinaryRelationshipDataTemplate="{StaticResource BinaryRelationshipConnectorTemplate}"
+                                                           SimpleDataTemplate="{StaticResource SimpleConnectorTemplate}"
                                                            InterfaceConnectorDataTemplate="{StaticResource InterfaceConnectorTemplate}" />
         </ResourceDictionary>
 

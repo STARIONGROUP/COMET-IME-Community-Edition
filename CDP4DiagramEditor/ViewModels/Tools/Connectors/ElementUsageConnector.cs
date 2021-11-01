@@ -29,6 +29,7 @@ namespace CDP4DiagramEditor.ViewModels
 
     using CDP4Composition.Diagram;
 
+    using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
 
     /// <summary>
@@ -42,6 +43,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
         public ElementUsageConnector(IConnectorTool tool) : base(tool)
         {
+            this.Type = ConnectorType.OrgChart;
         }
 
         /// <summary>

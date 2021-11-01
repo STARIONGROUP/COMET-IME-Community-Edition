@@ -42,6 +42,14 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     public class BinaryRelationshipCreatePaletteItemViewModel : ConnectorCreatePaletteItemBaseViewModel
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="BinaryRelationshipCreatePaletteItemViewModel"/> class.
+        /// </summary>
+        public BinaryRelationshipCreatePaletteItemViewModel()
+        {
+            this.ConnectorTool = new BinaryRelationshipConnectorTool();
+        }
+
+        /// <summary>
         /// Gets the label text
         /// </summary>
         public override string Text
