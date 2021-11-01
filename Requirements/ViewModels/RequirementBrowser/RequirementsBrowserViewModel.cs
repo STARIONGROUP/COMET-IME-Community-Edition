@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -153,21 +153,26 @@ namespace CDP4Requirements.ViewModels
                 pluginSettingsService)
         {
             this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
+
             this.ToolTip =
                 $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.ReqSpecificationRows = new DisposableReactiveList<RequirementsSpecificationRowViewModel>();
             var model = (EngineeringModel)this.Thing.Container;
             this.ActiveParticipant = model.GetActiveParticipant(this.Session.ActivePerson);
-
-            this.ComputeUserDependentPermission();
-
-            this.UpdateRequirementSpecificationsRows();
-
-            this.AddSubscriptions();
-            this.UpdateProperties();
-
             this.openRequirementsSpecificationEditorViewModels = new List<RequirementsSpecificationEditorViewModel>();
+
+            this.ExecuteLongRunningDispatcherAction(
+                () => 
+                { 
+                    this.ComputeUserDependentPermission();
+
+                    this.UpdateRequirementSpecificationsRows();
+
+                    this.AddSubscriptions();
+                    this.UpdateProperties();
+                },
+                "Loading browser...");
         }
 
         /// <summary>

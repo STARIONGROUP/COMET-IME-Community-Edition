@@ -187,223 +187,218 @@
         </ResourceDictionary>
     </UserControl.Resources>
 
-    <dx:LoadingDecorator IsSplashScreenShown="{Binding IsBusy}"
-                         OwnerLock="LoadingContent"
-                         BorderEffect="Default"
-                         BorderEffectColor="Blue">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-            <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <views:CommonThingControl GridView="{Binding ElementName=View}" />
 
-            <views:CommonThingControl GridView="{Binding ElementName=View}" />
+        <views:BrowserHeader Grid.Row="1" />
 
-            <views:BrowserHeader Grid.Row="1" />
-
-            <Grid Grid.Row="2" Background="AliceBlue">
-                <dxg:TreeListControl x:Name="TreeList"
-                                     ItemsSource="{Binding ElementDefinitionRowViewModels}"
-                                     SelectedItem="{Binding SelectedThing}"
-                                     CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                     SelectionMode="Row"
-                                     service:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
-                    <i:Interaction.Behaviors>
-                        <dragDrop:FrameworkElementDragBehavior />
-                        <dragDrop:FrameworkElementDropBehavior />
-                    </i:Interaction.Behaviors>
-                    <dxmvvm:Interaction.Behaviors>
-                        <cdp4Composition:ContextMenuBehavior />
-                    </dxmvvm:Interaction.Behaviors>
-                    <dxg:TreeListControl.View>
-                        <dxg:TreeListView Name="View"
-                                          AllowEditing="False"
-                                          AutoWidth="False"
-                                          EditorShowMode="MouseUpFocused"
-                                          ExpandCollapseNodesOnNavigation="True"
-                                          ExpandStateFieldName="IsExpanded"
-                                          FixedLineWidth="0"
-                                          HorizontalScrollbarVisibility="Auto"
-                                          NavigationStyle="Cell"
-                                          ShowHorizontalLines="False"
-                                          ShowIndicator="False"
-                                          ShowNodeImages="False"
-                                          ShowVerticalLines="False"
-                                          TreeDerivationMode="HierarchicalDataTemplate"
-                                          TreeLineStyle="Solid"
-                                          VerticalScrollbarVisibility="Auto">
-                            <dxg:TreeListView.RowStyle>
-                                <Style TargetType="{x:Type dxg:RowControl}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Row.IsPublishable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+        <Grid Grid.Row="2" Background="AliceBlue">
+            <dxg:TreeListControl x:Name="TreeList"
+                                 ItemsSource="{Binding ElementDefinitionRowViewModels}"
+                                 SelectedItem="{Binding SelectedThing}"
+                                 CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 SelectionMode="Row"
+                                 service:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
+                <i:Interaction.Behaviors>
+                    <dragDrop:FrameworkElementDragBehavior />
+                    <dragDrop:FrameworkElementDropBehavior />
+                </i:Interaction.Behaviors>
+                <dxmvvm:Interaction.Behaviors>
+                    <cdp4Composition:ContextMenuBehavior />
+                </dxmvvm:Interaction.Behaviors>
+                <dxg:TreeListControl.View>
+                    <dxg:TreeListView Name="View"
+                                      AllowEditing="False"
+                                      AutoWidth="False"
+                                      EditorShowMode="MouseUpFocused"
+                                      ExpandCollapseNodesOnNavigation="True"
+                                      ExpandStateFieldName="IsExpanded"
+                                      FixedLineWidth="0"
+                                      HorizontalScrollbarVisibility="Auto"
+                                      NavigationStyle="Cell"
+                                      ShowHorizontalLines="False"
+                                      ShowIndicator="False"
+                                      ShowNodeImages="False"
+                                      ShowVerticalLines="False"
+                                      TreeDerivationMode="HierarchicalDataTemplate"
+                                      TreeLineStyle="Solid"
+                                      VerticalScrollbarVisibility="Auto">
+                        <dxg:TreeListView.RowStyle>
+                            <Style TargetType="{x:Type dxg:RowControl}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Row.IsPublishable, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                        <Setter Property="Foreground" Value="Blue" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
+                                        <Setter Property="Background" Value="Yellow"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                        <Setter Property="FontWeight" Value="Normal" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                                <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                            </Style>
+                        </dxg:TreeListView.RowStyle>
+                        <dxg:TreeListView.FocusedRow>
+                            <dynamic:ExpandoObject />
+                        </dxg:TreeListView.FocusedRow>
+                        <dxg:TreeListView.ContextMenu>
+                            <ContextMenu />
+                        </dxg:TreeListView.ContextMenu>
+                        <dxmvvm:Interaction.Behaviors>
+                            <cdp4Composition:TreeCellEditBehavior />
+                            <cdp4Composition:TreeCellShowingEditorBehavior/>
+                        </dxmvvm:Interaction.Behaviors>
+                    </dxg:TreeListView>
+                </dxg:TreeListControl.View>
+                <dxg:TreeListControl.Columns>
+                    <dxg:TreeListColumn FieldName="Name" Fixed="Left">
+                        <dxg:TreeListColumn.DisplayTemplate>
+                            <ControlTemplate>
+                                <TextBlock Margin="5,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Path=RowData.Row.Name}" />
+                                <ControlTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Path=RowData.Row.IsTopElement, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
                                             <Setter Property="FontWeight" Value="Bold" />
-                                            <Setter Property="Foreground" Value="Blue" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
-                                            <Setter Property="Background" Value="Yellow"/>
+                                    <DataTrigger Binding="{Binding Path=RowData.Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                        <Setter Property="FontWeight" Value="Bold" />
                                         </DataTrigger>
-                                        <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
-                                            <Setter Property="FontWeight" Value="Bold" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="False">
-                                            <Setter Property="FontWeight" Value="Normal" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                    <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
-                                </Style>
-                            </dxg:TreeListView.RowStyle>
-                            <dxg:TreeListView.FocusedRow>
-                                <dynamic:ExpandoObject />
-                            </dxg:TreeListView.FocusedRow>
-                            <dxg:TreeListView.ContextMenu>
-                                <ContextMenu />
-                            </dxg:TreeListView.ContextMenu>
-                            <dxmvvm:Interaction.Behaviors>
-                                <cdp4Composition:TreeCellEditBehavior />
-                                <cdp4Composition:TreeCellShowingEditorBehavior/>
-                            </dxmvvm:Interaction.Behaviors>
-                        </dxg:TreeListView>
-                    </dxg:TreeListControl.View>
-                    <dxg:TreeListControl.Columns>
-                        <dxg:TreeListColumn FieldName="Name" Fixed="Left">
-                            <dxg:TreeListColumn.DisplayTemplate>
-                                <ControlTemplate>
-                                    <TextBlock Margin="5,0,0,0"
-                                               VerticalAlignment="Center"
-                                               Text="{Binding Path=RowData.Row.Name}" />
-                                    <ControlTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding Path=RowData.Row.IsTopElement, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
-                                                <Setter Property="FontWeight" Value="Bold" />
-                                            </DataTrigger>
-                                        <DataTrigger Binding="{Binding Path=RowData.Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
-                                            <Setter Property="FontWeight" Value="Bold" />
-                                            </DataTrigger>
-                                    </ControlTemplate.Triggers>
+                                </ControlTemplate.Triggers>
 
-                                </ControlTemplate>
-                            </dxg:TreeListColumn.DisplayTemplate>
-                        </dxg:TreeListColumn>
-                        <dxg:TreeListColumn Width="60"
-                                            AllowAutoFilter="False"
-                                            AllowColumnFiltering="False"
-                                            AllowEditing="True"
-                                            Header="Options"
-                                            HorizontalHeaderContentAlignment="Center">
-                            <dxg:TreeListColumn.DisplayTemplate>
-                                <ControlTemplate>
-                                    <Image x:Name="Icon"
-                                           Height="16"
-                                           Source="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/EnableClustering_16x16.png"
-                                           Visibility="Collapsed" />
-                                    <ControlTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding Path=RowData.Row, Converter={StaticResource DataTypeConverter}}" Value="{x:Type viewModels:ElementUsageRowViewModel}">
-                                            <Setter TargetName="Icon" Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Path=RowData.Row.HasExcludes}" Value="{x:Null}">
-                                            <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/LegendNone2_16x16.png" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Path=RowData.Row.HasExcludes}" Value="True">
-                                            <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/InlineSizeLegend_16x16.png" />
-                                        </DataTrigger>
-                                        <DataTrigger Binding="{Binding Path=RowData.Row.HasExcludes}" Value="False">
-                                            <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/EnableClustering_16x16.png" />
-                                        </DataTrigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </dxg:TreeListColumn.DisplayTemplate>
-                            <dxg:TreeListColumn.EditTemplate>
-                                <ControlTemplate>
-                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <dxe:ComboBoxEdit Name="PART_Editor"
-                                                          Width="40"
-                                                          HorizontalAlignment="Left"
-                                                          DisplayMember="Name"
-                                                          EditValue="{Binding RowData.Row.SelectedOptions,
-                                                                              Converter={StaticResource ElementUsageOptionsConverter},
-                                                                              Mode=TwoWay,
-                                                                              UpdateSourceTrigger=PropertyChanged}"
-                                                          IsTextEditable="False"
-                                                          ItemsSource="{Binding RowData.Row.AllOptions}"
-                                                          ShowBorder="True"
-                                                          ShowCustomItems="True"
-                                                          ToolTip="{Binding RowData.Row.OptionToolTip}"
-                                                          Visibility="{Binding Path=RowData.Row,
-                                                                               Converter={StaticResource ElementUsageTypeToVisibilityConverter}}">
-                                            <dxe:ComboBoxEdit.EditNonEditableTemplate>
-                                                <ControlTemplate>
-                                                    <Image x:Name="Icon"
-                                                           Height="16"
-                                                           Source="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/EnableClustering_16x16.png" />
-                                                    <ControlTemplate.Triggers>
-                                                        <DataTrigger Binding="{Binding Path=DataContext.RowData.Row.HasExcludes}" Value="True">
-                                                            <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/InlineSizeLegend_16x16.png" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Path=DataContext.RowData.Row.HasExcludes}" Value="False">
-                                                            <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/EnableClustering_16x16.png" />
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Path=DataContext.RowData.Row.HasExcludes}" Value="{x:Null}">
-                                                            <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/LegendNone2_16x16.png" />
-                                                        </DataTrigger>
-                                                    </ControlTemplate.Triggers>
-                                                </ControlTemplate>
-                                            </dxe:ComboBoxEdit.EditNonEditableTemplate>
-                                            <dxe:ComboBoxEdit.StyleSettings>
-                                                <dxe:CheckedComboBoxStyleSettings />
-                                            </dxe:ComboBoxEdit.StyleSettings>
-                                        </dxe:ComboBoxEdit>
-                                    </StackPanel>
-                                </ControlTemplate>
-                            </dxg:TreeListColumn.EditTemplate>
-                        </dxg:TreeListColumn>
-                        <dxg:TreeListColumn FieldName="OwnerShortName" Header="Owner"  Width="45"/>
-                        <dxg:TreeListColumn FieldName="Published" Header="Published Value"/>
-                        <dxg:TreeListColumn FieldName="ScaleShortName" Header="Scale"/>
-                        <dxg:TreeListColumn AllowEditing="True" FieldName="Switch">
-                            <dxg:TreeListColumn.CellTemplate>
-                                <DataTemplate>
+                            </ControlTemplate>
+                        </dxg:TreeListColumn.DisplayTemplate>
+                    </dxg:TreeListColumn>
+                    <dxg:TreeListColumn Width="60"
+                                        AllowAutoFilter="False"
+                                        AllowColumnFiltering="False"
+                                        AllowEditing="True"
+                                        Header="Options"
+                                        HorizontalHeaderContentAlignment="Center">
+                        <dxg:TreeListColumn.DisplayTemplate>
+                            <ControlTemplate>
+                                <Image x:Name="Icon"
+                                       Height="16"
+                                       Source="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/EnableClustering_16x16.png"
+                                       Visibility="Collapsed" />
+                                <ControlTemplate.Triggers>
+                                    <DataTrigger Binding="{Binding Path=RowData.Row, Converter={StaticResource DataTypeConverter}}" Value="{x:Type viewModels:ElementUsageRowViewModel}">
+                                        <Setter TargetName="Icon" Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=RowData.Row.HasExcludes}" Value="{x:Null}">
+                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/LegendNone2_16x16.png" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=RowData.Row.HasExcludes}" Value="True">
+                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/InlineSizeLegend_16x16.png" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding Path=RowData.Row.HasExcludes}" Value="False">
+                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/EnableClustering_16x16.png" />
+                                    </DataTrigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </dxg:TreeListColumn.DisplayTemplate>
+                        <dxg:TreeListColumn.EditTemplate>
+                            <ControlTemplate>
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                     <dxe:ComboBoxEdit Name="PART_Editor"
+                                                      Width="40"
+                                                      HorizontalAlignment="Left"
+                                                      DisplayMember="Name"
+                                                      EditValue="{Binding RowData.Row.SelectedOptions,
+                                                                          Converter={StaticResource ElementUsageOptionsConverter},
+                                                                          Mode=TwoWay,
+                                                                          UpdateSourceTrigger=PropertyChanged}"
                                                       IsTextEditable="False"
+                                                      ItemsSource="{Binding RowData.Row.AllOptions}"
                                                       ShowBorder="True"
-                                                      ShowCustomItems="False">
-                                        <dxmvvm:Interaction.Behaviors>
-                                            <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type engineeringModelData:ParameterSwitchKind}" />
-                                        </dxmvvm:Interaction.Behaviors>
+                                                      ShowCustomItems="True"
+                                                      ToolTip="{Binding RowData.Row.OptionToolTip}"
+                                                      Visibility="{Binding Path=RowData.Row,
+                                                                           Converter={StaticResource ElementUsageTypeToVisibilityConverter}}">
+                                        <dxe:ComboBoxEdit.EditNonEditableTemplate>
+                                            <ControlTemplate>
+                                                <Image x:Name="Icon"
+                                                       Height="16"
+                                                       Source="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/EnableClustering_16x16.png" />
+                                                <ControlTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding Path=DataContext.RowData.Row.HasExcludes}" Value="True">
+                                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/InlineSizeLegend_16x16.png" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Path=DataContext.RowData.Row.HasExcludes}" Value="False">
+                                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/EnableClustering_16x16.png" />
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Path=DataContext.RowData.Row.HasExcludes}" Value="{x:Null}">
+                                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v20.2;component/Images/Maps/LegendNone2_16x16.png" />
+                                                    </DataTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </dxe:ComboBoxEdit.EditNonEditableTemplate>
+                                        <dxe:ComboBoxEdit.StyleSettings>
+                                            <dxe:CheckedComboBoxStyleSettings />
+                                        </dxe:ComboBoxEdit.StyleSettings>
                                     </dxe:ComboBoxEdit>
-                                </DataTemplate>
-                            </dxg:TreeListColumn.CellTemplate>
-                        </dxg:TreeListColumn>
-                        <dxg:TreeListColumn FieldName="Computed" />
-                        <dxg:TreeListColumn AllowEditing="True"
-                                            CellTemplateSelector="{StaticResource ManualValueCellTemplateSelector}"
-                                            FieldName="Manual" />
-                        <dxg:TreeListColumn AllowEditing="True"
-                                            CellTemplateSelector="{StaticResource ReferenceValueCellTemplateSelector}"
-                                            FieldName="Reference" />
-                        <dxg:TreeListColumn FieldName="Formula" />
-                        <dxg:TreeListColumn FieldName="DisplayCategory"
-                                            AllowColumnFiltering="false"
-                                            Header="Category" />
-                        <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
-                        <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
-                        <dxg:TreeListColumn FieldName="IsObfuscated" Header="IsObfuscated" Visible="False" />
-                        <dxg:TreeListColumn FieldName="Category" Header="Category" Visible ="False" ShowInColumnChooser="False">
-                            <dxmvvm:Interaction.Behaviors>
-                                <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Category" ItemsSource="{Binding ElementDefinitionRowViewModels}"/>
-                            </dxmvvm:Interaction.Behaviors>
-                        </dxg:TreeListColumn>
-                        <dxg:TreeListColumn FieldName="ParameterTypeName" Header="ParameterTypeName" Visible ="False" ShowInColumnChooser="False" />
-                    </dxg:TreeListControl.Columns>
-                    <dxg:TreeListControl.InputBindings>
-                        <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
-                        <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
-                    </dxg:TreeListControl.InputBindings>
-                </dxg:TreeListControl>
-            </Grid>
-
-            <views:SelectedThingGroupControl Grid.Row="3"/>
+                                </StackPanel>
+                            </ControlTemplate>
+                        </dxg:TreeListColumn.EditTemplate>
+                    </dxg:TreeListColumn>
+                    <dxg:TreeListColumn FieldName="OwnerShortName" Header="Owner"  Width="45"/>
+                    <dxg:TreeListColumn FieldName="Published" Header="Published Value"/>
+                    <dxg:TreeListColumn FieldName="ScaleShortName" Header="Scale"/>
+                    <dxg:TreeListColumn AllowEditing="True" FieldName="Switch">
+                        <dxg:TreeListColumn.CellTemplate>
+                            <DataTemplate>
+                                <dxe:ComboBoxEdit Name="PART_Editor"
+                                                  IsTextEditable="False"
+                                                  ShowBorder="True"
+                                                  ShowCustomItems="False">
+                                    <dxmvvm:Interaction.Behaviors>
+                                        <dxmvvm:EnumItemsSourceBehavior EnumType="{x:Type engineeringModelData:ParameterSwitchKind}" />
+                                    </dxmvvm:Interaction.Behaviors>
+                                </dxe:ComboBoxEdit>
+                            </DataTemplate>
+                        </dxg:TreeListColumn.CellTemplate>
+                    </dxg:TreeListColumn>
+                    <dxg:TreeListColumn FieldName="Computed" />
+                    <dxg:TreeListColumn AllowEditing="True"
+                                        CellTemplateSelector="{StaticResource ManualValueCellTemplateSelector}"
+                                        FieldName="Manual" />
+                    <dxg:TreeListColumn AllowEditing="True"
+                                        CellTemplateSelector="{StaticResource ReferenceValueCellTemplateSelector}"
+                                        FieldName="Reference" />
+                    <dxg:TreeListColumn FieldName="Formula" />
+                    <dxg:TreeListColumn FieldName="DisplayCategory"
+                                        AllowColumnFiltering="false"
+                                        Header="Category" />
+                    <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
+                    <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
+                    <dxg:TreeListColumn FieldName="IsObfuscated" Header="IsObfuscated" Visible="False" />
+                    <dxg:TreeListColumn FieldName="Category" Header="Category" Visible ="False" ShowInColumnChooser="False">
+                        <dxmvvm:Interaction.Behaviors>
+                            <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Category" ItemsSource="{Binding ElementDefinitionRowViewModels}"/>
+                        </dxmvvm:Interaction.Behaviors>
+                    </dxg:TreeListColumn>
+                    <dxg:TreeListColumn FieldName="ParameterTypeName" Header="ParameterTypeName" Visible ="False" ShowInColumnChooser="False" />
+                </dxg:TreeListControl.Columns>
+                <dxg:TreeListControl.InputBindings>
+                    <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
+                    <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
+                </dxg:TreeListControl.InputBindings>
+            </dxg:TreeListControl>
         </Grid>
-    </dx:LoadingDecorator>
+
+        <views:SelectedThingGroupControl Grid.Row="3"/>
+        <views:LoadingControl Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
+    </Grid>
 </UserControl>
