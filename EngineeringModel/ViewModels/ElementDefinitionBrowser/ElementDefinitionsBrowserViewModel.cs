@@ -185,7 +185,7 @@ namespace CDP4EngineeringModel.ViewModels
                     this.AddSubscriptions();
                     this.UpdateProperties();
                 },
-                "Loading browser...");
+                $"Loading {this.Caption}");
         }
 
         /// <summary>

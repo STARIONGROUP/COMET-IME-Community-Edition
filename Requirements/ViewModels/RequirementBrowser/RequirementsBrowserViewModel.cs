@@ -172,7 +172,7 @@ namespace CDP4Requirements.ViewModels
                     this.AddSubscriptions();
                     this.UpdateProperties();
                 },
-                "Loading browser...");
+                $"Loading {this.Caption}");
         }
 
         /// <summary>

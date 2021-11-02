@@ -160,7 +160,7 @@ namespace CDP4ProductTree.ViewModels
                     this.SetTopElement(iteration);
                     this.UpdateProperties();
                 },
-                "Loading browser...");
+                $"Loading {this.Caption}");
         }
 
         /// <summary>

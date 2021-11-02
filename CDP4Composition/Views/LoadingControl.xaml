@@ -30,13 +30,13 @@
                     </dx:SimpleButton>
                 </Grid>
                 <Image Name="NormalImage" Source="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico" Stretch="Fill" Width="48" Height="48" Margin="16"/>
-                <Grid Margin="15,0,0,0">
+                <Grid Margin="0,0,0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" VerticalAlignment="Bottom" Text="Please Wait" FontSize="15"/>
-                    <TextBlock Grid.Row="1" VerticalAlignment="Top" Text="{Binding LoadingMessage}" FontSize="10"/>
+                    <TextBlock Grid.Row="0" VerticalAlignment="Bottom" Text="Please Wait" TextAlignment="Center" FontSize="15" Width="115"/>
+                    <TextBlock Grid.Row="1" VerticalAlignment="Top" TextWrapping="Wrap" TextAlignment="Center" Text="{Binding LoadingMessage}" FontSize="10" Width="115" />
                 </Grid>
             </StackPanel>
         </Grid>
