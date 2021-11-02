@@ -58,6 +58,11 @@ namespace CDP4DiagramEditor.ViewModels
         public DataTemplate RequirementDiagramItemTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> for a DiagramContentItem that represents an <see cref="DiagramFrame"/>
+        /// </summary>
+        public DataTemplate DiagramFrameTemplate { get; set; }
+
+        /// <summary>
         /// Selects the template for a <see cref="NamedThingDiagramContentItemViewModel"/>
         /// </summary>
         /// <param name="item">The <see cref="NamedThingDiagramContentItemViewModel"/></param>
@@ -70,6 +75,7 @@ namespace CDP4DiagramEditor.ViewModels
                 ElementDefinitionDiagramContentItemViewModel => this.ElementBaseDiagramItemTemplate,
                 RequirementDiagramContentItemViewModel => this.RequirementDiagramItemTemplate,
                 PortDiagramContentItemViewModel => this.DiagramPortTemplate,
+                DiagramFrameViewModel => this.DiagramFrameTemplate,
                 NamedThingDiagramContentItemViewModel => this.GenericDiagramItemDataTemplate,
                 _ => base.SelectTemplate(item, container)
             };

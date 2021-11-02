@@ -383,6 +383,11 @@ namespace CDP4CommonView.Diagram
                 return;
             }
 
+            if (e.Item is DiagramFrameShape { DataContext: DiagramFrameViewModel frameViewModel })
+            {
+                frameViewModel.SetDirty();
+            }
+
             if (namedThingDiagramContentItem.Content is PortContainerDiagramContentItemViewModel portContainer)
             {
                 portContainer.UpdatePortLayout();
@@ -438,20 +443,33 @@ namespace CDP4CommonView.Diagram
 
             foreach (var content in e.Items)
             {
-                if (content.Item is not DiagramContentItem namedThingDiagramContentItem)
+                if (content.Item is not DiagramContentItem contentItem)
                 {
                     continue;
                 }
 
-                if (!this.ItemPositions.TryGetValue(namedThingDiagramContentItem.Content, out _))
+                if (content.Item is DiagramFrameShape frameShape)
+                {
+                    if (!this.ItemPositions.TryGetValue(frameShape.DataContext, out _))
+                    {
+                        continue;
+                    }
+
+                    this.ItemPositions[frameShape.DataContext] = content.NewDiagramPosition;
+                    frameShape.Position = content.NewDiagramPosition;
+
+                    continue;
+                }
+
+                if (!this.ItemPositions.TryGetValue(contentItem.Content, out _))
                 {
                     continue;
                 }
 
-                this.ItemPositions[namedThingDiagramContentItem.Content] = content.NewDiagramPosition;
-                namedThingDiagramContentItem.Position = content.NewDiagramPosition;
+                this.ItemPositions[contentItem.Content] = content.NewDiagramPosition;
+                contentItem.Position = content.NewDiagramPosition;
 
-                if (namedThingDiagramContentItem.Content is PortContainerDiagramContentItemViewModel portContainer)
+                if (contentItem.Content is PortContainerDiagramContentItemViewModel portContainer)
                 {
                     portContainer.UpdatePortLayout();
                 }
@@ -507,6 +525,11 @@ namespace CDP4CommonView.Diagram
                 thingDiagramContentItem = portShape.DataContext as ThingDiagramContentItemViewModel;
             }
 
+            if (e.Item is DiagramFrameShape frameShape)
+            {
+                thingDiagramContentItem = frameShape.DataContext as ThingDiagramContentItemViewModel;
+            }
+
             if (e.Action == ItemsChangedAction.Removed)
             {
                 if (e.Item is DiagramPortShape port)
@@ -555,6 +578,14 @@ namespace CDP4CommonView.Diagram
 
             foreach (var item in e.Items)
             {
+                if (item is DiagramContentItem { DataContext: DiagramFrameViewModel frameViewModel })
+                {
+                    if (this.ItemPositions.TryGetValue(frameViewModel, out var itemPosition))
+                    {
+                        item.Position = itemPosition;
+                    }
+                }
+
                 if (item is DiagramContentItem { Content: ThingDiagramContentItemViewModel thingDiagramContentItem })
                 {
                     if (this.ItemPositions.TryGetValue(thingDiagramContentItem, out var itemPosition))

@@ -66,6 +66,7 @@ namespace CDP4DiagramEditor.ViewModels
 
     using ReactiveUI;
 
+    using DiagramShape = CDP4Common.DiagramData.DiagramShape;
     using Point = System.Windows.Point;
 
     /// <summary>
@@ -406,7 +407,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="thing">The <see cref="Thing" /> by which to find and remove diagram things.</param>
         public void RemoveDiagramThingItemByThing(Thing thing)
         {
-            var diagramItems = this.ThingDiagramItemViewModels.Where(di => di.Thing.Equals(thing)).ToList();
+            var diagramItems = this.ThingDiagramItemViewModels.Where(di => di.Thing != null && di.Thing.Equals(thing)).ToList();
 
             foreach (var thingDiagramContentItem in diagramItems)
             {
@@ -446,7 +447,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public void UpdateIsDirty()
         {
-            var currentObjects = this.Thing.DiagramElement.OfType<DiagramObject>().ToArray();
+            var currentObjects = this.Thing.DiagramElement.OfType<DiagramShape>().ToArray();
             var namedThingDiagramContentItemViewModels = this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().ToList();
             var displayedObjects = namedThingDiagramContentItemViewModels.Select(x => x.DiagramThing).ToArray();
 
@@ -731,6 +732,18 @@ namespace CDP4DiagramEditor.ViewModels
                     diagramItemViewModel = new RequirementDiagramContentItemViewModel(block, this.Session, this);
                     break;
                 }
+
+                case DiagramFrame frame:
+                {
+                    bounds.Width = 200;
+                    bounds.Height = 150;
+
+                    frame.Name = "Untitled";
+
+                    frame.Bounds.Add(bounds);
+                    diagramItemViewModel = new DiagramFrameViewModel(frame, this.Session, this);
+                    break;
+                }
                 default:
                     if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
                     {
@@ -996,6 +1009,11 @@ namespace CDP4DiagramEditor.ViewModels
                 }
             }
 
+            if (this.SelectedItem is DiagramFrameShape)
+            {
+                return false;
+            }
+
             return selectedDiagramItem != null && this.SelectedItems.Any();
         }
 
@@ -1066,6 +1084,12 @@ namespace CDP4DiagramEditor.ViewModels
                 if (selectedDiagramObject is DiagramPortShape)
                 {
                     // ignore port shapes
+                    continue;
+                }
+
+                if (selectedDiagramObject is DiagramFrameShape)
+                {
+                    this.RemoveDiagramThingItem(selectedDiagramObject.DataContext);
                     continue;
                 }
 
@@ -1211,7 +1235,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         private void ComputeDiagramObject()
         {
-            var updatedItems = this.Thing.DiagramElement.OfType<DiagramObject>().ToList();
+            var updatedItems = this.Thing.DiagramElement.OfType<DiagramShape>().ToList();
             var currentItems = this.ThingDiagramItemViewModels.Select(x => x.DiagramThing).OfType<DiagramObject>().ToList();
 
             var newItems = updatedItems.Except(currentItems);
@@ -1238,7 +1262,14 @@ namespace CDP4DiagramEditor.ViewModels
                         newDiagramElement = new ElementDefinitionDiagramContentItemViewModel((ArchitectureElement) diagramThing, this.Session, this);
                         break;
                     case Requirement:
-                        newDiagramElement = new RequirementDiagramContentItemViewModel(diagramThing, this.Session, this);
+                        newDiagramElement = new RequirementDiagramContentItemViewModel((DiagramObject)diagramThing, this.Session, this);
+                        break;
+                    case null:
+                        if (diagramThing is DiagramFrame diagramFrame)
+                        {
+                            newDiagramElement = new DiagramFrameViewModel(diagramFrame, this.Session, this);
+                        }
+
                         break;
                     default:
                         newDiagramElement = new NamedThingDiagramContentItemViewModel(diagramThing, this.Session, this);
@@ -1381,8 +1412,6 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             var position = new Point { X = bound.X, Y = bound.Y };
-
-            //newDiagramElement.Position = position;
 
             this.Behavior.ItemPositions.Add(newDiagramElement, position);
             this.ThingDiagramItemViewModels.Add(newDiagramElement);

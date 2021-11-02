@@ -164,7 +164,7 @@ namespace CDP4Composition.Diagram
         public bool IsDirty
         {
             get => this.isDirty;
-            private set => this.RaiseAndSetIfChanged(ref this.isDirty, value);
+            protected set => this.RaiseAndSetIfChanged(ref this.isDirty, value);
         }
 
         /// <summary>
@@ -173,7 +173,7 @@ namespace CDP4Composition.Diagram
         public string DisplayText
         {
             get => this.displayText;
-            protected set => this.RaiseAndSetIfChanged(ref this.displayText, value);
+            set => this.RaiseAndSetIfChanged(ref this.displayText, value);
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Sets the <see cref="IsDirty"/> property
         /// </summary>
-        public void SetDirty()
+        public virtual void SetDirty()
         {
             var bound = this.DiagramThing.Bounds.Single();
 
@@ -252,13 +252,8 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="transaction">The transaction to update</param>
         /// <param name="container">The container</param>
-        public void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container)
+        public virtual void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container)
         {
-            if (this.Thing == null)
-            {
-                return;
-            }
-
             if (this.Thing.Iid == Guid.Empty)
             {
                 if (!(this.DiagramThing is DiagramEdge))

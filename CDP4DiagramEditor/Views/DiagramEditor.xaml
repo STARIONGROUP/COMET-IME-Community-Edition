@@ -23,6 +23,8 @@
              xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              xmlns:palette="clr-namespace:CDP4DiagramEditor.ViewModels.Palette"
              xmlns:DiagramViews="clr-namespace:CDP4CommonView.Diagram.Views;assembly=CDP4Composition"
+             xmlns:diagram1="clr-namespace:CDP4Composition.Diagram;assembly=CDP4Composition"
+             xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300"
@@ -39,6 +41,7 @@
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <cdp4Composition:StringToIconUriConverter x:Key="StringToIconUriConverter" />
+            <helpers:InstanceTypeConverter x:Key="InstanceTypeConverter"></helpers:InstanceTypeConverter>
             <dx:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <dxmvvm:EnumToStringConverter x:Key="EnumToStringConverter" />
             <Style TargetType="{x:Type dxb:BarButtonItem}">
@@ -105,41 +108,41 @@
             </DataTemplate>
 
             <DataTemplate x:Key="ElementBaseDiagramItemTemplate">
-                <StackPanel Margin="10,10"
+                    <StackPanel Margin="10,10"
                             Background="Transparent"
                             Orientation="Vertical"
                             HorizontalAlignment="Center"
                             Width="200">
-                    <TextBlock Text="Diagram Top Element"
+                        <TextBlock Text="Diagram Top Element"
                                FontSize="10"
                                HorizontalAlignment="Center"
                                FontStyle="Italic"
                                Visibility="{Binding IsTopDiagramElement, Converter={StaticResource BooleanToVisibilityConverter}}"
                                VerticalAlignment="Center"
                                Margin="10,0,10,2" />
-                    <TextBlock Text="{Binding ClassKind}"
+                        <TextBlock Text="{Binding ClassKind}"
                                FontSize="12"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                Margin="10,0,10,2" />
-                    <TextBlock Text="{Binding Categories}"
+                        <TextBlock Text="{Binding Categories}"
                                FontSize="12"
                                HorizontalAlignment="Center"
                                TextWrapping="Wrap"
                                TextAlignment="Center"
                                VerticalAlignment="Center"
                                Margin="10,0,10,10" />
-                    <TextBlock Text="{Binding FullName}"
+                        <TextBlock Text="{Binding FullName}"
                                TextAlignment="Center"
                                FontWeight="Bold"
                                FontSize="14"
                                Margin="10,0,10,10" />
-                    <TextBlock Text="{Binding ShortName}"
+                        <TextBlock Text="{Binding ShortName}"
                                TextAlignment="Center"
                                FontStyle="Italic"
                                FontSize="11"
                                Margin="10,0,10,10" />
-                    <dxlc:LayoutGroup Header="Parameters"
+                        <dxlc:LayoutGroup Header="Parameters"
                                       View="GroupBox"
                                       HorizontalAlignment="Stretch"
                                       VerticalAlignment="Stretch"
@@ -149,45 +152,45 @@
                                       ScrollBars="Auto"
                                       GroupBoxDisplayMode="Light"
                                       Margin="3,0,3,0">
-                        <dxlc:LayoutGroup.Resources>
-                            <Style TargetType="dxlc:GroupBox">
-                                <Setter Property="BorderThickness"
+                            <dxlc:LayoutGroup.Resources>
+                                <Style TargetType="dxlc:GroupBox">
+                                    <Setter Property="BorderThickness"
                                         Value="0, 0.2,0,0" />
-                            </Style>
-                        </dxlc:LayoutGroup.Resources>
-                        <dxlc:LayoutGroup.HeaderTemplate>
-                            <DataTemplate>
-                                <Grid HorizontalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding}"
+                                </Style>
+                            </dxlc:LayoutGroup.Resources>
+                            <dxlc:LayoutGroup.HeaderTemplate>
+                                <DataTemplate>
+                                    <Grid HorizontalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding}"
                                                    FontStyle="Italic" />
-                                    </StackPanel>
-                                </Grid>
-                            </DataTemplate>
-                        </dxlc:LayoutGroup.HeaderTemplate>
-                        <ItemsControl ItemsSource="{Binding DiagramContentItemChildren}"
+                                        </StackPanel>
+                                    </Grid>
+                                </DataTemplate>
+                            </dxlc:LayoutGroup.HeaderTemplate>
+                            <ItemsControl ItemsSource="{Binding DiagramContentItemChildren}"
                                       HorizontalContentAlignment="Stretch">
-                            <ItemsControl.Template>
-                                <ControlTemplate>
-                                    <!-- 
+                                <ItemsControl.Template>
+                                    <ControlTemplate>
+                                        <!-- 
                                         Don't change the ScrollViewer's property related to horizontal alignment or horizontal scrollbar visibility, 
                                         because that messes up dragging visually.
                                     -->
-                                    <ScrollViewer x:Name="ScrollViewer">
-                                        <ItemsPresenter />
-                                    </ScrollViewer>
-                                </ControlTemplate>
-                            </ItemsControl.Template>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Margin="0,2,0,2"
+                                        <ScrollViewer x:Name="ScrollViewer">
+                                            <ItemsPresenter />
+                                        </ScrollViewer>
+                                    </ControlTemplate>
+                                </ItemsControl.Template>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Margin="0,2,0,2"
                                                TextWrapping="Wrap"
                                                Text="{Binding DiagramContentItemChildString}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </dxlc:LayoutGroup>
-                </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </dxlc:LayoutGroup>
+                    </StackPanel>
             </DataTemplate>
 
             <DataTemplate x:Key="GenericDiagramItemTemplate">
@@ -287,10 +290,26 @@
                                          Stroke="Magenta" />
             </DataTemplate>
 
+            <DataTemplate x:Key="DiagramFrameDataTemplate">
+                <DiagramViews:DiagramFrameShape/>
+            </DataTemplate>
+
+            <Style TargetType="{x:Type dxdiag:DiagramContentItem}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=Content, RelativeSource={RelativeSource Self}, Converter={StaticResource InstanceTypeConverter}}" Value="{x:Type diagram1:ElementDefinitionDiagramContentItemViewModel}">
+                        <Setter Property="CanResize" Value="False"></Setter>
+                    </DataTrigger>
+                    <DataTrigger Binding="{Binding Path=Content, RelativeSource={RelativeSource Self}, Converter={StaticResource InstanceTypeConverter}}" Value="{x:Type diagram1:RequirementDiagramContentItemViewModel}">
+                        <Setter Property="CanResize" Value="False"></Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
             <viewModels:DiagramItemViewModelTemplateSelector x:Key="DiagramItemViewModelTemplateSelector"
                                                              RequirementDiagramItemTemplate="{StaticResource RequirementDiagramItemTemplate}"
                                                              ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
                                                              GenericDiagramItemDataTemplate="{StaticResource GenericDiagramItemTemplate}"
+                                                             DiagramFrameTemplate="{StaticResource DiagramFrameDataTemplate}"
                                                              DiagramPortTemplate="{StaticResource DiagramPortTemplate}" />
 
             <viewModels:ConnectorViewModelTemplateSelector x:Key="ConnectorViewModelTemplateSelector"
@@ -325,7 +344,8 @@
                                         ConnectorsSeparationMode="AllLines"
                                         IsManipulationEnabled="True"
                                         AllowRotateItems="False"
-                                        AllowResizeItems="False"
+                                        AllowResizeItems="True"
+                                        AllowUndoRedo="False"
                                         AllowApplyAutomaticLayoutForSubordinates="True"
                                         AllowApplyAutomaticLayout="True">
                 <dxb:BarManager.DXContextMenu>

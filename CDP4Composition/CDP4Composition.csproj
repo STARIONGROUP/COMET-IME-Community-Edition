@@ -370,6 +370,9 @@
     <Resource Include="Resources\Images\Thing\category_32x32.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="CommonView\Diagram\Views\DiagramFrameShape.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CommonView\Diagram\Views\DiagramPortShape.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -690,6 +693,7 @@
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="CommonView\Diagram\Views\DiagramFrameShape.xaml" />
     <None Remove="CommonView\Resources\AttachmentTemplate.xaml" />
     <None Remove="CommonView\Resources\ScriptTemplate.xaml" />
     <None Remove="Resources\Images\cometlogo.png" />

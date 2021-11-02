@@ -17,6 +17,7 @@
                            CanSnapToOtherItems="False"
                            CanSnapToThisItem="True"
                            CanDelete="False"
+                           CanResize="False"
                            CanMove="False"
                            Background="Transparent"
                            BorderThickness="0"

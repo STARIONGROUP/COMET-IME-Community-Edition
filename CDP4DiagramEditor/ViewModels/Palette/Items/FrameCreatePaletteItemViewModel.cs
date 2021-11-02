@@ -30,14 +30,17 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using System.ComponentModel.Composition;
     using System.Threading.Tasks;
 
+    using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.DragDrop;
 
     /// <summary>
     /// Diagram palette button responsible for creating new <see cref="Requirement" />
     /// </summary>
     [Export(typeof(IPaletteItemViewModel))]
-    public class FrameCreatePaletteItemViewModel : PaletteItemBaseViewModel
+    public class FrameCreatePaletteItemViewModel : PaletteDroppableItemBaseViewModel
     {
         /// <summary>
         /// Gets the label text
@@ -77,6 +80,21 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         public override string Image
         {
             get { return "BottomRightHorizontalInside_16x16.png"; }
+        }
+
+        /// <summary>
+        /// Handle mouse move when dropping
+        /// </summary>
+        /// <param name="dropInfo">The mouse event args.</param>
+        /// <param name="createCallback">Callback operation which creates the content</param>
+        /// <returns>The <see cref="Task{Thing}"/></returns>
+        public override Task<Thing> HandleMouseDrop(IDropInfo dropInfo, Action<Thing> createCallback = null)
+        {
+            var frame = new DiagramFrame(Guid.NewGuid(), this.editorViewModel.Session.Assembler.Cache, new Uri(this.editorViewModel.Session.DataSourceUri));
+
+            createCallback?.Invoke(frame);
+
+            return Task.FromResult<Thing>(frame);
         }
     }
 }
