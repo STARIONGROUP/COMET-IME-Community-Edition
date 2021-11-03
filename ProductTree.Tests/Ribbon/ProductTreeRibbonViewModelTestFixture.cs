@@ -28,6 +28,8 @@ namespace ProductTree.Tests.Ribbon
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Threading;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -48,7 +50,9 @@ namespace ProductTree.Tests.Ribbon
 
     using NUnit.Framework;
 
-    [TestFixture]
+    using ReactiveUI;
+
+    [TestFixture, Apartment(ApartmentState.STA)]
     internal class ProductTreeRibbonViewModelTestFixture
     {
         private Mock<IPermissionService> permissionService;
@@ -78,6 +82,8 @@ namespace ProductTree.Tests.Ribbon
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
             this.serviceLocator = new Mock<IServiceLocator>();
             this.permissionService = new Mock<IPermissionService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
