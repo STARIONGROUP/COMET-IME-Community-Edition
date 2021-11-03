@@ -163,6 +163,11 @@ namespace CDP4Composition.Mvvm
         private bool isFilterEnabled;
 
         /// <summary>
+        /// Backing field for <see cref="LoadingMessage"/>
+        /// </summary>
+        private string loadingMessage = string.Empty;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModelBase{T}"/> class.
         /// Used by MEF.
         /// </summary>
@@ -334,6 +339,15 @@ namespace CDP4Composition.Mvvm
         {
             get { return this.canWriteSelectedThing; }
             set { this.RaiseAndSetIfChanged(ref this.canWriteSelectedThing, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the loading message
+        /// </summary>
+        public string LoadingMessage
+        {
+            get => this.loadingMessage;
+            protected set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
         }
 
         public Dictionary<DataViewBase, Dictionary<string, (CustomFilterOperatorType, IEnumerable<IRowViewModelBase<Thing>>)>> CustomFilterOperators { get; } = 
@@ -1043,6 +1057,48 @@ namespace CDP4Composition.Mvvm
             this.CreateContextMenu.Clear();
             this.CreateContextMenu.AddRange(this.ContextMenu.Where(x => x.MenuItemKind == MenuItemKind.Create));
             this.IsAddButtonEnabled = this.CreateContextMenu.Any();
+        }
+
+        /// <summary>
+        /// Executes a long running <see cref="Action"/> using the current <see cref="Dispatcher"/> async.
+        /// </summary>
+        /// <param name="action">The <see cref="Action"/></param>
+        /// <param name="loadingMessage">A message to be shown during execution.</param>
+        protected void ExecuteLongRunningDispatcherAction(Action action, string loadingMessage = "")
+        {
+            var changeLoadingMessage = loadingMessage != string.Empty;
+            this.IsBusy = true;
+            
+            if (changeLoadingMessage)
+            {
+                this.LoadingMessage = loadingMessage;
+            }
+
+            var invoke = new Action(
+                () =>
+                {
+                    action.Invoke();
+
+                    this.IsBusy = false;
+
+                    if (changeLoadingMessage)
+                    {
+                        this.LoadingMessage = string.Empty;
+                    }
+                });
+
+            if (Application.Current?.MainWindow == null)
+            {
+                Dispatcher.CurrentDispatcher.Invoke(
+                    invoke,
+                    DispatcherPriority.Background);
+            }
+            else
+            {
+                Application.Current.Dispatcher.InvokeAsync(
+                    invoke,
+                    DispatcherPriority.Background);
+            }
         }
     }
 }

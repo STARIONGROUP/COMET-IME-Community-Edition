@@ -244,5 +244,6 @@
         </dxg:TreeListControl>
 
         <views:SelectedThingGroupControl Grid.Row="3"/>
+        <views:LoadingControl Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
     </Grid>
 </UserControl>

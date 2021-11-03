@@ -177,10 +177,15 @@ namespace CDP4EngineeringModel.ViewModels
             this.Disposables.Add(this.obfuscationService);
 
             this.ElementDefinitionRowViewModels = new DisposableReactiveList<IRowViewModelBase<Thing>>();
-            this.UpdateElementDefinition();
 
-            this.AddSubscriptions();
-            this.UpdateProperties();
+            this.ExecuteLongRunningDispatcherAction(
+                () => 
+                { 
+                    this.UpdateElementDefinition();
+                    this.AddSubscriptions();
+                    this.UpdateProperties();
+                },
+                $"Loading {this.Caption}");
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -150,13 +150,17 @@ namespace CDP4ProductTree.ViewModels
                 .Select(x => x.ChangedThing as Iteration)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.SetTopElement);
+
             this.Disposables.Add(iterationSubscription);
 
-            this.AddSubscriptions();
-
-            this.SetTopElement(iteration);
-
-            this.UpdateProperties();
+            this.ExecuteLongRunningDispatcherAction(
+                () => 
+                { 
+                    this.AddSubscriptions();
+                    this.SetTopElement(iteration);
+                    this.UpdateProperties();
+                },
+                $"Loading {this.Caption}");
         }
 
         /// <summary>
