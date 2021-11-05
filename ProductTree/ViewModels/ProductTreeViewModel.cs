@@ -26,6 +26,7 @@
 namespace CDP4ProductTree.ViewModels
 {
     using System;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -130,6 +131,8 @@ namespace CDP4ProductTree.ViewModels
         public ProductTreeViewModel(Option option, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(option, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
+            var stopWatch = Stopwatch.StartNew();
+
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
             this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
@@ -159,6 +162,8 @@ namespace CDP4ProductTree.ViewModels
                     this.AddSubscriptions();
                     this.SetTopElement(iteration);
                     this.UpdateProperties();
+                    stopWatch.Stop();
+                    logger.Info("The Product Tree loaded in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
                 },
                 $"Loading {this.Caption}");
         }

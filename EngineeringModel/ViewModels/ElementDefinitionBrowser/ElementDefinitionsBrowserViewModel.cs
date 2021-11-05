@@ -27,6 +27,7 @@ namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -165,6 +166,8 @@ namespace CDP4EngineeringModel.ViewModels
             IChangeOwnershipBatchService changeOwnershipBatchService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
+            var stopWatch = Stopwatch.StartNew();
+
             this.Caption = "Element Definitions";
             this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
@@ -184,6 +187,8 @@ namespace CDP4EngineeringModel.ViewModels
                     this.UpdateElementDefinition();
                     this.AddSubscriptions();
                     this.UpdateProperties();
+                    stopWatch.Stop();
+                    logger.Info("The Element Definition browser loaded in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
                 },
                 $"Loading {this.Caption}");
         }

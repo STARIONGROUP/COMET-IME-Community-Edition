@@ -27,6 +27,7 @@ namespace CDP4Requirements.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -152,6 +153,8 @@ namespace CDP4Requirements.ViewModels
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
                 pluginSettingsService)
         {
+            var stopWatch = Stopwatch.StartNew();
+
             this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
 
             this.ToolTip =
@@ -171,6 +174,10 @@ namespace CDP4Requirements.ViewModels
 
                     this.AddSubscriptions();
                     this.UpdateProperties();
+                    
+                    stopWatch.Stop();
+                    logger.Info("The Requirements browser loaded in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
+
                 },
                 $"Loading {this.Caption}");
         }
