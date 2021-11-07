@@ -27,6 +27,8 @@ namespace CDP4DiagramEditor.ViewModels.Palette
 {
     using CDP4Composition.Diagram;
 
+    using DevExpress.Xpf.Diagram;
+
     /// <summary>
     /// Base viewmodel for palette items that have connector tool associated with them
     /// </summary>

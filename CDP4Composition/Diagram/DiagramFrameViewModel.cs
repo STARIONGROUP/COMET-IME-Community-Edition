@@ -106,11 +106,11 @@ namespace CDP4Composition.Diagram
 
             this.IsDirty = this.DiagramRepresentation is DiagramFrameShape parent
                            && parent.Position != default
-                           && this.DisplayText != this.DiagramThing.Name
                            && ((float)parent.Position.X != bound.X
-                              || (float)parent.Position.Y != bound.Y
-                              || parent.ActualHeight != bound.Height
-                              || parent.ActualWidth != bound.Width);
+                               || (float)parent.Position.Y != bound.Y
+                               || parent.ActualHeight != bound.Height
+                               || parent.ActualWidth != bound.Width
+                               || this.DisplayText != this.DiagramThing.Name);
 
             this.containerViewModel?.UpdateIsDirty();
         }
@@ -142,6 +142,8 @@ namespace CDP4Composition.Diagram
             {
                 this.UpdateBound(bound);
             }
+
+            clone.Name = this.DisplayText;
 
             transaction.CreateOrUpdate(bound);
 

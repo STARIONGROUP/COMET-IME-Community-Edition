@@ -96,7 +96,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         public override async Task ExecuteAsyncCommand()
         {
             // activate tool
-            await this.editorViewModel.ActivateConnectorTool<BinaryRelationshipConnectorTool>(this);
+            this.editorViewModel.ActivateConnectorTool<BinaryRelationshipConnectorTool>(this);
         }
     }
 }

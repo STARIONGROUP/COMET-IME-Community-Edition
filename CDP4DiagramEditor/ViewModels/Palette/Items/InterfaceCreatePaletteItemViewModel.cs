@@ -35,6 +35,8 @@ namespace CDP4DiagramEditor.ViewModels.Palette
 
     using CDP4DiagramEditor.ViewModels.Tools;
 
+    using DevExpress.Xpf.Diagram;
+
     /// <summary>
     /// Diagram palette button responsible for creating new <see cref="Requirement" />
     /// </summary>
@@ -96,7 +98,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         public override async Task ExecuteAsyncCommand()
         {
             // activate tool
-            await this.editorViewModel.ActivateConnectorTool<InterfaceConnectorTool>(this);
+            this.editorViewModel.ActivateConnectorTool<InterfaceConnectorTool>(this);
         }
     }
 }

@@ -25,11 +25,17 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
+    using System.Linq;
+    using System.Text;
+
     using CDP4Common.DiagramData;
+    using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Diagram;
 
     using CDP4Dal;
+    using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     /// <summary>
     /// View model for a Simple diagram edge
@@ -44,6 +50,40 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="container">The container <see cref="IDiagramEditorViewModel" /></param>
         public SimpleEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
         {
+            this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// The <see cref="ObjectChangedEvent" /> event-handler
+        /// </summary>
+        /// <param name="objectChange">The <see cref="ObjectChangedEvent" /></param>
+        protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
+        {
+            base.ObjectChangeEventHandler(objectChange);
+            this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Update the transaction with the data contained in this view-model
+        /// </summary>
+        /// <param name="transaction">The transaction to update</param>
+        /// <param name="container">The container</param>
+        public override void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container)
+        {
+            var clone = this.DiagramThing.Clone(true);
+
+            clone.Name = this.DisplayedText;
+
+            container.DiagramElement.Add(clone);
+            transaction.CreateOrUpdate(clone);
+        }
+
+        /// <summary>
+        /// Updates the properties of this view-model
+        /// </summary>
+        private void UpdateProperties()
+        {
+            this.DisplayedText = this.DiagramThing.Name;
         }
     }
 }

@@ -216,6 +216,15 @@ namespace CDP4CommonView.Diagram
         /// Removed the connector directly from the associated objects item collection.
         /// </summary>
         /// <param name="connector">The connector to remove</param>
+        public async Task RemoveConnectorAsync(DiagramConnector connector)
+        {
+            this.AssociatedObject.Items.Remove(connector);
+        }
+
+        /// <summary>
+        /// Removed the connector directly from the associated objects item collection.
+        /// </summary>
+        /// <param name="connector">The connector to remove</param>
         public void RemoveConnector(DiagramConnector connector)
         {
             this.AssociatedObject.Items.Remove(connector);
@@ -406,6 +415,8 @@ namespace CDP4CommonView.Diagram
                 return;
             }
 
+            ((DiagramConnector)connector).Loaded += this.OnDummyConnectorDrawn;
+
             if ((connector as DiagramConnector)?.BeginItem == null || (connector as DiagramConnector).EndItem == null)
             {
                 e.Cancel = true;
@@ -427,6 +438,16 @@ namespace CDP4CommonView.Diagram
             ((DiagramConnector)connector).Visibility = Visibility.Hidden;
 
             this.ResetTool();
+        }
+
+        /// <summary>
+        /// Event handler for cleaning up dummy connectors on creation
+        /// </summary>
+        /// <param name="sender">The sending connector</param>
+        /// <param name="e">Arguments</param>
+        private void OnDummyConnectorDrawn(object sender, RoutedEventArgs e)
+        {
+            this.RemoveConnector((DiagramConnector)sender);
         }
 
         /// <summary>
@@ -555,10 +576,6 @@ namespace CDP4CommonView.Diagram
                     {
                         port.Container?.UpdatePortLayout();
                     }
-                }
-                else if (e.Item is DiagramConnector connector && connector.DataContext == this.ViewModel)
-                {
-                    connector.Visibility = Visibility.Hidden;
                 }
             }
         }

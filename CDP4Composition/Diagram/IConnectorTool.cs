@@ -47,6 +47,11 @@ namespace CDP4Composition.Diagram
         DiagramConnector GetConnector { get; }
 
         /// <summary>
+        /// Gets the dummy connector that was used in the creation method
+        /// </summary>
+        DiagramConnector DummyConnector { get; }
+
+        /// <summary>
         /// Executes the creation of the objects conveyed by the tool
         /// </summary>
         /// <param name="connector">The temporary connector</param>

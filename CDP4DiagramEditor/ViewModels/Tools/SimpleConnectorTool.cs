@@ -82,12 +82,19 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         }
 
         /// <summary>
+        /// Gets the dummy connector that was used in the creation method
+        /// </summary>
+        public DiagramConnector DummyConnector { get; private set; }
+
+        /// <summary>
         /// Executes the creation of the objects conveyed by the tool
         /// </summary>
         /// <param name="connector">The supplied temp connector</param>
         /// <param name="behavior">The behavior</param>
         public async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
         {
+            this.DummyConnector = connector;
+
             // misuse connector.CustomStyleId to carry the Category to apply to the binary relationship
             var beginItemContent = ((DiagramContentItem) connector.BeginItem)?.Content as ThingDiagramContentItemViewModel;
             var endItemContent = ((DiagramContentItem) connector.EndItem)?.Content as ThingDiagramContentItemViewModel;
@@ -95,8 +102,6 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             if (beginItemContent == null || endItemContent == null)
             {
                 // connector was drawn with either the source or target missing or incorrect
-                // remove the dummy connector
-                behavior.ViewModel.RemoveDiagramThingItem(connector);
                 behavior.ResetTool();
                 return;
             }
@@ -111,8 +116,6 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             }
             finally
             {
-                // remove the dummy connector
-                behavior.ViewModel.RemoveDiagramThingItem(connector);
                 behavior.ResetTool();
             }
         }

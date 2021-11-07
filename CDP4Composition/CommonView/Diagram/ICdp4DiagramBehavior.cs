@@ -28,6 +28,7 @@ namespace CDP4CommonView.Diagram
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Composition.Diagram;

@@ -40,6 +40,7 @@ namespace CDP4Composition.Diagram
     using CDP4Dal;
 
     using DevExpress.Diagram.Core;
+    using DevExpress.Xpf.Diagram;
 
     /// <summary>
     /// The interface that describes the dirty mechanism of DiagramEditorViewModel
@@ -92,7 +93,7 @@ namespace CDP4Composition.Diagram
         /// <typeparam name="TTool">The type of tool</typeparam>
         /// <param name="sender">The sender object.</param>
         /// <returns>An empty task</returns>
-        Task ActivateConnectorTool<TTool>(object sender) where TTool : DiagramTool, IConnectorTool, new();
+        void ActivateConnectorTool<TTool>(object sender) where TTool : DiagramTool, IConnectorTool, new();
 
         /// <summary>
         /// Shows a context menu in the diagram at the current mouse position with the specified options

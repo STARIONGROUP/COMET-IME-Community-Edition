@@ -131,7 +131,7 @@ namespace CDP4Composition.Diagram
         public string DisplayedText
         {
             get { return this.displayedText; }
-            protected set { this.RaiseAndSetIfChanged(ref this.displayedText, value); }
+            set { this.RaiseAndSetIfChanged(ref this.displayedText, value); }
         }
 
         /// <summary>
@@ -334,7 +334,7 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="transaction">The transaction to update</param>
         /// <param name="container">The container</param>
-        public void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container)
+        public virtual void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container)
         {
             var clone = this.DiagramThing.Clone(true);
 

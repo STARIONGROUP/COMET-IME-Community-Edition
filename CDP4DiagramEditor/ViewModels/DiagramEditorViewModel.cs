@@ -414,7 +414,7 @@ namespace CDP4DiagramEditor.ViewModels
                 this.RemoveDiagramThingItem(thingDiagramContentItem);
             }
 
-            var connectors = this.ConnectorViewModels.Where(c => c.Thing.Equals(thing)).ToList();
+            var connectors = this.ConnectorViewModels.Where(c => c.Thing != null && c.Thing.Equals(thing)).ToList();
 
             foreach (var connector in connectors)
             {
@@ -493,8 +493,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         /// <typeparam name="TTool">The type of tool</typeparam>
         /// <param name="sender">The sender object.</param>
-        /// <returns>An empty task</returns>
-        public async Task ActivateConnectorTool<TTool>(object sender) where TTool : DiagramTool, IConnectorTool, new()
+        /// <returns>A task with the dummy connector</returns>
+        public void ActivateConnectorTool<TTool>(object sender) where TTool : DiagramTool, IConnectorTool, new()
         {
             this.Behavior.ActivateConnectorTool<TTool>();
         }
@@ -953,7 +953,7 @@ namespace CDP4DiagramEditor.ViewModels
                 // create EU connectors
                 foreach (var elementUsage in elementUsages)
                 {
-                    if (this.ConnectorViewModels.Any(c => c.Thing.Equals(elementUsage)))
+                    if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(elementUsage)))
                     {
                         continue;
                     }
