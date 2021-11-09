@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementUsageConnectorTool.cs" company="RHEA System S.A.">
+// <copyright file="ConstraintConnectorTool.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -37,6 +37,8 @@ namespace CDP4DiagramEditor.ViewModels.Tools
     using CDP4Composition.Diagram;
     using CDP4Composition.Services;
 
+    using CDP4DiagramEditor.Helpers;
+
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
 
@@ -45,9 +47,9 @@ namespace CDP4DiagramEditor.ViewModels.Tools
     using NLog;
 
     /// <summary>
-    /// A connector tool to create Element Usages
+    /// A connector tool to create Constraints
     /// </summary>
-    public class ElementUsageConnectorTool : ConnectorTool, IConnectorTool
+    public abstract class ConstraintConnectorTool : ConnectorTool, IConnectorTool
     {
         /// <summary>
         /// The NLog logger
@@ -64,7 +66,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// </summary>
         public override string ToolName
         {
-            get { return "Element Usage Tool"; }
+            get { return "Constraint Tool"; }
         }
 
         /// <summary>
@@ -72,7 +74,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// </summary>
         public override string ToolId
         {
-            get { return nameof(ElementUsageConnectorTool); }
+            get { return nameof(ConstraintConnectorTool); }
         }
 
         /// <summary>
@@ -87,12 +89,12 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// Gets the type of connector to be created
         /// </summary>
-        public IDiagramConnectorViewModel GetConnectorViewModel => new ElementUsageEdgeViewModel(null, null, null);
+        public IDiagramConnectorViewModel GetConnectorViewModel => new ConstraintEdgeViewModel(null, null, null);
 
         /// <summary>
         /// Gets the type of <see cref="DiagramConnector"/> to be created
         /// </summary>
-        public DiagramConnector GetConnector => new ElementUsageConnector(this);
+        public DiagramConnector GetConnector => new ConstraintConnector(this);
 
         /// <summary>
         /// Gets the dummy connector that was used in the creation method
@@ -102,9 +104,16 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// Executes the creation of the objects conveyed by the tool
         /// </summary>
+        /// <param name="connector">The temporary connector</param>
+        /// <param name="behavior">The behavior</param>
+        public abstract Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior);
+
+        /// <summary>
+        /// Executes the creation of the objects conveyed by the tool
+        /// </summary>
         /// <param name="connector">The supplied temp connector</param>
         /// <param name="behavior">The behavior</param>
-        public async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
+        protected async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior, ConstraintKind kind)
         {
             this.DummyConnector = connector;
             var beginItemContent = ((DiagramContentItem)connector.BeginItem)?.Content as ElementDefinitionDiagramContentItemViewModel;
@@ -118,8 +127,11 @@ namespace CDP4DiagramEditor.ViewModels.Tools
 
             try
             {
-                var usage = await this.ThingCreator.CreateAndGetElementUsage(endItemContent.Thing as ElementDefinition, beginItemContent.Thing as ElementDefinition, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration) behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
-                CreateConnector(usage, (DiagramObject) beginItemContent.DiagramThing, (DiagramObject) endItemContent.DiagramThing, behavior);
+                var iteration = (Iteration)behavior.ViewModel.Thing.Container;
+                var createCategory = DiagramRDLHelper.GetOrAddConstraintCategory(iteration, kind, out var category, out var rdlClone);
+
+                var relationship = await this.ThingCreator.CreateAndGetConstraint(endItemContent.Thing as ElementDefinition, beginItemContent.Thing as ElementDefinition, category, createCategory ? rdlClone : null, iteration, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise(iteration), behavior.ViewModel.Session);
+                CreateConnector(relationship, (DiagramObject)beginItemContent.DiagramThing, (DiagramObject)endItemContent.DiagramThing, behavior);
             }
             catch (Exception ex)
             {
@@ -132,33 +144,81 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         }
 
         /// <summary>
-        /// Create a <see cref="DiagramEdge" /> from a <see cref="ElementUsage" />
+        /// Create a <see cref="DiagramEdge" /> from a <see cref="BinaryRelationship" />
         /// </summary>
-        /// <param name="usage">The <see cref="ElementUsage" /></param>
+        /// <param name="relationship">The <see cref="BinaryRelationship" /></param>
         /// <param name="source">The <see cref="DiagramObject" /> source</param>
         /// <param name="target">The <see cref="DiagramObject" /> target</param>
         /// <param name="behavior">The diagram bahavior</param>
-        public static void CreateConnector(ElementUsage usage, DiagramObject source, DiagramObject target, ICdp4DiagramBehavior behavior)
+        public static void CreateConnector(BinaryRelationship relationship, DiagramObject source, DiagramObject target, ICdp4DiagramBehavior behavior)
         {
-            var connectorItem = behavior.ViewModel.ConnectorViewModels.SingleOrDefault(x => x.Thing == usage);
+            var connectorItem = behavior.ViewModel.ConnectorViewModels.SingleOrDefault(x => x.Thing == relationship);
 
             if (connectorItem != null)
             {
                 return;
             }
 
-            var edge = new DiagramEdge(Guid.NewGuid(), usage.Cache, new Uri(behavior.ViewModel.Session.DataSourceUri))
+            var edge = new DiagramEdge(Guid.NewGuid(), relationship.Cache, new Uri(behavior.ViewModel.Session.DataSourceUri))
             {
                 Source = source,
                 Target = target,
-                DepictedThing = usage,
+                DepictedThing = relationship,
                 Name = source.Name
             };
 
-            connectorItem = new ElementUsageEdgeViewModel(edge, behavior.ViewModel.Session, behavior.ViewModel);
+            connectorItem = new ConstraintEdgeViewModel(edge, behavior.ViewModel.Session, behavior.ViewModel);
             behavior.ViewModel.ConnectorViewModels.Add(connectorItem);
 
             behavior.ViewModel.UpdateIsDirty();
+        }
+    }
+
+    /// <summary>
+    /// Connector tool to create restricted constraints
+    /// </summary>
+    public class RestrictedConstraintConnectorTool : ConstraintConnectorTool
+    {
+        /// <summary>
+        /// Executes the creation of the objects conveyed by the tool
+        /// </summary>
+        /// <param name="connector">The temporary connector</param>
+        /// <param name="behavior">The behavior</param>
+        public override async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
+        {
+            await base.ExecuteCreate(connector, behavior, ConstraintKind.Restricted);
+        }
+    }
+
+    /// <summary>
+    /// Connector tool to create optional constraints
+    /// </summary>
+    public class OptionalConstraintConnectorTool : ConstraintConnectorTool
+    {
+        /// <summary>
+        /// Executes the creation of the objects conveyed by the tool
+        /// </summary>
+        /// <param name="connector">The temporary connector</param>
+        /// <param name="behavior">The behavior</param>
+        public override async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
+        {
+            await base.ExecuteCreate(connector, behavior, ConstraintKind.Optional);
+        }
+    }
+
+    /// <summary>
+    /// Connector tool to create enforced constraints
+    /// </summary>
+    public class EnforcedConstraintConnectorTool : ConstraintConnectorTool
+    {
+        /// <summary>
+        /// Executes the creation of the objects conveyed by the tool
+        /// </summary>
+        /// <param name="connector">The temporary connector</param>
+        /// <param name="behavior">The behavior</param>
+        public override async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
+        {
+            await base.ExecuteCreate(connector, behavior, ConstraintKind.Enforced);
         }
     }
 }

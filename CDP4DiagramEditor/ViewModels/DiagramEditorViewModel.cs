@@ -57,6 +57,7 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
+    using CDP4DiagramEditor.Helpers;
     using CDP4DiagramEditor.ViewModels.Palette;
     using CDP4DiagramEditor.ViewModels.Relation;
     using CDP4DiagramEditor.ViewModels.Tools;
@@ -341,7 +342,13 @@ namespace CDP4DiagramEditor.ViewModels
                     case ElementUsage:
                         newDrawnDiagramElement = new ElementUsageEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
                         break;
-                    case BinaryRelationship:
+                    case BinaryRelationship relationship:
+                        if (relationship.IsConstraint())
+                        {
+                            newDrawnDiagramElement = new ConstraintEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
+                            break;
+                        }
+
                         newDrawnDiagramElement = new BinaryRelationshipEdgeViewModel((DiagramEdge)diagramThing, this.Session, this);
                         break;
                     case null:
@@ -1573,9 +1580,25 @@ namespace CDP4DiagramEditor.ViewModels
 
             transaction.CreateOrUpdate(clone);
 
-            var deletedDiagramObj = this.Thing.DiagramElement.OfType<DiagramObject>().Except(this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().Select(x => x.DiagramThing)).ToList();
+            // content items
+            var diagramElementThingsOnCanvas = this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().ToList();
+            var diagramObjectsInDataSource = this.Thing.DiagramElement.OfType<DiagramObject>().ToList();
 
-            var deletedEdges = this.Thing.DiagramElement.OfType<DiagramEdge>().Except(this.ConnectorViewModels.OfType<IPersistedConnector>().Select(x => x.DiagramThing));
+            var addedDiagramObj = diagramElementThingsOnCanvas.Select(x => x.DiagramThing)
+                .Where(dt => !diagramObjectsInDataSource.Any(d => d.Iid.Equals(dt.Iid)));
+
+            var deletedDiagramObj = diagramObjectsInDataSource
+                .Where(ob => !diagramElementThingsOnCanvas.Select(x => x.DiagramThing).Any(x => x.Iid.Equals(ob.Iid))).ToList();
+
+            // edges
+            var diagramEdgesInDataSource = this.Thing.DiagramElement.OfType<DiagramEdge>().ToList();
+            var diagramEdgesOnCanvas = this.ConnectorViewModels.OfType<IPersistedConnector>().ToList();
+
+            var addedEdges = diagramEdgesOnCanvas.Select(x => x.DiagramThing)
+                .Where(de => !diagramEdgesInDataSource.Any(y => y.Iid.Equals(de.Iid)));
+
+            var deletedEdges = diagramEdgesInDataSource
+                .Where(ed => !diagramEdgesOnCanvas.Select(x => x.DiagramThing).Any(y => y.Iid.Equals(ed.Iid)));
 
             foreach (var diagramObject in deletedDiagramObj)
             {
@@ -1587,27 +1610,61 @@ namespace CDP4DiagramEditor.ViewModels
                 transaction.Delete(diagramEdge.Clone(false));
             }
 
-            foreach (var diagramObjectViewModel in this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>())
+            foreach (var diagramObjectViewModel in diagramElementThingsOnCanvas)
             {
                 diagramObjectViewModel.UpdateTransaction(transaction, clone);
             }
 
-            foreach (var connectorViewModel in this.ConnectorViewModels.OfType<IPersistedConnector>())
+            foreach (var connectorViewModel in diagramEdgesOnCanvas)
             {
                 connectorViewModel.UpdateTransaction(transaction, clone);
             }
 
             try
             {
-                await this.DalWrite(transaction);
+                this.IsBusy = true;
+                var operationContainer = transaction.FinalizeTransaction();
+                await this.Session.Write(operationContainer);
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                logger.Error(ex);
+                logger.Error(exception, "The inline update operation failed");
+                this.Feedback = exception.Message;
+
+                this.IsDirty = true;
                 return;
             }
+            finally
+            {
+                this.IsBusy = false;
+            }
+
+            this.ReinitializeAddedDiagramThings(addedDiagramObj, addedEdges);
 
             this.IsDirty = false;
+        }
+
+        /// <summary>
+        /// Swaps out dummy diagram objects with newly created <see cref="DiagramElementThing"/>s. Relevant for when you save a diagram with newly added things and then continue working with it.
+        /// </summary>
+        /// <param name="addedDiagramObj">Added objects</param>
+        /// <param name="addedEdges">Added edges</param>
+        private void ReinitializeAddedDiagramThings(IEnumerable<DiagramElementThing> addedDiagramObj, IEnumerable<DiagramElementThing> addedEdges)
+        {
+            // reconfigure the added things with newly cached returns
+            foreach (var diagramElementThing in addedDiagramObj)
+            {
+                var contentItemViewModel = this.ThingDiagramItemViewModels.FirstOrDefault(vm => vm.DiagramThing == diagramElementThing);
+
+                contentItemViewModel?.Reinitialize();
+            }
+
+            foreach (var diagramEdge in addedEdges)
+            {
+                var edgeViewModel = this.ConnectorViewModels.FirstOrDefault(vm => vm.DiagramThing == diagramEdge);
+
+                edgeViewModel?.Reinitialize();
+            }
         }
 
         /// <summary>

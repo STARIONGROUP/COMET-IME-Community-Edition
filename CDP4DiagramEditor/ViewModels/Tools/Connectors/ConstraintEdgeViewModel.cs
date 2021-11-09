@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DrawnDiagramEdgeViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ConstraintEdgeViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -25,31 +25,49 @@
 
 namespace CDP4DiagramEditor.ViewModels
 {
-    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
 
     using CDP4Common.DiagramData;
+    using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Diagram;
 
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using Point = System.Windows.Point;
+    using CDP4DiagramEditor.Helpers;
+
+    using ReactiveUI;
 
     /// <summary>
-    /// The view-model representing a <see cref="DiagramEdge" />
+    /// View model for a Constraint diagram edge
     /// </summary>
-    public class DrawnDiagramEdgeViewModel : ThingDiagramConnectorViewModel
+    public class ConstraintEdgeViewModel : DrawnDiagramEdgeViewModel, IPersistedConnector
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DrawnDiagramEdgeViewModel" /> class
+        /// Backing field for <see cref="ConstraintKind"/>
+        /// </summary>
+        private ConstraintKind? constraintKind;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConstraintEdgeViewModel" /> class
         /// </summary>
         /// <param name="diagramEdge">The associated <see cref="DiagramEdge" /></param>
-        /// <param name="container">The <see cref="IDiagramEditorViewModel" /> containing this edge</param>
-        public DrawnDiagramEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
+        /// <param name="session">The <see cref="ISession"/></param>
+        /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
+        public ConstraintEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
         {
-            this.ConnectingPoints = new List<Point>();
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Gets or sets the constraint type
+        /// </summary>
+        public ConstraintKind? ConstraintKind
+        {
+            get { return this.constraintKind; }
+            set { this.RaiseAndSetIfChanged(ref this.constraintKind, value); }
         }
 
         /// <summary>
@@ -63,22 +81,18 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Reinitialize the view model with a new Thing from the cache
-        /// </summary>
-        public override void Reinitialize()
-        {
-            base.Reinitialize();
-            this.UpdateProperties();
-        }
-
-        /// <summary>
         /// Updates the properties of this view-model
         /// </summary>
         private void UpdateProperties()
         {
-            this.DisplayedText = this.Thing?.UserFriendlyName;
-            this.Source = ((DiagramEdge) this.DiagramThing)?.Source;
-            this.Target = ((DiagramEdge) this.DiagramThing)?.Target;
+            if (this.Thing is BinaryRelationship relationship)
+            {
+                this.ConstraintKind = DiagramRDLHelper.GetConstraintKind(relationship);
+            }
+            else
+            {
+                this.ConstraintKind = null;
+            }
         }
     }
 }

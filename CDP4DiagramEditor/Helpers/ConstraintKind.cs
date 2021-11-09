@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConnectorCreatePaletteItemBaseViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ConstraintKind.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,18 +23,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4DiagramEditor.ViewModels.Palette
+namespace CDP4DiagramEditor.Helpers
 {
-    using CDP4Composition.Diagram;
-
     /// <summary>
-    /// Base viewmodel for palette items that have connector tool associated with them
+    /// The type of constraint
     /// </summary>
-    public class ConnectorCreatePaletteItemBaseViewModel : PaletteItemBaseViewModel, IConnectorCreateItem
+    /// <remarks>This enum is GCD specific</remarks>
+    public enum ConstraintKind
     {
         /// <summary>
-        /// Gets the connector tool associated with this item
+        /// Indicates an optional constraint
         /// </summary>
-        public virtual IConnectorTool ConnectorTool { get; protected set; }
+        Optional,
+
+        /// <summary>
+        /// Indicates a restricted constraint
+        /// </summary>
+        Restricted,
+
+        /// <summary>
+        /// Indicates an enforced constraint
+        /// </summary>
+        Enforced
     }
 }

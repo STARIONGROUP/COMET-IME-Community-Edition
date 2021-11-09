@@ -98,6 +98,15 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
+        /// Reinitializes the viewmodel with the Thing from cache
+        /// </summary>
+        public override void Reinitialize()
+        {
+            base.Reinitialize();
+            this.UpdateProperties();
+        }
+
+        /// <summary>
         /// Sets the <see cref="IsDirty"/> property
         /// </summary>
         public override void SetDirty()

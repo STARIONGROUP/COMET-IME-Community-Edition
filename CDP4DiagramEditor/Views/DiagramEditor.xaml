@@ -41,6 +41,7 @@
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
             <cdp4Composition:StringToIconUriConverter x:Key="StringToIconUriConverter" />
+            <helpers:ConstraintKindToBrushConverter x:Key="ConstraintKindToBrushConverter" />
             <helpers:InstanceTypeConverter x:Key="InstanceTypeConverter"></helpers:InstanceTypeConverter>
             <dx:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <dxmvvm:EnumToStringConverter x:Key="EnumToStringConverter" />
@@ -295,6 +296,13 @@
                                          Stroke="Magenta" />
             </DataTemplate>
 
+            <DataTemplate x:Key="ConstraintConnectorTemplate">
+                <dxdiag:DiagramConnector EndArrow="(none)"
+                                         BeginArrow="(none)"
+                                         Type="RightAngle"
+                                         Stroke="{Binding DataItem.ConstraintKind, Converter={StaticResource ConstraintKindToBrushConverter},  UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+
             <DataTemplate x:Key="DiagramFrameDataTemplate">
                 <DiagramViews:DiagramFrameShape/>
             </DataTemplate>
@@ -321,6 +329,7 @@
                                                            ElementUsageConnectorDataTemplate="{StaticResource ElementUsageConnectorTemplate}"
                                                            BinaryRelationshipDataTemplate="{StaticResource BinaryRelationshipConnectorTemplate}"
                                                            SimpleDataTemplate="{StaticResource SimpleConnectorTemplate}"
+                                                           ConstraintDataTemplate="{StaticResource ConstraintConnectorTemplate}"
                                                            InterfaceConnectorDataTemplate="{StaticResource InterfaceConnectorTemplate}" />
         </ResourceDictionary>
 

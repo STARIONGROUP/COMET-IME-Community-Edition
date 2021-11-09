@@ -66,5 +66,10 @@ namespace CDP4Composition.Diagram
         /// <param name="transaction">The transaction to update</param>
         /// <param name="container">The container</param>
         void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container);
+
+        /// <summary>
+        /// Reinitializes the viewmodel with the Thing from cache
+        /// </summary>
+        void Reinitialize();
     }
 }

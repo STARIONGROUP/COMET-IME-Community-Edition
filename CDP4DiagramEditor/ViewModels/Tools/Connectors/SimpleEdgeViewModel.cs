@@ -79,6 +79,15 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
+        /// Reinitialize the view model with a new Thing from the cache
+        /// </summary>
+        public override void Reinitialize()
+        {
+            base.Reinitialize();
+            this.UpdateProperties();
+        }
+
+        /// <summary>
         /// Updates the properties of this view-model
         /// </summary>
         private void UpdateProperties()

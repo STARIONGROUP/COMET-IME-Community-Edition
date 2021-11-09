@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OptionalConstraintCreatePaletteItemViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ConstraintCreatePaletteItemViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -25,66 +25,40 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.Composition;
+    using System.Threading.Tasks;
 
-    using CDP4Common.DiagramData;
+    using CDP4Composition.Diagram;
 
     using CDP4DiagramEditor.Helpers;
     using CDP4DiagramEditor.ViewModels.Tools;
 
     /// <summary>
-    /// Diagram palette button responsible for creating new optional constraint
+    /// Base view model for constraint create items
     /// </summary>
-    [Export(typeof(IPaletteItemViewModel))]
-    public class OptionalConstraintCreatePaletteItemViewModel : ConstraintCreatePaletteItemViewModel<OptionalConstraintConnectorTool>
+    public class ConstraintCreatePaletteItemViewModel<TTool> : ConnectorCreatePaletteItemBaseViewModel where TTool : ConstraintConnectorTool, IConnectorTool, new()
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="OptionalConstraintCreatePaletteItemViewModel" /> class.
+        /// Initializes a new instance of the <see cref="ConstraintCreatePaletteItemViewModel" /> class.
         /// </summary>
-        public OptionalConstraintCreatePaletteItemViewModel() : base(ConstraintKind.Optional)
+        public ConstraintCreatePaletteItemViewModel(ConstraintKind kind)
         {
+            this.ConstraintKind = kind;
+            this.ConnectorTool = new TTool();
         }
 
         /// <summary>
-        /// Gets the label text
+        /// Gets the <see cref="ConstraintKind"/>
         /// </summary>
-        public override string Text
-        {
-            get { return "Optional"; }
-        }
+        public ConstraintKind ConstraintKind { get; private set; }
 
         /// <summary>
-        /// Gets the list of supported diagram types. When a supertype is listed all subtypes are also supported.
+        /// Executes the command of this <see cref="IPaletteItemViewModel" />
         /// </summary>
-        public override List<Type> SupportedDiagramTypes
+        /// <returns>An empty task</returns>
+        public override async Task ExecuteAsyncCommand()
         {
-            get { return new() { typeof(ArchitectureDiagram) }; }
-        }
-
-        /// <summary>
-        /// Gets the group sort order.Lower number = higher in the group.
-        /// </summary>
-        public override int GroupSortOrder
-        {
-            get { return 2000; }
-        }
-
-        /// <summary>
-        /// Gets the palette group this item belongs to
-        /// </summary>
-        public override PaletteGroup Group
-        {
-            get { return PaletteGroup.Constraints; }
-        }
-
-        /// <summary>
-        /// Gets the button Icon string
-        /// </summary>
-        public override string Image
-        {
-            get { return "AppointmentDayClock.png"; }
+            // activate tool
+            this.editorViewModel.ActivateConnectorTool<TTool>(this);
         }
     }
 }

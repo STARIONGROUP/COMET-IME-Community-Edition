@@ -540,6 +540,90 @@ namespace CDP4Composition.Services
         }
 
         /// <summary>
+        /// Create and return a new BinaryRelationship representing a Constraint between two <see cref="Thing"/>
+        /// </summary>
+        /// <param name="output">
+        /// The source <see cref="Thing"/> of the relationship
+        /// </param>
+        /// <param name="input">
+        /// The target <see cref="Thing"/> of the relationship
+        /// </param>
+        /// <param name="category">Applied <see cref="Category"/></param>
+        /// <param name="rdlClone">A clone of the RDL that needs to be updated if the Category is being created</param>
+        /// <param name="iteration">The <see cref="Iteration"/></param>
+        /// <param name="owner">
+        /// The <see cref="DomainOfExpertise"/> that is the owner of the <see cref="ElementUsage"/> that is to be created.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the current <see cref="Parameter"/> is to be added
+        /// </param>
+        public async Task<BinaryRelationship> CreateAndGetConstraint(Thing output, Thing input, Category category, ReferenceDataLibrary rdlClone, Iteration iteration, DomainOfExpertise owner, ISession session)
+        {
+            var binaryRelationship = new BinaryRelationship(Guid.NewGuid(), null, null) { Owner = owner };
+
+            var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(iteration));
+
+            binaryRelationship.Container = iteration;
+            binaryRelationship.Source = output;
+            binaryRelationship.Target = input;
+
+            // category is being created
+            if (rdlClone != null)
+            {
+                var transactionForCategory = new ThingTransaction(TransactionContextResolver.ResolveContext(rdlClone));
+
+                transactionForCategory.Create(category);
+                transactionForCategory.CreateOrUpdate(rdlClone);
+
+                try
+                {
+                    var operationContainerForCategory = transactionForCategory.FinalizeTransaction();
+                    await session.Write(operationContainerForCategory);
+
+                    var isCategoryCreated = output.Cache.TryGetValue(category.CacheKey, out var createdCategory);
+
+                    if (!isCategoryCreated)
+                    {
+                        throw new ArgumentNullException(nameof(createdCategory), "Constraint category could not be created");
+                    }
+
+                    binaryRelationship.Category.Add(createdCategory.Value as Category);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error("The Constraint category could not be created", ex);
+                    throw ex;
+                }
+            }
+            else if (category != null)
+            {
+                binaryRelationship.Category.Add(category);
+            }
+
+            var iterationClone = iteration.Clone(false);
+
+            iterationClone.Relationship.Add(binaryRelationship);
+
+            transaction.CreateOrUpdate(iterationClone);
+            transaction.Create(binaryRelationship);
+
+            try
+            {
+                var operationContainer = transaction.FinalizeTransaction();
+                await session.Write(operationContainer);
+
+                output.Cache.TryGetValue(binaryRelationship.CacheKey, out var createdInterface);
+
+                return (BinaryRelationship)createdInterface?.Value;
+            }
+            catch (Exception ex)
+            {
+                logger.Error("The Constraint could not be created", ex);
+                throw ex;
+            }
+        }
+
+        /// <summary>
         /// Method for creating a <see cref="BinaryRelationship" /> for requirement verification between a
         /// <see cref="ParameterOrOverrideBase" /> and a <see cref="RelationalExpression" />.
         /// </summary>

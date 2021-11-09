@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ConstrainedConstraintCreatePaletteItemViewModel.cs" company="RHEA System S.A.">
+// <copyright file="ConstraintConnector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,60 +23,52 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4DiagramEditor.ViewModels.Palette
+namespace CDP4DiagramEditor.ViewModels
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel.Composition;
-    using System.Threading.Tasks;
-
-    using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.Diagram;
+
+    using DevExpress.Diagram.Core;
+    using DevExpress.Xpf.Diagram;
+
     /// <summary>
-    /// Diagram palette button responsible for creating new <see cref="Requirement" />
+    /// The connector representing <see cref="BinaryRelationship"/> that is a constraint
     /// </summary>
-    [Export(typeof(IPaletteItemViewModel))]
-    public class ConstrainedConstraintCreatePaletteItemViewModel : PaletteItemBaseViewModel
+    public class ConstraintConnector : DrawnConnector
     {
         /// <summary>
-        /// Gets the label text
+        /// Initializes a new instance of the <see cref="ConstraintConnector" /> class
         /// </summary>
-        public override string Text
+        /// <param name="tool">The associated <see cref="IConnectorTool" /></param>
+        public ConstraintConnector(IConnectorTool tool) : base(tool)
         {
-            get { return "Constrained"; }
+            this.Type = ConnectorType.RightAngle;
         }
 
         /// <summary>
-        /// Gets the list of supported diagram types. When a supertype is listed all subtypes are also supported.
+        /// Checks whether the provided diagramItem can be used to draw from for this connector
         /// </summary>
-        public override List<Type> SupportedDiagramTypes
+        /// <param name="item">The diagramitem</param>
+        /// <returns>True if allowed</returns>
+        public override bool CanDrawFrom(DiagramItem item)
         {
-            get { return new() { typeof(ArchitectureDiagram) }; }
+            return (((item as DiagramContentItem)?.Content as ElementDefinitionDiagramContentItemViewModel)?.Thing is ElementDefinition);
         }
 
         /// <summary>
-        /// Gets the group sort order.Lower number = higher in the group.
+        /// Checks whether the provided diagramItem can be used to draw to for this connector
         /// </summary>
-        public override int GroupSortOrder
+        /// <param name="item">The diagramitem</param>
+        /// <returns>True if allowed</returns>
+        public override bool CanDrawTo(DiagramItem item)
         {
-            get { return 1000; }
-        }
+            if (item == this.BeginItem)
+            {
+                return false;
+            }
 
-        /// <summary>
-        /// Gets the palette group this item belongs to
-        /// </summary>
-        public override PaletteGroup Group
-        {
-            get { return PaletteGroup.Constraints; }
-        }
-
-        /// <summary>
-        /// Gets the button Icon string
-        /// </summary>
-        public override string Image
-        {
-            get { return "IconSetRedToBlack4_16x16.png"; }
+            return (((item as DiagramContentItem)?.Content as ElementDefinitionDiagramContentItemViewModel)?.Thing is ElementDefinition);
         }
     }
 }

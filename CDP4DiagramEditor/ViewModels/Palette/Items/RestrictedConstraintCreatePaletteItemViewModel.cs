@@ -28,17 +28,25 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
-    using System.Threading.Tasks;
 
     using CDP4Common.DiagramData;
-    using CDP4Common.EngineeringModelData;
+
+    using CDP4DiagramEditor.Helpers;
+    using CDP4DiagramEditor.ViewModels.Tools;
 
     /// <summary>
-    /// Diagram palette button responsible for creating new <see cref="Requirement" />
+    /// Diagram palette button responsible for creating new restricted constraint
     /// </summary>
     [Export(typeof(IPaletteItemViewModel))]
-    public class RestrictedConstraintCreatePaletteItemViewModel : PaletteItemBaseViewModel
+    public class RestrictedConstraintCreatePaletteItemViewModel : ConstraintCreatePaletteItemViewModel<RestrictedConstraintConnectorTool>
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RestrictedConstraintCreatePaletteItemViewModel" /> class.
+        /// </summary>
+        public RestrictedConstraintCreatePaletteItemViewModel() : base(ConstraintKind.Restricted)
+        {
+        }
+
         /// <summary>
         /// Gets the label text
         /// </summary>
@@ -60,7 +68,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// </summary>
         public override int GroupSortOrder
         {
-            get { return 3000; }
+            get { return 1000; }
         }
 
         /// <summary>
@@ -76,7 +84,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// </summary>
         public override string Image
         {
-            get { return "IconSetTrafficLights4_16x16.png"; }
+            get { return "IconSetRedToBlack4_16x16.png"; }
         }
     }
 }

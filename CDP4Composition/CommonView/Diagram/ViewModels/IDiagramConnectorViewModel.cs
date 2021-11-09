@@ -86,5 +86,10 @@ namespace CDP4CommonView.Diagram
         bool IsDirty { get; }
 
         void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container);
+
+        /// <summary>
+        /// Reinitialize the view model with a new Thing from the cache
+        /// </summary>
+        void Reinitialize();
     }
 }

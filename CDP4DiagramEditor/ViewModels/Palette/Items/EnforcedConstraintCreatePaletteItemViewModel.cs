@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OptionalConstraintCreatePaletteItemViewModel.cs" company="RHEA System S.A.">
+// <copyright file="EnforcedConstraintCreatePaletteItemViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -35,15 +35,15 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using CDP4DiagramEditor.ViewModels.Tools;
 
     /// <summary>
-    /// Diagram palette button responsible for creating new optional constraint
+    /// Diagram palette button responsible for creating new enforced constraint
     /// </summary>
     [Export(typeof(IPaletteItemViewModel))]
-    public class OptionalConstraintCreatePaletteItemViewModel : ConstraintCreatePaletteItemViewModel<OptionalConstraintConnectorTool>
+    public class EnforcedConstraintCreatePaletteItemViewModel : ConstraintCreatePaletteItemViewModel<EnforcedConstraintConnectorTool>
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="OptionalConstraintCreatePaletteItemViewModel" /> class.
+        /// Initializes a new instance of the <see cref="EnforcedConstraintCreatePaletteItemViewModel" /> class.
         /// </summary>
-        public OptionalConstraintCreatePaletteItemViewModel() : base(ConstraintKind.Optional)
+        public EnforcedConstraintCreatePaletteItemViewModel() : base(ConstraintKind.Enforced)
         {
         }
 
@@ -52,7 +52,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// </summary>
         public override string Text
         {
-            get { return "Optional"; }
+            get { return "Enforced"; }
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// </summary>
         public override int GroupSortOrder
         {
-            get { return 2000; }
+            get { return 3000; }
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// </summary>
         public override string Image
         {
-            get { return "AppointmentDayClock.png"; }
+            get { return "IconSetTrafficLights4_16x16.png"; }
         }
     }
 }

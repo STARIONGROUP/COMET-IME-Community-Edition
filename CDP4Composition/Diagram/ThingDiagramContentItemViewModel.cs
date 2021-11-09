@@ -33,6 +33,8 @@ namespace CDP4Composition.Diagram
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.Types;
 
     using CDP4Composition.DragDrop;
 
@@ -283,6 +285,26 @@ namespace CDP4Composition.Diagram
 
                 container.DiagramElement.Add(clone);
                 transaction.CreateOrUpdate(clone);
+            }
+        }
+
+        /// <summary>
+        /// Reinitializes the viewmodel with the Thing from cache
+        /// </summary>
+        public virtual void Reinitialize()
+        {
+            var cachedThingExists = this.containerViewModel.Thing.Cache.TryGetValue(new CacheKey(this.DiagramThing.Iid, this.containerViewModel.Thing.Container.Iid), out var cachedThing);
+
+            if (cachedThingExists)
+            {
+                var newThing = cachedThing.Value as DiagramElementThing;
+
+                if (newThing is null)
+                {
+                    return;
+                }
+
+                this.DiagramThing = newThing;
             }
         }
 

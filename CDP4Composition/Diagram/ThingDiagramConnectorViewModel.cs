@@ -34,6 +34,7 @@ namespace CDP4Composition.Diagram
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
+    using CDP4Common.Types;
 
     using CDP4CommonView.Diagram;
 
@@ -126,7 +127,7 @@ namespace CDP4Composition.Diagram
         public DiagramElementThing Target { get; set; }
 
         /// <summary>
-        /// Gets the displayed text
+        /// Gets or sets the displayed text
         /// </summary>
         public string DisplayedText
         {
@@ -340,6 +341,29 @@ namespace CDP4Composition.Diagram
 
             container.DiagramElement.Add(clone);
             transaction.CreateOrUpdate(clone);
+        }
+
+        /// <summary>
+        /// Reinitialize the view model with a new Thing from the cache
+        /// </summary>
+        public virtual void Reinitialize()
+        {
+            var cachedThingExists = this.containerViewModel.Thing.Cache.TryGetValue(new CacheKey(this.DiagramThing.Iid, this.containerViewModel.Thing.Container.Iid), out var cachedThing);
+
+            if (cachedThingExists)
+            {
+                var newThing = cachedThing.Value as DiagramEdge;
+
+                if (newThing is null)
+                {
+                    return;
+                }
+
+                this.DiagramThing = newThing;
+
+                this.SetSource(((DiagramEdge)this.DiagramThing).Source);
+                this.SetTarget(((DiagramEdge)this.DiagramThing).Target);
+            }
         }
 
         /// <summary>
