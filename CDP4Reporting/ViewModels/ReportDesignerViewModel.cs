@@ -473,7 +473,9 @@ namespace CDP4Reporting.ViewModels
                 return;
             }
 
-            this.compilationConcurrentActionRunner.DelayRunAction(() => this.CompileAssembly(this.Document.Text), 2500);
+            var text = this.Document.Text;
+
+            this.compilationConcurrentActionRunner.DelayRunAction(() => this.CompileAssembly(text), 2500);
         }
 
         /// <summary>
