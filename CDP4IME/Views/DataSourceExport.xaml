@@ -42,6 +42,15 @@
                                                  Mode=TwoWay,
                                                  UpdateSourceTrigger=PropertyChanged}" />
                 </dxlc:LayoutItem>
+                <dxlc:LayoutItem AddColonToLabel="True" Label="Model version">
+                    <dxe:ComboBoxEdit DisplayMember="Key"
+                                      ItemsSource="{Binding Path=Versions,
+                                                UpdateSourceTrigger=PropertyChanged}"
+                                      SelectedItem="{Binding Path=SelectedVersion,
+                                                 Mode=TwoWay,
+                                                 UpdateSourceTrigger=PropertyChanged}" />
+                </dxlc:LayoutItem>
+
                 <dxlc:LayoutItem AddColonToLabel="True" Label="Output Path">
                     <Grid>
                         <Grid.ColumnDefinitions>

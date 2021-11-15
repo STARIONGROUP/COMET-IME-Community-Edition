@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceExportViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -37,9 +37,9 @@ namespace CDP4IME.ViewModels
     using CDP4Composition.Services;
 
     using CDP4Dal;
-    using CDP4Dal.Operations;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -82,6 +82,16 @@ namespace CDP4IME.ViewModels
         private string path;
 
         /// <summary>
+        /// Backing field for the <see cref="Versions"/> property.
+        /// </summary>
+        private Dictionary<string, Version> versions;
+
+        /// <summary>
+        /// Backing field for the <see cref="SelectedVersion"/> property.
+        /// </summary>
+        private KeyValuePair<string, Version> selectedVersion;
+
+        /// <summary>
         /// The available dals.
         /// </summary>
         private List<IDalMetaData> availableDals;
@@ -107,6 +117,11 @@ namespace CDP4IME.ViewModels
         private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
+        /// The available <see cref="Version"/>s
+        /// </summary>
+        private readonly Dictionary<string, Version> availableVersions;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceExportViewModel"/> class.
         /// </summary>
         /// <param name="sessions">
@@ -126,9 +141,39 @@ namespace CDP4IME.ViewModels
             this.AvailableDals = new List<IDalMetaData>();
             this.OpenSessions = new ReactiveList<ISession>(sessions);
             this.DialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+
+            this.availableVersions = new Dictionary<string, Version>
+            {
+                { "ECSS-E-TM-10-25 (Version 2.4.1)", new Version("1.0.0") },
+                { "COMET 1.1.0", new Version("1.1.0") },
+                { "COMET 1.2.0", new Version("1.2.0") }
+            };
+
             this.IsBusy = false;
 
             this.OpenSessions.ChangeTrackingEnabled = true;
+
+            this.WhenAnyValue(
+                vm => vm.SelectedSession).Subscribe(
+                x =>
+                {
+                    if (x == null)
+                    {
+                        this.Versions = new Dictionary<string, Version>();
+                    }
+                    else
+                    {
+                        this.Versions = 
+                            this.availableVersions
+                                .Where(y => y.Value <= x.DalVersion)
+                                .ToDictionary(k => k.Key, v => v.Value);
+
+                        if (this.SelectedVersion.Key != null && !this.Versions.ContainsKey(this.SelectedVersion.Key))
+                        {
+                            this.SelectedVersion = default;
+                        }
+                    }
+                });
 
             var canOk = this.WhenAnyValue(
                 vm => vm.PasswordRetype,
@@ -136,8 +181,14 @@ namespace CDP4IME.ViewModels
                 vm => vm.SelectedDal,
                 vm => vm.SelectedSession,
                 vm => vm.Path,
-                (passwordRetype, password, selecteddal, selectedsession, path) => selecteddal != null && selectedsession != null 
-                    && !string.IsNullOrEmpty(path) && !string.IsNullOrEmpty(password) && password == passwordRetype);
+                vm => vm.SelectedVersion,
+                (passwordRetype, password, selecteddal, selectedsession, path, selectedVersion) 
+                    => selecteddal != null && 
+                       selectedsession != null && 
+                       !string.IsNullOrEmpty(path) && 
+                       !string.IsNullOrEmpty(password) && 
+                       password == passwordRetype &&
+                       selectedVersion.Key != default);
 
             this.OkCommand = ReactiveCommand.Create(canOk);
             this.OkCommand.Subscribe(_ => this.ExecuteOk());
@@ -156,15 +207,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public IDalMetaData SelectedDal
         {
-            get
-            {
-                return this.selectedDal;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedDal, value);
-            }
+            get => this.selectedDal;
+            set => this.RaiseAndSetIfChanged(ref this.selectedDal, value);
         }
 
         /// <summary>
@@ -172,15 +216,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public ISession SelectedSession
         {
-            get
-            {
-                return this.selectedSession;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedSession, value);
-            }
+            get => this.selectedSession;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSession, value);
         }
 
         /// <summary>
@@ -188,15 +225,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public string PasswordRetype
         {
-            get
-            {
-                return this.passwordRetype;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.passwordRetype, value);
-            }
+            get => this.passwordRetype;
+            set => this.RaiseAndSetIfChanged(ref this.passwordRetype, value);
         }
 
         /// <summary>
@@ -204,15 +234,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public string Password
         {
-            get
-            {
-                return this.password;
-            }
-
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.password, value);
-            }
+            get => this.password;
+            set => this.RaiseAndSetIfChanged(ref this.password, value);
         }
 
         /// <summary>
@@ -220,15 +243,26 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public string Path
         {
-            get
-            {
-                return this.path;
-            }
+            get => this.path;
+            set => this.RaiseAndSetIfChanged(ref this.path, value);
+        }
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.path, value);
-            }
+        /// <summary>
+        /// Gets or sets the currently Selected version used to create the Annex.C3 data from
+        /// </summary>
+        public KeyValuePair<string, Version> SelectedVersion
+        {
+            get => this.selectedVersion;
+            set => this.RaiseAndSetIfChanged(ref this.selectedVersion, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the currently implemented and supported CDP/COMET versions used to create the Annex.C3 data from
+        /// </summary>
+        public Dictionary<string, Version> Versions
+        {
+            get => this.versions;
+            set => this.RaiseAndSetIfChanged(ref this.versions, value);
         }
 
         /// <summary>
@@ -236,15 +270,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public List<IDalMetaData> AvailableDals
         {
-            get
-            {
-                return this.availableDals;
-            }
-
-            private set
-            {
-                this.RaiseAndSetIfChanged(ref this.availableDals, value);
-            }
+            get => this.availableDals;
+            private set => this.RaiseAndSetIfChanged(ref this.availableDals, value);
         }
 
         /// <summary>
@@ -252,15 +279,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         public ReactiveList<ISession> OpenSessions
         {
-            get
-            {
-                return this.openSessions;
-            }
-
-            private set
-            {
-                this.RaiseAndSetIfChanged(ref this.openSessions, value);
-            }
+            get => this.openSessions;
+            private set => this.RaiseAndSetIfChanged(ref this.openSessions, value);
         }
 
         /// <summary>
@@ -303,6 +323,12 @@ namespace CDP4IME.ViewModels
                 return;
             }
 
+            if (this.selectedVersion.Key == default)
+            {
+                this.ErrorMessage = "No version selected.";
+                return;
+            }
+
             this.IsBusy = true;
             this.LoadingMessage = "Exporting...";
 
@@ -311,7 +337,7 @@ namespace CDP4IME.ViewModels
                 var creds = new Credentials(this.selectedSession.Credentials.UserName, this.Password, new Uri(this.Path));
 
                 var dal = this.dals.Single(x => x.Metadata == this.SelectedDal);
-                var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
+                var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType(), this.SelectedVersion.Value);
 
                 var fileExportSession = dalInstance.CreateSession(creds);
 
@@ -392,12 +418,13 @@ namespace CDP4IME.ViewModels
 
             if (this.AvailableDals.Any())
             {
-                this.SelectedDal = this.AvailableDals.First(); 
+                this.SelectedDal = this.AvailableDals.First();
             }
 
             if (this.OpenSessions.Any())
             {
-                this.SelectedSession = this.OpenSessions.First(); 
+                this.SelectedSession = this.OpenSessions.First();
+                this.SelectedVersion = this.Versions.FirstOrDefault();
             }
         }
     }
