@@ -17,7 +17,7 @@ namespace CDP4Dashboard.Views
     /// <summary>
     /// Interaction logic for RequirementBrowserRibbon.xaml
     /// </summary>
-    [Export(typeof(DashboardBrowserRibbon))]
+    [Export(typeof(ExtendedRibbonPageGroup))]
     public partial class DashboardBrowserRibbon : ExtendedRibbonPageGroup, IView
     {
         /// <summary>
