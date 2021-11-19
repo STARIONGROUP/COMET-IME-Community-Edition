@@ -1,0 +1,12 @@
+{
+  "solution": "CDP4-CE.sln",
+  "mappings": {
+    //Don't use it yet, because of lack of support for "<ExcludeAssets>runtime</ExcludeAssets>" XML Element in DNT tools!!!!
+    //
+    //"CDP4Common-CE": "../CDP4-SDK-Community-Edition/CDP4Common/CDP4Common.csproj",
+    //"CDP4Dal-CE": "../CDP4-SDK-Community-Edition/CDP4Dal/CDP4Dal.csproj",
+    //"CDP4JsonSerializer-CE": "../CDP4-SDK-Community-Edition/CDP4JsonSerializer/CDP4JsonSerializer.csproj",
+    //"CDP4RequirementsVerification-CE": "../CDP4-SDK-Community-Edition/CDP4RequirementsVerification/CDP4RequirementsVerification.csproj"
+  },
+  "removeProjects": true
+}
