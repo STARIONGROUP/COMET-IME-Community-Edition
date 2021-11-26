@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportMappingManagerTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
@@ -37,19 +37,18 @@ namespace CDP4Requirements.Tests.ReqIF
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
-    using CDP4Requirements.ViewModels;
-
     using CDP4Dal;
     using CDP4Dal.Permission;
+
+    using CDP4Requirements.ReqIFDal;
+    using CDP4Requirements.ViewModels;
 
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
-    
+
     using NUnit.Framework;
-    
-    using ReqIFDal;
-    
+
     using ReqIFSharp;
 
     [TestFixture]
@@ -139,10 +138,10 @@ namespace CDP4Requirements.Tests.ReqIF
 
             this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.reqIf = new ReqIF();
-            this.reqIf.TheHeader.Add(new ReqIFHeader() {Title = "test"});
+            this.reqIf.TheHeader = new ReqIFHeader() { Title = "test" };
             this.reqIf.Lang = "en";
             var corecontent = new ReqIFContent();
-            this.reqIf.CoreContent.Add(corecontent);
+            this.reqIf.CoreContent = corecontent;
             this.datatypedef = new DatatypeDefinitionString();
             this.spectype = new SpecificationType();
             this.specobjecttype = new SpecObjectType();
@@ -158,7 +157,7 @@ namespace CDP4Requirements.Tests.ReqIF
                 this.domain,
                 this.dialogNavigationService.Object,
                 this.thingDialogNavigationService.Object);
-            
+
             this.serviceLocator = new Mock<IServiceLocator>();
             this.serviceLocator.Setup(x => x.GetInstance<IPluginSettingsService>()).Returns(this.pluginSettingsService.Object);
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -193,7 +192,7 @@ namespace CDP4Requirements.Tests.ReqIF
 
             Assert.DoesNotThrow(() => this.importMappingManager.StartMapping());
         }
-        
+
         [Test]
         public void VerifyThatGoBackToParameterTypeWorks()
         {
@@ -221,7 +220,7 @@ namespace CDP4Requirements.Tests.ReqIF
 
             var specrelationTypeMap = new Dictionary<SpecRelationType, SpecRelationTypeMap>();
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<SpecRelationTypeMappingDialogViewModel>())).Returns(new RelationshipMappingDialogResult(specrelationTypeMap, true, true));
-            
+
             Assert.DoesNotThrow(() => this.importMappingManager.StartMapping());
         }
 

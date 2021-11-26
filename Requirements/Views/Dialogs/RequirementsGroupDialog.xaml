@@ -35,6 +35,7 @@
                 <items:NameLayoutItem/>
                 <items:OwnerLayoutItem/>
             </dxlc:LayoutGroup>
+            <items:CategoryLayoutGroup/>
             <items:AliasLayoutGroup/>
             <items:DefinitionLayoutGroup/>
             <items:HyperLinkLayoutGroup/>

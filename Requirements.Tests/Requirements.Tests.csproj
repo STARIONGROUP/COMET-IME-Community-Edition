@@ -49,7 +49,7 @@
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="reactiveui" Version="6.4.0" />
     <PackageReference Include="reactiveui-core" Version="6.4.0" />
-    <PackageReference Include="ReqIFSharp" Version="2.0.0" />
+    <PackageReference Include="ReqIFSharp" Version="4.0.0" />
     <PackageReference Include="Rx-Core" Version="2.2.5" />
     <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
     <PackageReference Include="Rx-Linq" Version="2.2.5" />

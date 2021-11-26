@@ -1,6 +1,25 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="SpecRelationTypeMappingDialogTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -30,10 +49,13 @@ namespace CDP4Requirements.Tests.ReqIF
     using Moq;
 
     using NUnit.Framework;
+
     using ReactiveUI;
+
     using ReqIFSharp;
 
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     internal class SpecRelationTypeMappingDialogTestFixture
     {
         /// <summary>
@@ -122,7 +144,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.reqIf = new ReqIF();
             this.reqIf.Lang = "en";
             var corecontent = new ReqIFContent();
-            this.reqIf.CoreContent.Add(corecontent);
+            this.reqIf.CoreContent = corecontent;
             this.stringDatadef = new DatatypeDefinitionString();
             this.spectype = new SpecRelationType();
             this.attribute = new AttributeDefinitionString() { Identifier = Guid.NewGuid().ToString(), DatatypeDefinition = this.stringDatadef };
@@ -224,8 +246,8 @@ namespace CDP4Requirements.Tests.ReqIF
         public void VerifyThatExistingMapIsApplied()
         {
             var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var rule = new ParameterizedCategoryRule(Guid.NewGuid(), this.assembler.Cache, this.uri) {Category = category};
-            var binaryRelationshipRule = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { RelationshipCategory = category, TargetCategory = category, SourceCategory = category};
+            var rule = new ParameterizedCategoryRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Category = category };
+            var binaryRelationshipRule = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { RelationshipCategory = category, TargetCategory = category, SourceCategory = category };
             var categoryVm = new CategoryComboBoxItemViewModel(category, true);
 
             Dictionary<SpecRelationType, SpecRelationTypeMap> specRelationTypeMaps = null;
@@ -240,17 +262,17 @@ namespace CDP4Requirements.Tests.ReqIF
             row.PossibleBinaryRelationshipRules.Add(binaryRelationshipRule);
             row.PossibleCategories.Add(categoryVm);
             row.PossibleRules.Add(rule);
-            
+
             specRelationTypeMaps = new Dictionary<SpecRelationType, SpecRelationTypeMap>()
             {
                 {
                     this.spectype,
                     new SpecRelationTypeMap(
                         this.spectype,
-                        new [] { rule }, 
-                        new [] { category },
-                        new List<AttributeDefinitionMap>() { new AttributeDefinitionMap(this.attribute, AttributeDefinitionMapKind.SHORTNAME)},
-                        new [] { binaryRelationshipRule })
+                        new[] { rule },
+                        new[] { category },
+                        new List<AttributeDefinitionMap>() { new AttributeDefinitionMap(this.attribute, AttributeDefinitionMapKind.SHORTNAME) },
+                        new[] { binaryRelationshipRule })
                 }
             };
 

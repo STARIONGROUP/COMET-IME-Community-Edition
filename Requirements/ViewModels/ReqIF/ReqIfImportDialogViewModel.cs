@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
@@ -250,7 +250,7 @@ namespace CDP4Requirements.ViewModels
 
             try
             {
-                var reqif = await Task.Run(() => this.serializer.Deserialize(this.Path));
+                var reqif = (await Task.Run(() => this.serializer.Deserialize(this.Path))).FirstOrDefault();
 
                 var configuration = this.GetMappingConfiguation(reqif);
 
@@ -289,7 +289,7 @@ namespace CDP4Requirements.ViewModels
             }
 
             return mappingConfigurations.FirstOrDefault(
-                x => x.ReqIfId == reqif.TheHeader.First().Identifier);
+                x => x.ReqIfId == reqif.TheHeader.Identifier);
         }
 
         /// <summary>

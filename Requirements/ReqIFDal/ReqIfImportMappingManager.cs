@@ -1,8 +1,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportMappingManager.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -103,7 +103,7 @@ namespace CDP4Requirements.ReqIFDal
             this.dialogNavigationService = dialogNavigationService;
             this.thingDialogNavigationService = thingDialogNavigationService;
             this.currentDomain = domain;
-            this.mappingConfiguration = mappingConfiguration ?? new ImportMappingConfiguration() { ReqIfName = this.reqIf.TheHeader.FirstOrDefault()?.Title, ReqIfId = this.reqIf.TheHeader.FirstOrDefault()?.Identifier };
+            this.mappingConfiguration = mappingConfiguration ?? new ImportMappingConfiguration() { ReqIfName = this.reqIf.TheHeader?.Title, ReqIfId = this.reqIf.TheHeader?.Identifier };
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         private void NavigateToParameterTypeMappingDialog()
         {
-            var dialog = new ParameterTypeMappingDialogViewModel(this.reqIf.Lang, this.reqIf.CoreContent.First().DataTypes, this.mappingConfiguration.DatatypeDefinitionMap, this.iteration, this.session, this.thingDialogNavigationService);
+            var dialog = new ParameterTypeMappingDialogViewModel(this.reqIf.Lang, this.reqIf.CoreContent.DataTypes, this.mappingConfiguration.DatatypeDefinitionMap, this.iteration, this.session, this.thingDialogNavigationService);
             var res = (ParameterTypeMappingDialogResult)this.dialogNavigationService.NavigateModal(dialog);
 
             if (res == null || !res.Result.HasValue || !res.Result.Value)
@@ -137,7 +137,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         private void NavigateToSpecificationTypeMappingDialog()
         {
-            var dialog = new SpecificationTypeMappingDialogViewModel(this.reqIf.CoreContent.First().SpecTypes, this.mappingConfiguration.DatatypeDefinitionMap, this.mappingConfiguration.SpecificationTypeMap, this.iteration, this.session, this.thingDialogNavigationService, this.reqIf.Lang);
+            var dialog = new SpecificationTypeMappingDialogViewModel(this.reqIf.CoreContent.SpecTypes, this.mappingConfiguration.DatatypeDefinitionMap, this.mappingConfiguration.SpecificationTypeMap, this.iteration, this.session, this.thingDialogNavigationService, this.reqIf.Lang);
             var res = (SpecificationTypeMappingDialogResult)this.dialogNavigationService.NavigateModal(dialog);
 
             if (res == null || !res.Result.HasValue || !res.Result.Value)
@@ -164,7 +164,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         private void NavigateToRequirementObjectTypeMappingDialog()
         {
-            var dialog = new SpecObjectTypesMappingDialogViewModel(this.reqIf.CoreContent.First().SpecTypes, this.mappingConfiguration.DatatypeDefinitionMap, this.mappingConfiguration.SpecObjectTypeMap, this.iteration, this.session, this.thingDialogNavigationService, this.reqIf.Lang);
+            var dialog = new SpecObjectTypesMappingDialogViewModel(this.reqIf.CoreContent.SpecTypes, this.mappingConfiguration.DatatypeDefinitionMap, this.mappingConfiguration.SpecObjectTypeMap, this.iteration, this.session, this.thingDialogNavigationService, this.reqIf.Lang);
             var res = (RequirementTypeMappingDialogResult)this.dialogNavigationService.NavigateModal(dialog);
 
             if (res == null || !res.Result.HasValue || !res.Result.Value)
@@ -191,7 +191,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         private void NavigateToRelationshipGroupDialog()
         {
-            var relationgroups = this.reqIf.CoreContent.First().SpecTypes.OfType<RelationGroupType>();
+            var relationgroups = this.reqIf.CoreContent.SpecTypes.OfType<RelationGroupType>();
             var dialog = new RelationGroupTypeMappingDialogViewModel(relationgroups, this.mappingConfiguration.RelationGroupTypeMap, this.mappingConfiguration.DatatypeDefinitionMap, this.iteration, this.session, this.thingDialogNavigationService, this.reqIf.Lang);
             var res = (RelationshipGroupMappingDialogResult)this.dialogNavigationService.NavigateModal(dialog);
 
@@ -217,7 +217,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         private void NavigateToRelationshipDialog()
         {
-            var dialog = new SpecRelationTypeMappingDialogViewModel(this.reqIf.CoreContent.Single().SpecTypes.OfType<SpecRelationType>(), this.mappingConfiguration.SpecRelationTypeMap, this.mappingConfiguration.DatatypeDefinitionMap, this.iteration, this.session, this.thingDialogNavigationService, this.reqIf.Lang);
+            var dialog = new SpecRelationTypeMappingDialogViewModel(this.reqIf.CoreContent.SpecTypes.OfType<SpecRelationType>(), this.mappingConfiguration.SpecRelationTypeMap, this.mappingConfiguration.DatatypeDefinitionMap, this.iteration, this.session, this.thingDialogNavigationService, this.reqIf.Lang);
             var res = (RelationshipMappingDialogResult)this.dialogNavigationService.NavigateModal(dialog);
 
             // go back or mapping operation over.
@@ -292,7 +292,7 @@ namespace CDP4Requirements.ReqIFDal
                 return;
             }
 
-            var reqIfTitle = this.reqIf.TheHeader.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Title))?.Title;
+            var reqIfTitle = this.reqIf.TheHeader?.Title;
 
             var map = new ExternalIdentifierMap(Guid.NewGuid(), this.session.Assembler.Cache, this.session.Assembler.IDalUri)
             {
