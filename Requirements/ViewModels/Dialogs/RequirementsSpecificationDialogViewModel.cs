@@ -1,23 +1,46 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsSpecificationDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+    using CDP4Dal.Operations;
+
     using ReactiveUI;
-    using System.Collections.Generic;
-    using System.Linq;
 
     /// <summary>
     /// The purpose of the <see cref="RequirementsSpecificationDialogViewModel"/> is to allow a <see cref="Person"/> to
@@ -31,6 +54,11 @@ namespace CDP4Requirements.ViewModels
     public class RequirementsSpecificationDialogViewModel : CDP4CommonView.RequirementsSpecificationDialogViewModel, IThingDialogViewModel
     {
         /// <summary>
+        /// The Required Referance-Data-library for the current <see cref="Iteration"/>
+        /// </summary>
+        private ModelReferenceDataLibrary mRdl;
+
+        /// <summary>
         /// Backing field for <see cref="ShortName"/> property
         /// </summary>
         private string shortName;
@@ -43,6 +71,32 @@ namespace CDP4Requirements.ViewModels
         /// </remarks>
         public RequirementsSpecificationDialogViewModel()
         {
+        }
+
+        /// <summary>
+        /// Initializes the properties of this <see cref="Requirement"/>
+        /// </summary>
+        protected override void Initialize()
+        {
+            base.Initialize();
+            var iteration = (Iteration)this.Container ?? this.ChainOfContainer.OfType<Iteration>().Single();
+            var model = (EngineeringModel)iteration.Container;
+
+            this.mRdl = model.EngineeringModelSetup.RequiredRdl.Single();
+        }
+
+        /// <summary>
+        /// Populate the <see cref="PossibleCategory"/> and <see cref="Category"/> properties.
+        /// </summary>
+        protected override void PopulateCategory()
+        {
+            var categories = this.mRdl.DefinedCategory.Where(x => x.PermissibleClass.Contains(ClassKind.RequirementsSpecification)).ToList();
+            categories.AddRange(this.mRdl.GetRequiredRdls().SelectMany(x => x.DefinedCategory).Where(x => x.PermissibleClass.Contains(ClassKind.RequirementsSpecification)));
+
+            this.PossibleCategory.Clear();
+            this.PossibleCategory.AddRange(categories);
+
+            base.PopulateCategory();
         }
 
         /// <summary>
@@ -80,8 +134,8 @@ namespace CDP4Requirements.ViewModels
         [ValidationOverride(true, "RequirementShortName")]
         public override string ShortName
         {
-            get { return this.shortName; }
-            set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
+            get => this.shortName;
+            set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
         /// <summary>

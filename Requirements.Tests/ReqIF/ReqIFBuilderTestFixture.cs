@@ -1,22 +1,50 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ReqIFBuilderTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
+    using CDP4Composition.Services;
+
     using CDP4Dal;
+
     using CDP4Requirements.ReqIFDal;
+
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReqIFSharp;
 
     [TestFixture]
@@ -24,6 +52,8 @@ namespace CDP4Requirements.Tests
     {
         private Mock<ISession> session;
         private Assembler assembler;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IMessageBoxService> messageBoxService;
 
         private SiteDirectory sitedir;
         private EngineeringModelSetup modelsetup;
@@ -61,7 +91,6 @@ namespace CDP4Requirements.Tests
         private SimpleParameterValue reqValue11;
         private SimpleParameterValue reqValue2;
 
-
         private ParameterizedCategoryRule parameRule;
 
         private Category reqCategory;
@@ -74,6 +103,12 @@ namespace CDP4Requirements.Tests
         [SetUp]
         public void Setup()
         {
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.messageBoxService = new Mock<IMessageBoxService>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
+
             this.session = new Mock<ISession>();
             this.assembler = new Assembler(this.uri);
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -83,13 +118,13 @@ namespace CDP4Requirements.Tests
             this.modelsetup.IterationSetup.Add(this.iterationsetup);
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.sitedir.SiteReferenceDataLibrary.Add(this.srdl);
-            this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri){RequiredRdl = this.srdl};
+            this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { RequiredRdl = this.srdl };
             this.modelsetup.RequiredRdl.Add(this.mrdl);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
-            this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri){EngineeringModelSetup = this.modelsetup};
-            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri){IterationSetup = this.iterationsetup};
+            this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) { EngineeringModelSetup = this.modelsetup };
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri) { IterationSetup = this.iterationsetup };
             this.model.Iteration.Add(this.iteration);
 
             this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -111,7 +146,7 @@ namespace CDP4Requirements.Tests
             this.group1.Group.Add(this.group11);
 
             this.req = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var definition = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) {Content = "def0"};
+            var definition = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Content = "def0" };
             this.req.Definition.Add(definition);
 
             this.req1 = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Group = this.group1 };
@@ -132,17 +167,17 @@ namespace CDP4Requirements.Tests
 
             this.reqSpec2.Requirement.Add(this.req2);
 
-            this.booleanParameterType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "bool", ShortName = "bool"};
+            this.booleanParameterType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "bool", ShortName = "bool" };
             this.srdl.ParameterType.Add(this.booleanParameterType);
 
             this.functionalReq = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Functional", ShortName = "Func" };
 
             this.deriveCat = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Derive Category", ShortName = "Derive" };
 
-            this.reqCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "req cat", ShortName = "reqcat"};
-            this.specCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "spec cat", ShortName = "speccat"};
+            this.reqCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "req cat", ShortName = "reqcat" };
+            this.specCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "spec cat", ShortName = "speccat" };
 
-            this.specRelationRuleCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Spec Link", ShortName = "SpecLink"};
+            this.specRelationRuleCategory = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Spec Link", ShortName = "SpecLink" };
 
             this.srdl.DefinedCategory.Add(this.functionalReq);
             this.srdl.DefinedCategory.Add(this.deriveCat);
@@ -151,7 +186,7 @@ namespace CDP4Requirements.Tests
 
             this.reqCategory.SuperCategory.Add(this.functionalReq);
 
-            this.specRuleType = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "Spec Link", ShortName = "SpecLink"};
+            this.specRuleType = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Spec Link", ShortName = "SpecLink" };
             this.specRuleType.SourceCategory = this.specCategory;
             this.specRuleType.TargetCategory = this.specCategory;
             this.specRuleType.RelationshipCategory = this.specRelationRuleCategory;
@@ -161,7 +196,7 @@ namespace CDP4Requirements.Tests
             this.derivedRule.TargetCategory = this.reqCategory;
             this.derivedRule.RelationshipCategory = this.deriveCat;
 
-            this.parameRule = new ParameterizedCategoryRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "param Rule", ShortName = "ParamRule"};
+            this.parameRule = new ParameterizedCategoryRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "param Rule", ShortName = "ParamRule" };
             this.parameRule.ParameterType.Add(this.booleanParameterType);
             this.parameRule.Category = this.functionalReq;
 
@@ -206,6 +241,7 @@ namespace CDP4Requirements.Tests
                 Source = this.reqSpec,
                 Target = this.reqSpec2
             };
+
             this.specDeriveRelationship.Category.Add(this.specRelationRuleCategory);
 
             this.iteration.Relationship.Add(this.deriveRelationship1);
@@ -216,7 +252,7 @@ namespace CDP4Requirements.Tests
             this.reqValue = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ParameterType = this.booleanParameterType,
-                Value = new ValueArray<string>(new [] {"true"})
+                Value = new ValueArray<string>(new[] { "true" })
             };
 
             this.reqValue1 = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -250,15 +286,16 @@ namespace CDP4Requirements.Tests
 
             var reqif = builder.BuildReqIF(this.session.Object, this.iteration);
             Assert.IsNotNull(reqif);
-            // 2 + 1 extra datatype for requriement text
-            Assert.AreEqual(3, reqif.CoreContent.Single().DataTypes.Count); // booleanPt and boolean and Text datatype
-            Assert.AreEqual(7, reqif.CoreContent.Single().SpecObjects.Count); // 4 requirements + 2 groups
-            Assert.AreEqual(3, reqif.CoreContent.Single().Specifications.Count); // 2 specification
-            Assert.AreEqual(9, reqif.CoreContent.Single().SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
-            Assert.AreEqual(3, reqif.CoreContent.Single().SpecRelations.Count); // 3 specRelation from 3 relationship
-            Assert.AreEqual(1, reqif.CoreContent.Single().SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
 
-            Assert.IsNotEmpty(reqif.CoreContent.Single().SpecRelationGroups.Single().SpecRelations);
+            // 2 + 1 extra datatype for requriement text
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
+            Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
+            Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
+            Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
+            Assert.AreEqual(1, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+
+            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Single().SpecRelations);
 
             var serializer = new ReqIFSerializer(false);
             serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });

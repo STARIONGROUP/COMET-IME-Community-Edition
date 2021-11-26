@@ -1,9 +1,27 @@
-﻿
-// -------------------------------------------------------------------------------------------------
+﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ThingToReqIfMapper.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ReqIFDal
 {
@@ -11,10 +29,12 @@ namespace CDP4Requirements.ReqIFDal
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using ReqIFSharp;
 
     /// <summary>
@@ -22,16 +42,20 @@ namespace CDP4Requirements.ReqIFDal
     /// </summary>
     public class ThingToReqIfMapper
     {
-        #region Constants
         /// <summary>
         /// The separator used in a EnumerationParameterType values when MultiSelect is enabled
         /// </summary>
-        private const char parameterEnumSeparator = '|';
+        private const char ParameterEnumSeparator = '|';
 
         /// <summary>
         /// The string used for empty field
         /// </summary>
-        private const string emptyContent = "-";
+        private const string EmptyContent = "-";
+
+        /// <summary>
+        /// The <see cref="Cdp4ModelValidationFailureHandler"/>
+        /// </summary>
+        public readonly Cdp4ModelValidationFailureHandler cdp4ModelValidationFailureHandler;
 
         /// <summary>
         /// The prefix that shall be displayed in front of the name of a group type
@@ -62,12 +86,19 @@ namespace CDP4Requirements.ReqIFDal
         /// The <see cref="AttributeDefinition.LongName"/> for the <see cref="Requirement.IsDeprecated"/> and <see cref="RequirementsSpecification.IsDeprecated"/>
         /// </summary>
         public const string IsDeprecatedAttributeDefName = "IsDeprecated";
-        #endregion
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="ThingToReqIfMapper"/> classs
+        /// </summary>
+        public ThingToReqIfMapper(Cdp4ModelValidationFailureHandler cdp4ModelValidationFailureHandler)
+        {
+            this.cdp4ModelValidationFailureHandler = cdp4ModelValidationFailureHandler;
+        }
 
         /// <summary>
         /// The <see cref="DatatypeDefinitionString"/> used for the requirement text, name, short-name and categories
         /// </summary>
-        public readonly DatatypeDefinitionString TextDatatypeDefinition = new DatatypeDefinitionString
+        public readonly DatatypeDefinitionString TextDatatypeDefinition = new()
         {
             LongName = "String",
             Identifier = "a0788043-3c29-4cdc-b656-816a1a9e111d",
@@ -78,7 +109,7 @@ namespace CDP4Requirements.ReqIFDal
         /// <summary>
         /// The <see cref="DatatypeDefinitionBoolean"/> used for the requirement and requirement specification isDeprecated property
         /// </summary>
-        public readonly DatatypeDefinitionBoolean BooleanDatatypeDefinition = new DatatypeDefinitionBoolean
+        public readonly DatatypeDefinitionBoolean BooleanDatatypeDefinition = new()
         {
             LongName = "Boolean",
             Identifier = "cf78e807-a8af-4816-aa0f-c7b9e7ec1520",
@@ -97,7 +128,7 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (group == null)
             {
-                throw new ArgumentNullException("group");
+                throw new ArgumentNullException(nameof(group));
             }
 
             var specObjectType = new SpecObjectType
@@ -110,7 +141,11 @@ namespace CDP4Requirements.ReqIFDal
 
             this.AddCommonAttributeDefinition(specObjectType);
 
-            var parameterTypes = appliedRules.SelectMany(r => r.ParameterType).Distinct();
+            var parameterTypes = appliedRules.SelectMany(r => r.ParameterType).Distinct().ToList();
+            var requirementGroupParameterTypes = group.ParameterValue.Select(spv => spv.ParameterType);
+
+            parameterTypes.AddRange(requirementGroupParameterTypes);
+
             foreach (var parameterType in parameterTypes)
             {
                 var attibuteDef = this.ToReqIfAttributeDefinition(parameterType, parameterTypeMap);
@@ -130,7 +165,7 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (requirementsGroup == null)
             {
-                throw new ArgumentNullException("requirementsGroup");
+                throw new ArgumentNullException(nameof(requirementsGroup));
             }
 
             var specObject = new SpecObject();
@@ -141,7 +176,17 @@ namespace CDP4Requirements.ReqIFDal
 
             foreach (var parameterValue in requirementsGroup.ParameterValue)
             {
-                var attributeDef = specObjectType.SpecAttributes.Single(x => x.DatatypeDefinition.Identifier == parameterValue.ParameterType.Iid.ToString());
+                var attributeDef = specObjectType.SpecAttributes.SingleOrDefault(x => x.DatatypeDefinition.Identifier == parameterValue.ParameterType.Iid.ToString());
+
+                if (attributeDef == null)
+                {
+                    var message = $"Parameter type '{parameterValue.ParameterType.Name}' should be part of a {nameof(ParameterizedCategoryRule)} whose {nameof(Category)} should be applied to {nameof(RequirementsGroup)} '{requirementsGroup.Name}'";
+
+                    this.cdp4ModelValidationFailureHandler.CheckCdp4ModelValidationMessaging(message);
+
+                    continue;
+                }
+
                 var value = this.ToReqIfAttributeValue(parameterValue.ParameterType, attributeDef, parameterValue.Value, parameterValue.Scale);
                 specObject.Values.Add(value);
             }
@@ -160,7 +205,7 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (requirement == null)
             {
-                throw new ArgumentNullException("requirement");
+                throw new ArgumentNullException(nameof(requirement));
             }
 
             var specObjectType = new SpecObjectType()
@@ -220,7 +265,7 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (requirement == null)
             {
-                throw new ArgumentNullException("requirement");
+                throw new ArgumentNullException(nameof(requirement));
             }
 
             var specObject = new SpecObject();
@@ -231,7 +276,17 @@ namespace CDP4Requirements.ReqIFDal
 
             foreach (var parameterValue in requirement.ParameterValue)
             {
-                var attributeDef = specObjectType.SpecAttributes.Single(x => x.DatatypeDefinition.Identifier == parameterValue.ParameterType.Iid.ToString());
+                var attributeDef = specObjectType.SpecAttributes.SingleOrDefault(x => x.DatatypeDefinition.Identifier == parameterValue.ParameterType.Iid.ToString());
+
+                if (attributeDef == null)
+                {
+                    var message = $"Parameter type '{parameterValue.ParameterType.Name}' should be part of a {nameof(ParameterizedCategoryRule)} whose {nameof(Category)} should be applied to {nameof(Requirement)} '{requirement.Name}'";
+
+                    this.cdp4ModelValidationFailureHandler.CheckCdp4ModelValidationMessaging(message);
+
+                    continue;
+                }
+
                 var value = this.ToReqIfAttributeValue(parameterValue.ParameterType, attributeDef, parameterValue.Value, parameterValue.Scale);
                 specObject.Values.Add(value);
             }
@@ -241,6 +296,7 @@ namespace CDP4Requirements.ReqIFDal
             {
                 var definition = requirement.Definition.First();
                 var attributeDefinition = (AttributeDefinitionString)specObjectType.SpecAttributes.Single(def => def.DatatypeDefinition == this.TextDatatypeDefinition && def.LongName == RequirementTextAttributeDefName);
+
                 var requirementValue = new AttributeValueString
                 {
                     TheValue = definition.Content,
@@ -252,13 +308,15 @@ namespace CDP4Requirements.ReqIFDal
 
             // Add extra AttributeValue corresponding to the isDeprecated property            
             var isDeprecatedType = (AttributeDefinitionBoolean)specObjectType.SpecAttributes.Single(def => def.DatatypeDefinition == this.BooleanDatatypeDefinition && def.LongName == IsDeprecatedAttributeDefName);
+
             var isDeprecated = new AttributeValueBoolean
             {
                 TheValue = requirement.IsDeprecated,
                 Definition = isDeprecatedType
             };
+
             specObject.Values.Add(isDeprecated);
-            
+
             return specObject;
         }
 
@@ -273,7 +331,7 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (requirementsSpecification == null)
             {
-                throw new ArgumentNullException("requirementsSpecification");
+                throw new ArgumentNullException(nameof(requirementsSpecification));
             }
 
             var specificationType = new SpecificationType
@@ -299,6 +357,7 @@ namespace CDP4Requirements.ReqIFDal
 
             // set the attribute-definition
             var parameterTypes = appliedRules.SelectMany(r => r.ParameterType).Distinct();
+
             foreach (var parameterType in parameterTypes)
             {
                 var attibuteDef = this.ToReqIfAttributeDefinition(parameterType, parameterTypeMap);
@@ -318,7 +377,7 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (requirementsSpecification == null)
             {
-                throw new ArgumentNullException("requirementsSpecification");
+                throw new ArgumentNullException(nameof(requirementsSpecification));
             }
 
             var specification = new Specification();
@@ -329,18 +388,30 @@ namespace CDP4Requirements.ReqIFDal
 
             foreach (var parameterValue in requirementsSpecification.ParameterValue)
             {
-                var attributeDef = specificationType.SpecAttributes.Single(x => x.DatatypeDefinition.Identifier == parameterValue.ParameterType.Iid.ToString());
+                var attributeDef = specificationType.SpecAttributes.SingleOrDefault(x => x.DatatypeDefinition.Identifier == parameterValue.ParameterType.Iid.ToString());
+
+                if (attributeDef == null)
+                {
+                    var message = $"Parameter type '{parameterValue.ParameterType.Name}' should be part of a {nameof(ParameterizedCategoryRule)} whose {nameof(Category)} should be applied to {nameof(RequirementsSpecification)} '{requirementsSpecification.Name}'";
+
+                    this.cdp4ModelValidationFailureHandler.CheckCdp4ModelValidationMessaging(message);
+
+                    continue;
+                }
+
                 var value = this.ToReqIfAttributeValue(parameterValue.ParameterType, attributeDef, parameterValue.Value, parameterValue.Scale);
                 specification.Values.Add(value);
             }
 
             // Add extra AttributeValue corresponding to the isDeprecated property            
             var isDeprecatedType = (AttributeDefinitionBoolean)specificationType.SpecAttributes.Single(def => def.DatatypeDefinition == this.BooleanDatatypeDefinition && def.LongName == IsDeprecatedAttributeDefName);
+
             var isDeprecated = new AttributeValueBoolean
             {
                 TheValue = requirementsSpecification.IsDeprecated,
                 Definition = isDeprecatedType
             };
+
             specification.Values.Add(isDeprecated);
 
             return specification;
@@ -357,7 +428,7 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (binaryRelationship == null)
             {
-                throw new ArgumentNullException("binaryRelationship");
+                throw new ArgumentNullException(nameof(binaryRelationship));
             }
 
             var relationType = new SpecRelationType()
@@ -372,6 +443,7 @@ namespace CDP4Requirements.ReqIFDal
 
             // set the attribute-definition
             var parameterTypes = appliedRules.SelectMany(r => r.ParameterType).Distinct();
+
             foreach (var parameterType in parameterTypes)
             {
                 var attibuteDef = this.ToReqIfAttributeDefinition(parameterType, parameterTypeMap);
@@ -397,16 +469,16 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (relationship == null)
             {
-                throw new ArgumentNullException("relationship");
+                throw new ArgumentNullException(nameof(relationship));
             }
 
             var specRelation = new SpecRelation
             {
                 Identifier = relationship.Iid.ToString(),
                 LastChange = DateTime.UtcNow,
-                LongName = relationship.UserFriendlyName
+                LongName = relationship.UserFriendlyName,
+                Type = relationType
             };
-            specRelation.Type = relationType;
 
             this.SetCommonAttributeValues(specRelation, relationship);
 
@@ -434,7 +506,7 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (binaryRelationship == null)
             {
-                throw new ArgumentNullException("binaryRelationship");
+                throw new ArgumentNullException(nameof(binaryRelationship));
             }
 
             var relationGroupType = new RelationGroupType()
@@ -449,6 +521,7 @@ namespace CDP4Requirements.ReqIFDal
 
             // set the attribute-definition
             var parameterTypes = appliedRules.SelectMany(r => r.ParameterType).Distinct();
+
             foreach (var parameterType in parameterTypes)
             {
                 var attibuteDef = this.ToReqIfAttributeDefinition(parameterType, parameterTypeMap);
@@ -474,16 +547,16 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (relationship == null)
             {
-                throw new ArgumentNullException("relationship");
+                throw new ArgumentNullException(nameof(relationship));
             }
 
             var relationGroup = new RelationGroup
             {
                 Identifier = relationship.Iid.ToString(),
                 LastChange = DateTime.UtcNow,
-                LongName = relationship.UserFriendlyName
+                LongName = relationship.UserFriendlyName,
+                Type = relationGroupType
             };
-            relationGroup.Type = relationGroupType;
 
             this.SetCommonAttributeValues(relationGroup, relationship);
 
@@ -499,7 +572,7 @@ namespace CDP4Requirements.ReqIFDal
 
             return relationGroup;
         }
-        #region DataType Definition
+
         /// <summary>
         /// Returns the <see cref="DatatypeDefinition"/> representation of a <see cref="ParameterType"/>
         /// </summary>
@@ -509,11 +582,10 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (parameterType == null)
             {
-                throw new ArgumentNullException("parameterType");
+                throw new ArgumentNullException(nameof(parameterType));
             }
 
-            var enumerationParameterType = parameterType as EnumerationParameterType;
-            if (enumerationParameterType != null)
+            if (parameterType is EnumerationParameterType enumerationParameterType)
             {
                 return this.ToReqIfDatatypeDefinitionEnumeration(enumerationParameterType);
             }
@@ -609,9 +681,6 @@ namespace CDP4Requirements.ReqIFDal
             this.SetIdentifiableProperties(datatype, definedThing);
             return datatype;
         }
-        #endregion
-
-        #region Attribute 
 
         /// <summary>
         /// Returns the <see cref="AttributeDefinition"/> representation of <see cref="SimpleParameterValue"/>
@@ -623,29 +692,28 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (parameterType == null)
             {
-                throw new ArgumentNullException("parameterType");
+                throw new ArgumentNullException(nameof(parameterType));
             }
 
             AttributeDefinition attributeDefinition;
 
-            var enumerationParameterType = parameterType as EnumerationParameterType;
-            if (enumerationParameterType != null)
+            if (parameterType is EnumerationParameterType enumerationParameterType)
             {
                 attributeDefinition = new AttributeDefinitionEnumeration
                 {
                     IsMultiValued = enumerationParameterType.AllowMultiSelect,
                     Type = (DatatypeDefinitionEnumeration)parameterTypeMap[parameterType],
-                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : emptyContent
+                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : EmptyContent
                 };
             }
             else if (parameterType is DateParameterType ||
-                parameterType is DateTimeParameterType ||
-                parameterType is TimeOfDayParameterType)
+                     parameterType is DateTimeParameterType ||
+                     parameterType is TimeOfDayParameterType)
             {
                 attributeDefinition = new AttributeDefinitionDate
                 {
                     Type = (DatatypeDefinitionDate)parameterTypeMap[parameterType],
-                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : emptyContent
+                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : EmptyContent
                 };
             }
             else if (parameterType is TextParameterType)
@@ -653,15 +721,15 @@ namespace CDP4Requirements.ReqIFDal
                 attributeDefinition = new AttributeDefinitionString
                 {
                     Type = (DatatypeDefinitionString)parameterTypeMap[parameterType],
-                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : emptyContent
-                }; 
+                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : EmptyContent
+                };
             }
             else if (parameterType is BooleanParameterType)
             {
                 attributeDefinition = new AttributeDefinitionBoolean
                 {
                     Type = (DatatypeDefinitionBoolean)parameterTypeMap[parameterType],
-                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : emptyContent
+                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : EmptyContent
                 };
             }
             else if (parameterType is QuantityKind)
@@ -669,7 +737,7 @@ namespace CDP4Requirements.ReqIFDal
                 attributeDefinition = new AttributeDefinitionString
                 {
                     Type = (DatatypeDefinitionString)parameterTypeMap[parameterType],
-                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : emptyContent
+                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : EmptyContent
                 };
             }
             else
@@ -678,7 +746,7 @@ namespace CDP4Requirements.ReqIFDal
                 attributeDefinition = new AttributeDefinitionString
                 {
                     Type = (DatatypeDefinitionString)parameterTypeMap[parameterType],
-                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : emptyContent
+                    Description = parameterType.Definition.Any() ? parameterType.Definition.First().Content : EmptyContent
                 };
             }
 
@@ -698,16 +766,13 @@ namespace CDP4Requirements.ReqIFDal
         {
             if (parameterType == null)
             {
-                throw new ArgumentNullException("parameterType");
+                throw new ArgumentNullException(nameof(parameterType));
             }
 
-            if (parameterType is EnumerationParameterType)
+            if (parameterType is EnumerationParameterType enumParameterType)
             {
-                
-                var enumParameterType = (EnumerationParameterType)parameterType;
-
                 var concatEnumValue = valuearray.Single();
-                var enumValues = concatEnumValue.Split(parameterEnumSeparator).Select(x => x.Trim()); // retrieve the list of litteral
+                var enumValues = concatEnumValue.Split(ParameterEnumSeparator).Select(x => x.Trim()); // retrieve the list of litteral
                 var valueDefinitions = enumParameterType.ValueDefinition.Where(x => enumValues.Contains(x.ShortName)).ToList();
 
                 // Assuming the model is not wrong the values in the SimpleParameterValue references the ValueDefinition by its ShortName
@@ -745,6 +810,7 @@ namespace CDP4Requirements.ReqIFDal
             if (parameterType is TextParameterType)
             {
                 var value = valuearray.Single();
+
                 return new AttributeValueString
                 {
                     TheValue = value,
@@ -755,7 +821,7 @@ namespace CDP4Requirements.ReqIFDal
             if (parameterType is BooleanParameterType)
             {
                 var value = valuearray.Single();
-                var boolean = Boolean.Parse(value);
+                var boolean = bool.Parse(value);
 
                 return new AttributeValueBoolean
                 {
@@ -767,27 +833,29 @@ namespace CDP4Requirements.ReqIFDal
             if (parameterType is QuantityKind)
             {
                 var value = valuearray.Single();
+
                 return new AttributeValueString
                 {
-                    TheValue = string.Format("{0} [{1}]", value, scale != null ? scale.ShortName : "-"),
+                    TheValue = $"{value} [{(scale != null ? scale.ShortName : "-")}]",
                     Definition = (AttributeDefinitionString)attributeDefinition
                 };
             }
 
-
             // CompoundParameterType
             var compoundType = (CompoundParameterType)parameterType;
             var theValue = "Error: The value could not be parsed.";
+
             if (valuearray.Count() == compoundType.Component.Count)
             {
                 var values = new List<string>();
+
                 for (var i = 0; i < valuearray.Count(); i++)
                 {
                     var component = compoundType.Component[i].Scale != null ? compoundType.Component[i].Scale.ShortName : "-";
-                    values.Add(string.Format("{0}: {1} [{2}]", compoundType.Component[i].ShortName, valuearray[i], component));
+                    values.Add($"{compoundType.Component[i].ShortName}: {valuearray[i]} [{component}]");
                 }
 
-                theValue = string.Format("{{ {0} }}", string.Join(", ", values));
+                theValue = $"{{ {string.Join(", ", values)} }}";
             }
 
             return new AttributeValueString
@@ -795,9 +863,7 @@ namespace CDP4Requirements.ReqIFDal
                 TheValue = theValue,
                 Definition = (AttributeDefinitionString)attributeDefinition
             };
-            
         }
-        #endregion
 
         /// <summary>
         /// Set the <see cref="Identifiable"/> properties from a <see cref="DefinedThing"/>
@@ -807,7 +873,7 @@ namespace CDP4Requirements.ReqIFDal
         private void SetIdentifiableProperties(Identifiable identifiable, DefinedThing definedThing)
         {
             identifiable.Identifier = definedThing.Iid.ToString();
-            identifiable.LongName = string.Format("{0}{1}", definedThing.ClassKind == ClassKind.RequirementsGroup ? GroupNamePrefix : string.Empty, definedThing.ShortName);
+            identifiable.LongName = $"{(definedThing.ClassKind == ClassKind.RequirementsGroup ? GroupNamePrefix : string.Empty)}{definedThing.ShortName}";
             identifiable.LastChange = DateTime.UtcNow;
             identifiable.Description = definedThing.Name;
         }
@@ -827,6 +893,7 @@ namespace CDP4Requirements.ReqIFDal
                 LastChange = DateTime.UtcNow,
                 LongName = ShortNameAttributeDefName
             };
+
             spectType.SpecAttributes.Add(shortNameAttributeDef);
 
             var nameAttributeDef = new AttributeDefinitionString
@@ -837,6 +904,7 @@ namespace CDP4Requirements.ReqIFDal
                 LastChange = DateTime.UtcNow,
                 LongName = NameAttributeDefName
             };
+
             spectType.SpecAttributes.Add(nameAttributeDef);
 
             var catAttributeDef = new AttributeDefinitionString
@@ -847,6 +915,7 @@ namespace CDP4Requirements.ReqIFDal
                 LastChange = DateTime.UtcNow,
                 LongName = CategoryAttributeDefName
             };
+
             spectType.SpecAttributes.Add(catAttributeDef);
         }
 
@@ -862,13 +931,14 @@ namespace CDP4Requirements.ReqIFDal
             var categoryType = (AttributeDefinitionString)elementWithAttributes.SpecType.SpecAttributes.Single(x => x.DatatypeDefinition == this.TextDatatypeDefinition && x.LongName == CategoryAttributeDefName);
 
             var castthing = (Thing)thing;
-            
+
             // Add shortname
-            var shortname =  new AttributeValueString
+            var shortname = new AttributeValueString
             {
                 TheValue = castthing.UserFriendlyShortName ?? string.Empty,
                 Definition = shortNameType
             };
+
             elementWithAttributes.Values.Add(shortname);
 
             // Add name
@@ -877,14 +947,16 @@ namespace CDP4Requirements.ReqIFDal
                 TheValue = castthing.UserFriendlyName ?? string.Empty,
                 Definition = nameType
             };
+
             elementWithAttributes.Values.Add(name);
 
             // Add Category
             var category = new AttributeValueString
             {
-                TheValue = thing.Category.Any() ? string.Join(", ", thing.Category.Select(x => x.ShortName)) : emptyContent,
+                TheValue = thing.Category.Any() ? string.Join(", ", thing.Category.Select(x => x.ShortName)) : EmptyContent,
                 Definition = categoryType
             };
+
             elementWithAttributes.Values.Add(category);
         }
     }

@@ -1,8 +1,27 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsSpecificationDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// --------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests
 {
@@ -11,21 +30,29 @@ namespace CDP4Requirements.Tests
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4Requirements.ViewModels;
+
     using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -38,6 +65,7 @@ namespace CDP4Requirements.Tests
         private readonly Uri uri = new Uri("http://test.com");
         private EngineeringModel model;
         private EngineeringModelSetup modelSetup;
+        private ModelReferenceDataLibrary mrdl;
         private Iteration iteration;
         private IterationSetup iterationSetup;
         private RequirementsSpecification resSpec;
@@ -49,7 +77,7 @@ namespace CDP4Requirements.Tests
         private Mock<IPermissionService> permissionService;
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
-        
+
         [SetUp]
         public void Setup()
         {
@@ -60,6 +88,8 @@ namespace CDP4Requirements.Tests
             this.session = new Mock<ISession>();
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
+            this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
+            this.modelSetup.RequiredRdl.Add(this.mrdl);
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.resSpec = new RequirementsSpecification();
@@ -70,6 +100,7 @@ namespace CDP4Requirements.Tests
             this.serviceLocator = new Mock<IServiceLocator>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>())
                 .Returns(this.dialogNavigation.Object);
 

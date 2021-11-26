@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfJsonConverter.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -65,7 +65,7 @@ namespace CDP4Requirements.Settings.JsonConverters
         /// <param name="session">The <see cref="ISession"/></param>
         protected ReqIfJsonConverter(ReqIF reqIf, ISession session)
         {
-            this.ReqIfCoreContent = reqIf?.CoreContent.FirstOrDefault();
+            this.ReqIfCoreContent = reqIf?.CoreContent;
             this.session = session;
         }
 

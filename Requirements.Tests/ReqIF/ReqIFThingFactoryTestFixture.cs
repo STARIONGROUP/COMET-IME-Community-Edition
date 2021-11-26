@@ -1,6 +1,25 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ReqIFThingFactoryTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -9,24 +28,30 @@ namespace CDP4Requirements.Tests.ReqIF
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
-    using Moq;
-    using NUnit.Framework;
-    using ReqIFDal;
-    using ReqIFSharp;
+
+    using CDP4Requirements.ReqIFDal;
     using CDP4Requirements.ViewModels;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using ReqIFSharp;
 
     [TestFixture]
     internal class ReqIFThingFactoryTestFixture
     {
-
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<ISession> session;
@@ -36,6 +61,7 @@ namespace CDP4Requirements.Tests.ReqIF
         private Uri uri = new Uri("http://test.com");
 
         #region Things
+
         private SiteDirectory sitedir;
         private EngineeringModelSetup modelsetup;
         private IterationSetup iterationSetup;
@@ -61,9 +87,11 @@ namespace CDP4Requirements.Tests.ReqIF
         private BinaryRelationshipRule reqRule;
 
         private ParameterizedCategoryRule parameterRule;
+
         #endregion
 
         #region ReqIF data
+
         private ReqIF reqIf;
         private ReqIFContent corecontent;
         private DatatypeDefinitionString stringDatadef;
@@ -87,7 +115,6 @@ namespace CDP4Requirements.Tests.ReqIF
         private AttributeDefinitionString specRelationAttribute;
         private AttributeDefinitionString relationgroupAttribute;
 
-
         private AttributeValueString specValue1;
         private AttributeValueString specValue2;
 
@@ -96,6 +123,7 @@ namespace CDP4Requirements.Tests.ReqIF
 
         private AttributeValueString specrelationValue;
         private AttributeValueString relationgroupValue;
+
         #endregion
 
         [SetUp]
@@ -127,10 +155,10 @@ namespace CDP4Requirements.Tests.ReqIF
             datatypeMap.Add(this.stringDatadef, datatypedef1);
 
             var spectypeMap = new Dictionary<SpecType, SpecTypeMap>();
-            var specificationMap = new SpecTypeMap(this.specificationtype, null, new [] {this.specCategory}, new [] {new AttributeDefinitionMap(this.specAttribute, AttributeDefinitionMapKind.NAME)});
-            var requirementMap = new SpecObjectTypeMap(this.specobjecttype, null, new [] {this.reqCateory}, new[] { new AttributeDefinitionMap(this.reqAttribute, AttributeDefinitionMapKind.FIRST_DEFINITION) }, true);
-            var specRelationMap = new SpecRelationTypeMap(this.specrelationtype, new [] {this.parameterRule}, new [] {this.specRelationCategory}, new[] { new AttributeDefinitionMap(this.specRelationAttribute, AttributeDefinitionMapKind.PARAMETER_VALUE) }, new [] {this.reqRule});
-            var relationGroupMap = new RelationGroupTypeMap(this.relationgrouptype, null, new [] {this.relationGroupCategory}, new[] { new AttributeDefinitionMap(this.relationgroupAttribute, AttributeDefinitionMapKind.NONE) }, new []{this.specRule});
+            var specificationMap = new SpecTypeMap(this.specificationtype, null, new[] { this.specCategory }, new[] { new AttributeDefinitionMap(this.specAttribute, AttributeDefinitionMapKind.NAME) });
+            var requirementMap = new SpecObjectTypeMap(this.specobjecttype, null, new[] { this.reqCateory }, new[] { new AttributeDefinitionMap(this.reqAttribute, AttributeDefinitionMapKind.FIRST_DEFINITION) }, true);
+            var specRelationMap = new SpecRelationTypeMap(this.specrelationtype, new[] { this.parameterRule }, new[] { this.specRelationCategory }, new[] { new AttributeDefinitionMap(this.specRelationAttribute, AttributeDefinitionMapKind.PARAMETER_VALUE) }, new[] { this.reqRule });
+            var relationGroupMap = new RelationGroupTypeMap(this.relationgrouptype, null, new[] { this.relationGroupCategory }, new[] { new AttributeDefinitionMap(this.relationgroupAttribute, AttributeDefinitionMapKind.NONE) }, new[] { this.specRule });
             spectypeMap.Add(this.specificationtype, specificationMap);
             spectypeMap.Add(this.specobjecttype, requirementMap);
             spectypeMap.Add(this.specrelationtype, specRelationMap);
@@ -143,7 +171,6 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.AreEqual(1, factory.SpecRelationMap.Count);
             Assert.AreEqual(2, factory.SpecificationMap.Count);
             Assert.IsTrue(factory.SpecificationMap.All(x => x.Value.Requirement.Count == 1));
-            
 
             var reqSpec1 = factory.SpecificationMap[this.specification1];
             var reqSpec2 = factory.SpecificationMap[this.specification2];
@@ -242,7 +269,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.reqIf = new ReqIF();
             this.reqIf.Lang = "en";
             this.corecontent = new ReqIFContent();
-            this.reqIf.CoreContent.Add(this.corecontent);
+            this.reqIf.CoreContent = this.corecontent;
             this.stringDatadef = new DatatypeDefinitionString();
             this.specificationtype = new SpecificationType();
             this.specobjecttype = new SpecObjectType();
@@ -260,17 +287,17 @@ namespace CDP4Requirements.Tests.ReqIF
             this.specrelationtype.SpecAttributes.Add(this.specRelationAttribute);
             this.relationgrouptype.SpecAttributes.Add(this.relationgroupAttribute);
 
-            this.specification1 = new Specification() {Type = this.specificationtype};
-            this.specification2 = new Specification() {Type = this.specificationtype};
+            this.specification1 = new Specification() { Type = this.specificationtype };
+            this.specification2 = new Specification() { Type = this.specificationtype };
 
-            this.specobject1 = new SpecObject() {Type = this.specobjecttype};
-            this.specobject2 = new SpecObject() {Type = this.specobjecttype};
+            this.specobject1 = new SpecObject() { Type = this.specobjecttype };
+            this.specobject2 = new SpecObject() { Type = this.specobjecttype };
 
-            this.specrelation = new SpecRelation() {Type = this.specrelationtype, Source = this.specobject1, Target = this.specobject2};
-            this.relationgroup = new RelationGroup() {Type = this.relationgrouptype, SourceSpecification = this.specification1, TargetSpecification = this.specification2};
+            this.specrelation = new SpecRelation() { Type = this.specrelationtype, Source = this.specobject1, Target = this.specobject2 };
+            this.relationgroup = new RelationGroup() { Type = this.relationgrouptype, SourceSpecification = this.specification1, TargetSpecification = this.specification2 };
 
-            this.specValue1 = new AttributeValueString() {AttributeDefinition = this.specAttribute, TheValue = "spec1"};
-            this.specValue2 = new AttributeValueString() {AttributeDefinition = this.specAttribute, TheValue = "spec2"};
+            this.specValue1 = new AttributeValueString() { AttributeDefinition = this.specAttribute, TheValue = "spec1" };
+            this.specValue2 = new AttributeValueString() { AttributeDefinition = this.specAttribute, TheValue = "spec2" };
             this.objectValue1 = new AttributeValueString() { AttributeDefinition = this.reqAttribute, TheValue = "req1" };
             this.objectValue2 = new AttributeValueString() { AttributeDefinition = this.reqAttribute, TheValue = "req2" };
             this.relationgroupValue = new AttributeValueString() { AttributeDefinition = this.relationgroupAttribute, TheValue = "group" };
@@ -284,14 +311,14 @@ namespace CDP4Requirements.Tests.ReqIF
             this.relationgroup.Values.Add(this.relationgroupValue);
 
             this.corecontent.DataTypes.Add(this.stringDatadef);
-            this.corecontent.SpecTypes.AddRange(new SpecType[] {this.specobjecttype, this.specificationtype, this.specrelationtype, this.relationgrouptype});
-            this.corecontent.SpecObjects.AddRange(new SpecObject[] {this.specobject1, this.specobject2});
-            this.corecontent.Specifications.AddRange(new Specification[] {this.specification1, this.specification2});
+            this.corecontent.SpecTypes.AddRange(new SpecType[] { this.specobjecttype, this.specificationtype, this.specrelationtype, this.relationgrouptype });
+            this.corecontent.SpecObjects.AddRange(new SpecObject[] { this.specobject1, this.specobject2 });
+            this.corecontent.Specifications.AddRange(new Specification[] { this.specification1, this.specification2 });
             this.corecontent.SpecRelations.Add(this.specrelation);
             this.corecontent.SpecRelationGroups.Add(this.relationgroup);
 
-            this.specification1.Children.Add(new SpecHierarchy() {Object = this.specobject1});
-            this.specification2.Children.Add(new SpecHierarchy() {Object = this.specobject2});
+            this.specification1.Children.Add(new SpecHierarchy() { Object = this.specobject1 });
+            this.specification2.Children.Add(new SpecHierarchy() { Object = this.specobject2 });
         }
     }
 }

@@ -1,29 +1,54 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsGroupDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests.Dialogs
 {
     using System;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Navigation;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4Requirements.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
     internal class RequirementsGroupDialogViewModelTestFixture
     {
         private Mock<ISession> session;
-        private Mock<IPermissionService> permissionService; 
+        private Mock<IPermissionService> permissionService;
         private ThingTransaction thingTransaction;
         private SiteDirectory siteDir;
 
@@ -31,6 +56,7 @@ namespace CDP4Requirements.Tests.Dialogs
         private Iteration iteration;
         private RequirementsSpecification requirementsSpecification;
         private EngineeringModelSetup engineeringModelSetup;
+        private ModelReferenceDataLibrary mrdl1;
         private IterationSetup iterationSetup;
         private DomainOfExpertise domainOfExpertise;
 
@@ -38,6 +64,7 @@ namespace CDP4Requirements.Tests.Dialogs
         private RequirementsGroup reqGroup;
         private DomainOfExpertise domain;
         private EngineeringModelSetup modelsetup;
+        private ModelReferenceDataLibrary mrdl2;
 
         private Uri uri;
 
@@ -46,26 +73,32 @@ namespace CDP4Requirements.Tests.Dialogs
         {
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
-            
+
             this.uri = new Uri("http://test.com");
             this.siteDir = new SiteDirectory(Guid.NewGuid(), null, this.uri);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
             this.siteDir.Domain.Add(this.domain);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             this.modelsetup.ActiveDomain.Add(this.domain);
+            this.mrdl1 = new ModelReferenceDataLibrary(Guid.NewGuid(), null, this.uri);
+            this.modelsetup.RequiredRdl.Add(this.mrdl1);
 
             this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), null, this.uri);
             this.reqGroup = new RequirementsGroup(Guid.NewGuid(), null, this.uri);
 
-            this.engineeringModel = new EngineeringModel(Guid.NewGuid(), null, this.uri) { EngineeringModelSetup =  this.modelsetup};
+            this.engineeringModel = new EngineeringModel(Guid.NewGuid(), null, this.uri) { EngineeringModelSetup = this.modelsetup };
             this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
             this.requirementsSpecification = new RequirementsSpecification(Guid.NewGuid(), null, this.uri);
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
+
+            this.mrdl2 = new ModelReferenceDataLibrary(Guid.NewGuid(), null, this.uri);
+            this.engineeringModelSetup.RequiredRdl.Add(this.mrdl2);
+
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
             this.iteration.IterationSetup = this.iterationSetup;
 
             var person = new Person(Guid.NewGuid(), null, this.uri);
-            this.domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) {Name = "test"};
+            this.domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "test" };
             person.DefaultDomain = this.domainOfExpertise;
 
             this.engineeringModelSetup.ActiveDomain.Add(this.domainOfExpertise);
@@ -74,7 +107,7 @@ namespace CDP4Requirements.Tests.Dialogs
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.ActivePerson).Returns(person);
             this.siteDir.Domain.Add(this.domainOfExpertise);
-            
+
             this.engineeringModel.Iteration.Add(this.iteration);
             this.iteration.RequirementsSpecification.Add(this.requirementsSpecification);
             this.iteration.RequirementsSpecification.Add(this.reqSpec);
@@ -97,13 +130,12 @@ namespace CDP4Requirements.Tests.Dialogs
             CDPMessageBus.Current.ClearSubscriptions();
         }
 
-
         [Test]
         public void VerifyThatPopulatePossibleOwnerWorks()
         {
-
             var clone = this.reqSpec.Clone(true);
             this.thingTransaction.CreateOrUpdate(clone);
+
             var vm = new RequirementsGroupDialogViewModel(this.reqGroup, this.thingTransaction, this.session.Object,
                 true, ThingDialogKind.Create, null, clone);
 

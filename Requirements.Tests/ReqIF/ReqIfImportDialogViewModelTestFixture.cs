@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
@@ -40,7 +40,6 @@ namespace CDP4Requirements.Tests.ReqIF
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    using CDP4Composition.Services.PluginSettingService;
 
     using CDP4Dal;
     using CDP4Dal.Permission;
@@ -104,11 +103,11 @@ namespace CDP4Requirements.Tests.ReqIF
             this.permissionService = new Mock<IPermissionService>();
             this.path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReqIf", "testreq.reqif");
             this.fileDialogService = new Mock<IOpenSaveFileDialogService>();
-            this.fileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.path});
+            this.fileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.path });
             this.reqIf = new ReqIF { Lang = "en" };
-            this.reqIf.TheHeader.Add(new ReqIFHeader() {Identifier = Guid.NewGuid().ToString()});
+            this.reqIf.TheHeader = new ReqIFHeader() { Identifier = Guid.NewGuid().ToString() };
             var corecontent = new ReqIFContent();
-            this.reqIf.CoreContent.Add(corecontent);
+            this.reqIf.CoreContent = corecontent;
             this.stringDatadef = new DatatypeDefinitionString();
             this.spectype = new SpecificationType();
             this.attribute = new AttributeDefinitionString() { DatatypeDefinition = this.stringDatadef };
@@ -117,13 +116,13 @@ namespace CDP4Requirements.Tests.ReqIF
 
             corecontent.DataTypes.Add(this.stringDatadef);
 
-            this.settings = new RequirementsModuleSettings() 
+            this.settings = new RequirementsModuleSettings()
             {
-                SavedConfigurations = 
+                SavedConfigurations =
                 {
                     new ImportMappingConfiguration()
                     {
-                        ReqIfId = this.reqIf.TheHeader[0].Identifier, Name = "Test"
+                        ReqIfId = this.reqIf.TheHeader.Identifier, Name = "Test"
                     }
                 }
             };
@@ -131,9 +130,9 @@ namespace CDP4Requirements.Tests.ReqIF
             this.pluginSettingService = new Mock<IPluginSettingsService>();
             this.pluginSettingService.Setup(x => x.Read<RequirementsModuleSettings>(true, It.IsAny<JsonConverter[]>())).Returns(this.settings);
             this.pluginSettingService.Setup(x => x.Read<RequirementsModuleSettings>(false)).Returns(this.settings);
-            
+
             this.reqIfSerialiser = new Mock<IReqIFDeSerializer>();
-            this.reqIfSerialiser.Setup(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null)).Returns(this.reqIf);
+            this.reqIfSerialiser.Setup(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null)).Returns(new[] { this.reqIf });
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString());
             this.assembler = new Assembler(this.uri);
@@ -167,8 +166,8 @@ namespace CDP4Requirements.Tests.ReqIF
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
 
             this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
-            
-            this.dialog = new ReqIfImportDialogViewModel(new []{this.session.Object}, new []{ this.iteration }, this.fileDialogService.Object, this.pluginSettingService.Object, this.reqIfSerialiser.Object);
+
+            this.dialog = new ReqIfImportDialogViewModel(new[] { this.session.Object }, new[] { this.iteration }, this.fileDialogService.Object, this.pluginSettingService.Object, this.reqIfSerialiser.Object);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
         }
 
@@ -193,7 +192,7 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.IsFalse(this.dialog.CanExecuteImport);
             this.dialog.Path = this.path;
             this.dialog.SelectedIteration = this.dialog.Iterations.First();
-            
+
             Assert.IsTrue(this.dialog.CanExecuteImport);
             _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
             this.reqIfSerialiser.Verify(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null), Times.Once);
@@ -205,7 +204,7 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.IsNotNull(result.Iteration);
             Assert.IsNotNull(result.ReqIfObject);
         }
-        
+
         [Test]
         public async Task VerifyThatSavedConfigurationArePickedUpCorrectly()
         {
@@ -216,7 +215,7 @@ namespace CDP4Requirements.Tests.ReqIF
             // Without Any Configuration
             this.dialog.SelectedMappingConfiguration = this.dialog.AvailableMappingConfiguration.FirstOrDefault(x => x.Name == ReqIfImportDialogViewModel.NoConfigurationText);
             Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.NoConfigurationText);
-            
+
             Assert.IsTrue(this.dialog.CanExecuteImport);
             _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
             var resultNoConfiguration = this.dialog.DialogResult as ReqIfImportResult;
@@ -227,7 +226,7 @@ namespace CDP4Requirements.Tests.ReqIF
             //With AUTO selection of the mapping configuration
             this.dialog.SelectedMappingConfiguration = this.dialog.AvailableMappingConfiguration.FirstOrDefault(x => x.Name == ReqIfImportDialogViewModel.AutoConfigurationText);
             Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.AutoConfigurationText);
-            
+
             Assert.IsTrue(this.dialog.CanExecuteImport);
             _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
 

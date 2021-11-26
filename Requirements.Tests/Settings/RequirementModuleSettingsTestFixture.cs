@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementModuleSettingsTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
@@ -25,8 +25,6 @@
 
 namespace CDP4Requirements.Tests.Settings
 {
-    using NUnit.Framework;
-
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -38,6 +36,7 @@ namespace CDP4Requirements.Tests.Settings
     using CDP4Common.Types;
 
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -46,7 +45,11 @@ namespace CDP4Requirements.Tests.Settings
     using CDP4Requirements.Settings.JsonConverters;
     using CDP4Requirements.ViewModels;
 
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
+
+    using NUnit.Framework;
 
     using ReqIFSharp;
 
@@ -76,12 +79,20 @@ namespace CDP4Requirements.Tests.Settings
         private Category category1;
         private BinaryRelationshipRule binaryRelationshipRule0;
         private BinaryRelationshipRule binaryRelationshipRule1;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IMessageBoxService> messageBoxService;
 
         [SetUp]
         public void Setup()
         {
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.messageBoxService = new Mock<IMessageBoxService>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
+
             this.pluginSettingsService = new PluginSettingsService();
-            
+
             this.expectedSettingsPath =
                 Path.Combine(
                     this.pluginSettingsService.AppDataFolder,
@@ -94,8 +105,8 @@ namespace CDP4Requirements.Tests.Settings
             var credentials = new Credentials("John", "Doe", new Uri(this.uri));
             this.session = new Session(new Mock<IDal>().Object, credentials);
 
-            var reqIfPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Settings","testreq.reqif");
-            this.reqIf = new ReqIFDeserializer().Deserialize(reqIfPath);
+            var reqIfPath = Path.Combine(TestContext.CurrentContext.TestDirectory, "Settings", "testreq.reqif");
+            this.reqIf = new ReqIFDeserializer().Deserialize(reqIfPath).First();
 
             this.dataTypeDefinitionMapConverter = new DataTypeDefinitionMapConverter(this.reqIf, this.session);
             this.specObjectTypeMapConverter = new SpecObjectTypeMapConverter(this.reqIf, this.session);
@@ -106,19 +117,19 @@ namespace CDP4Requirements.Tests.Settings
 
         private void SetupData()
         {
-            var datatypeDefinition0 = new DatatypeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.DataTypes[0].Identifier };
-            var datatypeDefinition1 = new DatatypeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.DataTypes[1].Identifier };
-            
-            var specObjectType0 = new SpecObjectType() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes.OfType<SpecObjectType>().ToList()[0].Identifier };
-            var specObjectType1 = new SpecObjectType() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes.OfType<SpecObjectType>().ToList()[1].Identifier };
+            var datatypeDefinition0 = new DatatypeDefinitionString() { Identifier = this.reqIf.CoreContent?.DataTypes[0].Identifier };
+            var datatypeDefinition1 = new DatatypeDefinitionString() { Identifier = this.reqIf.CoreContent?.DataTypes[1].Identifier };
 
-            var specRelationType0 = new SpecRelationType() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes.OfType<SpecRelationType>().ToList()[0].Identifier };
+            var specObjectType0 = new SpecObjectType() { Identifier = this.reqIf.CoreContent?.SpecTypes.OfType<SpecObjectType>().ToList()[0].Identifier };
+            var specObjectType1 = new SpecObjectType() { Identifier = this.reqIf.CoreContent?.SpecTypes.OfType<SpecObjectType>().ToList()[1].Identifier };
+
+            var specRelationType0 = new SpecRelationType() { Identifier = this.reqIf.CoreContent?.SpecTypes.OfType<SpecRelationType>().ToList()[0].Identifier };
 
             this.rule0 = new ParameterizedCategoryRule(Guid.NewGuid(), this.session.Assembler.Cache, new Uri(this.uri));
             this.rule1 = new ParameterizedCategoryRule(Guid.NewGuid(), this.session.Assembler.Cache, new Uri(this.uri));
             this.session.Assembler.Cache.TryAdd(new CacheKey(this.rule0.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.rule0));
             this.session.Assembler.Cache.TryAdd(new CacheKey(this.rule1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.rule1));
-            
+
             this.category0 = new Category(Guid.NewGuid(), this.session.Assembler.Cache, new Uri(this.uri));
             this.category1 = new Category(Guid.NewGuid(), this.session.Assembler.Cache, new Uri(this.uri));
             this.session.Assembler.Cache.TryAdd(new CacheKey(this.category0.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.category0));
@@ -129,8 +140,8 @@ namespace CDP4Requirements.Tests.Settings
                 new[] { this.category0, this.category1 },
                 new[]
                 {
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME ),
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME )
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME),
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME)
                 },
                 true);
 
@@ -139,8 +150,8 @@ namespace CDP4Requirements.Tests.Settings
                 new[] { this.category0, this.category1 },
                 new[]
                 {
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME ),
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME )
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME),
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME)
                 },
                 true);
 
@@ -149,53 +160,53 @@ namespace CDP4Requirements.Tests.Settings
 
             this.session.Assembler.Cache.TryAdd(new CacheKey(this.binaryRelationshipRule0.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.binaryRelationshipRule0));
             this.session.Assembler.Cache.TryAdd(new CacheKey(this.binaryRelationshipRule1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.binaryRelationshipRule1));
-            
+
             var specRelationTypeMap0 = new SpecRelationTypeMap(specRelationType0,
                 new[] { this.rule0, this.rule1 },
                 new[] { this.category0, this.category1 },
                 new[]
                 {
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME ),
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME )
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME),
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME)
                 },
                 new[] { this.binaryRelationshipRule0, this.binaryRelationshipRule1 });
 
-            var relationGroupType0 = new RelationGroupType() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes.OfType<SpecRelationType>().ToList()[0].Identifier };
-            
+            var relationGroupType0 = new RelationGroupType() { Identifier = this.reqIf.CoreContent?.SpecTypes.OfType<SpecRelationType>().ToList()[0].Identifier };
+
             var relationGroupTypeMap0 = new RelationGroupTypeMap(relationGroupType0,
                 new[] { this.rule0, this.rule1 },
                 new[] { this.category0, this.category1 },
                 new[]
                 {
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME ),
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME )
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME),
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME)
                 },
                 new[] { this.binaryRelationshipRule0, this.binaryRelationshipRule1 });
 
-            var specificationType0 = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes.OfType<SpecificationType>().First();
+            var specificationType0 = this.reqIf.CoreContent?.SpecTypes.OfType<SpecificationType>().First();
 
             var specificationTypeMap0 = new SpecTypeMap(specificationType0,
                 new[] { this.rule0, this.rule1 },
                 new[] { this.category0, this.category1 },
                 new[]
                 {
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME ),
-                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent.FirstOrDefault()?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME )
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[0].Identifier }, AttributeDefinitionMapKind.NAME),
+                    new AttributeDefinitionMap(new AttributeDefinitionString() { Identifier = this.reqIf.CoreContent?.SpecTypes[0].SpecAttributes[1].Identifier }, AttributeDefinitionMapKind.SHORTNAME)
                 });
 
             this.parameterType0 = new TextParameterType(Guid.NewGuid(), this.session.Assembler.Cache, new Uri(this.uri));
             this.parameterType1 = new TextParameterType(Guid.NewGuid(), this.session.Assembler.Cache, new Uri(this.uri));
             this.session.Assembler.Cache.TryAdd(new CacheKey(this.parameterType0.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.parameterType0));
             this.session.Assembler.Cache.TryAdd(new CacheKey(this.parameterType1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.parameterType1));
-            
+
             this.mappingConfiguration = new ImportMappingConfiguration()
             {
                 Name = "TestName",
                 Description = "TestDescription",
                 DatatypeDefinitionMap =
                 {
-                    { datatypeDefinition0, new DatatypeDefinitionMap(datatypeDefinition0, this.parameterType0, new Dictionary<EnumValue, EnumerationValueDefinition>() {{new EnumValue(), new EnumerationValueDefinition()} }) },
-                    { datatypeDefinition1, new DatatypeDefinitionMap(datatypeDefinition1, this.parameterType1, new Dictionary<EnumValue, EnumerationValueDefinition>() {{new EnumValue(), new EnumerationValueDefinition()} }) }
+                    { datatypeDefinition0, new DatatypeDefinitionMap(datatypeDefinition0, this.parameterType0, new Dictionary<EnumValue, EnumerationValueDefinition>() { { new EnumValue(), new EnumerationValueDefinition() } }) },
+                    { datatypeDefinition1, new DatatypeDefinitionMap(datatypeDefinition1, this.parameterType1, new Dictionary<EnumValue, EnumerationValueDefinition>() { { new EnumValue(), new EnumerationValueDefinition() } }) }
                 },
                 SpecObjectTypeMap =
                 {

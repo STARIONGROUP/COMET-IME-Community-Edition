@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementSpecificationMappingDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
@@ -30,7 +30,6 @@ namespace CDP4Requirements.Tests.ReqIF
     using System.IO;
     using System.Linq;
     using System.Reactive.Concurrency;
-    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -108,11 +107,11 @@ namespace CDP4Requirements.Tests.ReqIF
             this.permissionService = new Mock<IPermissionService>();
             this.path = Path.Combine(TestContext.CurrentContext.TestDirectory, "ReqIf", "testreq.reqif");
             this.fileDialogService = new Mock<IOpenSaveFileDialogService>();
-            this.fileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.path});
+            this.fileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.path });
             this.reqIf = new ReqIF { Lang = "en" };
-            this.reqIf.TheHeader.Add(new ReqIFHeader() {Identifier = Guid.NewGuid().ToString()});
+            this.reqIf.TheHeader = new ReqIFHeader() { Identifier = Guid.NewGuid().ToString() };
             var corecontent = new ReqIFContent();
-            this.reqIf.CoreContent.Add(corecontent);
+            this.reqIf.CoreContent = corecontent;
             this.stringDatadef = new DatatypeDefinitionString();
             this.spectype = new SpecificationType();
             this.attribute = new AttributeDefinitionString() { DatatypeDefinition = this.stringDatadef };
@@ -120,13 +119,13 @@ namespace CDP4Requirements.Tests.ReqIF
             this.spectype.SpecAttributes.Add(this.attribute);
 
             corecontent.DataTypes.Add(this.stringDatadef);
-            this.settings = new RequirementsModuleSettings() { SavedConfigurations = { new ImportMappingConfiguration() { ReqIfId = this.reqIf.TheHeader[0].Identifier} } };
+            this.settings = new RequirementsModuleSettings() { SavedConfigurations = { new ImportMappingConfiguration() { ReqIfId = this.reqIf.TheHeader.Identifier } } };
             this.pluginSettingService = new Mock<IPluginSettingsService>();
             this.pluginSettingService.Setup(x => x.Read<RequirementsModuleSettings>(It.IsAny<bool>(), It.IsAny<JsonConverter[]>())).Returns(this.settings);
             this.pluginSettingService.Setup(x => x.Write(It.IsAny<PluginSettings>(), It.IsAny<JsonConverter[]>()));
-            
+
             this.reqIfSerialiser = new Mock<IReqIFDeSerializer>();
-            this.reqIfSerialiser.Setup(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null)).Returns(this.reqIf);
+            this.reqIfSerialiser.Setup(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null)).Returns(new[] { this.reqIf });
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString());
             this.assembler = new Assembler(this.uri);
@@ -160,11 +159,11 @@ namespace CDP4Requirements.Tests.ReqIF
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
 
             this.assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
-            
+
             this.serviceLocator = new Mock<IServiceLocator>();
             this.serviceLocator.Setup(x => x.GetInstance<IPluginSettingsService>()).Returns(this.pluginSettingService.Object);
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
-            
+
             var thingFactory = new ThingFactory(this.iteration, new Dictionary<DatatypeDefinition, DatatypeDefinitionMap>(), new Dictionary<SpecType, SpecTypeMap>(), this.domain);
             this.dialog = new RequirementSpecificationMappingDialogViewModel(thingFactory, this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, "EN", this.settings.SavedConfigurations[0] as ImportMappingConfiguration);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
@@ -176,7 +175,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.dialog.CancelCommand.Execute(null);
             Assert.IsFalse(this.dialog.DialogResult.Result.Value);
         }
-        
+
         [Test]
         public void VerifyThatExecuteSaveMappingWorks()
         {

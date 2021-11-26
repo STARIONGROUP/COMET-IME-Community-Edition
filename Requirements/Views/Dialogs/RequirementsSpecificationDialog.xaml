@@ -37,6 +37,7 @@
                 
             </lc:LayoutGroup>
             
+            <items:CategoryLayoutGroup/>
             <items:DefinitionLayoutGroup/>
             <items:AliasLayoutGroup/>
             <items:HyperLinkLayoutGroup/>
