@@ -30,6 +30,7 @@ namespace CDP4Requirements.ViewModels
     using System.ComponentModel;
     using System.Linq;
     using System.Reactive;
+    using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -146,8 +147,12 @@ namespace CDP4Requirements.ViewModels
                 vm => vm.SelectedIteration,
                 (path, iteration) => iteration != null && !string.IsNullOrEmpty(path));
 
-            this.OkCommand = ReactiveCommand.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+            this.OkCommand = ReactiveCommand.CreateAsyncTask(canOk, async x => await this.ExecuteOk(), RxApp.MainThreadScheduler);
+
+            this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
+            {
+                this.ErrorMessage = x.Message;
+            });
 
             this.BrowseCommand = ReactiveCommand.Create();
             this.BrowseCommand.Subscribe(_ => this.ExecuteBrowse());
@@ -234,7 +239,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the Ok Command
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel Command
@@ -249,7 +254,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Executes the Ok Command
         /// </summary>
-        private async void ExecuteOk()
+        public async Task ExecuteOk()
         {
             this.IsBusy = true;
             this.LoadingMessage = "Exporting...";
@@ -266,14 +271,14 @@ namespace CDP4Requirements.ViewModels
             {
                 this.LoadingMessage = "Pre checking model validity...";
 
-                if (!await this.CheckModelValidity(this.SelectedIteration.Iteration))
+                if (!await Task.Run(this.CheckModelValidity, this.cancellationToken))
                 {
                     this.ErrorMessage = "The model contains errors that need to be fixed before exporting the requirements.";
                     return;
                 }
 
                 this.LoadingMessage = "Building ReqIf file...";
-                var reqif = await this.BuildReqIf();
+                var reqif = await Task.Run(this.BuildReqIf, this.cancellationToken);
 
                 this.LoadingMessage = $"Writing ReqIf file {this.Path}...";
                 await Task.Run(() => this.serializer.Serialize(reqif, this.Path, (sender, args) => { }), this.cancellationToken);
@@ -316,35 +321,31 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Check the validity of the model
         /// </summary>
-        /// <param name="iteration">The <see cref="Iteration"/> to check</param>
         /// <returns>True if no violations related to the exported data were found</returns>
-        private async Task<bool> CheckModelValidity(Iteration iteration)
+        private async Task<bool> CheckModelValidity()
         {
-            return await Task.Run(
-                () =>
-                {
-                    if (iteration.Container is not EngineeringModel model)
-                    {
-                        this.ErrorMessage = "The container of the selected Iteration is not set.";
-                        return false;
-                    }
+            var iteration = this.SelectedIteration.Iteration;
 
-                    var rules = model.RequiredRdls.SelectMany(x => x.Rule).OfType<ParameterizedCategoryRule>();
-                    var violations = new List<RuleViolation>();
+            if (iteration.Container is not EngineeringModel model)
+            {
+                this.ErrorMessage = "The container of the selected Iteration is not set.";
+                return false;
+            }
 
-                    var thingsToCheck = new List<Guid>();
-                    this.AddThingsToCheck(iteration, thingsToCheck);
+            var rules = model.RequiredRdls.SelectMany(x => x.Rule).OfType<ParameterizedCategoryRule>();
+            var violations = new List<RuleViolation>();
 
-                    foreach (var parameterizedCategoryRule in rules)
-                    {
-                        violations.AddRange(parameterizedCategoryRule.Verify(iteration).Where(v => v.ViolatingThing.Intersect(thingsToCheck).Any()));
-                    }
+            var thingsToCheck = new List<Guid>();
+            await this.AddThingsToCheck(iteration, thingsToCheck);
 
-                    this.ErrorDetailMessage = string.Join(Environment.NewLine, violations.Select(v => v.Description));
+            foreach (var parameterizedCategoryRule in rules)
+            {
+                violations.AddRange(parameterizedCategoryRule.Verify(iteration).Where(v => v.ViolatingThing.Intersect(thingsToCheck).Any()));
+            }
 
-                    return !violations.Any();
-                },
-                this.cancellationToken);
+            this.ErrorDetailMessage = string.Join(Environment.NewLine, violations.Select(v => v.Description));
+
+            return !violations.Any();
         }
 
         /// <summary>
@@ -352,7 +353,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="thingsToCheck">The collection of <see cref="Guid"/></param>
-        private void AddThingsToCheck(Iteration iteration, List<Guid> thingsToCheck)
+        private async Task AddThingsToCheck(Iteration iteration, List<Guid> thingsToCheck)
         {
             var relationships = iteration.Relationship
                 .OfType<BinaryRelationship>()
@@ -364,7 +365,7 @@ namespace CDP4Requirements.ViewModels
             foreach (var requirementsSpecification in iteration.RequirementsSpecification)
             {
                 thingsToCheck.Add(requirementsSpecification.Iid);
-                this.AddThingsToVerify(requirementsSpecification, thingsToCheck);
+                await this.AddThingsToVerify(requirementsSpecification, thingsToCheck);
 
                 foreach (var requirement in requirementsSpecification.Requirement)
                 {
@@ -380,12 +381,12 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         /// <param name="reqContainer">The <see cref="RequirementsContainer"/></param>
         /// <param name="thingsToCheck">The collection of <see cref="Guid"/> to populate</param>
-        private void AddThingsToVerify(RequirementsContainer reqContainer, List<Guid> thingsToCheck)
+        private async Task AddThingsToVerify(RequirementsContainer reqContainer, List<Guid> thingsToCheck)
         {
             foreach (var group in reqContainer.Group)
             {
                 thingsToCheck.Add(group.Iid);
-                this.AddThingsToVerify(group, thingsToCheck);
+                await this.AddThingsToVerify(group, thingsToCheck);
             }
         }
 
