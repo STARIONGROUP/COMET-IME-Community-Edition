@@ -51,6 +51,10 @@
         </Style>
     </dxr:DXRibbonWindow.Resources>
 
+    <dxmvvm:Interaction.Behaviors>  
+        <dxmvvm:CurrentWindowService ClosingCommand="{Binding OnClosingCommand}"/>  
+    </dxmvvm:Interaction.Behaviors>  
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
