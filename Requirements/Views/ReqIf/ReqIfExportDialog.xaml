@@ -9,6 +9,7 @@
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
     xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+    xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
     Title="Export to ReqIF file..." 
     dx:ThemeManager.ThemeName="Seven"
     navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
@@ -18,7 +19,10 @@
     <dx:DXWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </dx:DXWindow.Resources>
-    
+    <dxmvvm:Interaction.Behaviors>  
+        <dxmvvm:CurrentWindowService ClosingCommand="{Binding OnClosingCommand}"/>  
+    </dxmvvm:Interaction.Behaviors>  
+
     <Grid>
         <dxlc:LayoutControl Background="White" 
                             Orientation="Vertical">
@@ -126,6 +130,12 @@
             </dxlc:LayoutGroup>
             
         </dxlc:LayoutControl>
-        <views:LoadingControl Grid.Row="0" Grid.Column="0" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
+        <views:LoadingControl 
+            Grid.Row="0" 
+            Grid.Column="0" 
+            Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"
+            CancelCommand="{Binding CancelReqIfCommand}" 
+            IsCancelVisible="{Binding IsCancelButtonVisible}"
+            />
     </Grid>
 </dx:DXWindow>

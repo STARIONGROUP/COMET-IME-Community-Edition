@@ -28,6 +28,8 @@ namespace CDP4Requirements.Tests.Controls
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -44,6 +46,8 @@ namespace CDP4Requirements.Tests.Controls
     using Moq;
 
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     using ReqIFSharp;
 
@@ -67,6 +71,8 @@ namespace CDP4Requirements.Tests.Controls
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
             this.serviceLocator = new Mock<IServiceLocator>();
             this.messageBoxService = new Mock<IMessageBoxService>();
 
@@ -117,7 +123,7 @@ namespace CDP4Requirements.Tests.Controls
         }
 
         [Test]
-        public void VeriyThatOkCommandWorks()
+        public async Task VeriyThatOkCommandWorks()
         {
             var vm = new ReqIfExportDialogViewModel(new List<ISession> { this.session.Object }, new List<Iteration> { this.iteration }, this.fileDialogService.Object, this.serializer.Object);
 
@@ -139,8 +145,8 @@ namespace CDP4Requirements.Tests.Controls
             Assert.That(vm.Path, Is.Not.Null.Or.Empty);
 
             Assert.IsTrue(vm.OkCommand.CanExecute(null));
-            vm.OkCommand.Execute(null);
 
+            await vm.ExecuteOk();
             Assert.IsNotNull(vm.DialogResult);
         }
     }
