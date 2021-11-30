@@ -54,13 +54,13 @@ namespace CDP4Composition.ViewModels
         [ImportingConstructor]
         public DockLayoutViewModel(IDialogNavigationService dialogNavigationService)
         {
-            DockPanelViewModels = new ReactiveList<IPanelViewModel>();
+            this.DockPanelViewModels = new ReactiveList<IPanelViewModel>();
 
             this.dialogNavigationService = dialogNavigationService;
 
             //Forced to use async delegate without an await in order to achieve sychronous command call. Should be better options available in newer versions of reactive.
-            DockPanelClosingCommand = ReactiveCommand.CreateAsyncTask(async arg => PanelClosing((ItemCancelEventArgs)arg));
-            DockPanelClosedCommand = ReactiveCommand.CreateAsyncTask(async arg => PanelClosed((DockItemClosedEventArgs)arg));
+            this.DockPanelClosingCommand = ReactiveCommand.CreateAsyncTask(async arg => this.PanelClosing((ItemCancelEventArgs)arg));
+            this.DockPanelClosedCommand = ReactiveCommand.CreateAsyncTask(async arg => this.PanelClosed((DockItemClosedEventArgs)arg));
         }
 
         /// <summary>
@@ -113,9 +113,9 @@ namespace CDP4Composition.ViewModels
                 return;
             }
 
-            var confirmation = new GenericConfirmationDialogViewModel("Warning", MessageHelper.ClosingPanelConfirmation);
+            var confirmation = new GenericConfirmationDialogViewModel(panelViewModel.Caption, MessageHelper.ClosingPanelConfirmation);
 
-            if (dialogNavigationService.NavigateModal(confirmation)?.Result is not true)
+            if (this.dialogNavigationService.NavigateModal(confirmation)?.Result is not true)
             {
                 e.Cancel = true;
             }

@@ -83,7 +83,7 @@ namespace CDP4Reporting.ViewModels
     /// <summary>
     /// The view-model for the Report Designer that lets users to create reports based on template source files.
     /// </summary>
-    public partial class ReportDesignerViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
+    public partial class ReportDesignerViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IHaveAfterOnClosingLogic
     {
         /// <summary>
         /// The logger for the current class
@@ -169,6 +169,15 @@ namespace CDP4Reporting.ViewModels
         /// Backing field for <see cref="Output" />
         /// </summary>
         private string output;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the browser is dirty
+        /// </summary>
+        public override bool IsDirty
+        {
+            get => (bool)(this.currentReportDesignerDocument?.GetValue(ReportDesignerDocument.HasChangesProperty) ?? false) || !this.lastSavedDataSourceText.Equals(this.Document.Text);
+            set { }
+        }
 
         /// <summary>
         /// Gets or sets text editor document
@@ -438,7 +447,6 @@ namespace CDP4Reporting.ViewModels
             this.CodeFilePath = filePath.Single();
 
             this.Document.Text = File.ReadAllText(this.CodeFilePath);
-            this.IsDirty = true;
         }
 
         /// <summary>
@@ -566,7 +574,7 @@ namespace CDP4Reporting.ViewModels
         /// <returns>true if allowed, otherwise false. </returns>
         private bool IsSwitchReportProjectAllowed()
         {
-            if ((bool)(this.currentReportDesignerDocument?.GetValue(ReportDesignerDocument.HasChangesProperty) ?? false) || !this.lastSavedDataSourceText.Equals(this.Document.Text))
+            if (this.IsDirty)
             {
                 var confirmation = new GenericConfirmationDialogViewModel("Warning",
                     "The currently active report has unsaved changes. \n Are you sure you want to continue and lose these changes?");
@@ -1338,6 +1346,20 @@ namespace CDP4Reporting.ViewModels
                 var okDialogViewModel = new OkDialogViewModel("Error", $"Error while trying to submit data to the model:\n\n{ex.Message}");
                 this.DialogNavigationService.NavigateModal(okDialogViewModel);
             }
+        }
+
+        /// <summary>
+        /// The logic to be executed after handling an OnClosing event
+        /// </summary>
+        /// <remarks>
+        /// The reason this method is executed here is because DevExpress implements its own OnClosing logic for a changed Report Designer canvas.
+        /// Since we handle saving all report data ourselves, we don't want this logic to be executed.
+        /// When this code gets hit we can assume that the user already answered a question about these changes and we can suppress DevExpress'
+        /// message by setting the <see cref="ReportDesignerDocument.HasChangesProperty"/> to false.
+        /// </remarks>
+        public void AfterOnClosing()
+        {
+            this.currentReportDesignerDocument?.SetValue(ReportDesignerDocument.HasChangesProperty, false);
         }
     }
 }

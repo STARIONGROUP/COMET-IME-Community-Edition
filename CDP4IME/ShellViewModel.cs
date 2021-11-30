@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShellViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2021 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
 //
@@ -26,13 +26,16 @@
 namespace CDP4IME
 {
     using System;
+    using System.ComponentModel;
     using System.ComponentModel.Composition;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Composition.Events;
     using CDP4Composition.Log;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services.AppSettingService;
     using CDP4Composition.ViewModels;
 
@@ -135,7 +138,7 @@ namespace CDP4IME
         {
             if (dialogNavigationService == null)
             {
-                throw new ArgumentNullException("dialogNavigationService", "The dialogNavigationService may not be null");
+                throw new ArgumentNullException(nameof(dialogNavigationService), "The dialogNavigationService may not be null");
             }
 
             this.OpenSessions = new ReactiveList<ISession>();
@@ -156,6 +159,7 @@ namespace CDP4IME
 
             this.Sessions = new ReactiveList<SessionViewModel>();
             this.Sessions.ChangeTrackingEnabled = true;
+
             this.Sessions.ItemChanged.Where(x => x.PropertyName == "IsClosed" && x.Sender.IsClosed)
                 .Subscribe(x => this.Sessions.Remove(x.Sender));
 
@@ -211,6 +215,8 @@ namespace CDP4IME
             this.CheckForUpdateCommand = ReactiveCommand.Create();
             this.CheckForUpdateCommand.Subscribe(_ => this.ExecuteCheckForUpdateCommand());
 
+            this.OnClosingCommand = ReactiveCommand.CreateAsyncTask(async x => this.OnClosing(x as CancelEventArgs), RxApp.MainThreadScheduler);
+
             logger.Info("Welcome in the COMET Application");
         }
         
@@ -230,6 +236,11 @@ namespace CDP4IME
             get { return this.logEventInfo; }
             set { this.RaiseAndSetIfChanged(ref this.logEventInfo, value); }
         }
+
+        /// <summary>
+        /// Gets the OnClosing Command
+        /// </summary>
+        public ReactiveCommand<Unit> OnClosingCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to select and open a data-source
@@ -540,6 +551,32 @@ namespace CDP4IME
                 log.Level == LogLevel.Error)
             {
                 this.LogEventInfo = log;
+            }
+        }
+
+        /// <summary>
+        /// Handles the window's OnClosing event.
+        /// </summary>
+        /// <param name="args">The <see cref="CancelEventArgs"/></param>
+        private void OnClosing(CancelEventArgs args)
+        {
+            foreach (var panelViewModel in this.DockViewModel.DockPanelViewModels)
+            {
+                if (panelViewModel.IsDirty)
+                {
+                    var confirmation = new GenericConfirmationDialogViewModel(panelViewModel.Caption, MessageHelper.ClosingPanelConfirmation);
+
+                    if (this.dialogNavigationService.NavigateModal(confirmation)?.Result is not true)
+                    {
+                        args.Cancel = true;
+                        break;
+                    }
+
+                    if (panelViewModel is IHaveAfterOnClosingLogic afterOnClosingViewModel)
+                    {
+                        afterOnClosingViewModel.AfterOnClosing();
+                    }
+                }
             }
         }
     }
