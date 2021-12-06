@@ -27,7 +27,6 @@ namespace CDP4IME.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading;
     using System.Threading.Tasks;
@@ -120,13 +119,15 @@ namespace CDP4IME.Tests.ViewModels
         public void VerifyOkCommand()
         {
             this.viewModel.Path = @"C:\test\somerandom\no\existant\path\doubletest.zip";
+            this.viewModel.Password = "pass";
+            this.viewModel.PasswordRetype = "pass";
 
             Assert.AreEqual(this.viewModel.Password, this.viewModel.PasswordRetype);
             Assert.That(this.viewModel.ErrorMessage, Is.Null.Or.Empty);
 
             Assert.IsNotNull(this.viewModel.SelectedDal);
             Assert.IsNotNull(this.viewModel.SelectedSession);
-            Assert.IsNotNull(this.viewModel.SelectedVersion);
+            Assert.IsNotNull(this.viewModel.SelectedVersion.Key);
 
             Assert.IsTrue(this.viewModel.OkCommand.CanExecute(null));
 
