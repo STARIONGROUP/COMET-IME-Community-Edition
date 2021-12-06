@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{A9EF51F8-4F27-4F50-8EE3-33BC2F69DF12}</ProjectGuid>
-    <MinIMEVersion>9.0.1</MinIMEVersion>
+    <MinIMEVersion>9.0.2</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4RelationshipMatrix</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>RelationshipMatrix</Product>
     <Description>COMET Relationship Matrix Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.0.1.1</AssemblyVersion>
-    <FileVersion>9.0.1.1</FileVersion>
+    <AssemblyVersion>9.0.2.0</AssemblyVersion>
+    <FileVersion>9.0.2.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -34,13 +34,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.1.0-679-PR215">
+    <PackageReference Include="CDP4Common-CE" Version="8.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0-679-PR215">
+    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0-679-PR215">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">

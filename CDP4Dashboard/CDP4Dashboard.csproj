@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{89E91585-C793-4D90-AB8C-FD295590665B}</ProjectGuid>
-    <MinIMEVersion>9.0.1</MinIMEVersion>
+    <MinIMEVersion>9.0.2</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4Dashboard</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>Dashboard</Product>
     <Description>COMET Dashboard Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>0.2.1.12</AssemblyVersion>
-    <FileVersion>0.2.1.12</FileVersion>
+    <AssemblyVersion>0.2.2.0</AssemblyVersion>
+    <FileVersion>0.2.2.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -23,16 +23,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.1.0-679-PR215">
+    <PackageReference Include="CDP4Common-CE" Version="8.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0-679-PR215">
+    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0-679-PR215">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.9.2-679-PR215">
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="0.11.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">
