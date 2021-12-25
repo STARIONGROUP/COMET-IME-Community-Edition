@@ -225,6 +225,11 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<object> AddUsagesToDiagramCommand { get; protected set; }
 
         /// <summary>
+        /// Gets or sets the add usages to existing elements diagram command
+        /// </summary>
+        public ReactiveCommand<object> AddUsagesToExistingElementsDiagramCommand { get; protected set; }
+
+        /// <summary>
         /// Gets or sets the RelationshipRules
         /// </summary>
         public DisposableReactiveList<RuleNavBarRelationViewModel> RelationshipRules
@@ -521,7 +526,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             switch (dropInfo.Payload)
             {
-                case Thing rowPayload when !this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().Select(x => x.Thing).Contains(rowPayload):
+                case Thing rowPayload when ((!this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().Select(x => x.Thing).Contains(rowPayload)) && (!this.ConnectorViewModels.Select(x => x.Thing).Contains(rowPayload))):
                     dropInfo.Effects = DragDropEffects.Copy;
                     return;
                 case Tuple<ParameterType, MeasurementScale> tuplePayload:
@@ -734,6 +739,63 @@ namespace CDP4DiagramEditor.ViewModels
                     break;
                 }
 
+                case ElementUsage elementUsage:
+                {
+                    if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(elementUsage)))
+                    {
+                        break;
+                    }
+
+                    // check if there is a element def node already of both container and target
+                    var containerEd = elementUsage.Container as ElementDefinition;
+                    var representingEd = elementUsage.ElementDefinition;
+
+                    if (containerEd == null || representingEd == null)
+                    {
+                        break;
+                    }
+
+                    var containerArchitectureElement = this.ThingDiagramItemViewModels.FirstOrDefault(v => v.Thing is ElementDefinition && v.Thing.Equals(containerEd)) as ElementDefinitionDiagramContentItemViewModel;
+
+                    var representingArchitectureElement = this.ThingDiagramItemViewModels.FirstOrDefault(v => v.Thing is ElementDefinition && v.Thing.Equals(representingEd)) as ElementDefinitionDiagramContentItemViewModel;
+
+                    var containerWasCreated = false;
+
+                    // if container AD does not exist create
+                    if (containerArchitectureElement == null)
+                    {
+                        containerArchitectureElement = ElementDefinitionDiagramContentItemViewModel.CreatElementDefinitionDiagramContentItemViewModel(this.Session, containerEd, this, position);
+
+                        this.Behavior.ItemPositions.Add(containerArchitectureElement, position);
+                        this.ThingDiagramItemViewModels.Add(containerArchitectureElement);
+
+                        containerArchitectureElement.UpdatePorts();
+                        containerWasCreated = true;
+                    }
+
+                    var height = 130;
+
+                    // if representing AD does not exist, create
+                    if (representingArchitectureElement == null)
+                    {
+                        if (containerWasCreated)
+                        {
+                            position = new Point(position.X, position.Y + height * 2);
+                        }
+
+                        representingArchitectureElement = ElementDefinitionDiagramContentItemViewModel.CreatElementDefinitionDiagramContentItemViewModel(this.Session, representingEd, this, position);
+
+                        this.Behavior.ItemPositions.Add(representingArchitectureElement, position);
+                        this.ThingDiagramItemViewModels.Add(representingArchitectureElement);
+
+                        representingArchitectureElement.UpdatePorts();
+                    }
+
+                    // create the connector
+                    ElementUsageConnectorTool.CreateConnector(elementUsage, representingArchitectureElement.DiagramThing as ArchitectureElement, containerArchitectureElement.DiagramThing as ArchitectureElement, this.Behavior);
+                    break;
+                }
+
                 case Requirement requirement:
                 {
                     diagramItemViewModel = new RequirementDiagramContentItemViewModel(block, this.Session, this);
@@ -765,11 +827,15 @@ namespace CDP4DiagramEditor.ViewModels
                     break;
             }
 
-            this.Behavior.ItemPositions.Add(diagramItemViewModel, convertedDropPosition);
-            this.ThingDiagramItemViewModels.Add(diagramItemViewModel);
+            if (diagramItemViewModel != null)
+            {
+                this.Behavior.ItemPositions.Add(diagramItemViewModel, convertedDropPosition);
+                this.ThingDiagramItemViewModels.Add(diagramItemViewModel);
 
-            (diagramItemViewModel as PortContainerDiagramContentItemViewModel)?.UpdatePorts();
-            this.ComputeGeneratedConnectors();
+                (diagramItemViewModel as PortContainerDiagramContentItemViewModel)?.UpdatePorts();
+                this.ComputeGeneratedConnectors();
+            }
+
             this.UpdateIsDirty();
         }
 
@@ -821,6 +887,9 @@ namespace CDP4DiagramEditor.ViewModels
             this.AddUsagesToDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
             this.AddUsagesToDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToDiagramCommand());
 
+            this.AddUsagesToExistingElementsDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
+            this.AddUsagesToExistingElementsDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToExistingElementsDiagramCommand());
+
             this.SetAsTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.SelectedItem)
                     .Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItemViewModel }),
                 _ => this.ExecuteSetTopElementCommand(), RxApp.MainThreadScheduler);
@@ -847,6 +916,8 @@ namespace CDP4DiagramEditor.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Inspect", "", this.InspectCommand, MenuItemKind.Inspect));
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Expand Element Usages", "", this.AddUsagesToDiagramCommand, MenuItemKind.Navigate));
+
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Expand Element Usages of Element Definitions Already in Diagram", "", this.AddUsagesToExistingElementsDiagramCommand, MenuItemKind.Navigate));
 
             if (this.Thing is ArchitectureDiagram)
             {
@@ -966,6 +1037,48 @@ namespace CDP4DiagramEditor.ViewModels
                     }
 
                     var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is ElementDefinition).First(vm => vm.Thing.Equals(elementUsage.ElementDefinition)).DiagramThing as ArchitectureElement;
+                    var target = diagramContentItem.DiagramThing as ArchitectureElement;
+
+                    ElementUsageConnectorTool.CreateConnector(elementUsage, source, target, this.Behavior);
+                }
+            }
+
+            this.ComputeGeneratedConnectors();
+        }
+
+        /// <summary>
+        /// Adds ElementUsages to the selected element definitions if they exist on diagram
+        /// </summary>
+        private void ExecuteAddUsagesToExistingElementsDiagramCommand()
+        {
+            var edViewModels = this.SelectedItems.OfType<DiagramContentItem>().Select(i => i.Content as ElementDefinitionDiagramContentItemViewModel);
+
+            foreach (var diagramContentItem in edViewModels.Where(vm => vm != null))
+            {
+                var elementDefinition = diagramContentItem.Thing as ElementDefinition;
+
+                if (elementDefinition == null)
+                {
+                    continue;
+                }
+
+                var elementUsages = elementDefinition.ContainedElement.Where(e => e.InterfaceEnd == InterfaceEndKind.NONE).ToList();
+
+                // create EU connectors
+                foreach (var elementUsage in elementUsages)
+                {
+                    if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(elementUsage)))
+                    {
+                        continue;
+                    }
+
+                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is ElementDefinition).FirstOrDefault(vm => vm.Thing.Equals(elementUsage.ElementDefinition))?.DiagramThing as ArchitectureElement;
+
+                    if (source == null)
+                    {
+                        continue;
+                    }
+
                     var target = diagramContentItem.DiagramThing as ArchitectureElement;
 
                     ElementUsageConnectorTool.CreateConnector(elementUsage, source, target, this.Behavior);
