@@ -146,6 +146,11 @@ namespace CDP4Composition.Diagram
         private string displayText;
 
         /// <summary>
+        /// Backing field for <see cref="IsFiltered"/>
+        /// </summary>
+        private bool isFiltered;
+
+        /// <summary>
         /// Gets or sets the <see cref="IThingDiagramItemViewModel.Thing"/>.
         /// </summary>
         public Thing Thing { get; set; }
@@ -167,6 +172,15 @@ namespace CDP4Composition.Diagram
         {
             get => this.isDirty;
             protected set => this.RaiseAndSetIfChanged(ref this.isDirty, value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the node is filtered out
+        /// </summary>
+        public bool IsFiltered
+        {
+            get => this.isFiltered;
+            set => this.RaiseAndSetIfChanged(ref this.isFiltered, value);
         }
 
         /// <summary>

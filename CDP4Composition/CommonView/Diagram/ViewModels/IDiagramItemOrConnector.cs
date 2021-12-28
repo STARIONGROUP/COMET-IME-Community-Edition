@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDiagramConnectorViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IDiagramItemOrConnector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -25,61 +25,26 @@
 
 namespace CDP4CommonView.Diagram
 {
-    using System;
-    using System.Collections.Generic;
-
-    using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
 
-    using CDP4Composition.Diagram;
-    using CDP4Dal.Operations;
-    using Point = System.Windows.Point;
-
     /// <summary>
-    /// The interface that shall be realized by view-models representing a <see cref="DiagramEdge" />
+    /// A commoninterface for diagram viewmodels
     /// </summary>
-    public interface IDiagramConnectorViewModel : IDisposable, IDiagramItemOrConnector
+    public interface IDiagramItemOrConnector
     {
         /// <summary>
-        /// Gets the connection points for the represented <see cref="DiagramEdge" />
+        /// Gets otr sets the Diagram thing
         /// </summary>
-        List<Point> ConnectingPoints { get; }
+        DiagramElementThing DiagramThing { get; set; }
 
         /// <summary>
-        /// Gets the source of the <see cref="DiagramEdge" />
+        /// Gets a value indicating whether the diagram editor is dirty
         /// </summary>
-        DiagramElementThing Source { get; set; }
+        bool IsDirty { get; }
 
         /// <summary>
-        /// Gets the target of the <see cref="DiagramEdge" />
+        /// Gets the value indicating whether the item is filtered out
         /// </summary>
-        DiagramElementThing Target { get; set; }
-
-        /// <summary>
-        /// Gets the source <see cref="IThingDiagramItemViewModel"/>
-        /// </summary>
-        IThingDiagramItemViewModel BeginItem { get; set; }
-
-        /// <summary>
-        /// Gets the target <see cref="IThingDiagramItemViewModel" />
-        /// </summary>
-        IThingDiagramItemViewModel EndItem { get; set; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        string DisplayedText { get; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        Thing Thing { get; }
-
-        void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container);
-
-        /// <summary>
-        /// Reinitialize the view model with a new Thing from the cache
-        /// </summary>
-        void Reinitialize();
+        bool IsFiltered { get; set; }
     }
 }

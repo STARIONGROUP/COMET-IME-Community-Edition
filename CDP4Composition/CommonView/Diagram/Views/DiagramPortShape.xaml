@@ -205,10 +205,17 @@
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <Style x:Key="Dimming" TargetType="{x:Type Grid}">
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsFiltered}" Value="True">
+                    <Setter Property="Opacity" Value="0.1"></Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </dxdiag:DiagramContentItem.Resources>
-
+    
     <dxdiag:DiagramContentItem.Content>
-        <Grid>
+        <Grid Style="{StaticResource Dimming}">
             <ContentPresenter Style="{StaticResource Arrow}" Content="{Binding}" />
             <ContentPresenter Style="{StaticResource Label}" Content="{Binding}" />
         </Grid>

@@ -95,6 +95,11 @@ namespace CDP4Composition.Diagram
         private List<Point> connectingPoints;
 
         /// <summary>
+        /// Backing field for <see cref="IsFiltered"/>
+        /// </summary>
+        private bool isFiltered;
+
+        /// <summary>
         /// Backing field for <see cref="DisplayedText" />
         /// </summary>
         private string displayedText;
@@ -133,6 +138,15 @@ namespace CDP4Composition.Diagram
         {
             get { return this.displayedText; }
             set { this.RaiseAndSetIfChanged(ref this.displayedText, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the node is filtered out
+        /// </summary>
+        public bool IsFiltered
+        {
+            get => this.isFiltered;
+            set => this.RaiseAndSetIfChanged(ref this.isFiltered, value);
         }
 
         /// <summary>

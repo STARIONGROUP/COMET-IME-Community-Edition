@@ -27,6 +27,8 @@ namespace CDP4DiagramEditor.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -61,13 +63,16 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4DiagramEditor.ViewModels.Palette;
     using CDP4DiagramEditor.ViewModels.Relation;
     using CDP4DiagramEditor.ViewModels.Tools;
+    using CDP4DiagramEditor.ViewModels.TreeView;
 
     using DevExpress.Diagram.Core;
+    using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Diagram;
 
     using ReactiveUI;
 
     using DiagramShape = CDP4Common.DiagramData.DiagramShape;
+    using IDropTarget = CDP4Composition.DragDrop.IDropTarget;
     using Point = System.Windows.Point;
 
     /// <summary>
@@ -134,6 +139,16 @@ namespace CDP4DiagramEditor.ViewModels
         /// Backing field for <see cref="ThingDiagramItemViewModels" />
         /// </summary>
         private DisposableReactiveList<IThingDiagramItemViewModel> thingDiagramItemViewModels;
+
+        /// <summary>
+        /// Backing field for <see cref="DiagramElementTreeRowViewModels"/>
+        /// </summary>
+        private DisposableReactiveList<IDiagramElementTreeRowViewModel> diagramElementTreeRowViewModels;
+
+        /// <summary>
+        /// Backing field for <see cref="VisibleDiagramElementTreeRowViewModels"/>
+        /// </summary>
+        private ObservableCollectionCore<object> visibleDiagramElementTreeRowViewModels;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramEditorViewModel" /> class
@@ -273,6 +288,24 @@ namespace CDP4DiagramEditor.ViewModels
         {
             get { return this.thingDiagramItemViewModels; }
             set { this.RaiseAndSetIfChanged(ref this.thingDiagramItemViewModels, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the collection of diagram item rows from element tree view.
+        /// </summary>
+        public DisposableReactiveList<IDiagramElementTreeRowViewModel> DiagramElementTreeRowViewModels
+        {
+            get { return this.diagramElementTreeRowViewModels; }
+            set { this.RaiseAndSetIfChanged(ref this.diagramElementTreeRowViewModels, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the collection of diagram item rows from element tree view that are visible. Usef for filtering
+        /// </summary>
+        public ObservableCollectionCore<object> VisibleDiagramElementTreeRowViewModels
+        {
+            get { return this.visibleDiagramElementTreeRowViewModels; }
+            set { this.RaiseAndSetIfChanged(ref this.visibleDiagramElementTreeRowViewModels, value); }
         }
 
         /// <summary>
@@ -856,8 +889,198 @@ namespace CDP4DiagramEditor.ViewModels
             this.Disposables.Add(deleteObservable);
             this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel> { ChangeTrackingEnabled = true };
             this.ThingDiagramItemViewModels = new DisposableReactiveList<IThingDiagramItemViewModel> { ChangeTrackingEnabled = true };
+
+            this.ThingDiagramItemViewModels.Changed.Subscribe(this.UpdateTree);
+
+            this.DiagramElementTreeRowViewModels = new DisposableReactiveList<IDiagramElementTreeRowViewModel> { ChangeTrackingEnabled = true};
+            this.VisibleDiagramElementTreeRowViewModels = new ObservableCollectionCore<object>();
+
+            this.WhenAnyValue(vm => vm.VisibleDiagramElementTreeRowViewModels)
+                .Subscribe(_ =>
+                {
+                    if (this.VisibleDiagramElementTreeRowViewModels != null)
+                    {
+                        this.VisibleDiagramElementTreeRowViewModels.CollectionChanged += this.UpdateFilter;
+                    }
+                });
+
             this.ConnectorViewModels = new DisposableReactiveList<IDiagramConnectorViewModel> { ChangeTrackingEnabled = true };
+
+            this.ConnectorViewModels.Changed.Subscribe(this.UpdateTree);
+
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
+        }
+
+        /// <summary>
+        /// Update the filter for nodes
+        /// </summary>
+        private void UpdateFilter(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            // reset
+            foreach (var thingDiagramItemViewModel in this.ThingDiagramItemViewModels)
+            {
+                thingDiagramItemViewModel.IsFiltered = false;
+            }
+
+            foreach (var connector in this.ConnectorViewModels)
+            {
+                connector.IsFiltered = false;
+            }
+
+            var visibleNodes = this.VisibleDiagramElementTreeRowViewModels.OfType<IDiagramElementTreeRowViewModel>().Select(v => v.ThingDiagramItemViewModel).ToList();
+            var invisbleItems = this.ThingDiagramItemViewModels.Except(visibleNodes);
+
+            foreach (var thingDiagramItemViewModel in invisbleItems)
+            {
+                thingDiagramItemViewModel.IsFiltered = true;
+            }
+
+            var invisbleConnectors = this.ConnectorViewModels.Except(visibleNodes);
+
+            foreach (var thingDiagramItemViewModel in invisbleConnectors)
+            {
+                thingDiagramItemViewModel.IsFiltered = true;
+            }
+        }
+
+        /// <summary>
+        /// Updates the tree
+        /// </summary>
+        /// <param name="args">The item change arguments</param>
+        private void UpdateTree(NotifyCollectionChangedEventArgs args)
+        {
+            switch (args.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (var newItem in args.NewItems.OfType<IThingDiagramItemViewModel>())
+                    {
+                        this.AddNewItemToTree(newItem);
+                    }
+
+                    foreach (var connector in args.NewItems.OfType<IDiagramConnectorViewModel>())
+                    {
+                        this.AddNewConnectorToTree(connector);
+                    }
+
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var oldItem in args.OldItems.OfType<IThingDiagramItemViewModel>())
+                    {
+                        this.RemoveItemFromTree(oldItem);
+                    }
+
+                    foreach (var oldItem in args.OldItems.OfType<IDiagramConnectorViewModel>())
+                    {
+                        this.RemoveConnectorFromTree(oldItem);
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Adds the connector to tree
+        /// </summary>
+        /// <param name="connector">The new connector to add</param>
+        private void AddNewConnectorToTree(IDiagramConnectorViewModel connector)
+        {
+            var source = connector.Source;
+            var target = connector.Target;
+
+            var sourceNode = this.DiagramElementTreeRowViewModels.FirstOrDefault(i => i.Thing.Equals(source));
+
+            if (sourceNode != null)
+            {
+                sourceNode.Children.Add(new DiagramElementTreeRowViewModel(connector.DiagramThing, this, connector));
+            }
+            else if (source is DiagramPort port)
+            {
+                var portNode = this.DiagramElementTreeRowViewModels.SelectMany(s => s.Children).FirstOrDefault(d => d.Thing.Equals(port));
+
+                if (portNode != null)
+                {
+                    portNode.Children.Add(new DiagramElementTreeRowViewModel(connector.DiagramThing, this, connector));
+                }
+            }
+
+            var targetNode = this.DiagramElementTreeRowViewModels.FirstOrDefault(i => i.Thing.Equals(target));
+
+            if (targetNode != null)
+            {
+                targetNode.Children.Add(new DiagramElementTreeRowViewModel(connector.DiagramThing, this, connector));
+            }
+            else if (target is DiagramPort port)
+            {
+                var portNode = this.DiagramElementTreeRowViewModels.SelectMany(s => s.Children).FirstOrDefault(d => d.Thing.Equals(port));
+
+                if (portNode != null)
+                {
+                    portNode.Children.Add(new DiagramElementTreeRowViewModel(connector.DiagramThing, this, connector));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes a tree item
+        /// </summary>
+        /// <param name="oldItem">The item to remove</param>
+        private void RemoveItemFromTree(IThingDiagramItemViewModel oldItem)
+        {
+            var row = this.DiagramElementTreeRowViewModels.FirstOrDefault(i => i.Thing.Equals(oldItem.DiagramThing));
+
+            this.DiagramElementTreeRowViewModels.RemoveAndDispose(row);
+        }
+
+        /// <summary>
+        /// Removes a tree connector
+        /// </summary>
+        /// <param name="oldItem">The connector to remove</param>
+        private void RemoveConnectorFromTree(IDiagramConnectorViewModel oldItem)
+        {
+            var rows = this.DiagramElementTreeRowViewModels.SelectMany(node => node.Children).Where(i => i.Thing.Equals(oldItem.DiagramThing)).ToList();
+
+            foreach (var diagramElementTreeRowViewModel in rows)
+            {
+                var containers = this.DiagramElementTreeRowViewModels.Where(r => r.Children.Contains(diagramElementTreeRowViewModel)).ToList();
+
+                foreach (var elementTreeRowViewModel in containers)
+                {
+                    elementTreeRowViewModel.Children.RemoveAndDispose(diagramElementTreeRowViewModel);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds the item to tree
+        /// </summary>
+        /// <param name="newItem">The new item to add</param>
+        private void AddNewItemToTree(IThingDiagramItemViewModel newItem)
+        {
+            var thing = newItem.DiagramThing;
+
+            if (thing is null)
+            {
+                return;
+            }
+
+            if(thing is DiagramPort port)
+            {
+                var portItem = newItem as IDiagramPortViewModel;
+
+                var elementUsage = port.DepictedThing as ElementUsage;
+
+                if (elementUsage?.Container is not ElementDefinition container)
+                {
+                    return;
+                }
+
+                var containerNode = this.DiagramElementTreeRowViewModels.FirstOrDefault(c => (c.Thing as ArchitectureElement)?.DepictedThing == container);
+
+                containerNode?.Children.Add(new DiagramElementTreeRowViewModel(port, this, portItem));
+                return;
+            }
+
+            var newRowItem = new DiagramElementTreeRowViewModel(thing, this, newItem);
+            this.DiagramElementTreeRowViewModels.Add(newRowItem);
         }
 
         /// <summary>
@@ -1755,6 +1978,11 @@ namespace CDP4DiagramEditor.ViewModels
             this.ReinitializeAddedDiagramThings(addedDiagramObj, addedEdges);
 
             this.IsDirty = false;
+
+            foreach (var diagramElementTreeRowViewModel in this.DiagramElementTreeRowViewModels)
+            {
+                diagramElementTreeRowViewModel.IsDirty = false;
+            }
         }
 
         /// <summary>

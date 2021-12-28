@@ -25,6 +25,8 @@
              xmlns:DiagramViews="clr-namespace:CDP4CommonView.Diagram.Views;assembly=CDP4Composition"
              xmlns:diagram1="clr-namespace:CDP4Composition.Diagram;assembly=CDP4Composition"
              xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:treeView="clr-namespace:CDP4DiagramEditor.ViewModels.TreeView"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300"
@@ -252,7 +254,7 @@
             </DataTemplate>
 
             <DataTemplate x:Key="DiagramPortTemplate">
-                    <DiagramViews:DiagramPortShape />
+                    <DiagramViews:DiagramPortShape/>
             </DataTemplate>
 
             <DataTemplate x:Key="ElementUsageConnectorTemplate">
@@ -309,11 +311,22 @@
 
             <Style TargetType="{x:Type dxdiag:DiagramContentItem}">
                 <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=Content.IsFiltered, RelativeSource={RelativeSource Self}}" Value="True">
+                        <Setter Property="Opacity" Value="0.1"></Setter>
+                    </DataTrigger>
                     <DataTrigger Binding="{Binding Path=Content, RelativeSource={RelativeSource Self}, Converter={StaticResource InstanceTypeConverter}}" Value="{x:Type diagram1:ElementDefinitionDiagramContentItemViewModel}">
                         <Setter Property="CanResize" Value="False"></Setter>
                     </DataTrigger>
                     <DataTrigger Binding="{Binding Path=Content, RelativeSource={RelativeSource Self}, Converter={StaticResource InstanceTypeConverter}}" Value="{x:Type diagram1:RequirementDiagramContentItemViewModel}">
                         <Setter Property="CanResize" Value="False"></Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style TargetType="{x:Type dxdiag:DiagramConnector}">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Path=DataItem.IsFiltered}" Value="True">
+                        <Setter Property="Opacity" Value="0.1"></Setter>
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
@@ -331,24 +344,51 @@
                                                            SimpleDataTemplate="{StaticResource SimpleConnectorTemplate}"
                                                            ConstraintDataTemplate="{StaticResource ConstraintConnectorTemplate}"
                                                            InterfaceConnectorDataTemplate="{StaticResource InterfaceConnectorTemplate}" />
+            <treeView:NodeImageSelector x:Key="ImageSelector"></treeView:NodeImageSelector>
         </ResourceDictionary>
 
     </UserControl.Resources>
-    <Grid>
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <views:BrowserHeader Grid.Row="0" />
-        </Grid>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="180" />
-            </Grid.ColumnDefinitions>
-            <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
+    <dxdo:DockLayoutManager FloatingMode="Desktop" x:Name="Manager" MDIMergeStyle="Default">
+        <dxdo:LayoutGroup Orientation="Vertical" x:Name="layoutRoot">
+            <dxdo:LayoutPanel ItemHeight="Auto" ShowCaption="False" AllowHide="False" AllowClose="False" AllowSizing="False">
+                <views:BrowserHeader />
+            </dxdo:LayoutPanel>
+            <dxdo:LayoutGroup  AllowSplitters="True" Orientation="Horizontal">
+                <dxdo:LayoutPanel Caption="Diagram Elements" AllowClose="False" ItemWidth="Auto" AllowSizing="True" AllowFloat="False" AllowMove="False">
+                    <dxg:TreeViewControl Width="Auto" ItemsSource="{Binding DiagramElementTreeRowViewModels, UpdateSourceTrigger=PropertyChanged}"
+                                         ChildNodesPath="Children"
+                                         TreeViewFieldName="Name"
+                                         ShowNodeImages="True"
+                                         SortFieldName="Name"
+                                         SortMode="Value"
+                                         SortOrder="Ascending"
+                                         FilteringMode="ParentBranch"
+                                         IsNodeMenuEnabled="True"
+                                         RestoreTreeStateOnClearFilter="True"
+                                         EnableDynamicLoading="False"
+                                         ShowAutoFilterNode="True"
+                                         NodeImageSelector="{StaticResource ImageSelector}"
+                                         ExpandNodesOnFiltering="True"
+                                         AllowEditing="False"
+                                         AllowDragDrop="False">
+                        <dxmvvm:Interaction.Behaviors>
+                            <dxmvvm:ReadOnlyDependencyPropertyBindingBehavior Property="VisibleItems"
+                                                                              Binding="{Binding VisibleDiagramElementTreeRowViewModels, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}"/>
+                        </dxmvvm:Interaction.Behaviors>
+                        <dxg:TreeViewControl.NodeStyle>
+                            <Style TargetType="dxg:RowControl">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Row.IsDirty}" Value="True">
+                                        <Setter Property="Foreground" Value="Blue" />
+                                        <Setter Property="FontWeight" Value="Bold" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </dxg:TreeViewControl.NodeStyle>
+                    </dxg:TreeViewControl>
+                </dxdo:LayoutPanel>
+                <dxdo:LayoutPanel ShowCaption="False" AllowClose="False" AllowHide="False" dxb:MergingProperties.ElementMergingBehavior="InternalWithExternal" AllowFloat="False" AllowMove="False">
+                    <diagram:Cdp4DiagramControl Name="Cdp4DiagramControl"
                                         ToolboxVisibility="Closed"
                                         Theme="NoTheme"
                                         SaveCommand="{Binding SaveDiagramCommand}"
@@ -362,13 +402,13 @@
                                         AllowUndoRedo="False"
                                         AllowApplyAutomaticLayoutForSubordinates="True"
                                         AllowApplyAutomaticLayout="True">
-                <dxb:BarManager.DXContextMenu>
-                    <dxb:PopupMenu IsOpen="{Binding DropContextMenuIsOpen}"
+                        <dxb:BarManager.DXContextMenu>
+                            <dxb:PopupMenu IsOpen="{Binding DropContextMenuIsOpen}"
                                    Placement="Mouse"
                                    ItemLinksSource="{Binding DropContextMenuItems}" />
-                </dxb:BarManager.DXContextMenu>
-                <dxmvvm:Interaction.Behaviors>
-                    <diagram:Cdp4DiagramBehavior x:Name="orgChartBehavior"
+                        </dxb:BarManager.DXContextMenu>
+                        <dxmvvm:Interaction.Behaviors>
+                            <diagram:Cdp4DiagramBehavior x:Name="orgChartBehavior"
                                                  RibbonMergeCategoryName="DiagramCategory"
                                                  ItemTemplateSelector="{StaticResource DiagramItemViewModelTemplateSelector}"
                                                  ConnectorTemplateSelector="{StaticResource ConnectorViewModelTemplateSelector}"
@@ -377,30 +417,26 @@
                                                  ConnectorToMember="EndItem"
                                                  ItemsSource="{Binding ThingDiagramItemViewModels, UpdateSourceTrigger=PropertyChanged}"
                                                  EventPublisher="{Binding EventPublisher, Mode=OneWay}" />
-                </dxmvvm:Interaction.Behaviors>
-                <diagram:Cdp4DiagramControl.Actions>
-                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.Save}" />
-                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveFile}" />
-                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveAsFile}" />
-                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.OpenFile}" />
-                    <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.NewFile}" />
+                        </dxmvvm:Interaction.Behaviors>
+                        <diagram:Cdp4DiagramControl.Actions>
+                            <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.Save}" />
+                            <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveFile}" />
+                            <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.SaveAsFile}" />
+                            <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.OpenFile}" />
+                            <dxb:RemoveBarItemAndLinkAction ItemName="{x:Static dxdiag:DefaultBarItemNames.NewFile}" />
 
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}"
+                            <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.HomeRibbonPage}"
                                       PropertyName="Caption"
                                       Value="Tools" />
 
-                    <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DefaultPageCategory}"
+                            <dxb:UpdateAction ElementName="{x:Static dxdiag:DefaultBarItemNames.DefaultPageCategory}"
                                       Property="dxr:RibbonDefaultPageCategory.MergeType"
                                       Value="Remove" />
 
-                </diagram:Cdp4DiagramControl.Actions>
-            </diagram:Cdp4DiagramControl>
-            <Grid Grid.Column="1">
-                <dxdo:LayoutPanel DataContext="{Binding PaletteViewModel}"
-                                  Caption="Palette"
-                                  ShowHideButton="False"
-                                  ShowCloseButton="False"
-                                  ShowPinButton="False">
+                        </diagram:Cdp4DiagramControl.Actions>
+                    </diagram:Cdp4DiagramControl>
+                </dxdo:LayoutPanel>
+                <dxdo:LayoutPanel Caption="Palette" AllowClose="False" DataContext="{Binding PaletteViewModel}" ItemWidth="Auto" AllowSizing="False" AllowFloat="False" AllowMove="False">
                     <dxdo:LayoutPanel.Resources>
                         <CollectionViewSource x:Key="PaletteGroups"
                                               Source="{Binding Items}">
@@ -417,6 +453,7 @@
                     </dxdo:LayoutPanel.Resources>
                     <dxn:NavBarControl dx:ThemeManager.ThemeName="Seven"
                                        AllowSelectItem="True"
+                                       Width="180"
                                        EachGroupHasSelectedItem="False"
                                        ItemsSource="{Binding Source={StaticResource PaletteGroups}}"
                                        GroupDescription="Group"
@@ -457,8 +494,38 @@
                         </dxn:NavBarControl.View>
                     </dxn:NavBarControl>
                 </dxdo:LayoutPanel>
+            </dxdo:LayoutGroup>
+        </dxdo:LayoutGroup>
+        
+    </dxdo:DockLayoutManager>
+    <!--<Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+        </Grid>
+        <dxdo:LayoutGroup Orientation="Horizontal">
+            
+        </dxdo:LayoutGroup>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="180" />
+            </Grid.ColumnDefinitions>
+            
+            <Grid Grid.Column="1">
+                <dxdo:LayoutPanel 
+                                  Caption="Palette"
+                                  ShowHideButton="False"
+                                  ShowCloseButton="False"
+                                  ShowPinButton="False">
+                    
+                </dxdo:LayoutPanel>
 
             </Grid>
         </Grid>
-    </Grid>
+    </Grid>-->
 </UserControl>

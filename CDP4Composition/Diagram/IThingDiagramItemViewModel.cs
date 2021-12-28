@@ -31,6 +31,9 @@ namespace CDP4Composition.Diagram
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
+
+    using CDP4CommonView.Diagram;
+
     using CDP4Dal.Operations;
 
     using DevExpress.Xpf.Diagram;
@@ -38,22 +41,12 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents an interface to <see cref="DiagramItem"/> controls that also hold a <see cref="Thing"/>.
     /// </summary>
-    public interface IThingDiagramItemViewModel : IDisposable
+    public interface IThingDiagramItemViewModel : IDisposable, IDiagramItemOrConnector
     {
         /// <summary>
         /// Gets or sets the <see cref="Thing"/>.
         /// </summary>
         Thing Thing { get; set; }
-
-        /// <summary>
-        /// Gets the value indicating whether the item is dirty
-        /// </summary>
-        bool IsDirty { get; }
-
-        /// <summary>
-        /// The diagram thing
-        /// </summary>
-        DiagramElementThing DiagramThing { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="DiagramItem"/> that represents this viewmodel on the convas

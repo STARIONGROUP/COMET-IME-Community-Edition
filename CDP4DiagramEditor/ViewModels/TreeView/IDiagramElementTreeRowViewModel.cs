@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDiagramConnectorViewModel.cs" company="RHEA System S.A.">
+// <copyright file="IDiagramElementTreeRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
@@ -23,63 +23,40 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4CommonView.Diagram
+namespace CDP4DiagramEditor.ViewModels.TreeView
 {
     using System;
-    using System.Collections.Generic;
-
     using CDP4Common.CommonData;
-    using CDP4Common.DiagramData;
+
+    using CDP4CommonView.Diagram;
 
     using CDP4Composition.Diagram;
-    using CDP4Dal.Operations;
-    using Point = System.Windows.Point;
+    using CDP4Composition.Mvvm.Types;
 
     /// <summary>
-    /// The interface that shall be realized by view-models representing a <see cref="DiagramEdge" />
+    /// Interface for tree view rows in diagram control
     /// </summary>
-    public interface IDiagramConnectorViewModel : IDisposable, IDiagramItemOrConnector
+    public interface IDiagramElementTreeRowViewModel : IDisposable
     {
         /// <summary>
-        /// Gets the connection points for the represented <see cref="DiagramEdge" />
+        /// Gets or sets the name
         /// </summary>
-        List<Point> ConnectingPoints { get; }
+        string Name { get; set; }
 
         /// <summary>
-        /// Gets the source of the <see cref="DiagramEdge" />
+        /// Gets or sets the collection of children diagram item rows from element tree view.
         /// </summary>
-        DiagramElementThing Source { get; set; }
+        DisposableReactiveList<IDiagramElementTreeRowViewModel> Children { get; set; }
 
         /// <summary>
-        /// Gets the target of the <see cref="DiagramEdge" />
+        /// Gets or sets the represented Thing
         /// </summary>
-        DiagramElementThing Target { get; set; }
+        Thing Thing { get; set; }
 
         /// <summary>
-        /// Gets the source <see cref="IThingDiagramItemViewModel"/>
+        /// Gets or sets the diagram item view model
         /// </summary>
-        IThingDiagramItemViewModel BeginItem { get; set; }
-
-        /// <summary>
-        /// Gets the target <see cref="IThingDiagramItemViewModel" />
-        /// </summary>
-        IThingDiagramItemViewModel EndItem { get; set; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        string DisplayedText { get; }
-
-        /// <summary>
-        /// Gets the text to display
-        /// </summary>
-        Thing Thing { get; }
-
-        void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container);
-
-        /// <summary>
-        /// Reinitialize the view model with a new Thing from the cache
-        /// </summary>
-        void Reinitialize();
+        IDiagramItemOrConnector ThingDiagramItemViewModel { get; set; }
+        bool IsDirty { get; set; }
     }
 }
