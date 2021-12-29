@@ -204,6 +204,31 @@ namespace CDP4CommonView.Diagram
         }
 
         /// <summary>
+        /// Selects the correct diagram items based on provided things
+        /// </summary>
+        /// <param name="things">The Things that are either diagram things or EM representations</param>
+        public void SelectItemsByThing(IList<Thing> things)
+        {
+            var selection = new List<DiagramItem>();
+
+            foreach (var thing in things)
+            {
+                var thingDiagramItem = this.AssociatedObject.Items.FirstOrDefault(
+                    c =>
+                    ((c as DiagramContentItem)?.Content is IDiagramItemOrConnector cont && (cont.DiagramThing == thing || cont.Thing == thing)) ||
+                    (c.DataContext is IDiagramItemOrConnector dc && (dc.DiagramThing == thing || dc.Thing == thing)) ||
+                    (((c as DiagramConnector)?.DataContext as Connection)?.DataItem is IDiagramItemOrConnector conn && (conn.DiagramThing == thing || conn.Thing == thing)));
+
+                if (thingDiagramItem != null)
+                {
+                    selection.Add(thingDiagramItem);
+                }
+            }
+
+            this.AssociatedObject.SelectItems(selection.Distinct(), ModifySelectionMode.ReplaceSelection);
+        }
+
+        /// <summary>
         /// Gets the associated diagram control
         /// </summary>
         /// <returns>The associated diagram control</returns>

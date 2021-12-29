@@ -71,10 +71,10 @@ namespace CDP4CommonView.Diagram
         string DisplayedText { get; }
 
         /// <summary>
-        /// Gets the text to display
+        /// Updates the transaction
         /// </summary>
-        Thing Thing { get; }
-
+        /// <param name="transaction">The transaction</param>
+        /// <param name="container">The container</param>
         void UpdateTransaction(IThingTransaction transaction, DiagramElementContainer container);
 
         /// <summary>

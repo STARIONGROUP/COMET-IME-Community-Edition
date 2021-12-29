@@ -44,11 +44,6 @@ namespace CDP4Composition.Diagram
     public interface IThingDiagramItemViewModel : IDisposable, IDiagramItemOrConnector
     {
         /// <summary>
-        /// Gets or sets the <see cref="Thing"/>.
-        /// </summary>
-        Thing Thing { get; set; }
-
-        /// <summary>
         /// Gets or sets the <see cref="DiagramItem"/> that represents this viewmodel on the convas
         /// </summary>
         DiagramItem DiagramRepresentation { get; set; }

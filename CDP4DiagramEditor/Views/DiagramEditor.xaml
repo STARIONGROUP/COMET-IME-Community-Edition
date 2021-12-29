@@ -363,6 +363,8 @@
                                          SortMode="Value"
                                          SortOrder="Ascending"
                                          FilteringMode="ParentBranch"
+                                         SelectionMode="Row"
+                                         SelectedItems="{Binding SelectedTreeRowViewModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                          IsNodeMenuEnabled="True"
                                          RestoreTreeStateOnClearFilter="True"
                                          EnableDynamicLoading="False"

@@ -151,6 +151,11 @@ namespace CDP4DiagramEditor.ViewModels
         private ObservableCollectionCore<object> visibleDiagramElementTreeRowViewModels;
 
         /// <summary>
+        /// Backing field for <see cref="SelectedTreeRowViewModels"/>
+        /// </summary>
+        private ReactiveList<IDiagramElementTreeRowViewModel> selectedTreeRowViewModels;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DiagramEditorViewModel" /> class
         /// </summary>
         /// <param name="diagram">The diagram of the <see cref="Thing" />s to display</param>
@@ -297,6 +302,15 @@ namespace CDP4DiagramEditor.ViewModels
         {
             get { return this.diagramElementTreeRowViewModels; }
             set { this.RaiseAndSetIfChanged(ref this.diagramElementTreeRowViewModels, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the list of diagram item rows that are selected.
+        /// </summary>
+        public ReactiveList<IDiagramElementTreeRowViewModel> SelectedTreeRowViewModels
+        {
+            get { return this.selectedTreeRowViewModels; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedTreeRowViewModels, value); }
         }
 
         /// <summary>
@@ -893,22 +907,57 @@ namespace CDP4DiagramEditor.ViewModels
             this.ThingDiagramItemViewModels.Changed.Subscribe(this.UpdateTree);
 
             this.DiagramElementTreeRowViewModels = new DisposableReactiveList<IDiagramElementTreeRowViewModel> { ChangeTrackingEnabled = true};
+            this.SelectedTreeRowViewModels = new ReactiveList<IDiagramElementTreeRowViewModel> { ChangeTrackingEnabled = true };
+
+            //this.Disposables.Add(this.WhenAnyValue(vm => vm.SelectedTreeRowViewModels).Subscribe(_ => this.SelectInDiagramFromTree()));
+            this.Disposables.Add(this.SelectedTreeRowViewModels.Changed.Subscribe(_ => this.SelectInDiagramFromTree()));
+
             this.VisibleDiagramElementTreeRowViewModels = new ObservableCollectionCore<object>();
 
-            this.WhenAnyValue(vm => vm.VisibleDiagramElementTreeRowViewModels)
+            this.Disposables.Add(this.WhenAnyValue(vm => vm.VisibleDiagramElementTreeRowViewModels)
                 .Subscribe(_ =>
                 {
                     if (this.VisibleDiagramElementTreeRowViewModels != null)
                     {
                         this.VisibleDiagramElementTreeRowViewModels.CollectionChanged += this.UpdateFilter;
                     }
-                });
+                }));
 
             this.ConnectorViewModels = new DisposableReactiveList<IDiagramConnectorViewModel> { ChangeTrackingEnabled = true };
 
-            this.ConnectorViewModels.Changed.Subscribe(this.UpdateTree);
+            this.Disposables.Add(this.ConnectorViewModels.Changed.Subscribe(this.UpdateTree));
 
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
+        }
+
+        /// <summary>
+        /// React on selecting things in the tree
+        /// </summary>
+        private void SelectInDiagramFromTree()
+        {
+            if (this.SelectedTreeRowViewModels == null || !this.SelectedTreeRowViewModels.Any())
+            {
+                return;
+            }
+
+            this.Behavior.SelectItemsByThing(this.SelectedTreeRowViewModels.Where(x => x.Thing is not null).Select(d => d.Thing).ToList());
+
+            //foreach (var thing in this.SelectedTreeRowViewModels.Where(x => x.Thing is not null).Select(d => d.Thing).ToList())
+            //{
+            //    var treeSelectedThingDiagramItem = this.ThingDiagramItemViewModels.FirstOrDefault(c => c.Thing == thing || c.DiagramThing == thing)?.DiagramRepresentation;
+
+            //    if (treeSelectedThingDiagramItem != null)
+            //    {
+            //        this.SelectedItems.Add(treeSelectedThingDiagramItem);
+            //    }
+
+            //    var connectorSelectedThing = this.ConnectorViewModels.FirstOrDefault(c => c.Thing == thing || c.DiagramThing == thing);
+
+            //    if(connectorSelectedThing != null)
+            //    {
+            //        this.Behavior.
+            //    }
+            //}
         }
 
         /// <summary>

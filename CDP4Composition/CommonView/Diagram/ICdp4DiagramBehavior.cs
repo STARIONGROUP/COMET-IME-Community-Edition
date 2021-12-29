@@ -30,7 +30,7 @@ namespace CDP4CommonView.Diagram
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using System.Windows;
-
+    using CDP4Common.CommonData;
     using CDP4Composition.Diagram;
 
     using DevExpress.Diagram.Core;
@@ -110,5 +110,11 @@ namespace CDP4CommonView.Diagram
         /// Updates connector routes
         /// </summary>
         void RerouteConnectors();
+
+        /// <summary>
+        /// Selects the correct diagram items based on provided things
+        /// </summary>
+        /// <param name="things">The Things that are either diagram things or EM representations</param>
+        void SelectItemsByThing(IList<Thing> things);
     }
 }

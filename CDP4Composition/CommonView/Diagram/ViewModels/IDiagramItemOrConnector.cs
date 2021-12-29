@@ -25,6 +25,7 @@
 
 namespace CDP4CommonView.Diagram
 {
+    using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
 
     /// <summary>
@@ -46,5 +47,10 @@ namespace CDP4CommonView.Diagram
         /// Gets the value indicating whether the item is filtered out
         /// </summary>
         bool IsFiltered { get; set; }
+
+        /// <summary>
+        /// Gets or the <see cref="Thing"/>
+        /// </summary>
+        Thing Thing { get; set; }
     }
 }
