@@ -42,7 +42,7 @@ namespace CDP4Composition.Utilities
         /// <param name="thing">The <see cref="Thing"/></param>
         /// <param name="dictionary">The returned <see cref="Dictionary{TKey,TValue}"/></param>
         /// <returns>True if dictionary is there and not null</returns>
-        private static bool GetThingPreferenceDictionary(Thing thing, out Dictionary<string, string> dictionary)
+        public static bool GetThingPreferenceDictionary(Thing thing, out Dictionary<string, string> dictionary)
         {
             if (string.IsNullOrWhiteSpace(thing.ThingPreference))
             {
@@ -107,6 +107,18 @@ namespace CDP4Composition.Utilities
             {
                 thing.ThingPreference = serialized;
             }
+        }
+
+        /// <summary>
+        /// Set a key value pairs from a dictionary.
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        /// <param name="dictionary">The dictionary</param>
+        public static void SetThingPreferencesFromDictionary(this Thing thing, Dictionary<string, string> dictionary)
+        {
+            var serialized = JsonConvert.SerializeObject(dictionary);
+
+            thing.ThingPreference = !string.IsNullOrWhiteSpace(serialized) ? serialized : string.Empty;
         }
     }
 }
