@@ -25,18 +25,37 @@
 
 namespace CDP4DiagramEditor.ViewModels.Palette
 {
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
+    using CDP4Common.DiagramData;
+    using CDP4Common.EngineeringModelData;
+
     using CDP4Composition.Diagram;
+    using CDP4Composition.Services;
 
     using CDP4DiagramEditor.Helpers;
     using CDP4DiagramEditor.ViewModels.Tools;
+
+    using DevExpress.Xpf.Diagram;
+
+    using Microsoft.Practices.ServiceLocation;
+
+    using NLog;
 
     /// <summary>
     /// Base view model for constraint create items
     /// </summary>
     public class ConstraintCreatePaletteItemViewModel<TTool> : ConnectorCreatePaletteItemBaseViewModel where TTool : ConstraintConnectorTool, IConnectorTool, new()
     {
+        /// <summary>
+        /// The backing field for <see cref="ThingCreator" />
+        /// </summary>
+        private IThingCreator thingCreator;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ConstraintCreatePaletteItemViewModel" /> class.
         /// </summary>
@@ -52,11 +71,49 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         public ConstraintKind ConstraintKind { get; private set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="IThingCreator" /> that is used to create different <see cref="Things" />.
+        /// </summary>
+        public IThingCreator ThingCreator
+        {
+            get { return this.thingCreator ??= ServiceLocator.Current.GetInstance<IThingCreator>(); }
+            set { this.thingCreator = value; }
+        }
+
+        /// <summary>
         /// Executes the command of this <see cref="IPaletteItemViewModel" />
         /// </summary>
         /// <returns>An empty task</returns>
         public override async Task ExecuteAsyncCommand()
         {
+            var selectionList = this.editorViewModel.SelectedItems.OfType<DiagramContentItem>().ToList();
+
+            // if selection is two things between which constraints canbe created, do it without need to drag
+            if (selectionList.Count == 2)
+            {
+                var beginItemContent = selectionList.First().Content as ElementDefinitionDiagramContentItemViewModel;
+                var endItemContent = selectionList.Last().Content as ElementDefinitionDiagramContentItemViewModel;
+
+                if (beginItemContent == null || endItemContent == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    var iteration = (Iteration)this.editorViewModel.Thing.Container;
+                    var createCategory = DiagramRDLHelper.GetOrAddConstraintCategory(iteration, this.ConstraintKind, out var category, out var rdlClone);
+
+                    var relationship = await this.ThingCreator.CreateAndGetConstraint(endItemContent.Thing as ElementDefinition, beginItemContent.Thing as ElementDefinition, category, createCategory ? rdlClone : null, iteration, this.editorViewModel.Session.QuerySelectedDomainOfExpertise(iteration), this.editorViewModel.Session);
+                    ConstraintConnectorTool.CreateConnector(relationship, (DiagramObject)beginItemContent.DiagramThing, (DiagramObject)endItemContent.DiagramThing, this.editorViewModel.Behavior);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
+
+                return;
+            }
+
             // activate tool
             this.editorViewModel.ActivateConnectorTool<TTool>(this);
         }

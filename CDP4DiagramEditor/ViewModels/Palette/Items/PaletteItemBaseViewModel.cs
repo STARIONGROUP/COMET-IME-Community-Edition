@@ -34,6 +34,8 @@ namespace CDP4DiagramEditor.ViewModels.Palette
 
     using CDP4Composition.Diagram;
 
+    using NLog;
+
     using ReactiveUI;
 
     /// <summary>
@@ -41,6 +43,11 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     /// </summary>
     public abstract class PaletteItemBaseViewModel : ReactiveObject, IPaletteItemViewModel
     {
+        /// <summary>
+        /// The NLog logger
+        /// </summary>
+        protected static Logger Logger;
+
         /// <summary>
         /// The viewmodel of the attached editor
         /// </summary>

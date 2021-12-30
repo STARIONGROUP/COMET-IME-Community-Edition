@@ -28,12 +28,18 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.Diagram;
+
+    using CDP4DiagramEditor.Helpers;
     using CDP4DiagramEditor.ViewModels.Tools;
+
+    using DevExpress.Xpf.Diagram;
 
     /// <summary>
     /// Diagram palette button responsible for creating new <see cref="SimpleConnector" />
@@ -95,6 +101,31 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// <returns>An empty task</returns>
         public override async Task ExecuteAsyncCommand()
         {
+            var selectionList = this.editorViewModel.SelectedItems.OfType<DiagramContentItem>().ToList();
+
+            // if selection is two things between which simple connector can be created, do it without need to drag
+            if (selectionList.Count == 2)
+            {
+                var beginItemContent = selectionList.First().Content as ThingDiagramContentItemViewModel;
+                var endItemContent = selectionList.Last().Content as ThingDiagramContentItemViewModel;
+
+                if (beginItemContent == null || endItemContent == null)
+                {
+                    return;
+                }
+
+                try
+                {
+                    SimpleConnectorTool.CreateConnector((DiagramObject)beginItemContent.DiagramThing, (DiagramObject)endItemContent.DiagramThing, this.editorViewModel.Behavior);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
+
+                return;
+            }
+
             // activate tool
             this.editorViewModel.ActivateConnectorTool<SimpleConnectorTool>(this);
         }
