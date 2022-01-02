@@ -26,6 +26,7 @@
 namespace CDP4CommonView.Diagram
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Windows;
     using System.Windows.Input;
 
@@ -80,11 +81,36 @@ namespace CDP4CommonView.Diagram
 
             foreach (var contextMenuItemViewModel in browser.ContextMenu)
             {
-                yield return new BarButtonItem
+                yield return this.CreateContextMenuItem(contextMenuItemViewModel);
+            }
+        }
+
+        /// <summary>
+        /// Create menu with subitems
+        /// </summary>
+        /// <param name="contextMenuItemViewModel">The context menu vm</param>
+        /// <returns>The bar item</returns>
+        private IBarManagerControllerAction CreateContextMenuItem(ContextMenuItemViewModel contextMenuItemViewModel)
+        {
+            if (contextMenuItemViewModel.SubMenu != null && contextMenuItemViewModel.SubMenu.Any())
+            {
+                var subitem = new BarSubItem
                 {
                     DataContext = contextMenuItemViewModel
                 };
+
+                foreach (var menuItemViewModel in contextMenuItemViewModel.SubMenu)
+                {
+                    subitem.Items.Add((IBarItem)this.CreateContextMenuItem(menuItemViewModel));
+                }
+
+                return subitem;
             }
+
+            return new BarButtonItem
+            {
+                DataContext = contextMenuItemViewModel
+            };
         }
 
         /// <summary>

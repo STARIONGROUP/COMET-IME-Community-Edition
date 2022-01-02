@@ -331,7 +331,11 @@
                 </Style.Triggers>
             </Style>
 
-            <viewModels:DiagramItemViewModelTemplateSelector x:Key="DiagramItemViewModelTemplateSelector"
+            <Style TargetType="{x:Type dxb:BarSubItem}">
+                <Setter Property="Content" Value="{Binding Header}" />
+            </Style>
+
+                <viewModels:DiagramItemViewModelTemplateSelector x:Key="DiagramItemViewModelTemplateSelector"
                                                              RequirementDiagramItemTemplate="{StaticResource RequirementDiagramItemTemplate}"
                                                              ElementBaseDiagramItemTemplate="{StaticResource ElementBaseDiagramItemTemplate}"
                                                              GenericDiagramItemDataTemplate="{StaticResource GenericDiagramItemTemplate}"

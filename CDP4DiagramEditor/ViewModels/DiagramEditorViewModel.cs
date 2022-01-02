@@ -54,6 +54,7 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.ViewModels;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -68,6 +69,7 @@ namespace CDP4DiagramEditor.ViewModels
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Diagram;
+    using DevExpress.XtraRichEdit.Commands;
 
     using ReactiveUI;
 
@@ -909,7 +911,6 @@ namespace CDP4DiagramEditor.ViewModels
             this.DiagramElementTreeRowViewModels = new DisposableReactiveList<IDiagramElementTreeRowViewModel> { ChangeTrackingEnabled = true};
             this.SelectedTreeRowViewModels = new ReactiveList<IDiagramElementTreeRowViewModel> { ChangeTrackingEnabled = true };
 
-            //this.Disposables.Add(this.WhenAnyValue(vm => vm.SelectedTreeRowViewModels).Subscribe(_ => this.SelectInDiagramFromTree()));
             this.Disposables.Add(this.SelectedTreeRowViewModels.Changed.Subscribe(_ => this.SelectInDiagramFromTree()));
 
             this.VisibleDiagramElementTreeRowViewModels = new ObservableCollectionCore<object>();
@@ -928,6 +929,12 @@ namespace CDP4DiagramEditor.ViewModels
             this.Disposables.Add(this.ConnectorViewModels.Changed.Subscribe(this.UpdateTree));
 
             this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
+
+            this.Disposables.Add(this.WhenAnyValue(vm => vm.SelectedItem)
+                .Subscribe(_ =>
+                {
+                    this.AugmentContextMenu();
+                }));
         }
 
         /// <summary>
@@ -941,23 +948,6 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             this.Behavior.SelectItemsByThing(this.SelectedTreeRowViewModels.Where(x => x.Thing is not null).Select(d => d.Thing).ToList());
-
-            //foreach (var thing in this.SelectedTreeRowViewModels.Where(x => x.Thing is not null).Select(d => d.Thing).ToList())
-            //{
-            //    var treeSelectedThingDiagramItem = this.ThingDiagramItemViewModels.FirstOrDefault(c => c.Thing == thing || c.DiagramThing == thing)?.DiagramRepresentation;
-
-            //    if (treeSelectedThingDiagramItem != null)
-            //    {
-            //        this.SelectedItems.Add(treeSelectedThingDiagramItem);
-            //    }
-
-            //    var connectorSelectedThing = this.ConnectorViewModels.FirstOrDefault(c => c.Thing == thing || c.DiagramThing == thing);
-
-            //    if(connectorSelectedThing != null)
-            //    {
-            //        this.Behavior.
-            //    }
-            //}
         }
 
         /// <summary>
@@ -1201,6 +1191,183 @@ namespace CDP4DiagramEditor.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Delete From Diagram", "Del", this.DeleteFromDiagramCommand, MenuItemKind.Deprecate));
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Delete From Model", "", this.DeleteFromModelCommand, MenuItemKind.Delete));
+        }
+
+        /// <summary>
+        /// Augments context menu based on selection
+        /// </summary>
+        private void AugmentContextMenu()
+        {
+            if (this.ContextMenu is null)
+            {
+                // context menu is not initialized so do nothing
+                return;
+            }
+
+            this.PopulateContextMenu();
+
+            var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing.Container as Iteration);
+
+            if ((this.SelectedItem as DiagramContentItem)?.Content is ElementDefinitionDiagramContentItemViewModel edContentItemViewModel)
+            {
+                var parameters = (edContentItemViewModel.Thing as ElementDefinition)?.Parameter.ToList();
+
+                if (parameters is not null && parameters.Any())
+                {
+                    var parametersMenuItem = new ContextMenuItemViewModel("Parameters", "", null, MenuItemKind.None);
+
+                    foreach (var parameter in parameters)
+                    {
+                        var paramSubmenu = new ContextMenuItemViewModel($"{parameter.ParameterType.Name}", "", null, MenuItemKind.None);
+
+                        paramSubmenu.SubMenu.Add(new ContextMenuItemViewModel("Inspect", "", this.ExecuteInspectParameter, parameter, this.PermissionService.CanRead(parameter), MenuItemKind.Inspect));
+                        paramSubmenu.SubMenu.Add(new ContextMenuItemViewModel("Edit", "", this.ExecuteEditParameter, parameter, this.PermissionService.CanWrite(parameter), MenuItemKind.Edit));
+                        paramSubmenu.SubMenu.Add(new ContextMenuItemViewModel("Delete", "", this.ExecuteDeleteParameter, parameter, this.PermissionService.CanWrite(parameter), MenuItemKind.Delete));
+
+                        if (parameter.Container is ElementDefinition)
+                        {
+                            var canExecute = parameter.Owner != selectedDomainOfExpertise &&
+                                             this.PermissionService.CanWrite(ClassKind.ParameterSubscription, parameter) &&
+                                             parameter.ParameterSubscription.All(ps => ps.Owner != selectedDomainOfExpertise);
+
+                            paramSubmenu.SubMenu.Insert(0, new ContextMenuItemViewModel("Subscribe to this Parameter", "", this.ExecuteSubscribeParameter, parameter, canExecute, MenuItemKind.Create));
+                        }
+
+                        parametersMenuItem.SubMenu.Add(paramSubmenu);
+                    }
+
+                    this.ContextMenu.Insert(3, parametersMenuItem);
+
+                    var parameterSubscriptions = parameters.SelectMany(p => p.ParameterSubscription).Where(s => s.Owner == selectedDomainOfExpertise).ToList();
+
+                    if (parameterSubscriptions.Any())
+                    {
+                        var parameterSubscriptionMenuItem = new ContextMenuItemViewModel("Parameter Subscriptions", "", null, MenuItemKind.None);
+
+                        foreach (var subscription in parameterSubscriptions)
+                        {
+                            var paramSubmenu = new ContextMenuItemViewModel($"{subscription.ParameterType.Name}", "", null, MenuItemKind.None);
+
+                            paramSubmenu.SubMenu.Add(new ContextMenuItemViewModel("Inspect", "", this.ExecuteInspectParameter, subscription, this.PermissionService.CanRead(subscription), MenuItemKind.Inspect));
+                            paramSubmenu.SubMenu.Add(new ContextMenuItemViewModel("Edit", "", this.ExecuteEditParameter, subscription, this.PermissionService.CanWrite(subscription), MenuItemKind.Edit));
+                            paramSubmenu.SubMenu.Add(new ContextMenuItemViewModel("Delete", "", this.ExecuteDeleteParameter, subscription, this.PermissionService.CanWrite(subscription), MenuItemKind.Delete));
+
+                            parameterSubscriptionMenuItem.SubMenu.Add(paramSubmenu);
+                        }
+
+                        this.ContextMenu.Insert(4, parameterSubscriptionMenuItem);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Subscribe to parameter
+        /// </summary>
+        /// <param name="thing">The thing</param>
+        private async void ExecuteSubscribeParameter(Thing thing)
+        {
+            if (thing == null)
+            {
+                return;
+            }
+
+            if (!(thing is ParameterOrOverrideBase parameterOrOverride))
+            {
+                return;
+            }
+
+            var owner = this.Session.QuerySelectedDomainOfExpertise(this.Thing.Container as Iteration);
+
+            if (owner != null)
+            {
+                var subscription = new ParameterSubscription
+                {
+                    Owner = owner
+                };
+
+                var transactionContext = TransactionContextResolver.ResolveContext(parameterOrOverride);
+                var transaction = new ThingTransaction(transactionContext);
+
+                var clone = parameterOrOverride.Clone(false);
+                transaction.Create(subscription);
+                transaction.CreateOrUpdate(clone);
+                clone.ParameterSubscription.Add(subscription);
+
+                await this.DalWrite(transaction);
+            }
+        }
+
+        /// <summary>
+        /// Inspect the thing
+        /// </summary>
+        /// <param name="thing">The thing</param>
+        private void ExecuteInspectParameter(Thing thing)
+        {
+            var containerClone = (thing.Container != null) ? thing.Container.Clone(false) : null;
+
+            var context = TransactionContextResolver.ResolveContext(this.Thing);
+            var transaction = new ThingTransaction(context);
+
+            this.ThingDialogNavigationService.Navigate(thing, transaction, this.Session, true, ThingDialogKind.Inspect, this.ThingDialogNavigationService, containerClone);
+        }
+
+        /// <summary>
+        /// Execute the <see cref="DeleteCommand"/>
+        /// </summary>
+        /// <param name="thing">
+        /// The thing to delete.
+        /// </param>
+        private async void ExecuteDeleteParameter(Thing thing)
+        {
+            if (thing == null)
+            {
+                return;
+            }
+
+            var confirmation = new ConfirmationDialogViewModel(thing);
+            var dialogResult = this.DialogNavigationService.NavigateModal(confirmation);
+
+            if (dialogResult == null || !dialogResult.Result.HasValue || !dialogResult.Result.Value)
+            {
+                return;
+            }
+
+            this.IsBusy = true;
+
+            var context = TransactionContextResolver.ResolveContext(this.Thing);
+
+            var transaction = new ThingTransaction(context);
+            transaction.Delete(thing.Clone(false));
+
+            try
+            {
+                await this.Session.Write(transaction.FinalizeTransaction());
+            }
+            catch (Exception ex)
+            {
+                logger.Error("An error was produced when deleting the {0}: {1}", thing.ClassKind, ex.Message);
+                this.Feedback = ex.Message;
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Executes the update command on a given <see cref="Thing"/>
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> to update</param>
+        protected void ExecuteEditParameter(Thing thing)
+        {
+            var clone = thing.Clone(false);
+            var containerClone = thing.Container.Clone(false);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
+            var transaction = new ThingTransaction(transactionContext, containerClone);
+
+            this.ThingDialogNavigationService.Navigate(clone, transaction, this.Session, true, ThingDialogKind.Update, this.ThingDialogNavigationService, containerClone);
         }
 
         /// <summary>

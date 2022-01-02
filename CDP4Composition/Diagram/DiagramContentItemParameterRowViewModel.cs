@@ -111,7 +111,7 @@ namespace CDP4Composition.Diagram
         private void AddParameterString(Parameter parameter, StringBuilder stringBuilder)
         {
             stringBuilder.Append(parameter.ParameterType.Name);
-            stringBuilder.Append($" [{parameter.Scale?.ShortName ?? "-"}]");
+            stringBuilder.Append($" [{parameter.Scale?.ShortName ?? "-"}] [{parameter.Owner?.ShortName ?? "-"}]");
 
             foreach (var valueset in parameter.ValueSet.OrderBy(x => x.ActualOption?.Name).ThenBy(x => x.ActualState?.Name))
             {
