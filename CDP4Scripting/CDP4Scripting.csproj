@@ -34,7 +34,7 @@
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
-    <PackageReference Include="CDP4Common-CE" Version="8.1.0">
+    <PackageReference Include="CDP4Common-CE" Version="8.2.0-693-PR221">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CDP4Dal-CE" Version="8.1.0">

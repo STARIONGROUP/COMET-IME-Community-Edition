@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AndExpressionRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -31,6 +31,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Extensions;
 
     using CDP4Composition.Mvvm;
 
@@ -190,7 +191,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void OnExpressionUpdate()
         {
-            this.StringExpression = this.ContainedRows.OfType<IRowViewModelBase<BooleanExpression>>().ToExpressionString(this.Thing);
+            this.StringExpression = this.Thing?.ToExpressionString();
+
             this.RequirementStateOfCompliance = RequirementStateOfCompliance.Unknown;
         }
 
