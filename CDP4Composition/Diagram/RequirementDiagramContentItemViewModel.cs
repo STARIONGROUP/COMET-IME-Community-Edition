@@ -38,8 +38,23 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents an <see cref="Requirement"/> to be used in a Diagram
     /// </summary>
-    public class RequirementDiagramContentItemViewModel : NamedThingDiagramContentItemViewModel, IDiagramContentItemChildren
+    public class RequirementDiagramContentItemViewModel : NamedThingDiagramContentItemViewModel //, IDiagramContentItemChildren
     {
+        /// <summary>
+        /// Backing field for <see cref="IsDefinitionCollapsed"/>
+        /// </summary>
+        private bool isDefinitionCollapsed;
+
+        /// <summary>
+        /// Backing field for <see cref="IsSimpleParameterValueGroupCollapsed"/>
+        /// </summary>
+        private bool isSimpleParameterValueGroupCollapsed;
+
+        /// <summary>
+        /// Backing field for <see cref="IsParametricConstraintGroupCollapsed"/>
+        /// </summary>
+        private bool isParametricConstraintGroupCollapsed;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementDiagramContentItemViewModel"/> class.
         /// </summary>
@@ -57,6 +72,52 @@ namespace CDP4Composition.Diagram
             }
 
             this.UpdateProperties();
+
+            this.IsDefinitionCollapsed = true;
+            this.IsSimpleParameterValueGroupCollapsed = true;
+            this.IsParametricConstraintGroupCollapsed = true;
+        }
+
+        /// <summary>
+        /// Gets or sets the definition child of the <see cref="RequirementDiagramContentItemViewModel"/>
+        /// </summary>
+        public ReactiveList<IDiagramContentItemChild> DefinitionChildren { get; set; } = new();
+
+        /// <summary>
+        /// Gets or sets the SimpleParameterValue children of the <see cref="RequirementDiagramContentItemViewModel"/>
+        /// </summary>
+        public ReactiveList<IDiagramContentItemChild> SimpleParameterValueChildren { get; set; } = new();
+
+        /// <summary>
+        /// Gets or sets the ParametricConstraint children of the <see cref="RequirementDiagramContentItemViewModel"/>
+        /// </summary>
+        public ReactiveList<IDiagramContentItemChild> ParametricConstraintChildren { get; set; } = new();
+
+        /// <summary>
+        /// Gets or sets whether the definition group is collapsed
+        /// </summary>
+        public bool IsDefinitionCollapsed
+        {
+            get => this.isDefinitionCollapsed;
+            set => this.RaiseAndSetIfChanged(ref this.isDefinitionCollapsed, value);
+        }
+
+        /// <summary>
+        /// Gets or sets whether the SimpleParameterValue group is collapsed
+        /// </summary>
+        public bool IsSimpleParameterValueGroupCollapsed
+        {
+            get => this.isSimpleParameterValueGroupCollapsed;
+            set => this.RaiseAndSetIfChanged(ref this.isSimpleParameterValueGroupCollapsed, value);
+        }
+
+        /// <summary>
+        /// Gets or sets whether the definition group is collapsed
+        /// </summary>
+        public bool IsParametricConstraintGroupCollapsed
+        {
+            get => this.isParametricConstraintGroupCollapsed;
+            set => this.RaiseAndSetIfChanged(ref this.isParametricConstraintGroupCollapsed, value);
         }
 
         /// <summary>
@@ -66,20 +127,35 @@ namespace CDP4Composition.Diagram
         {
             if (this.Thing is Requirement requirement)
             {
-                this.DiagramContentItemChildren.Clear();
+                this.DefinitionChildren.Clear();
+                this.SimpleParameterValueChildren.Clear();
+                this.ParametricConstraintChildren.Clear();
 
-                foreach (var cateogry in requirement.Category.OrderBy(x => x.Name))
+                var definition = requirement.Definition.FirstOrDefault();
+
+                if (definition != null)
                 {
-                    var parameterRowViewModel = new DiagramContentItemCategoryRowViewModel(cateogry, this.session, null);
-                    this.DiagramContentItemChildren.Add(parameterRowViewModel);
+                    this.DefinitionChildren.Add(new DiagramContentItemDefinitionRowViewModel(definition, this.session, null));
+                }
+
+                foreach (var parameter in requirement.ParameterValue.OrderBy(x => x.ParameterType.Name))
+                {
+                    var parameterRowViewModel = new DiagramContentItemSimpleParameterValueRowViewModel(parameter, this.session, null);
+                    this.SimpleParameterValueChildren.Add(parameterRowViewModel);
+                }
+
+                foreach (var constraint in requirement.ParametricConstraint.ToList())
+                {
+                    var parameterRowViewModel = new DiagramContentItemParametricConstraintRowViewModel(constraint, this.session, null);
+                    this.ParametricConstraintChildren.Add(parameterRowViewModel);
                 }
             }
         }
 
-        /// <summary>
-        /// Gets or sets the Children of the <see cref="RequirementDiagramContentItemViewModel"/>
-        /// </summary>
-        public ReactiveList<IDiagramContentItemChild> DiagramContentItemChildren { get; set; } = new();
+        ///// <summary>
+        ///// Gets or sets the Children of the <see cref="RequirementDiagramContentItemViewModel"/>
+        ///// </summary>
+        //public ReactiveList<IDiagramContentItemChild> DiagramContentItemChildren { get; set; } = new();
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates

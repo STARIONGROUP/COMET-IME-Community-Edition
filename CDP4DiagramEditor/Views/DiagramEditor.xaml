@@ -250,6 +250,105 @@
                                FontStyle="Italic"
                                FontSize="11"
                                Margin="10,0,10,10" />
+                    <dxlc:LayoutGroup Header="Definition"
+                                      View="GroupBox"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
+                                      IsCollapsible="True"
+                                      IsCollapsed="True"
+                                      Orientation="Vertical"
+                                      ScrollBars="Auto"
+                                      Width="250"
+                                      GroupBoxDisplayMode="Light"
+                                      Margin="3,0,3,0">
+                        <dxlc:LayoutGroup.Resources>
+                            <Style TargetType="dxlc:GroupBox">
+                                <Setter Property="BorderThickness"
+                                        Value="0, 0.2,0,0" />
+                            </Style>
+                        </dxlc:LayoutGroup.Resources>
+                        <dxlc:LayoutGroup.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding}"
+                                                   FontStyle="Italic" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </dxlc:LayoutGroup.HeaderTemplate>
+                        <ItemsControl ItemsSource="{Binding DefinitionChildren}"
+                                      HorizontalContentAlignment="Stretch">
+                            <ItemsControl.Template>
+                                <ControlTemplate>
+                                    <!-- 
+                                        Don't change the ScrollViewer's property related to horizontal alignment or horizontal scrollbar visibility, 
+                                        because that messes up dragging visually.
+                                    -->
+                                    <ScrollViewer x:Name="ScrollViewer">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="0,2,0,2"
+                                               TextWrapping="Wrap"
+                                               TextAlignment="Justify"
+                                               Text="{Binding DiagramContentItemChildString}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </dxlc:LayoutGroup>
+                    <dxlc:LayoutGroup Header="Simple Parameter Values"
+                                      View="GroupBox"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch"
+                                      IsCollapsible="True"
+                                      IsCollapsed="True"
+                                      Orientation="Vertical"
+                                      ScrollBars="Auto"
+                                      GroupBoxDisplayMode="Light"
+                                      Margin="3,0,3,0">
+                        <dxlc:LayoutGroup.Resources>
+                            <Style TargetType="dxlc:GroupBox">
+                                <Setter Property="BorderThickness"
+                                        Value="0, 0.2,0,0" />
+                            </Style>
+                        </dxlc:LayoutGroup.Resources>
+                        <dxlc:LayoutGroup.HeaderTemplate>
+                            <DataTemplate>
+                                <Grid HorizontalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding}"
+                                                   FontStyle="Italic" />
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </dxlc:LayoutGroup.HeaderTemplate>
+                        <ItemsControl ItemsSource="{Binding SimpleParameterValueChildren}"
+                                      HorizontalContentAlignment="Stretch">
+                            <ItemsControl.Template>
+                                <ControlTemplate>
+                                    <!-- 
+                                        Don't change the ScrollViewer's property related to horizontal alignment or horizontal scrollbar visibility, 
+                                        because that messes up dragging visually.
+                                    -->
+                                    <ScrollViewer x:Name="ScrollViewer">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </ItemsControl.Template>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Margin="0,2,0,2"
+                                               TextWrapping="Wrap"
+                                               Text="{Binding DiagramContentItemChildString}" />
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </dxlc:LayoutGroup>
+                    
                 </StackPanel>
             </DataTemplate>
 
