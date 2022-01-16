@@ -57,6 +57,11 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
 
             var converter = new ThingToIconUriConverter();
 
+            if( rowElement.Thing == null)
+            {
+                return DXImageHelper.GetImageSource("Images/Conditional Formatting/GreaterThan_16x16.png");
+            }
+
             switch (rowElement.Thing)
             {
                 case DiagramPort:
@@ -70,6 +75,7 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
                 case DomainOfExpertise:
                 case Requirement:
                 case Category:
+                case ActualFiniteStateList:
                 case Parameter:
                 default:
                     return converter.Convert(new object[] { rowElement.Thing }, null, null, null) as BitmapImage;

@@ -36,6 +36,7 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
 
     using CDP4Composition.Diagram;
     using CDP4Composition.Mvvm.Types;
+    using CDP4Composition.Utilities;
 
     using ReactiveUI;
 
@@ -93,7 +94,7 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
 
             this.WhenAnyValue(vm => vm.ThingDiagramItemViewModel.IsDirty).Subscribe(_ =>
             {
-                if(this.ThingDiagramItemViewModel is NamedThingDiagramContentItemViewModel)
+                if (this.ThingDiagramItemViewModel is NamedThingDiagramContentItemViewModel)
                 {
                     this.IsDirty = this.ThingDiagramItemViewModel.IsDirty;
                 }
@@ -177,7 +178,7 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
         /// <summary>
         /// Sets the name
         /// </summary>
-        private void SetName()
+        protected virtual void SetName()
         {
             switch (this.Thing)
             {
@@ -205,9 +206,14 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
         /// <summary>
         /// Sets the children nodes
         /// </summary>
-        private void SetChildren()
+        protected virtual void SetChildren()
         {
             this.Children.ClearAndDispose();
+
+            if (this.Thing == null)
+            {
+                return;
+            }
 
             if (this.Thing is IOwnedThing owned)
             {
@@ -229,6 +235,7 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
                     {
                         this.Children.Add(new DiagramElementTreeRowViewModel(edge.DepictedThing, this.container, null));
                     }
+
                     break;
                 case DiagramPort port:
                     this.Children.Add(new DiagramElementTreeRowViewModel(port.DepictedThing, this.container, null));
@@ -241,8 +248,62 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
                     {
                         this.Children.Add(new DiagramElementTreeRowViewModel(parameter, this.container, null));
                     }
+
+                    break;
+                case Parameter param:
+                    if (param.StateDependence != null)
+                    {
+                        this.Children.Add(new DiagramElementTreeRowViewModel(param.StateDependence, this.container, null));
+                    }
+
                     break;
             }
+
+            // add thing preferences
+            var pref = ThingPreferenceHelper.GetThingPreferenceDictionary(this.Thing, out var dictionary);
+
+            if (pref)
+            {
+                foreach (var kvp in dictionary)
+                {
+                    this.Children.Add(new PropertyTreeRowViewModel(null, this.container, this.ThingDiagramItemViewModel, $"{kvp.Key} = {kvp.Value}"));
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// A row view model for a property of a thing
+    /// </summary>
+    public class PropertyTreeRowViewModel : DiagramElementTreeRowViewModel
+    {
+        /// <summary>
+        /// Instantiates a new instance of <see cref="PropertyTreeRowViewModel" />
+        /// </summary>
+        public PropertyTreeRowViewModel(Thing thing, IDiagramEditorViewModel container, IDiagramItemOrConnector thingDiagramItemViewModel, string value) : base(thing, container, thingDiagramItemViewModel)
+        {
+            this.Value = value;
+        }
+
+        /// <summary>
+        /// Gets or sets the value
+        /// </summary>
+        public string Value { get; set; }
+
+        /// <summary>
+        /// Sets the name
+        /// </summary>
+        protected override void SetName()
+        {
+            this.Name = this.Value;
+        }
+
+        /// <summary>
+        /// Sets the children nodes
+        /// </summary>
+        protected override void SetChildren()
+        {
+            return;
         }
     }
 }

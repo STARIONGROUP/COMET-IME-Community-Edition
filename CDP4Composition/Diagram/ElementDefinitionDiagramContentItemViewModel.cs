@@ -206,24 +206,6 @@ namespace CDP4Composition.Diagram
         }
 
         /// <summary>
-        /// Gets the height of the height of the representing <see cref="DiagramItem"/>
-        /// </summary>
-        /// <returns>The actual height</returns>
-        public double GetDiagramContentItemHeight()
-        {
-            return this.DiagramRepresentation.ActualHeight;
-        }
-
-        /// <summary>
-        /// Gets the width of the height of the representing <see cref="DiagramItem"/>
-        /// </summary>
-        /// <returns>The actual width</returns>
-        public double GetDiagramContentItemWidth()
-        {
-            return this.DiagramRepresentation.ActualWidth;
-        }
-
-        /// <summary>
         /// Creates a new <see cref="ElementDefinitionDiagramContentItemViewModel"/>
         /// </summary>
         /// <param name="session">The session</param>

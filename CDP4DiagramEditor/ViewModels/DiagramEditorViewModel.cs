@@ -242,14 +242,24 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<object> DeleteFromDiagramCommand { get; protected set; }
 
         /// <summary>
-        /// Gets or sets the add usages to diagram command
+        /// Gets or sets the add relationships to diagram command
         /// </summary>
         public ReactiveCommand<object> AddUsagesToDiagramCommand { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the add usages to diagram command
+        /// </summary>
+        public ReactiveCommand<object> AddBinaryRelationshipsToDiagramCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the add usages to existing elements diagram command
         /// </summary>
         public ReactiveCommand<object> AddUsagesToExistingElementsDiagramCommand { get; protected set; }
+
+        /// <summary>
+        /// Gets or sets the add usages to diagram command
+        /// </summary>
+        public ReactiveCommand<object> AddBinaryRelationshipsToExistingElementsDiagramCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the RelationshipRules
@@ -1152,6 +1162,12 @@ namespace CDP4DiagramEditor.ViewModels
             this.AddUsagesToExistingElementsDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
             this.AddUsagesToExistingElementsDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToExistingElementsDiagramCommand());
 
+            this.AddBinaryRelationshipsToDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ThingDiagramContentItemViewModel)));
+            this.AddBinaryRelationshipsToDiagramCommand.Subscribe(x => this.ExecuteAddBinaryRelationshipsToDiagramCommand());
+
+            this.AddBinaryRelationshipsToExistingElementsDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
+            this.AddBinaryRelationshipsToExistingElementsDiagramCommand.Subscribe(x => this.ExecuteAddBinaryRelationshipsToExistingElementsDiagramCommand());
+
             this.SetAsTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.SelectedItem)
                     .Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItemViewModel }),
                 _ => this.ExecuteSetTopElementCommand(), RxApp.MainThreadScheduler);
@@ -1180,6 +1196,10 @@ namespace CDP4DiagramEditor.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Expand Element Usages", "", this.AddUsagesToDiagramCommand, MenuItemKind.Navigate));
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Expand Element Usages of Element Definitions Already in Diagram", "", this.AddUsagesToExistingElementsDiagramCommand, MenuItemKind.Navigate));
+
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Expand Binary Relationships", "", this.AddBinaryRelationshipsToDiagramCommand, MenuItemKind.Navigate));
+
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Expand Binary Relationships to Things Already in Diagram", "", this.AddBinaryRelationshipsToExistingElementsDiagramCommand, MenuItemKind.Navigate));
 
             if (this.Thing is ArchitectureDiagram)
             {
@@ -1479,6 +1499,179 @@ namespace CDP4DiagramEditor.ViewModels
                     var target = diagramContentItem.DiagramThing as ArchitectureElement;
 
                     ElementUsageConnectorTool.CreateConnector(elementUsage, source, target, this.Behavior);
+                }
+            }
+
+            this.ComputeGeneratedConnectors();
+        }
+
+        /// <summary>
+        /// Adds BinaryRelationships to the selected things
+        /// </summary>
+        private void ExecuteAddBinaryRelationshipsToDiagramCommand()
+        {
+            var viewModels = this.SelectedItems.OfType<DiagramContentItem>().Select(i => i.Content as NamedThingDiagramContentItemViewModel);
+
+            foreach (var diagramContentItem in viewModels.Where(vm => vm != null))
+            {
+                var thing = diagramContentItem.Thing;
+
+                if (thing == null)
+                {
+                    continue;
+                }
+
+                var binaryRelationships = (this.Thing.Container as Iteration)?.Relationship.OfType<BinaryRelationship>().Where(br => (br.Source == thing && (br.Target is ElementDefinition || br.Target is Requirement)) || (br.Target == thing && (br.Source is ElementDefinition || br.Source is Requirement))).ToList();
+
+                if (binaryRelationships == null)
+                {
+                    continue;
+                }
+
+                // create missing things
+                var thingsToCreate = binaryRelationships.Select(br => br.Source).Concat(binaryRelationships.Select(br => br.Target)).Distinct().Except(this.ThingDiagramItemViewModels.Select(d => d.Thing)).Distinct().ToList();
+
+                // compute positional data
+                var count = thingsToCreate.Count;
+                var width = diagramContentItem.GetDiagramContentItemWidth();
+                var height = diagramContentItem.GetDiagramContentItemHeight();
+                var horizontalGap = 0.5 * width;
+                var verticalGap = 1 * height;
+
+                var startPosition = diagramContentItem.DiagramRepresentation.Position;
+                var totalWidth = count * width + (count - 1) * horizontalGap;
+
+                var position = new Point(startPosition.X + 0.5 * width - 0.5 * totalWidth, startPosition.Y + height + verticalGap);
+
+                // create definitions
+                foreach (var elementDefinitionToCreate in thingsToCreate.OfType<ElementDefinition>())
+                {
+                    var newDiagramElement = ElementDefinitionDiagramContentItemViewModel.CreatElementDefinitionDiagramContentItemViewModel(this.Session, elementDefinitionToCreate, this, position);
+
+                    this.Behavior.ItemPositions.Add(newDiagramElement, position);
+                    this.ThingDiagramItemViewModels.Add(newDiagramElement);
+
+                    newDiagramElement.UpdatePorts();
+
+                    position = new Point(position.X + width + horizontalGap, position.Y);
+                }
+
+                // create requirements
+                foreach (var requirement in thingsToCreate.OfType<Requirement>())
+                {
+                    var bounds = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+                    {
+                        X = (float)position.X,
+                        Y = (float)position.Y,
+                        Name = requirement.UserFriendlyName
+                    };
+
+                    var block = new DiagramObject(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
+                    {
+                        DepictedThing = requirement,
+                        Name = requirement.UserFriendlyName,
+                        Documentation = requirement.UserFriendlyName,
+                        Resolution = Cdp4DiagramHelper.DefaultResolution
+                    };
+
+                    block.Bounds.Add(bounds);
+
+                    var newDiagramElement = new RequirementDiagramContentItemViewModel(block, this.Session, this);
+
+                    this.Behavior.ItemPositions.Add(newDiagramElement, position);
+                    this.ThingDiagramItemViewModels.Add(newDiagramElement);
+
+                    position = new Point(position.X + width + horizontalGap, position.Y);
+                }
+
+                var constraints = binaryRelationships.Where(r => r.IsConstraint());
+                var nonConstraints = binaryRelationships.Where(r => !r.IsConstraint());
+
+                // create simple binary connectors
+                foreach (var relationship in nonConstraints)
+                {
+                    if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(relationship)))
+                    {
+                        continue;
+                    }
+
+                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Source)).DiagramThing;
+                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Target)).DiagramThing;
+
+                    BinaryRelationshipConnectorTool.CreateConnector(relationship, source as DiagramShape, target as DiagramShape, this.Behavior);
+                }
+
+                // create constraint connectors
+                foreach (var relationship in constraints)
+                {
+                    if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(relationship)))
+                    {
+                        continue;
+                    }
+
+                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Source)).DiagramThing;
+                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Target)).DiagramThing;
+
+                    ConstraintConnectorTool.CreateConnector(relationship, source as DiagramObject, target as DiagramObject, this.Behavior);
+                }
+            }
+
+            this.ComputeGeneratedConnectors();
+        }
+
+
+        /// <summary>
+        /// Adds ElementUsages to the selected element definitions if they exist on diagram
+        /// </summary>
+        private void ExecuteAddBinaryRelationshipsToExistingElementsDiagramCommand()
+        {
+            var viewModels = this.SelectedItems.OfType<DiagramContentItem>().Select(i => i.Content as NamedThingDiagramContentItemViewModel);
+
+            foreach (var diagramContentItem in viewModels.Where(vm => vm != null))
+            {
+                var thing = diagramContentItem.Thing;
+
+                if (thing == null)
+                {
+                    continue;
+                }
+
+                var binaryRelationships = (this.Thing.Container as Iteration)?.Relationship.OfType<BinaryRelationship>().Where(br => (br.Source == thing && (br.Target is ElementDefinition || br.Target is Requirement)) || (br.Target == thing && (br.Source is ElementDefinition || br.Source is Requirement))).ToList();
+
+                if (binaryRelationships == null)
+                {
+                    continue;
+                }
+
+                var constraints = binaryRelationships.Where(r => r.IsConstraint());
+                var nonConstraints = binaryRelationships.Where(r => !r.IsConstraint());
+
+                // create simple binary connectors
+                foreach (var relationship in nonConstraints)
+                {
+                    if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(relationship)))
+                    {
+                        continue;
+                    }
+
+                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Source)).DiagramThing;
+                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Target)).DiagramThing;
+
+                    BinaryRelationshipConnectorTool.CreateConnector(relationship, source as DiagramShape, target as DiagramShape, this.Behavior);
+                }
+
+                // create constraint connectors
+                foreach (var relationship in constraints)
+                {
+                    if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(relationship)))
+                    {
+                        continue;
+                    }
+
+                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Source)).DiagramThing;
+                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Target)).DiagramThing;
+
+                    ConstraintConnectorTool.CreateConnector(relationship, source as DiagramObject, target as DiagramObject, this.Behavior);
                 }
             }
 

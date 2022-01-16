@@ -30,7 +30,6 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
 
     using CDP4CommonView.Diagram;
 
-    using CDP4Composition.Diagram;
     using CDP4Composition.Mvvm.Types;
 
     /// <summary>
@@ -57,6 +56,10 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
         /// Gets or sets the diagram item view model
         /// </summary>
         IDiagramItemOrConnector ThingDiagramItemViewModel { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating that the view model is dirty
+        /// </summary>
         bool IsDirty { get; set; }
     }
 }
