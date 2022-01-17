@@ -31,6 +31,7 @@ namespace CDP4DiagramEditor.ViewModels
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
@@ -38,6 +39,8 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
+
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -56,7 +59,7 @@ namespace CDP4DiagramEditor.ViewModels
     /// <summary>
     /// The purpose of the <see cref="DiagramBrowserViewModel" /> is to represent the view-model for <see cref="Diagram" />s
     /// </summary>
-    public class DiagramBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
+    public class DiagramBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget
     {
         /// <summary>
         /// The logger for the current class
@@ -528,6 +531,62 @@ namespace CDP4DiagramEditor.ViewModels
             var thing = this.SelectedThing.Thing;
             var vm = new DiagramEditorViewModel((DiagramCanvas) thing, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
             this.PanelNavigationService.OpenInDock(vm);
+        }
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            logger.Trace("drag over {0}", dropInfo.TargetItem);
+            var droptarget = dropInfo.TargetItem as IDropTarget;
+
+            if (droptarget == null)
+            {
+                dropInfo.Effects = DragDropEffects.None;
+
+                return;
+            }
+
+            droptarget.DragOver(dropInfo);
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            var droptarget = dropInfo.TargetItem as IDropTarget;
+
+            if (droptarget == null)
+            {
+                return;
+            }
+
+            try
+            {
+                this.IsBusy = true;
+                await droptarget.Drop(dropInfo);
+            }
+            catch (Exception ex)
+            {
+                this.Feedback = ex.Message;
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
         }
     }
 }

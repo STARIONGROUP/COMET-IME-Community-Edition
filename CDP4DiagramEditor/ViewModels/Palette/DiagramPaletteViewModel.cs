@@ -32,6 +32,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
 
     using CDP4Common.DiagramData;
 
+    using CDP4Composition.Diagram;
     using CDP4Composition.Mvvm.Types;
 
     using DevExpress.Xpf.NavBar;
@@ -60,7 +61,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// </summary>
         /// <param name="diagram">The diagram of the <see cref="Thing" />s to display</param>
         /// <param name="parent">The parent <see cref="DiagramEditorViewModel" /></param>
-        public DiagramPaletteViewModel(DiagramCanvas diagram, DiagramEditorViewModel parent)
+        public DiagramPaletteViewModel(DiagramCanvas diagram, IDiagramEditorViewModel parent)
         {
             this.paletteItems = ServiceLocator.Current.GetAllInstances<IPaletteItemViewModel>();
 
@@ -83,7 +84,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// <summary>
         /// Gets the <see cref="DiagramEditorViewModel" /> that this palette is part of.
         /// </summary>
-        public DiagramEditorViewModel ParentViewModel { get; private set; }
+        public IDiagramEditorViewModel ParentViewModel { get; private set; }
 
         /// <summary>
         /// Gets or sets he list of <see cref="IPaletteItemViewModel" /> to populate the menu

@@ -180,6 +180,12 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
         /// </summary>
         protected virtual void SetName()
         {
+            if(this.Thing == null)
+            {
+                this.Name = "No Thing assigned. Possible model corruption.";
+                return;
+            }
+
             switch (this.Thing)
             {
                 case DiagramPort port:
@@ -282,7 +288,7 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
         /// </summary>
         public PropertyTreeRowViewModel(Thing thing, IDiagramEditorViewModel container, IDiagramItemOrConnector thingDiagramItemViewModel, string value) : base(thing, container, thingDiagramItemViewModel)
         {
-            this.Value = value;
+            this.Name = value;
         }
 
         /// <summary>
@@ -295,7 +301,7 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
         /// </summary>
         protected override void SetName()
         {
-            this.Name = this.Value;
+            return;
         }
 
         /// <summary>

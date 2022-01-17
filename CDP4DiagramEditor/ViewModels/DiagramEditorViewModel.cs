@@ -1285,7 +1285,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// Subscribe to parameter
         /// </summary>
         /// <param name="thing">The thing</param>
-        private async void ExecuteSubscribeParameter(Thing thing)
+        public async void ExecuteSubscribeParameter(Thing thing)
         {
             if (thing == null)
             {
@@ -1322,7 +1322,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// Inspect the thing
         /// </summary>
         /// <param name="thing">The thing</param>
-        private void ExecuteInspectParameter(Thing thing)
+        public void ExecuteInspectParameter(Thing thing)
         {
             var containerClone = (thing.Container != null) ? thing.Container.Clone(false) : null;
 
