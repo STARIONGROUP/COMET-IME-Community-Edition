@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelOpeningDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski.
 //
@@ -33,6 +33,7 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -42,9 +43,11 @@ namespace CDP4ShellDialogs.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
+
     using CDP4Dal;
 
     using NLog;
+
     using ReactiveUI;
 
     /// <summary>
@@ -97,15 +100,17 @@ namespace CDP4ShellDialogs.ViewModels
             var canOk = this.WhenAnyValue(x => x.SelectedIterations.Count, count => count != 0);
 
             this.SelectCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteSelect(), RxApp.MainThreadScheduler);
+
             this.SelectCommand.ThrownExceptions.Select(ex => ex).Subscribe(
                 x =>
-            {
-                this.ErrorMessage = x.Message;
-                this.IsBusy = false;
-            });
+                {
+                    this.ErrorMessage = x.Message;
+                    this.IsBusy = false;
+                });
 
             var canActiveOk = this.WhenAnyValue(x => x.SelectedEngineeringModelSetup.IterationSetupRowViewModels.Count, count => count != 0);
             this.SelectActiveIterationCommand = ReactiveCommand.CreateAsyncTask(canActiveOk, x => this.ExecuteSelectActiveIteration(), RxApp.MainThreadScheduler);
+
             this.SelectActiveIterationCommand.ThrownExceptions.Select(ex => ex).Subscribe(
                 x =>
                 {
@@ -126,25 +131,22 @@ namespace CDP4ShellDialogs.ViewModels
             this.SelectedIterations.ItemsAdded.Subscribe(this.FilterIterationSelectionItems);
 
             this.WhenAnyValue(x => x.IsModelScreen).Subscribe(x => this.IsIterationScreen = !x);
-            
+
             this.PopulateSessionsRowViewModel(sessionAvailable);
         }
 
         /// <summary>
         /// Gets the dialog box title
         /// </summary>
-        public string DialogTitle
-        {
-            get { return "Iteration Selection"; }
-        }
+        public string DialogTitle => "Iteration Selection";
 
         /// <summary>
         /// Gets the title of the group
         /// </summary>
         public string Title
         {
-            get { return this.title; }
-            set { this.RaiseAndSetIfChanged(ref this.title, value); }
+            get => this.title;
+            set => this.RaiseAndSetIfChanged(ref this.title, value);
         }
 
         /// <summary>
@@ -152,8 +154,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public bool IsModelScreen
         {
-            get { return this.isModelScreen; }
-            set { this.RaiseAndSetIfChanged(ref this.isModelScreen, value); }
+            get => this.isModelScreen;
+            set => this.RaiseAndSetIfChanged(ref this.isModelScreen, value);
         }
 
         /// <summary>
@@ -161,8 +163,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public bool IsIterationScreen
         {
-            get { return this.isIterationScreen; }
-            set { this.RaiseAndSetIfChanged(ref this.isIterationScreen, value); }
+            get => this.isIterationScreen;
+            set => this.RaiseAndSetIfChanged(ref this.isIterationScreen, value);
         }
 
         /// <summary>
@@ -205,16 +207,17 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public ModelSelectionSessionRowViewModel SelectedRowSession
         {
-            get { return this.selectedRowSession; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedRowSession, value); }
+            get => this.selectedRowSession;
+            set => this.RaiseAndSetIfChanged(ref this.selectedRowSession, value);
         }
+
         /// <summary>
         /// Gets or sets the selected row model.
         /// </summary>
         public ModelSelectionEngineeringModelSetupRowViewModel SelectedEngineeringModelSetup
         {
-            get { return this.selectedEngineeringModelSetup; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedEngineeringModelSetup, value); }
+            get => this.selectedEngineeringModelSetup;
+            set => this.RaiseAndSetIfChanged(ref this.selectedEngineeringModelSetup, value);
         }
 
         /// <summary>
@@ -245,8 +248,9 @@ namespace CDP4ShellDialogs.ViewModels
 
                 // Retrieve the Iteration from the IDal
                 var session = iterationSetupRow.Session;
+
                 var model = new EngineeringModel(modelSetup.EngineeringModelIid, session.Assembler.Cache, session.Credentials.Uri)
-                { EngineeringModelSetup = modelSetup };
+                    { EngineeringModelSetup = modelSetup };
 
                 var iteration = new Iteration(iterationSetupRow.Thing.IterationIid, session.Assembler.Cache, session.Credentials.Uri);
 
@@ -287,16 +291,26 @@ namespace CDP4ShellDialogs.ViewModels
 
                 // Retrieve the Iteration from the IDal
                 var session = activeIterationSetupRow.Session;
+
                 var model = new EngineeringModel(modelSetup.EngineeringModelIid, session.Assembler.Cache, session.Credentials.Uri)
-                { EngineeringModelSetup = modelSetup };
+                    { EngineeringModelSetup = modelSetup };
 
                 var iteration = new Iteration(activeIterationSetupRow.Thing.IterationIid, session.Assembler.Cache, session.Credentials.Uri);
 
                 model.Iteration.Add(iteration);
 
-                var defaultDomain = session.ActivePerson.DefaultDomain ?? activeIterationSetupRow.DomainOfExpertises.FirstOrDefault();
+                DomainOfExpertise initialDomain;
 
-                await session.Read(iteration, defaultDomain);
+                if (session.ActivePerson.DefaultDomain != null && activeIterationSetupRow.DomainOfExpertises.Contains(session.ActivePerson.DefaultDomain))
+                {
+                    initialDomain = session.ActivePerson.DefaultDomain;
+                }
+                else
+                {
+                    initialDomain = activeIterationSetupRow.DomainOfExpertises.FirstOrDefault();
+                }
+
+                await session.Read(iteration, initialDomain);
             }
 
             this.IsBusy = false;
@@ -359,7 +373,7 @@ namespace CDP4ShellDialogs.ViewModels
                 this.SelectedEngineeringModelSetup = modelSelectionSessionRowViewModel.EngineeringModelSetupRowViewModels.FirstOrDefault();
             }
         }
-        
+
         /// <summary>
         /// Filters the <see cref="SelectedIterations"/> added items to only select <see cref="IterationSetupRowViewModel"/>
         /// </summary>
@@ -367,6 +381,7 @@ namespace CDP4ShellDialogs.ViewModels
         private void FilterIterationSelectionItems(IViewModelBase<Thing> row)
         {
             var iterationRow = row as ModelSelectionIterationSetupRowViewModel;
+
             if (iterationRow == null)
             {
                 this.RemoveSelectedRowFromSelectedIterationList(row);
