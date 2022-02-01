@@ -20,6 +20,7 @@
                 <Directory Id="PROPERTYGRID" Name="CDP4PropertyGrid"/>
                 <Directory Id="REQUIREMENTS" Name="CDP4Requirements"/>
                 <Directory Id="DASHBOARD" Name="CDP4Dashboard"/>
+                <Directory Id="DIAGRAMEDITOR" Name="CDP4DiagramEditor"/>
                 <Directory Id="CROSSVIEWEDITOR" Name="CDP4CrossViewEditor"/>
                 <Directory Id="REFERENCEDATAMAPPER" Name="CDP4ReferenceDataMapper"/>
                 <Directory Id="GRAPHER" Name="CDP4Grapher"/>

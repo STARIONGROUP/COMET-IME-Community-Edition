@@ -57,6 +57,7 @@
     <Compile Include="CDP4Grapher.wxs" />
     <Compile Include="CDP4CrossViewEditor.wxs" />
     <Compile Include="CDP4ReferenceDataMapper.wxs" />
+    <Compile Include="CDP4DiagramEditor.wxs" />
     <Compile Include="Dependencies.wxs" />
     <Compile Include="DevExpress.wxs" />
     <Compile Include="EngineeringModelPlugin.wxs" />
@@ -177,6 +178,14 @@
     <ProjectReference Include="..\CDP4Dashboard\CDP4Dashboard.csproj">
       <Name>CDP4Dashboard</Name>
       <Project>{89e91585-c793-4d90-ab8c-fd295590665b}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4DiagramEditor\CDP4DiagramEditor.csproj">
+      <Name>CDP4DiagramEditor</Name>
+      <Project>{f541da64-5c66-45fe-822c-cf93964a3f52}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>

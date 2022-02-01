@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+  <?include variables.wxi ?>
+
+  <Fragment>
+    <ComponentGroup Id="CDP4DIAGRAMEDITOR_CG" Directory="DIAGRAMEDITOR">
+      
+      <Component Id="comp_CDP4DiagramEditor" Guid="{70DCB213-9D8E-4C5F-984F-94755EDB0397}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4DiagramEditor"  Vital="yes" Source="$(var.CDP4DiagramEditor.TargetPath)" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Manifest_CDP4DiagramEditor" Guid="{300B1D2F-8818-4E63-A4DD-3069F37D3F84}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Manifest_CDP4DiagramEditor"  Vital="yes" Source="$(var.CDP4DiagramEditor.TargetDir)CDP4DiagramEditor.plugin.manifest" KeyPath="yes"></File>
+      </Component>
+
+      <!-- scripting -->
+      <Component Id="comp_MicrosoftDynamic_CDP4DiagramEditor" Guid="{7E127668-804D-4CDE-9F5E-D831DDA8F3C4}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_MicrosoftDynamic_CDP4DiagramEditor"  Vital="yes" Source="$(var.CDP4DiagramEditor.TargetDir)Microsoft.Dynamic.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_MicrosoftScriptin_CDP4DiagramEditor" Guid="{454BDF7E-68A4-4A02-83B8-54C09480E4CC}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_MicrosoftScripting_CDP4DiagramEditor"  Vital="yes" Source="$(var.CDP4DiagramEditor.TargetDir)Microsoft.Scripting.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_MicrosoftScriptingMetadata_CDP4DiagramEditor" Guid="{BB788A03-02E9-4A64-A428-9F502405A24C}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_MicrosoftScriptingMetadata_CDP4DiagramEditor"  Vital="yes" Source="$(var.CDP4DiagramEditor.TargetDir)Microsoft.Scripting.Metadata.dll" KeyPath="yes"></File>
+      </Component>
+
+    </ComponentGroup>
+  </Fragment>
+</Wix>
