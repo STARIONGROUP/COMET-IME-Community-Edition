@@ -34,18 +34,27 @@ namespace CDP4IME
 
     using DevExpress.Xpf.Core;
 
+    using NLog;
+
     /// <summary>
     /// Bootstrapper implementation for the IME
     /// </summary>
     public class CDP4IMEBootstrapper : COMETBootstrapper<ImeAppSettings>
     {
         /// <summary>
+        /// A NLog logger
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
         /// Adds the bootstrapper assembly to the catalogues
         /// </summary>
         /// <param name="catalog">The <see cref="AggregateCatalog"/></param>
         protected override void AddCustomCatalogs(AggregateCatalog catalog)
         {
+            logger.Info($"Adding bootsrapper assembly catalog {typeof(CDP4IMEBootstrapper).Assembly.FullName}");
             catalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4IMEBootstrapper).Assembly));
+            logger.Info("Bootsrapper catalog added");
         }
 
         /// <summary>
@@ -66,6 +75,7 @@ namespace CDP4IME
         {
             base.UpdateBootstrapperStatus(message);
             DXSplashScreen.SetState(message);
+            logger.Info(message);
         }
     }
 }
