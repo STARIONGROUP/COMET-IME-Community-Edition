@@ -25,12 +25,12 @@ for:
 configuration: Debug
 
 install:
-  - choco install opencover.portable --version=4.7.1221
-  - choco install "sonarscanner-msbuild-net46" -y --version=5.2.1.31210
+  - choco install opencover.portable
+  - choco install "sonarscanner-msbuild-net46" -y
 
 before_build:
-  - cmd: nuget install NUnit.Console -Version 3.12.0 -OutputDirectory testrunner
-  - cmd: nuget install NUnit.Runners -Version 3.12.0 -OutputDirectory testrunner
+  - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
+  - cmd: nuget install NUnit.Runners -Version 3.11.1 -OutputDirectory testrunner
   - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
   - cmd: nuget sources add -name github -source https://nuget.pkg.github.com/RHEAGROUP/index.json -username %GITHUB_USER% -password %GITHUB_TOKEN% -StorePasswordInClearText
   - cmd: nuget restore -verbosity quiet
@@ -39,7 +39,7 @@ before_build:
   - cmd: java -version
   - ps: >-
       if ($env:APPVEYOR_PULL_REQUEST_NUMBER) {
-        Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER
+        Write-Host Sonar Scanning PR# $env:APPVEYOR_PULL_REQUEST_NUMBER Branch $env:APPVEYOR_PULL_REQUEST_HEAD_REPO_BRANCH
         SonarScanner.MSBuild.exe begin /key:$env:SONARCLOUD_PROJECT_KEY /o:$env:SONARCLOUD_ORGANIZATION /d:sonar.host.url=$env:SONARCLOUD_URL /d:sonar.login=$env:SONARCLOUD_TOKEN /d:sonar.cs.opencover.reportsPaths=$env:TEST_COVERAGE /d:sonar.cs.nunit.reportsPaths=$env:TEST_RESULT /d:sonar.pullrequest.key=$env:APPVEYOR_PULL_REQUEST_NUMBER /d:sonar.pullrequest.provider=GitHub /d:sonar.pullrequest.github.repository=$env:APPVEYOR_REPO_NAME
       } elseif ($env:APPVEYOR_REPO_BRANCH -eq "development") {
         Write-Host Sonar Scanning branch $env:APPVEYOR_REPO_BRANCH
@@ -60,10 +60,10 @@ test_script:
       OpenCover.Console.exe
       -log:Error
       -register
-      -target:".\testrunner\NUnit.ConsoleRunner.3.12.0\tools\nunit3-console.exe"
-      -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent"" --config=%CONFIGURATION%"
+      -target:".\testrunner\NUnit.ConsoleRunner.3.11.1\tools\nunit3-console.exe"
+      -targetargs:"cdp4ime-tests.nunit --where=""cat!=WebServicesDependent && cat!=AppVeyorExclusion && cat!=OfficeDependent""
       -returntargetcode
-      -hideskipped:All
+      -hideskipped:All;Attribute
       -output:"%TEST_COVERAGE%"
       -filter:"+[CDP4*]* -[*.Tests*]* -[*.Views]*"
       -excludebyattribute:*.ExcludeFromCodeCoverageAttribute
