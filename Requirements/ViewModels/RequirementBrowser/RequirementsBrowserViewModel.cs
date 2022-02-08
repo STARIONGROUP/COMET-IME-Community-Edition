@@ -232,11 +232,6 @@ namespace CDP4Requirements.ViewModels
         public ReactiveCommand<object> CreateRequirementGroupCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Verify Requirement command
-        /// </summary>
-        public ReactiveCommand<object> VerifyRequirementsCommand { get; private set; }
-
-        /// <summary>
         /// Gets the Navigate To <see cref="RequirementsSpecification"/> Editor Command
         /// </summary>
         public ReactiveCommand<object> NavigateToRequirementsSpecificationEditorCommand { get; private set; }
@@ -549,9 +544,6 @@ namespace CDP4Requirements.ViewModels
             this.CreateRequirementCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirement));
             this.CreateRequirementCommand.Subscribe(_ => this.ExecuteCreateRequirement());
 
-            this.VerifyRequirementsCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanVerifyRequirements));
-            this.VerifyRequirementsCommand.Subscribe(_ => this.ExecuteVerifyRequirements());
-
             this.NavigateToRequirementsSpecificationEditorCommand = ReactiveCommand.Create();
             this.NavigateToRequirementsSpecificationEditorCommand.Subscribe(_ =>
                 this.ExecuteNavigateToRequirementsSpecificationEditor());
@@ -712,14 +704,25 @@ namespace CDP4Requirements.ViewModels
                 this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request for Waiver", "",
                 this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Verify Requirements", "",
-                this.VerifyRequirementsCommand, MenuItemKind.Refresh, ClassKind.Requirement));
+
+            var verifyRequirementsContextMenu = new ContextMenuItemViewModel(
+                "Verify Requirements",
+                "",
+                null,
+                MenuItemKind.Refresh);
+
+            foreach (Option option in this.Thing.Option)
+            {
+                verifyRequirementsContextMenu.SubMenu.Add(new ContextMenuItemViewModel(option.Name, "", this.ExecuteVerifyRequirements, option, this.CanVerifyRequirements, MenuItemKind.Refresh));
+            }
+
+            this.ContextMenu.Add(verifyRequirementsContextMenu);
         }
 
         /// <summary>
         /// Start a delete operation on a specific BinaryRelationship
         /// </summary>
-        /// <param name="obj"></param>
+        /// <param name="obj">The <see cref="BinaryRelationship"/> to delete</param>
         private void DeleteBinaryRelationship(Thing obj)
         {
             if (obj is BinaryRelationship binaryRelationship)
@@ -731,7 +734,8 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Updates requirement verification for all <see cref="RequirementsSpecification"/>s contained in this RequirementBrowser
         /// </summary>
-        private async void ExecuteVerifyRequirements()
+        /// <param name="option">The <see cref="Option"/> to verify for</param>
+        public async void ExecuteVerifyRequirements(Thing option)
         {
             if (this.CanVerifyRequirements)
             {
@@ -741,9 +745,16 @@ namespace CDP4Requirements.ViewModels
                     var iteration = this.Thing;
                     var tasks = new List<Task>();
 
+                    var targetOption = option as Option;
+
+                    var configuration = new RequirementVerificationConfiguration
+                    {
+                        Option = targetOption
+                    };
+
                     foreach (var requirementsSpecification in this.ReqSpecificationRows.Select(x => x.Thing).OfType<RequirementsSpecification>().Where(x => !x.IsDeprecated))
                     {
-                        var requirementVerifier = new RequirementsContainerVerifier(requirementsSpecification);
+                        var requirementVerifier = new RequirementsContainerVerifier(requirementsSpecification, configuration);
                         tasks.Add(requirementVerifier.VerifyRequirements(iteration));
                     }
 

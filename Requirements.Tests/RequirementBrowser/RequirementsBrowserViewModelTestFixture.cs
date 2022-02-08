@@ -76,6 +76,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private Mock<IPanelNavigationService> panelNavigation;
         private Mock<IPermissionService> permissionService;
         private Person person;
+        private Option option;
 
         [SetUp]
         public void Setup()
@@ -98,6 +99,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
+            this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri);
             this.reqGroup = new RequirementsGroup(Guid.NewGuid(), this.cache, this.uri);
@@ -113,6 +115,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.participant.Domain.Add(this.domain);
             
             this.iteration.RequirementsSpecification.Add(this.reqSpec);
+            this.iteration.Option.Add(this.option);
+            this.iteration.DefaultOption = this.option;
             this.iteration.IterationSetup = this.iterationSetup;
             this.model.EngineeringModelSetup = this.modelSetup;
             this.model.Iteration.Add(this.iteration);
@@ -214,7 +218,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             var reqSpecRow = vm.ReqSpecificationRows.Single();
 
             Assert.IsTrue(vm.CanVerifyRequirements);
-            vm.VerifyRequirementsCommand.Execute(null);
+            vm.ExecuteVerifyRequirements(this.iteration.DefaultOption);
             Assert.AreEqual(RequirementStateOfCompliance.Inconclusive, reqSpecRow.RequirementStateOfCompliance);
         }
 
@@ -228,7 +232,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             reqSpecRow.RequirementStateOfCompliance = RequirementStateOfCompliance.Unknown;
             reqSpecRow.Thing.IsDeprecated = true;
 
-            vm.VerifyRequirementsCommand.Execute(null);
+            vm.ExecuteVerifyRequirements(this.iteration.DefaultOption);
             Assert.AreEqual(RequirementStateOfCompliance.Unknown, reqSpecRow.RequirementStateOfCompliance);
         }
     }

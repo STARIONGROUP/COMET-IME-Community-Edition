@@ -357,7 +357,7 @@ namespace CDP4Dashboard.ViewModels.Widget
 
                 foreach (var binaryRelationship in binaryRelationshipsToVerify)
                 {
-                    complianceStates.Add(await new RelationalExpressionVerifier(binaryRelationship.Target as RelationalExpression)
+                    complianceStates.Add(await new RelationalExpressionVerifier(binaryRelationship.Target as RelationalExpression, new RequirementVerificationConfiguration { Option = null })
                         .VerifyRequirementStateOfCompliance(new List<BinaryRelationship> { binaryRelationship }, this.iteration));
                 }
 
