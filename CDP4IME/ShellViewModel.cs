@@ -150,7 +150,7 @@ namespace CDP4IME
 
             this.dialogNavigationService = dialogNavigationService;
             this.DockViewModel = dockViewModel;
-            this.Title = $"COMET IME {Assembly.GetEntryAssembly().GetName().Version} - Community Edition";
+            this.Title = $"COMET IME {Assembly.GetEntryAssembly()?.GetName().Version} - Community Edition";
 
             this.logTarget = new MemoryEventTarget();
             this.logTarget.EventReceived += this.LogEventReceived;
@@ -218,7 +218,7 @@ namespace CDP4IME
 
             this.OnClosingCommand = ReactiveCommand.CreateAsyncTask(async x => this.OnClosing(x as CancelEventArgs), RxApp.MainThreadScheduler);
 
-            logger.Info($"Welcome in the COMET IME version {Assembly.GetEntryAssembly().GetName().Version}");
+            logger.Info($"Welcome in the COMET IME version {Assembly.GetEntryAssembly()?.GetName().Version}");
             logger.Info($"IME Shell Initialized");
         }
 

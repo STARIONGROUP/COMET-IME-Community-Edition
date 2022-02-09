@@ -136,9 +136,18 @@ namespace CDP4Composition.Modularity
 
             this.logger.Info($"Loading plugin files from path {path}: {string.Join("; ", dllCatalog.LoadedFiles.Select(p => new FileInfo(p).Name))}");
 
-            foreach (var composablePartDefinition in dllCatalog.Parts)
+            try
             {
-                this.logger.Info($"Imported part {composablePartDefinition}");
+                // try catch block as unit tests can throw an exception due to not all assemblies being preloaded.
+                // This is expected behavior
+                foreach (var composablePartDefinition in dllCatalog.Parts)
+                {
+                    this.logger.Info($"Imported part {composablePartDefinition}");
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error($"Parts catalog unavailable due to missing assembly. Error: {ex.Message}");
             }
 
             this.DirectoryCatalogues.Add(dllCatalog);
