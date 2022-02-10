@@ -49,7 +49,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
         public ElementUsageEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
         {
-            if (diagramEdge.DepictedThing is ElementUsage elementUsage)
+            if (diagramEdge?.DepictedThing is ElementUsage elementUsage)
             {
                 this.DropTarget = new ElementUsageDropTarget(elementUsage, this.session);
             }

@@ -59,7 +59,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// The NLog logger
         /// </summary>
-        protected static Logger Logger;
+        protected static Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// The backing field for <see cref="ThingCreator" />
@@ -142,7 +142,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <param name="beginItemContent">The begin item content</param>
         /// <param name="endItemContent">The end item content</param>
         /// <returns>An empty task</returns>
-        private async Task CreateCallback(DiagramConnector connector, ICdp4DiagramBehavior behavior, ThingDiagramContentItemViewModel beginItemContent, ThingDiagramContentItemViewModel endItemContent)
+        public async Task CreateCallback(DiagramConnector connector, ICdp4DiagramBehavior behavior, ThingDiagramContentItemViewModel beginItemContent, ThingDiagramContentItemViewModel endItemContent)
         {
             try
             {

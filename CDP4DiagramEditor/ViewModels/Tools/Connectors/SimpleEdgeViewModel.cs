@@ -92,7 +92,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.DisplayedText = this.DiagramThing.Name;
+            this.DisplayedText = this.DiagramThing?.Name;
         }
     }
 }

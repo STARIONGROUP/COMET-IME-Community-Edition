@@ -54,7 +54,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// The NLog logger
         /// </summary>
-        protected static Logger Logger;
+        protected static Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// The backing field for <see cref="ThingCreator" />
@@ -171,54 +171,6 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             behavior.ViewModel.ConnectorViewModels.Add(connectorItem);
 
             behavior.ViewModel.UpdateIsDirty();
-        }
-    }
-
-    /// <summary>
-    /// Connector tool to create restricted constraints
-    /// </summary>
-    public class RestrictedConstraintConnectorTool : ConstraintConnectorTool
-    {
-        /// <summary>
-        /// Executes the creation of the objects conveyed by the tool
-        /// </summary>
-        /// <param name="connector">The temporary connector</param>
-        /// <param name="behavior">The behavior</param>
-        public override async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
-        {
-            await base.ExecuteCreate(connector, behavior, ConstraintKind.Restricted);
-        }
-    }
-
-    /// <summary>
-    /// Connector tool to create optional constraints
-    /// </summary>
-    public class OptionalConstraintConnectorTool : ConstraintConnectorTool
-    {
-        /// <summary>
-        /// Executes the creation of the objects conveyed by the tool
-        /// </summary>
-        /// <param name="connector">The temporary connector</param>
-        /// <param name="behavior">The behavior</param>
-        public override async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
-        {
-            await base.ExecuteCreate(connector, behavior, ConstraintKind.Optional);
-        }
-    }
-
-    /// <summary>
-    /// Connector tool to create enforced constraints
-    /// </summary>
-    public class EnforcedConstraintConnectorTool : ConstraintConnectorTool
-    {
-        /// <summary>
-        /// Executes the creation of the objects conveyed by the tool
-        /// </summary>
-        /// <param name="connector">The temporary connector</param>
-        /// <param name="behavior">The behavior</param>
-        public override async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior)
-        {
-            await base.ExecuteCreate(connector, behavior, ConstraintKind.Enforced);
         }
     }
 }

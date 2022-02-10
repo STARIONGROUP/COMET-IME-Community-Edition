@@ -53,7 +53,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// The NLog logger
         /// </summary>
-        protected static Logger Logger;
+        protected static Logger Logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// The backing field for <see cref="ThingCreator" />

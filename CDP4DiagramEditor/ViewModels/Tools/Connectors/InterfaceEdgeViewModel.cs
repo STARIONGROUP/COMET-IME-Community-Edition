@@ -49,7 +49,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="container">The container <see cref="IDiagramEditorViewModel"/></param>
         public InterfaceEdgeViewModel(DiagramEdge diagramEdge, ISession session, IDiagramEditorViewModel container) : base(diagramEdge, session, container)
         {
-            if (diagramEdge.DepictedThing is BinaryRelationship relationship)
+            if (diagramEdge?.DepictedThing is BinaryRelationship relationship)
             {
                 this.DropTarget = new BinaryRelationshipDropTarget(relationship, this.session);
             }
