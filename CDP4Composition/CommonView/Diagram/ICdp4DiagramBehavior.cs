@@ -116,5 +116,11 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="things">The Things that are either diagram things or EM representations</param>
         void SelectItemsByThing(IList<Thing> things);
+
+        /// <summary>
+        /// Export the graph as the specified <see cref="DiagramExportFormat"/>
+        /// </summary>
+        /// <param name="format">the format to export the diagram to</param>
+        void ExportDiagram(DiagramExportFormat format);
     }
 }

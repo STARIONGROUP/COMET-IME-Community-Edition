@@ -158,6 +158,11 @@ namespace CDP4DiagramEditor.ViewModels
         private ReactiveList<IDiagramElementTreeRowViewModel> selectedTreeRowViewModels;
 
         /// <summary>
+        /// Backing field for <see cref="CanExportDiagram"/>
+        /// </summary>
+        private bool canExportDiagram = true;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DiagramEditorViewModel" /> class
         /// </summary>
         /// <param name="diagram">The diagram of the <see cref="Thing" />s to display</param>
@@ -281,6 +286,16 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<Unit> UnsetTopElementCommand { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as jpg
+        /// </summary>
+        public ReactiveCommand<object> ExportDiagramAsJpg { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as pdf
+        /// </summary>
+        public ReactiveCommand<object> ExportDiagramAsPdf { get; private set; }
+
+        /// <summary>
         /// Gets a value indicating whether the diagram has its top element set
         /// </summary>
         public bool IsTopDiagramElementSet
@@ -359,6 +374,15 @@ namespace CDP4DiagramEditor.ViewModels
         {
             get { return this.selectedItem; }
             set { this.RaiseAndSetIfChanged(ref this.selectedItem, value); }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the diagram can be exported
+        /// </summary>
+        public bool CanExportDiagram
+        {
+            get => this.canExportDiagram;
+            private set => this.RaiseAndSetIfChanged(ref this.canExportDiagram, value);
         }
 
         /// <summary>
@@ -1178,6 +1202,11 @@ namespace CDP4DiagramEditor.ViewModels
                 _ => this.ExecuteUnsetTopElementCommand(), RxApp.MainThreadScheduler);
 
             this.UnsetTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
+
+            this.ExportDiagramAsJpg = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
+            this.ExportDiagramAsJpg.Subscribe(_ => this.ExecuteExportDiagramAsJpg());
+            this.ExportDiagramAsPdf = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
+            this.ExportDiagramAsPdf.Subscribe(_ => this.ExecuteExportDiagramAsPdf());
         }
 
         /// <summary>
@@ -1188,6 +1217,13 @@ namespace CDP4DiagramEditor.ViewModels
             base.PopulateContextMenu();
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Save the Diagram", "", this.SaveDiagramCommand, MenuItemKind.Save, ClassKind.DiagramCanvas));
+
+            var exportMenu = new ContextMenuItemViewModel("Export", "", null, MenuItemKind.Export);
+
+            exportMenu.SubMenu.Add(new ContextMenuItemViewModel("As JPG", "", this.ExportDiagramAsJpg, MenuItemKind.Jpg));
+            exportMenu.SubMenu.Add(new ContextMenuItemViewModel("As PDF", "", this.ExportDiagramAsPdf, MenuItemKind.Pdf));
+
+            this.ContextMenu.Add(exportMenu);
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Edit", "", this.UpdateCommand, MenuItemKind.Edit));
 
@@ -1279,6 +1315,26 @@ namespace CDP4DiagramEditor.ViewModels
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Executes the <see cref="ExportDiagramAsPdf"/>
+        /// </summary>
+        private void ExecuteExportDiagramAsPdf()
+        {
+            this.CanExportDiagram = false;
+            this.Behavior.ExportDiagram(DiagramExportFormat.PDF);
+            this.CanExportDiagram = true;
+        }
+
+        /// <summary>
+        /// Executes the <see cref="ExportDiagramAsJpg"/>
+        /// </summary>
+        private void ExecuteExportDiagramAsJpg()
+        {
+            this.CanExportDiagram = false;
+            this.Behavior.ExportDiagram(DiagramExportFormat.JPEG);
+            this.CanExportDiagram = true;
         }
 
         /// <summary>

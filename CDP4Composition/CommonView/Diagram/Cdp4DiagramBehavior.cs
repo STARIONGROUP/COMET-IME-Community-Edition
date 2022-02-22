@@ -41,11 +41,14 @@ namespace CDP4CommonView.Diagram
 
     using CDP4Composition.Diagram;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Navigation;
 
     using DevExpress.Diagram.Core;
     using DevExpress.Mvvm.UI;
     using DevExpress.Xpf.Diagram;
     using DevExpress.Xpf.Ribbon;
+
+    using Microsoft.Practices.ServiceLocation;
 
     using ReactiveUI;
 
@@ -187,6 +190,26 @@ namespace CDP4CommonView.Diagram
         public void ApplyChildLayout(DiagramItem item)
         {
             this.AssociatedObject.ApplyMindMapTreeLayoutForSubordinates(new[] { item });
+        }
+
+        /// <summary>
+        /// Export the graph as the specified <see cref="DiagramExportFormat"/>
+        /// </summary>
+        /// <param name="format">the format to export the diagram to</param>
+        public void ExportDiagram(DiagramExportFormat format)
+        {
+            var openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
+            var extension = format.ToString().ToLower();
+            var result = openSaveFileDialogService.GetSaveFileDialog($"Untitled", $".{extension}", $"{ format } file(*.{ extension }) | *.{ extension }; ", "", 0);
+
+            if (string.IsNullOrWhiteSpace(result))
+            {
+                return;
+            }
+
+            using var writer = System.IO.File.Create(result);
+
+            this.AssociatedObject.ExportDiagram(writer, format, 72, 1);
         }
 
         /// <summary>
