@@ -593,8 +593,8 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.AddPublicationRowViewModel(publication);
             }
-
-            this.Publications.Sort((o1, o2) => o1.Index.CompareTo(o2.Index));
+            
+            this.Publications.Sort((o1, o2) => o2.PublicationDate.CompareTo(o1.PublicationDate));
         }
 
         /// <summary>
