@@ -6,6 +6,7 @@
 
 namespace CDP4EngineeringModel.ViewModels
 {
+    using System;
     using System.Globalization;
     using System.Linq;
     using CDP4Common.CommonData;
@@ -36,6 +37,15 @@ namespace CDP4EngineeringModel.ViewModels
         public string Name
         {
             get { return this.Thing.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DateTime"/> on which the publication was published
+        /// </summary>
+        /// <returns></returns>
+        public DateTime PublicationDate
+        {
+            get { return this.Thing.CreatedOn; }
         }
 
         /// <summary>
