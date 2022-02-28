@@ -296,6 +296,11 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<object> ExportDiagramAsPdf { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram to clipboard
+        /// </summary>
+        public ReactiveCommand<object> ExportDiagramToClipboard { get; private set; }
+
+        /// <summary>
         /// Gets a value indicating whether the diagram has its top element set
         /// </summary>
         public bool IsTopDiagramElementSet
@@ -434,6 +439,12 @@ namespace CDP4DiagramEditor.ViewModels
                         if (relationship.IsConstraint())
                         {
                             newDrawnDiagramElement = new ConstraintEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
+                            break;
+                        }
+
+                        if (relationship.IsImplication())
+                        {
+                            newDrawnDiagramElement = new ImplicationEdgeViewModel((DiagramEdge)diagramThing, this.Session, this);
                             break;
                         }
 
@@ -1166,47 +1177,49 @@ namespace CDP4DiagramEditor.ViewModels
             var canExecute = this.WhenAnyValue(x => x.CanCreateDiagram, x => x.IsDirty, (x, y) => x && y);
 
             this.SaveDiagramCommand = ReactiveCommand.CreateAsyncTask(canExecute, x => this.ExecuteSaveDiagramCommand(), RxApp.MainThreadScheduler);
-            this.SaveDiagramCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
+            this.Disposables.Add(this.SaveDiagramCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message)));
 
             this.UpdateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(i => i != null && this.PermissionService.CanWrite(this.GetThingFromSelectedItem())));
-            this.UpdateCommand.Subscribe(_ => this.ExecuteUpdateCommand());
+            this.Disposables.Add(this.UpdateCommand.Subscribe(_ => this.ExecuteUpdateCommand()));
 
             this.InspectCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(x => x != null && this.GetThingFromSelectedItem() != null));
-            this.InspectCommand.Subscribe(_ => this.ExecuteInspectCommand());
+            this.Disposables.Add(this.InspectCommand.Subscribe(_ => this.ExecuteInspectCommand()));
 
             this.DeleteFromDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(this.CanDeleteFromDiagram));
-            this.DeleteFromDiagramCommand.Subscribe(x => this.ExecuteDeleteFromDiagramCommand());
+            this.Disposables.Add(this.DeleteFromDiagramCommand.Subscribe(x => this.ExecuteDeleteFromDiagramCommand()));
 
             this.DeleteFromModelCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(this.CanDeleteFromModel));
-            this.DeleteFromModelCommand.Subscribe(x => this.ExecuteDeleteFromModelCommand());
+            this.Disposables.Add(this.DeleteFromModelCommand.Subscribe(x => this.ExecuteDeleteFromModelCommand()));
 
             this.AddUsagesToDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
-            this.AddUsagesToDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToDiagramCommand());
+            this.Disposables.Add(this.AddUsagesToDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToDiagramCommand()));
 
             this.AddUsagesToExistingElementsDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
-            this.AddUsagesToExistingElementsDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToExistingElementsDiagramCommand());
+            this.Disposables.Add(this.AddUsagesToExistingElementsDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToExistingElementsDiagramCommand()));
 
             this.AddBinaryRelationshipsToDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ThingDiagramContentItemViewModel)));
-            this.AddBinaryRelationshipsToDiagramCommand.Subscribe(x => this.ExecuteAddBinaryRelationshipsToDiagramCommand());
+            this.Disposables.Add(this.AddBinaryRelationshipsToDiagramCommand.Subscribe(x => this.ExecuteAddBinaryRelationshipsToDiagramCommand()));
 
             this.AddBinaryRelationshipsToExistingElementsDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
-            this.AddBinaryRelationshipsToExistingElementsDiagramCommand.Subscribe(x => this.ExecuteAddBinaryRelationshipsToExistingElementsDiagramCommand());
+            this.Disposables.Add(this.AddBinaryRelationshipsToExistingElementsDiagramCommand.Subscribe(x => this.ExecuteAddBinaryRelationshipsToExistingElementsDiagramCommand()));
 
             this.SetAsTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.SelectedItem)
                     .Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItemViewModel }),
                 _ => this.ExecuteSetTopElementCommand(), RxApp.MainThreadScheduler);
 
-            this.SetAsTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
+            this.Disposables.Add(this.SetAsTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message)));
 
             this.UnsetTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.IsTopDiagramElementSet, x => x.CanCreateDiagram, (x, y) => x && y),
                 _ => this.ExecuteUnsetTopElementCommand(), RxApp.MainThreadScheduler);
 
-            this.UnsetTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
+            this.Disposables.Add(this.UnsetTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message)));
 
             this.ExportDiagramAsJpg = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
-            this.ExportDiagramAsJpg.Subscribe(_ => this.ExecuteExportDiagramAsJpg());
+            this.Disposables.Add(this.ExportDiagramAsJpg.Subscribe(_ => this.ExecuteExportDiagramAsJpg()));
             this.ExportDiagramAsPdf = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
-            this.ExportDiagramAsPdf.Subscribe(_ => this.ExecuteExportDiagramAsPdf());
+            this.Disposables.Add(this.ExportDiagramAsPdf.Subscribe(_ => this.ExecuteExportDiagramAsPdf()));
+            this.ExportDiagramToClipboard = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
+            this.Disposables.Add(this.ExportDiagramToClipboard.Subscribe(_ => this.ExecuteExportDiagramToClipboard()));
         }
 
         /// <summary>
@@ -1220,8 +1233,9 @@ namespace CDP4DiagramEditor.ViewModels
 
             var exportMenu = new ContextMenuItemViewModel("Export", "", null, MenuItemKind.Export);
 
-            exportMenu.SubMenu.Add(new ContextMenuItemViewModel("As JPG", "", this.ExportDiagramAsJpg, MenuItemKind.Jpg));
-            exportMenu.SubMenu.Add(new ContextMenuItemViewModel("As PDF", "", this.ExportDiagramAsPdf, MenuItemKind.Pdf));
+            exportMenu.SubMenu.Add(new ContextMenuItemViewModel("To JPG", "", this.ExportDiagramAsJpg, MenuItemKind.Jpg));
+            exportMenu.SubMenu.Add(new ContextMenuItemViewModel("To PDF", "", this.ExportDiagramAsPdf, MenuItemKind.Pdf));
+            exportMenu.SubMenu.Add(new ContextMenuItemViewModel("To Clipboard", "", this.ExportDiagramToClipboard, MenuItemKind.Jpg));
 
             this.ContextMenu.Add(exportMenu);
 
@@ -1334,6 +1348,16 @@ namespace CDP4DiagramEditor.ViewModels
         {
             this.CanExportDiagram = false;
             this.Behavior.ExportDiagram(DiagramExportFormat.JPEG);
+            this.CanExportDiagram = true;
+        }
+
+        /// <summary>
+        /// Executes the <see cref="ExportDiagramToClipboard"/>
+        /// </summary>
+        private void ExecuteExportDiagramToClipboard()
+        {
+            this.CanExportDiagram = false;
+            this.Behavior.ExportDiagramToClipboard();
             this.CanExportDiagram = true;
         }
 
@@ -1641,10 +1665,11 @@ namespace CDP4DiagramEditor.ViewModels
                 }
 
                 var constraints = binaryRelationships.Where(r => r.IsConstraint());
-                var nonConstraints = binaryRelationships.Where(r => !r.IsConstraint());
+                var implications = binaryRelationships.Where(r => r.IsImplication());
+                var nonConstraintsOrImplication = binaryRelationships.Where(r => !r.IsConstraint() && !r.IsImplication());
 
                 // create simple binary connectors
-                foreach (var relationship in nonConstraints)
+                foreach (var relationship in nonConstraintsOrImplication)
                 {
                     if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(relationship)))
                     {
@@ -1669,6 +1694,20 @@ namespace CDP4DiagramEditor.ViewModels
                     var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Target)).DiagramThing;
 
                     ConstraintConnectorTool.CreateConnector(relationship, source as DiagramObject, target as DiagramObject, this.Behavior);
+                }
+
+                // create implication connectors
+                foreach (var relationship in implications)
+                {
+                    if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(relationship)))
+                    {
+                        continue;
+                    }
+
+                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Source)).DiagramThing;
+                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Target)).DiagramThing;
+
+                    ImplicationConnectorTool.CreateConnector(relationship, source as DiagramObject, target as DiagramObject, this.Behavior);
                 }
             }
 
@@ -1700,18 +1739,24 @@ namespace CDP4DiagramEditor.ViewModels
                 }
 
                 var constraints = binaryRelationships.Where(r => r.IsConstraint());
-                var nonConstraints = binaryRelationships.Where(r => !r.IsConstraint());
+                var implications = binaryRelationships.Where(r => r.IsImplication());
+                var nonConstraintsOrImplications = binaryRelationships.Where(r => !r.IsConstraint() && !r.IsImplication());
 
                 // create simple binary connectors
-                foreach (var relationship in nonConstraints)
+                foreach (var relationship in nonConstraintsOrImplications)
                 {
                     if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(relationship)))
                     {
                         continue;
                     }
 
-                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Source)).DiagramThing;
-                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Target)).DiagramThing;
+                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).FirstOrDefault(vm => vm.Thing.Equals(relationship.Source))?.DiagramThing;
+                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).FirstOrDefault(vm => vm.Thing.Equals(relationship.Target))?.DiagramThing;
+
+                    if (source == null || target == null)
+                    {
+                        continue;
+                    }
 
                     BinaryRelationshipConnectorTool.CreateConnector(relationship, source as DiagramShape, target as DiagramShape, this.Behavior);
                 }
@@ -1724,10 +1769,34 @@ namespace CDP4DiagramEditor.ViewModels
                         continue;
                     }
 
-                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Source)).DiagramThing;
-                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).First(vm => vm.Thing.Equals(relationship.Target)).DiagramThing;
+                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).FirstOrDefault(vm => vm.Thing.Equals(relationship.Source))?.DiagramThing;
+                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).FirstOrDefault(vm => vm.Thing.Equals(relationship.Target))?.DiagramThing;
+
+                    if (source == null || target == null)
+                    {
+                        continue;
+                    }
 
                     ConstraintConnectorTool.CreateConnector(relationship, source as DiagramObject, target as DiagramObject, this.Behavior);
+                }
+
+                // create implication connectors
+                foreach (var relationship in implications)
+                {
+                    if (this.ConnectorViewModels.Any(c => c.Thing != null && c.Thing.Equals(relationship)))
+                    {
+                        continue;
+                    }
+
+                    var source = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).FirstOrDefault(vm => vm.Thing.Equals(relationship.Source))?.DiagramThing;
+                    var target = this.ThingDiagramItemViewModels.Where(v => v.Thing is not null).FirstOrDefault(vm => vm.Thing.Equals(relationship.Target))?.DiagramThing;
+
+                    if (source == null || target == null)
+                    {
+                        continue;
+                    }
+
+                    ImplicationConnectorTool.CreateConnector(relationship, source as DiagramObject, target as DiagramObject, this.Behavior);
                 }
             }
 

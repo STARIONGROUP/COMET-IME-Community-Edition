@@ -70,6 +70,11 @@ namespace CDP4DiagramEditor.ViewModels
         public DataTemplate ConstraintDataTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> for a DiagramContentItem that represents a implication
+        /// </summary>
+        public DataTemplate ImplicationDataTemplate { get; set; }
+
+        /// <summary>
         /// Selects the template for a <see cref="NamedThingDiagramContentItemViewModel"/>
         /// </summary>
         /// <param name="item">The <see cref="NamedThingDiagramContentItemViewModel"/></param>
@@ -91,6 +96,7 @@ namespace CDP4DiagramEditor.ViewModels
                 BinaryRelationshipEdgeViewModel => this.BinaryRelationshipDataTemplate,
                 SimpleEdgeViewModel => this.SimpleDataTemplate,
                 ConstraintEdgeViewModel => this.ConstraintDataTemplate,
+                ImplicationEdgeViewModel => this.ImplicationDataTemplate,
                 _ => base.SelectTemplate(item, container)
             };
         }

@@ -27,6 +27,7 @@
              xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:treeView="clr-namespace:CDP4DiagramEditor.ViewModels.TreeView"
+             xmlns:converters="clr-namespace:CDP4DiagramEditor.Converters"
              mc:Ignorable="d"
              dx:ThemeManager.ThemeName="{Binding ThemeName}"
              d:DesignHeight="300"
@@ -42,8 +43,9 @@
                     Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
-            <cdp4Composition:StringToIconUriConverter x:Key="StringToIconUriConverter" />
+            <converters:PaletteStringToIconUriConverter x:Key="StringToIconUriConverter" />
             <helpers:ConstraintKindToBrushConverter x:Key="ConstraintKindToBrushConverter" />
+            <helpers:ImplicationKindToBrushConverter x:Key="ImplicationKindToBrushConverter" />
             <helpers:InstanceTypeConverter x:Key="InstanceTypeConverter"></helpers:InstanceTypeConverter>
             <dx:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <dxmvvm:EnumToStringConverter x:Key="EnumToStringConverter" />
@@ -404,6 +406,17 @@
                                          Stroke="{Binding DataItem.ConstraintKind, Converter={StaticResource ConstraintKindToBrushConverter},  UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
 
+            <DataTemplate x:Key="ImplicationConnectorTemplate">
+                <dxdiag:DiagramConnector EndArrow="FilledSquare"
+                                         BeginArrow="(none)"
+                                         Type="RightAngle"
+                                         Content="{Binding DataItem.DisplayedText, Mode=Default, UpdateSourceTrigger=PropertyChanged}"
+                                         TextAlignment="Center"
+                                         StrokeDashArray="8,2"
+                                         CanEdit="False"
+                                         Stroke="{Binding DataItem.ImplicationKind, Converter={StaticResource ImplicationKindToBrushConverter},  UpdateSourceTrigger=PropertyChanged}" />
+            </DataTemplate>
+
             <DataTemplate x:Key="DiagramFrameDataTemplate">
                 <DiagramViews:DiagramFrameShape/>
             </DataTemplate>
@@ -446,6 +459,7 @@
                                                            BinaryRelationshipDataTemplate="{StaticResource BinaryRelationshipConnectorTemplate}"
                                                            SimpleDataTemplate="{StaticResource SimpleConnectorTemplate}"
                                                            ConstraintDataTemplate="{StaticResource ConstraintConnectorTemplate}"
+                                                           ImplicationDataTemplate="{StaticResource ImplicationConnectorTemplate}"
                                                            InterfaceConnectorDataTemplate="{StaticResource InterfaceConnectorTemplate}" />
             <treeView:NodeImageSelector x:Key="ImageSelector"></treeView:NodeImageSelector>
         </ResourceDictionary>

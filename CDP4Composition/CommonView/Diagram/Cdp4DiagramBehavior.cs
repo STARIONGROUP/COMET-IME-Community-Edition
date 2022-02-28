@@ -27,11 +27,13 @@ namespace CDP4CommonView.Diagram
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
+    using System.Windows.Media.Imaging;
 
     using CDP4Common.CommonData;
 
@@ -209,7 +211,24 @@ namespace CDP4CommonView.Diagram
 
             using var writer = System.IO.File.Create(result);
 
-            this.AssociatedObject.ExportDiagram(writer, format, 72, 1);
+            this.AssociatedObject.ExportDiagram(writer, format, 144, 1);
+        }
+
+        /// <summary>
+        /// Export the graph to clipboard
+        /// </summary>
+        public void ExportDiagramToClipboard()
+        {
+            using var writer = new MemoryStream();
+
+            this.AssociatedObject.ExportDiagram(writer, DiagramExportFormat.JPEG, 144, 1);
+            writer.Seek(0, SeekOrigin.Begin);
+
+            var decoder = new JpegBitmapDecoder(writer, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+            var bitmapSource = decoder.Frames[0];
+            bitmapSource.Freeze();
+
+            System.Windows.Clipboard.SetImage(bitmapSource);
         }
 
         /// <summary>

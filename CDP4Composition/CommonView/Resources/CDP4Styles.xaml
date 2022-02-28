@@ -153,6 +153,7 @@
                             <Setter Property="Icon" Value="{StaticResource ExcelIcon}"/>
                         </DataTrigger>
                     </Style.Triggers>
+                    
                 </Style>
             </Setter.Value>
         </Setter>

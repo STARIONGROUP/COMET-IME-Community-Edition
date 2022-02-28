@@ -23,6 +23,12 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
+    <None Remove="Resources\a_implies_b_16x16.png" />
+    <None Remove="Resources\a_implies_not_b_16x16.png" />
+    <None Remove="Resources\not_a_implies_b_16x16.png" />
+    <None Remove="Resources\not_a_implies_not_b_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="9.0.0-716-PR210">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -138,5 +144,11 @@
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\a_implies_b_16x16.png" />
+    <Resource Include="Resources\a_implies_not_b_16x16.png" />
+    <Resource Include="Resources\not_a_implies_b_16x16.png" />
+    <Resource Include="Resources\not_a_implies_not_b_16x16.png" />
   </ItemGroup>
 </Project>

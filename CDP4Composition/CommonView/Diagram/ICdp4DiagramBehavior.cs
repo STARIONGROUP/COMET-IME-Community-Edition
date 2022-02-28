@@ -122,5 +122,10 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         /// <param name="format">the format to export the diagram to</param>
         void ExportDiagram(DiagramExportFormat format);
+
+        /// <summary>
+        /// Export the graph to clipboard
+        /// </summary>
+        void ExportDiagramToClipboard();
     }
 }
