@@ -544,5 +544,19 @@ namespace CDP4EngineeringModel.ViewModels
             this.Scale = null;
             this.Published = null;
         }
+
+        /// <summary>
+        /// The event-handler that is invoked by the subscription that listens for highlight of row
+        /// on the <see cref="Thing"/> that is being represented by the view-model
+        /// </summary>
+        protected override void HighlightEventHandler()
+        {
+            base.HighlightEventHandler();
+
+            if (this.TopContainerViewModel is ElementDefinitionsBrowserViewModel browser)
+            {
+                browser.ChangeFocusOnThing(this.Thing);
+            }
+        }
     }
 }

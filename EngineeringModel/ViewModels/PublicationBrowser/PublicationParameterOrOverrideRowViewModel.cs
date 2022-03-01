@@ -46,7 +46,7 @@ namespace CDP4EngineeringModel.ViewModels
         public PublicationParameterOrOverrideRowViewModel(ParameterOrOverrideBase parameterOrOverrideBase, ISession session, IRowViewModelBase<Thing> containerViewModel)
             : base(parameterOrOverrideBase, session, containerViewModel, false)
         {
-            this.WhenAnyValue(vm => vm.ToBePublished).Subscribe(_ => this.ToBePublishedChanged());
+            this.Disposables.Add(this.WhenAnyValue(vm => vm.ToBePublished).Subscribe(_ => this.ToBePublishedChanged()));
             this.IsCheckable = true;
             this.SetProperties();
         }
@@ -96,9 +96,32 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get
             {
+                if (this.Thing == null)
+                {
+                    return string.Empty;
+                }
+
                 return this.Thing is Parameter
                     ? ((Parameter)this.Thing).ModelCode()
                     : ((ParameterOverride)this.Thing).ModelCode();
+            }
+        }
+
+        /// <summary>
+        /// Gets the Model Code
+        /// </summary>
+        public string Element
+        {
+            get
+            {
+                if (this.Thing == null)
+                {
+                    return string.Empty;
+                }
+
+                return this.Thing is Parameter
+                    ? ((Parameter)this.Thing).GetContainerOfType<ElementDefinition>().ShortName
+                    : ((ParameterOverride)this.Thing).GetContainerOfType<ElementUsage>().ShortName;
             }
         }
 
@@ -116,7 +139,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets or sets whether this row is checkable.
         /// </summary>
         public bool IsCheckable { get; set; }
-        
+
+        /// <summary>
+        /// Gets a value indicating whether the row is visible.
+        /// </summary>
+        public bool IsEmpty => false;
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="ParameterOrOverrideBase"/> is to be published in the next publication.
         /// </summary>

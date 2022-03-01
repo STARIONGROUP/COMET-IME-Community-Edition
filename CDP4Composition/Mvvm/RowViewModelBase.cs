@@ -91,7 +91,7 @@ namespace CDP4Composition.Mvvm
         protected RowViewModelBase(T thing, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(thing, session)
         {
-            this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
+            this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>> { ChangeTrackingEnabled = true };
             this.ContainerViewModel = containerViewModel;
             this.HighlightCancelDisposables = new List<IDisposable>();
 

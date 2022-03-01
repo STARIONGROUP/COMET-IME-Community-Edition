@@ -718,6 +718,182 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Brings the Thing into view in the tree
+        /// </summary>
+        /// <param name="thing">The Thing to focus on</param>
+        public void ChangeFocusOnThing(Thing thing)
+        {
+            IRowViewModelBase<Thing> rowToFocus = null;
+
+            switch (thing)
+            {
+                case ElementDefinition elementDefinition:
+                    rowToFocus = this.ElementDefinitionRowViewModels.SingleOrDefault(x => x.Thing == elementDefinition);
+                    break;
+                case ElementUsage elementUsage:
+                    var containerElementDefinition = elementUsage.Container as ElementDefinition;
+
+                    if (containerElementDefinition == null)
+                    {
+                        return;
+                    }
+
+                    var elementDefinitionRow = this.ElementDefinitionRowViewModels.SingleOrDefault(x => x.Thing == containerElementDefinition);
+
+                    if (elementDefinitionRow == null)
+                    {
+                        return;
+                    }
+
+                    rowToFocus = elementDefinitionRow.ContainedRows.SingleOrDefault(x => x.Thing == elementUsage);
+                    break;
+                case Parameter parameter:
+                    var elementRootNode = this.ElementDefinitionRowViewModels.SingleOrDefault(x => x.Thing == parameter.Container);
+
+                    if (elementRootNode == null)
+                    {
+                        return;
+                    }
+
+                    elementRootNode.IsExpanded = true;
+
+                    // get all the group rows from parameter and expand them recursively in the reverse order
+                    if (parameter.Group != null)
+                    {
+                        var groupRows = this.GetParameterBaseGroupHierarchyFromRoot(parameter, elementRootNode);
+
+                        if (!groupRows.Any())
+                        {
+                            // something is wrong and hierarchy cant be made.
+                            return;
+                        }
+
+                        foreach (var rowViewModelBase in groupRows)
+                        {
+                            rowViewModelBase.IsExpanded = true;
+                        }
+
+                        rowToFocus = groupRows.Last().ContainedRows.SingleOrDefault(x => x.Thing == parameter);
+                    }
+                    else
+                    {
+                        rowToFocus = elementRootNode.ContainedRows.SingleOrDefault(x => x.Thing == parameter);
+                    }
+
+                    break;
+
+                case ParameterOverride parameterOverride:
+                    var usage = parameterOverride.Container as ElementUsage;
+
+                    if (usage == null)
+                    {
+                        return;
+                    }
+
+                    var rootNode = this.ElementDefinitionRowViewModels.SingleOrDefault(x => x.Thing == usage.Container);
+
+                    if (rootNode == null)
+                    {
+                        return;
+                    }
+
+                    rootNode.IsExpanded = true;
+
+                    // get usage row
+                    var usageRow = rootNode.ContainedRows.SingleOrDefault(x => x.Thing == usage);
+
+                    if (usageRow == null)
+                    {
+                        return;
+                    }
+
+                    usageRow.IsExpanded = true;
+
+                    // get all the group rows from parameter and expand them recursively in the reverse order
+                    if (parameterOverride.Group != null)
+                    {
+                        var groupRows = this.GetParameterBaseGroupHierarchyFromRoot(parameterOverride, usageRow);
+
+                        if (!groupRows.Any())
+                        {
+                            // something is wrong and hierarchy cant be made.
+                            return;
+                        }
+
+                        foreach (var rowViewModelBase in groupRows)
+                        {
+                            rowViewModelBase.IsExpanded = true;
+                        }
+
+                        rowToFocus = groupRows.Last().ContainedRows.SingleOrDefault(x => x.Thing == parameterOverride);
+                    }
+                    else
+                    {
+                        rowToFocus = usageRow.ContainedRows.SingleOrDefault(x => x.Thing == parameterOverride);
+                    }
+
+                    break;
+            }
+
+            if (rowToFocus == null)
+            {
+                return;
+            }
+
+            this.SelectedThing = rowToFocus;
+            this.FocusedRow = rowToFocus;
+        }
+
+        /// <summary>
+        /// Get the group row hierchy of the parameterbase and a root
+        /// </summary>
+        /// <param name="parameterBase">The parameterbase that is located somewhere in the subtree of the root</param>
+        /// <param name="root">The root node from which to calculate</param>
+        /// <returns>List of group rows that is ordered from the root to the parameter base</returns>
+        private List<IRowViewModelBase<Thing>> GetParameterBaseGroupHierarchyFromRoot(ParameterBase parameterBase, IRowViewModelBase<Thing> root)
+        {
+            var result = new List<IRowViewModelBase<Thing>>();
+
+            if (parameterBase.Group == null)
+            {
+                return result;
+            }
+
+            // get a list of groups from parameter up
+            var groups = new List<ParameterGroup>();
+
+            var group = parameterBase.Group;
+
+            while (group != null)
+            {
+                groups.Add(group);
+                group = group.ContainingGroup;
+            }
+
+            // reverse order the rows starting from root
+            var current = root;
+            groups.Reverse();
+
+            foreach (var parameterGroup in groups)
+            {
+                var groupRow = current.ContainedRows.SingleOrDefault(x => x.Thing == parameterGroup);
+
+                if (groupRow != null)
+                {
+                    result.Add(groupRow);
+                    current = groupRow;
+                }
+                else
+                {
+                    // something is broken in the chain and it cannot be established
+                    return new List<IRowViewModelBase<Thing>>();
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
         /// <param name="disposing">

@@ -14,6 +14,7 @@
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -59,7 +60,7 @@
                                 <dxmvvm:EventToCommand EventName="Checked"
                                                        Command="{Binding DataContext.PublicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
                                 <dxmvvm:EventToCommand EventName="Unchecked"
-                                                       Command="{Binding DataContext.PublicationRowCheckedCommand, ElementName=TreeListToBePublished}" />                                
+                                                       Command="{Binding DataContext.PublicationRowCheckedCommand, ElementName=TreeListToBePublished}" />
                             </dxmvvm:Interaction.Behaviors>
                         </CheckBox>
                         <ContentPresenter x:Name="defaultRowPresenter"
@@ -141,6 +142,10 @@
                                IsEnabled="{Binding CanCreatePublication, UpdateSourceTrigger=PropertyChanged}"
                                Hint="Publish" />
 
+                <dxb:BarCheckItem 
+                                   IsChecked="{Binding IsHidingEmptyDomains, UpdateSourceTrigger=PropertyChanged}"
+                                   Hint="Hide Empty Domain Rows" Glyph="{dx:DXImage Images/Actions/Hide_16x16.png}" />
+
                 <dxb:BarButtonItem Command="{Binding RefreshCommand}"
                                Glyph="{dx:DXImage Image=Refresh2_16x16.png}"
                                Hint="{Binding SelectedThingClassKindString,
@@ -172,6 +177,7 @@
                 <dxg:TreeListControl x:Name="TreeListToBePublished"
                                  Grid.Row="0"
                                  IsEnabled="{Binding CanCreatePublication, UpdateSourceTrigger=PropertyChanged}"
+                                 FilterString="{Binding FilterString, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                  ItemsSource="{Binding Path=Domains}"
                                  SelectedItem="{Binding SelectedThing,
                                                         Mode=TwoWay,
@@ -183,8 +189,9 @@
                     <i:Interaction.Behaviors>
                         <dragDrop:FrameworkElementDragBehavior />
                     </i:Interaction.Behaviors>
+
                     <dxg:TreeListControl.Columns>
-                        <dxg:TreeListColumn FieldName="Name">
+                        <dxg:TreeListColumn FieldName="Name" DefaultSortOrder="Ascending" SortIndex="0">
                             <dxg:TreeListColumn.HeaderTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal"
@@ -203,21 +210,25 @@
                                 </DataTemplate>
                             </dxg:TreeListColumn.FilterEditorHeaderTemplate>
                         </dxg:TreeListColumn>
-                        <dxg:TreeListColumn FieldName="Value" Header="New Value" />
-                        <dxg:TreeListColumn FieldName="Published" Header="Old Value" />
-                        <dxg:TreeListColumn FieldName="PercentageChange" Header="% Changed" />
+                        <dxg:TreeListColumn FieldName="Value" Header="New Value" AllowColumnFiltering="False"/>
+                        <dxg:TreeListColumn FieldName="Published" Header="Old Value" AllowColumnFiltering="False"/>
+                        <dxg:TreeListColumn FieldName="PercentageChange" Header="% Changed" AllowColumnFiltering="False"/>
                         <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
+                        <dxg:TreeListColumn FieldName="Element" Header="Element Short Name" />
+                        <dxg:TreeListColumn FieldName="IsEmpty" Visible ="False" ShowInColumnChooser="False" />
                     </dxg:TreeListControl.Columns>
                     <dxg:TreeListControl.View>
                         <dxg:TreeListView x:Name="ViewToBePublished"
                                       AllowEditing="False"
                                       AutoWidth="False"
+                                      FilteringMode="EntireBranch"
                                       ExpandStateFieldName="IsExpanded"
                                       HorizontalScrollbarVisibility="Auto"
                                       NavigationStyle="Cell"
                                       ShowHorizontalLines="False"
                                       ShowIndicator="False"
                                       ShowNodeImages="False"
+                                      ShowFilterPanelMode="Never"
                                       ShowVerticalLines="False"
                                       TreeDerivationMode="HierarchicalDataTemplate"
                                       TreeLineStyle="Solid"
@@ -225,6 +236,20 @@
                             <dxg:TreeListView.ContextMenu>
                                 <ContextMenu Name="RowContextMenuPublication" />
                             </dxg:TreeListView.ContextMenu>
+                            <dxg:TreeListView.RowStyle>
+                                <Style TargetType="{x:Type dxg:RowControl}" >
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Row.IsEmpty, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="False">
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                            <Setter Property="Foreground" Value="Blue" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Path=Row.IsHighlighted}" Value="True">
+                                            <Setter Property="Background" Value="Yellow"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                    <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
+                                </Style>
+                            </dxg:TreeListView.RowStyle>
                         </dxg:TreeListView>
                     </dxg:TreeListControl.View>
                 </dxg:TreeListControl>
@@ -242,7 +267,7 @@
                         <cdp4Composition:ContextMenuBehavior />
                     </dxmvvm:Interaction.Behaviors>
                     <dxg:TreeListControl.Columns>
-                        <dxg:TreeListColumn FieldName="Name" Header="Created On" />
+                        <dxg:TreeListColumn FieldName="Name" Header="Created On" DefaultSortOrder="Descending" SortOrder="Descending" SortIndex="0" />
                         <dxg:TreeListColumn FieldName="OwnerShortName" Header="Domain" />
                         <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
                     </dxg:TreeListControl.Columns>

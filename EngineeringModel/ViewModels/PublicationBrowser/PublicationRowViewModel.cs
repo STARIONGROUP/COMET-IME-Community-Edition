@@ -7,6 +7,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
     using CDP4Common.CommonData;
@@ -36,7 +37,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>The <see cref="Thing.CreatedOn"/> property in YYYY-MM-DD format.</returns>
         public string Name
         {
-            get { return this.Thing.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); }
+            get { return this.Thing?.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture); }
         }
 
         /// <summary>
@@ -45,7 +46,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns></returns>
         public DateTime PublicationDate
         {
-            get { return this.Thing.CreatedOn; }
+            get { return this.Thing?.CreatedOn ?? DateTime.UtcNow; }
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string OwnerShortName
         {
-            get { return string.Join(", ", this.Thing.Domain.Select(d => d.ShortName)); }
+            get { return string.Join(", ", this.Thing == null ? new List<string>() : this.Thing.Domain.Select(d => d.ShortName)); }
         }
 
         /// <summary>

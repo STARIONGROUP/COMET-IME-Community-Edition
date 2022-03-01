@@ -20,7 +20,15 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class PublicationDomainOfExpertiseRowViewModel : CDP4CommonView.DomainOfExpertiseRowViewModel, IPublishableRow
     {
+        /// <summary>
+        /// Backinf field for <see cref="ToBePublished"/>
+        /// </summary>
         private bool toBePublished;
+
+        /// <summary>
+        /// Backinf field for <see cref="IsEmpty"/>
+        /// </summary>
+        private bool isEmpty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CDP4CommonView.DomainOfExpertiseRowViewModel"/> class
@@ -31,7 +39,16 @@ namespace CDP4EngineeringModel.ViewModels
         public PublicationDomainOfExpertiseRowViewModel(DomainOfExpertise domainOfExpertise, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(domainOfExpertise, session, containerViewModel)
         {
-            this.WhenAnyValue(vm => vm.ToBePublished).Subscribe(_ => this.ToBePublishedChanged());
+            this.Disposables.Add(this.WhenAnyValue(vm => vm.ToBePublished).Subscribe(_ => this.ToBePublishedChanged()));
+            this.Disposables.Add(this.ContainedRows.IsEmptyChanged.Subscribe(_ => this.SetIsEmpty()));
+        }
+
+        /// <summary>
+        /// Set whether this row is Empty
+        /// </summary>
+        private void SetIsEmpty()
+        {
+            this.IsEmpty = this.ContainedRows.Count == 0;
         }
 
         /// <summary>
@@ -39,7 +56,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void ToBePublishedChanged()
         {
-            foreach(var row in this.ContainedRows.OfType<IPublishableRow>())
+            foreach (var row in this.ContainedRows.OfType<IPublishableRow>())
             {
                 row.ToBePublished = this.ToBePublished;
             }
@@ -52,6 +69,15 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return this.toBePublished; }
             set { this.RaiseAndSetIfChanged(ref this.toBePublished, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the row is to be published.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get { return this.isEmpty; }
+            set { this.RaiseAndSetIfChanged(ref this.isEmpty, value); }
         }
     }
 }
