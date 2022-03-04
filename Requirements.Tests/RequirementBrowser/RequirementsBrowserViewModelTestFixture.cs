@@ -65,6 +65,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private EngineeringModel model;
         private EngineeringModelSetup modelSetup;
         private Iteration iteration;
+        private ElementDefinition elementDefinition;
         private IterationSetup iterationSetup;
         private RequirementsSpecification reqSpec;
         private RequirementsGroup reqGroup;
@@ -99,6 +100,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
+            this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
             this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri);
@@ -118,6 +120,9 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.iteration.Option.Add(this.option);
             this.iteration.DefaultOption = this.option;
             this.iteration.IterationSetup = this.iterationSetup;
+            this.iteration.Element.Add(this.elementDefinition);
+            this.iteration.TopElement = this.elementDefinition;
+
             this.model.EngineeringModelSetup = this.modelSetup;
             this.model.Iteration.Add(this.iteration);
             this.reqSpec.Group.Add(this.reqGroup);

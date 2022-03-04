@@ -27,6 +27,7 @@ namespace CDP4Reporting.Utilities
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -87,13 +88,20 @@ namespace CDP4Reporting.Utilities
         /// </returns>
         public bool TryGetProcessedValueSet(Option option, IEnumerable<NestedParameter> allNestedParameters, IEnumerable<NestedParameter> ownedNestedParameters, SubmittableParameterValue submittableParameterValue, ref Dictionary<Guid, ProcessedValueSet> processedValueSets, out string errorText)
         {
+            if (!this.ValueSetWriteAllowed(submittableParameterValue, option))
+            {
+                // This value should not be written, but in this case no error should be returned as it is as expected
+                errorText = "";
+                return true;
+            }
+
             var path = ReportingUtilities.ConvertToOptionPath(submittableParameterValue.Path, option);
 
             var nestedParameters = option.GetNestedParameterValueSetsByPath(path, allNestedParameters).ToList();
 
             if (nestedParameters.Count == 0)
             {
-                errorText = $"Path {path} was not found in option {option.ShortName}";
+                errorText = $"Path {path} was not found in Product Tree for Option {option.ShortName}";
                 return false;
             }
 
@@ -141,6 +149,29 @@ namespace CDP4Reporting.Utilities
 
             return false;
         }
+        
+ 
+        /// <summary>
+        /// Checks if a data in a <see cref="SubmittableParameterValue"/> should be written to a ValueSet if found.
+        /// </summary>
+        /// <param name="submittableParameterValue">The <see cref="SubmittableParameterValue"/></param>
+        /// <param name="option">The <see cref="Option"/> used to check if writing a value is allowed</param>
+        /// <returns>true is write is allowed, otherwise false</returns>
+        private bool ValueSetWriteAllowed(SubmittableParameterValue submittableParameterValue, Option option)
+        {            
+            var path = ReportingUtilities.ConvertToOptionPath(submittableParameterValue.Path, option);
+
+            var calculatedPathWithoutOption = path.TrimEnd(option.ShortName.ToCharArray());
+            var submittableParameterValuePathWithoutOption = submittableParameterValue.Path.TrimEnd(option.ShortName.ToCharArray());
+
+            if (calculatedPathWithoutOption != submittableParameterValuePathWithoutOption)
+            {
+                // different option defined in submittableParameterValue, so write is not allowed
+                return false;
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Process the <see cref="ParameterValueSet"/> .
@@ -181,6 +212,11 @@ namespace CDP4Reporting.Utilities
 
             if (parameterType != null)
             {
+                if (ValueSetConverter.TryParseDouble(computedValue, parameterType, out var convertedComputedValue))
+                {
+                    computedValue = convertedComputedValue.ToString(CultureInfo.InvariantCulture);
+                }
+
                 computedValue = computedValue?.ToValueSetObject(parameterType).ToValueSetString(parameterType) ?? parameterValueSet.Computed[componentIndex];
 
                 var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
