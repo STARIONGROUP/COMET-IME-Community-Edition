@@ -148,7 +148,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
             {
                 var iteration = (Iteration)behavior.ViewModel.Thing.Container;
 
-                var binaryRelationship = await this.ThingCreator.CreateAndGetBinaryRelationship(endItemContent.Thing, beginItemContent.Thing, connector.CustomStyleId as Category, iteration, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise(iteration), behavior.ViewModel.Session);
+                var binaryRelationship = await this.ThingCreator.CreateAndGetBinaryRelationship(beginItemContent.Thing, endItemContent.Thing, connector.CustomStyleId as Category, iteration, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise(iteration), behavior.ViewModel.Session);
                 CreateConnector(binaryRelationship, (DiagramShape)beginItemContent.DiagramThing, (DiagramShape)endItemContent.DiagramThing, behavior);
             }
             catch (Exception ex)

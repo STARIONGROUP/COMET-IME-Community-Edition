@@ -68,6 +68,7 @@ namespace CDP4DiagramEditor.Views
                     x => {
                         x.RegisterHandler(DiagramCommandsBase.UndoCommand, () => { }, () => false);
                         x.RegisterHandler(DiagramCommandsBase.RedoCommand, () => { }, () => false);
+                        x.RegisterHandler(DiagramCommandsBase.DeleteCommand, () => { }, () => false);
                     });
             }
         }

@@ -120,7 +120,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
 
             try
             {
-                var relationship = await this.ThingCreator.CreateAndGetInterface(endItemContent.Thing as ElementUsage, beginItemContent.Thing as ElementUsage, (Iteration)behavior.ViewModel.Thing.Container, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration)behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
+                var relationship = await this.ThingCreator.CreateAndGetInterface(beginItemContent.Thing as ElementUsage, endItemContent.Thing as ElementUsage, (Iteration)behavior.ViewModel.Thing.Container, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration)behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
             }
             catch (Exception ex)
             {

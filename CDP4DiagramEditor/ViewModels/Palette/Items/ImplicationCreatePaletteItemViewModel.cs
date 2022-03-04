@@ -99,7 +99,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
                     var iteration = (Iteration)this.editorViewModel.Thing.Container;
                     var createCategory = DiagramRDLHelper.GetOrAddImplicationCategory(iteration, this.ImplicationKind, out var category, out var rdlClone);
 
-                    var relationship = await this.ThingCreator.CreateAndGetConstraint(endItemContent.Thing as ElementDefinition, beginItemContent.Thing as ElementDefinition, category, createCategory ? rdlClone : null, iteration, this.editorViewModel.Session.QuerySelectedDomainOfExpertise(iteration), this.editorViewModel.Session);
+                    var relationship = await this.ThingCreator.CreateAndGetConstraint(beginItemContent.Thing as ElementDefinition, endItemContent.Thing as ElementDefinition, category, createCategory ? rdlClone : null, iteration, this.editorViewModel.Session.QuerySelectedDomainOfExpertise(iteration), this.editorViewModel.Session);
                     ImplicationConnectorTool.CreateConnector(relationship, (DiagramObject)beginItemContent.DiagramThing, (DiagramObject)endItemContent.DiagramThing, this.editorViewModel.Behavior);
                 }
                 catch (Exception ex)
