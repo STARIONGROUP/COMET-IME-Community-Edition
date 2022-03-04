@@ -617,7 +617,7 @@ namespace CDP4Reporting.Tests.ViewModels
             yield return (domainOfExpertise, option_A, @"Sat\m\\OPT_A", true, "3", true, false);
             yield return (domainOfExpertise, option_A, @"NotFound\m\\OPT_A", false, "1", true, false);
             yield return (domainOfExpertise, option_A, @"NotFound", false, "1", true, false);
-            yield return (domainOfExpertise, option_A, @"Sat\m\\UnknownOption", true, "1", true, true);
+            yield return (domainOfExpertise, option_A, @"Sat\m\\UnknownOption", true, "1", true, false);
             yield return (domainOfExpertise, option_A, @"Sat\m\\UnknownOption", true, "3", true, false);
             yield return (domainOfExpertise, option_A, @"Sat\m\\OPT_A", true, "1.1", true, true);
             yield return (domainOfExpertise, option_A, @"Sat\m\\OPT_A", true, "1.1.1", false, true);
