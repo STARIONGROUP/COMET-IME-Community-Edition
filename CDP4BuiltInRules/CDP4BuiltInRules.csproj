@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{1CACEEA5-D398-419D-B88B-D4CC4EA67EED}</ProjectGuid>
-    <MinIMEVersion>9.0.2</MinIMEVersion>
+    <MinIMEVersion>9.1.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4BuiltInRules</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4BuiltInRules</Product>
     <Description>COMET Built-In rules Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.0.2.0</AssemblyVersion>
-    <FileVersion>9.0.2.0</FileVersion>
+    <AssemblyVersion>9.1.0.0</AssemblyVersion>
+    <FileVersion>9.1.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
