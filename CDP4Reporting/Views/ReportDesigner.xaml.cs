@@ -69,10 +69,12 @@ namespace CDP4Reporting.Views
             if (!string.IsNullOrEmpty(this.ErrorTextBox.Text))
             {
                 this.lgTabs.SelectTab(this.lgErrors);
+                this.ErrorTextBox.ScrollToEnd();
             }
             else if (Equals(e.Source, this.OutputTextBox))
             {
                 this.lgTabs.SelectTab(this.lgOutput);
+                this.OutputTextBox.ScrollToEnd();
             }
         }
     }

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReportDesignerViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
@@ -60,6 +60,7 @@ namespace CDP4Reporting.ViewModels
 
     using CDP4Reporting.DataCollection;
     using CDP4Reporting.DynamicTableChecker;
+    using CDP4Reporting.Events;
     using CDP4Reporting.Parameters;
     using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.Utilities;
@@ -406,6 +407,12 @@ namespace CDP4Reporting.ViewModels
                         this.CurrentReport.DataSourceDemanded -= this.CheckDynamicTables;
                     }
                 });
+
+            this.Disposables.Add(
+                CDPMessageBus.Current.Listen<ReportOutputEvent>()
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => this.AddOutput(x.Output))
+                );
 
             this.InitializeDataSetExtensionsUsage();
         }
@@ -1268,32 +1275,36 @@ namespace CDP4Reporting.ViewModels
             {
                 return processedValueSets;
             }
-
-            var nestedElementTree = new NestedElementTreeGenerator();
-            var allNestedParameters = nestedElementTree.GetNestedParameters(optionDependentDataCollector.SelectedOption).ToList();
-
-            var ownedNestedParameters = nestedElementTree.GetNestedParameters(
-                optionDependentDataCollector.SelectedOption, optionDependentDataCollector.DomainOfExpertise).ToList();
-
-            var processedValueSetGenerator = new ProcessedValueSetGenerator(optionDependentDataCollector);
-
-            foreach (var submittableParameter in this.submittableParameterValues)
+            
+            foreach (Option option in optionDependentDataCollector.Iteration.Option)
             {
-                if (processedValueSetGenerator
-                    .TryGetProcessedValueSet(
-                        optionDependentDataCollector.SelectedOption,
-                        allNestedParameters,
-                        ownedNestedParameters,
-                        submittableParameter,
-                        ref processedValueSets,
-                        out var errorText))
-                {
-                    continue;
-                }
+                var nestedElementTree = new NestedElementTreeGenerator();
 
-                if (!string.IsNullOrWhiteSpace(errorText))
+                var allNestedParameters = nestedElementTree.GetNestedParameters(option).ToList();
+
+                var ownedNestedParameters = nestedElementTree.GetNestedParameters(
+                    option, optionDependentDataCollector.DomainOfExpertise).ToList();
+
+                var processedValueSetGenerator = new ProcessedValueSetGenerator(optionDependentDataCollector);
+
+                foreach (var submittableParameter in this.submittableParameterValues)
                 {
-                    errorTexts.Add(errorText);
+                    if (processedValueSetGenerator
+                        .TryGetProcessedValueSet(
+                            option,
+                            allNestedParameters,
+                            ownedNestedParameters,
+                            submittableParameter,
+                            ref processedValueSets,
+                            out var errorText))
+                    {
+                        continue;
+                    }
+
+                    if (!string.IsNullOrWhiteSpace(errorText))
+                    {
+                        errorTexts.Add(errorText);
+                    }
                 }
             }
 
