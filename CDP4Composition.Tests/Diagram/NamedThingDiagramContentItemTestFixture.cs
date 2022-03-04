@@ -15,7 +15,7 @@ namespace CDP4Composition.Tests.Diagram
     using NUnit.Framework;
 
     /// <summary>
-    /// Suite of tests for the <see cref="NamedThingDiagramContentItem"/> class
+    /// Suite of tests for the <see cref="NamedThingDiagramContentItemViewModel"/> class
     /// </summary>
     [TestFixture, Apartment(ApartmentState.STA)]
     public class NamedThingDiagramContentItemTestFixture
@@ -34,10 +34,9 @@ namespace CDP4Composition.Tests.Diagram
         [Test]
         public void VerifyThatNamedWithThingCanBeConstructed()
         {
-            var namedThingDiagramContentItem = new NamedThingDiagramContentItem(this.domainOfExpertise);
+            var namedThingDiagramContentItem = new NamedThingDiagramContentItemViewModel(this.domainOfExpertise);
 
             Assert.AreEqual(this.domainOfExpertise, namedThingDiagramContentItem.Thing);
-            Assert.AreEqual(this.domainOfExpertise, namedThingDiagramContentItem.Content);
         }
     }
 }

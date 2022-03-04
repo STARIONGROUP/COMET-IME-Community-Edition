@@ -30,11 +30,14 @@ namespace CDP4Composition.Composition
     using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 
     using CDP4Composition.Exceptions;
     using CDP4Composition.Modularity;
     using CDP4Composition.Services.AppSettingService;
+
+    using DevExpress.Data.ODataLinq.Helpers;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -102,7 +105,14 @@ namespace CDP4Composition.Composition
 
             var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");
 
+            foreach (var dllCatalogLoadedFile in dllCatalog.LoadedFiles)
+            {
+                this.logger.Info($"Loading assembly: {dllCatalogLoadedFile}");
+            }
+
             catalog.Catalogs.Add(dllCatalog);
+
+            this.logger.Info("Done adding root assemblies");
         }
 
         /// <summary>
@@ -110,9 +120,10 @@ namespace CDP4Composition.Composition
         /// </summary>
         /// <param name="container">The <see cref="CompositionContainer"/></param>
         private void ConfigureServiceLocator(CompositionContainer container)
-        {            
+        {
             var serviceLocator = new MefServiceLocator(container);
             ServiceLocator.SetLocatorProvider(() => serviceLocator);
+            this.logger.Info("Done configuring service locator");
         }
 
         /// <summary>
@@ -121,7 +132,7 @@ namespace CDP4Composition.Composition
         /// <param name="catalog">The <see cref="AggregateCatalog"/></param>
         private void AddPluginCatalogs(AggregateCatalog catalog)
         {
-            this.UpdateBootstrapperStatus("Loading COMET Plugins");
+            this.UpdateBootstrapperStatus("Loading Plugins");
 
             var pluginLoader = new PluginLoader<T>();
 
@@ -134,8 +145,18 @@ namespace CDP4Composition.Composition
                 }
                 catch (ReflectionTypeLoadException reflectionTypeLoadException)
                 {
+                    this.logger.Error($"Plugin catalog reflection loading exception: {reflectionTypeLoadException.Message}");
                     throw new CometReflectionTypeLoadException(reflectionTypeLoadException);
                 }
+                catch (Exception ex)
+                {
+                    this.logger.Error($"Plugin catalog general loading exception: {ex.Message}");
+                }
+            }
+
+            foreach (var composablePartDefinition in catalog.Parts.Where(p => p.ExportDefinitions.Any(ed => ed.ContractName.Contains("IModule"))))
+            {
+                this.logger.Info($"Module part {composablePartDefinition} loaded into container.");
             }
 
             this.UpdateBootstrapperStatus($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
@@ -147,8 +168,10 @@ namespace CDP4Composition.Composition
         /// <param name="container">The <see cref="CompositionContainer"/></param>
         private void InitializeModules(CompositionContainer container)
         {
+            this.UpdateBootstrapperStatus("Initializing plugin modules");
             var moduleInitializer = container.GetExportedValue<IModuleInitializer>();
             moduleInitializer.Initialize();
+            this.UpdateBootstrapperStatus("Done initializing plugin modules");
         }
 
         /// <summary>
@@ -158,7 +181,6 @@ namespace CDP4Composition.Composition
         protected virtual void UpdateBootstrapperStatus(string message)
         {
             this.status = message;
-            this.logger.Debug(this.status);
         }
 
         /// <summary>

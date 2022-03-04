@@ -35,6 +35,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using System.Windows;
 
     using CDP4Common.CommonData;
+    using CDP4Common.DiagramData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -78,6 +79,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private ElementDefinition elementDefinition4;
         private ElementDefinition elementDefinition5;
         private DomainOfExpertise domain;
+
+        private ArchitectureDiagram diagram;
+        private DomainFileStore dfs;
+        private File file;
 
         private SiteReferenceDataLibrary srdl;
         private ModelReferenceDataLibrary mrdl;
@@ -124,6 +129,15 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.elementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "E3" };
             this.elementDefinition4 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "E4" };
             this.elementDefinition5 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "E5" };
+
+            this.diagram = new ArchitectureDiagram(Guid.NewGuid(), this.cache, this.uri) { Name = "D1" };
+            this.dfs = new DomainFileStore(Guid.NewGuid(), this.cache, this.uri) { Name = "DFS1" };
+            this.file = new File(Guid.NewGuid(), this.cache, this.uri);
+
+            this.dfs.File.Add(this.file);
+
+            this.iteration.DiagramCanvas.Add(this.diagram);
+            this.iteration.DomainFileStore.Add(this.dfs);
 
             this.iteration.Element.Add(this.elementDefinition1);
             this.iteration.Element.Add(this.elementDefinition2);
@@ -261,6 +275,35 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             var dropinfo2 = new Mock<IDropInfo>();
             dropinfo2.Setup(x => x.Payload).Returns(this.elementDefinition2);
+            await creator.TargetViewModel.Drop(dropinfo2.Object);
+
+            Assert.IsTrue(viewmodel.RelationshipCreator.CreateRelationshipCommand.CanExecute(null));
+            viewmodel.RelationshipCreator.CreateRelationshipCommand.Execute(null);
+
+            creator.ReInitializeControl();
+            Assert.IsNull(creator.SourceViewModel.RelatedThing);
+            Assert.IsNull(creator.TargetViewModel.RelatedThing);
+        }
+
+        [Test]
+        public async Task VerifyThatCreateBinaryRelationshipFileAndDiagramWorks()
+        {
+            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var creator = viewmodel.RelationshipCreator.BinaryRelationshipCreator;
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.diagram);
+            dropinfo.SetupProperty(x => x.Effects);
+
+            creator.SourceViewModel.DragOver(dropinfo.Object);
+            dropinfo.VerifySet(x => x.Effects = DragDropEffects.Copy);
+
+            await creator.SourceViewModel.Drop(dropinfo.Object);
+            Assert.AreSame(creator.SourceViewModel.RelatedThing, this.diagram);
+            Assert.AreEqual(string.Format("({0}) {1}", this.diagram.ClassKind, this.diagram.UserFriendlyName), creator.SourceViewModel.RelatedThingDenomination);
+
+            var dropinfo2 = new Mock<IDropInfo>();
+            dropinfo2.Setup(x => x.Payload).Returns(this.file);
             await creator.TargetViewModel.Drop(dropinfo2.Object);
 
             Assert.IsTrue(viewmodel.RelationshipCreator.CreateRelationshipCommand.CanExecute(null));

@@ -98,7 +98,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// Backing field for the <see cref="Password"/> property.
         /// </summary>
         private string password;
-        
+
         /// <summary>
         /// Backing field for the <see cref="ShowBrowseButton"/> property.
         /// </summary>
@@ -118,7 +118,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// The session.
         /// </summary>
         private ISession session;
-       
+
         /// <summary>
         /// The existing correctly opened openSessions
         /// </summary>
@@ -147,7 +147,7 @@ namespace CDP4ShellDialogs.ViewModels
             this.AvailableDataSourceKinds.ChangeTrackingEnabled = true;
 
             this.WhenAnyValue(vm => vm.IsProxyEnabled).Subscribe(_ => this.UpdateProxyAddressProperty());
-            
+
             var canOk = this.WhenAnyValue(
                 vm => vm.UserName,
                 vm => vm.Password,
@@ -264,7 +264,7 @@ namespace CDP4ShellDialogs.ViewModels
                 this.RaiseAndSetIfChanged(ref this.proxyPort, value);
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the uri value that is hand edited by the user
         /// </summary>
@@ -430,14 +430,14 @@ namespace CDP4ShellDialogs.ViewModels
             else
             {
                 ProxySettings proxySettings = null;
-                
+
                 if (this.isProxyEnabled)
                 {
                     var proxyServerConfiguration = ProxyServerConfigurationManager.Read();
                     var proxyUri = new Uri($"http://{proxyServerConfiguration.Address}:{proxyServerConfiguration.Port}");
                     proxySettings = new ProxySettings(proxyUri, proxyServerConfiguration.UserName, proxyServerConfiguration.Password);
                 }
-                
+
                 var credentials = new Credentials(this.UserName, this.Password, providedUri, proxySettings);
                 var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
@@ -607,7 +607,7 @@ namespace CDP4ShellDialogs.ViewModels
             this.IsProxyEnabled = false;
             this.ProxyUri = string.Empty;
             this.ProxyPort = string.Empty;
-            
+
             this.SelectedDataSourceKind = this.AvailableDataSourceKinds.FirstOrDefault(v => v.DalType == DalType.Web);            
         }
 
@@ -671,7 +671,7 @@ namespace CDP4ShellDialogs.ViewModels
             var result = dal.Value.IsValidUri(uriToCheck);
             return result;
         }
-        
+
         /// <summary>
         /// Queries the open openSessions to check if a session with the same uri and user name has already been opened
         /// </summary>

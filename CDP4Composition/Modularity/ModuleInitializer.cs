@@ -28,12 +28,19 @@ namespace CDP4Composition.Modularity
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
 
+    using NLog;
+
     /// <summary>
     /// A class to collect all <see cref="IModule"/>s loaded and initializes them
     /// </summary>
     [Export(typeof(IModuleInitializer))]
     public class ModuleInitializer : IModuleInitializer
     {
+        /// <summary>
+        /// A <see cref="Logger"/> instance
+        /// </summary>
+        protected readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// The <see cref="IModule"/>s to initialize
         /// </summary>
@@ -42,7 +49,7 @@ namespace CDP4Composition.Modularity
         /// <summary>
         /// Initializes a new instance of the <see cref="ModuleInitializer"/> class
         /// </summary>
-        /// <param name="modules">The <see cref="IModule"s to initialize/></param>
+        /// <param name="modules">The <see cref="IModule"/>s to initialize</param>
         [ImportingConstructor]
         public ModuleInitializer([ImportMany] IEnumerable<IModule> modules)
         {
@@ -54,9 +61,10 @@ namespace CDP4Composition.Modularity
         /// </summary>
         public void Initialize()
         {
-            foreach (var module in modules)
+            foreach (var module in this.modules)
             {
                 module.Initialize();
+                this.logger.Info($"Initialized {module.GetType().Name} module");
             }
         }
     }

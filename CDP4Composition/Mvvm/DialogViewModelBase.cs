@@ -1,24 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DialogViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2021 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//    GNU Affero General Public License for more details.
-//
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -35,29 +34,31 @@ namespace CDP4Composition.Mvvm
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
-  
+
     using CDP4Common.CommonData;
     using CDP4Common.Exceptions;
 
+    using CDP4Composition.CommonView.ViewModels;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    
+    using CDP4Composition.Services;
+    using CDP4Composition.Utilities;
+
     using CDP4Dal;
     using CDP4Dal.Operations;
-    
+
     using CDP4JsonSerializer;
-    
+
     using DevExpress.Xpf.SpellChecker;
     using DevExpress.XtraSpellChecker;
-    
+
     using ReactiveUI;
-    
-    using Services;
-    
+
     /// <summary>
-    /// Abstract base class from which all dialog view-models that represent a <see cref="Thing"/> need to derive
+    /// Abstract base class from which all dialog view-models that represent a <see cref="Thing" /> need to derive
     /// </summary>
     /// <typeparam name="T">
     /// A type of Thing that is represented by the view-model
@@ -68,102 +69,105 @@ namespace CDP4Composition.Mvvm
         /// The relative location of the loading animation image.
         /// </summary>
         private const string CdpLogoAnimationPath = @"\Resources\Images\comet.ico";
-        
+
         /// <summary>
-        /// The <see cref="IThingDialogNavigationService"/> used to navigate to <see cref="IThingDialogViewModel"/>s
+        /// The <see cref="Cdp4JsonSerializer" /> that is used to serialize an <see cref="Thing" /> to the clipboard
+        /// </summary>
+        private readonly Cdp4JsonSerializer serializer;
+
+        /// <summary>
+        /// The <see cref="IThingDialogNavigationService" /> used to navigate to <see cref="IThingDialogViewModel" />s
         /// </summary>
         protected readonly IThingDialogNavigationService thingDialogNavigationService;
 
         /// <summary>
-        /// The parent <see cref="ThingTransaction"/> that records the changes that are executed on the <see cref="Thing"/>
+        /// The <see cref="Thing" /> that contains the created <see cref="Thing" /> in this dialog
+        /// </summary>
+        private Thing container;
+
+        /// <summary>
+        /// The kind of operation this <see cref="DialogViewModelBase{T}" /> performs
+        /// </summary>
+        protected ThingDialogKind dialogKind;
+
+        /// <summary>
+        /// Backing field for the <see cref="DialogResult" /> property.
+        /// </summary>
+        protected bool? dialogResult;
+
+        /// <summary>
+        /// The <see cref="ISpellDictionaryService" /> that is used to set the dictionaries of the <see cref="SpellChecker" />
+        /// </summary>
+        private ISpellDictionaryService dictionaryService;
+
+        /// <summary>
+        /// Out property for the <see cref="HasException" /> property
+        /// </summary>
+        protected ObservableAsPropertyHelper<bool> hasException;
+
+        /// <summary>
+        /// Assert if this <see cref="DialogViewModelBase{T}" /> is the root of all <see cref="IThingDialogViewModel" />
+        /// </summary>
+        protected bool isRoot;
+
+        /// <summary>
+        /// Backing field for <see cref="OkCanExecute" /> property.
+        /// </summary>
+        private bool okCanExecute;
+
+        /// <summary>
+        /// The parent <see cref="ThingTransaction" /> that records the changes that are executed on the <see cref="Thing" />
         /// that is the subject of this view-model
         /// </summary>
         protected IThingTransaction parentTransaction;
 
         /// <summary>
-        /// The <see cref="ThingTransaction"/> that records the changes that happens in this view-model and its contained items
-        /// </summary>
-        protected IThingTransaction transaction;
-
-        /// <summary>
-        /// Backing field for the <see cref="DialogResult"/> property.
-        /// </summary>
-        protected bool? dialogResult;
-
-        /// <summary>
-        /// Out property for the <see cref="HasException"/> property
-        /// </summary>
-        protected ObservableAsPropertyHelper<bool> hasException;
-
-        /// <summary>
-        /// The <see cref="Exception"/> that has been caught trying to 
-        /// </summary>
-        protected Exception writeException;
-
-        /// <summary>
-        /// Assert if this <see cref="DialogViewModelBase{T}"/> is the root of all <see cref="IThingDialogViewModel"/>
-        /// </summary>
-        protected bool isRoot;
-
-        /// <summary>
-        /// The kind of operation this <see cref="DialogViewModelBase{T}"/> performs
-        /// </summary>
-        protected ThingDialogKind dialogKind;
-
-        /// <summary>
-        /// Backing field for <see cref="OkCanExecute"/> property.
-        /// </summary>
-        private bool okCanExecute;
-
-        /// <summary>
-        /// Backing field for the <see cref="SpellChecker"/> property.
+        /// Backing field for the <see cref="SpellChecker" /> property.
         /// </summary>
         private SpellChecker spellChecker;
 
         /// <summary>
-        /// The <see cref="Thing"/> that contains the created <see cref="Thing"/> in this dialog
+        /// The <see cref="ThingTransaction" /> that records the changes that happens in this view-model and its contained items
         /// </summary>
-        private Thing container;
+        protected IThingTransaction transaction;
 
         /// <summary>
-        /// The <see cref="ISpellDictionaryService"/> that is used to set the dictionaries of the <see cref="SpellChecker"/>
+        /// The <see cref="Exception" /> that has been caught trying to
         /// </summary>
-        private ISpellDictionaryService dictionaryService;
-        
+        protected Exception writeException;
+
         /// <summary>
-        /// The <see cref="Cdp4JsonSerializer"/> that is used to serialize an <see cref="Thing"/> to the clipboard
+        /// Initializes a new instance of the <see cref="DialogViewModelBase{T}" /> class
         /// </summary>
-        private readonly Cdp4JsonSerializer serializer;
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DialogViewModelBase{T}"/> class
-        /// </summary>
-        /// <param name="thingClone">The clone of the <see cref="Thing"/> that this dialog belongs to.</param>
+        /// <param name="thingClone">The clone of the <see cref="Thing" /> that this dialog belongs to.</param>
         /// <param name="parentTransaction">
-        /// The parent <see cref="ThingTransaction"/> that contains the log of recorded changes at the previous level.
+        /// The parent <see cref="ThingTransaction" /> that contains the log of recorded changes at the previous level.
         /// </param>
         /// <param name="session">
-        /// The <see cref="ISession"/> in which the current <see cref="Thing"/> is to be added or updated
+        /// The <see cref="ISession" /> in which the current <see cref="Thing" /> is to be added or updated
         /// </param>
         /// <param name="isRoot">
-        /// Assert if this <see cref="DialogViewModelBase{T}"/> is the root of all <see cref="IThingDialogViewModel"/>
+        /// Assert if this <see cref="DialogViewModelBase{T}" /> is the root of all <see cref="IThingDialogViewModel" />
         /// </param>
         /// <param name="dialogKind">
-        /// The kind of operation this <see cref="DialogViewModelBase{T}"/> performs
+        /// The kind of operation this <see cref="DialogViewModelBase{T}" /> performs
         /// </param>
-        /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
-        /// <param name="container">The <see cref="Thing"/> that contains the created one in this <see cref="DialogViewModelBase{T}"/></param>
+        /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService" /></param>
+        /// <param name="container">
+        /// The <see cref="Thing" /> that contains the created one in this
+        /// <see cref="DialogViewModelBase{T}" />
+        /// </param>
         /// <param name="chainOfContainers">
-        /// The optional chain of containers that contains the <paramref name="container"/> argument
+        /// The optional chain of containers that contains the <paramref name="container" /> argument
         /// </param>
         /// <remarks>
-        /// <paramref name="thingClone"/> shall always be a clone when opening a dialog to create or edit a thing.
+        /// <paramref name="thingClone" /> shall always be a clone when opening a dialog to create or edit a thing.
         /// </remarks>
         protected DialogViewModelBase(T thingClone, IThingTransaction parentTransaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container, IEnumerable<Thing> chainOfContainers)
             : base(thingClone, session)
         {
-            // add the animation uri path            
-            this.AnimationUri = $"{Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)}{CdpLogoAnimationPath}";            
+            // add the animation uri path
+            this.AnimationUri = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}{CdpLogoAnimationPath}";
             this.LoadingMessage = "Processing...";
 
             this.InitializeSpellingChecker();
@@ -177,93 +181,68 @@ namespace CDP4Composition.Mvvm
             this.dialogKind = dialogKind;
             this.serializer = new Cdp4JsonSerializer(this.Session.Dal.MetaDataProvider, this.Session.DalVersion);
 
-            this.ChainOfContainer = (chainOfContainers != null) ? chainOfContainers.ToList() : new List<Thing>();
+            this.ChainOfContainer = chainOfContainers != null ? chainOfContainers.ToList() : new List<Thing>();
             this.ChainOfContainer.Add(this.Container);
 
             this.WhenAnyValue(vm => vm.Container)
-                    .Where(x => x != null)
-                    .Subscribe(_ => this.UpdateChainOfContainer());
+                .Where(x => x != null)
+                .Subscribe(_ => this.UpdateChainOfContainer());
 
             this.Initialize();
             this.InitializeCommands();
             this.UpdateProperties();
 
             this.WhenAnyValue(x => x.WriteException).Select(x => x != null).ToProperty(this, x => x.HasException, out this.hasException);
-            
+
             switch (this.dialogKind)
             {
-                case ThingDialogKind.Create:                    
-                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);                    
+                case ThingDialogKind.Create:
+                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);
                     break;
-                case ThingDialogKind.Update:                    
-                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);                    
+                case ThingDialogKind.Update:
+                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);
                     break;
                 case ThingDialogKind.Inspect:
                     break;
                 default:
-                    throw new InvalidEnumArgumentException("The provided dialogKind is Invalid");   
+                    throw new InvalidEnumArgumentException("The provided dialogKind is Invalid");
             }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DialogViewModelBase{T}"/> class
+        /// Initializes a new instance of the <see cref="DialogViewModelBase{T}" /> class
         /// </summary>
         protected DialogViewModelBase()
         {
         }
 
         /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> that represents an "confirmation" of the dialog
-        /// </summary>
-        public ReactiveCommand<Unit> OkCommand { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> that represents an "cancellation" of the dialog
-        /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> that represents an copy of the Uri to Clipboard
+        /// Gets the <see cref="ReactiveCommand" /> that represents an copy of the Uri to Clipboard
         /// </summary>
         public ReactiveCommand<object> CopyUriCommand { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> that represents a shallow export to Clipboard
+        /// Gets the <see cref="ReactiveCommand" /> that represents a shallow export to Clipboard
         /// </summary>
         public ReactiveCommand<object> ShallowExportCommand { get; private set; }
 
         /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> that represents a deep export to Clipboard
+        /// Gets the <see cref="ReactiveCommand" /> that represents a deep export to Clipboard
         /// </summary>
         public ReactiveCommand<object> DeepExportCommand { get; private set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="OkCommand"/> can be executed
+        /// Gets the chain of <see cref="Thing" />s that contains the current one
         /// </summary>
-        public bool OkCanExecute
+        public List<Thing> ChainOfContainer { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="SpellChecker" /> instance that the <see cref="SpellingCheckerService" /> provides
+        /// </summary>
+        public SpellChecker SpellChecker
         {
-            get => this.okCanExecute;
-            set => this.RaiseAndSetIfChanged(ref this.okCanExecute, value);
+            get { return this.spellChecker; }
         }
-
-        /// <summary>
-        /// Gets or sets the container of the <see cref="Thing"/> in this dialog
-        /// </summary>
-        public Thing Container
-        {
-            get => this.container;
-            set => this.RaiseAndSetIfChanged(ref this.container, value);
-        }
-
-        /// <summary>
-        /// Gets the chain of <see cref="Thing"/>s that contains the current one
-        /// </summary>
-        public List<Thing> ChainOfContainer { get; private set; } 
-
-        /// <summary>
-        /// Gets the <see cref="SpellChecker"/> instance that the <see cref="SpellingCheckerService"/> provides
-        /// </summary>
-        public SpellChecker SpellChecker => this.spellChecker;
 
         /// <summary>
         /// Gets the animation uri
@@ -276,47 +255,51 @@ namespace CDP4Composition.Mvvm
         public string LoadingMessage { get; private set; }
 
         /// <summary>
-        /// Gets the possible container for the <see cref="Thing"/> in this dialog
+        /// Gets the possible container for the <see cref="Thing" /> in this dialog
         /// </summary>
         public ReactiveList<Thing> PossibleContainer { get; private set; }
 
         /// <summary>
+        /// Gets or sets the list of <see cref="ThingPreferenceRowViewModel" />s
+        /// </summary>
+        public ReactiveList<ThingPreferenceRowViewModel> ThingPreferenceRowViewModels { get; set; }
+
+        /// <summary>
         /// Gets the inspect command for the selected container
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedContainerCommand { get; private set; } 
-
-        /// <summary>
-        /// Gets an error message indicating what is wrong with this object.
-        /// </summary>
-        /// <returns>
-        /// Gets or sets an error message indicating what is wrong with this object. The default is an empty string ("").
-        /// </returns>
-        public string Error { get; set; }
-
-        /// <summary>
-        /// Gets or sets the list of <see cref="ValidationService.ValidationRule"/>s that are violated.
-        /// </summary>
-        public ReactiveList<ValidationService.ValidationRule> ValidationErrors { get; set; }
+        public ReactiveCommand<object> InspectSelectedContainerCommand { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the associated view is read-only
         /// </summary>
-        public virtual bool IsReadOnly => this.dialogKind == ThingDialogKind.Inspect;
+        public virtual bool IsReadOnly
+        {
+            get { return this.dialogKind == ThingDialogKind.Inspect; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether a non-editable field is read-only
         /// </summary>
-        public virtual bool IsNonEditableFieldReadOnly => this.dialogKind != ThingDialogKind.Create;
+        public virtual bool IsNonEditableFieldReadOnly
+        {
+            get { return this.dialogKind != ThingDialogKind.Create; }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the Ok button is visible
         /// </summary>
-        public bool IsOkVisible => !this.IsReadOnly;
+        public bool IsOkVisible
+        {
+            get { return !this.IsReadOnly; }
+        }
 
         /// <summary>
-        /// Gets a value indicating whether the <see cref="writeException"/> is not empty.
+        /// Gets a value indicating whether the <see cref="writeException" /> is not empty.
         /// </summary>
-        public bool HasException => this.hasException.Value;
+        public bool HasException
+        {
+            get { return this.hasException.Value; }
+        }
 
         /// <summary>
         /// Gets or sets a value that forces the window to close, specifying whether the user
@@ -327,28 +310,28 @@ namespace CDP4Composition.Mvvm
         /// </remarks>
         public bool? DialogResult
         {
-            get => this.dialogResult;
+            get { return this.dialogResult; }
 
-            set => this.RaiseAndSetIfChanged(ref this.dialogResult, value);
+            set { this.RaiseAndSetIfChanged(ref this.dialogResult, value); }
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="WriteException"/> that may have occurred during a
-        /// Write operation on the current <see cref="Session"/>.
+        /// Gets or sets the <see cref="WriteException" /> that may have occurred during a
+        /// Write operation on the current <see cref="Session" />.
         /// </summary>
         public Exception WriteException
         {
-            get => this.writeException;
+            get { return this.writeException; }
 
-            set => this.RaiseAndSetIfChanged(ref this.writeException, value);
+            set { this.RaiseAndSetIfChanged(ref this.writeException, value); }
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="IDictionaryService"/>
+        /// Gets or sets the <see cref="IDictionaryService" />
         /// </summary>
         public ISpellDictionaryService DictionaryService
         {
-            get => this.dictionaryService;
+            get { return this.dictionaryService; }
 
             set
             {
@@ -368,6 +351,52 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// Gets the <see cref="Uri" /> of the <see cref="Thing" /> with respect to it's data-source
+        /// </summary>
+        public string ThingUri { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand" /> that represents an "confirmation" of the dialog
+        /// </summary>
+        public ReactiveCommand<Unit> OkCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand" /> that represents an "cancellation" of the dialog
+        /// </summary>
+        public ReactiveCommand<object> CancelCommand { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="OkCommand" /> can be executed
+        /// </summary>
+        public bool OkCanExecute
+        {
+            get { return this.okCanExecute; }
+            set { this.RaiseAndSetIfChanged(ref this.okCanExecute, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the container of the <see cref="Thing" /> in this dialog
+        /// </summary>
+        public Thing Container
+        {
+            get { return this.container; }
+            set { this.RaiseAndSetIfChanged(ref this.container, value); }
+        }
+
+        /// <summary>
+        /// Gets an error message indicating what is wrong with this object.
+        /// </summary>
+        /// <returns>
+        /// Gets or sets an error message indicating what is wrong with this object. The default is an empty string ("").
+        /// </returns>
+        public string Error { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of <see cref="ValidationService.ValidationRule" />s that are violated.
+        /// </summary>
+        public ReactiveList<ValidationService.ValidationRule> ValidationErrors { get; set; }
+
+        /// <summary>
         /// Gets the error message for the property with the given name.
         /// </summary>
         /// <returns>
@@ -377,18 +406,16 @@ namespace CDP4Composition.Mvvm
         /// <remarks>
         /// Used by the view through the IDataErrorInfo interface to validate a field
         /// </remarks>
-        public virtual string this[string columnName] => ValidationService.ValidateProperty(columnName, this);
+        public virtual string this[string columnName]
+        {
+            get { return ValidationService.ValidateProperty(columnName, this); }
+        }
 
-        /// <summary>
-        /// Gets the <see cref="Uri"/> of the <see cref="Thing"/> with respect to it's data-source
-        /// </summary>
-        public string ThingUri { get; private set; }
-        
         /// <summary>
         /// Updates the property indicating whether it is possible to close the current dialog by clicking the OK button
         /// </summary>
         /// <remarks>
-        /// The <see cref="Container"/> may not be null and there may not be any Validation Errors
+        /// The <see cref="Container" /> may not be null and there may not be any Validation Errors
         /// </remarks>
         protected virtual void UpdateOkCanExecute()
         {
@@ -404,38 +431,45 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Initialize the <see cref="ReactiveCommand"/>s of the current view-model
+        /// Initialize the <see cref="ReactiveCommand" />s of the current view-model
         /// </summary>
         protected virtual void InitializeCommands()
         {
             this.ValidationErrors = new ReactiveList<ValidationService.ValidationRule>();
             this.ValidationErrors.ChangeTrackingEnabled = true;
 
-            this.ValidationErrors.Changed.Subscribe(_ => this.UpdateOkCanExecute());
+            this.Disposables.Add(this.ValidationErrors.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
+
+            this.ThingPreferenceRowViewModels = new ReactiveList<ThingPreferenceRowViewModel>();
+            this.ThingPreferenceRowViewModels.ChangeTrackingEnabled = true;
+
+            this.Disposables.Add(this.ThingPreferenceRowViewModels.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
 
             var canExecute = this.WhenAnyValue(vm => vm.OkCanExecute);
 
             this.OkCommand = ReactiveCommand.CreateAsyncTask(canExecute, x => this.ExecuteOkCommand(), RxApp.MainThreadScheduler);
-            this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
-            {
-                this.WriteException = x;
-                logger.Error(x);
-            });
+
+            this.Disposables.Add(this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(
+                x =>
+                {
+                    this.WriteException = x;
+                    logger.Error(x);
+                }));
 
             this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancelCommand());
+            this.Disposables.Add(this.CancelCommand.Subscribe(_ => this.ExecuteCancelCommand()));
 
             this.CopyUriCommand = ReactiveCommand.Create();
-            this.CopyUriCommand.Subscribe(_ => this.ExecuteCopyUriCommand());
+            this.Disposables.Add(this.CopyUriCommand.Subscribe(_ => this.ExecuteCopyUriCommand()));
 
             this.ShallowExportCommand = ReactiveCommand.Create();
-            this.ShallowExportCommand.Subscribe(_ => this.ExecuteShallowExportCommand());
+            this.Disposables.Add(this.ShallowExportCommand.Subscribe(_ => this.ExecuteShallowExportCommand()));
 
             this.DeepExportCommand = ReactiveCommand.Create();
-            this.DeepExportCommand.Subscribe(_ => this.ExecuteDeepExportCommand());
+            this.Disposables.Add(this.DeepExportCommand.Subscribe(_ => this.ExecuteDeepExportCommand()));
 
             this.InspectSelectedContainerCommand = ReactiveCommand.Create();
-            this.InspectSelectedContainerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.Container));
+            this.Disposables.Add(this.InspectSelectedContainerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.Container)));
         }
 
         /// <summary>
@@ -448,14 +482,16 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Set the <see cref="SpellCheckerOpenOfficeDictionary"/> and <see cref="CultureInfo"/> of the <see cref="SpellChecker"/>
+        /// Set the <see cref="SpellCheckerOpenOfficeDictionary" /> and <see cref="CultureInfo" /> of the
+        /// <see cref="SpellChecker" />
         /// </summary>
         /// <param name="dictionary">
-        /// The <see cref="SpellCheckerOpenOfficeDictionary"/> that is to be added to the <see cref="SpellChecker"/> if it is not yet added.
+        /// The <see cref="SpellCheckerOpenOfficeDictionary" /> that is to be added to the <see cref="SpellChecker" /> if it is not
+        /// yet added.
         /// </param>
         /// <param name="culture">
-        /// The <see cref="CultureInfo"/> that is the active <see cref="CultureInfo"/> of the <see cref="SpellChecker"/>
-        /// </param>        
+        /// The <see cref="CultureInfo" /> that is the active <see cref="CultureInfo" /> of the <see cref="SpellChecker" />
+        /// </param>
         private void SetSpellCheckerDictonary(SpellCheckerOpenOfficeDictionary dictionary, CultureInfo culture)
         {
             if (!this.spellChecker.Dictionaries.Contains(dictionary))
@@ -467,13 +503,13 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Event handler for the CultureInfoChanged of the <see cref="DictionaryService"/>
+        /// Event handler for the CultureInfoChanged of the <see cref="DictionaryService" />
         /// </summary>
         /// <param name="source">
         /// The source of the event
         /// </param>
         /// <param name="cultureInfoChangedEventArgs">
-        /// The event arguments that carry the <see cref="CultureInfo"/> and <see cref="SpellCheckerOpenOfficeDictionary"/>
+        /// The event arguments that carry the <see cref="CultureInfo" /> and <see cref="SpellCheckerOpenOfficeDictionary" />
         /// </param>
         private void DictionaryServiceOnCultureInfoChanged(object source, CultureInfoChangedEventArgs cultureInfoChangedEventArgs)
         {
@@ -486,11 +522,11 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Executes the <see cref="CancelCommand"/>.
+        /// Executes the <see cref="CancelCommand" />.
         /// </summary>
         /// <remarks>
-        /// The changes that have been set on the view-model will not be set on the <see cref="Thing"/>,
-        /// the <see cref="ThingTransaction"/> is not updated with any of these changes.
+        /// The changes that have been set on the view-model will not be set on the <see cref="Thing" />,
+        /// the <see cref="ThingTransaction" /> is not updated with any of these changes.
         /// </remarks>
         protected virtual void ExecuteCancelCommand()
         {
@@ -499,7 +535,7 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Executes the <see cref="CopyUriCommand"/>.
+        /// Executes the <see cref="CopyUriCommand" />.
         /// </summary>
         protected virtual void ExecuteCopyUriCommand()
         {
@@ -507,7 +543,7 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Executes the <see cref="ShallowExportCommand"/>.
+        /// Executes the <see cref="ShallowExportCommand" />.
         /// </summary>
         protected virtual void ExecuteShallowExportCommand()
         {
@@ -515,7 +551,7 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Executes the <see cref="DeepExportCommand"/>.
+        /// Executes the <see cref="DeepExportCommand" />.
         /// </summary>
         protected virtual void ExecuteDeepExportCommand()
         {
@@ -523,10 +559,10 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Executes the <see cref="OkCommand"/>
+        /// Executes the <see cref="OkCommand" />
         /// </summary>
         /// <returns>
-        /// The <see cref="Task"/>.
+        /// The <see cref="Task" />.
         /// </returns>
         private async Task ExecuteOkCommand()
         {
@@ -560,7 +596,7 @@ namespace CDP4Composition.Mvvm
                 }
 
                 this.DialogResult = true;
-            }            
+            }
             finally
             {
                 this.IsBusy = false;
@@ -568,11 +604,23 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Updates the <see cref="ThingTransaction"/> with the changes recorded in the current view-model
+        /// Updates the <see cref="ThingTransaction" /> with the changes recorded in the current view-model
         /// </summary>
         protected virtual void UpdateTransaction()
         {
             this.Thing.ModifiedOn = DateTime.UtcNow;
+
+            var thingPreferenceDictionary = new Dictionary<string, string>();
+
+            foreach (var thingPreferenceRowViewModel in this.ThingPreferenceRowViewModels)
+            {
+                if (!thingPreferenceDictionary.ContainsKey(thingPreferenceRowViewModel.Key))
+                {
+                    thingPreferenceDictionary.Add(thingPreferenceRowViewModel.Key, thingPreferenceRowViewModel.Value);
+                }
+            }
+
+            this.Thing.SetThingPreferencesFromDictionary(thingPreferenceDictionary);
         }
 
         /// <summary>
@@ -609,13 +657,28 @@ namespace CDP4Composition.Mvvm
                 this.ThingUri = ex.Message;
                 logger.Warn(ex);
             }
+
+            var isDictionary = ThingPreferenceHelper.GetThingPreferenceDictionary(this.Thing, out var preferenceDictionary);
+
+            if (!isDictionary)
+            {
+                return;
+            }
+
+            foreach (var kvpair in preferenceDictionary)
+            {
+                this.ThingPreferenceRowViewModels.Add(new ThingPreferenceRowViewModel(kvpair));
+            }
         }
 
         /// <summary>
-        /// Execute the Create Command for a <see cref="Thing"/>
+        /// Execute the Create Command for a <see cref="Thing" />
         /// </summary>
-        /// <typeparam name="TThing">The type of <see cref="Thing"/> to create</typeparam>
-        /// <param name="populateMethod">The populate method which clear the <see cref="ReactiveList{T}"/> the new <see cref="Thing"/> is contained in and populates it</param>
+        /// <typeparam name="TThing">The type of <see cref="Thing" /> to create</typeparam>
+        /// <param name="populateMethod">
+        /// The populate method which clear the <see cref="ReactiveList{T}" /> the new
+        /// <see cref="Thing" /> is contained in and populates it
+        /// </param>
         protected void ExecuteCreateCommand<TThing>(Action populateMethod) where TThing : Thing, new()
         {
             var thing = new TThing();
@@ -630,9 +693,9 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Execute the Delete command for a <see cref="Thing"/>
+        /// Execute the Delete command for a <see cref="Thing" />
         /// </summary>
-        /// <param name="thing">the <see cref="Thing"/> to delete</param>
+        /// <param name="thing">the <see cref="Thing" /> to delete</param>
         /// <param name="repopulateMethod">the repopulate method to refresh the rows</param>
         protected void ExecuteDeleteCommand(Thing thing, Action repopulateMethod)
         {
@@ -641,10 +704,13 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Execute the Edit command for a <see cref="Thing"/>
+        /// Execute the Edit command for a <see cref="Thing" />
         /// </summary>
-        /// <param name="thing">the <see cref="Thing"/> to edit</param>
-        /// <param name="repopulateAction">The method that repopulates the list that contains the row associated with the updated thing</param>
+        /// <param name="thing">the <see cref="Thing" /> to edit</param>
+        /// <param name="repopulateAction">
+        /// The method that repopulates the list that contains the row associated with the updated
+        /// thing
+        /// </param>
         protected void ExecuteEditCommand(Thing thing, Action repopulateAction)
         {
             var result = this.thingDialogNavigationService.Navigate(thing.Clone(false), this.transaction, this.Session, false, ThingDialogKind.Update, this.thingDialogNavigationService, this.Thing, this.ChainOfContainer);
@@ -696,6 +762,7 @@ namespace CDP4Composition.Mvvm
         protected void ExecuteMoveDownCommand<TRow>(ReactiveList<TRow> orderedList, TRow selectedItem) where TRow : IRowViewModelBase<Thing>
         {
             var selectedIndex = orderedList.IndexOf(selectedItem);
+
             if (selectedIndex == orderedList.Count - 1)
             {
                 return;
@@ -705,9 +772,9 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Execute the Inspect command for a <see cref="Thing"/>
+        /// Execute the Inspect command for a <see cref="Thing" />
         /// </summary>
-        /// <param name="thing">the <see cref="Thing"/> to inspect</param>
+        /// <param name="thing">the <see cref="Thing" /> to inspect</param>
         protected void ExecuteInspectCommand(Thing thing)
         {
             this.thingDialogNavigationService.Navigate(thing, this.transaction, this.Session, false, ThingDialogKind.Inspect, this.thingDialogNavigationService, thing.Container);

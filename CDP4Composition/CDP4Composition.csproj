@@ -7,8 +7,8 @@
     <Product>CDP4Composition</Product>
     <Description>COMET Composition and Infrastructure library</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.0.2.0</AssemblyVersion>
-    <FileVersion>9.0.2.0</FileVersion>
+    <AssemblyVersion>10.0.1.1</AssemblyVersion>
+    <FileVersion>10.0.1.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -27,10 +27,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="1.12.0" />
+    <PackageReference Include="CDP4Common-CE" Version="9.0.0-716-PR210" />
+    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-716-PR210" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-716-PR210" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="1.12.0-716-PR210" />
     <PackageReference Include="CommonServiceLocator" Version="1.3" />
     <PackageReference Include="DevExpress.CodeParser" Version="20.2.8" />
     <PackageReference Include="DevExpress.Data" Version="20.2.8" />
@@ -370,7 +370,14 @@
     <Resource Include="Resources\Images\Thing\category_32x32.png" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="CommonView\Diagram\Views\DiagramFrameShape.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CommonView\Diagram\Views\DiagramPortShape.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CommonView\Items\BehaviorLayoutGroup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -534,6 +541,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CommonView\Resources\ScriptTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CommonView\Resources\AttachmentTemplate.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CommonView\Resources\ValueSetTemplates.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -551,6 +566,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CommonView\Views\AnnotationTooltip.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CommonView\Views\BehaviorDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -674,6 +693,9 @@
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="CommonView\Diagram\Views\DiagramFrameShape.xaml" />
+    <None Remove="CommonView\Resources\AttachmentTemplate.xaml" />
+    <None Remove="CommonView\Resources\ScriptTemplate.xaml" />
     <None Remove="Resources\Images\cometlogo.png" />
     <None Remove="Resources\Images\cometlogo_48x48.png" />
     <None Remove="Views\CustomFilterEditorDialog.xaml" />

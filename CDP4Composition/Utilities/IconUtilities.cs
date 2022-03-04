@@ -313,6 +313,11 @@ namespace CDP4Common.Helpers
                     imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
 
                     return imageInfo.MakeUri().ToString();
+                case ClassKind.ArchitectureDiagram:
+                    imagename = "LegendLeft";
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
+                    return imageInfo.MakeUri().ToString();
                 case ClassKind.SimpleUnit:
                 case ClassKind.PrefixedUnit:
                 case ClassKind.LinearConversionUnit:

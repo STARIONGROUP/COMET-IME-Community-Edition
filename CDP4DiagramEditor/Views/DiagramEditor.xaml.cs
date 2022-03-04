@@ -29,6 +29,9 @@ namespace CDP4DiagramEditor.Views
 
     using CDP4Composition;
 
+    using DevExpress.Diagram.Core;
+    using DevExpress.Xpf.Diagram;
+
     /// <summary>
     /// Interaction logic for CDP4DiagramEditor.xaml
     /// </summary>
@@ -59,6 +62,14 @@ namespace CDP4DiagramEditor.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
+
+                // disable undo/redo
+                this.Cdp4DiagramControl.Commands.RegisterHandlers(
+                    x => {
+                        x.RegisterHandler(DiagramCommandsBase.UndoCommand, () => { }, () => false);
+                        x.RegisterHandler(DiagramCommandsBase.RedoCommand, () => { }, () => false);
+                        x.RegisterHandler(DiagramCommandsBase.DeleteCommand, () => { }, () => false);
+                    });
             }
         }
     }

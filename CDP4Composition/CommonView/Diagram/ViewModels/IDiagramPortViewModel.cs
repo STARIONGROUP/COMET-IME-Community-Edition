@@ -27,20 +27,15 @@ namespace CDP4CommonView.Diagram.ViewModels
 {
     using System;
 
-    using CDP4Common.DiagramData;
+    using CDP4Common.EngineeringModelData;
 
-    using CDP4Composition.Mvvm;
+    using CDP4Composition.Diagram;
 
     /// <summary>
-    /// Defines a DiagramPortViewModel that shall be bound to a <see cref="PortContainerDiagramContentItem"/>
+    /// Defines a DiagramPortViewModel that shall be bound to a <see cref="PortContainerDiagramContentItemViewModel"/>
     /// </summary>
-    public interface IDiagramPortViewModel : IRowViewModelBase<DiagramObject>
+    public interface IDiagramPortViewModel : IThingDiagramItemViewModel
     {
-        /// <summary>
-        /// Event handler that fires when the port position has been recalculated
-        /// </summary>
-        event EventHandler WhenPositionIsUpdated;
-
         /// <summary>
         /// Gets or sets the position
         /// </summary>
@@ -52,23 +47,19 @@ namespace CDP4CommonView.Diagram.ViewModels
         PortContainerShapeSide PortContainerShapeSide { get; set; }
 
         /// <summary>
-        /// Gets or sets the height
+        /// Determines the orientation of theport connector
         /// </summary>
-        double Height { get; set; }
-
-        /// <summary>
-        /// Gets or sets the width
-        /// </summary>
-        double Width { get; set; }
-
-        /// <summary>
-        /// Gets or sets its Parent bound
-        /// </summary>
-        Bounds ContainerBounds { get; set; }
+        void DeterminePortConnectorRotation();
 
         /// <summary>
         /// public invoker of <see cref="WhenPositionIsUpdated"/> that is fired when its position is updated
         /// </summary>
         void WhenPositionIsUpdatedInvoke();
+
+        /// <summary>
+        /// Returns the <see cref="ElementUsage"/> of this port.
+        /// </summary>
+        /// <returns>The <see cref="ElementUsage"/></returns>
+        ElementUsage GetElementUsage();
     }
 }

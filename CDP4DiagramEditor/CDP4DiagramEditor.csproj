@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{F541DA64-5C66-45FE-822C-CF93964A3F52}</ProjectGuid>
-    <MinIMEVersion>9.0.2</MinIMEVersion>
+    <MinIMEVersion>10.0.1</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4DiagramEditor</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4DiagramEditor</Product>
     <Description>COMET Diagram Editor plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>0.20.1.0</AssemblyVersion>
-    <FileVersion>0.20.1.0</FileVersion>
+    <AssemblyVersion>0.22.1.0</AssemblyVersion>
+    <FileVersion>0.22.1.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -23,10 +23,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0">
+    <None Remove="Resources\a_implies_b_16x16.png" />
+    <None Remove="Resources\a_implies_not_b_16x16.png" />
+    <None Remove="Resources\not_a_implies_b_16x16.png" />
+    <None Remove="Resources\not_a_implies_not_b_16x16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CDP4Common-CE" Version="9.0.0-716-PR210">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
+    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-716-PR210">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DynamicLanguageRuntime" Version="1.3.0" />
@@ -108,6 +114,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\ArchitectureDiagramDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -135,5 +144,11 @@
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\a_implies_b_16x16.png" />
+    <Resource Include="Resources\a_implies_not_b_16x16.png" />
+    <Resource Include="Resources\not_a_implies_b_16x16.png" />
+    <Resource Include="Resources\not_a_implies_not_b_16x16.png" />
   </ItemGroup>
 </Project>

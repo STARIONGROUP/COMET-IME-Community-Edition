@@ -5,6 +5,7 @@
                   xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+                  xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
                   Header="Advanced"
                   Orientation="Vertical"
                   mc:Ignorable="d"
@@ -31,26 +32,51 @@
             <Button Content="Copy" ToolTip="Copy Uri to Clipboard" Margin="5,0,0,0" Command="{Binding Path=CopyUriCommand}"/>
         </StackPanel>
     </dxlc:LayoutItem>
-    
-    <dxg:GridControl AllowLiveDataShaping="False"
-                         Name="PocoErrorControl"
-                         Width="Auto"
-                         ItemsSource="{Binding Path=Thing.ValidationErrors, Mode=OneWay}"
-                         SelectionMode="Row">
-        <dxg:GridControl.Columns>
-            <dxg:GridColumn Header="Errors" AllowEditing="False" DisplayMemberBinding="{Binding}" />
-        </dxg:GridControl.Columns>
-        <dxg:GridControl.View>
-            <dxg:TableView Name="View"
-                            HorizontalAlignment="Stretch"
-                            VerticalAlignment="Stretch"
-                            AllowEditing="False"
-                            AllowGrouping="False"
-                            AutoWidth="true"
-                            IsDetailButtonVisibleBinding="{x:Null}"
-                            ShowGroupPanel="False"/>
-        </dxg:GridControl.View>
-    </dxg:GridControl>
+
+    <dx:DXTabControl>
+        <dx:DXTabItem Header="Thing Preferences">
+            <dxg:GridControl Name="ThingPreferenceControl"
+                             Width="Auto"
+                             ItemsSource="{Binding Path=ThingPreferenceRowViewModels, Mode=TwoWay}"
+                             SelectionMode="Row">
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn AllowEditing="True" FieldName="Key" />
+                    <dxg:GridColumn AllowEditing="True" FieldName="Value" />
+                </dxg:GridControl.Columns>
+                <dxg:GridControl.View>
+                    <dxg:TableView HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   AllowEditing="{Binding IsOkVisible}"
+                                   AllowGrouping="False"
+                                   AutoWidth="true"
+                                   ShowDataNavigator="{Binding IsOkVisible}"
+                                   NewItemRowPosition="Bottom"
+                                   ShowGroupPanel="False"/>
+                </dxg:GridControl.View>
+            </dxg:GridControl>
+        </dx:DXTabItem>
+        <dx:DXTabItem Header="Errors">
+            <dxg:GridControl AllowLiveDataShaping="False"
+                             Name="PocoErrorControl"
+                             Width="Auto"
+                             ItemsSource="{Binding Path=Thing.ValidationErrors, Mode=OneWay}"
+                             SelectionMode="Row">
+                <dxg:GridControl.Columns>
+                    <dxg:GridColumn Header="Errors" AllowEditing="False" DisplayMemberBinding="{Binding}" />
+                </dxg:GridControl.Columns>
+                <dxg:GridControl.View>
+                    <dxg:TableView Name="View"
+                                   HorizontalAlignment="Stretch"
+                                   VerticalAlignment="Stretch"
+                                   AllowEditing="False"
+                                   AllowGrouping="False"
+                                   AutoWidth="true"
+                                   IsDetailButtonVisibleBinding="{x:Null}"
+                                   ShowGroupPanel="False"/>
+                </dxg:GridControl.View>
+            </dxg:GridControl>
+        </dx:DXTabItem>
+    </dx:DXTabControl>
 
     <dxlc:LayoutItem Label="JSON Clipboard Export:">
         <StackPanel Orientation="Horizontal">

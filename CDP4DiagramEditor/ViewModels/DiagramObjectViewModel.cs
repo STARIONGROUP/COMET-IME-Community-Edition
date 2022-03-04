@@ -33,6 +33,8 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4CommonView;
     using CDP4CommonView.Diagram;
 
+    using CDP4Composition.Diagram;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -65,9 +67,9 @@ namespace CDP4DiagramEditor.ViewModels
         private bool isDirty;
 
         /// <summary>
-        /// The <see cref="DiagramEditorViewModel"/> container
+        /// The <see cref="IDiagramEditorViewModel"/> container
         /// </summary>
-        private readonly DiagramEditorViewModel containerViewModel;
+        private readonly IDiagramEditorViewModel containerViewModel;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramObjectViewModel"/> class
@@ -75,7 +77,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="diagramObject">The <see cref="DiagramObject"/></param>
         /// <param name="session">The current <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container view-model</param>
-        public DiagramObjectViewModel(DiagramObject diagramObject, ISession session, DiagramEditorViewModel containerViewModel) : base(diagramObject, session, containerViewModel)
+        public DiagramObjectViewModel(DiagramObject diagramObject, ISession session, IDiagramEditorViewModel containerViewModel) : base(diagramObject, session, containerViewModel)
         {
             this.containerViewModel = containerViewModel;
             this.UpdateProperties();

@@ -20,12 +20,12 @@
                 <Directory Id="PROPERTYGRID" Name="CDP4PropertyGrid"/>
                 <Directory Id="REQUIREMENTS" Name="CDP4Requirements"/>
                 <Directory Id="DASHBOARD" Name="CDP4Dashboard"/>
+                <Directory Id="DIAGRAMEDITOR" Name="CDP4DiagramEditor"/>
                 <Directory Id="CROSSVIEWEDITOR" Name="CDP4CrossViewEditor"/>
                 <Directory Id="REFERENCEDATAMAPPER" Name="CDP4ReferenceDataMapper"/>
                 <Directory Id="GRAPHER" Name="CDP4Grapher"/>
                 <Directory Id="SITEDIRECTORY" Name="CDP4SiteDirectory"/>
                 <Directory Id="PRODUCTTREE" Name="CDP4ProductTree"/>                
-                <Directory Id="RELATIONSHIPEDITOR" Name="CDP4RelationshipEditor"/>
                 <Directory Id="RELATIONSHIPMATRIX" Name="CDP4RelationshipMatrix"/>
                 <Directory Id="NOTES" Name="CDP4Notes"/>
                 <Directory Id="ANNOTATIONS" Name="CDP4ANNOTATIONS"/>
