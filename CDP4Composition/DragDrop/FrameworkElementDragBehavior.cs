@@ -106,6 +106,7 @@ namespace CDP4Composition.DragDrop
                 if (Math.Abs(position.X - dragStart.X) > SystemParameters.MinimumHorizontalDragDistance
                     || Math.Abs(position.Y - dragStart.Y) > SystemParameters.MinimumVerticalDragDistance)
                 {
+                    this.dragInfo.Effects = DragDropEffects.All;
                     var dragSource = this.AssociatedObject.DataContext as IDragSource;
                     if (dragSource != null)
                     {

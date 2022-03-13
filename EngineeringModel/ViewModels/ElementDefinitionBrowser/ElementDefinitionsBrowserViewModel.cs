@@ -26,7 +26,9 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Reactive;
@@ -57,11 +59,15 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels.Dialogs;
 
+    using DevExpress.Xpf.Core;
+
     using Microsoft.Practices.ServiceLocation;
 
     using NLog;
 
     using ReactiveUI;
+
+    using IDropTarget = CDP4Composition.DragDrop.IDropTarget;
 
     /// <summary>
     /// Represent the view-model of the browser that displays all the <see cref="ElementDefinition"/>s in one <see cref="Iteration"/>
@@ -397,6 +403,35 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Queries whether a drag can be started
+        /// </summary>
+        /// <param name="dragInfo">
+        /// Information about the drag.
+        /// </param>
+        /// <remarks>
+        /// To allow a drag to be started, the <see cref="IDragInfo.Effects"/> property on <paramref name="dragInfo"/> 
+        /// should be set to a value other than <see cref="DragDropEffects.None"/>. 
+        /// </remarks>
+        public override void StartDrag(IDragInfo dragInfo)
+        {
+            var dragSource = dragInfo.Payload as IDragSource;
+            if (dragSource != null)
+            {
+                dragSource.StartDrag(dragInfo);
+                return;
+            }
+
+            // dragging list of ElementDefinitionRows (from another browser)
+            if (dragInfo.Payload is IList dragSourceListCollection)
+            {
+                var dragSourceList = dragSourceListCollection.OfType<ElementDefinitionRowViewModel>();
+                dragInfo.Payload = dragSourceList.Select(x => x.Thing).ToList();
+                dragInfo.Effects = DragDropEffects.All;
+                return;
+            }
+        }
+
+        /// <summary>
         /// Performs the drop operation
         /// </summary>
         /// <param name="dropInfo">
@@ -467,6 +502,57 @@ namespace CDP4EngineeringModel.ViewModels
                     finally
                     {
                         this.IsBusy = false;
+                    }
+                }
+
+                return;
+            }
+
+            // deal with multiselect ElementDefinitions
+            if (dropInfo.Payload is List<ElementDefinition> list)
+            {
+                foreach (var definition in list)
+                {
+                    if (definition.Iid == Guid.Empty)
+                    {
+                        logger.Debug("Copying an Element Definition that has been created as template - iid is the empty guid");
+
+                        dropInfo.Effects = DragDropEffects.Copy;
+
+                        try
+                        {
+                            this.IsBusy = true;
+                            await ElementDefinitionService.CreateElementDefinitionFromTemplate(this.Session, this.Thing, definition);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Error(e.Message);
+                            this.Feedback = e.Message;
+                        }
+                        finally
+                        {
+                            this.IsBusy = false;
+                        }
+                    }
+                    else
+                    {
+                        // copy the payload to this iteration
+                        try
+                        {
+                            this.IsBusy = true;
+
+                            var copyCreator = new CopyCreator(this.Session, this.DialogNavigationService);
+                            await copyCreator.Copy(definition, this.Thing, dropInfo.KeyStates);
+                        }
+                        catch (Exception e)
+                        {
+                            logger.Error(e.Message);
+                            this.Feedback = e.Message;
+                        }
+                        finally
+                        {
+                            this.IsBusy = false;
+                        }
                     }
                 }
             }

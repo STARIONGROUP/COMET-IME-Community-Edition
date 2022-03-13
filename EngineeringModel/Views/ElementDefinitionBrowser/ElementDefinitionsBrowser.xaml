@@ -214,7 +214,7 @@
                     <cdp4Composition:ContextMenuBehavior />
                 </dxmvvm:Interaction.Behaviors>
                 <dxg:TreeListControl.View>
-                    <dxg:TreeListView Name="View"
+                    <dragDrop:TreeListViewDragDrop Name="View"
                                       AllowEditing="False"
                                       AutoWidth="False"
                                       EditorShowMode="MouseUpFocused"
@@ -260,7 +260,7 @@
                             <cdp4Composition:TreeCellEditBehavior />
                             <cdp4Composition:TreeCellShowingEditorBehavior/>
                         </dxmvvm:Interaction.Behaviors>
-                    </dxg:TreeListView>
+                    </dragDrop:TreeListViewDragDrop>
                 </dxg:TreeListControl.View>
                 <dxg:TreeListControl.Columns>
                     <dxg:TreeListColumn FieldName="Name" Fixed="Left">

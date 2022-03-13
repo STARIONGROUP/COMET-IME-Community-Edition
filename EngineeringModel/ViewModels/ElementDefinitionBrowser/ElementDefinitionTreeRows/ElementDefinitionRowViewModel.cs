@@ -31,6 +31,8 @@ namespace CDP4EngineeringModel.ViewModels
     using ReactiveUI;
     using Utilities;
 
+    using IDropTarget = CDP4Composition.DragDrop.IDropTarget;
+
     /// <summary>
     /// The row representing an <see cref="ElementDefinition"/>
     /// </summary>
@@ -128,6 +130,12 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
+            if (dropInfo.Payload is List<ElementDefinition> list)
+            {
+                this.DragOver(dropInfo, list[0]);
+                return;
+            }
+
             if (dropInfo.Payload is ElementDefinition elementDefinition)
             {
                 this.DragOver(dropInfo, elementDefinition);
@@ -167,6 +175,14 @@ namespace CDP4EngineeringModel.ViewModels
             if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
             {
                 await this.Drop(dropInfo, parameterTypeAndScale);
+            }
+
+            if (dropInfo.Payload is List<ElementDefinition> list)
+            {
+                foreach (var definition in list)
+                {
+                    await this.Drop(dropInfo, definition);
+                }
             }
 
             if (dropInfo.Payload is ElementDefinition elementDefinition)
@@ -336,12 +352,6 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            if (!iteration.Element.Contains(elementDefinition))
-            {
-                dropinfo.Effects = DragDropEffects.None;
-                return;
-            }
-
             if (elementDefinition.TopContainer == this.Thing.TopContainer)
             {
                 dropinfo.Effects = elementDefinition.HasUsageOf(this.Thing)
@@ -350,7 +360,14 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
+                // copying from another EM
                 dropinfo.Effects = DragDropEffects.Copy;
+                return;
+            }
+
+            if (!iteration.Element.Contains(elementDefinition))
+            {
+                dropinfo.Effects = DragDropEffects.None;
             }
         }
 
