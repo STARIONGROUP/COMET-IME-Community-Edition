@@ -9,6 +9,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -293,6 +294,33 @@ namespace CDP4EngineeringModel.ViewModels
             // add new parameters
             var addedParameters = definedParameterWithoutSubscription.Except(currentParameter).ToList();
             this.AddParameterBase(addedParameters);
+        }
+
+        /// <summary>
+        /// Update this <see cref="Tooltip"/> with extra information.
+        /// </summary>
+        protected override void UpdateTooltip()
+        {
+            base.UpdateTooltip();
+
+            var sb = new StringBuilder(this.Tooltip);
+
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine("When dragging and dropping Element Definitions between models, the following modifier keys can be used:");
+            sb.AppendLine();
+            sb.AppendLine("- None: The ownership in the target model is set to the Active Domain. The values are set to the default \"-\".");
+            sb.AppendLine();
+            sb.AppendLine("- Ctrl: The ownership in the target model is set to the Active Domain. The values are set to values as defined in the source Model.");
+            sb.AppendLine();
+            sb.AppendLine("- Shift: The ownership in the target model is set to the ownership as defined in the source model. The values are set to the default \"-\".");
+            sb.AppendLine();
+            sb.AppendLine("- Ctrl + Shift: The ownership in the target model is set to the ownership as defined in the source model. The values are set to values as defined in the source Model.");
+            sb.AppendLine();
+            sb.AppendLine("NOTE: The Element Definition is always copied, including the contained Element Usages and Parameters.");
+            sb.AppendLine("NOTE: This functionality is only supported if the target server is COMET.");
+
+            this.Tooltip = sb.ToString();
         }
 
         /// <summary>

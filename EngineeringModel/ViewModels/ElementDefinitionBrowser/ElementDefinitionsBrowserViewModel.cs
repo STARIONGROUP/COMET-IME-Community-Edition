@@ -392,6 +392,15 @@ namespace CDP4EngineeringModel.ViewModels
                     }
                 }
 
+                var list = dropInfo.Payload as List<ElementDefinition>;
+                if (list != null && list.Any())
+                {
+                    dropInfo.Effects = list.First().TopContainer == this.Thing.TopContainer
+                            ? DragDropEffects.None
+                            : DragDropEffects.Copy;
+                        return;
+                }
+
                 dropInfo.Effects = DragDropEffects.None;
             }
             catch (Exception ex)
