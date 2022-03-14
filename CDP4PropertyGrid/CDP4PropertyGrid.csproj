@@ -9,8 +9,8 @@
     <Product>CDP4PropertyGrid</Product>
     <Description>COMET Property Grid Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.1.0.0</AssemblyVersion>
-    <FileVersion>9.1.0.0</FileVersion>
+    <AssemblyVersion>9.1.0.2</AssemblyVersion>
+    <FileVersion>9.1.0.2</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
