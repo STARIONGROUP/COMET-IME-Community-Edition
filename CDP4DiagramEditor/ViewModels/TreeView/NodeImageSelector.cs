@@ -70,6 +70,8 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
                     return DXImageHelper.GetImageSource("Images/Grid/FitToContent_16x16.png");
                 case DiagramEdge:
                     return DXImageHelper.GetImageSource("Images/Toolbox Items/LineItem_16x16.png");
+                case DiagramFrame:
+                    return DXImageHelper.GetImageSource("Images/Chart/BottomRightHorizontalInside_16x16.png");
                 case ElementDefinition:
                 case ElementUsage:
                 case DomainOfExpertise:

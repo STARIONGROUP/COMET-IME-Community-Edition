@@ -197,6 +197,9 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
                 case DiagramEdge edge:
                     this.Name = edge.DepictedThing == null ? $"<<SimpleConnector>> {edge.Name}" : $"<<{edge.DepictedThing.ClassKind}>> {edge.DepictedThing.UserFriendlyName} ({edge.DepictedThing.UserFriendlyShortName})";
                     break;
+                case DiagramFrame frame:
+                    this.Name = frame.DepictedThing == null ? $"<<Frame>> {frame.Name}" : $"<<{frame.DepictedThing.ClassKind}>> {frame.DepictedThing.UserFriendlyName} ({frame.DepictedThing.UserFriendlyShortName})";
+                    break;
                 case Parameter param:
                     this.Name = param.ParameterType?.Name;
                     break;

@@ -34,6 +34,7 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4CommonView.Diagram.Views;
 
     using CDP4Composition.Diagram;
+    using CDP4Composition.Utilities;
 
     using DevExpress.Xpf.Diagram;
 
@@ -77,8 +78,14 @@ namespace CDP4DiagramEditor.ViewModels
                 return false;
             }
 
+            var targetCategories = targetElementUsage.GetAllCategories();
+            var targetConsideredCategories = targetCategories.Except(targetCategories.Where(c => c.GetThingPreference("gcd_port") == "gcd_port_optional"));
+
+            var sourceCategories = sourceElementUsage.GetAllCategories();
+            var sourceConsideredCategories = sourceCategories.Except(sourceCategories.Where(c => c.GetThingPreference("gcd_port") == "gcd_port_optional"));
+
             // mismatching Categories on Ports
-            return new HashSet<Category>(targetElementUsage.GetAllCategories()).SetEquals(sourceElementUsage.GetAllCategories());
+            return new HashSet<Category>(targetConsideredCategories).SetEquals(sourceConsideredCategories);
         }
     }
 }
