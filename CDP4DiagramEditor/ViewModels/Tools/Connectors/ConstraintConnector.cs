@@ -27,6 +27,8 @@ namespace CDP4DiagramEditor.ViewModels
 {
     using CDP4Common.EngineeringModelData;
 
+    using CDP4CommonView.Diagram.Views;
+
     using CDP4Composition.Diagram;
 
     using DevExpress.Diagram.Core;
@@ -53,7 +55,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <returns>True if allowed</returns>
         public override bool CanDrawFrom(DiagramItem item)
         {
-            return (((item as DiagramContentItem)?.Content as ElementDefinitionDiagramContentItemViewModel)?.Thing is ElementDefinition);
+            return (item is DiagramPortShape) || (((item as DiagramContentItem)?.Content as ElementDefinitionDiagramContentItemViewModel)?.Thing is ElementDefinition);
         }
 
         /// <summary>
@@ -68,7 +70,7 @@ namespace CDP4DiagramEditor.ViewModels
                 return false;
             }
 
-            return (((item as DiagramContentItem)?.Content as ElementDefinitionDiagramContentItemViewModel)?.Thing is ElementDefinition);
+            return (item is DiagramPortShape) || (((item as DiagramContentItem)?.Content as ElementDefinitionDiagramContentItemViewModel)?.Thing is ElementDefinition);
         }
     }
 }

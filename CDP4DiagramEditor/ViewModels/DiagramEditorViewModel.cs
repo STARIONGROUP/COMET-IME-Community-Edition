@@ -438,7 +438,7 @@ namespace CDP4DiagramEditor.ViewModels
                     case BinaryRelationship relationship:
                         if (relationship.IsConstraint())
                         {
-                            newDrawnDiagramElement = new ConstraintEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
+                            //newDrawnDiagramElement = new ConstraintEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
                             break;
                         }
 
@@ -459,7 +459,10 @@ namespace CDP4DiagramEditor.ViewModels
                         break;
                 }
 
-                this.ConnectorViewModels.Add(newDrawnDiagramElement);
+                if (newDrawnDiagramElement != null)
+                {
+                    this.ConnectorViewModels.Add(newDrawnDiagramElement);
+                }
             }
 
             this.UpdateIsDirty();
@@ -1483,7 +1486,7 @@ namespace CDP4DiagramEditor.ViewModels
             if (binaryRelationships is not null)
             {
                 // interfaces are bunary relationships between two EUs with interface end kind set to not NONE
-                var interfaces = binaryRelationships.Where(br => InterfaceConnectorTool.IsThingAnInterfaceEnd(br.Source) && InterfaceConnectorTool.IsThingAnInterfaceEnd(br.Target));
+                var interfaces = binaryRelationships.Where(br => !br.IsConstraint() & InterfaceConnectorTool.IsThingAnInterfaceEnd(br.Source) && InterfaceConnectorTool.IsThingAnInterfaceEnd(br.Target));
 
                 foreach (var iface in interfaces)
                 {
@@ -1503,6 +1506,28 @@ namespace CDP4DiagramEditor.ViewModels
                     }
 
                     InterfaceConnectorTool.CreateConnector(iface, (DiagramPort) source.DiagramThing, (DiagramPort) target.DiagramThing, this.Behavior);
+                }
+
+                // constraints
+                var constraints = binaryRelationships.Where(br => br.IsConstraint());
+
+                foreach (var constraint in constraints)
+                {
+                    if (existingConnectors.Any(c => c.Thing.Equals(constraint)))
+                    {
+                        continue;
+                    }
+
+                    // only draw if both source and target are on the canvas
+                    var source = this.ThingDiagramItemViewModels.FirstOrDefault(p => p.Thing != null && p.Thing.Equals(constraint.Source));
+                    var target = this.ThingDiagramItemViewModels.FirstOrDefault(p => p.Thing != null && p.Thing.Equals(constraint.Target));
+
+                    if (source == null || target == null)
+                    {
+                        continue;
+                    }
+
+                    ConstraintConnectorTool.CreateConnector(constraint, (DiagramShape)source.DiagramThing, (DiagramShape)target.DiagramThing, this.Behavior);
                 }
             }
         }

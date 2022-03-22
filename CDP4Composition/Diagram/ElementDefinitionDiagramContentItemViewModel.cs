@@ -49,7 +49,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// Represents an <see cref="ElementDefinition"/> to be used in a Diagram
     /// </summary>
-    public class ElementDefinitionDiagramContentItemViewModel : PortContainerDiagramContentItemViewModel, IDiagramContentItemChildren
+    public class ElementDefinitionDiagramContentItemViewModel : PortContainerDiagramContentItemViewModel, IDiagramContentItemChildren, IConstrainableDiagramContentItem
     {
         /// <summary>
         /// Backing fied for <see cref="IsTopDiagramElement"/>

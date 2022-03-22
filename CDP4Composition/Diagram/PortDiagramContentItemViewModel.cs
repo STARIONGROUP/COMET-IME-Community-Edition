@@ -47,7 +47,7 @@ namespace CDP4Composition.Diagram
     /// <summary>
     /// The view model representing a diagram port that shall be bound to a <see cref="PortContainerDiagramContentItemViewModel" />
     /// </summary>
-    public class PortDiagramContentItemViewModel : ThingDiagramContentItemViewModel, IDiagramPortViewModel
+    public class PortDiagramContentItemViewModel : ThingDiagramContentItemViewModel, IDiagramPortViewModel, IConstrainableDiagramContentItem
     {
         /// <summary>
         /// Backing field for <see cref="EndKind"/>

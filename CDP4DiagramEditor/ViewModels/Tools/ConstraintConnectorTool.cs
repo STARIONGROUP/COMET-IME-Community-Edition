@@ -46,6 +46,8 @@ namespace CDP4DiagramEditor.ViewModels.Tools
 
     using NLog;
 
+    using DiagramShape = CDP4Common.DiagramData.DiagramShape;
+
     /// <summary>
     /// A connector tool to create Constraints
     /// </summary>
@@ -116,8 +118,8 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         protected async Task ExecuteCreate(DiagramConnector connector, ICdp4DiagramBehavior behavior, ConstraintKind kind)
         {
             this.DummyConnector = connector;
-            var beginItemContent = ((DiagramContentItem)connector.BeginItem)?.Content as ElementDefinitionDiagramContentItemViewModel;
-            var endItemContent = ((DiagramContentItem)connector.EndItem)?.Content as ElementDefinitionDiagramContentItemViewModel;
+            var beginItemContent = ((DiagramContentItem)connector.BeginItem)?.Content as IConstrainableDiagramContentItem ?? ((DiagramContentItem)connector.BeginItem)?.DataContext as IConstrainableDiagramContentItem;
+            var endItemContent = ((DiagramContentItem)connector.EndItem)?.Content as IConstrainableDiagramContentItem ?? ((DiagramContentItem)connector.EndItem)?.DataContext as IConstrainableDiagramContentItem;
 
             if (beginItemContent == null || endItemContent == null)
             {
@@ -130,8 +132,8 @@ namespace CDP4DiagramEditor.ViewModels.Tools
                 var iteration = (Iteration)behavior.ViewModel.Thing.Container;
                 var createCategory = DiagramRDLHelper.GetOrAddConstraintCategory(iteration, kind, out var category, out var rdlClone);
 
-                var relationship = await this.ThingCreator.CreateAndGetConstraint(beginItemContent.Thing as ElementDefinition, endItemContent.Thing as ElementDefinition, category, createCategory ? rdlClone : null, iteration, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise(iteration), behavior.ViewModel.Session);
-                CreateConnector(relationship, (DiagramObject)beginItemContent.DiagramThing, (DiagramObject)endItemContent.DiagramThing, behavior);
+                var relationship = await this.ThingCreator.CreateAndGetConstraint(beginItemContent.Thing as ElementBase, endItemContent.Thing as ElementBase, category, createCategory ? rdlClone : null, iteration, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise(iteration), behavior.ViewModel.Session);
+                CreateConnector(relationship, (DiagramShape)beginItemContent.DiagramThing, (DiagramShape)endItemContent.DiagramThing, behavior);
             }
             catch (Exception ex)
             {
@@ -150,7 +152,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <param name="source">The <see cref="DiagramObject" /> source</param>
         /// <param name="target">The <see cref="DiagramObject" /> target</param>
         /// <param name="behavior">The diagram bahavior</param>
-        public static void CreateConnector(BinaryRelationship relationship, DiagramObject source, DiagramObject target, ICdp4DiagramBehavior behavior)
+        public static void CreateConnector(BinaryRelationship relationship, DiagramShape source, DiagramShape target, ICdp4DiagramBehavior behavior)
         {
             var connectorItem = behavior.ViewModel.ConnectorViewModels.SingleOrDefault(x => x.Thing == relationship);
 

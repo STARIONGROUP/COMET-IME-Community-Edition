@@ -43,7 +43,7 @@ namespace CDP4DiagramEditor.ViewModels
     /// <summary>
     /// View model for a Constraint diagram edge
     /// </summary>
-    public class ConstraintEdgeViewModel : DrawnDiagramEdgeViewModel, IPersistedConnector
+    public class ConstraintEdgeViewModel : DrawnDiagramEdgeViewModel, IGeneratedConnector
     {
         /// <summary>
         /// Backing field for <see cref="ConstraintKind"/>

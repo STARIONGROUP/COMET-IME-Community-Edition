@@ -204,7 +204,7 @@ namespace CDP4DiagramEditor.ViewModels.TreeView
                     this.Name = param.ParameterType?.Name;
                     break;
                 case BinaryRelationship br:
-                    this.Name = $"<<{br.ClassKind}>> {br.UserFriendlyName} ({br.UserFriendlyShortName})";
+                    this.Name = $"<<{br.ClassKind}>> {br.Name} {br.UserFriendlyName} ({br.UserFriendlyShortName})";
                     break;
                 default:
                     this.Name = $"<<{this.Thing.ClassKind}>> {(this.Thing as DefinedThing)?.Name ?? "Undefined Object"} ({(this.Thing as DefinedThing)?.ShortName ?? "undefined"})";

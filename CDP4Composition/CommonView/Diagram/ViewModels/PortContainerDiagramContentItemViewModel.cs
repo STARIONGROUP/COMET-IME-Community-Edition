@@ -124,7 +124,7 @@ namespace CDP4CommonView.Diagram.ViewModels
                 rightSide[index].WhenPositionIsUpdatedInvoke();
             }
 
-            this.containerViewModel.Behavior.RerouteConnectors();
+            //this.containerViewModel.Behavior.RerouteConnectors();
         }
 
         /// <summary>
@@ -145,7 +145,7 @@ namespace CDP4CommonView.Diagram.ViewModels
         {
             var presentPort = (double)this.PortCollection.Count(p => p.PortContainerShapeSide == side);
             var sideLength = side == PortContainerShapeSide.Left || side == PortContainerShapeSide.Right ? (this.DiagramRepresentation as DiagramItem).ActualHeight : (this.DiagramRepresentation as DiagramItem).ActualWidth;
-            var portion = ((100 / (presentPort + 1)) / 100) * sideLength;
+            var portion = ((100 / ((presentPort % 2 != 0 ? presentPort + 1 : presentPort) + 1)) / 100) * sideLength;
             return portion;
         }
 

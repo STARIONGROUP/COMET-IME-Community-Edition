@@ -18,6 +18,7 @@
         <lc:LayoutGroup Orientation="Vertical">
             <lc:LayoutItem>
                 <dxe:TextEdit MinHeight="150"
+                              MaxHeight="300"
                               VerticalScrollBarVisibility="Auto"
                               AcceptsReturn="True"
                               VerticalContentAlignment="Top"

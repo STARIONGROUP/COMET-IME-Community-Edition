@@ -302,9 +302,9 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         public void RerouteConnectors()
         {
-            var connectors = this.AssociatedObject.Items.OfType<DiagramConnector>().ToList();
+            var connectors = this.AssociatedObject.Items.OfType<DiagramConnector>();
 
-            if (connectors.Count == 0)
+            if (connectors.Count() == 0)
             {
                 return;
             }
