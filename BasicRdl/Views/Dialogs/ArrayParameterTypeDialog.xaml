@@ -24,6 +24,7 @@
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
+        
     </dx:DXWindow.Resources>
     <dxlc:LayoutControl Margin="5" Orientation="Vertical">
         <dxlc:LayoutGroup Height="450"
@@ -89,7 +90,7 @@
                                     </dxg:GridColumn.DisplayTemplate>
                                 </dxg:GridColumn>
 
-                                <dxg:GridColumn FieldName="Coordinates" Width="50">
+                                <dxg:GridColumn FieldName="Coordinates" AllowEditing="False">
                                     <dxg:GridColumn.CellTemplate>
                                         <DataTemplate>
                                             <dxe:TextEdit Name="Coordinates"
@@ -101,19 +102,7 @@
                                     </dxg:GridColumn.CellTemplate>
                                 </dxg:GridColumn>
 
-                                <dxg:GridColumn AllowEditing="True" FieldName="ShortName">
-                                    <dxg:GridColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <dxe:TextEdit Name="PART_Editor"
-                                                          EditValue="{Binding RowData.Row.ShortName,
-                                                                              Mode=TwoWay,
-                                                                              ValidatesOnDataErrors=True,
-                                                                              UpdateSourceTrigger=PropertyChanged}"
-                                                          IsReadOnly="{Binding RowData.Row.IsReadOnly}"
-                                                          ShowError="True" />
-                                        </DataTemplate>
-                                    </dxg:GridColumn.CellTemplate>
-                                </dxg:GridColumn>
+                                <dxg:GridColumn AllowEditing="{Binding IsOkVisible}" FieldName="ShortName"/>
 
                                 <dxg:GridColumn FieldName="ParameterType" Header="Parameter Type">
                                     <dxg:GridColumn.CellTemplate>

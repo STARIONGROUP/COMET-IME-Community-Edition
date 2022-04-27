@@ -107,18 +107,9 @@
                                         </ControlTemplate>
                                     </dxg:GridColumn.DisplayTemplate>
                                 </dxg:GridColumn>
-                                
+
                                 <dxg:GridColumn FieldName="ShortName" 
-                                                AllowEditing="True">
-                                    <dxg:GridColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <dxe:TextEdit Name="PART_Editor"
-                                                          EditValue="{Binding RowData.Row.ShortName, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"
-                                                          IsReadOnly="{Binding RowData.Row.IsReadOnly}"
-                                                          ShowError="True">
-                                            </dxe:TextEdit>
-                                        </DataTemplate>
-                                    </dxg:GridColumn.CellTemplate>
+                                                AllowEditing="{Binding IsOkVisible}">
                                 </dxg:GridColumn>
 
                                 <dxg:GridColumn Header="Parameter Type" FieldName="ParameterType">
