@@ -155,7 +155,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             var currentIterationSetup = this.Thing.IterationSetup;
             var newparticipant = this.Thing.Participant.Except(this.participantFolderRow.ContainedRows.Select(x => (Participant)x.Thing)).ToList();
-            var newiteration = currentIterationSetup.Except(this.iterationSetupFolderRow.ContainedRows.Select(x => (IterationSetup)x.Thing)).ToList();
+            var newiteration = currentIterationSetup.Except(this.iterationSetupFolderRow.ContainedRows.Select(x => (IterationSetup)x.Thing)).ToList().OrderBy(i => i.CreatedOn);
             var newDomain = this.Thing.ActiveDomain.Except(this.activeDomainFolderRow.ContainedRows.Select(x => (DomainOfExpertise)x.Thing)).ToList();
             var newOrganizations = this.Thing.OrganizationalParticipant.Except(this.organizationFolderRow.ContainedRows.Select(x => ((OrganizationalParticipationRowViewModel)x).OrganizationalParticipation)).ToList();
 
