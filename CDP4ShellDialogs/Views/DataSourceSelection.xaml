@@ -7,7 +7,7 @@
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
-             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition" xmlns:dxe1="clr-namespace:DevExpress.Xpf.Core;assembly=DevExpress.Xpf.Core.v20.2"
+             xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              Title="Data Source Selection"
              SizeToContent="Height"
              dx:ThemeManager.ThemeName="Seven"
@@ -117,7 +117,7 @@
                                                   Visibility="{Binding ElementName=ShowPasswordBox,
                                                        Path=IsChecked,
                                                        Converter={dx:BooleanToVisibilityConverter}}" />
-                                    <dxe1:SimpleButton x:Name="ShowPasswordBox"
+                                    <dx:SimpleButton x:Name="ShowPasswordBox"
                                               Grid.Column="1"
                                               Margin="10,0,10,0"
                                               Content="Show"
