@@ -114,13 +114,13 @@
                                                   EditValue="{Binding ElementName=PasswordBoxEdit,
                                                   Path=Password,
                                                   Mode=TwoWay}"
-                                                  Visibility="{Binding ElementName=ShowPasswordBox,
-                                                       Path=IsChecked,
+                                                  Visibility="{Binding IsPasswordVisible,
                                                        Converter={dx:BooleanToVisibilityConverter}}" />
                                     <dx:SimpleButton x:Name="ShowPasswordBox"
                                               Grid.Column="1"
-                                              Margin="10,0,10,0"
-                                              Content="Show"
+                                              Margin="10,0,10,0"                                              
+                                              IsChecked="{Binding IsPasswordVisible}"
+                                              Content="{Binding ShowPasswordButtonText}"
                                               ButtonKind="Toggle"/>
                                 </Grid>
                             </dxlc:LayoutItem>
