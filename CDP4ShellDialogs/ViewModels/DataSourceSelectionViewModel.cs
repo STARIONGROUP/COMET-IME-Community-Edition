@@ -130,6 +130,16 @@ namespace CDP4ShellDialogs.ViewModels
         private IDialogNavigationService dialogNavigationService;
 
         /// <summary>
+        /// Backing field for the <see cref="IsPasswordVisible"/> property
+        /// </summary>
+        private bool isPasswordVisible;
+
+        /// <summary>
+        /// Backing field for the <see cref="ShowPasswordButtonText"/> property
+        /// </summary>
+        private string showPasswordButtonText;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceSelectionViewModel"/> class.
         /// </summary>
         /// <param name="dialogNavigationService">An instance of <see cref="IDialogNavigationService"/>.</param>
@@ -147,6 +157,7 @@ namespace CDP4ShellDialogs.ViewModels
             this.AvailableDataSourceKinds.ChangeTrackingEnabled = true;
 
             this.WhenAnyValue(vm => vm.IsProxyEnabled).Subscribe(_ => this.UpdateProxyAddressProperty());
+            this.WhenAnyValue(vm => vm.IsPasswordVisible).Subscribe(_ => this.ChangeShowPasswordButtonText());
             
             var canOk = this.WhenAnyValue(
                 vm => vm.UserName,
@@ -177,6 +188,9 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.OpenProxyConfigurationCommand = ReactiveCommand.Create();
             this.OpenProxyConfigurationCommand.Subscribe(_ => this.ExecuteOpenProxyConfigurationCommand());
+
+            // Set the initial show password button value to Show         
+            this.IsPasswordVisible = false;      
 
             canBrowse.Subscribe(_ => this.ResetBrowseButton());
 
@@ -324,6 +338,38 @@ namespace CDP4ShellDialogs.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref this.password, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the visibility of password
+        /// </summary>
+        public bool IsPasswordVisible
+        {
+            get
+            {
+                return this.isPasswordVisible;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.isPasswordVisible, value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the show password button text
+        /// </summary>
+        public string ShowPasswordButtonText
+        {
+            get
+            {
+                return this.showPasswordButtonText;
+            }
+
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.showPasswordButtonText, value);
             }
         }
 
@@ -696,6 +742,21 @@ namespace CDP4ShellDialogs.ViewModels
         private string TrimUri(string input)
         {
            return input.EndsWith("/") ? input.Substring(0, input.Length - 1) : input;
+        }
+
+        /// <summary>
+        /// Changes the value of the show/hide password button
+        /// </summary>
+        private void ChangeShowPasswordButtonText()
+        {
+            if (this.IsPasswordVisible)
+            {
+                this.ShowPasswordButtonText = "Hide";
+            }
+            else
+            {
+                this.ShowPasswordButtonText = "Show";
+            }
         }
     }
 }
