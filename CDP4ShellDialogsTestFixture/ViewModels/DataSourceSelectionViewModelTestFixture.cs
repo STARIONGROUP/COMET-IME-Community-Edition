@@ -215,5 +215,17 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             Assert.AreEqual(string.Empty, vm.ProxyUri);
             Assert.AreEqual(string.Empty, vm.ProxyPort);
         }
+
+        [Test]
+        public void AssertThatShowPasswordButtonTextMatchesState()
+        {
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
+            // When password is hidden button should be Show
+            viewmodel.IsPasswordVisible = false;
+            Assert.AreEqual(viewmodel.ShowPasswordButtonText, "Show");
+            // When password is visible it should show Hide
+            viewmodel.IsPasswordVisible = true;
+            Assert.AreEqual(viewmodel.ShowPasswordButtonText, "Hide");
+        }
     }
 }
