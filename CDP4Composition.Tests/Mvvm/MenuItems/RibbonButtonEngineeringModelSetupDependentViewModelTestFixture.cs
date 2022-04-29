@@ -118,6 +118,34 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
             Assert.AreEqual(0, this.viewModel.EngineeringModelSetups.Count);
 
         }
+        
+        [Test]
+        public void VerifyThatMenuItemsAreSortedAlphabetically()
+        {
+            Assert.IsEmpty(this.viewModel.EngineeringModelSetups);
+
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            CDPMessageBus.Current.SendMessage(openSessionEvent);
+
+            var siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            siteDirectory.Model.Add(engineeringModelSetup);
+
+            var engineeringModelOne = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            engineeringModelOne.EngineeringModelSetup = engineeringModelSetup;
+
+            CDPMessageBus.Current.SendObjectChangeEvent(engineeringModelSetup, EventKind.Added);
+            var sessionEngineeringModelSetupMenuGroupViewModel = this.viewModel.EngineeringModelSetups.SingleOrDefault(x => x.Thing == engineeringModelSetup.Container);
+            var menuItem = new RibbonMenuItemEngineeringModelSetupDependentViewModel(engineeringModelSetup, session.Object, null);
+            sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.Add(menuItem);
+            
+            var menuItemTwo = new RibbonMenuItemEngineeringModelSetupDependentViewModel(engineeringModelSetup, session.Object, null);
+            sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.Add(menuItemTwo);
+            
+            Assert.AreEqual(3, sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.Count);
+            var sortedList = sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.OrderBy(em => em.MenuItemContent);
+            Assert.AreEqual(sortedList, sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups);
+        }
 
         private class TestClass : RibbonButtonEngineeringModelSetupDependentViewModel
         {

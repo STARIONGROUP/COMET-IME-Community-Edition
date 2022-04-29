@@ -125,6 +125,9 @@ namespace CDP4Composition.Mvvm
 
             var menuItem = new RibbonMenuItemEngineeringModelSetupDependentViewModel(engineeringModelSetup, session, this.InstantiatePanelViewModelFunction);
             sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.Add(menuItem);
+
+            // Sort the list alphabetically
+            sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.Sort((x,y) => x.MenuItemContent.CompareTo(y.MenuItemContent));
         }
 
         /// <summary>
