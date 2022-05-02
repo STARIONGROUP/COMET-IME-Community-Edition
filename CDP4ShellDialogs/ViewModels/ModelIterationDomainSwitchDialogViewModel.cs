@@ -108,7 +108,6 @@ namespace CDP4ShellDialogs.ViewModels
                 if (openIteration != null)
                 {
                     session.SwitchDomain(modelrow.IterationIid, modelrow.SelectedDomain);
-                    modelrow.ActiveParticipant.SelectedDomain = modelrow.SelectedDomain;
                 }
             }
 

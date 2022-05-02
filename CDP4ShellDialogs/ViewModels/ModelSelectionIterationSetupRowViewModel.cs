@@ -48,10 +48,15 @@ namespace CDP4ShellDialogs.ViewModels
             if (participant.Domain.Count != 0)
             {
                 this.DomainOfExpertises.AddRange(participant.Domain.OrderBy(x => x.ShortName));
-
-                this.SelectedDomain = this.DomainOfExpertises.Contains(this.ActiveParticipant.SelectedDomain)
-                    ? this.ActiveParticipant.SelectedDomain
-                    : this.DomainOfExpertises.First();
+                
+                var iteration = this.Session.OpenIterations.Keys.FirstOrDefault(i => i.IterationSetup.IterationIid == this.Thing.IterationIid);
+                if (iteration != null)
+                {
+                    var selectedDomain = this.Session.QuerySelectedDomainOfExpertise(iteration);
+                    this.SelectedDomain = this.DomainOfExpertises.Contains(selectedDomain)
+                        ? selectedDomain
+                        : this.DomainOfExpertises.First();
+                }
             }
 
             this.Name = "iteration_" + this.Thing.IterationNumber.ToString(CultureInfo.InvariantCulture);
