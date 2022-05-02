@@ -49,8 +49,6 @@ namespace CDP4ShellDialogs.ViewModels
             {
                 this.DomainOfExpertises.AddRange(participant.Domain.OrderBy(x => x.ShortName));
 
-                var selectedDomain2 = this.ActiveParticipant.SelectedDomain.Name;
-
                 this.SelectedDomain = this.DomainOfExpertises.Contains(this.ActiveParticipant.SelectedDomain)
                     ? this.ActiveParticipant.SelectedDomain
                     : this.DomainOfExpertises.First();
