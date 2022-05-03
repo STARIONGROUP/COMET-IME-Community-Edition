@@ -1,5 +1,5 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ModelSelectionEngineeringModelSetupRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="SwitchDomainEngineeringModelSetupRowViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2022 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ namespace CDP4ShellDialogs.ViewModels
     public class SwitchDomainEngineeringModelSetupRowViewModel : CDP4CommonView.EngineeringModelSetupRowViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ModelSelectionEngineeringModelSetupRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="SwitchDomainEngineeringModelSetupRowViewModel"/> class
         /// </summary>
         /// <param name="engineeringModelSetup">
         /// The engineering Model Setup.
@@ -30,18 +30,18 @@ namespace CDP4ShellDialogs.ViewModels
             : base(engineeringModelSetup, session, null)
         {
             this.IterationSetupRowViewModels = new DisposableReactiveList<SwitchDomainIterationSetupRowViewModel>();
-            this.InitializeContainers();
+            this.InitializeContainedRows();
         }
 
         /// <summary>
-        /// Gets the <see cref="IterationSetupRowViewModel"/> that are contained by the row-view-model
+        /// Gets the <see cref="SwitchDomainIterationSetupRowViewModel"/> that are contained by the row-view-model
         /// </summary>
         public DisposableReactiveList<SwitchDomainIterationSetupRowViewModel> IterationSetupRowViewModels { get; private set; }
 
         /// <summary>
-        /// Initializes containers
+        /// Initializes contained rows
         /// </summary>
-        private void InitializeContainers()
+        private void InitializeContainedRows()
         {
             var iterationSetups = this.Session.OpenIterations.Keys.Select(i => i.IterationSetup).Where(i => i.Container.Iid.Equals(this.Thing.Iid));
 

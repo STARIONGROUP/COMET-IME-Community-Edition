@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ModelSelectionSessionRowViewModel.cs" company="RHEA System S.A.">
+// <copyright file="SwitchDomainSessionRowViewModel.cs" company="RHEA System S.A.">
 //   Copyright (c) 2015-2022 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -16,12 +16,12 @@ namespace CDP4ShellDialogs.ViewModels
     using CDP4Dal;
 
     /// <summary>
-    /// The purpose of the <see cref="SessionRowViewModel"/> is to represent a <see cref="Session"/> and its <see cref="SiteDirectory"/>
+    /// The purpose of the <see cref="SwitchDomainSessionRowViewModel"/> is to represent a <see cref="Session"/> and its <see cref="SiteDirectory"/>
     /// </summary>
     public class SwitchDomainSessionRowViewModel : SiteDirectoryRowViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ModelSelectionSessionRowViewModel"/> class. 
+        /// Initializes a new instance of the <see cref="SwitchDomainSessionRowViewModel"/> class. 
         /// </summary>
         /// <param name="siteDirectory">
         /// The <see cref="SiteDirectory"/> that is represented by the row-view-model
@@ -50,17 +50,17 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="EngineeringModelSetupRowViewModel"/> that are contained by the row-view-model
+        /// Gets the <see cref="SwitchDomainEngineeringModelSetupRowViewModel"/> that are contained by the row-view-model
         /// </summary>
         public DisposableReactiveList<SwitchDomainEngineeringModelSetupRowViewModel> EngineeringModelSetupRowViewModels { get; private set; }
-        
+
         /// <summary>
-        /// Add a <see cref="EngineeringModelSetupRowViewModel"/> to the list of <see cref="EngineeringModelSetup"/>s
+        /// Add a <see cref="SwitchDomainEngineeringModelSetupRowViewModel"/> to the list of <see cref="EngineeringModelSetup"/>s
         /// </summary>
-        /// <param name="model">The <see cref="EngineeringModelSetup"/> that is to be added</param>
-        private void AddModelRowViewModel(EngineeringModelSetup model)
+        /// <param name="engineeringModelSetup">The <see cref="EngineeringModelSetup"/> that is to be added</param>
+        private void AddModelRowViewModel(EngineeringModelSetup engineeringModelSetup)
         {
-            var row = new SwitchDomainEngineeringModelSetupRowViewModel(model, this.Session);
+            var row = new SwitchDomainEngineeringModelSetupRowViewModel(engineeringModelSetup, this.Session);
             this.EngineeringModelSetupRowViewModels.Add(row);
         }
 

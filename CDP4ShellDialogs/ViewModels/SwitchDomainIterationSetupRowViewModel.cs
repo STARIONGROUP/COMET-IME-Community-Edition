@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ModelSelectionIterationSetupRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="SwitchDomainIterationSetupRowViewModel.cs" company="RHEA System S.A.">
+//   Copyright (c) 2015-2022 RHEA System S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace CDP4ShellDialogs.ViewModels
         private DomainOfExpertise selectedDomain;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ModelIterationDomainSwitchDialogViewModel"/> class. 
+        /// Initializes a new instance of the <see cref="SwitchDomainIterationSetupRowViewModel"/> class. 
         /// </summary>
         /// <param name="iterationSetup">
         /// The <see cref="IterationSetup"/> this is associated to

@@ -47,7 +47,7 @@ namespace CDP4ShellDialogs.ViewModels
         public string DialogTitle => "Switch Domain";
 
         /// <summary>
-        /// Gets the list of <see cref="BaseRowViewModel"/> available
+        /// Gets the list of <see cref="SwitchDomainSessionRowViewModel"/> available
         /// </summary>
         public DisposableReactiveList<SwitchDomainSessionRowViewModel> SessionsAvailable { get; private set; }
 
@@ -145,7 +145,7 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Filters the <see cref="SelectedIterations"/> added items to only select <see cref="IterationSetupRowViewModel"/>
+        /// Filters the <see cref="SelectedIterations"/> added items to only select <see cref="SwitchDomainIterationSetupRowViewModel"/>
         /// </summary>
         /// <param name="row">the added row-view-model</param>
         private void FilterIterationSelectionItems(IViewModelBase<Thing> row)
