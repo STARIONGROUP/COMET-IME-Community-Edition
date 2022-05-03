@@ -246,7 +246,7 @@
 &lt;copyright file="$FILENAME$" company="RHEA System S.A."&gt;&#xD;
    Copyright (c) 2015-$CURRENT_YEAR$ RHEA System S.A.&#xD;
 &#xD;
-   Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed.&#xD;
+   Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Omar Elebiary&#xD;
 &#xD;
    This file is part of CDP4-IME Community Edition. &#xD;
    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration&#xD;

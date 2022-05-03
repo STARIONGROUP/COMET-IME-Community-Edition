@@ -1,8 +1,27 @@
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelIterationDomainSwitchDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Omar Elebiary
+// 
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+// 
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ShellDialogs.ViewModels
 {
@@ -13,22 +32,27 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
+
     using CDP4Dal;
+
     using ReactiveUI;
 
     /// <summary>
-    /// The ViewModel for the <see cref="ModelSelection"/> Dialog
+    /// The ViewModel for the Domain Switch Dialog
     /// </summary>
     public class ModelIterationDomainSwitchDialogViewModel : DialogViewModelBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ModelClosingDialogViewModel"/> class. 
+        /// Initializes a new instance of the <see cref="ModelClosingDialogViewModel" /> class.
         /// </summary>
         /// <param name="sessionAvailable">
         /// The session Available.
@@ -47,22 +71,22 @@ namespace CDP4ShellDialogs.ViewModels
         public string DialogTitle => "Switch Domain";
 
         /// <summary>
-        /// Gets the list of <see cref="SwitchDomainSessionRowViewModel"/> available
+        /// Gets the list of <see cref="SwitchDomainSessionRowViewModel" /> available
         /// </summary>
         public DisposableReactiveList<SwitchDomainSessionRowViewModel> SessionsAvailable { get; private set; }
 
         /// <summary>
-        /// Gets the list of <see cref="IterationSetup"/> selected
+        /// Gets the list of <see cref="IterationSetup" /> selected
         /// </summary>
         public ReactiveList<IViewModelBase<Thing>> SelectedIterations { get; set; }
 
         /// <summary>
-        /// Gets the Select <see cref="ICommand"/>
+        /// Gets the Switch <see cref="ICommand" />
         /// </summary>
         public ReactiveCommand<Unit> SwitchCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Cancel <see cref="ICommand"/>
+        /// Gets the Cancel <see cref="ICommand" />
         /// </summary>
         public ReactiveCommand<object> CancelCommand { get; private set; }
 
@@ -73,16 +97,17 @@ namespace CDP4ShellDialogs.ViewModels
         {
             this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>> { ChangeTrackingEnabled = true };
             this.IsBusy = false;
-            
+
             var canOk = this.WhenAnyValue(x => x.SelectedIterations.Count, count => count != 0);
 
             this.SwitchCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteDomainSwitch(), RxApp.MainThreadScheduler);
-            
-            this.SwitchCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
-            {
-                this.ErrorMessage = x.Message;
-                this.IsBusy = false;
-            });
+
+            this.SwitchCommand.ThrownExceptions.Select(ex => ex).Subscribe(
+                x =>
+                {
+                    this.ErrorMessage = x.Message;
+                    this.IsBusy = false;
+                });
 
             this.CancelCommand = ReactiveCommand.Create();
             this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
@@ -95,7 +120,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// Executes the Close command
         /// </summary>
         /// <returns>
-        /// The <see cref="Task"/>.
+        /// The <see cref="Task" />.
         /// </returns>
         private async Task ExecuteDomainSwitch()
         {
@@ -108,6 +133,7 @@ namespace CDP4ShellDialogs.ViewModels
                 var session = modelrow.Session;
 
                 var openIteration = session.OpenIterations.Keys.FirstOrDefault(x => x.Iid == modelrow.IterationIid);
+
                 if (openIteration != null)
                 {
                     session.SwitchDomain(modelrow.IterationIid, modelrow.SelectedDomain);
@@ -131,7 +157,7 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Populates <see cref="SessionsAvailable"/> from the list of <see cref="Session"/>s available
+        /// Populates <see cref="SessionsAvailable" /> from the list of <see cref="Session" />s available
         /// </summary>
         /// <param name="sessions">
         /// The sessions.
@@ -145,12 +171,14 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Filters the <see cref="SelectedIterations"/> added items to only select <see cref="SwitchDomainIterationSetupRowViewModel"/>
+        /// Filters the <see cref="SelectedIterations" /> added items to only select
+        /// <see cref="SwitchDomainIterationSetupRowViewModel" />
         /// </summary>
         /// <param name="row">the added row-view-model</param>
         private void FilterIterationSelectionItems(IViewModelBase<Thing> row)
         {
             var iterationRow = row as SwitchDomainIterationSetupRowViewModel;
+
             if (iterationRow == null)
             {
                 // Cant remove directly from the reactiveList: KeyNotFoundException

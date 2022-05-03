@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ModelSelectionSessionTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="SwitchDomainSessionTextFixture.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Omar Elebiary
+// 
+//    This file is part of CDP4-IME Community Edition.
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+// 
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,65 +30,47 @@ namespace CDP4ShellDialogs.Tests.ViewModels
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
+
     using CDP4ShellDialogs.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
-    class SwitchDomainSessionTextFixture
+    internal class SwitchDomainSessionTextFixture
     {
-        private Mock<ISession> session;
-        private Mock<IPermissionService> permissionService;
-
-        private SiteDirectory siteDirectory;
-        private EngineeringModelSetup modelSetup1;
-        private EngineeringModelSetup modelSetup2;
-        private IterationSetup iterationSetup11;
-        private IterationSetup iterationSetup21;
-        private IterationSetup iterationSetup22;
-        private EngineeringModel model;
-        private Iteration iteration11;
-        private Iteration iteration21;
-        private Person person;
-        private Participant participant;
-        private DomainOfExpertise domain;
-        private DomainOfExpertise domain2;
-        private string frozenOnDate;
-
-        private Assembler assembler;
-        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
-
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
-
         [SetUp]
         public void Setup()
         {
-            this.session = new Mock<ISession>() { Name = "http://www.rheagroup.com/" };
+            this.session = new Mock<ISession> { Name = "http://www.rheagroup.com/" };
             this.assembler = new Assembler(this.uri);
             this.cache = this.assembler.Cache;
 
             this.permissionService = new Mock<IPermissionService>();
 
-            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, uri) { Name = "TestSiteDir" };
-            this.modelSetup1 = new EngineeringModelSetup(Guid.NewGuid(), null, uri) { Name = "modelSetup1" };
-            this.modelSetup2 = new EngineeringModelSetup(Guid.NewGuid(), null, uri) { Name = "modelSetup2" };
-            
-            this.iterationSetup11 = new IterationSetup(Guid.NewGuid(), null, uri);
-            this.iterationSetup21 = new IterationSetup(Guid.NewGuid(), null, uri);
+            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, this.uri) { Name = "TestSiteDir" };
+            this.modelSetup1 = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri) { Name = "modelSetup1" };
+            this.modelSetup2 = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri) { Name = "modelSetup2" };
+
+            this.iterationSetup11 = new IterationSetup(Guid.NewGuid(), null, this.uri);
+            this.iterationSetup21 = new IterationSetup(Guid.NewGuid(), null, this.uri);
             this.frozenOnDate = "2022-01-12 12:12:30";
             this.iterationSetup21.FrozenOn = DateTime.Parse(this.frozenOnDate);
 
-            this.iterationSetup22 = new IterationSetup(Guid.NewGuid(), null, uri);
+            this.iterationSetup22 = new IterationSetup(Guid.NewGuid(), null, this.uri);
 
-            this.person = new Person(Guid.NewGuid(), null, uri) { GivenName = "testPerson" };
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, uri) { Name = "domaintest" };
-            this.domain2 = new DomainOfExpertise(Guid.NewGuid(), null, uri) { Name = "domaintest2" };
+            this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "testPerson" };
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domaintest" };
+            this.domain2 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domaintest2" };
 
             this.modelSetup1.ActiveDomain.Add(this.domain);
             this.modelSetup1.ActiveDomain.Add(this.domain2);
@@ -79,8 +80,8 @@ namespace CDP4ShellDialogs.Tests.ViewModels
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.modelSetup1 };
             this.iteration11 = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationSetup11 };
             this.iteration21 = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationSetup21 };
-            this.model.Iteration.Add(iteration11);
-            this.model.Iteration.Add(iteration21);
+            this.model.Iteration.Add(this.iteration11);
+            this.model.Iteration.Add(this.iteration21);
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person, SelectedDomain = this.domain };
             this.participant.Domain.Add(this.domain);
             this.participant.Domain.Add(this.domain2);
@@ -110,6 +111,29 @@ namespace CDP4ShellDialogs.Tests.ViewModels
             CDPMessageBus.Current.ClearSubscriptions();
         }
 
+        private Mock<ISession> session;
+        private Mock<IPermissionService> permissionService;
+
+        private SiteDirectory siteDirectory;
+        private EngineeringModelSetup modelSetup1;
+        private EngineeringModelSetup modelSetup2;
+        private IterationSetup iterationSetup11;
+        private IterationSetup iterationSetup21;
+        private IterationSetup iterationSetup22;
+        private EngineeringModel model;
+        private Iteration iteration11;
+        private Iteration iteration21;
+        private Person person;
+        private Participant participant;
+        private DomainOfExpertise domain;
+        private DomainOfExpertise domain2;
+        private string frozenOnDate;
+
+        private Assembler assembler;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+
+        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+
         [Test]
         public void VerifyThatPropertiesAreSetAndAdded()
         {
@@ -117,6 +141,7 @@ namespace CDP4ShellDialogs.Tests.ViewModels
             Assert.AreEqual(this.siteDirectory.Name + $" ({this.siteDirectory.IDalUri})", viewmodel.Name.Insert(13, this.session.Name));
 
             var models = viewmodel.EngineeringModelSetupRowViewModels;
+
             // Check for unique values
             Assert.AreEqual(1, models.Count);
 
