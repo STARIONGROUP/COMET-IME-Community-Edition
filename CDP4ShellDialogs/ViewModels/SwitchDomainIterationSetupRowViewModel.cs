@@ -16,7 +16,7 @@ namespace CDP4ShellDialogs.ViewModels
     /// <summary>
     /// the view model for <see cref="IterationSetup"/> displayed in the Tree
     /// </summary>
-    public class ModelSelectionIterationSetupRowViewModel : IterationSetupRowViewModel
+    public class SwitchDomainIterationSetupRowViewModel : IterationSetupRowViewModel
     {
         /// <summary>
         /// backing field for <see cref="SelectedDomain"/>
@@ -24,7 +24,7 @@ namespace CDP4ShellDialogs.ViewModels
         private DomainOfExpertise selectedDomain;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ModelSelectionIterationSetupRowViewModel"/> class. 
+        /// Initializes a new instance of the <see cref="ModelIterationDomainSwitchDialogViewModel"/> class. 
         /// </summary>
         /// <param name="iterationSetup">
         /// The <see cref="IterationSetup"/> this is associated to
@@ -38,7 +38,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// <param name="session">
         /// The session.
         /// </param>
-        public ModelSelectionIterationSetupRowViewModel(IterationSetup iterationSetup, Participant participant, ISession session)
+        public SwitchDomainIterationSetupRowViewModel(IterationSetup iterationSetup, Participant participant, ISession session)
             : base(iterationSetup, session, null)
         {
             this.ActiveParticipant = participant;
@@ -47,11 +47,17 @@ namespace CDP4ShellDialogs.ViewModels
 
             if (participant.Domain.Count != 0)
             {
-                this.DomainOfExpertises.AddRange(participant.Domain.OrderBy(x => x.ShortName)); 
-
-                this.SelectedDomain = this.DomainOfExpertises.Contains(this.ActiveParticipant.Person.DefaultDomain)
-                    ? this.ActiveParticipant.Person.DefaultDomain
-                    : this.DomainOfExpertises.First();
+                this.DomainOfExpertises.AddRange(participant.Domain.OrderBy(x => x.ShortName));
+                
+                // Get the current iteration and set the selectedDomain
+                var iteration = this.Session.OpenIterations.Keys.FirstOrDefault(i => i.IterationSetup.IterationIid == this.Thing.IterationIid);
+                if (iteration != null)
+                {
+                    var selectedDomain = this.Session.QuerySelectedDomainOfExpertise(iteration);
+                    this.SelectedDomain = this.DomainOfExpertises.Contains(selectedDomain)
+                        ? selectedDomain
+                        : this.DomainOfExpertises.First();
+                }
             }
 
             this.Name = "iteration_" + this.Thing.IterationNumber.ToString(CultureInfo.InvariantCulture);

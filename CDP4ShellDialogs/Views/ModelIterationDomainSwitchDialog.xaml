@@ -20,7 +20,7 @@
     <dx:DXWindow.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
 
-        <HierarchicalDataTemplate DataType="{x:Type viewModels:ModelSelectionSessionRowViewModel}" ItemsSource="{Binding EngineeringModelSetupRowViewModels}">
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:SwitchDomainSessionRowViewModel}" ItemsSource="{Binding EngineeringModelSetupRowViewModels}">
             <dx:MeasurePixelSnapper>
                 <StackPanel Orientation="Horizontal">
                     <dx:PixelSnapper>
@@ -36,7 +36,7 @@
             </dx:MeasurePixelSnapper>
         </HierarchicalDataTemplate>
 
-        <HierarchicalDataTemplate DataType="{x:Type viewModels:ModelSelectionEngineeringModelSetupRowViewModel}" ItemsSource="{Binding IterationSetupRowViewModels}">
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:SwitchDomainEngineeringModelSetupRowViewModel}" ItemsSource="{Binding IterationSetupRowViewModels}">
             <dx:MeasurePixelSnapper>
                 <StackPanel Orientation="Horizontal">
                     <dx:PixelSnapper>
@@ -52,7 +52,7 @@
             </dx:MeasurePixelSnapper>
         </HierarchicalDataTemplate>
 
-        <HierarchicalDataTemplate DataType="{x:Type viewModels:ModelSelectionIterationSetupRowViewModel}">
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:SwitchDomainIterationSetupRowViewModel}">
             <dx:MeasurePixelSnapper>
                 <StackPanel Orientation="Horizontal">
                     <dx:PixelSnapper>
@@ -87,7 +87,7 @@
                                  HorizontalAlignment="Stretch"
                                  VerticalAlignment="Stretch"
                                  ItemsSource="{Binding SessionsAvailable}"
-                                 SelectedItems="{Binding SelectedIterations}"
+                                 SelectedItems="{Binding SelectedIterations, Mode=TwoWay}"
                                  SelectionMode="Row">
                 <dxg:TreeListControl.Columns>
                     <dxg:TreeListColumn FieldName="Name" HorizontalHeaderContentAlignment="Left" />
@@ -148,7 +148,7 @@
                     MaxHeight="25"
                     Margin="5"
                     HorizontalAlignment="Right"
-                    Command="{Binding switchCommand}"
+                    Command="{Binding SwitchCommand}"
                     Content="Switch" />
             <Button MinWidth="75"
                     MinHeight="25"

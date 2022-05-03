@@ -35,7 +35,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// </param>
         public ModelIterationDomainSwitchDialogViewModel(IEnumerable<ISession> sessionAvailable)
         {
-            this.SessionsAvailable = new DisposableReactiveList<ModelSelectionSessionRowViewModel>();
+            this.SessionsAvailable = new DisposableReactiveList<SwitchDomainSessionRowViewModel>();
             this.InitializeReactiveCommands();
 
             this.PopulateSessionsRowViewModel(sessionAvailable);
@@ -49,17 +49,17 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets the list of <see cref="BaseRowViewModel"/> available
         /// </summary>
-        public DisposableReactiveList<ModelSelectionSessionRowViewModel> SessionsAvailable { get; private set; }
+        public DisposableReactiveList<SwitchDomainSessionRowViewModel> SessionsAvailable { get; private set; }
 
         /// <summary>
         /// Gets the list of <see cref="IterationSetup"/> selected
         /// </summary>
-        public ReactiveList<IViewModelBase<Thing>> SelectedIterations { get; private set; }
+        public ReactiveList<IViewModelBase<Thing>> SelectedIterations { get; set; }
 
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<Unit> switchCommand { get; private set; }
+        public ReactiveCommand<Unit> SwitchCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ICommand"/>
@@ -73,9 +73,12 @@ namespace CDP4ShellDialogs.ViewModels
         {
             this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>> { ChangeTrackingEnabled = true };
             this.IsBusy = false;
+            
             var canOk = this.WhenAnyValue(x => x.SelectedIterations.Count, count => count != 0);
-            this.switchCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteDomainSwitch(), RxApp.MainThreadScheduler);
-            this.switchCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
+
+            this.SwitchCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteDomainSwitch(), RxApp.MainThreadScheduler);
+            
+            this.SwitchCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
             {
                 this.ErrorMessage = x.Message;
                 this.IsBusy = false;
@@ -97,11 +100,11 @@ namespace CDP4ShellDialogs.ViewModels
         private async Task ExecuteDomainSwitch()
         {
             this.IsBusy = true;
-            this.LoadingMessage = "Closing...";
+            this.LoadingMessage = "Switching...";
 
             foreach (var iteration in this.SelectedIterations)
             {
-                var modelrow = (ModelSelectionIterationSetupRowViewModel)iteration;
+                var modelrow = (SwitchDomainIterationSetupRowViewModel)iteration;
                 var session = modelrow.Session;
 
                 var openIteration = session.OpenIterations.Keys.FirstOrDefault(x => x.Iid == modelrow.IterationIid);
@@ -137,27 +140,7 @@ namespace CDP4ShellDialogs.ViewModels
         {
             foreach (var session in sessions.Where(session => session.Assembler.Cache.Select(x => x.Value).Any(item => item.Value.ClassKind == ClassKind.Iteration)))
             {
-                this.SessionsAvailable.Add(new ModelSelectionSessionRowViewModel(session.RetrieveSiteDirectory(), session));
-            }
-
-            foreach (var availableSession in this.SessionsAvailable)
-            {
-                var openIterationIids = availableSession.Session.OpenIterations.Keys.Select(x => x.Iid).ToList();
-
-                // remove iteration rows
-                foreach (var model in availableSession.EngineeringModelSetupRowViewModels)
-                {
-                    var rowToRemove =
-                        model.IterationSetupRowViewModels.Where(x => !openIterationIids.Contains(x.IterationIid)).ToList();
-
-                    foreach (var modelSelectionIterationSetupRowViewModel in rowToRemove)
-                    {
-                        model.IterationSetupRowViewModels.RemoveAndDispose(modelSelectionIterationSetupRowViewModel);
-                    }
-                }
-
-                // remove model rows that don't have any open iteration
-                availableSession.EngineeringModelSetupRowViewModels.RemoveAllAndDispose(availableSession.EngineeringModelSetupRowViewModels.ToList().Where(x => !x.IterationSetupRowViewModels.Any()));
+                this.SessionsAvailable.Add(new SwitchDomainSessionRowViewModel(session.RetrieveSiteDirectory(), session));
             }
         }
 
@@ -167,7 +150,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// <param name="row">the added row-view-model</param>
         private void FilterIterationSelectionItems(IViewModelBase<Thing> row)
         {
-            var iterationRow = row as ModelSelectionIterationSetupRowViewModel;
+            var iterationRow = row as SwitchDomainIterationSetupRowViewModel;
             if (iterationRow == null)
             {
                 // Cant remove directly from the reactiveList: KeyNotFoundException
