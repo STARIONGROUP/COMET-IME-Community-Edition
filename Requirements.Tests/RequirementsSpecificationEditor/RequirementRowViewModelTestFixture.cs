@@ -9,6 +9,8 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Dal;
+    using CDP4Dal.Permission;
+
     using CDP4Requirements.ViewModels.RequirementsSpecificationEditor;
     using Moq;
     using NUnit.Framework;
@@ -20,6 +22,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
     public class RequirementRowViewModelTestFixture
     {
         private Mock<ISession> session;
+        private Mock<IPermissionService> permissionService;
         private DomainOfExpertise domainOfExpertise;
         private Category category_1;
         private Category category_2;
@@ -29,7 +32,10 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
         [SetUp]
         public void SetUp()
         {
+            this.permissionService = new Mock<IPermissionService>();
             this.session = new Mock<ISession>();
+
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
             this.domainOfExpertise = new DomainOfExpertise {ShortName = "SYS", Name = "System"};
             this.category_1 = new Category {ShortName = "REQ", Name = "Requirements"};
