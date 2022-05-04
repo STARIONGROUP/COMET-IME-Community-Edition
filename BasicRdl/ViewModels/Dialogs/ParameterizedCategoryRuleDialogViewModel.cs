@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterizedCategoryRuleDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Omar Elebiary
+// 
+//    This file is part of CDP4-IME Community Edition.
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
+// 
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
+// 
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-//    GNU Affero General Public License for more details.
-//
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+//    Lesser General Public License for more details.
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -31,30 +31,40 @@ namespace BasicRdl.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Operations;
-    
+
+    using Microsoft.Practices.ServiceLocation;
+
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="ParameterizedCategoryRuleDialogViewModel"/> is to allow an <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule"/> to
+    /// The purpose of the <see cref="ParameterizedCategoryRuleDialogViewModel" /> is to allow an
+    /// <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule" /> to
     /// be created or updated.
     /// </summary>
     /// <remarks>
-    /// The creation of an <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule"/> will result in an <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule"/> being created by
+    /// The creation of an <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule" /> will result in an
+    /// <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule" /> being created by
     /// the connected data-source
     /// </remarks>
     [ThingDialogViewModelExport(ClassKind.ParameterizedCategoryRule)]
     public class ParameterizedCategoryRuleDialogViewModel : CDP4CommonView.ParameterizedCategoryRuleDialogViewModel, IThingDialogViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterizedCategoryRuleDialogViewModel"/> class.
+        /// The (injected) <see cref="IFilterStringService" />
+        /// </summary>
+        private IFilterStringService filterStringService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ParameterizedCategoryRuleDialogViewModel" /> class.
         /// </summary>
         /// <remarks>
         /// The default constructor is required by MEF
@@ -64,73 +74,81 @@ namespace BasicRdl.ViewModels
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterizedCategoryRuleDialogViewModel"/> class.
+        /// Initializes a new instance of the <see cref="ParameterizedCategoryRuleDialogViewModel" /> class.
         /// </summary>
         /// <param name="parameterizedCategoryRule">
-        /// The <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule"/> that is the subject of the current view-model. This is the object
+        /// The <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule" /> that is the subject of the current
+        /// view-model. This is the object
         /// that will be either created, or edited.
         /// </param>
         /// <param name="transaction">
-        /// The <see cref="ThingTransaction"/> that contains the log of recorded changes.
+        /// The <see cref="ThingTransaction" /> that contains the log of recorded changes.
         /// </param>
         /// <param name="session">
-        /// The <see cref="ISession"/> in which the current <see cref="CDP4Common.CommonData.Thing"/> is to be added or updated
+        /// The <see cref="ISession" /> in which the current <see cref="CDP4Common.CommonData.Thing" /> is to be added or updated
         /// </param>
         /// <param name="isRoot">
-        /// Assert if this <see cref="ParameterizedCategoryRuleDialogViewModel"/> is the root of all <see cref="IThingDialogViewModel"/>
+        /// Assert if this <see cref="ParameterizedCategoryRuleDialogViewModel" /> is the root of all
+        /// <see cref="IThingDialogViewModel" />
         /// </param>
         /// <param name="dialogKind">
-        /// The kind of operation this <see cref="ParameterizedCategoryRuleDialogViewModel"/> performs
+        /// The kind of operation this <see cref="ParameterizedCategoryRuleDialogViewModel" /> performs
         /// </param>
         /// <param name="thingDialogNavigationService">
-        /// The <see cref="IThingDialogNavigationService"/> that is used to navigate to a dialog of a specific <see cref="Thing"/>.
+        /// The <see cref="IThingDialogNavigationService" /> that is used to navigate to a dialog of a specific
+        /// <see cref="Thing" />.
         /// </param>
         /// <param name="container">
-        /// The Container <see cref="CDP4Common.CommonData.Thing"/> of the created <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule"/>
+        /// The Container <see cref="CDP4Common.CommonData.Thing" /> of the created
+        /// <see cref="CDP4Common.SiteDirectoryData.ParameterizedCategoryRule" />
         /// </param>
         /// <param name="chainOfContainers">
-        /// The optional chain of containers that contains the <paramref name="container"/> argument
+        /// The optional chain of containers that contains the <paramref name="container" /> argument
         /// </param>
         public ParameterizedCategoryRuleDialogViewModel(ParameterizedCategoryRule parameterizedCategoryRule, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(parameterizedCategoryRule, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
-            this.WhenAnyValue(vm => vm.Container).Subscribe(_ => 
-                    {
-                        this.PopulatePossibleCategory();
-                        this.PopulatePossibleParameterTypes();
-                        this.UpdateOkCanExecute();
-                    });
+            this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
+
+            this.WhenAnyValue(vm => vm.Container).Subscribe(
+                _ =>
+                {
+                    this.PopulatePossibleCategory();
+                    this.PopulatePossibleParameterTypes();
+                    this.UpdateOkCanExecute();
+                });
+
             this.WhenAnyValue(vm => vm.ParameterType.Count).Subscribe(_ => this.UpdateOkCanExecute());
         }
 
         /// <summary>
-        /// Updates the <see cref="DialogViewModelBase{T}.OkCanExecute"/> property using validation rules
+        /// Updates the <see cref="DialogViewModelBase{T}.OkCanExecute" /> property using validation rules
         /// </summary>
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
-            this.OkCanExecute = this.OkCanExecute && this.Container != null && this.SelectedCategory != null && this.ParameterType.Any();
+            this.OkCanExecute = this.OkCanExecute && (this.Container != null) && (this.SelectedCategory != null) && this.ParameterType.Any();
         }
 
         /// <summary>
-        /// Populates the <see cref="PopulatePossibleCategory"/> property
+        /// Populates the <see cref="PopulatePossibleCategory" /> property
         /// </summary>
         protected override void PopulatePossibleCategory()
         {
             base.PopulatePossibleCategory();
-            
-            var containerRdl = this.Container as ReferenceDataLibrary;            
+
+            var containerRdl = this.Container as ReferenceDataLibrary;
+
             if (containerRdl == null)
             {
-                return;
             }
             else
             {
                 var rdls = containerRdl.AggregatedReferenceDataLibrary;
-                
+
                 var allCategories = rdls.SelectMany(x => x.DefinedCategory);
                 this.PossibleCategory.AddRange(allCategories.OrderBy(c => c.ShortName));
-            }            
+            }
         }
 
         /// <summary>
@@ -149,13 +167,26 @@ namespace BasicRdl.ViewModels
         {
             this.PossibleParameterType.Clear();
             var containerRdl = this.Container as ReferenceDataLibrary;
+
             if (containerRdl == null)
             {
                 return;
             }
 
             var allParameterTypes = containerRdl.ParameterType.ToList();
-            allParameterTypes.AddRange(containerRdl.GetRequiredRdls().SelectMany(rdl => rdl.ParameterType));
+            var allParameterTypesFromChainedRdl = containerRdl.GetRequiredRdls().SelectMany(rdl => rdl.ParameterType);
+            allParameterTypes.AddRange(allParameterTypesFromChainedRdl);
+
+            if (this.filterStringService == null)
+            {
+                this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
+            }
+
+            if (!this.filterStringService.ShowDeprecatedThings)
+            {
+                allParameterTypes = allParameterTypes.Where(pt => pt.IsDeprecated == false).ToList();
+            }
+
             this.PossibleParameterType.AddRange(this.ParameterType.OrderBy(c => c.ShortName));
             this.PossibleParameterType.AddRange(allParameterTypes.Except(this.ParameterType).OrderBy(c => c.ShortName));
         }
