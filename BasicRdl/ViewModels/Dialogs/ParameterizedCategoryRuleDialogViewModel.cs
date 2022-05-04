@@ -184,7 +184,7 @@ namespace BasicRdl.ViewModels
 
             if (!this.filterStringService.ShowDeprecatedThings)
             {
-                allParameterTypes = allParameterTypes.Where(pt => pt.IsDeprecated == false).ToList();
+                allParameterTypes = allParameterTypes.Where(pt => !pt.IsDeprecated).ToList();
             }
 
             this.PossibleParameterType.AddRange(this.ParameterType.OrderBy(c => c.ShortName));
