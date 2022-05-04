@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
@@ -39,6 +39,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Builders;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -99,7 +100,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.AllOptions = new ReactiveList<Option>();
             this.ExcludedOptions = new ReactiveList<Option>();
             this.SelectedOptions = new ReactiveList<Option>();
-            
+
             this.WhenAnyValue(vm => vm.SelectedOptions).Subscribe(_ => this.ExcludedOptions = new ReactiveList<Option>(this.AllOptions.Except(this.SelectedOptions)));
 
             this.WhenAnyValue(vm => vm.ExcludedOptions).Subscribe(
@@ -210,34 +211,73 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeSubscriptions();
 
-            var elementDefListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.ElementDefinitionObjectChangedHandler());
+            Func<ObjectChangedEvent, bool> optionAddDiscriminator = 
+                objectChange => 
+                objectChange.EventKind == EventKind.Added 
+                && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache 
+                && objectChange.ChangedThing.Container == this.Thing.Container.Container;
+            Action<ObjectChangedEvent> optionAddAction = x => this.UpdateOptionLists();
 
-            var highlightSubscription = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.HighlightEventHandler());
+            Func<ObjectChangedEvent, bool> optionRemoveDiscriminator = 
+                objectChange => 
+                objectChange.EventKind == EventKind.Removed 
+                && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache 
+                && objectChange.ChangedThing.Container == this.Thing.Container.Container;
+            Action<ObjectChangedEvent> optionRemoveAction = x => this.UpdateOptionLists();
 
-            this.Disposables.Add(highlightSubscription);
+            Func<ObjectChangedEvent, bool> elementDefinitionDiscriminator = objectChange => objectChange.EventKind == EventKind.Updated;
+            Action<ObjectChangedEvent> elementDefinitionAction = x => this.ElementDefinitionObjectChangedHandler();
 
-            var optionAddListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache && objectChange.ChangedThing.Container == this.Thing.Container.Container)
-                    .Select(x => x.ChangedThing as Option)
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var elementDefListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
+                    .Where(elementDefinitionDiscriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateOptionLists());
+                    .Subscribe(elementDefinitionAction);
 
-            var optionRemoveListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache && objectChange.ChangedThing.Container == this.Thing.Container.Container)
-                    .Select(x => x.ChangedThing as Option)
+                var highlightSubscription = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateOptionLists());
+                    .Subscribe(_ => this.HighlightEventHandler());
 
-            this.Disposables.Add(optionAddListener);
-            this.Disposables.Add(optionRemoveListener);
-            this.Disposables.Add(elementDefListener);
+                this.Disposables.Add(highlightSubscription);
+
+                var optionAddListener =
+                    CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
+                        .Where(optionAddDiscriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(optionAddAction);
+
+                var optionRemoveListener =
+                    CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
+                        .Where(optionRemoveDiscriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(optionRemoveAction);
+
+                this.Disposables.Add(optionAddListener);
+                this.Disposables.Add(optionRemoveListener);
+                this.Disposables.Add(elementDefListener);
+            }
+            else
+            {
+                var highlightObserver = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(typeof(ElementDefinition));
+
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ElementUsageHighlightEvent>()
+                    .RegisterEventHandler(highlightObserver, new MessageBusHandlerData<ElementUsageHighlightEvent>(
+                        x => x.ElementDefinition.Equals(this.Thing.ElementDefinition), _ => this.HighlightEventHandler())));
+
+                var optionObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option));
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusHandlerData(null, optionAddDiscriminator, optionAddAction)));
+
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusHandlerData(null, optionRemoveDiscriminator, optionRemoveAction)));
+
+                var elementDefinitionObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementDefinition));
+
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusHandlerData(this.Thing.ElementDefinition, elementDefinitionDiscriminator, elementDefinitionAction)));
+            }
         }
 
         /// <summary>

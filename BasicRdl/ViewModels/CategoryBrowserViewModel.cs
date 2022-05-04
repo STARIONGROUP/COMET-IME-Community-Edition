@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CategoryBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -285,6 +285,8 @@ namespace BasicRdl.ViewModels
             // highlight the selected thing
             CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.SelectedThing.Thing as Category),
                 this.SelectedThing.Thing);
+            CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.SelectedThing.Thing as Category),
+                null);
         }
     }
 }

@@ -281,6 +281,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             // highlight the selected thing
             CDPMessageBus.Current.SendMessage(new HighlightEvent(thing), thing);
+            CDPMessageBus.Current.SendMessage(new HighlightEvent(thing), null);
         }
 
         /// <summary>
@@ -298,6 +299,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             // highlight the selected thing
             CDPMessageBus.Current.SendMessage(new HighlightEvent(this.SelectedThing.Thing), this.SelectedThing.Thing);
+            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.SelectedThing.Thing), null);
         }
 
         /// <summary>

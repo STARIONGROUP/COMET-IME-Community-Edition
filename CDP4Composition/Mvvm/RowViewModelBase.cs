@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RowViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,23 +31,32 @@ namespace CDP4Composition.Mvvm
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm.Types;
+    using CDP4Composition.MessageBus;
 
     using Converters;
+
     using Navigation;
+
     using Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using Events;
+
     using Navigation.Interfaces;
+
     using ReactiveUI;
 
     /// <summary>
@@ -89,10 +117,9 @@ namespace CDP4Composition.Mvvm
         /// <param name="session">The session</param>
         /// <param name="containerViewModel">The parent Row</param>
         protected RowViewModelBase(T thing, ISession session, IViewModelBase<Thing> containerViewModel)
-            : base(thing, session)
+            : base(thing, session, containerViewModel)
         {
             this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>> { ChangeTrackingEnabled = true };
-            this.ContainerViewModel = containerViewModel;
             this.HighlightCancelDisposables = new List<IDisposable>();
 
             var rowContainerViewModel = this.ContainerViewModel as IRowViewModelBase<Thing>;
@@ -143,11 +170,6 @@ namespace CDP4Composition.Mvvm
         /// Gets or sets the Contained <see cref="IRowViewModelBase{T}"/>
         /// </summary>
         public DisposableReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; protected set; }
-
-        /// <summary>
-        /// Gets or sets the parent <see cref="IViewModelBase{T}"/>
-        /// </summary>
-        public IViewModelBase<Thing> ContainerViewModel { get; protected set; }
 
         /// <summary>
         /// Gets the top container <see cref="IViewModelBase{T}"/>
@@ -340,30 +362,77 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         protected virtual void InitializeSubscriptions()
         {
-            var highlightSubscription = CDPMessageBus.Current.Listen<HighlightEvent>(this.Thing)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.HighlightEventHandler());
-            this.Disposables.Add(highlightSubscription);
-
-            // category highlighting
-            var thingAsCategorizableThing = this.Thing as ICategorizableThing;
-            if (thingAsCategorizableThing != null)
+            if (this.AllowMessageBusSubscriptions)
             {
-                // TODO: if this is indeed a categorizable thing we also have to listen to changes on added/removed categories. Need to figure out how to do this best
-                // as the list of Categories is not reactive. Currently you will need to close and open the view after applying a category to make
-                // highlighting work.
-                foreach (var category in thingAsCategorizableThing.Category)
-                {
-                    var highlightCategorySubscription = CDPMessageBus.Current.Listen<HighlightByCategoryEvent>(category)
-                        .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(_ => this.HighlightEventHandler());
-                    this.Disposables.Add(highlightCategorySubscription);
-                }
-            }
+                var highlightSubscription = CDPMessageBus.Current.Listen<HighlightEvent>(this.Thing)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => this.HighlightEventHandler());
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Relationship))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateThingStatus()));
+                this.Disposables.Add(highlightSubscription);
+
+                // category highlighting
+                if (this.Thing is ICategorizableThing thingAsCategorizableThing)
+                {
+                    // TODO: if this is indeed a categorizable thing we also have to listen to changes on added/removed categories. Need to figure out how to do this best
+                    // as the list of Categories is not reactive. Currently you will need to close and open the view after applying a category to make
+                    // highlighting work.
+                    foreach (var category in thingAsCategorizableThing.Category)
+                    {
+                        var highlightCategorySubscription = CDPMessageBus.Current.Listen<HighlightByCategoryEvent>(category)
+                            .ObserveOn(RxApp.MainThreadScheduler)
+                            .Subscribe(_ => this.HighlightEventHandler());
+
+                        this.Disposables.Add(highlightCategorySubscription);
+                    }
+                }
+ 
+                this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Relationship))
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => this.UpdateThingStatus()));
+            }
+            else
+            {
+                var highlightObserver = CDPMessageBus.Current.Listen<HighlightEvent>();
+
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<HighlightEvent>().RegisterEventHandler(
+                    highlightObserver,
+                    new MessageBusHandlerData<HighlightEvent>(
+                        e => true,
+                        e => 
+                        {
+                            if (e.HighlightedThing == this.Thing)
+                            {
+                                this.HighlightEventHandler();
+                            }
+                        })));
+
+                // category highlighting
+                if (this.Thing is ICategorizableThing thingAsCategorizableThing)
+                {
+                    var highlightByCategoryObserver = CDPMessageBus.Current.Listen<HighlightByCategoryEvent>();
+
+                    this.Disposables.Add(this.MessageBusHandler.GetHandler<HighlightByCategoryEvent>().RegisterEventHandler(
+                        highlightByCategoryObserver,
+                        new MessageBusHandlerData<HighlightByCategoryEvent>(
+                            e => true,
+                            e =>
+                            {
+                                if (thingAsCategorizableThing.Category.Contains(e.Category))
+                                {
+                                    this.HighlightEventHandler();
+                                }
+                            })));
+                }
+
+                var relationshipObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Relationship));
+
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(
+                    relationshipObserver, 
+                    new ObjectChangedMessageBusHandlerData(
+                        null, 
+                        objectChange => true, 
+                        objectChange => this.UpdateThingStatus())));
+            }
 
             this.WhenAnyValue(vm => vm.ErrorMsg)
                 .Select(x => !string.IsNullOrEmpty(x))
@@ -431,6 +500,7 @@ namespace CDP4Composition.Mvvm
             var cancelHighlightSubscription = CDPMessageBus.Current.Listen<CancelHighlightEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.CancelHighlightEventHandler());
+
             this.HighlightCancelDisposables.Add(cancelHighlightSubscription);
         }
 
@@ -559,7 +629,7 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         protected virtual void UpdateTooltip()
         {
-            this.Tooltip = this.Thing.Tooltip();
+            this.Tooltip = this.Thing?.Tooltip();
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
@@ -44,6 +44,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -72,7 +73,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// Represent the view-model of the browser that displays all the <see cref="ElementDefinition"/>s in one <see cref="Iteration"/>
     /// </summary>
-    public class ElementDefinitionsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget
+    public class ElementDefinitionsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget, IHaveMessageBusHandler
     {
         /// <summary>
         /// The logger for the current class
@@ -190,7 +191,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.ExecuteLongRunningDispatcherAction(
                 () => 
                 { 
-                    this.UpdateElementDefinition();
+                    this.UpdateElementDefinition(true);
                     this.AddSubscriptions();
                     this.UpdateProperties();
                     stopWatch.Stop();
@@ -349,6 +350,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
+
+        /// <summary>
+        /// Gets the <see cref="MessageBusHandler"/>
+        /// </summary>
+        public MessageBusHandler MessageBusHandler { get; } = new MessageBusHandler();
 
         /// <summary>
         /// Updates the current drag state.
@@ -784,7 +790,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.UpdateDomain(domainChangeEvent);
             this.ElementDefinitionRowViewModels.ClearAndDispose();
-            this.UpdateElementDefinition();
+            this.UpdateElementDefinition(true);
         }
 
         /// <summary>
@@ -1001,6 +1007,8 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 elementDef.Dispose();
             }
+
+            this.MessageBusHandler.Dispose();
         }
 
         /// <summary>
@@ -1032,20 +1040,31 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Update the rows to display
         /// </summary>
-        private void UpdateElementDefinition()
+        /// <param name="initial">
+        /// A boolean indicating if this is the first load
+        /// </param>
+        private void UpdateElementDefinition(bool initial = false)
         {
             var currentDef = this.ElementDefinitionRowViewModels.Select(x => (ElementDefinition)x.Thing).ToList();
             var addedDef = this.Thing.Element.Except(currentDef).ToList();
-            var removedDef = currentDef.Except(this.Thing.Element).ToList();
 
-            foreach (var elementDefinition in addedDef)
+            if (initial)
             {
-                this.AddElementDefinitionRow(elementDefinition);
+                this.AddElementDefinitionRows(addedDef);
             }
-
-            foreach (var elementDefinition in removedDef)
+            else
             {
-                this.RemoveElementDefinitionRow(elementDefinition);
+                foreach (var elementDefinition in addedDef)
+                {
+                    this.AddElementDefinitionRow(elementDefinition);
+                }
+
+                var removedDef = currentDef.Except(this.Thing.Element).ToList();
+
+                foreach (var elementDefinition in removedDef)
+                {
+                    this.RemoveElementDefinitionRow(elementDefinition);
+                }
             }
 
             var topElementDefinitionOld = this.ElementDefinitionRowViewModels.FirstOrDefault(vm => ((ElementDefinitionRowViewModel)vm).IsTopElement);
@@ -1084,6 +1103,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             // highlight the selected thing
             CDPMessageBus.Current.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), this.SelectedThing.Thing);
+            CDPMessageBus.Current.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), null);
         }
 
         /// <summary>
@@ -1098,6 +1118,27 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var row = new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this, this.obfuscationService);
                 this.ElementDefinitionRowViewModels.SortedInsert(row, rowComparer);
+            }
+        }
+
+        /// <summary>
+        /// Add rows of the associated <see cref="ElementDefinition"/>s
+        /// </summary>
+        /// <param name="elementDefs">The <see cref="ElementDefinition"/>s to add</param>
+        private void AddElementDefinitionRows(IEnumerable<ElementDefinition> elementDefs)
+        {
+            this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
+
+            if (tuple != null)
+            {
+                var rows = new List<ElementDefinitionRowViewModel>();
+                foreach (var elementDef in elementDefs)
+                {
+                    rows.Add(new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this, this.obfuscationService));
+                }
+
+                rows.Sort(rowComparer);
+                this.ElementDefinitionRowViewModels.AddRange(rows);
             }
         }
 
