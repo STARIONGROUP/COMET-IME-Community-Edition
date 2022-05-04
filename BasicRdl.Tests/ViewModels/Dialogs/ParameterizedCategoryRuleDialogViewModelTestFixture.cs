@@ -15,13 +15,8 @@
 // 
 //    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-<<<<<<< HEAD
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-=======
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
->>>>>>> 0fe08cd011e13a88219a142f2076547b75be0cc2
 // 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
