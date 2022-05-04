@@ -483,8 +483,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="addedParameterBase">The <see cref="ParameterBase" />s to add</param>
         protected void AddParameterBase(IEnumerable<ParameterBase> addedParameterBase)
         {
-            var newRows = new List<IRowViewModelBase<Thing>>();
-
             foreach (var parameterBase in addedParameterBase)
             {
                 IRowViewModelBase<ParameterBase> row = null;
@@ -537,7 +535,7 @@ namespace CDP4EngineeringModel.ViewModels
 
                 if (group == null)
                 {
-                    newRows.Add(row);
+                    this.ContainedRows.SortedInsert(row, ChildRowComparer);
                 }
                 else
                 {
@@ -549,9 +547,6 @@ namespace CDP4EngineeringModel.ViewModels
                     }
                 }
             }
-            newRows.Sort(ChildRowComparer);
-            this.ContainedRows.AddRange(newRows);
-
         }
 
         /// <summary>
