@@ -66,6 +66,8 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         /// </summary>
         private IDisposable definitionSubscription;
 
+        public bool CanEdit { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementRowViewModel"/> class
         /// </summary>
@@ -78,6 +80,8 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         {
             this.InitializeCommands();
             this.EventPublisher = new EventPublisher();
+
+            this.CanEdit = this.Session.PermissionService.CanWrite(this.Thing);
 
             this.WhenAnyValue(vm => vm.DefinitionContent).Subscribe(
                 _ =>
