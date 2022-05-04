@@ -66,6 +66,9 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         /// </summary>
         private IDisposable definitionSubscription;
 
+        /// <summary>
+        /// Check the edit permission using <see cref="PermissionService"/>
+        /// </summary>
         public bool CanEdit { get; set; }
 
         /// <summary>
