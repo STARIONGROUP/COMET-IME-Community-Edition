@@ -92,8 +92,10 @@ namespace CDP4EngineeringModel.Tests
             
             this.req1 = new Requirement(Guid.NewGuid(), this.cache, this.uri);
             this.req1.Category.Add(this.requirementCat1);
+            this.req1.ClassKind = ClassKind.ActionItem;
             this.req2 = new Requirement(Guid.NewGuid(), this.cache, this.uri);
             this.req2.Category.Add(this.requirementCat2);
+            this.req2.ClassKind = ClassKind.ActionItem;
 
             this.reqSpec.Requirement.Add(this.req1);
             this.reqSpec.Requirement.Add(this.req2);
@@ -125,6 +127,7 @@ namespace CDP4EngineeringModel.Tests
             Assert.AreEqual(1, vm.PossibleCategory.Count);
             Assert.AreEqual(0, vm.PossibleSource.Count);
             Assert.AreEqual(0, vm.PossibleTarget.Count);
+            Assert.AreEqual(null, vm.Name);
             
             vm.PossibleSource.Add(this.req1);
             vm.PossibleTarget.Add(this.req2);
@@ -138,10 +141,21 @@ namespace CDP4EngineeringModel.Tests
             Assert.IsTrue(vm.PossibleTarget.Contains(this.req2));
             vm.SelectedTarget = this.req2;
 
+            Assert.IsFalse(vm.PossibleTarget.Contains(this.req1));
+            Assert.IsFalse(vm.PossibleSource.Contains(this.req2));
+
+            vm.SelectedSourceClasskind = this.req1.ClassKind;
+            vm.SelectedTargetClasskind = this.req2.ClassKind;
+
+            Assert.AreEqual(this.req1.ClassKind, vm.SelectedSourceClasskind);
+            Assert.AreEqual(this.req2.ClassKind, vm.SelectedTargetClasskind);
+
             Assert.IsTrue(vm.PossibleOwner.Contains(this.domain));
             vm.SelectedOwner = this.domain;
 
             Assert.IsTrue(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(vm.CancelCommand.CanExecute(null));
+            Assert.IsTrue(vm.OkCanExecute);
         }
 
         [Test]
