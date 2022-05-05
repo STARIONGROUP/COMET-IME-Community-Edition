@@ -81,9 +81,10 @@
                                     <commonViews:InlineEditContentUserControl
                                     InlineMode="True"
                                     EventPublisher="{Binding EventPublisher, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                    IsEnabled="{Binding CanEdit}"
                                     SaveCommand="{Binding SaveCommand}"
                                     CancelCommand="{Binding CancelCommand}"
-                                    StartInPreviewMode="True"                                 
+                                    StartInPreviewMode="True"
                                     ContentText="{Binding Path=DefinitionContent, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}">
                                     </commonViews:InlineEditContentUserControl>
                                 </dxlc:LayoutGroup>
