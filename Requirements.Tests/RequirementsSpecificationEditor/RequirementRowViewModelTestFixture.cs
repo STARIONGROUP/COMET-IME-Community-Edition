@@ -43,6 +43,14 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
     [TestFixture]
     public class RequirementRowViewModelTestFixture
     {
+        private Mock<ISession> session;
+        private Mock<IPermissionService> permissionService;
+        private DomainOfExpertise domainOfExpertise;
+        private Category category_1;
+        private Category category_2;
+        private RequirementsSpecification requirementsSpecification;
+        private Requirement requirement;
+
         [SetUp]
         public void SetUp()
         {
@@ -59,14 +67,6 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             this.requirement = new Requirement { ShortName = "REQ_1", Name = "Requirement 1", Owner = this.domainOfExpertise };
             this.requirementsSpecification.Requirement.Add(this.requirement);
         }
-
-        private Mock<ISession> session;
-        private Mock<IPermissionService> permissionService;
-        private DomainOfExpertise domainOfExpertise;
-        private Category category_1;
-        private Category category_2;
-        private RequirementsSpecification requirementsSpecification;
-        private Requirement requirement;
 
         [Test]
         public void Verify_that_when_requirement_is_not_categorized_categories_property_is_default_hyphen()
