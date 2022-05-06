@@ -354,7 +354,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="MessageBusHandler"/>
         /// </summary>
-        public MessageBusHandler MessageBusHandler { get; } = new MessageBusHandler();
+        public new MessageBusHandler MessageBusHandler { get; } = new MessageBusHandler();
 
         /// <summary>
         /// Updates the current drag state.
