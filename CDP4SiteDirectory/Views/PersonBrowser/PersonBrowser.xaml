@@ -125,6 +125,7 @@
                 <dxg:TreeListColumn FieldName="GivenName" Header="First Name" SortIndex="0" />
                 <dxg:TreeListColumn FieldName="Surname" Header="Last Name" />
                 <dxg:TreeListColumn FieldName="Organization.ShortName" Header="Organization" />
+                <dxg:TreeListColumn FieldName="DefaultDomain.Name" Header="Default Domain"></dxg:TreeListColumn>
             </dxg:TreeListControl.Columns>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView x:Name="View"
