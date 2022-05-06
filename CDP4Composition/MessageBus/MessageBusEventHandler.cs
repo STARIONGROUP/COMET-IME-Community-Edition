@@ -2,24 +2,24 @@
 // <copyright file="MessageBusEventHandler.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -46,29 +46,29 @@ namespace CDP4Composition.MessageBus
         /// <summary>
         /// A <see cref="List{T}"/> of type <see cref="IDisposable"/> that contains disposable items
         /// </summary>
-        private List<IDisposable> disposables = new List<IDisposable>();
+        private readonly List<IDisposable> disposables = new List<IDisposable>();
 
         /// <summary>
         /// A <see cref="Dictionary{TKey, TValue}"/> of type <see cref="IObservable{T}"/> and <see cref="HashSet{IMessageBusEventHandlerData}}"/>
-        /// that holds all <see cref="IMessageBusEventHandlerData"/> classes per <see cref="IObservable{T}"/>.
+        /// that holds all <see cref="IMessageBusEventHandlerSubscription"/> classes per <see cref="IObservable{T}"/>.
         /// </summary>
-        private Dictionary<IObservable<T>, HashSet<IMessageBusEventHandlerData>> MessageBusHandlerDataList { get; } 
-            = new Dictionary<IObservable<T>, HashSet<IMessageBusEventHandlerData>>();
+        private Dictionary<IObservable<T>, HashSet<IMessageBusEventHandlerSubscription>> MessageBusHandlerDataList { get; } 
+            = new Dictionary<IObservable<T>, HashSet<IMessageBusEventHandlerSubscription>>();
 
         /// <summary>
         /// Register a message bus event handler
         /// </summary>
         /// <param name="listener">The <see cref="IObservable{T}"/> to listen to for message bus messages</param>
-        /// <param name="messageBusHandlerData">The <see cref="IMessageBusEventHandlerData"/> instance that holds information about the event handler</param>
+        /// <param name="messageBusHandlerData">The <see cref="IMessageBusEventHandlerSubscription"/> instance that holds information about the event handler</param>
         /// <returns>A <see cref="MessageBusEventHandlerDisposer"/> as an <see cref="IDisposable"/></returns>
-        public IDisposable RegisterEventHandler(IObservable<T> listener, IMessageBusEventHandlerData messageBusHandlerData)
+        public IDisposable RegisterEventHandler(IObservable<T> listener, IMessageBusEventHandlerSubscription messageBusHandlerData)
         {
             return Task.Run
                 (() =>
                     { 
                         if (!this.MessageBusHandlerDataList.TryGetValue(listener, out var messageBusHandlerDataList))
                         {
-                            messageBusHandlerDataList = new HashSet<IMessageBusEventHandlerData>();
+                            messageBusHandlerDataList = new HashSet<IMessageBusEventHandlerSubscription>();
                             this.MessageBusHandlerDataList.Add(listener, messageBusHandlerDataList);
 
                             // At least one subscription, otherwise the CDPMessageBus could remove the listener unexpectedly
@@ -103,7 +103,7 @@ namespace CDP4Composition.MessageBus
         private void HandleEvent(IObservable<T> listener, T obj)
         {
             var messageBusHandlerDataHashSet = this.MessageBusHandlerDataList[listener];
-            IMessageBusEventHandlerData[] messageBusHandlerDataArray = new IMessageBusEventHandlerData[messageBusHandlerDataHashSet.Count];
+            IMessageBusEventHandlerSubscription[] messageBusHandlerDataArray = new IMessageBusEventHandlerSubscription[messageBusHandlerDataHashSet.Count];
             messageBusHandlerDataHashSet.CopyTo(messageBusHandlerDataArray);
 
             foreach (var messageBusHandlerData in messageBusHandlerDataArray)
@@ -116,10 +116,10 @@ namespace CDP4Composition.MessageBus
         }
 
         /// <summary>
-        /// Unregisters a registered <see cref="IMessageBusEventHandlerData"/>
+        /// Unregisters a registered <see cref="IMessageBusEventHandlerSubscription"/>
         /// </summary>
-        /// <param name="messageBusHandlerData">The <see cref="IMessageBusEventHandlerData"/></param>
-        public void UnregisterEventHandler(IMessageBusEventHandlerData messageBusHandlerData)
+        /// <param name="messageBusHandlerData">The <see cref="IMessageBusEventHandlerSubscription"/></param>
+        public void UnregisterEventHandler(IMessageBusEventHandlerSubscription messageBusHandlerData)
         {
             foreach (var keyValuePair in this.MessageBusHandlerDataList)
             {

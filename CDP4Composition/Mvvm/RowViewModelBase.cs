@@ -2,24 +2,24 @@
 // <copyright file="RowViewModelBase.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -376,6 +376,8 @@ namespace CDP4Composition.Mvvm
                     // TODO: if this is indeed a categorizable thing we also have to listen to changes on added/removed categories. Need to figure out how to do this best
                     // as the list of Categories is not reactive. Currently you will need to close and open the view after applying a category to make
                     // highlighting work.
+                    // Github ticket: https://github.com/RHEAGROUP/COMET-IME-Community-Edition/issues/1057
+
                     foreach (var category in thingAsCategorizableThing.Category)
                     {
                         var highlightCategorySubscription = CDPMessageBus.Current.Listen<HighlightByCategoryEvent>(category)
@@ -396,7 +398,7 @@ namespace CDP4Composition.Mvvm
 
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<HighlightEvent>().RegisterEventHandler(
                     highlightObserver,
-                    new MessageBusHandlerData<HighlightEvent>(
+                    new MessageBusEventHandlerSubscription<HighlightEvent>(
                         e => true,
                         e => 
                         {
@@ -413,7 +415,7 @@ namespace CDP4Composition.Mvvm
 
                     this.Disposables.Add(this.MessageBusHandler.GetHandler<HighlightByCategoryEvent>().RegisterEventHandler(
                         highlightByCategoryObserver,
-                        new MessageBusHandlerData<HighlightByCategoryEvent>(
+                        new MessageBusEventHandlerSubscription<HighlightByCategoryEvent>(
                             e => true,
                             e =>
                             {
@@ -428,7 +430,7 @@ namespace CDP4Composition.Mvvm
 
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(
                     relationshipObserver, 
-                    new ObjectChangedMessageBusHandlerData(
+                    new ObjectChangedMessageBusEventHandlerSubscription(
                         null, 
                         objectChange => true, 
                         objectChange => this.UpdateThingStatus())));

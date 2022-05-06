@@ -1,25 +1,25 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSubscriptionRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -120,13 +120,13 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var parameterOrOverrideObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase));
                 this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterOrOverrideObserver, new ObjectChangedMessageBusHandlerData(parameterOrOverride, discriminator, parameterOrOverrideAction)));
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterOrOverrideObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOrOverride, discriminator, parameterOrOverrideAction)));
 
                 if (parameterOverride != null)
                 {
                     var parameterObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Parameter));
                     this.Disposables.Add(
-                        this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterObserver, new ObjectChangedMessageBusHandlerData(parameterOverride.Parameter, discriminator, parameterAction)));
+                        this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOverride.Parameter, discriminator, parameterAction)));
                 }
             }
         }
@@ -158,7 +158,7 @@ namespace CDP4EngineeringModel.ViewModels
             else
             {
                 var ownerObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise));
-                listener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusHandlerData(parameterOrOverride.Owner, discriminator, action));
+                listener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOrOverride.Owner, discriminator, action));
             }
             
             this.OwnerListener = new KeyValuePair<DomainOfExpertise, IDisposable>(parameterOrOverride.Owner, listener);
@@ -238,11 +238,11 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var parameterSubscriptionValueSetObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterSubscriptionValueSet));
                 this.valueSetListener.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterSubscriptionValueSetObserver, new ObjectChangedMessageBusHandlerData(valueset, discriminator, action)));
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterSubscriptionValueSetObserver, new ObjectChangedMessageBusEventHandlerSubscription(valueset, discriminator, action)));
 
                 var parameterValueSetObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase));
                 this.valueSetListener.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterValueSetObserver, new ObjectChangedMessageBusHandlerData(valueset.SubscribedValueSet, discriminator, action)));
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterValueSetObserver, new ObjectChangedMessageBusEventHandlerSubscription(valueset.SubscribedValueSet, discriminator, action)));
             }
         }
 

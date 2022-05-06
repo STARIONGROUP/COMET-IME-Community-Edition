@@ -2,24 +2,24 @@
 // <copyright file="ViewModelBase.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -98,7 +98,7 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         protected ViewModelBase()
         {
-            InitializeLogger();
+            this.InitializeLogger();
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace CDP4Composition.Mvvm
 
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(
                     thingObserver, 
-                    new ObjectChangedMessageBusHandlerData(
+                    new ObjectChangedMessageBusEventHandlerSubscription(
                         this.Thing, 
                         discriminator,
                         action)));
@@ -195,24 +195,24 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         protected virtual void BeforeInitialize()
         {
-            var searchContainerViewModel = this.ContainerViewModel;
+            var containerViewModel = this.ContainerViewModel;
 
-            while (searchContainerViewModel != null)
+            while (containerViewModel != null)
             {
-                if (searchContainerViewModel is IHaveMessageBusHandler hasMessageBusHandlers)
+                if (containerViewModel is IHaveMessageBusHandler hasMessageBusHandlers)
                 {
                     this.MessageBusHandler = hasMessageBusHandlers.MessageBusHandler;
 
                     break;
                 }
 
-                if (searchContainerViewModel is IHaveContainerViewModel hasContainerViewModel)
+                if (containerViewModel is IHaveContainerViewModel hasContainerViewModel)
                 {
-                    searchContainerViewModel = hasContainerViewModel.ContainerViewModel;
+                    containerViewModel = hasContainerViewModel.ContainerViewModel;
                 }
                 else
                 {
-                    searchContainerViewModel = null;
+                    containerViewModel = null;
                 }
             }
 

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IHaveMessageBusHandler.cs" company="RHEA System S.A.">
+// <copyright file="ObjectChangedMessageBusEventHandlerSubscription.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,22 +32,22 @@ namespace CDP4Composition.MessageBus
     using System;
 
     /// <summary>
-    /// Specific <see cref="MessageBusHandlerData{T}"/> class that mandles message bus events for <see cref="ObjectChangedEvent"/> message bus events
+    /// Specific <see cref="MessageBusEventHandlerSubscription{T}"/> class that mandles message bus events for <see cref="ObjectChangedEvent"/> message bus events
     /// </summary>
-    public class ObjectChangedMessageBusHandlerData : MessageBusHandlerData<ObjectChangedEvent>
+    public class ObjectChangedMessageBusEventHandlerSubscription : MessageBusEventHandlerSubscription<ObjectChangedEvent>
     {
         /// <summary>
-        /// The <see cref="Thing"/> where this <see cref="ObjectChangedMessageBusHandlerData"/> was registered for
+        /// The <see cref="Thing"/> where this <see cref="ObjectChangedMessageBusEventHandlerSubscription"/> was registered for
         /// </summary>
         public Thing Thing { get; }
 
         /// <summary>
-        /// Creates a new instance of the <see cref="ObjectChangedMessageBusHandlerData"/> class
+        /// Creates a new instance of the <see cref="ObjectChangedMessageBusEventHandlerSubscription"/> class
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/></param>
         /// <param name="discriminator">The discriminator code</param>
         /// <param name="action">The to be executed code</param>
-        public ObjectChangedMessageBusHandlerData(Thing thing, Func<ObjectChangedEvent, bool> discriminator, Action<ObjectChangedEvent> action) 
+        public ObjectChangedMessageBusEventHandlerSubscription(Thing thing, Func<ObjectChangedEvent, bool> discriminator, Action<ObjectChangedEvent> action) 
             : base(discriminator, action)
         {
             Thing = thing;
