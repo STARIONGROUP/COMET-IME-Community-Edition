@@ -276,7 +276,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var elementDefinitionObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementDefinition));
 
                 this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ElementDefinition, elementDefinitionDiscriminator, elementDefinitionAction)));
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(elementDefinitionObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ElementDefinition, elementDefinitionDiscriminator, elementDefinitionAction)));
             }
         }
 

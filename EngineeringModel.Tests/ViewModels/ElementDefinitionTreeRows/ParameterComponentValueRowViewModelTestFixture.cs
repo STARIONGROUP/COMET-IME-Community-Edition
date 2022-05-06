@@ -1,9 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterComponentValueRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------------
 namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 {
     using System;
@@ -15,7 +33,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.Permission;
     using CDP4EngineeringModel.ViewModels;
@@ -31,7 +48,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     [TestFixture]
     public class ParameterComponentValueRowViewModelTestFixture
     {
-        private Mock<IThingDialogNavigationService> thingDialognavigationService;        
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<IPermissionService> permissionService;
@@ -53,7 +69,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [SetUp]
         public void SetUp()
         {
-            this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
@@ -240,7 +255,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
-        public void VerifyThatOwnerIsUpdatedForSubscription()
+        public void VerifyThatOwnerIsUpdatedForDirectSubscription()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
             parameter.Owner = this.activeDomain;
@@ -271,7 +286,39 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
-        public void VerifyThatOwnerIsUpdatedForParameterOrOverride()
+        public void VerifyThatOwnerIsUpdatedForMessageBusHandlerSubscription()
+        {
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
+            parameter.Owner = this.activeDomain;
+            var boolPt = new BooleanParameterType(Guid.NewGuid(), this.cache, this.uri);
+            var compoundParameterType = new CompoundParameterType(Guid.NewGuid(), this.cache, this.uri);
+            var component1 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = boolPt };
+            var component2 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = boolPt };
+            compoundParameterType.Component.Add(component1);
+            compoundParameterType.Component.Add(component2);
+            parameter.ParameterType = compoundParameterType;
+            this.elementDefinition.Parameter.Add(parameter);
+
+            var parameterSubscription = new ParameterSubscription(Guid.NewGuid(), this.cache, this.uri);
+            parameterSubscription.Owner = this.otherDomain;
+
+            parameter.ParameterSubscription.Add(parameterSubscription);
+
+            var container = new TestMessageBusHandlerContainerViewModel();
+            var parameterSubscriptionRowViewModel = new ParameterSubscriptionRowViewModel(parameterSubscription, this.session.Object, container, false);
+
+            var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
+            Assert.IsTrue(component1row.OwnerName.Contains(this.activeDomain.Name));
+
+            this.activeDomain.Name = "updated";
+            this.activeDomain.RevisionNumber = 100;
+            CDPMessageBus.Current.SendObjectChangeEvent(this.activeDomain, EventKind.Updated);
+
+            Assert.IsTrue(component1row.OwnerName.Contains("updated"));
+        }
+
+        [Test]
+        public void VerifyThatOwnerIsUpdatedForParameterOrOverrideForDirectSubscription()
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
             parameter.Owner = this.activeDomain;
@@ -285,6 +332,33 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinition.Parameter.Add(parameter);
 
             var parameterSubscriptionRowViewModel = new ParameterRowViewModel(parameter, this.session.Object, null, false);
+
+            var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
+            Assert.IsTrue(component1row.OwnerName.Contains(this.activeDomain.Name));
+
+            this.activeDomain.Name = "updated";
+            this.activeDomain.RevisionNumber = 100;
+            CDPMessageBus.Current.SendObjectChangeEvent(this.activeDomain, EventKind.Updated);
+
+            Assert.IsTrue(component1row.OwnerName.Contains("updated"));
+        }
+
+        [Test]
+        public void VerifyThatOwnerIsUpdatedForParameterOrOverrideForMessageBusHandlerSubscription()
+        {
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
+            parameter.Owner = this.activeDomain;
+            var boolPt = new BooleanParameterType(Guid.NewGuid(), this.cache, this.uri);
+            var compoundParameterType = new CompoundParameterType(Guid.NewGuid(), this.cache, this.uri);
+            var component1 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = boolPt };
+            var component2 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = boolPt };
+            compoundParameterType.Component.Add(component1);
+            compoundParameterType.Component.Add(component2);
+            parameter.ParameterType = compoundParameterType;
+            this.elementDefinition.Parameter.Add(parameter);
+
+            var container = new TestMessageBusHandlerContainerViewModel();
+            var parameterSubscriptionRowViewModel = new ParameterRowViewModel(parameter, this.session.Object, container, false);
 
             var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
             Assert.IsTrue(component1row.OwnerName.Contains(this.activeDomain.Name));

@@ -308,7 +308,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
         }
 
-        #region Update value sets Methods
         /// <summary>
         /// Call the correct update method depending on kind of parameter type (scalar, compound)
         /// </summary>
@@ -380,7 +379,6 @@ namespace CDP4EngineeringModel.ViewModels
                 this.SetOwnerListener();
             }
         }
-        #endregion
 
         /// <summary>
         /// Computes the entire row or specific property of the row is editable based on the

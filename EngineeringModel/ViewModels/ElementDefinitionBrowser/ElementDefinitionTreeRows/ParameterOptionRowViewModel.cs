@@ -52,7 +52,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="session">The associated <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container row</param>
         /// <param name="isReadOnly">A value indicating whether the row is read-only</param>
-        public ParameterOptionRowViewModel(ParameterBase parameterBase, Option option, ISession session, IRowViewModelBase<Thing> containerViewModel, bool isReadOnly)
+        public ParameterOptionRowViewModel(ParameterBase parameterBase, Option option, ISession session, IViewModelBase<Thing> containerViewModel, bool isReadOnly)
             : base(parameterBase, session, option, null, containerViewModel, 0, isReadOnly)
         {
             this.Name = this.ActualOption.Name;

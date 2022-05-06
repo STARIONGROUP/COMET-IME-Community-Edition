@@ -88,7 +88,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var parameterOverrideObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterSubscription));
+                var parameterOverrideObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Parameter));
                 this.Disposables.Add(
                     this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterOverrideObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOverride.Parameter, discriminator, action)));
             }
