@@ -40,11 +40,5 @@ namespace CDP4Composition.MessageBus
         /// <param name="messageBusHandlerData">The <see cref="IMessageBusEventHandlerSubscription"/></param>
         /// <returns>The event handler as an <see cref="IDisposable"/></returns>
         IDisposable RegisterEventHandler(IObservable<T> messageBusEvent, IMessageBusEventHandlerSubscription messageBusHandlerData);
-
-        /// <summary>
-        /// Removes an existing <see cref="IMessageBusEventHandlerSubscription"/> from the event handler cache
-        /// </summary>
-        /// <param name="messageBusHandlerData">The <see cref="IMessageBusEventHandlerSubscription"/></param>
-        void UnregisterEventHandler(IMessageBusEventHandlerSubscription messageBusHandlerData);
     }
 }

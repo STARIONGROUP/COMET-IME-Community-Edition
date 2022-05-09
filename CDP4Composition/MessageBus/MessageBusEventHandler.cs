@@ -25,10 +25,13 @@
 
 namespace CDP4Composition.MessageBus
 {
+    using CDP4Dal.Events;
+
     using ReactiveUI;
 
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
@@ -52,24 +55,31 @@ namespace CDP4Composition.MessageBus
         /// A <see cref="Dictionary{TKey, TValue}"/> of type <see cref="IObservable{T}"/> and <see cref="HashSet{IMessageBusEventHandlerData}}"/>
         /// that holds all <see cref="IMessageBusEventHandlerSubscription"/> classes per <see cref="IObservable{T}"/>.
         /// </summary>
-        private Dictionary<IObservable<T>, HashSet<IMessageBusEventHandlerSubscription>> MessageBusHandlerDataList { get; } 
-            = new Dictionary<IObservable<T>, HashSet<IMessageBusEventHandlerSubscription>>();
+        protected Dictionary<IObservable<T>, Dictionary<object, HashSet<IMessageBusEventHandlerSubscription>>> MessageBusHandlerDataList { get; } 
+            = new Dictionary<IObservable<T>, Dictionary<object, HashSet<IMessageBusEventHandlerSubscription>>>();
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="MessageBusEventHandler"/> class
+        /// </summary>
+        protected MessageBusEventHandler() : base()
+        {
+        }
 
         /// <summary>
         /// Register a message bus event handler
         /// </summary>
         /// <param name="listener">The <see cref="IObservable{T}"/> to listen to for message bus messages</param>
-        /// <param name="messageBusHandlerData">The <see cref="IMessageBusEventHandlerSubscription"/> instance that holds information about the event handler</param>
+        /// <param name="messageBusEventHandlerSubscription">The <see cref="IMessageBusEventHandlerSubscription"/> instance that holds information about the event handler</param>
         /// <returns>A <see cref="MessageBusEventHandlerDisposer"/> as an <see cref="IDisposable"/></returns>
-        public IDisposable RegisterEventHandler(IObservable<T> listener, IMessageBusEventHandlerSubscription messageBusHandlerData)
+        public IDisposable RegisterEventHandler(IObservable<T> listener, IMessageBusEventHandlerSubscription messageBusEventHandlerSubscription)
         {
             return Task.Run
                 (() =>
                     { 
-                        if (!this.MessageBusHandlerDataList.TryGetValue(listener, out var messageBusHandlerDataList))
+                        if (!this.MessageBusHandlerDataList.TryGetValue(listener, out var messageBusEventHandlerSubscriptionDictionary))
                         {
-                            messageBusHandlerDataList = new HashSet<IMessageBusEventHandlerSubscription>();
-                            this.MessageBusHandlerDataList.Add(listener, messageBusHandlerDataList);
+                            messageBusEventHandlerSubscriptionDictionary = new Dictionary<object, HashSet<IMessageBusEventHandlerSubscription>>();
+                            this.MessageBusHandlerDataList.Add(listener, messageBusEventHandlerSubscriptionDictionary);
 
                             // At least one subscription, otherwise the CDPMessageBus could remove the listener unexpectedly
                             this.disposables.Add(
@@ -77,16 +87,33 @@ namespace CDP4Composition.MessageBus
                                 .ObserveOn(RxApp.MainThreadScheduler)
                                 .Subscribe(
                                     x => 
-                                    this.HandleEvent(listener, x)));
+                                    this.HandleEvents(listener, x)));
                         }
 
-                        messageBusHandlerDataList.Add(messageBusHandlerData);
+                        var subscriptionObject = this.GetSubscriptionObject(messageBusEventHandlerSubscription);
+                        if (subscriptionObject == null)
+                        {
+                            return new MessageBusEventHandlerDisposer(new Action(() => { })); 
+                        }
+
+                        if (!messageBusEventHandlerSubscriptionDictionary.TryGetValue(subscriptionObject, out var messageBusEventHandlerSubscriptionHashSet))
+                        {
+                            messageBusEventHandlerSubscriptionHashSet = new HashSet<IMessageBusEventHandlerSubscription>();
+                            messageBusEventHandlerSubscriptionDictionary.Add(subscriptionObject, messageBusEventHandlerSubscriptionHashSet);
+                        }
+
+                        messageBusEventHandlerSubscriptionHashSet.Add(messageBusEventHandlerSubscription);
 
                         Action cleanUpAction = () =>
                         {
-                            if (messageBusHandlerDataList.Contains(messageBusHandlerData))
+                            if (messageBusEventHandlerSubscriptionHashSet.Contains(messageBusEventHandlerSubscription))
                             {
-                                messageBusHandlerDataList.Remove(messageBusHandlerData);
+                                messageBusEventHandlerSubscriptionHashSet.Remove(messageBusEventHandlerSubscription);
+                            }
+
+                            if (!messageBusEventHandlerSubscriptionHashSet.Any())
+                            {
+                                messageBusEventHandlerSubscriptionDictionary.Remove(subscriptionObject);
                             }
                         };
 
@@ -96,36 +123,31 @@ namespace CDP4Composition.MessageBus
         }
 
         /// <summary>
+        /// Gets the object where the subscription is registered for
+        /// </summary>
+        /// <returns>The <see cref="object"/></returns>
+        protected virtual object GetSubscriptionObject(IMessageBusEventHandlerSubscription messageBusEventHandlerSubscription)
+        {
+            return this;
+        }
+
+        /// <summary>
         /// Handles the registered events based on an <see cref="IObservable{T}"/>
         /// </summary>
         /// <param name="listener">The <see cref="IObservable{T}"</param>
         /// <param name="obj">The type of message bus event</param>
-        private void HandleEvent(IObservable<T> listener, T obj)
+        protected virtual void HandleEvents(IObservable<T> listener, T obj)
         {
-            var messageBusHandlerDataHashSet = this.MessageBusHandlerDataList[listener];
-            IMessageBusEventHandlerSubscription[] messageBusHandlerDataArray = new IMessageBusEventHandlerSubscription[messageBusHandlerDataHashSet.Count];
-            messageBusHandlerDataHashSet.CopyTo(messageBusHandlerDataArray);
+            var messageBusHandlerDataDictionary = this.MessageBusHandlerDataList[listener];
 
-            foreach (var messageBusHandlerData in messageBusHandlerDataArray)
+            if (messageBusHandlerDataDictionary.TryGetValue(this, out var messageBusEventHandlerSubscriptions))
             {
-                if (messageBusHandlerData.ExecuteDiscriminator(obj))
+                foreach (var messageBusEventHandlerSubscription in messageBusEventHandlerSubscriptions)
                 {
-                    messageBusHandlerData.ExecuteAction(obj);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Unregisters a registered <see cref="IMessageBusEventHandlerSubscription"/>
-        /// </summary>
-        /// <param name="messageBusHandlerData">The <see cref="IMessageBusEventHandlerSubscription"/></param>
-        public void UnregisterEventHandler(IMessageBusEventHandlerSubscription messageBusHandlerData)
-        {
-            foreach (var keyValuePair in this.MessageBusHandlerDataList)
-            {
-                if (keyValuePair.Value.Contains(messageBusHandlerData))
-                {
-                    keyValuePair.Value.Remove(messageBusHandlerData);
+                    if (messageBusEventHandlerSubscription.ExecuteDiscriminator(obj))
+                    {
+                        messageBusEventHandlerSubscription.ExecuteAction(obj);
+                    }
                 }
             }
         }
@@ -161,6 +183,21 @@ namespace CDP4Composition.MessageBus
 
             // Indicate that the instance has been disposed.
             this.isDisposed = true;
+        }
+
+        /// <summary>
+        /// Creates an <see cref="IMessageBusEventHandlerBase"/> based on a <see cref="Type"/>
+        /// </summary>
+        /// <typeparam name="THandler">The <see cref="Type"/></typeparam>
+        /// <returns>An <see cref="IMessageBusEventHandlerBase"/></returns>
+        public static IMessageBusEventHandlerBase CreateHandler<THandler>()
+        {
+            if (typeof(THandler) == typeof(ObjectChangedEvent))
+            {
+                return new ObjectChangedMessageBusEventHandler();
+            }
+
+            return new MessageBusEventHandler<THandler>();
         }
     }
 }

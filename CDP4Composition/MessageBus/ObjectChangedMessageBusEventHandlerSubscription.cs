@@ -42,6 +42,11 @@ namespace CDP4Composition.MessageBus
         public Thing Thing { get; }
 
         /// <summary>
+        /// Gets the <see cref="Type"/> where this <see cref="ObjectChangedMessageBusEventHandlerSubscription"/> was registered for
+        /// </summary>
+        public Type Type { get; }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="ObjectChangedMessageBusEventHandlerSubscription"/> class
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/></param>
@@ -54,14 +59,15 @@ namespace CDP4Composition.MessageBus
         }
 
         /// <summary>
-        /// Executes discriminator code (sort of Where statement) to check if ExecuteAction is allowed to be executed
+        /// Creates a new instance of the <see cref="ObjectChangedMessageBusEventHandlerSubscription"/> class
         /// </summary>
-        /// <param name="messageBusEvent">The type of message bus event</param>
-        /// <returns>True if ExecuteAction is allowed, otherwise false</returns>
-        public override bool ExecuteDiscriminator(object messageBusEvent)
+        /// <param name="type">The <see cref="Type"/></param>
+        /// <param name="discriminator">The discriminator code</param>
+        /// <param name="action">The to be executed code</param>
+        public ObjectChangedMessageBusEventHandlerSubscription(Type type, Func<ObjectChangedEvent, bool> discriminator, Action<ObjectChangedEvent> action) 
+            : base(discriminator, action)
         {
-            var objectChangedEvent = messageBusEvent as ObjectChangedEvent;
-            return (this.Thing == null || objectChangedEvent.ChangedThing.Equals(this.Thing)) && base.ExecuteDiscriminator(objectChangedEvent);
+            Type = type;
         }
     }
 }

@@ -431,7 +431,7 @@ namespace CDP4Composition.Mvvm
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(
                     relationshipObserver, 
                     new ObjectChangedMessageBusEventHandlerSubscription(
-                        null, 
+                        typeof(Relationship), 
                         objectChange => true, 
                         objectChange => this.UpdateThingStatus())));
             }
