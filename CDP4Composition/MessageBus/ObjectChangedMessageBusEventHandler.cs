@@ -83,17 +83,23 @@ namespace CDP4Composition.MessageBus
                 }
             }
 
-            if (messageBusHandlerDataDictionary.TryGetValue(objectChangedEvent.ChangedThing.GetType(), out var messageBusEventHandlerTypeSubscriptions))
-            {
-                ObjectChangedMessageBusEventHandlerSubscription[] messageBusEventHandlerTypeSubscriptionArray = new ObjectChangedMessageBusEventHandlerSubscription[messageBusEventHandlerTypeSubscriptions.Count];
-                messageBusEventHandlerTypeSubscriptions.CopyTo(messageBusEventHandlerTypeSubscriptionArray);
-                var list = messageBusEventHandlerTypeSubscriptionArray.OfType<ObjectChangedMessageBusEventHandlerSubscription>();
+            var type = objectChangedEvent.ChangedThing.GetType();
 
-                foreach (var objectChangedMessageBusEventHandlerSubscription in list)
+            foreach (var keyValuePair in messageBusHandlerDataDictionary.Where(x => x.Key is Type))
+            {
+                if (keyValuePair.Key is Type subscriptionType && (subscriptionType == type || subscriptionType.IsAssignableFrom(type)))
                 {
-                    if (objectChangedMessageBusEventHandlerSubscription.ExecuteDiscriminator(objectChangedEvent))
+                    var messageBusEventHandlerTypeSubscriptions = keyValuePair.Value;
+                    ObjectChangedMessageBusEventHandlerSubscription[] messageBusEventHandlerTypeSubscriptionArray = new ObjectChangedMessageBusEventHandlerSubscription[messageBusEventHandlerTypeSubscriptions.Count];
+                    messageBusEventHandlerTypeSubscriptions.CopyTo(messageBusEventHandlerTypeSubscriptionArray);
+                    var list = messageBusEventHandlerTypeSubscriptionArray.OfType<ObjectChangedMessageBusEventHandlerSubscription>();
+
+                    foreach (var objectChangedMessageBusEventHandlerSubscription in list)
                     {
-                        objectChangedMessageBusEventHandlerSubscription.ExecuteAction(objectChangedEvent);
+                        if (objectChangedMessageBusEventHandlerSubscription.ExecuteDiscriminator(objectChangedEvent))
+                        {
+                            objectChangedMessageBusEventHandlerSubscription.ExecuteAction(objectChangedEvent);
+                        }
                     }
                 }
             }
