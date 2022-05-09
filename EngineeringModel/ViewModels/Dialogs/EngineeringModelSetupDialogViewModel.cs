@@ -19,7 +19,14 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
+
+    using CDP4EngineeringModel.ViewModels.Dialogs.Rows;
+
+    using DevExpress.Xpf.Core.DragDrop.Native;
+
     using ReactiveUI;
+
+    using ActiveDomainRowViewModel = CDP4Composition.CommonView.ViewModels.ActiveDomainRowViewModel;
 
     /// <summary>
     /// The purpose of the <see cref="EngineeringModelSetupDialogViewModel"/> is to allow an <see cref="EngineeringModelSetup"/> to
@@ -209,6 +216,21 @@ namespace CDP4EngineeringModel.ViewModels
             get { return this.name; }
             set { this.RaiseAndSetIfChanged(ref this.name, value); }
         }
+
+        /// <summary>
+        /// The backing field for <see cref="ShowDeprecatedDomains"/> property.
+        /// </summary>
+        private bool showDeprecatedDomains = false;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to display deprecated domains.
+        /// </summary>
+        public bool ShowDeprecatedDomains
+        {
+            get { return this.showDeprecatedDomains; }
+            set { this.RaiseAndSetIfChanged(ref this.showDeprecatedDomains, value); }
+        }
+
         #endregion
 
         /// <summary>
@@ -223,6 +245,8 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.SelectedOrganizations = new ReactiveList<Organization>();
             this.SelectedOrganizations.ChangeTrackingEnabled = true;
+            
+            this.WhenAnyValue(vm => vm.ShowDeprecatedDomains).Subscribe();
         }
 
         /// <summary>
@@ -234,9 +258,27 @@ namespace CDP4EngineeringModel.ViewModels
 
             var currentActiveDomain = this.Thing.ActiveDomain;
             this.PossibleActiveDomain.Clear();
-            this.PossibleActiveDomain.AddRange(sitedir.Domain.OrderBy(x => x.Name));
 
-            this.ActiveDomain = new ReactiveList<DomainOfExpertise>(currentActiveDomain);
+            //if (this.ShowDeprecatedDomains)
+            //{
+            foreach (var domainOfExpertise in sitedir.Domain.OrderBy(x => x.Name))
+            {
+                var activeDomainRowModel = new ActiveDomainRowViewModel(domainOfExpertise, !this.ShowDeprecatedDomains);
+                this.PossibleActiveDomain.Add(activeDomainRowModel);
+            }
+
+            //                this.PossibleActiveDomain.AddRange(sitedir.Domain.OrderBy(x => x.Name));
+            //}
+            //else
+            //{
+            //    this.PossibleActiveDomain.AddRange(sitedir.Domain.Where(x => !x.IsDeprecated).OrderBy(x => x.Name));
+            //}
+            this.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel>();
+            foreach (var activeDomain in currentActiveDomain)
+            {
+                var activeDomainRowModel = new ActiveDomainRowViewModel(activeDomain, !this.ShowDeprecatedDomains);
+                this.ActiveDomain.Add(activeDomainRowModel);
+            }
         }
 
         /// <summary>

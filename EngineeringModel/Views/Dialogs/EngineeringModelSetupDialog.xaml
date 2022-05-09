@@ -13,6 +13,7 @@
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              xmlns:converters1="clr-namespace:CDP4EngineeringModel.Converters"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              Height="550"
              Width="400"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -21,6 +22,7 @@
         <converters:UnderscoreCapitalsToSpacedTitleCaseConverter x:Key="UnderscoreCapitalsToSpacedTitleCaseConverter" />
         <converters:NotConverter x:Key="NotConverter" />
         <converters1:ReactiveDomainToObjectListConverter x:Key="DomainToObjectListConverter" />
+        <converters1:ReactiveActiveDomainToObjectListConverter x:Key="ActiveDomainToObjectListConverter" />
         <converters:ReactiveOrganizationToObjectListConverter x:Key="ReactiveOrganizationToObjectListConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </dx:DXWindow.Resources>
@@ -105,15 +107,31 @@
                 </lc:LayoutGroup>
 
                 <lc:LayoutGroup Header="Active Domain" Orientation="Vertical" IsEnabled="{Binding IsActiveDomainSelectionReadOnly, Converter={StaticResource NotConverter}}">
+                    <lc:LayoutItem HorizontalAlignment="Right">
+                        <dx:SimpleButton x:Name="ShowDeprecatedDomainBox"
+                                         Margin="0,0,10,0"
+                                         IsChecked="{Binding ShowDeprecatedDomains}"
+                                         Glyph="{dx:DXImage Image=Show_16x16.png}"
+                                         ToolTip="Show Deprecated Domains of Expertise"
+                                         ButtonKind="Toggle"
+                                         Width="25"
+                                         Height="25"/>
+                    </lc:LayoutItem>
                     <lc:LayoutItem>
                         <dxe:ListBoxEdit VerticalAlignment="Stretch"
                                          HorizontalAlignment="Stretch"
                                          MaxHeight="250"
                                          Margin="10"
                                          IsReadOnly="{Binding IsActiveDomainSelectionReadOnly}"
-                                         DisplayMember="Name"
-                                         EditValue="{Binding ActiveDomain, Converter={StaticResource DomainToObjectListConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         DisplayMember="DomainOfExpertise.Name"
+                                         EditValue="{Binding ActiveDomain, Converter={StaticResource ActiveDomainToObjectListConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                          ItemsSource="{Binding PossibleActiveDomain}">
+
+                            <dxe:ListBoxEdit.ItemContainerStyle>
+                                <Style TargetType="dxe:ListBoxEditItem">
+                                    <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                </Style>
+                            </dxe:ListBoxEdit.ItemContainerStyle>
                             <dxe:ListBoxEdit.StyleSettings>
                                 <dxe:CheckedListBoxEditStyleSettings />
                             </dxe:ListBoxEdit.StyleSettings>
