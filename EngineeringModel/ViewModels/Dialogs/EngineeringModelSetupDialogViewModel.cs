@@ -274,7 +274,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
-            this.OkCanExecute = this.OkCanExecute && this.IsOrganizationalParticipationSetup();
+            this.OkCanExecute = this.OkCanExecute && (this.ActiveDomain.Count >= 0) && this.IsOrganizationalParticipationSetup();
         }
 
         /// <summary>
