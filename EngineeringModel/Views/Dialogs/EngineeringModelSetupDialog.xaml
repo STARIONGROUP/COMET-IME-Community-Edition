@@ -14,6 +14,7 @@
              xmlns:converters1="clr-namespace:CDP4EngineeringModel.Converters"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
              Height="550"
              Width="400"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -25,6 +26,7 @@
         <converters1:ReactiveActiveDomainToObjectListConverter x:Key="ActiveDomainToObjectListConverter" />
         <converters:ReactiveOrganizationToObjectListConverter x:Key="ReactiveOrganizationToObjectListConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <FontStyleConverter x:Key="FontStyleConverter"></FontStyleConverter>
     </dx:DXWindow.Resources>
 
     <Grid>
@@ -118,22 +120,29 @@
                                          Height="25"/>
                     </lc:LayoutItem>
                     <lc:LayoutItem>
-                        <dxe:ListBoxEdit VerticalAlignment="Stretch"
-                                         HorizontalAlignment="Stretch"
-                                         MaxHeight="250"
-                                         Margin="10"
-                                         IsReadOnly="{Binding IsActiveDomainSelectionReadOnly}"
-                                         DisplayMember="DomainOfExpertise.Name"
-                                         EditValue="{Binding ActiveDomain, Converter={StaticResource ActiveDomainToObjectListConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                         ItemsSource="{Binding PossibleActiveDomain}">
+                        <dxe:ListBoxEdit
+                            MaxHeight="250"
+                            Margin="10"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            DisplayMember="Name"
+                            EditValue="{Binding ActiveDomain, Converter={StaticResource ActiveDomainToObjectListConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            ItemsSource="{Binding PossibleActiveDomain}">
 
-                            <dxe:ListBoxEdit.ItemContainerStyle>
-                                <Style TargetType="dxe:ListBoxEditItem">
-                                    <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"/>
-                                </Style>
-                            </dxe:ListBoxEdit.ItemContainerStyle>
                             <dxe:ListBoxEdit.StyleSettings>
-                                <dxe:CheckedListBoxEditStyleSettings />
+                                <dxe:CheckedListBoxEditStyleSettings>
+                                    <dxe:CheckedListBoxEditStyleSettings.ItemContainerStyle>
+                                        <Style BasedOn="{StaticResource {themes:EditorListBoxThemeKey ResourceKey=CheckBoxItemStyle}}" TargetType="dxe:ListBoxEditItem">
+                                            <Setter Property="Visibility" Value="{Binding IsVisible, Converter={dxmvvm:BooleanToVisibilityConverter}}" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Path=IsDeprecated}" Value="True">
+                                                    <Setter Property = "FontStyle" Value="Italic"/>
+                                                    <Setter Property = "IsEnabled" Value="{Binding IsEnabled}" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </dxe:CheckedListBoxEditStyleSettings.ItemContainerStyle>
+                                </dxe:CheckedListBoxEditStyleSettings>
                             </dxe:ListBoxEdit.StyleSettings>
                         </dxe:ListBoxEdit>
                     </lc:LayoutItem>

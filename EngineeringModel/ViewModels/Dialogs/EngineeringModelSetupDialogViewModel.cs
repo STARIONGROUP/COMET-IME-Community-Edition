@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelSetupDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
@@ -10,229 +29,43 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Windows;
+
     using CDP4Common.CommonData;
+
     using CDP4Dal.Operations;
+
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
 
     using CDP4EngineeringModel.ViewModels.Dialogs.Rows;
 
     using DevExpress.Xpf.Core.DragDrop.Native;
+    using DevExpress.Xpf.Editors;
 
     using ReactiveUI;
 
     using ActiveDomainRowViewModel = CDP4Composition.CommonView.ViewModels.ActiveDomainRowViewModel;
 
     /// <summary>
-    /// The purpose of the <see cref="EngineeringModelSetupDialogViewModel"/> is to allow an <see cref="EngineeringModelSetup"/> to
+    /// The purpose of the <see cref="EngineeringModelSetupDialogViewModel" /> is to allow an
+    /// <see cref="EngineeringModelSetup" /> to
     /// be created or updated.
     /// </summary>
     /// <remarks>
-    /// The creation of an <see cref="EngineeringModelSetup"/> will result in an <see cref="EngineeringModel"/> being created by 
+    /// The creation of an <see cref="EngineeringModelSetup" /> will result in an <see cref="EngineeringModel" /> being created
+    /// by
     /// the connected data-source
     /// </remarks>
     [ThingDialogViewModelExport(ClassKind.EngineeringModelSetup)]
     public class EngineeringModelSetupDialogViewModel : CDP4CommonView.EngineeringModelSetupDialogViewModel, IThingDialogViewModel
     {
-        #region field
-        /// <summary>
-        /// Backing field for the <see cref="SourceEngineeringModelSetup"/> property;
-        /// </summary>
-        private EngineeringModelSetup sourceEngineeringModelSetup;
-
-        /// <summary>
-        /// Backing field for the <see cref="ReferenceDataLibrary"/> property;
-        /// </summary>
-        private SiteReferenceDataLibrary selectedSiteReferenceDataLibrary;
-
-        /// <summary>
-        /// Backing field for the <see cref="isOriginal"/> property.
-        /// </summary>
-        private bool isOriginal;
-
-        /// <summary>
-        /// The backing field for <see cref="ShortName"/>
-        /// </summary>
-        private string shortName;
-
-        /// <summary>
-        /// The backing field for <see cref="Name"/>
-        /// </summary>
-        private string name;
-
-        /// <summary>
-        /// Backing field for <see cref="SelectedOrganizations"/>
-        /// </summary>
-        private ReactiveList<Organization> selectedOrganizations;
-
-        /// <summary>
-        /// Backing field for <see cref="SelectedDefaultOrganization"/>
-        /// </summary>
-        private Organization selectedDefaultOrganization;
-
-        #endregion
-
-        #region Constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EngineeringModelSetupDialogViewModel"/> class.
-        /// </summary>
-        /// <remarks>
-        /// The default constructor is required by MEF
-        /// </remarks>
-        public EngineeringModelSetupDialogViewModel()
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EngineeringModelSetupDialogViewModel"/> class.
-        /// </summary>
-        /// <param name="engineeringModelSetup">
-        /// The <see cref="engineeringModelSetup"/> that is the subject of the current view-model. This is the object
-        /// that will be either created, or edited.
-        /// </param>
-        /// <param name="transaction">
-        /// The <see cref="ThingTransaction"/> that contains the log of recorded changes.
-        /// </param>
-        /// <param name="session">
-        /// The <see cref="ISession"/> in which the current <see cref="Thing"/> is to be added or updated
-        /// </param>
-        /// <param name="isRoot">
-        /// Assert if the <see cref="EngineeringModelSetupDialogViewModel"/> is the root of all <see cref="IThingDialogViewModel"/>
-        /// </param>
-        /// <param name="dialogKind">
-        /// The kind of operation this <see cref="EngineeringModelSetupDialogViewModel"/> performs
-        /// </param>
-        /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService"/></param>
-        /// <param name="container">The container <see cref="Thing"/></param>
-        /// <param name="chainOfContainers">The optional chain of containers that contains the <paramref name="container"/> argument</param>
-        public EngineeringModelSetupDialogViewModel(EngineeringModelSetup engineeringModelSetup, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container, IEnumerable<Thing> chainOfContainers = null)
-            : base(engineeringModelSetup, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
-        {
-            this.ActiveDomain.ChangeTrackingEnabled = true;
-
-            this.WhenAnyValue(x => x.SourceEngineeringModelSetup).Subscribe(v => this.IsOriginal = v == null || v.Iid == default(Guid));
-            this.WhenAnyValue(x => x.ActiveDomain).Subscribe(_ => this.UpdateOkCanExecute());
-            this.WhenAnyValue(x => x.SelectedOrganizations).Subscribe(_ => this.UpdateOkCanExecute());
-            this.SelectedOrganizations.Changed.Subscribe(_ => this.UpdateDefaultOrganization());
-            this.WhenAnyValue(x => x.SelectedDefaultOrganization).Subscribe(_ => this.UpdateOkCanExecute());
-        }
-
-        #endregion
-
-        #region Properties
-        /// <summary>
-        /// Gets or sets the  the <see cref="EngineeringModelSetup"/> that this <see cref="EngineeringModelSetup"/>
-        /// has been derived from.
-        /// </summary>
-        public EngineeringModelSetup SourceEngineeringModelSetup
-        {
-            get { return this.sourceEngineeringModelSetup; }
-            set { this.RaiseAndSetIfChanged(ref this.sourceEngineeringModelSetup, value); }
-        }
-
-        /// <summary>
-        /// Gets the list of possible source <see cref="EngineeringModelSetup"/>s
-        /// </summary>
-        public List<EngineeringModelSetup> PossibleSourceEngineeringModelSetup { get; private set; }
-
-        /// <summary>
-        /// Gets the possible <see cref="SiteReferenceDataLibrary"/> that may be selected.
-        /// </summary>
-        public List<SiteReferenceDataLibrary> PossibleSiteReferenceDataLibraries { get; private set; }
-
-        /// <summary>
-        /// Gets the possible <see cref="Organization"/> that may be selected.
-        /// </summary>
-        public List<Organization> PossibleOrganizations { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the selected <see cref="Organization"/>s.
-        /// </summary>
-        public ReactiveList<Organization> SelectedOrganizations
-        {
-            get { return this.selectedOrganizations; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedOrganizations, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the selected default <see cref="Organization"/>.
-        /// </summary>
-        public Organization SelectedDefaultOrganization
-        {
-            get { return this.selectedDefaultOrganization; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedDefaultOrganization, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the selected <see cref="SiteReferenceDataLibrary"/>
-        /// </summary>
-        public SiteReferenceDataLibrary SelectedSiteReferenceDataLibrary
-        {
-            get { return this.selectedSiteReferenceDataLibrary; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSiteReferenceDataLibrary, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="EngineeringModelSetup"/> is derived.
-        /// </summary>
-        public bool IsOriginal
-        {
-            get { return this.isOriginal; }
-            set { this.RaiseAndSetIfChanged(ref this.isOriginal, value); }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the Active Domain of Expertiese selection is possible
-        /// </summary>
-        /// <remarks>
-        /// TODO: In the future this should be refactored to allow CDP4 server creating active domains on Engineering model setup creation.
-        /// </remarks>
-        public bool IsActiveDomainSelectionReadOnly
-        {
-            get { return (this.dialogKind != ThingDialogKind.Update) || this.IsReadOnly; }
-        }
-
-        /// <summary>
-        /// Gets or sets the ShortName
-        /// </summary>
-        [ValidationOverride(true, "ModelSetupShortName")]
-        public override string ShortName
-        {
-            get { return this.shortName; }
-            set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
-        }
-
-        /// <summary>
-        /// Gets or sets the Name
-        /// </summary>
-        [ValidationOverride(true, "ModelSetupName")]
-        public override string Name
-        {
-            get { return this.name; }
-            set { this.RaiseAndSetIfChanged(ref this.name, value); }
-        }
-
-        /// <summary>
-        /// The backing field for <see cref="ShowDeprecatedDomains"/> property.
-        /// </summary>
-        private bool showDeprecatedDomains = false;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether to display deprecated domains.
-        /// </summary>
-        public bool ShowDeprecatedDomains
-        {
-            get { return this.showDeprecatedDomains; }
-            set { this.RaiseAndSetIfChanged(ref this.showDeprecatedDomains, value); }
-        }
-
-        #endregion
-
         /// <summary>
         /// Initialize the dialog
         /// </summary>
@@ -243,14 +76,55 @@ namespace CDP4EngineeringModel.ViewModels
             this.PossibleSourceEngineeringModelSetup = new List<EngineeringModelSetup>();
             this.PossibleOrganizations = new List<Organization>();
 
+            this.PossibleActiveDomain = new ReactiveList<ActiveDomainRowViewModel>();
+            this.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel> { ChangeTrackingEnabled = true };
+
+            this.ActiveDomain.ItemsAdded.Subscribe(this.SetActiveState);
+            this.ActiveDomain.ItemsRemoved.Subscribe(this.SetInactiveState);
+
             this.SelectedOrganizations = new ReactiveList<Organization>();
             this.SelectedOrganizations.ChangeTrackingEnabled = true;
-            
-            this.WhenAnyValue(vm => vm.ShowDeprecatedDomains).Subscribe();
+
+            this.WhenAnyValue(vm => vm.ShowDeprecatedDomains).Subscribe(_ => this.ShowHideDeprecatedDomains());
         }
 
         /// <summary>
-        /// Populate the <see cref="PossibleActiveDomain"/>
+        /// Set active domain inactive state
+        /// </summary>
+        /// <param name="oldRow">
+        ///     <see cref="ActiveDomainRowViewModel" />
+        /// </param>
+        private void SetInactiveState(ActiveDomainRowViewModel oldRow)
+        {
+            oldRow.IsEnabled = false;
+        }
+
+        /// <summary>
+        /// Set active domain active state
+        /// </summary>
+        /// <param name="newRow">
+        ///     <see cref="ActiveDomainRowViewModel" />
+        /// </param>
+        private void SetActiveState(ActiveDomainRowViewModel newRow)
+        {
+            newRow.IsEnabled = true;
+        }
+
+        /// <summary>
+        /// Show/hide deprecated domains from the view
+        /// </summary>
+        private void ShowHideDeprecatedDomains()
+        {
+            var deprecatedItems = this.PossibleActiveDomain.Where(d => d.DomainOfExpertise.IsDeprecated);
+
+            foreach (var activeDomainRowViewModel in deprecatedItems)
+            {
+                activeDomainRowViewModel.IsVisible = this.ShowDeprecatedDomains;
+            }
+        }
+
+        /// <summary>
+        /// Populate the <see cref="PossibleActiveDomain" />
         /// </summary>
         protected override void PopulateActiveDomain()
         {
@@ -259,25 +133,21 @@ namespace CDP4EngineeringModel.ViewModels
             var currentActiveDomain = this.Thing.ActiveDomain;
             this.PossibleActiveDomain.Clear();
 
-            //if (this.ShowDeprecatedDomains)
-            //{
             foreach (var domainOfExpertise in sitedir.Domain.OrderBy(x => x.Name))
             {
-                var activeDomainRowModel = new ActiveDomainRowViewModel(domainOfExpertise, !this.ShowDeprecatedDomains);
+                var activeDomainRowModel = new ActiveDomainRowViewModel(domainOfExpertise, !this.ShowDeprecatedDomains && !domainOfExpertise.IsDeprecated);
                 this.PossibleActiveDomain.Add(activeDomainRowModel);
             }
 
-            //                this.PossibleActiveDomain.AddRange(sitedir.Domain.OrderBy(x => x.Name));
-            //}
-            //else
-            //{
-            //    this.PossibleActiveDomain.AddRange(sitedir.Domain.Where(x => !x.IsDeprecated).OrderBy(x => x.Name));
-            //}
-            this.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel>();
             foreach (var activeDomain in currentActiveDomain)
             {
-                var activeDomainRowModel = new ActiveDomainRowViewModel(activeDomain, !this.ShowDeprecatedDomains);
-                this.ActiveDomain.Add(activeDomainRowModel);
+                var activeDomainRowModel = this.PossibleActiveDomain.FirstOrDefault(d => d.DomainOfExpertise == activeDomain);
+
+                if (activeDomainRowModel != null)
+                {
+                    this.ActiveDomain.Add(activeDomainRowModel);
+                    activeDomainRowModel.IsEnabled = true;
+                }
             }
         }
 
@@ -305,6 +175,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             // set the site reference data library if this model already has a mrdl assigned
             var modelRdl = this.Thing.RequiredRdl.FirstOrDefault();
+
             if (modelRdl != null)
             {
                 this.SelectedSiteReferenceDataLibrary = modelRdl.RequiredRdl;
@@ -324,11 +195,16 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Updates the <see cref="Transaction"/> with the changes recorded in the current view-model
+        /// Updates the <see cref="Transaction" /> with the changes recorded in the current view-model
         /// </summary>
         protected override void UpdateTransaction()
         {
             base.UpdateTransaction();
+
+            var clone = this.Thing;
+
+            clone.ActiveDomain.Clear();
+            clone.ActiveDomain.AddRange(this.ActiveDomain.Select(ad => ad.DomainOfExpertise));
 
             // organizational prticipation
             if (this.SelectedOrganizations.Any() || this.Thing.OrganizationalParticipant.Any())
@@ -398,7 +274,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
-            this.OkCanExecute = this.OkCanExecute && this.ActiveDomain.Count >= 0 && this.IsOrganizationalParticipationSetup();
+            this.OkCanExecute = this.OkCanExecute && (this.ActiveDomain.Count >= 0) && this.IsOrganizationalParticipationSetup();
         }
 
         /// <summary>
@@ -407,12 +283,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>True if the selection is done correctly.</returns>
         private bool IsOrganizationalParticipationSetup()
         {
-            if (this.SelectedOrganizations == null || this.SelectedOrganizations.Count < 1)
+            if ((this.SelectedOrganizations == null) || (this.SelectedOrganizations.Count < 1))
             {
                 return true;
             }
 
-            if (this.SelectedDefaultOrganization != null && this.SelectedOrganizations.Contains(this.SelectedDefaultOrganization))
+            if ((this.SelectedDefaultOrganization != null) && this.SelectedOrganizations.Contains(this.SelectedDefaultOrganization))
             {
                 return true;
             }
@@ -421,16 +297,225 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Updates the default <see cref="Organization"/> selection based on changes in the list of possible organizations.
+        /// Updates the default <see cref="Organization" /> selection based on changes in the list of possible organizations.
         /// </summary>
         private void UpdateDefaultOrganization()
         {
-            if (this.SelectedOrganizations == null || this.SelectedOrganizations.Count == 0 || !this.SelectedOrganizations.Contains(this.SelectedDefaultOrganization))
+            if ((this.SelectedOrganizations == null) || (this.SelectedOrganizations.Count == 0) || !this.SelectedOrganizations.Contains(this.SelectedDefaultOrganization))
             {
                 this.SelectedDefaultOrganization = null;
             }
 
             this.UpdateOkCanExecute();
         }
+
+        #region field
+
+        /// <summary>
+        /// Backing field for the <see cref="SourceEngineeringModelSetup" /> property;
+        /// </summary>
+        private EngineeringModelSetup sourceEngineeringModelSetup;
+
+        /// <summary>
+        /// Backing field for the <see cref="ReferenceDataLibrary" /> property;
+        /// </summary>
+        private SiteReferenceDataLibrary selectedSiteReferenceDataLibrary;
+
+        /// <summary>
+        /// Backing field for the <see cref="isOriginal" /> property.
+        /// </summary>
+        private bool isOriginal;
+
+        /// <summary>
+        /// The backing field for <see cref="ShortName" />
+        /// </summary>
+        private string shortName;
+
+        /// <summary>
+        /// The backing field for <see cref="Name" />
+        /// </summary>
+        private string name;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedOrganizations" />
+        /// </summary>
+        private ReactiveList<Organization> selectedOrganizations;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedDefaultOrganization" />
+        /// </summary>
+        private Organization selectedDefaultOrganization;
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EngineeringModelSetupDialogViewModel" /> class.
+        /// </summary>
+        /// <remarks>
+        /// The default constructor is required by MEF
+        /// </remarks>
+        public EngineeringModelSetupDialogViewModel()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EngineeringModelSetupDialogViewModel" /> class.
+        /// </summary>
+        /// <param name="engineeringModelSetup">
+        /// The <see cref="engineeringModelSetup" /> that is the subject of the current view-model. This is the object
+        /// that will be either created, or edited.
+        /// </param>
+        /// <param name="transaction">
+        /// The <see cref="ThingTransaction" /> that contains the log of recorded changes.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession" /> in which the current <see cref="Thing" /> is to be added or updated
+        /// </param>
+        /// <param name="isRoot">
+        /// Assert if the <see cref="EngineeringModelSetupDialogViewModel" /> is the root of all
+        /// <see cref="IThingDialogViewModel" />
+        /// </param>
+        /// <param name="dialogKind">
+        /// The kind of operation this <see cref="EngineeringModelSetupDialogViewModel" /> performs
+        /// </param>
+        /// <param name="thingDialogNavigationService">The <see cref="IThingDialogNavigationService" /></param>
+        /// <param name="container">The container <see cref="Thing" /></param>
+        /// <param name="chainOfContainers">
+        /// The optional chain of containers that contains the <paramref name="container" />
+        /// argument
+        /// </param>
+        public EngineeringModelSetupDialogViewModel(EngineeringModelSetup engineeringModelSetup, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container, IEnumerable<Thing> chainOfContainers = null)
+            : base(engineeringModelSetup, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
+        {
+            this.ActiveDomain.ChangeTrackingEnabled = true;
+
+            this.WhenAnyValue(x => x.SourceEngineeringModelSetup).Subscribe(v => this.IsOriginal = (v == null) || (v.Iid == default));
+            this.WhenAnyValue(x => x.ActiveDomain).Subscribe(_ => this.UpdateOkCanExecute());
+            this.WhenAnyValue(x => x.SelectedOrganizations).Subscribe(_ => this.UpdateOkCanExecute());
+            this.SelectedOrganizations.Changed.Subscribe(_ => this.UpdateDefaultOrganization());
+            this.WhenAnyValue(x => x.SelectedDefaultOrganization).Subscribe(_ => this.UpdateOkCanExecute());
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// Gets or sets the  the <see cref="EngineeringModelSetup" /> that this <see cref="EngineeringModelSetup" />
+        /// has been derived from.
+        /// </summary>
+        public EngineeringModelSetup SourceEngineeringModelSetup
+        {
+            get => this.sourceEngineeringModelSetup;
+            set => this.RaiseAndSetIfChanged(ref this.sourceEngineeringModelSetup, value);
+        }
+
+        /// <summary>
+        /// Gets the list of possible source <see cref="EngineeringModelSetup" />s
+        /// </summary>
+        public List<EngineeringModelSetup> PossibleSourceEngineeringModelSetup { get; private set; }
+
+        /// <summary>
+        /// Gets the possible <see cref="SiteReferenceDataLibrary" /> that may be selected.
+        /// </summary>
+        public List<SiteReferenceDataLibrary> PossibleSiteReferenceDataLibraries { get; private set; }
+
+        /// <summary>
+        /// Gets the possible <see cref="Organization" /> that may be selected.
+        /// </summary>
+        public List<Organization> PossibleOrganizations { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="Organization" />s.
+        /// </summary>
+        public ReactiveList<Organization> SelectedOrganizations
+        {
+            get => this.selectedOrganizations;
+            set => this.RaiseAndSetIfChanged(ref this.selectedOrganizations, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the selected default <see cref="Organization" />.
+        /// </summary>
+        public Organization SelectedDefaultOrganization
+        {
+            get => this.selectedDefaultOrganization;
+            set => this.RaiseAndSetIfChanged(ref this.selectedDefaultOrganization, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the selected <see cref="SiteReferenceDataLibrary" />
+        /// </summary>
+        public SiteReferenceDataLibrary SelectedSiteReferenceDataLibrary
+        {
+            get => this.selectedSiteReferenceDataLibrary;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSiteReferenceDataLibrary, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="EngineeringModelSetup" /> is derived.
+        /// </summary>
+        public bool IsOriginal
+        {
+            get => this.isOriginal;
+            set => this.RaiseAndSetIfChanged(ref this.isOriginal, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the value of possible active domain.
+        /// </summary>
+        public ReactiveList<ActiveDomainRowViewModel> PossibleActiveDomain { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value of active domain.
+        /// </summary>
+        public ReactiveList<ActiveDomainRowViewModel> ActiveDomain { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether the Active Domain of Expertiese selection is possible
+        /// </summary>
+        /// <remarks>
+        /// TODO: In the future this should be refactored to allow CDP4 server creating active domains on Engineering model setup
+        /// creation.
+        /// </remarks>
+        public bool IsActiveDomainSelectionReadOnly => (this.dialogKind != ThingDialogKind.Update) || this.IsReadOnly;
+
+        /// <summary>
+        /// Gets or sets the ShortName
+        /// </summary>
+        [ValidationOverride(true, "ModelSetupShortName")]
+        public override string ShortName
+        {
+            get => this.shortName;
+            set => this.RaiseAndSetIfChanged(ref this.shortName, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Name
+        /// </summary>
+        [ValidationOverride(true, "ModelSetupName")]
+        public override string Name
+        {
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
+        }
+
+        /// <summary>
+        /// The backing field for <see cref="ShowDeprecatedDomains" /> property.
+        /// </summary>
+        private bool showDeprecatedDomains;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to display deprecated domains or not.
+        /// </summary>
+        public bool ShowDeprecatedDomains
+        {
+            get => this.showDeprecatedDomains;
+            set => this.RaiseAndSetIfChanged(ref this.showDeprecatedDomains, value);
+        }
+
+        #endregion
     }
 }
