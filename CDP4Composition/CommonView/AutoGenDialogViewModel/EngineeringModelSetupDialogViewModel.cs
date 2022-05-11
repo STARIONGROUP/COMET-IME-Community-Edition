@@ -204,21 +204,21 @@ namespace CDP4CommonView
         /// <summary>
         /// Backing field for <see cref="ActiveDomain"/>s
         /// </summary>
-        private ReactiveList<ActiveDomainRowViewModel> activeDomain;
+        private ReactiveList<DomainOfExpertise> activeDomain;
 
         /// <summary>
         /// Gets or sets the list of selected <see cref="DomainOfExpertise"/>s
         /// </summary>
-        public ReactiveList<ActiveDomainRowViewModel> ActiveDomain
+        public ReactiveList<DomainOfExpertise> ActiveDomain
         { 
             get { return this.activeDomain; } 
             set { this.RaiseAndSetIfChanged(ref this.activeDomain, value); } 
         }
 
         /// <summary>
-        /// Gets or sets the Possible <see cref="ActiveDomainRowViewModel"/> for <see cref="ActiveDomain"/>
+        /// Gets or sets the Possible <see cref="DomainOfExpertise"/> for <see cref="ActiveDomain"/>
         /// </summary>
-        public ReactiveList<ActiveDomainRowViewModel> PossibleActiveDomain { get; protected set; }
+        public ReactiveList<DomainOfExpertise> PossibleActiveDomain { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Participant
@@ -349,7 +349,7 @@ namespace CDP4CommonView
             clone.EngineeringModelIid = this.EngineeringModelIid;
             clone.SourceEngineeringModelSetupIid = this.SourceEngineeringModelSetupIid;
             clone.ActiveDomain.Clear();
-            clone.ActiveDomain.AddRange(this.ActiveDomain.Select(d => d.DomainOfExpertise).ToList());
+            clone.ActiveDomain.AddRange(this.ActiveDomain);
         }
 
         /// <summary>
@@ -359,8 +359,8 @@ namespace CDP4CommonView
         {
             base.Initialize();
             this.Participant = new ReactiveList<ParticipantRowViewModel>();
-            this.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel>();
-            this.PossibleActiveDomain = new ReactiveList<ActiveDomainRowViewModel>();
+            this.ActiveDomain = new ReactiveList<DomainOfExpertise>();
+            this.PossibleActiveDomain = new ReactiveList<DomainOfExpertise>();
             this.RequiredRdl = new ReactiveList<ModelReferenceDataLibraryRowViewModel>();
             this.IterationSetup = new ReactiveList<IterationSetupRowViewModel>();
         }
@@ -390,7 +390,7 @@ namespace CDP4CommonView
 
             foreach (var value in this.Thing.ActiveDomain)
             {
-                this.ActiveDomain.Add(new ActiveDomainRowViewModel(value, true));
+                this.ActiveDomain.Add(value);
             }
         } 
 
