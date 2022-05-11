@@ -34,7 +34,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -579,25 +579,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.That(row.ScaleName, Is.Null.Or.Empty);
         }
 
-        [Test]
-        public void VerifyThatParameterComponentRowsUpdateOnParameterTypeUpdateForDirectSubscription()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatParameterComponentRowsUpdateOnParameterType(IViewModelBase<Thing> container, string scenario)
         {
-            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null, false);
-
-            Assert.AreEqual(2, this.cptType.Component.Count);
-            Assert.AreEqual(2, row.ContainedRows.Count);
-
-            this.cptType.Component.Remove(this.cptType.Component.Last());
-            Assert.AreEqual(1, this.cptType.Component.Count);
-
-            CDPMessageBus.Current.SendObjectChangeEvent(this.cptType, EventKind.Updated);
-            Assert.AreEqual(1, row.ContainedRows.Count);
-        }
-
-        [Test]
-        public void VerifyThatParameterComponentRowsUpdateOnParameterTypeUpdateForDirectSubscriptionsForMessageBusHandlerSubscription()
-        {
-            var container = new TestMessageBusHandlerContainerViewModel();
             var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, container, false);
 
             Assert.AreEqual(2, this.cptType.Component.Count);
@@ -609,7 +593,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             CDPMessageBus.Current.SendObjectChangeEvent(this.cptType, EventKind.Updated);
             Assert.AreEqual(1, row.ContainedRows.Count);
         }
-
 
         [Test]
         public void VerifyThatValidatePropertyWorks()
@@ -623,8 +606,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.That(row.ValidateProperty("Reference", null), Is.Null.Or.Empty);
         }
 
-        [Test]
-        public void VerifyThatStateDependentRowAreUpdatedForDirectSubscription()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatStateDependentRowAreUpdated(IViewModelBase<Thing> container, string scenario)
         {
             var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var valueSetState2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -642,40 +625,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter1.ValueSet.Add(valueSetState2);
 
             this.parameter1.StateDependence = this.stateList;
-            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
-
-            Assert.AreEqual(1, row.ContainedRows.Count);
-
-            astate1.Kind = ActualFiniteStateKind.FORBIDDEN;
-            CDPMessageBus.Current.SendObjectChangeEvent(astate1, EventKind.Updated);
-
-            Assert.AreEqual(0, row.ContainedRows.Count);
-
-            astate1.Kind = ActualFiniteStateKind.MANDATORY;
-            CDPMessageBus.Current.SendObjectChangeEvent(astate1, EventKind.Updated);
-            Assert.AreEqual(1, row.ContainedRows.Count);
-        }
-
-        [Test]
-        public void VerifyThatStateDependentRowAreUpdatedForMessageBusHandlerSubscription()
-        {
-            var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var valueSetState2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
-
-            this.SetScalarValueSet(valueSetState1);
-            this.SetScalarValueSet(valueSetState2);
-
-            var astate1 = this.stateList.ActualState.First();
-            var astate2 = this.stateList.ActualState.Last();
-
-            valueSetState1.ActualState = astate1;
-            valueSetState2.ActualState = astate2;
-
-            this.parameter1.ValueSet.Add(valueSetState1);
-            this.parameter1.ValueSet.Add(valueSetState2);
-
-            this.parameter1.StateDependence = this.stateList;
-            var container = new TestMessageBusHandlerContainerViewModel();
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, container, false);
 
             Assert.AreEqual(1, row.ContainedRows.Count);
@@ -689,7 +638,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             CDPMessageBus.Current.SendObjectChangeEvent(astate1, EventKind.Updated);
             Assert.AreEqual(1, row.ContainedRows.Count);
         }
-
 
         [Test]
         public void VerifyThatElementCategoryIsCollectedCorrectlyForElementUsage1()

@@ -26,7 +26,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
+
+    using CDP4Composition.Mvvm;
     
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -34,13 +37,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Common.Types;
 
     using CDP4Dal;
+    using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
     
     using Moq;
+
     using NUnit.Framework;
-    using System.Collections.Generic;
-    using CDP4Dal.Events;
 
     /// <summary>
     /// Suite of tests for the <see cref="ParameterComponentValueRowViewModel"/>
@@ -254,8 +258,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.That(component1row.ValidateProperty("Reference", null), Is.Null.Or.Empty);
         }
 
-        [Test]
-        public void VerifyThatOwnerIsUpdatedForDirectSubscription()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatOwnerIsUpdated(IViewModelBase<Thing> container, string scenario)
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
             parameter.Owner = this.activeDomain;
@@ -273,38 +277,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             parameter.ParameterSubscription.Add(parameterSubscription);
 
-            var parameterSubscriptionRowViewModel = new ParameterSubscriptionRowViewModel(parameterSubscription, this.session.Object, null, false);
-
-            var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
-            Assert.IsTrue(component1row.OwnerName.Contains(this.activeDomain.Name));
-
-            this.activeDomain.Name = "updated";
-            this.activeDomain.RevisionNumber = 100;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.activeDomain, EventKind.Updated);
-
-            Assert.IsTrue(component1row.OwnerName.Contains("updated"));
-        }
-
-        [Test]
-        public void VerifyThatOwnerIsUpdatedForMessageBusHandlerSubscription()
-        {
-            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
-            parameter.Owner = this.activeDomain;
-            var boolPt = new BooleanParameterType(Guid.NewGuid(), this.cache, this.uri);
-            var compoundParameterType = new CompoundParameterType(Guid.NewGuid(), this.cache, this.uri);
-            var component1 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = boolPt };
-            var component2 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = boolPt };
-            compoundParameterType.Component.Add(component1);
-            compoundParameterType.Component.Add(component2);
-            parameter.ParameterType = compoundParameterType;
-            this.elementDefinition.Parameter.Add(parameter);
-
-            var parameterSubscription = new ParameterSubscription(Guid.NewGuid(), this.cache, this.uri);
-            parameterSubscription.Owner = this.otherDomain;
-
-            parameter.ParameterSubscription.Add(parameterSubscription);
-
-            var container = new TestMessageBusHandlerContainerViewModel();
             var parameterSubscriptionRowViewModel = new ParameterSubscriptionRowViewModel(parameterSubscription, this.session.Object, container, false);
 
             var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
@@ -317,8 +289,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.IsTrue(component1row.OwnerName.Contains("updated"));
         }
 
-        [Test]
-        public void VerifyThatOwnerIsUpdatedForParameterOrOverrideForDirectSubscription()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatOwnerIsUpdatedForParameterOrOverride(IViewModelBase<Thing> container, string scenario)
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
             parameter.Owner = this.activeDomain;
@@ -331,33 +303,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             parameter.ParameterType = compoundParameterType;
             this.elementDefinition.Parameter.Add(parameter);
 
-            var parameterSubscriptionRowViewModel = new ParameterRowViewModel(parameter, this.session.Object, null, false);
-
-            var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();
-            Assert.IsTrue(component1row.OwnerName.Contains(this.activeDomain.Name));
-
-            this.activeDomain.Name = "updated";
-            this.activeDomain.RevisionNumber = 100;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.activeDomain, EventKind.Updated);
-
-            Assert.IsTrue(component1row.OwnerName.Contains("updated"));
-        }
-
-        [Test]
-        public void VerifyThatOwnerIsUpdatedForParameterOrOverrideForMessageBusHandlerSubscription()
-        {
-            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
-            parameter.Owner = this.activeDomain;
-            var boolPt = new BooleanParameterType(Guid.NewGuid(), this.cache, this.uri);
-            var compoundParameterType = new CompoundParameterType(Guid.NewGuid(), this.cache, this.uri);
-            var component1 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = boolPt };
-            var component2 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) { ParameterType = boolPt };
-            compoundParameterType.Component.Add(component1);
-            compoundParameterType.Component.Add(component2);
-            parameter.ParameterType = compoundParameterType;
-            this.elementDefinition.Parameter.Add(parameter);
-
-            var container = new TestMessageBusHandlerContainerViewModel();
             var parameterSubscriptionRowViewModel = new ParameterRowViewModel(parameter, this.session.Object, container, false);
 
             var component1row = (ParameterComponentValueRowViewModel)parameterSubscriptionRowViewModel.ContainedRows.First();

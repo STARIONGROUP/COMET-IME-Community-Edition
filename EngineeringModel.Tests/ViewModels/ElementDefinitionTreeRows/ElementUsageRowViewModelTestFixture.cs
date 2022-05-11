@@ -29,21 +29,27 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using System.Collections.Generic;
     using System.Linq;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.DragDrop;
-    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -330,8 +336,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             CDPMessageBus.Current.ClearSubscriptions();
         }
 
-        [Test]
-        public void VerifyThatParameterBaseElementAreHandledCorrectlyForDirectSubscriptions()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatParameterBaseElementAreHandledCorrectly(IViewModelBase<Thing> container, string scenario)
         {
             var revision = typeof (Thing).GetProperty("RevisionNumber");
 
@@ -367,102 +373,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
             // ***************************************
 
-            var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
-
-            // Verify That Override is displayed instead of parameter
-            Assert.AreEqual(2, row.ContainedRows.Count);
-            var overrideRow = row.ContainedRows.SingleOrDefault(x => x.Thing == this.parameter6Override);
-            var parameterRow = row.ContainedRows.SingleOrDefault(x => x.Thing == this.parameter1);
-            Assert.IsNotNull(overrideRow);
-            Assert.IsNotNull(parameterRow);
-            // **********************************
-
-            // Add a subscription to parameter and see that its replaced.
-            var subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.activeDomain };
-            subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { SubscribedValueSet = valueSet });
-            this.parameter1.ParameterSubscription.Add(subscription);
-
-            revision.SetValue(this.elementDefinitionForUsage1, 1);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinitionForUsage1, EventKind.Updated);
-
-            Assert.AreEqual(2, row.ContainedRows.Count);
-            var subscriptionRow = row.ContainedRows.SingleOrDefault(x => x.Thing == subscription);
-            Assert.IsNotNull(subscriptionRow);
-
-            parameterRow = row.ContainedRows.SingleOrDefault(x => x.Thing == this.parameter1);
-            Assert.IsNull(parameterRow);
-
-            // Add a subscription to the override of the usage
-            var subscriptionOverride = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.activeDomain };
-            subscriptionOverride.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { SubscribedValueSet = valueSet });
-            this.parameter6Override.ParameterSubscription.Add(subscriptionOverride);
-
-            revision.SetValue(this.elementUsage1, 1);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementUsage1, EventKind.Updated);
-
-            Assert.AreEqual(2, row.ContainedRows.Count);
-            var subscriptionOverrideRow = row.ContainedRows.SingleOrDefault(x => x.Thing == subscriptionOverride);
-            subscriptionRow = row.ContainedRows.SingleOrDefault(x => x.Thing == subscription);
-
-            Assert.IsNotNull(subscriptionRow);
-            Assert.IsNotNull(subscriptionOverrideRow);
-
-            // removes the subscriptions
-            this.parameter6Override.ParameterSubscription.Clear();
-            revision.SetValue(this.elementUsage1, 2);
-            
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementUsage1, EventKind.Updated);
-            Assert.AreEqual(2, row.ContainedRows.Count);
-            overrideRow = row.ContainedRows.SingleOrDefault(x => x.Thing == this.parameter6Override);
-
-            Assert.IsNotNull(overrideRow);
-            
-            this.parameter1.ParameterSubscription.Clear();
-            revision.SetValue(this.elementDefinitionForUsage1, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinitionForUsage1, EventKind.Updated);
-            Assert.AreEqual(2, row.ContainedRows.Count);
-            parameterRow = row.ContainedRows.SingleOrDefault(x => x.Thing == this.parameter1);
-            Assert.IsNotNull(parameterRow);
-        }
-
-        [Test]
-        public void VerifyThatParameterBaseElementAreHandledCorrectlyForMessageBusHandlerSubscriptions()
-        {
-            var revision = typeof (Thing).GetProperty("RevisionNumber");
-
-            // Test input
-            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var valueSetOverride = new ParameterOverrideValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterValueSet = valueSet };
-
-            var manualSet = new ValueArray<string>(new List<string> { "manual" });
-            var referenceSet = new ValueArray<string>(new List<string> { "ref" });
-            var computedSet = new ValueArray<string>(new List<string> { "computed" });
-            var publishedSet = new ValueArray<string>(new List<string> { "published" });
-
-            valueSet.Manual = manualSet;
-            valueSet.Reference = referenceSet;
-            valueSet.Computed = computedSet;
-            valueSet.Published = publishedSet;
-
-            valueSetOverride.Manual = manualSet;
-            valueSetOverride.Reference = referenceSet;
-            valueSetOverride.Computed = computedSet;
-            valueSetOverride.Published = publishedSet;
-
-            this.parameter6ForOverride.ValueSet.Add(valueSet);
-            this.parameter1.ValueSet.Add(valueSet);
-
-            this.parameter6Override.ValueSet.Add(valueSetOverride);
-
-            this.elementDefinitionForUsage1.Parameter.Add(this.parameter6ForOverride);
-            this.elementDefinitionForUsage1.Parameter.Add(this.parameter1);
-
-            this.elementUsage1.ParameterOverride.Add(this.parameter6Override);
-
-            this.elementDefinition.ContainedElement.Add(this.elementUsage1);
-            // ***************************************
-
-            var container = new TestMessageBusHandlerContainerViewModel();
             var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, container, this.obfuscationService.Object);
 
             // Verify That Override is displayed instead of parameter

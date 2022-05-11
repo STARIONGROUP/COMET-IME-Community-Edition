@@ -44,6 +44,11 @@ namespace CDP4Composition.MessageBus
         private Action<T> Action { get; }
 
         /// <summary>
+        /// Gets or sets a value indicating that this instance is disposed, hence not usable anymore
+        /// </summary>
+        public bool IsDisposed { get; private set; }
+
+        /// <summary>
         /// Creates a new instance of the <see cref="MessageBusHandlerData"/> class
         /// </summary>
         /// <param name="discriminator">The discriminator code</param>
@@ -61,7 +66,7 @@ namespace CDP4Composition.MessageBus
         /// <returns>True if ExecuteAction is allowed, otherwise false</returns>
         public virtual bool ExecuteDiscriminator(object messageBusEvent)
         {
-            return Discriminator?.Invoke(messageBusEvent as T) ?? true;
+            return !this.IsDisposed && (Discriminator?.Invoke(messageBusEvent as T) ?? true);
         }
 
         /// <summary>
@@ -71,6 +76,14 @@ namespace CDP4Composition.MessageBus
         public virtual void ExecuteAction(object messageBusEvent)
         {
             this.Action?.Invoke(messageBusEvent as T);
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            this.IsDisposed = true;
         }
     }
 }

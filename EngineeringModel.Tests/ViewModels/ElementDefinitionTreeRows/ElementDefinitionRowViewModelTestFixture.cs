@@ -336,8 +336,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
 
-        [Test]
-        public void VeriftyThatDomainChangesWorksForDirectMessageBusSubscription()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VeriftyThatDomainChangesWorks(IViewModelBase<Thing> container, string scenario)
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -345,28 +345,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.iteration.Element.Add(elementDefinition);
 
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
-
-            domainOfExpertise.Name = "ChangedName";
-            domainOfExpertise.ShortName = "ChangedShortName";
-
-            CDPMessageBus.Current.SendObjectChangeEvent(domainOfExpertise, EventKind.Updated);
-
-            Assert.That(row.OwnerName == domainOfExpertise.Name);
-            Assert.That(row.OwnerShortName == domainOfExpertise.ShortName);
-        }
-
-        [Test]
-        public void VeriftyThatDomainChangesWorksForMessageBusHandler()
-        {
-            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            elementDefinition.Owner = domainOfExpertise;
-
-            this.iteration.Element.Add(elementDefinition);
-
-            var containerViewModel = new TestMessageBusHandlerContainerViewModel();
-            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, containerViewModel, this.obfuscationService.Object);
+            var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, container, this.obfuscationService.Object);
 
             domainOfExpertise.Name = "ChangedName";
             domainOfExpertise.ShortName = "ChangedShortName";

@@ -38,6 +38,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Common.Types;
 
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
 
@@ -334,32 +335,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.AreEqual(o2s2Set.Reference[1], ValueSetConverter.ToValueSetString(o2s2c2Row.Reference, o2s2c2Row.ParameterType));
         }
 
-        [Test]
-        public void VerifyThatUpdateValueSetUpdatesRowForDirectSubscription()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatUpdateValueSetUpdatesRow(IViewModelBase<Thing> container, string scenario)
         {
             var valueset = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.parameter.ValueSet.Add(valueset);
 
-            var row = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
-
-            var revInfo = typeof(Thing).GetProperty("RevisionNumber");
-            revInfo.SetValue(valueset, 10);
-
-            Assert.AreEqual("-", row.Manual);
-            valueset.Manual = new ValueArray<string>(new List<string> { "test" });
-            CDPMessageBus.Current.SendObjectChangeEvent(valueset, EventKind.Updated);
-
-            Assert.AreEqual("test", row.Manual);
-            row.Dispose();
-        }
-
-        [Test]
-        public void VerifyThatUpdateValueSetUpdatesRowForMEssageBusHandlerSubscription()
-        {
-            var valueset = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.parameter.ValueSet.Add(valueset);
-
-            var container = new TestMessageBusHandlerContainerViewModel();
             var row = new ParameterRowViewModel(this.parameter, this.session.Object, container, false);
 
             var revInfo = typeof(Thing).GetProperty("RevisionNumber");

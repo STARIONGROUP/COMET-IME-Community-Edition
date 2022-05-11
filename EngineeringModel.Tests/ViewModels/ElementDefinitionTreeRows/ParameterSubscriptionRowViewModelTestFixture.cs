@@ -32,12 +32,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.ViewModels;
@@ -348,8 +350,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.AreEqual(o2s2Set.Manual[1], ValueSetConverter.ToValueSetString(o2s2c2Row.Manual, o2s2c2Row.ParameterType));
         }
 
-        [Test]
-        public void VerifyThatUpdateValueSetUpdatesRowForDirectSubscriptions()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatUpdateValueSetUpdates(IViewModelBase<Thing> container, string scenario)
         {
             var valueset = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.parameter.ValueSet.Add(valueset);
@@ -363,35 +365,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             };
             this.subscription.ValueSet.Add(subscriptionValueSet);
 
-            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null, false);
-
-            var revInfo = typeof (Thing).GetProperty("RevisionNumber");
-            revInfo.SetValue(subscriptionValueSet, 10);
-
-            Assert.AreEqual("-", row.Manual);
-            subscriptionValueSet.Manual = new ValueArray<string>(new List<string> { "test" });
-            CDPMessageBus.Current.SendObjectChangeEvent(subscriptionValueSet, EventKind.Updated);
-
-            Assert.AreEqual("test", row.Manual);
-            row.Dispose();
-        }
-
-        [Test]
-        public void VerifyThatUpdateValueSetUpdatesRowForMessageBusEventHAndlerSubscriptions()
-        {
-            var valueset = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.parameter.ValueSet.Add(valueset);
-
-            this.subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.parameter.ParameterSubscription.Add(subscription);
-
-            var subscriptionValueSet = new ParameterSubscriptionValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            {
-                SubscribedValueSet = valueset
-            };
-            this.subscription.ValueSet.Add(subscriptionValueSet);
-
-            var container = new TestMessageBusHandlerContainerViewModel();
             var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, container, false);
 
             var revInfo = typeof (Thing).GetProperty("RevisionNumber");
@@ -404,7 +377,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.AreEqual("test", row.Manual);
             row.Dispose();
         }
-
 
         [Test]
         public void VerifyThatValueSetInlineEditWorksCompoundOptionState()
@@ -562,8 +534,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterSubscriptionValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
-        [Test]
-        public void VerifyThatComputedAndReferenceValueAreUpdatedForDirectSubscriptions()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatComputedAndReferenceValueAreUpdated(IViewModelBase<Thing> container, string scenario)
         {
             this.subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.parameter.IsOptionDependent = false;
@@ -584,46 +556,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.subscription.ValueSet.Add(subset1);
 
-            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null, false);
-            Assert.AreEqual("abc", row.Computed);
-            Assert.AreEqual("abc", row.Reference);
-
-            var updated = new List<string> { "123" };
-
-            set1.Published = new ValueArray<string>(updated);
-            set1.Reference = new ValueArray<string>(updated);
-
-            var rev = typeof(Thing).GetProperty("RevisionNumber");
-            rev.SetValue(set1, 50);
-
-            CDPMessageBus.Current.SendObjectChangeEvent(set1, EventKind.Updated);
-            Assert.AreEqual("123", row.Computed);
-            Assert.AreEqual("123", row.Reference);
-        }
-
-        [Test]
-        public void VerifyThatComputedAndReferenceValueAreUpdatedForMessageBusHandlerSubscriptions()
-        {
-            this.subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.parameter.IsOptionDependent = false;
-            this.parameter.ParameterSubscription.Add(this.subscription);
-            this.parameter.StateDependence = null;
-
-            var set1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            var liststring = new List<string> {"abc"};
-            set1.Reference = new ValueArray<string>(liststring);
-            set1.Published = new ValueArray<string>(liststring);
-
-            this.parameter.ValueSet.Add(set1);
-
-            var subset1 = new ParameterSubscriptionValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
-            {
-                SubscribedValueSet = set1
-            };
-
-            this.subscription.ValueSet.Add(subset1);
-
-            var container = new TestMessageBusHandlerContainerViewModel();
             var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, container, false);
             Assert.AreEqual("abc", row.Computed);
             Assert.AreEqual("abc", row.Reference);

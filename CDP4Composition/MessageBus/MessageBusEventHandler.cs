@@ -115,6 +115,8 @@ namespace CDP4Composition.MessageBus
                             {
                                 messageBusEventHandlerSubscriptionDictionary.Remove(subscriptionObject);
                             }
+
+                            messageBusEventHandlerSubscription.Dispose();
                         };
 
                         return new MessageBusEventHandlerDisposer(cleanUpAction);

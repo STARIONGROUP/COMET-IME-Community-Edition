@@ -27,22 +27,24 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
+    using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
     
     using Moq;
     using NUnit.Framework;
-    using System.Collections.Generic;
-    using CDP4Dal.Events;
-
+ 
     /// <summary>
     /// Suite of tests for the <see cref="ParameterOptionRowViewModelTestFixture"/>
     /// </summary>
@@ -125,8 +127,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.IsNotNull(row.ThingStatus);
         }
 
-        [Test]
-        public void VerifyThatMessageBusMessageWorkForDirectSubscriptions()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatMessageBusMessageWork(IViewModelBase<Thing> container, string scenario)
         {
             var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
             var textParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri);
@@ -135,25 +137,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             parameter.IsOptionDependent = true;
 
             this.option.Name = "OriginalName";
-            var row = new ParameterOptionRowViewModel(parameter, this.option, this.session.Object, null, false);
-            Assert.That(row.Name, Is.EqualTo(this.option.Name));
-
-            this.option.Name = "ChangedName";
-            CDPMessageBus.Current.SendObjectChangeEvent(this.option, EventKind.Updated);
-            Assert.That(row.Name, Is.EqualTo(this.option.Name));
-        }
-
-        [Test]
-        public void VerifyThatMessageBusMessageWorkForMessageBusHandlerSubscriptions()
-        {
-            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri);
-            var textParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri);
-
-            parameter.ParameterType = textParameterType;
-            parameter.IsOptionDependent = true;
-
-            this.option.Name = "OriginalName";
-            var container = new TestMessageBusHandlerContainerViewModel();
             var row = new ParameterOptionRowViewModel(parameter, this.option, this.session.Object, container, false);
             Assert.That(row.Name, Is.EqualTo(this.option.Name));
 

@@ -25,10 +25,12 @@
 
 namespace CDP4Composition.MessageBus
 {
+    using System;
+
     /// <summary>
     /// Describes the properties and methods of a messagebus handler data object
     /// </summary>
-    public interface IMessageBusEventHandlerSubscription
+    public interface IMessageBusEventHandlerSubscription : IDisposable
     {
         /// <summary>
         /// Executes discriminator code (sort of Where statement) to check if ExecuteAction is allowed to be executed

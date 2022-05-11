@@ -1,8 +1,27 @@
-﻿// ------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ProductTree.Tests.ProductTreeRows
 {
@@ -12,11 +31,14 @@ namespace ProductTree.Tests.ProductTreeRows
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
@@ -24,13 +46,15 @@ namespace ProductTree.Tests.ProductTreeRows
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
+    using CDP4ProductTree.Tests.ProductTreeRows;
     using CDP4ProductTree.ViewModels;
 
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -200,8 +224,8 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.Throws<NullReferenceException>(() =>  new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null));
         }
 
-        [Test]
-        public void VerifyThatPopulateGroupWorks()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatPopulateGroupWorks(IViewModelBase<Thing> container, string scenario)
         {
             var revisionProperty = typeof(ElementUsage).GetProperty("RevisionNumber");
 
@@ -214,7 +238,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementUsage.ElementDefinition = this.elementDef;
             this.elementDef.ContainedElement.Clear();
 
-            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, container);
 
             var group1row = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Single();
             Assert.AreSame(group1, group1row.Thing);
@@ -264,8 +288,8 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreEqual(0, group2row.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
         }
 
-        [Test]
-        public void VerifyThatPopulateParameterOrOverrideWorks()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatPopulateParameterOrOverrideWorks(IViewModelBase<Thing> container, string scenario)
         {
             var revisionProperty = typeof(ElementUsage).GetProperty("RevisionNumber");
 
@@ -292,7 +316,7 @@ namespace ProductTree.Tests.ProductTreeRows
             override1.ValueSet.Add(this.valueSetOverride);
             this.elementUsage.ParameterOverride.Add(override1);
 
-            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, container);
             // **************************************************************************************
 
             // check added parameter
@@ -339,18 +363,17 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreEqual(2, vm.ContainedRows.OfType<ParameterOrOverrideBaseRowViewModel>().Count());
             var param1row = vm.ContainedRows.OfType<ParameterRowViewModel>().SingleOrDefault(x => x.Thing == parameter1);
             Assert.IsNotNull(param1row);
-
         }
 
-        [Test]
-        public void VerifyThatOptionDependencyIsHandled()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatOptionDependencyIsHandled(IViewModelBase<Thing> container, string scenario)
         {
             var newDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
             var newUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) {ElementDefinition = newDef};
 
             this.elementDef2.ContainedElement.Add(newUsage);
 
-            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, container);
 
             Assert.IsTrue(vm.ContainedRows.Select(x => x.Thing).Contains(newUsage));
 
@@ -368,7 +391,7 @@ namespace ProductTree.Tests.ProductTreeRows
             CDPMessageBus.Current.SendObjectChangeEvent(newUsage, EventKind.Updated);
             Assert.IsTrue(vm.ContainedRows.Select(x => x.Thing).Contains(newUsage));
         }
-
+        
         [Test]
         public void VerifyThatDragOverWorks()
         {

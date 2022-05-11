@@ -34,7 +34,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -230,8 +230,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             CDPMessageBus.Current.ClearSubscriptions();
         }
 
-        [Test]
-        public void VerifyThatParameterOverrideRowWorks()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatParameterOverrideRowWorks(IViewModelBase<Thing> container, string scenario)
         {
             var value = new List<string> {"test"};
 
@@ -250,15 +250,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.elementUsage1.ParameterOverride.Add(poverride);
 
-            var row = new ParameterOverrideRowViewModel(poverride, this.session.Object, null);
-
-            var container = new TestMessageBusHandlerContainerViewModel();
-            var row2 = new ParameterOverrideRowViewModel(poverride, this.session.Object, container);
+            var row = new ParameterOverrideRowViewModel(poverride, this.session.Object, container);
 
             Assert.AreEqual("test", row.Manual);
             Assert.AreEqual("-", row.Reference);
             Assert.AreEqual(0, row.ContainedRows.Count);
-            Assert.AreEqual(0, row2.ContainedRows.Count);
 
             this.parameter.StateDependence = this.stateList;
 
@@ -266,7 +262,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             rev.SetValue(this.parameter, 10);
             CDPMessageBus.Current.SendObjectChangeEvent(this.parameter, EventKind.Updated);
             Assert.AreEqual(2, row.ContainedRows.Count);
-            Assert.AreEqual(2, row2.ContainedRows.Count);
         }
     }
 }
