@@ -19,7 +19,6 @@ namespace CDP4CommonView
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4Composition.CommonView.ViewModels;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -209,7 +208,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the list of selected <see cref="DomainOfExpertise"/>s
         /// </summary>
-        public ReactiveList<DomainOfExpertise> ActiveDomain
+        public ReactiveList<DomainOfExpertise> ActiveDomain 
         { 
             get { return this.activeDomain; } 
             set { this.RaiseAndSetIfChanged(ref this.activeDomain, value); } 
@@ -350,6 +349,7 @@ namespace CDP4CommonView
             clone.SourceEngineeringModelSetupIid = this.SourceEngineeringModelSetupIid;
             clone.ActiveDomain.Clear();
             clone.ActiveDomain.AddRange(this.ActiveDomain);
+
         }
 
         /// <summary>
