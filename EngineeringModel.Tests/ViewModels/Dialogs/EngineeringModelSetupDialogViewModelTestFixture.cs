@@ -386,11 +386,17 @@ namespace CDP4EngineeringModel.Tests
             var visibleDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsVisible);
             Assert.AreEqual(2, visibleDomains);
 
+            this.viewModel.ShowDeprecatedDomains = true;
+            visibleDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsVisible);
+            Assert.AreEqual(4, visibleDomains);
+
             var enabledDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsEnabled);
             Assert.AreEqual(2, enabledDomains);
 
             var deprecatedDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsDeprecated);
             Assert.AreEqual(2, deprecatedDomains);
+
+            Assert.AreEqual(this.viewModel.PossibleActiveDomain[0].Name, domain1.Name);
         }
     }
 }
