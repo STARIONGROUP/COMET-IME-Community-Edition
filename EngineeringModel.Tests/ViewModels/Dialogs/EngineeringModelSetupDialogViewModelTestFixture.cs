@@ -28,6 +28,7 @@ namespace CDP4EngineeringModel.Tests
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading.Tasks;
 
@@ -352,6 +353,44 @@ namespace CDP4EngineeringModel.Tests
 
             Assert.AreEqual(3, this.viewModel.PossibleActiveDomain.Count);
             Assert.AreEqual(1, this.viewModel.ActiveDomain.Count);
+        }
+
+        [Test]
+        public void VerifyThaRowActiveDomainIsCorrectlyPopulated()
+        {
+            var domain1 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
+            var domain2 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
+            var domain3 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
+            var domain4 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
+
+            domain1.IsDeprecated = true;
+            domain4.IsDeprecated = true;
+
+            this.siteDirClone.Domain.Add(domain1);
+            this.siteDirClone.Domain.Add(domain2);
+            this.siteDirClone.Domain.Add(domain3);
+            this.siteDirClone.Domain.Add(domain4);
+
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
+            engineeringModelSetup.ActiveDomain.Add(domain1);
+            engineeringModelSetup.ActiveDomain.Add(domain2);
+
+            this.cache.TryAdd(new CacheKey(engineeringModelSetup.Iid, null), new Lazy<Thing>(() => engineeringModelSetup));
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
+            var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
+
+            this.viewModel = new EngineeringModelSetupDialogViewModel(engineeringModelSetup.Clone(false), transaction, this.session.Object, true, ThingDialogKind.Update, null, this.siteDirClone);
+
+            // Count of visible items
+            var visibleDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsVisible);
+            Assert.AreEqual(2, visibleDomains);
+
+            var enabledDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsEnabled);
+            Assert.AreEqual(2, enabledDomains);
+
+            var deprecatedDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsDeprecated);
+            Assert.AreEqual(2, deprecatedDomains);
         }
     }
 }

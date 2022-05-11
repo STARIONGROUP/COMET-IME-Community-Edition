@@ -309,8 +309,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateOkCanExecute();
         }
 
-        #region field
-
         /// <summary>
         /// Backing field for the <see cref="SourceEngineeringModelSetup" /> property;
         /// </summary>
@@ -345,10 +343,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="SelectedDefaultOrganization" />
         /// </summary>
         private Organization selectedDefaultOrganization;
-
-        #endregion
-
-        #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EngineeringModelSetupDialogViewModel" /> class.
@@ -397,10 +391,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.SelectedOrganizations.Changed.Subscribe(_ => this.UpdateDefaultOrganization());
             this.WhenAnyValue(x => x.SelectedDefaultOrganization).Subscribe(_ => this.UpdateOkCanExecute());
         }
-
-        #endregion
-
-        #region Properties
 
         /// <summary>
         /// Gets or sets the  the <see cref="EngineeringModelSetup" /> that this <see cref="EngineeringModelSetup" />
@@ -466,21 +456,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the value of possible active domain.
         /// </summary>
-        public ReactiveList<ActiveDomainRowViewModel> PossibleActiveDomain { get; set; }
+        public new ReactiveList<ActiveDomainRowViewModel> PossibleActiveDomain { get; set; }
 
         /// <summary>
         /// Gets or sets the value of active domain.
         /// </summary>
-        public ReactiveList<ActiveDomainRowViewModel> ActiveDomain { get; set; }
-
-        /// <summary>
-        /// Gets a value indicating whether the Active Domain of Expertiese selection is possible
-        /// </summary>
-        /// <remarks>
-        /// TODO: In the future this should be refactored to allow CDP4 server creating active domains on Engineering model setup
-        /// creation.
-        /// </remarks>
-        public bool IsActiveDomainSelectionReadOnly => (this.dialogKind != ThingDialogKind.Update) || this.IsReadOnly;
+        public new ReactiveList<ActiveDomainRowViewModel> ActiveDomain { get; set; }
 
         /// <summary>
         /// Gets or sets the ShortName
@@ -515,7 +496,5 @@ namespace CDP4EngineeringModel.ViewModels
             get => this.showDeprecatedDomains;
             set => this.RaiseAndSetIfChanged(ref this.showDeprecatedDomains, value);
         }
-
-        #endregion
     }
 }

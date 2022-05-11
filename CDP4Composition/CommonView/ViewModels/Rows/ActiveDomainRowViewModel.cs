@@ -29,13 +29,11 @@ namespace CDP4Composition.CommonView.ViewModels
 
     using ReactiveUI;
 
+    /// <summary>
+    /// The row view model for the active domain
+    /// </summary>
     public class ActiveDomainRowViewModel : ReactiveObject
     {
-        /// <summary>
-        /// The backing field for <see cref="IsActive" />
-        /// </summary>
-        private bool isActive;
-
         /// <summary>
         /// The backing field for <see cref="IsDeprecated" />
         /// </summary>
@@ -94,15 +92,6 @@ namespace CDP4Composition.CommonView.ViewModels
         {
             get => this.isDeprecated;
             set => this.RaiseAndSetIfChanged(ref this.isDeprecated, value);
-        }
-
-        /// <summary>
-        /// Gets or sets the active status of a domain
-        /// </summary>
-        public bool IsActive
-        {
-            get => this.isActive;
-            set => this.RaiseAndSetIfChanged(ref this.isActive, value);
         }
 
         /// <summary>

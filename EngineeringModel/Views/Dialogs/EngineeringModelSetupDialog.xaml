@@ -26,7 +26,6 @@
         <converters1:ReactiveActiveDomainToObjectListConverter x:Key="ActiveDomainToObjectListConverter" />
         <converters:ReactiveOrganizationToObjectListConverter x:Key="ReactiveOrganizationToObjectListConverter" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <FontStyleConverter x:Key="FontStyleConverter"></FontStyleConverter>
     </dx:DXWindow.Resources>
 
     <Grid>
