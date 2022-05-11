@@ -1,27 +1,28 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
-//
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
@@ -49,20 +50,45 @@ namespace CDP4EngineeringModel.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// The Base row-class for <see cref="ParameterBase"/>
+    /// The Base row-class for <see cref="ParameterBase" />
     /// </summary>
-    /// <typeparam name="T">A <see cref="ParameterBase"/> type</typeparam>
+    /// <typeparam name="T">A <see cref="ParameterBase" /> type</typeparam>
     public abstract class ParameterBaseRowViewModel<T> : CDP4CommonView.ParameterBaseRowViewModel<T>, IValueSetRow, IModelCodeRowViewModel where T : ParameterBase
     {
         /// <summary>
-        /// The current <see cref="ParameterGroup"/>
+        /// The state listeners
+        /// </summary>
+        private readonly List<IDisposable> actualFiniteStateListener;
+
+        /// <summary>
+        /// A value indicating whether this <see cref="ParameterBase" /> is editable in the current context
+        /// </summary>
+        private readonly bool isParameterBaseReadOnlyInDataContext;
+
+        /// <summary>
+        /// Backing field for <see cref="Category" />
+        /// </summary>
+        private IEnumerable<Category> category;
+
+        /// <summary>
+        /// The current <see cref="ParameterGroup" />
         /// </summary>
         private ParameterGroup currentGroup;
 
         /// <summary>
-        /// Backing field for <see cref="Formula"/>
+        /// Backing field for <see cref="DisplayCategory" />
+        /// </summary>
+        private string displayCategory;
+
+        /// <summary>
+        /// Backing field for <see cref="Formula" />
         /// </summary>
         private string formula;
+
+        /// <summary>
+        /// Backing field for <see cref="ModelCode" />
+        /// </summary>
+        private string modelCode;
 
         /// <summary>
         /// The value-set listeners cache
@@ -70,41 +96,16 @@ namespace CDP4EngineeringModel.ViewModels
         protected List<IDisposable> valueSetListener;
 
         /// <summary>
-        /// The state listeners
-        /// </summary>
-        private readonly List<IDisposable> actualFiniteStateListener;
-
-        /// <summary>
-        /// A value indicating whether this <see cref="ParameterBase"/> is editable in the current context
-        /// </summary>
-        private readonly bool isParameterBaseReadOnlyInDataContext;
-
-        /// <summary>
-        /// Backing field for <see cref="ModelCode"/>
-        /// </summary>
-        private string modelCode;
-
-        /// <summary>
-        /// Backing field for <see cref="Category"/>
-        /// </summary>
-        private IEnumerable<Category> category;
-
-        /// <summary>
-        /// Backing field for <see cref="DisplayCategory"/>
-        /// </summary>
-        private string displayCategory;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}"/> class. 
+        /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}" /> class.
         /// </summary>
         /// <param name="parameterBase">
-        /// The associated <see cref="ParameterBase"/>
+        /// The associated <see cref="ParameterBase" />
         /// </param>
         /// <param name="session">
-        /// The associated <see cref="ISession"/>
+        /// The associated <see cref="ISession" />
         /// </param>
         /// <param name="containerViewModel">
-        /// The <see cref="ElementBase{T}"/> row that contains this row.
+        /// The <see cref="ElementBase{T}" /> row that contains this row.
         /// </param>
         /// <param name="isReadOnly">
         /// A value indicating whether this row shall be made read-only in the current context.
@@ -122,7 +123,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Gets or sets the owner listener
         /// </summary>
@@ -133,8 +134,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public IEnumerable<Category> Category
         {
-            get { return this.category; }
-            private set { this.RaiseAndSetIfChanged(ref this.category, value); }
+            get => this.category;
+            private set => this.RaiseAndSetIfChanged(ref this.category, value);
         }
 
         /// <summary>
@@ -147,28 +148,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets the model-code
-        /// </summary>
-        public string ModelCode
-        {
-            get { return this.modelCode; }
-            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the <see cref="ParameterType"/> of this <see cref="Parameter"/> is a <see cref="EnumerationParameterType"/>
-        /// </summary>
-        public bool IsMultiSelect
-        {
-            get
-            {
-                var enumPt = this.ParameterType as EnumerationParameterType;
-                return enumPt == null ? false : enumPt.AllowMultiSelect;
-            }
-        }
-
-        /// <summary>
-        /// Gets the list of possible <see cref="EnumerationValueDefinition"/> for this <see cref="Parameter"/>
+        /// Gets the list of possible <see cref="EnumerationValueDefinition" /> for this <see cref="Parameter" />
         /// </summary>
         public ReactiveList<EnumerationValueDefinition> EnumerationValueDefinition
         {
@@ -177,6 +157,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var enumValues = new ReactiveList<EnumerationValueDefinition>();
 
                 var enumPt = this.ParameterType as EnumerationParameterType;
+
                 if (enumPt != null)
                 {
                     enumValues.AddRange(enumPt.ValueDefinition);
@@ -191,38 +172,55 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string Formula
         {
-            get { return this.formula; }
-            set { this.RaiseAndSetIfChanged(ref this.formula, value); }
+            get => this.formula;
+            set => this.RaiseAndSetIfChanged(ref this.formula, value);
         }
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="ParameterBase"/> is a <see cref="CompoundParameterType"/>
+        /// Gets a value indicating whether this <see cref="ParameterBase" /> is a <see cref="CompoundParameterType" />
         /// </summary>
         public bool IsCompoundType { get; private set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="HasExcludes"/>. Property implemented here to fix binding errors.
+        /// Gets or sets the <see cref="HasExcludes" />. Property implemented here to fix binding errors.
         /// </summary>
-        public bool? HasExcludes
-        {
-            get { return null; }
-        }
+        public bool? HasExcludes => null;
 
         /// <summary>
         /// Gets the value indicating whether the row is a top element. Property implemented here to fix binding errors.
         /// </summary>
-        public bool IsTopElement
+        public bool IsTopElement => false;
+
+        /// <summary>
+        /// Gets the model-code
+        /// </summary>
+        public string ModelCode
         {
-            get { return false; }
+            get => this.modelCode;
+            private set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
         }
 
         /// <summary>
-        /// Gets the <see cref="ClassKind"/> of the <see cref="ParameterType"/> represented by this <see cref="IValueSetRow"/>
+        /// Gets a value indicating whether the <see cref="ParameterType" /> of this <see cref="Parameter" /> is a
+        /// <see cref="EnumerationParameterType" />
+        /// </summary>
+        public bool IsMultiSelect
+        {
+            get
+            {
+                var enumPt = this.ParameterType as EnumerationParameterType;
+                return enumPt == null ? false : enumPt.AllowMultiSelect;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ClassKind" /> of the <see cref="ParameterType" /> represented by this <see cref="IValueSetRow" />
         /// </summary>
         public ClassKind ParameterTypeClassKind { get; protected set; }
 
         /// <summary>
-        /// Sets the values of this row in case where the <see cref="ParameterBase"/> is neither option-dependent nor state-dependent and is a <see cref="ScalarParameterType"/>
+        /// Sets the values of this row in case where the <see cref="ParameterBase" /> is neither option-dependent nor
+        /// state-dependent and is a <see cref="ScalarParameterType" />
         /// </summary>
         public abstract void SetProperties();
 
@@ -238,7 +236,7 @@ namespace CDP4EngineeringModel.ViewModels
 
         /// <summary>
         /// Computes the entire row or specific property of the row is editable based on the
-        /// result of the <see cref="PermissionService.CanWrite"/> method and potential
+        /// result of the <see cref="PermissionService.CanWrite" /> method and potential
         /// conditions of the property of the Row that is being edited.
         /// </summary>
         /// <param name="propertyName">
@@ -266,11 +264,19 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
+
             var parameterTypeListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
-                   .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                   .ObserveOn(RxApp.MainThreadScheduler)
-                   .Subscribe(x => this.UpdateProperties());
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.UpdateProperties());
+
+            var containerListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.UpdateModelCode());
+
             this.Disposables.Add(parameterTypeListener);
+            this.Disposables.Add(containerListener);
             this.SetOwnerListener();
         }
 
@@ -285,7 +291,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </remarks>
         public override string ValidateProperty(string columnName, object newValue)
         {
-            if (columnName == "Manual" || columnName == "Reference")
+            if ((columnName == "Manual") || (columnName == "Reference"))
             {
                 return ParameterValueValidator.Validate(newValue, this.ParameterType, this.Thing.Scale);
             }
@@ -296,7 +302,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// The object changed event handler
         /// </summary>
-        /// <param name="objectChange">The <see cref="ObjectChangedEvent"/></param>
+        /// <param name="objectChange">The <see cref="ObjectChangedEvent" /></param>
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
@@ -320,7 +326,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Update the <see cref="ThingStatus"/> property
+        /// Update the <see cref="ThingStatus" /> property
         /// </summary>
         protected override void UpdateThingStatus()
         {
@@ -328,10 +334,18 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Update model code <see cref="ModelCode" />
+        /// </summary>
+        private void UpdateModelCode()
+        {
+            this.ModelCode = this.Thing.ModelCode();
+        }
+
+        /// <summary>
         /// Update this ParameterBase row and its child nodes
         /// </summary>
         /// <remarks>
-        /// if the represented <see cref="ParameterBase"/> is updated, repopulate the contained rows
+        /// if the represented <see cref="ParameterBase" /> is updated, repopulate the contained rows
         /// </remarks>
         private void UpdateProperties()
         {
@@ -341,6 +355,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateCategories();
 
             this.ClearValues();
+
             // clear the listener on the unique value set represented
             foreach (var listener in this.valueSetListener)
             {
@@ -382,6 +397,7 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.currentGroup = this.Thing.Group;
                 var elementBaseRow = this.ContainerViewModel as IElementBaseRowViewModel;
+
                 if (elementBaseRow != null)
                 {
                     elementBaseRow.UpdateParameterBasePosition(this.Thing);
@@ -396,9 +412,10 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateCategories()
         {
             var builder = new CategoryStringBuilder()
-                                .AddCategories("PT", this.Thing.ParameterType.Category);
+                .AddCategories("PT", this.Thing.ParameterType.Category);
 
             var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
+
             if (elementBase != null)
             {
                 if (elementBase is ElementUsage elementUsage)
@@ -431,6 +448,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (Option availableOption in iteration.Option)
             {
                 var row = new ParameterOptionRowViewModel(this.Thing, availableOption, this.Session, this, this.isParameterBaseReadOnlyInDataContext);
+
                 if (this.Thing.StateDependence != null)
                 {
                     this.SetStateProperties(row, availableOption);
@@ -449,7 +467,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Create or remove a row representing an <see cref="ActualFiniteState"/>
+        /// Create or remove a row representing an <see cref="ActualFiniteState" />
         /// </summary>
         /// <param name="row">The row container for the rows to create or remove</param>
         /// <param name="actualOption">The actual option</param>
@@ -461,6 +479,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var rowToRemove =
                     row.ContainedRows.OfType<ParameterStateRowViewModel>()
                         .SingleOrDefault(x => x.ActualState == actualState);
+
                 if (rowToRemove != null)
                 {
                     row.ContainedRows.RemoveAndDispose(rowToRemove);
@@ -471,13 +490,15 @@ namespace CDP4EngineeringModel.ViewModels
 
             // mandatory state
             var existingRow = row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                                .SingleOrDefault(x => x.ActualState == actualState);
+                .SingleOrDefault(x => x.ActualState == actualState);
+
             if (existingRow != null)
             {
                 return;
             }
 
             var stateRow = new ParameterStateRowViewModel(this.Thing, actualOption, actualState, this.Session, row, this.isParameterBaseReadOnlyInDataContext);
+
             if (this.Thing.ParameterType is CompoundParameterType)
             {
                 this.SetComponentProperties(stateRow, actualOption, actualState);
@@ -491,7 +512,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Initialize the listeners and process the state-dependency of this <see cref="ParameterBase"/>
+        /// Initialize the listeners and process the state-dependency of this <see cref="ParameterBase" />
         /// </summary>
         /// <param name="row">The row container</param>
         /// <param name="actualOption">The actual option</param>
@@ -503,14 +524,16 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var state in this.Thing.StateDependence.ActualState)
             {
                 var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(state)
-                                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                                   .ObserveOn(RxApp.MainThreadScheduler)
-                                   .Subscribe(x => this.UpdateActualStateRow(row, actualOption, state));
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => this.UpdateActualStateRow(row, actualOption, state));
+
                 this.actualFiniteStateListener.Add(listener);
             }
 
             this.StateDependence.ActualState.Sort(new ActualFiniteStateComparer());
             var actualFiniteStates = this.StateDependence.ActualState.Where(x => x.Kind == ActualFiniteStateKind.MANDATORY);
+
             foreach (var state in actualFiniteStates)
             {
                 this.UpdateActualStateRow(row, actualOption, state);
@@ -518,10 +541,10 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Creates the component rows for this <see cref="CompoundParameterType"/> <see cref="ParameterRowViewModel"/>.
+        /// Creates the component rows for this <see cref="CompoundParameterType" /> <see cref="ParameterRowViewModel" />.
         /// </summary>
         private void SetComponentProperties(IRowViewModelBase<Thing> row, Option actualOption, ActualFiniteState actualState)
-        {         
+        {
             for (var i = 0; i < ((CompoundParameterType)this.Thing.ParameterType).Component.Count; i++)
             {
                 var componentRow = new ParameterComponentValueRowViewModel(this.Thing, i, this.Session, actualOption, actualState, row, this.isParameterBaseReadOnlyInDataContext);
@@ -547,7 +570,7 @@ namespace CDP4EngineeringModel.ViewModels
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for highlight of row
-        /// on the <see cref="Thing"/> that is being represented by the view-model
+        /// on the <see cref="Thing" /> that is being represented by the view-model
         /// </summary>
         protected override void HighlightEventHandler()
         {
