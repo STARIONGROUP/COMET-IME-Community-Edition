@@ -175,6 +175,25 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
+        /// Update the model code property of itself and all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            this.ModelCode = this.Thing.ModelCode();
+
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHavePath;
+                modelCodeRow?.UpdateModelCode();
+
+                if (containedRow is IHaveContainedModelCodes groupRow)
+                {
+                    groupRow.UpdateModelCode();
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
         public IThingCreator ThingCreator
@@ -393,7 +412,7 @@ namespace CDP4ProductTree.ViewModels
             this.PopulateElementUsages();
             this.PopulateParameterGroups();
             this.PopulateParameter();
-            this.ModelCode = this.Thing.ModelCode();
+            this.UpdateModelCode();
         }
 
         /// <summary>

@@ -44,7 +44,7 @@ namespace CDP4ProductTree.ViewModels
     /// <summary>
     /// Represents a <see cref="ParameterTypeComponent"/>
     /// </summary>
-    public class ParameterTypeComponentRowViewModel : CDP4CommonView.ParameterTypeComponentRowViewModel, IModelCodeRowViewModel
+    public class ParameterTypeComponentRowViewModel : CDP4CommonView.ParameterTypeComponentRowViewModel, IHavePath
     {
         /// <summary>
         /// Backing field for <see cref="Name"/>
@@ -82,6 +82,16 @@ namespace CDP4ProductTree.ViewModels
         private readonly INestedElementTreeService nestedElementTreeService = ServiceLocator.Current.GetInstance<INestedElementTreeService>();
 
         /// <summary>
+        /// ParameterValueSetBase used to set the ModelCode
+        /// </summary>
+        private ParameterValueSetBase valueSet;
+        
+        /// <summary>
+        /// Value set index used to set the ModelCode
+        /// </summary>
+        private int? valueSetIndex;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeComponentRowViewModel"/> class
         /// </summary>
         /// <param name="component">The <see cref="ParameterTypeComponent"/> represented</param>
@@ -107,6 +117,20 @@ namespace CDP4ProductTree.ViewModels
         {
             get { return this.modelCode; }
             private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
+
+        /// <summary>
+        /// Update the model code property of itself and all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            this.ModelCode = this.valueSetIndex.HasValue ? this.valueSet.ModelCode(this.valueSetIndex.Value) : this.valueSet.ModelCode();
+            
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHaveModelCode;
+                modelCodeRow?.UpdateModelCode();
+            }
         }
 
         /// <summary>
@@ -184,7 +208,11 @@ namespace CDP4ProductTree.ViewModels
                 ? valueSet.ActualValue[index.Value] 
                 : valueSet.ActualValue.FirstOrDefault();
 
-            this.ModelCode = index.HasValue ? valueSet.ModelCode(index.Value) : valueSet.ModelCode();
+            // propagate values to aid in modelcode updates
+            this.valueSetIndex = index;
+            this.valueSet = valueSet;
+
+            this.UpdateModelCode();
 
             this.Switch = valueSet.ValueSwitch;
             if (this.Value == null || actualValue == null)

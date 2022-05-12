@@ -53,7 +53,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// The Base row-class for <see cref="ParameterBase"/>
     /// </summary>
     /// <typeparam name="T">A <see cref="ParameterBase"/> type</typeparam>
-    public abstract class ParameterBaseRowViewModel<T> : CDP4CommonView.ParameterBaseRowViewModel<T>, IValueSetRow, IModelCodeRowViewModel where T : ParameterBase
+    public abstract class ParameterBaseRowViewModel<T> : CDP4CommonView.ParameterBaseRowViewModel<T>, IValueSetRow, IHaveModelCode where T : ParameterBase
     {
         /// <summary>
         /// The current <see cref="ParameterGroup"/>
@@ -345,6 +345,19 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Update the model code property of itself and all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            this.ModelCode = this.Thing.ModelCode();
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHaveModelCode;
+                modelCodeRow?.UpdateModelCode();
+            }
+        }
+
+        /// <summary>
         /// Update this ParameterBase row and its child nodes
         /// </summary>
         /// <remarks>
@@ -353,7 +366,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateProperties()
         {
             this.UpdateThingStatus();
-            this.ModelCode = this.Thing.ModelCode();
+            this.UpdateModelCode();
             this.Name = this.Thing.ParameterType.Name;
             this.UpdateCategories();
 

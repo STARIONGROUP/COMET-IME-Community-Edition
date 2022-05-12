@@ -47,7 +47,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// The base row view-model that displays the value-set of a <see cref="ParameterBase"/> 
     /// when its type is not a <see cref="ScalarParameterType"/> and it is not option and state dependent
     /// </summary>
-    public abstract class ParameterValueBaseRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IValueSetRow, IModelCodeRowViewModel
+    public abstract class ParameterValueBaseRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IValueSetRow, IHaveModelCode
     {
         /// <summary>
         /// Backing field for <see cref="Formula"/>
@@ -134,6 +134,40 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return this.modelCode; }
             protected set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
+
+        /// <summary>
+        /// Update the model code property of itself and all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            IValueSet valueSet = null;
+
+            if (this.Thing is Parameter)
+            {
+                valueSet = this.GetParameterValueSet();
+            }
+            else if (this.Thing is ParameterOverride)
+            {
+                valueSet = this.GetParameterOverrideValueSet();
+            } else if (this.Thing is ParameterSubscription)
+            {
+                valueSet = this.GetParameterSubscriptionValueSet();
+            }
+            
+            if (valueSet == null)
+            {
+                logger.Error("No Value set was found for the option: {0}, state: {1}", (this.ActualOption == null) ? "null" : this.ActualOption.Name, (this.ActualState == null) ? "null" : this.ActualState.Name);
+                return;
+            }
+
+            this.ModelCode = valueSet.ModelCode(this.ValueIndex);
+
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHaveModelCode;
+                modelCodeRow?.UpdateModelCode();
+            }
         }
 
         /// <summary>
@@ -376,7 +410,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.Manual = valueSet.Manual.Count() > this.ValueIndex ? valueSet.Manual[this.ValueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
             this.Reference = valueSet.Reference.Count() > this.ValueIndex ? valueSet.Reference[this.ValueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
             this.Value = valueSet.ActualValue.Count() > this.ValueIndex ? valueSet.ActualValue[this.ValueIndex] : "-";
-            this.ModelCode = valueSet.ModelCode(this.ValueIndex);
+            this.UpdateModelCode();
         }
 
         /// <summary>
@@ -437,7 +471,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.Error = "No ValueSet found for this component";
             }
 
-            this.ModelCode = valueSet.ModelCode(this.ValueIndex);
+            this.UpdateModelCode();
         }
 
         /// <summary>

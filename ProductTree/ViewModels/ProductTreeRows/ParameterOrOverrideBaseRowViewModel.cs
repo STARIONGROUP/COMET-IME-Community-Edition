@@ -53,7 +53,7 @@ namespace CDP4ProductTree.ViewModels
     /// <summary>
     /// The row-view-model that represents a <see cref="ParameterOrOverrideBase"/>
     /// </summary>
-    public abstract class ParameterOrOverrideBaseRowViewModel : CDP4CommonView.ParameterOrOverrideBaseRowViewModel<ParameterOrOverrideBase>, IModelCodeRowViewModel
+    public abstract class ParameterOrOverrideBaseRowViewModel : CDP4CommonView.ParameterOrOverrideBaseRowViewModel<ParameterOrOverrideBase>, IHavePath
     {
         /// <summary>
         /// The current <see cref="ParameterGroup"/>
@@ -226,6 +226,25 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
+        /// Update the model code property of itself and all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            this.ModelCode = this.Thing.ModelCode();
+
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHavePath;
+                modelCodeRow?.UpdateModelCode();
+
+                if (containedRow is IHaveContainedModelCodes groupRow)
+                {
+                    groupRow.UpdateModelCode();
+                }
+            }
+        }
+
+        /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>
         protected override void UpdateThingStatus()
@@ -303,7 +322,7 @@ namespace CDP4ProductTree.ViewModels
             this.Value = null;
             this.IsPublishable = false;
             this.UpdateOwnerNameAndShortName();
-            this.ModelCode = this.Thing.ModelCode();
+            this.UpdateModelCode();
             this.UpdateCategories();
 
             if (this.StateDependence != this.Thing.StateDependence)

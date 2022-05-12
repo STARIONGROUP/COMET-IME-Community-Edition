@@ -460,7 +460,7 @@ namespace CDP4ProductTree.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
             }
 
-            if (this.SelectedThing is IModelCodeRowViewModel)
+            if (this.SelectedThing is IHavePath)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Path to Clipboard", "", this.CopyPathToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
@@ -592,9 +592,9 @@ namespace CDP4ProductTree.ViewModels
                 return;
             }
 
-            if (this.SelectedThing is IModelCodeRowViewModel)
+            if (this.SelectedThing is IHavePath havePath)
             {
-                Clipboard.SetText(((IModelCodeRowViewModel)this.SelectedThing).ModelCode);
+                Clipboard.SetText(havePath.ModelCode);
             }
         }
 
@@ -608,9 +608,9 @@ namespace CDP4ProductTree.ViewModels
                 return;
             }
 
-            if (this.SelectedThing is IModelCodeRowViewModel model)
+            if (this.SelectedThing is IHavePath pathRow)
             {
-                Clipboard.SetText(model.GetPath());
+                Clipboard.SetText(pathRow.GetPath());
             }
         }
 
