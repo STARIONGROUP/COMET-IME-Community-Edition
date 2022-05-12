@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IParameterRowContainer.cs" company="RHEA System S.A.">
+// <copyright file="IHaveModelCode.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -23,27 +23,21 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ProductTree.ViewModels
+namespace CDP4Composition.Mvvm
 {
-    using CDP4Common.EngineeringModelData;
-
-    using CDP4Composition.Mvvm;
-
     /// <summary>
-    /// The interface for rows that contains rows representing a <see cref="ParameterGroup" /> or <see cref="ParameterBase" />
+    /// The interface for rows that can display a model-code
     /// </summary>
-    public interface IParameterRowContainer : IHavePath
+    public interface IHaveModelCode
     {
         /// <summary>
-        /// Update the row containment associated to a <see cref="ParameterBase" />
+        /// Gets ModelCode
         /// </summary>
-        /// <param name="parameterBase">The <see cref="ParameterBase" /></param>
-        void UpdateParameterBasePosition(ParameterBase parameterBase);
+        string ModelCode { get; }
 
         /// <summary>
-        /// Update the row containment associated to a <see cref="ParameterGroup" />
+        /// Update the model code property of itself and all contained rows recursively
         /// </summary>
-        /// <param name="parameterGroup">The <see cref="ParameterGroup" /></param>
-        void UpdateParameterGroupPosition(ParameterGroup parameterGroup);
+        void UpdateModelCode();
     }
 }

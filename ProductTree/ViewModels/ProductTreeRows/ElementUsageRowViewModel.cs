@@ -184,6 +184,19 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
+        /// Update the model code property of itself and all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            this.ModelCode = this.Thing.ModelCode();
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHaveModelCode;
+                modelCodeRow?.UpdateModelCode();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the <see cref="IThingCreator"/> that is used to create different <see cref="Things"/>.
         /// </summary>
         public IThingCreator ThingCreator
@@ -447,7 +460,7 @@ namespace CDP4ProductTree.ViewModels
             this.UpdateThingStatus();
             this.Name = this.Thing.Name + " : " + this.ElementDefinition.Name;
             this.ShortName = this.Thing.ShortName + " : " + this.ElementDefinition.ShortName;
-            this.ModelCode = this.Thing.ModelCode();
+            this.UpdateModelCode();
 
             var builder = new CategoryStringBuilder()
                                 .AddCategories("EU", this.Thing.Category)

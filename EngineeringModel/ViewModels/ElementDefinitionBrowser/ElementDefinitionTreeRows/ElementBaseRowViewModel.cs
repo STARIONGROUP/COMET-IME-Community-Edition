@@ -129,7 +129,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateOwnerProperties();
             this.UpdateObfuscationProperties();
             this.WhenAnyValue(vm => vm.Owner).Subscribe(_ => this.UpdateOwnerProperties());
-            this.ModelCode = ((IModelCode)this.Thing).ModelCode();
+            this.UpdateModelCode();
         }
 
         /// <summary>
@@ -179,6 +179,20 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get { return this.modelCode; }
             private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
+
+        /// <summary>
+        /// Update the model code property of itself and all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            this.ModelCode = ((IModelCode)this.Thing).ModelCode();
+
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHaveModelCode;
+                modelCodeRow?.UpdateModelCode();
+            }
         }
 
         /// <summary>
@@ -327,7 +341,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
             base.ObjectChangeEventHandler(objectChange);
-            this.ModelCode = ((IModelCode)this.Thing).ModelCode();
+            this.UpdateModelCode();
         }
 
         /// <summary>
