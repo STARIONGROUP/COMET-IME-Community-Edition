@@ -1021,9 +1021,9 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            if (this.SelectedThing is IHaveModelCode)
+            if (this.SelectedThing is IHaveModelCode modelCode)
             {
-                Clipboard.SetText(((IHaveModelCode)this.SelectedThing).ModelCode);
+                Clipboard.SetText(modelCode.ModelCode);
             }
         }
 

@@ -368,7 +368,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Update the model code property of itself and all contained rows recursively
+        /// Update the model code property of all contained rows recursively
         /// </summary>
         public void UpdateModelCode()
         {

@@ -592,9 +592,9 @@ namespace CDP4ProductTree.ViewModels
                 return;
             }
 
-            if (this.SelectedThing is IHavePath)
+            if (this.SelectedThing is IHavePath havePath)
             {
-                Clipboard.SetText(((IHavePath)this.SelectedThing).ModelCode);
+                Clipboard.SetText(havePath.ModelCode);
             }
         }
 
@@ -608,9 +608,9 @@ namespace CDP4ProductTree.ViewModels
                 return;
             }
 
-            if (this.SelectedThing is IHavePath model)
+            if (this.SelectedThing is IHavePath pathRow)
             {
-                Clipboard.SetText(model.GetPath());
+                Clipboard.SetText(pathRow.GetPath());
             }
         }
 
