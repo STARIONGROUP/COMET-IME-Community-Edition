@@ -46,7 +46,7 @@ namespace CDP4ProductTree.ViewModels
     /// <remarks>
     /// This row shall be used when a <see cref="Parameter"/> is state dependent
     /// </remarks>
-    public class ParameterStateRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IModelCodeRowViewModel
+    public class ParameterStateRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IHavePath
     {
         /// <summary>
         /// Backing field for <see cref="IsPublishable"/> property.
@@ -72,6 +72,11 @@ namespace CDP4ProductTree.ViewModels
         /// Backing field for <see cref="ActualState"/>
         /// </summary>
         private ActualFiniteState actualState;
+
+        /// <summary>
+        /// ParameterValueSetBase used to set the ModelCode
+        /// </summary>
+        private ParameterValueSetBase valueSet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterStateRowViewModel"/> class
@@ -110,6 +115,20 @@ namespace CDP4ProductTree.ViewModels
         {
             get { return this.modelCode; }
             private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+        }
+
+        /// <summary>
+        /// Update the model code property of itself and all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            this.ModelCode = this.valueSet.ModelCode();
+
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHaveModelCode;
+                modelCodeRow?.UpdateModelCode();
+            }
         }
 
         /// <summary>
@@ -165,7 +184,11 @@ namespace CDP4ProductTree.ViewModels
             }
 
             this.Switch = valueSet.ValueSwitch;
-            this.ModelCode = valueSet.ModelCode();
+
+            // propagate values to aid in modelcode updates
+            this.valueSet = valueSet;
+
+            this.UpdateModelCode();
         }
 
         /// <summary>

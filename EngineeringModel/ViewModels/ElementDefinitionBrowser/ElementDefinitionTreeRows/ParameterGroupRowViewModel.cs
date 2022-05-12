@@ -30,7 +30,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// The row representing a <see cref="ParameterGroup"/>
     /// </summary>
-    public class ParameterGroupRowViewModel : CDP4CommonView.ParameterGroupRowViewModel, IDropTarget
+    public class ParameterGroupRowViewModel : CDP4CommonView.ParameterGroupRowViewModel, IDropTarget, IHaveContainedModelCodes
     {
         /// <summary>
         /// The <see cref="IComparer{T}"/>
@@ -364,6 +364,23 @@ namespace CDP4EngineeringModel.ViewModels
                 var clone = group.Clone(false);
                 clone.ContainingGroup = this.Thing;
                 await this.DalWrite(clone);
+            }
+        }
+
+        /// <summary>
+        /// Update the model code property of all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHaveModelCode;
+                modelCodeRow?.UpdateModelCode();
+
+                if (containedRow is IHaveContainedModelCodes groupRow)
+                {
+                    groupRow.UpdateModelCode();
+                }
             }
         }
     }

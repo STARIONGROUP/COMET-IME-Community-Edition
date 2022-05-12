@@ -683,7 +683,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
 
-            if (this.SelectedThing is IModelCodeRowViewModel)
+            if (this.SelectedThing is IHaveModelCode)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
             }
@@ -745,7 +745,7 @@ namespace CDP4EngineeringModel.ViewModels
                         new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
                 }
 
-                if (this.SelectedThing is IModelCodeRowViewModel)
+                if (this.SelectedThing is IHaveModelCode)
                 {
                     this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
                 }
@@ -1021,9 +1021,9 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            if (this.SelectedThing is IModelCodeRowViewModel)
+            if (this.SelectedThing is IHaveModelCode modelCode)
             {
-                Clipboard.SetText(((IModelCodeRowViewModel)this.SelectedThing).ModelCode);
+                Clipboard.SetText(modelCode.ModelCode);
             }
         }
 

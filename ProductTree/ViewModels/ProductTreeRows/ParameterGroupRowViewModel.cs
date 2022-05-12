@@ -17,7 +17,7 @@ namespace CDP4ProductTree.ViewModels
     /// <summary>
     /// The row-view-model representing a <see cref="ParameterGroup"/>
     /// </summary>
-    public class ParameterGroupRowViewModel : CDP4CommonView.ParameterGroupRowViewModel
+    public class ParameterGroupRowViewModel : CDP4CommonView.ParameterGroupRowViewModel, IHaveContainedModelCodes
     {
         /// <summary>
         /// The current <see cref="ParameterGroup"/>
@@ -84,6 +84,23 @@ namespace CDP4ProductTree.ViewModels
         public string ShortName
         {
             get { return this.Name; }
+        }
+
+        /// <summary>
+        /// Update the model code property of all contained rows recursively
+        /// </summary>
+        public void UpdateModelCode()
+        {
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHavePath;
+                modelCodeRow?.UpdateModelCode();
+
+                if (containedRow is IHaveContainedModelCodes groupRow)
+                {
+                    groupRow.UpdateModelCode();
+                }
+            }
         }
     }
 }
