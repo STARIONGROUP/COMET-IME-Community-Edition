@@ -231,6 +231,17 @@ namespace CDP4ProductTree.ViewModels
         public void UpdateModelCode()
         {
             this.ModelCode = this.Thing.ModelCode();
+
+            foreach (var containedRow in this.ContainedRows)
+            {
+                var modelCodeRow = containedRow as IHavePath;
+                modelCodeRow?.UpdateModelCode();
+
+                if (containedRow is IHaveContainedModelCodes groupRow)
+                {
+                    groupRow.UpdateModelCode();
+                }
+            }
         }
 
         /// <summary>
