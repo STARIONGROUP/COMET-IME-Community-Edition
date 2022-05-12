@@ -192,6 +192,11 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var modelCodeRow = containedRow as IHaveModelCode;
                 modelCodeRow?.UpdateModelCode();
+
+                if (containedRow is IHaveContainedModelCodes groupRow)
+                {
+                    groupRow.UpdateModelCode();
+                }
             }
         }
 

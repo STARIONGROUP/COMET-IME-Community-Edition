@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IHaveModelCode.cs" company="RHEA System S.A.">
+// <copyright file="IHaveContainedModelCodes.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -26,13 +26,13 @@
 namespace CDP4Composition.Mvvm
 {
     /// <summary>
-    /// The interface for rows that can display a model-code
+    /// IHaveContainedModelCodes interface for rows that contains model code
     /// </summary>
-    public interface IHaveModelCode : IHaveContainedModelCodes
+    public interface IHaveContainedModelCodes
     {
         /// <summary>
-        /// Gets ModelCode
+        /// Update the model code property of itself and all contained rows recursively
         /// </summary>
-        string ModelCode { get; }
+        void UpdateModelCode();
     }
 }
