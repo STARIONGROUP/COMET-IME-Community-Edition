@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{FC0997A4-F981-4002-9BDC-BC2FFA6DF552}</ProjectGuid>
-    <MinIMEVersion>9.1.0</MinIMEVersion>
+    <MinIMEVersion>9.2.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>   
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ReferenceDataMapper</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4ReferenceDataMapper</Product>
     <Description>COMET ReferenceData Mapper Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.1.0.2</AssemblyVersion>
-    <FileVersion>9.1.0.2</FileVersion>
+    <AssemblyVersion>9.2.0.0</AssemblyVersion>
+    <FileVersion>9.2.0.0</FileVersion>
   </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
