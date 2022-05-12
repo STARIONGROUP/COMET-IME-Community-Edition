@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 namespace CDP4EngineeringModel.ViewModels
@@ -38,6 +38,7 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Composition.Builders;
     using CDP4Composition.Extensions;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
@@ -266,11 +267,27 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
-            var parameterTypeListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
-                   .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                   .ObserveOn(RxApp.MainThreadScheduler)
-                   .Subscribe(x => this.UpdateProperties());
-            this.Disposables.Add(parameterTypeListener);
+
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
+            Action<ObjectChangedEvent> action = x => this.UpdateProperties();
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var parameterTypeListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
+
+                this.Disposables.Add(parameterTypeListener);
+            }
+            else
+            {
+                var parameterTypeObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType));
+
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterTypeObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ParameterType, discriminator, action)));
+            }
+
             this.SetOwnerListener();
         }
 
@@ -314,7 +331,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.Dispose(disposing);
             this.valueSetListener.ForEach(x => x.Dispose());
             this.actualFiniteStateListener.ForEach(x => x.Dispose());
-            this.OwnerListener.Value.Dispose();
+            this.OwnerListener.Value?.Dispose();
             this.actualFiniteStateListener.Clear();
             this.valueSetListener.Clear();
         }
@@ -364,6 +381,9 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else if (this.Thing.StateDependence != null)
             {
+                this.actualFiniteStateListener.ForEach(x => x.Dispose());
+                this.actualFiniteStateListener.Clear();
+                
                 this.SetStateProperties(this, null);
                 this.CreateValueSetsSubscription();
             }
@@ -428,9 +448,18 @@ namespace CDP4EngineeringModel.ViewModels
                 throw new InvalidOperationException("No Iteration Container was found.");
             }
 
+            if (this.Thing.StateDependence != null)
+            {
+                this.actualFiniteStateListener.ForEach(x => x.Dispose());
+                this.actualFiniteStateListener.Clear();
+            }
+
+            var newRows = new List<IRowViewModelBase<Thing>>();
+
             foreach (Option availableOption in iteration.Option)
             {
                 var row = new ParameterOptionRowViewModel(this.Thing, availableOption, this.Session, this, this.isParameterBaseReadOnlyInDataContext);
+
                 if (this.Thing.StateDependence != null)
                 {
                     this.SetStateProperties(row, availableOption);
@@ -443,9 +472,11 @@ namespace CDP4EngineeringModel.ViewModels
                 {
                     row.SetValues();
                 }
-
-                this.ContainedRows.Add(row);
+                
+                newRows.Add(row);
             }
+
+            this.ContainedRows.AddRange(newRows);
         }
 
         /// <summary>
@@ -454,7 +485,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="row">The row container for the rows to create or remove</param>
         /// <param name="actualOption">The actual option</param>
         /// <param name="actualState">The actual state</param>
-        private void UpdateActualStateRow(IRowViewModelBase<Thing> row, Option actualOption, ActualFiniteState actualState)
+        private void UpdateActualStateRow(IRowViewModelBase<Thing> row, Option actualOption, ActualFiniteState actualState, IList<IRowViewModelBase<Thing>> parentRow)
         {
             if (actualState.Kind == ActualFiniteStateKind.FORBIDDEN)
             {
@@ -487,7 +518,7 @@ namespace CDP4EngineeringModel.ViewModels
                 stateRow.SetValues();
             }
 
-            row.ContainedRows.Add(stateRow);
+            parentRow.Add(stateRow);
         }
 
         /// <summary>
@@ -497,24 +528,42 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="actualOption">The actual option</param>
         private void SetStateProperties(IRowViewModelBase<Thing> row, Option actualOption)
         {
-            this.actualFiniteStateListener.ForEach(x => x.Dispose());
-            this.actualFiniteStateListener.Clear();
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
+            Action<ObjectChangedEvent> action = x => this.UpdateActualStateRow(row, actualOption, x.ChangedThing as ActualFiniteState, row.ContainedRows);
 
-            foreach (var state in this.Thing.StateDependence.ActualState)
+            if (this.AllowMessageBusSubscriptions)
             {
-                var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(state)
-                                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                                   .ObserveOn(RxApp.MainThreadScheduler)
-                                   .Subscribe(x => this.UpdateActualStateRow(row, actualOption, state));
-                this.actualFiniteStateListener.Add(listener);
+                foreach (var state in this.Thing.StateDependence.ActualState)
+                {
+                    var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(state)
+                        .Where(discriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(action);
+
+                    this.actualFiniteStateListener.Add(listener);
+                }
+            }
+            else
+            {
+                var stateObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ActualFiniteState));
+
+                foreach (var state in this.Thing.StateDependence.ActualState)
+                {
+                    this.actualFiniteStateListener.Add(
+                        this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(stateObserver, new ObjectChangedMessageBusEventHandlerSubscription(state, discriminator, action)));
+                }
             }
 
             this.StateDependence.ActualState.Sort(new ActualFiniteStateComparer());
             var actualFiniteStates = this.StateDependence.ActualState.Where(x => x.Kind == ActualFiniteStateKind.MANDATORY);
+
+            var newRows = new List<IRowViewModelBase<Thing>>();
             foreach (var state in actualFiniteStates)
             {
-                this.UpdateActualStateRow(row, actualOption, state);
+                this.UpdateActualStateRow(row, actualOption, state, newRows);
             }
+
+            row.ContainedRows.AddRange(newRows);
         }
 
         /// <summary>
@@ -522,12 +571,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void SetComponentProperties(IRowViewModelBase<Thing> row, Option actualOption, ActualFiniteState actualState)
         {         
+            var rows = new List<IRowViewModelBase<Thing>>();
+
             for (var i = 0; i < ((CompoundParameterType)this.Thing.ParameterType).Component.Count; i++)
             {
                 var componentRow = new ParameterComponentValueRowViewModel(this.Thing, i, this.Session, actualOption, actualState, row, this.isParameterBaseReadOnlyInDataContext);
                 componentRow.SetValues();
-                row.ContainedRows.Add(componentRow);
+                rows.Add(componentRow);
             }
+
+            row.ContainedRows.AddRange(rows);
         }
 
         /// <summary>

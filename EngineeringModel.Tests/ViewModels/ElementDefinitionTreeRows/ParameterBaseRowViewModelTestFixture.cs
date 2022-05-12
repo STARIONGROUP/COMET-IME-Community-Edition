@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -51,7 +51,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     internal class ParameterBaseRowViewModelTestFixture
     {
         private Mock<IPermissionService> permissionService;
-        private Mock<IThingDialogNavigationService> thingDialognavigationService;
         private Mock<IObfuscationService> obfuscationService;
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://test.com");
@@ -94,7 +93,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
-            this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.obfuscationService = new Mock<IObfuscationService>();
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
@@ -581,10 +579,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.That(row.ScaleName, Is.Null.Or.Empty);
         }
 
-        [Test]
-        public void VerifyThatParameterComponentRowsUpdateOnParameterTypeUpdate()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatParameterComponentRowsUpdateOnParameterType(IViewModelBase<Thing> container, string scenario)
         {
-            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, container, false);
 
             Assert.AreEqual(2, this.cptType.Component.Count);
             Assert.AreEqual(2, row.ContainedRows.Count);
@@ -608,8 +606,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.That(row.ValidateProperty("Reference", null), Is.Null.Or.Empty);
         }
 
-        [Test]
-        public void VerifyThatStateDependentRowAreUpdated()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatStateDependentRowAreUpdated(IViewModelBase<Thing> container, string scenario)
         {
             var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var valueSetState2 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -627,7 +625,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter1.ValueSet.Add(valueSetState2);
 
             this.parameter1.StateDependence = this.stateList;
-            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
+            var row = new ParameterRowViewModel(this.parameter1, this.session.Object, container, false);
 
             Assert.AreEqual(1, row.ContainedRows.Count);
 

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -39,6 +39,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
     using CDP4Common.Types;
 
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.Services.NestedElementTreeService;
 
@@ -282,8 +283,8 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             Assert.AreEqual("dom", row.OwnerShortName);
         }
 
-        [Test]
-        public void VerifyThatPropertiesArePopulatedForScalarStateDependent()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatPropertiesArePopulatedForScalarStateDependent(IViewModelBase<Thing> container, string scenario)
         {
             // **************************INPUT***************************************
             var published = new ValueArray<string>(new List<string> { "manual" }, this.valueset);
@@ -304,7 +305,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             // **********************************************************************
 
-            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, container);
 
             Assert.IsTrue(row.IsPublishable);
             Assert.That(row.Value, Is.Null.Or.Empty);
@@ -326,8 +327,8 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             Assert.AreEqual("dom", row.OwnerShortName);
         }
 
-        [Test]
-        public void VerifyThatOnUpdateOfStateTheRowIsUpdated()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatOnUpdateOfStateTheRowIsUpdated(IViewModelBase<Thing> container, string scenario)
         {
             // **************************INPUT***************************************
             var published = new ValueArray<string>(new List<string> { "manual" }, this.valueset);
@@ -348,7 +349,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             // **********************************************************************
 
-            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, container);
             Assert.AreEqual(1, row.ContainedRows.Count);
             this.state1.Kind = ActualFiniteStateKind.FORBIDDEN;
             CDPMessageBus.Current.SendObjectChangeEvent(this.state1, EventKind.Updated);
@@ -497,8 +498,8 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             Assert.IsTrue(s2c2.Value.Contains("s2value2"));
         }
 
-        [Test]
-        public void VerifyThatParameterTypeUpdatesAreHandled()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatParameterTypeUpdatesAreHandled(IViewModelBase<Thing> container, string scenario)
         {
             // **********************************************************************
             var published = new ValueArray<string>(new List<string> { "manual" }, this.valueset);
@@ -512,7 +513,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             // **********************************************************************
 
-            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
+            var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, container);
 
             Assert.AreEqual("pt1", row.Name);
             Assert.IsTrue(row.Value.Contains("manual"));

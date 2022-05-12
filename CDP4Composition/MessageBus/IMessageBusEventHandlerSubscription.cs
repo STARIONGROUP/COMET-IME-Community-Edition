@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterUsageKind.cs" company="RHEA System S.A.">
+// <copyright file="IMessageBusEventHandlerSubscription.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -23,29 +23,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ProductTree.ViewModels
+namespace CDP4Composition.MessageBus
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
+    using System;
 
     /// <summary>
-    /// The different kinds of a parameter usage 
+    /// Describes the properties and methods of a messagebus handler data object
     /// </summary>
-    public enum ParameterUsageKind
+    public interface IMessageBusEventHandlerSubscription : IDisposable
     {
         /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> is neither used or owned by the active <see cref="DomainOfExpertise"/>
+        /// Executes discriminator code (sort of Where statement) to check if ExecuteAction is allowed to be executed
         /// </summary>
-        Unused = 0,
+        /// <param name="messageBusEvent">The type of message bus event</param>
+        /// <returns>True if ExecuteAction is allowed, otherwise false</returns>
+        bool ExecuteDiscriminator(object messageBusEvent);
 
         /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> has subscription from other <see cref="DomainOfExpertise"/> than the active one
+        /// Executes code that needs to run according to a message bus event
         /// </summary>
-        SubscribedByOthers = 1,
-
-        /// <summary>
-        /// The active <see cref="DomainOfExpertise"/> has subscribed to the <see cref="ParameterOrOverrideBase"/>
-        /// </summary>
-        Subscribed = 2
+        /// <param name="messageBusEvent">The type of message bus event</param>
+        void ExecuteAction(object messageBusEvent);
     }
 }

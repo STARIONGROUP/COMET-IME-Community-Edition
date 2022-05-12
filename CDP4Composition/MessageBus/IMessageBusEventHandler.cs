@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterUsageKind.cs" company="RHEA System S.A.">
+// <copyright file="IMessageBusEventHandler.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -23,29 +23,22 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ProductTree.ViewModels
+namespace CDP4Composition.MessageBus
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
+    using System;
 
     /// <summary>
-    /// The different kinds of a parameter usage 
+    /// Defines the interface of a MessageBusHandler
     /// </summary>
-    public enum ParameterUsageKind
+    /// <typeparam name="T">The Type of events that the <see cref="IMessageBusEventHandler{T}"/></typeparam> handles
+    public interface IMessageBusEventHandler<in T> : IMessageBusEventHandlerBase
     {
         /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> is neither used or owned by the active <see cref="DomainOfExpertise"/>
+        /// Adds an event handler to based on an <see cref="IObservable{T}"/> <see cref="CDPMessageBus"/> event using a specific <see cref="IMessageBusEventHandlerSubscription"/>
         /// </summary>
-        Unused = 0,
-
-        /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> has subscription from other <see cref="DomainOfExpertise"/> than the active one
-        /// </summary>
-        SubscribedByOthers = 1,
-
-        /// <summary>
-        /// The active <see cref="DomainOfExpertise"/> has subscribed to the <see cref="ParameterOrOverrideBase"/>
-        /// </summary>
-        Subscribed = 2
+        /// <param name="messageBusEvent">The <see cref="IObservable{T}"/></param>
+        /// <param name="messageBusHandlerData">The <see cref="IMessageBusEventHandlerSubscription"/></param>
+        /// <returns>The event handler as an <see cref="IDisposable"/></returns>
+        IDisposable RegisterEventHandler(IObservable<T> messageBusEvent, IMessageBusEventHandlerSubscription messageBusHandlerData);
     }
 }
