@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterUsageKind.cs" company="RHEA System S.A.">
+// <copyright file="MessageBusEventHandlerDisposer.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -23,29 +23,35 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ProductTree.ViewModels
+namespace CDP4Composition.MessageBus
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
+    using System;
 
     /// <summary>
-    /// The different kinds of a parameter usage 
+    /// A wrapper class that can help to execute some code when it gets disposed
     /// </summary>
-    public enum ParameterUsageKind
+    public class MessageBusEventHandlerDisposer : IDisposable
     {
         /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> is neither used or owned by the active <see cref="DomainOfExpertise"/>
+        /// The <see cref="Action"/> to be executed on disposal
         /// </summary>
-        Unused = 0,
+        private readonly Action action;
 
         /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> has subscription from other <see cref="DomainOfExpertise"/> than the active one
+        /// Creates a new instance of the <see cref="MessageBusEventHandlerDisposer"/> class
         /// </summary>
-        SubscribedByOthers = 1,
+        /// <param name="action"></param>
+        public MessageBusEventHandlerDisposer(Action action)
+        {
+            this.action = action;
+        }
 
         /// <summary>
-        /// The active <see cref="DomainOfExpertise"/> has subscribed to the <see cref="ParameterOrOverrideBase"/>
+        /// Disposes this class
         /// </summary>
-        Subscribed = 2
+        public void Dispose()
+        {
+            this.action.Invoke();
+        }
     }
 }

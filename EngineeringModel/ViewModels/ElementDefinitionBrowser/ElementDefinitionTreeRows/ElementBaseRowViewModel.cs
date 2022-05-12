@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed.
-// 
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -38,6 +38,8 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
+    using CDP4Composition.Extensions;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
@@ -298,17 +300,24 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeSubscriptions();
 
-            var ownerListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Owner)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(
-                    x =>
-                    {
-                        this.OwnerName = this.Thing.Owner.Name;
-                        this.OwnerShortName = this.Thing.Owner.ShortName;
-                    });
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
+            Action<ObjectChangedEvent> action = x => this.UpdateOwnerProperties();
 
-            this.Disposables.Add(ownerListener);
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var ownerListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Owner)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
+
+                this.Disposables.Add(ownerListener);
+            }
+            else
+            {
+                var ownerObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise));
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.Owner, discriminator, action)));
+            }
         }
 
         /// <summary>
@@ -558,12 +567,27 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.PopulateParameters());
+            Func<ObjectChangedEvent, bool> discriminator = 
+                objectChange => objectChange.EventKind == EventKind.Updated 
+                && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
 
-            this.ParameterBaseListener.Add(parameterOrOverride, listener);
+            Action<ObjectChangedEvent> action = x => this.PopulateParameters();
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+               var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
+
+                this.ParameterBaseListener.Add(parameterOrOverride, listener);
+            }
+            else
+            {
+                var parameterOrOverrideObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase));
+                this.ParameterBaseListener.Add(parameterOrOverride, 
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterOrOverrideObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOrOverride, discriminator, action)));
+            }
         }
 
         /// <summary>
@@ -577,12 +601,24 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterSubscription)
-                .Where(objectChange => objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.PopulateParameters());
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
+            Action<ObjectChangedEvent> action = x => this.PopulateParameters();
 
-            this.ParameterBaseListener.Add(parameterSubscription, listener);
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterSubscription)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
+
+                this.ParameterBaseListener.Add(parameterSubscription, listener);
+            }
+            else
+            {
+                var parameterOrOverrideObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterSubscription));
+                this.ParameterBaseListener.Add(parameterSubscription, 
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterOrOverrideObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterSubscription, discriminator, action)));
+            }
         }
 
         /// <summary>

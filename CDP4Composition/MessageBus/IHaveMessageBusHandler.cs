@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterUsageKind.cs" company="RHEA System S.A.">
+// <copyright file="IHaveMessageBusHandler.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -23,29 +23,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ProductTree.ViewModels
+namespace CDP4Composition.MessageBus
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-
     /// <summary>
-    /// The different kinds of a parameter usage 
+    /// When applied to a class, this interface indicates that a MessageBusHandler can be used instead of single <see cref="CDPMessageBus"/> subscriptions
     /// </summary>
-    public enum ParameterUsageKind
+    public interface IHaveMessageBusHandler
     {
         /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> is neither used or owned by the active <see cref="DomainOfExpertise"/>
+        /// Gets the <see cref="MessageBusHandler"/>
         /// </summary>
-        Unused = 0,
-
-        /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> has subscription from other <see cref="DomainOfExpertise"/> than the active one
-        /// </summary>
-        SubscribedByOthers = 1,
-
-        /// <summary>
-        /// The active <see cref="DomainOfExpertise"/> has subscribed to the <see cref="ParameterOrOverrideBase"/>
-        /// </summary>
-        Subscribed = 2
+        MessageBusHandler MessageBusHandler { get; }
     }
 }

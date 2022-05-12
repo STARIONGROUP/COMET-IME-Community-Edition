@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -44,6 +44,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -72,7 +73,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// Represent the view-model of the browser that displays all the <see cref="ElementDefinition"/>s in one <see cref="Iteration"/>
     /// </summary>
-    public class ElementDefinitionsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget
+    public class ElementDefinitionsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget, IHaveMessageBusHandler
     {
         /// <summary>
         /// The logger for the current class
@@ -190,7 +191,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.ExecuteLongRunningDispatcherAction(
                 () => 
                 { 
-                    this.UpdateElementDefinition();
+                    this.UpdateElementDefinition(true);
                     this.AddSubscriptions();
                     this.UpdateProperties();
                     stopWatch.Stop();
@@ -349,6 +350,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
+
+        /// <summary>
+        /// Gets the <see cref="MessageBusHandler"/>
+        /// </summary>
+        public new MessageBusHandler MessageBusHandler { get; } = new MessageBusHandler();
 
         /// <summary>
         /// Updates the current drag state.
@@ -784,7 +790,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.UpdateDomain(domainChangeEvent);
             this.ElementDefinitionRowViewModels.ClearAndDispose();
-            this.UpdateElementDefinition();
+            this.UpdateElementDefinition(true);
         }
 
         /// <summary>
@@ -1001,6 +1007,8 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 elementDef.Dispose();
             }
+
+            this.MessageBusHandler.Dispose();
         }
 
         /// <summary>
@@ -1032,20 +1040,31 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Update the rows to display
         /// </summary>
-        private void UpdateElementDefinition()
+        /// <param name="initial">
+        /// A boolean indicating if this is the first load
+        /// </param>
+        private void UpdateElementDefinition(bool initial = false)
         {
             var currentDef = this.ElementDefinitionRowViewModels.Select(x => (ElementDefinition)x.Thing).ToList();
             var addedDef = this.Thing.Element.Except(currentDef).ToList();
-            var removedDef = currentDef.Except(this.Thing.Element).ToList();
 
-            foreach (var elementDefinition in addedDef)
+            if (initial)
             {
-                this.AddElementDefinitionRow(elementDefinition);
+                this.AddElementDefinitionRows(addedDef);
             }
-
-            foreach (var elementDefinition in removedDef)
+            else
             {
-                this.RemoveElementDefinitionRow(elementDefinition);
+                foreach (var elementDefinition in addedDef)
+                {
+                    this.AddElementDefinitionRow(elementDefinition);
+                }
+
+                var removedDef = currentDef.Except(this.Thing.Element).ToList();
+
+                foreach (var elementDefinition in removedDef)
+                {
+                    this.RemoveElementDefinitionRow(elementDefinition);
+                }
             }
 
             var topElementDefinitionOld = this.ElementDefinitionRowViewModels.FirstOrDefault(vm => ((ElementDefinitionRowViewModel)vm).IsTopElement);
@@ -1084,6 +1103,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             // highlight the selected thing
             CDPMessageBus.Current.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), this.SelectedThing.Thing);
+            CDPMessageBus.Current.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), null);
         }
 
         /// <summary>
@@ -1098,6 +1118,27 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var row = new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this, this.obfuscationService);
                 this.ElementDefinitionRowViewModels.SortedInsert(row, rowComparer);
+            }
+        }
+
+        /// <summary>
+        /// Add rows of the associated <see cref="ElementDefinition"/>s
+        /// </summary>
+        /// <param name="elementDefs">The <see cref="ElementDefinition"/>s to add</param>
+        private void AddElementDefinitionRows(IEnumerable<ElementDefinition> elementDefs)
+        {
+            this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
+
+            if (tuple != null)
+            {
+                var rows = new List<ElementDefinitionRowViewModel>();
+                foreach (var elementDef in elementDefs)
+                {
+                    rows.Add(new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this, this.obfuscationService));
+                }
+
+                rows.Sort(rowComparer);
+                this.ElementDefinitionRowViewModels.AddRange(rows);
             }
         }
 

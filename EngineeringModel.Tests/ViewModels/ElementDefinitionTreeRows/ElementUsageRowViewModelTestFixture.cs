@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,28 +29,33 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using System.Collections.Generic;
     using System.Linq;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.DragDrop;
-    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
     internal class ElementUsageRowViewModelTestFixture
     {
         private Mock<IPermissionService> permissionService;
-        private Mock<IThingDialogNavigationService> thingDialognavigationService;
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
@@ -82,7 +106,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void SetUp()
         {
             this.permissionService = new Mock<IPermissionService>();
-            this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.obfuscationService = new Mock<IObfuscationService>();
             this.session = new Mock<ISession>();
             this.assembler = new Assembler(this.uri);
@@ -313,8 +336,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             CDPMessageBus.Current.ClearSubscriptions();
         }
 
-        [Test]
-        public void VerifyThatPArameterBaseElementAreHandledCorrectly()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatParameterBaseElementAreHandledCorrectly(IViewModelBase<Thing> container, string scenario)
         {
             var revision = typeof (Thing).GetProperty("RevisionNumber");
 
@@ -350,7 +373,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
             // ***************************************
 
-            var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, container, this.obfuscationService.Object);
 
             // Verify That Override is displayed instead of parameter
             Assert.AreEqual(2, row.ContainedRows.Count);
@@ -415,7 +438,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             // ***************************************
 
             var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var container = new TestMessageBusHandlerContainerViewModel();
+            var row2 = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, container, this.obfuscationService.Object);
+
             Assert.AreEqual(2, row.AllOptions.Count);
+            Assert.AreEqual(2, row2.AllOptions.Count);
             Assert.AreEqual(0, row.ExcludedOptions.Count);
             Assert.IsTrue(row.HasExcludes.HasValue);
             Assert.IsFalse(row.HasExcludes.Value);
@@ -426,6 +453,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             CDPMessageBus.Current.SendObjectChangeEvent(newOption, EventKind.Added);
             Assert.AreEqual(3, row.AllOptions.Count);
+            Assert.AreEqual(3, row2.AllOptions.Count);
 
             row.SelectedOptions = new ReactiveList<Option> {this.option1, newOption};
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));

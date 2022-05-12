@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSubscriptionRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,33 +28,37 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Windows.Documents;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    using CDP4Composition.Navigation.Interfaces;
+
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
     internal class ParameterSubscriptionRowViewModelTestFixture
     {
         private Mock<IPermissionService> permissionService;
-        private Mock<IThingDialogNavigationService> thingDialognavigationService;
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://test.com");
         private Participant participant;
         private Person person;
         private DomainOfExpertise activeDomain;
-        private DomainOfExpertise someotherDomain;
         private EngineeringModel model;
         private EngineeringModelSetup modelsetup;
         private QuantityKind qqParamType;
@@ -76,7 +99,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.assembler = new Assembler(this.uri);
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
-            this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.stateList = new ActualFiniteStateList(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -141,7 +163,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             });
 
             this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "active", ShortName = "active" };
-            this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "other", ShortName = "other" };
 
             this.parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
@@ -329,8 +350,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.AreEqual(o2s2Set.Manual[1], ValueSetConverter.ToValueSetString(o2s2c2Row.Manual, o2s2c2Row.ParameterType));
         }
 
-        [Test]
-        public void VerifyThatUpdateValueSetUpdatesRow()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatUpdateValueSetUpdates(IViewModelBase<Thing> container, string scenario)
         {
             var valueset = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.parameter.ValueSet.Add(valueset);
@@ -344,7 +365,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             };
             this.subscription.ValueSet.Add(subscriptionValueSet);
 
-            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null, false);
+            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, container, false);
 
             var revInfo = typeof (Thing).GetProperty("RevisionNumber");
             revInfo.SetValue(subscriptionValueSet, 10);
@@ -513,8 +534,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterSubscriptionValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
-        [Test]
-        public void VerifyThatComputedAndReferenceValueAreUpdated()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatComputedAndReferenceValueAreUpdated(IViewModelBase<Thing> container, string scenario)
         {
             this.subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.parameter.IsOptionDependent = false;
@@ -535,7 +556,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.subscription.ValueSet.Add(subset1);
 
-            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null, false);
+            var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, container, false);
             Assert.AreEqual("abc", row.Computed);
             Assert.AreEqual("abc", row.Reference);
 
@@ -551,5 +572,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.AreEqual("123", row.Computed);
             Assert.AreEqual("123", row.Reference);
         }
+
     }
 }

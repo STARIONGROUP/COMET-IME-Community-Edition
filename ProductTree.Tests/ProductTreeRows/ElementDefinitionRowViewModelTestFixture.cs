@@ -1,9 +1,27 @@
-﻿// ------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ProductTree.Tests.ProductTreeRows
 {
@@ -13,25 +31,29 @@ namespace ProductTree.Tests.ProductTreeRows
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.DragDrop;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.MessageBus;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.Services.NestedElementTreeService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
+    using CDP4ProductTree.Tests.ProductTreeRows;
     using CDP4ProductTree.ViewModels;
 
     using Microsoft.Practices.ServiceLocation;
 
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -39,8 +61,6 @@ namespace ProductTree.Tests.ProductTreeRows
     {
         private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<IPermissionService> permissionService;
-        private Mock<IPanelNavigationService> panelNavigationService;
-        private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IThingCreator> thingCreator;
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
@@ -67,8 +87,6 @@ namespace ProductTree.Tests.ProductTreeRows
         public void Setup()
         {
             this.permissionService = new Mock<IPermissionService>();
-            this.panelNavigationService = new Mock<IPanelNavigationService>();
-            this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" , ShortName = "dom"};
 
@@ -154,10 +172,10 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreEqual(this.nestedElementPath, vm.GetPath());
         }
 
-        [Test]
-        public void VerifyThatUsagesAreAddedOrRemoved()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatUsagesAreAddedOrRemoved(IViewModelBase<Thing> container, string scenario)
         {
-            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, container);
 
             var usage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
             usage.ElementDefinition = this.elementDef2;
@@ -178,8 +196,10 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.IsFalse(vm.ContainedRows.Any(x => x.Thing == usage));
         }
 
-        [Test]
-        public void VerifyThatGroupAreAddedCorrectly()
+
+
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatGroupAreAddedCorrectly(IViewModelBase<Thing> container, string scenario)
         {
             var revisionProperty = typeof (ElementDefinition).GetProperty("RevisionNumber");
 
@@ -189,7 +209,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementDef.ParameterGroup.Add(group1);
             this.elementDef.ParameterGroup.Add(group11);
 
-            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, container);
 
             var group1row = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Single();
             Assert.AreSame(group1, group1row.Thing);
@@ -265,10 +285,10 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreSame(parameter1, param1row.Thing);
         }
 
-        [Test]
-        public void VerifyThatOptionDependencyIsHandled()
+        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        public void VerifyThatOptionDependencyIsHandled(IViewModelBase<Thing> container, string scenario)
         {
-            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, container);
             Assert.IsTrue(vm.ContainedRows.Select(x => x.Thing).Contains(this.elementUsage));
 
             var revisionProperty = typeof(ElementDefinition).GetProperty("RevisionNumber");
@@ -330,6 +350,29 @@ namespace ProductTree.Tests.ProductTreeRows
             await vm.Drop(dropinfo.Object);
 
             this.thingCreator.Verify(x => x.CreateElementUsage(It.IsAny<ElementDefinition>(), It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), It.IsAny<ISession>()));
+        }
+    }
+
+    /// <summary>
+    /// Implementation of <see cref="IViewModelBase{Thing}"/> and <see cref="IHaveMessageBusHandler"/>
+    /// </summary>
+    internal class TestMessageBusHandlerContainerViewModel : IViewModelBase<Thing>, IHaveMessageBusHandler
+    {
+        /// <summary>
+        /// The <see cref="MessageBusHandler"/>
+        /// </summary>
+        public MessageBusHandler MessageBusHandler { get; } = new MessageBusHandler();
+
+        /// <summary>
+        /// The <see cref="Thing"/>
+        /// </summary>
+        public Thing Thing { get; }
+
+        /// <summary>
+        /// Disposes the instance
+        /// </summary>
+        public void Dispose()
+        {
         }
     }
 }

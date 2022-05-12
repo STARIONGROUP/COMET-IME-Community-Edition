@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -40,6 +40,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Composition.Builders;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
     using CDP4Composition.Services.NestedElementTreeService;
@@ -133,7 +134,7 @@ namespace CDP4ProductTree.ViewModels
         /// <param name="containerRow">
         /// The <see cref="ElementDefinitionRowViewModel"/> parent row.
         /// </param>
-        public ElementUsageRowViewModel(ElementUsage elementUsage, Option option, ISession session, IRowViewModelBase<Thing> containerRow)
+        public ElementUsageRowViewModel(ElementUsage elementUsage, Option option, ISession session, IViewModelBase<Thing> containerRow)
             : base(elementUsage, session, containerRow)
         {
             this.Option = option;
@@ -301,25 +302,39 @@ namespace CDP4ProductTree.ViewModels
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
+            
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
 
-            var elementDefListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.UpdateElementDefinitionProperties());
+            Action<ObjectChangedEvent> elementDefAction = _ => this.UpdateElementDefinitionProperties();
+            Action<ElementUsageHighlightEvent> highlightUsageAction = _ => this.HighlightEventHandler();
 
-            this.Disposables.Add(elementDefListener);
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var elementDefListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(elementDefAction);
 
-            var highlightSubscription = CDPMessageBus.Current.Listen<HighlightByCategoryEvent>(this.Thing.ElementDefinition)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.HighlightEventHandler());
+                this.Disposables.Add(elementDefListener);
 
-            this.Disposables.Add(highlightSubscription);
+                var highlightUsageListener = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(highlightUsageAction);
 
-            var highlightUsageSubscription = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.HighlightEventHandler());
+                this.Disposables.Add(highlightUsageListener);
+            }
+            else
+            {
+                var elementDefObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementDefinition));
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>()
+                    .RegisterEventHandler(elementDefObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ElementDefinition, discriminator, elementDefAction)));
 
-            this.Disposables.Add(highlightUsageSubscription);
+                var highlightUsageObserver = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>();
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ElementUsageHighlightEvent>()
+                    .RegisterEventHandler(highlightUsageObserver, new MessageBusEventHandlerSubscription<ElementUsageHighlightEvent>(x => x.ElementDefinition.Equals(this.Thing.ElementDefinition), highlightUsageAction)));
+            }
         }
 
         /// <summary>
@@ -500,15 +515,30 @@ namespace CDP4ProductTree.ViewModels
         {
             if (!this.elementUsageListenerCache.ContainsKey(elementUsage))
             {
-                var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(elementUsage)
-                    .Where(
-                        objectChange =>
-                            objectChange.EventKind == EventKind.Updated &&
-                            objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(x => this.UpdateOptionDependentElementUsage((ElementUsage)x.ChangedThing));
+                IDisposable listener;
+                
+                Func<ObjectChangedEvent, bool> discriminator = 
+                    objectChange => 
+                    objectChange.EventKind == EventKind.Updated 
+                    && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
+
+                Action<ObjectChangedEvent> action = x => this.UpdateOptionDependentElementUsage((ElementUsage)x.ChangedThing);
+
+                if (this.AllowMessageBusSubscriptions)
+                {
+                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(elementUsage)
+                        .Where(discriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(action);
+                }
+                else
+                {
+                    var elementUsageObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementUsage));
+                    listener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(elementUsageObserver, new ObjectChangedMessageBusEventHandlerSubscription(elementUsage, discriminator, action));
+                }
 
                 this.elementUsageListenerCache.Add(elementUsage, listener);
+
             }
 
             // avoid duplicate and filter on Option

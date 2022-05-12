@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterUsageKind.cs" company="RHEA System S.A.">
+// <copyright file="MessageBusContainerCases.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -23,29 +23,23 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4ProductTree.ViewModels
+namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 {
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
+    using System.Collections.Generic;
 
     /// <summary>
-    /// The different kinds of a parameter usage 
+    /// Helper class to support direct <see cref="CDPMessageBus"/> subscriptions and subscription using <see cref="MessageBusHandler"/>s
     /// </summary>
-    public enum ParameterUsageKind
+    public static class MessageBusContainerCases
     {
         /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> is neither used or owned by the active <see cref="DomainOfExpertise"/>
+        /// Get the MessageBus cases
         /// </summary>
-        Unused = 0,
-
-        /// <summary>
-        /// The <see cref="ParameterOrOverrideBase"/> has subscription from other <see cref="DomainOfExpertise"/> than the active one
-        /// </summary>
-        SubscribedByOthers = 1,
-
-        /// <summary>
-        /// The active <see cref="DomainOfExpertise"/> has subscribed to the <see cref="ParameterOrOverrideBase"/>
-        /// </summary>
-        Subscribed = 2
+        /// <returns>The <see cref="IEnumerable{object}"/></returns>
+        public static IEnumerable<object> GetCases()
+        {
+            yield return new object [] { null, "Direct Subscriptions" };
+            yield return new object [] { new TestMessageBusHandlerContainerViewModel(), "MessageBus Handler" };
+        }
     }
 }

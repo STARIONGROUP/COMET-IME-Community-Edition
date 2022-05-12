@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSubscriptionRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
@@ -10,14 +29,19 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
@@ -25,8 +49,6 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class ParameterSubscriptionRowViewModel : ParameterBaseRowViewModel<ParameterSubscription>
     {
-        #region Constructor
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterSubscriptionRowViewModel"/> class
         /// </summary>
@@ -41,31 +63,71 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateOwnerValue();
         }
 
-        #endregion
-
         /// <summary>
         /// Initializes the extra listeners needed for this row
         /// </summary>
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
-            var parameterOrOverride = (ParameterOrOverrideBase)this.Thing.Container;
-            var listener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(x => { this.ObjectChangeEventHandler(new ObjectChangedEvent(this.Thing)); this.UpdateOwnerValue(); });
-            this.Disposables.Add(listener);
 
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
+            Action<ObjectChangedEvent> parameterOrOverrideAction = 
+                x =>
+                {
+                    if (this.Thing == null) {
+                        return;
+                    }
+
+                    this.ObjectChangeEventHandler(new ObjectChangedEvent(this.Thing));
+                    this.UpdateOwnerValue();
+                };
+
+            Action<ObjectChangedEvent> parameterAction = 
+                x => 
+                {
+                    if (this.Thing == null) {
+                        return;
+                    }
+
+                    this.ObjectChangeEventHandler(new ObjectChangedEvent(this.Thing));
+                };
+
+            var parameterOrOverride = (ParameterOrOverrideBase)this.Thing.Container;
             var parameterOverride = parameterOrOverride as ParameterOverride;
-            if (parameterOverride != null)
+
+            if (this.AllowMessageBusSubscriptions)
             {
-                var parameterListener =
-                    CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOverride.Parameter)
-                        .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                var listener =
+                    CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride)
+                        .Where(discriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(x => this.ObjectChangeEventHandler(new ObjectChangedEvent(this.Thing)));
-                this.Disposables.Add(parameterListener);
+                        .Subscribe(parameterOrOverrideAction);
+
+                this.Disposables.Add(listener);
+
+                if (parameterOverride != null)
+                {
+                    var parameterListener =
+                        CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOverride.Parameter)
+                            .Where(discriminator)
+                            .ObserveOn(RxApp.MainThreadScheduler)
+                            .Subscribe(parameterAction);
+
+                    this.Disposables.Add(parameterListener);
+                }
+            }
+            else
+            {
+                var parameterOrOverrideObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase));
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterOrOverrideObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOrOverride, discriminator, parameterOrOverrideAction)));
+
+                if (parameterOverride != null)
+                {
+                    var parameterObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Parameter));
+                    this.Disposables.Add(
+                        this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOverride.Parameter, discriminator, parameterAction)));
+                }
             }
         }
 
@@ -75,11 +137,30 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void SetOwnerListener()
         {
             var parameterOrOverride = (ParameterOrOverrideBase)this.Thing.Container;
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride.Owner)
-                                   .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                                   .ObserveOn(RxApp.MainThreadScheduler)
-                                   .Subscribe(x => { this.OwnerName = ((DomainOfExpertise)x.ChangedThing).Name; this.OwnerShortName = ((DomainOfExpertise)x.ChangedThing).ShortName; });
 
+            IDisposable listener;
+
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
+            Action<ObjectChangedEvent> action = 
+                x =>
+                    {
+                        this.OwnerName = ((DomainOfExpertise)x.ChangedThing).Name;
+                        this.OwnerShortName = ((DomainOfExpertise)x.ChangedThing).ShortName;
+                    };
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride.Owner)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
+            }
+            else
+            {
+                var ownerObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise));
+                listener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOrOverride.Owner, discriminator, action));
+            }
+            
             this.OwnerListener = new KeyValuePair<DomainOfExpertise, IDisposable>(parameterOrOverride.Owner, listener);
         }
 
@@ -130,17 +211,39 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(valueset)
-                            .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                            .ObserveOn(RxApp.MainThreadScheduler)
-                            .Subscribe(_ => this.SetProperties());
-            this.valueSetListener.Add(listener);
+            Func<ObjectChangedEvent, bool> discriminator = 
+                objectChange => 
+                objectChange.EventKind == EventKind.Updated 
+                && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
 
-            var subscribedListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(valueset.SubscribedValueSet)
-                            .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                            .ObserveOn(RxApp.MainThreadScheduler)
-                            .Subscribe(_ => this.SetProperties());
-            this.valueSetListener.Add(subscribedListener);
+            Action<ObjectChangedEvent> action = x => this.SetProperties();
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(valueset)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
+
+                this.valueSetListener.Add(listener);
+
+                var subscribedListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(valueset.SubscribedValueSet)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
+
+                this.valueSetListener.Add(subscribedListener);
+            }
+            else
+            {
+                var parameterSubscriptionValueSetObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterSubscriptionValueSet));
+                this.valueSetListener.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterSubscriptionValueSetObserver, new ObjectChangedMessageBusEventHandlerSubscription(valueset, discriminator, action)));
+
+                var parameterValueSetObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase));
+                this.valueSetListener.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterValueSetObserver, new ObjectChangedMessageBusEventHandlerSubscription(valueset.SubscribedValueSet, discriminator, action)));
+            }
         }
 
         /// <summary>
@@ -205,7 +308,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
         }
 
-        #region Update value sets Methods
         /// <summary>
         /// Call the correct update method depending on kind of parameter type (scalar, compound)
         /// </summary>
@@ -273,11 +375,10 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.OwnerListener.Key != parameter.Owner)
             {
-                this.OwnerListener.Value.Dispose();
+                this.OwnerListener.Value?.Dispose();
                 this.SetOwnerListener();
             }
         }
-        #endregion
 
         /// <summary>
         /// Computes the entire row or specific property of the row is editable based on the
