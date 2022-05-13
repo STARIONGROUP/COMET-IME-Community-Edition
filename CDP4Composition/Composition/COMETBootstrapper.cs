@@ -68,6 +68,7 @@ namespace CDP4Composition.Composition
 
             var sw = Stopwatch.StartNew();
             this.UpdateBootstrapperStatus("Loading COMET Catalogs");
+            this.ShowStatusMessage("Loading COMET IME Components...");
 
             this.AddExecutingAssemblyCatalog(catalog);
             this.AddCustomCatalogs(catalog);
@@ -75,10 +76,14 @@ namespace CDP4Composition.Composition
             this.UpdateBootstrapperStatus($"COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
 
             this.ConfigureServiceLocator(container);
+            this.ShowStatusMessage("Loading COMET IME Plugins...");
 
             this.AddPluginCatalogs(catalog);
 
             this.UpdateBootstrapperStatus("Composing parts");
+            this.ResetStatusProgress();
+            this.ShowStatusMessage("Initializing COMET IME Plugins...");
+
             container.ComposeParts();
 
             this.UpdateBootstrapperStatus("Initializing modules");
@@ -122,15 +127,22 @@ namespace CDP4Composition.Composition
         private void AddPluginCatalogs(AggregateCatalog catalog)
         {
             this.UpdateBootstrapperStatus("Loading COMET Plugins");
-
+            
             var pluginLoader = new PluginLoader<T>();
+            this.ResetStatusProgress();
+            var counter = 1;
 
             foreach (var directoryCatalog in pluginLoader.DirectoryCatalogues)
             {
                 try
                 {
+                    this.SetStatusProgress(counter, pluginLoader.DirectoryCatalogues.Count);
+                    this.ShowStatusMessage($"Loading Plugin: {Path.GetFileName(directoryCatalog.FullPath)}");
+
                     catalog.Catalogs.Add(directoryCatalog);
                     this.UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
+                                        
+                    counter++;
                 }
                 catch (ReflectionTypeLoadException reflectionTypeLoadException)
                 {
@@ -139,6 +151,7 @@ namespace CDP4Composition.Composition
             }
 
             this.UpdateBootstrapperStatus($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
+            this.ShowStatusMessage($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
         }
 
         /// <summary>
@@ -159,6 +172,33 @@ namespace CDP4Composition.Composition
         {
             this.status = message;
             this.logger.Debug(this.status);
+        }
+
+        /// <summary>
+        /// Show a status message to user, more display friendly than the logs. To be used for splash screens etc.
+        /// </summary>
+        /// <param name="message">The message to show</param>
+        protected virtual void ShowStatusMessage(string message)
+        {
+            // do nothing in base class
+        }
+
+        /// <summary>
+        /// Resets any progress bars to a determinate or indeterminate state and applies max value
+        /// </summary>
+        protected virtual void ResetStatusProgress()
+        {
+            // do nothing in base class
+        }
+
+        /// <summary>
+        /// Sets the progress bar indicator to value
+        /// </summary>
+        /// <param name="value">The value to set the progress bar to</param>
+        /// <param name="maxValue">The max value of the progress bar</param>
+        protected virtual void SetStatusProgress(int value, int maxValue = 100)
+        {
+            // do nothing in base class
         }
 
         /// <summary>
