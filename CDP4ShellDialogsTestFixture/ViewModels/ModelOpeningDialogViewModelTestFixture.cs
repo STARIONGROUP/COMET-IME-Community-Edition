@@ -50,6 +50,8 @@ namespace CDP4ShellDialogs.Tests
     {
         private Uri uri;
         private Mock<ISession> session;
+        private Mock<ISession> session2;
+
         private SiteDirectory siteDirectory;
         private EngineeringModelSetup model1;
         private EngineeringModelSetup model2;
@@ -70,6 +72,7 @@ namespace CDP4ShellDialogs.Tests
             this.uri = new Uri("http://www.rheagroup.com");
             this.credentials = new Credentials("John", "Doe", this.uri);
             this.session = new Mock<ISession>();
+            this.session2 = new Mock<ISession>();
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, this.uri) { Name = "TestSiteDir" };
             var model1RDL = new ModelReferenceDataLibrary(Guid.NewGuid(), null, null) { Name = "model1RDL" };
@@ -104,11 +107,19 @@ namespace CDP4ShellDialogs.Tests
 
             var lazysiteDirectory = new Lazy<Thing>(() => this.siteDirectory);
             this.assembler.Cache.GetOrAdd(new CacheKey(lazysiteDirectory.Value.Iid, null), lazysiteDirectory);
+            this.session.Setup(x => x.DataSourceUri).Returns("session1");
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             this.session.Setup(x => x.Credentials).Returns(this.credentials);
+
+            this.session2.Setup(x => x.DataSourceUri).Returns("session2");
+            this.session2.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session2.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
+            this.session2.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session2.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session2.Setup(x => x.Credentials).Returns(this.credentials);
         }
 
         [TearDown]
@@ -122,7 +133,7 @@ namespace CDP4ShellDialogs.Tests
         {
             var sessions = new List<ISession> { this.session.Object };
 
-            var viewmodel = new ModelOpeningDialogViewModel(sessions);
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, null);
             viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iteration11, this.participant, this.session.Object));
             Assert.AreEqual("Iteration Selection", viewmodel.DialogTitle);
             viewmodel.SelectCommand.Execute(null);
@@ -135,12 +146,22 @@ namespace CDP4ShellDialogs.Tests
         }
 
         [Test]
+        public void VerifyThatCanPreselectSession()
+        {
+            var sessions = new List<ISession> { this.session.Object, this.session2.Object };
+
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, this.session2.Object);
+            
+            Assert.AreEqual("session2", viewmodel.SelectedRowSession.Session.DataSourceUri);
+        }
+
+        [Test]
         public void VerifyThatErrorAreCaught()
         {
             var sessions = new List<ISession> { this.session.Object };
             this.session.Setup(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>())).Throws(new Exception("test"));
 
-            var viewmodel = new ModelOpeningDialogViewModel(sessions);
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, null);
             viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iteration11, this.participant, this.session.Object));
 
             viewmodel.SelectCommand.Execute(null);
@@ -154,7 +175,7 @@ namespace CDP4ShellDialogs.Tests
         public void VerifyThatSelectedItemCanOnlyContainIterationRow()
         {
             var sessions = new List<ISession> { this.session.Object };
-            var viewmodel = new ModelOpeningDialogViewModel(sessions);
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, null);
 
             viewmodel.SelectedIterations.Add(new ModelSelectionEngineeringModelSetupRowViewModel(this.model1, this.session.Object));
 
@@ -165,7 +186,7 @@ namespace CDP4ShellDialogs.Tests
         public void VerifyThatExecuteCancelWork()
         {
             var sessions = new List<ISession> { this.session.Object };
-            var viewmodel = new ModelOpeningDialogViewModel(sessions);
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, null);
             viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iteration11, this.participant, this.session.Object));
 
             viewmodel.CancelCommand.Execute(null);

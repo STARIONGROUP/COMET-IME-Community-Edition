@@ -91,7 +91,10 @@ namespace CDP4ShellDialogs.ViewModels
         /// <param name="sessionAvailable">
         /// The session Available.
         /// </param>
-        public ModelOpeningDialogViewModel(IEnumerable<ISession> sessionAvailable)
+        /// <param name="preselectedSession">
+        /// A <see cref="ISession"/> that should be preselected.
+        /// </param>
+        public ModelOpeningDialogViewModel(IEnumerable<ISession> sessionAvailable, ISession preselectedSession)
         {
             this.SessionsAvailable = new DisposableReactiveList<ModelSelectionSessionRowViewModel>();
             this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>>();
@@ -133,6 +136,11 @@ namespace CDP4ShellDialogs.ViewModels
             this.WhenAnyValue(x => x.IsModelScreen).Subscribe(x => this.IsIterationScreen = !x);
 
             this.PopulateSessionsRowViewModel(sessionAvailable);
+
+            if (preselectedSession != null)
+            {
+                this.SelectedRowSession = this.SessionsAvailable.FirstOrDefault(s => s.Session.Equals(preselectedSession));
+            }
         }
 
         /// <summary>

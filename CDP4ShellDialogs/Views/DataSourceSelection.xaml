@@ -74,7 +74,7 @@
                                                      Command="{Binding BrowseSourceCommand,
                                               UpdateSourceTrigger=PropertyChanged}"
                                                      Content="..."
-                                                     ToolTip="Browse for Source File"
+                                                     ToolTip="Browse for source file."
                                                      Visibility="{Binding ShowBrowseButton,
                                                  UpdateSourceTrigger=PropertyChanged,
                                                  Converter={dx:BooleanToVisibilityConverter}}"
@@ -86,7 +86,7 @@
                                                      Command="{Binding OpenUriManagerCommand,
                                                    UpdateSourceTrigger=PropertyChanged}"
                                                      Content="..."
-                                                     ToolTip="Open URI Manager"
+                                                     ToolTip="Open URI manager."
                                                      Glyph="{dx:DXImage Image=ManageDatasource_16x16.png}" />
                                     <!---->
                                 </Grid>
@@ -118,7 +118,8 @@
                                                        Converter={dx:BooleanToVisibilityConverter}}" />
                                     <dx:SimpleButton x:Name="ShowPasswordBox"
                                               Grid.Column="1"
-                                              Margin="10,0,10,0"                                              
+                                              Margin="10,0,10,0"
+                                                     ToolTip="Show password in clear text."
                                               IsChecked="{Binding IsPasswordVisible}"
                                               Content="{Binding ShowPasswordButtonText}"
                                               ButtonKind="Toggle"/>
@@ -160,7 +161,7 @@
                                                      Width="35"
                                                      HorizontalAlignment="Right"
                                                      Glyph="{dx:DXImage Image=ManageDatasource_16x16.png}"
-                                                     ToolTip="Configure Proxy"
+                                                     ToolTip="Configure proxy."
                                                      Command="{Binding OpenProxyConfigurationCommand,
                                                UpdateSourceTrigger=PropertyChanged}"
                                                      Content="..." />
@@ -178,13 +179,24 @@
                             </dxlc:LayoutItem>
                         </dxlc:LayoutGroup>
                         <dxlc:LayoutGroup Margin="0,10,0,0" Orientation="Horizontal">
-                            <dx:SimpleButton MinWidth="75"
+                            
+                            <dx:SplitButton MinWidth="75"
                                              MinHeight="25"
-                                             MaxWidth="75"
+                                             MaxWidth="300"
                                              MaxHeight="25"
                                              HorizontalAlignment="Right"
+                                            ToolTip="Connect to the Data Source and immediately select an Iteration to open."
+                                             Command="{Binding Path=OkAndOpenCommand}"
+                                             Content="Connect and Open Model" IsDefault="True" ButtonKind="Simple">
+                                <dx:SimpleButton MinWidth="75"
+                                             MinHeight="25"
+                                             MaxHeight="25"
+                                             HorizontalAlignment="Stretch"
                                              Command="{Binding Path=OkCommand}"
-                                             Content="OK" IsDefault="True" />
+                                                 ToolTip="Connect to the Data Source without directly opening an Iteration."
+                                             Content="Connect Without Opening" IsDefault="False" />
+
+                            </dx:SplitButton>
                             <dx:SimpleButton MinWidth="75"
                                              MinHeight="25"
                                              MaxWidth="75"
