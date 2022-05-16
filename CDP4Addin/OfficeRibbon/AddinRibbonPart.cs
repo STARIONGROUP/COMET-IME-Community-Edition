@@ -116,7 +116,7 @@ namespace CDP4AddinCE
                     break;
                 case "CDP4_SelectModelToOpen":
                     var sessionsOpening = new List<ISession> { this.session };
-                    var modelOpeningDialogViewModel = new ModelOpeningDialogViewModel(sessionsOpening);
+                    var modelOpeningDialogViewModel = new ModelOpeningDialogViewModel(sessionsOpening, null);
                     var modelOpeningDialogViewModelResult = this.DialogNavigationService.NavigateModal(modelOpeningDialogViewModel) as DataSourceSelectionResult;
                     break;
                 case "CDP4_SelectModelToClose":

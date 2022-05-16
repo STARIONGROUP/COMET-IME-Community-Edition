@@ -184,7 +184,7 @@ namespace CDP4IME
             this.OpenPluginManagerCommand.Subscribe(_ => this.ExecuteOpenPluginManagerRequest());
 
             this.OpenSelectIterationsCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.HasSessions));
-            this.OpenSelectIterationsCommand.Subscribe(_ => this.ExecuteOpenSelectIterationsCommand());
+            this.OpenSelectIterationsCommand.Subscribe(s => this.ExecuteOpenSelectIterationsCommand(s as ISession));
 
             this.CloseIterationsCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.HasOpenIterations));
             this.CloseIterationsCommand.Subscribe(_ => this.ExecuteCloseIterationsCommand());
@@ -420,6 +420,11 @@ namespace CDP4IME
 
             this.Sessions.Add(new SessionViewModel(result.Session));
             this.SelectedSession = this.Sessions.First();
+
+            if (result.OpenModel)
+            {
+                this.OpenSelectIterationsCommand.Execute(result.Session);
+            }
         }
 
         /// <summary>
@@ -463,11 +468,10 @@ namespace CDP4IME
         /// <summary>
         /// Executes the <see cref="OpenSelectIterationsCommand"/> command
         /// </summary>
-        private void ExecuteOpenSelectIterationsCommand()
+        private void ExecuteOpenSelectIterationsCommand(ISession session)
         {
-            var dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
-            var modelSelectionViewModel = new ModelOpeningDialogViewModel(this.OpenSessions);
-            dialogService.NavigateModal(modelSelectionViewModel);
+            var modelSelectionViewModel = new ModelOpeningDialogViewModel(this.OpenSessions, session);
+            this.dialogNavigationService.NavigateModal(modelSelectionViewModel);
         }
 
         /// <summary>
@@ -475,9 +479,8 @@ namespace CDP4IME
         /// </summary>
         private void ExecuteCloseIterationsCommand()
         {
-            var dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             var modelSelectionViewModel = new ModelClosingDialogViewModel(this.OpenSessions);
-            dialogService.NavigateModal(modelSelectionViewModel);
+            this.dialogNavigationService.NavigateModal(modelSelectionViewModel);
         }
 
         /// <summary>
@@ -485,9 +488,8 @@ namespace CDP4IME
         /// </summary>
         private void ExecuteOpenDomainSwitchDialogCommand()
         {
-            var dialogService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             var domainSwitchViewModel = new ModelIterationDomainSwitchDialogViewModel(this.OpenSessions);
-            dialogService.NavigateModal(domainSwitchViewModel);
+            this.dialogNavigationService.NavigateModal(domainSwitchViewModel);
         }
 
         /// <summary>

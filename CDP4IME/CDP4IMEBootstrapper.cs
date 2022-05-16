@@ -54,7 +54,7 @@ namespace CDP4IME
         /// <param name="container">The <see cref="AggregateCatalog"/></param>
         protected override void OnComposed(CompositionContainer container)
         {
-            this.UpdateBootstrapperStatus("Creating the Shell");
+            this.UpdateBootstrapperStatus("Starting COMET IME");
             Application.Current.MainWindow = container.GetExportedValue<Shell>();
         }
 
@@ -65,7 +65,33 @@ namespace CDP4IME
         protected override void UpdateBootstrapperStatus(string message)
         {
             base.UpdateBootstrapperStatus(message);
+        }
+
+        /// <summary>
+        /// Show meesage in splash screen
+        /// </summary>
+        /// <param name="message">The message</param>
+        protected override void ShowStatusMessage(string message)
+        {
             DXSplashScreen.SetState(message);
+        }
+
+        /// <summary>
+        /// Resets any progress bars to a determinate or indeterminate state and applies max value 0
+        /// </summary>
+        protected override void ResetStatusProgress()
+        {
+            DXSplashScreen.Progress(0, 0);
+        }
+
+        /// <summary>
+        /// Sets the progress bar indicator to value
+        /// </summary>
+        /// <param name="value">The value to set the progress bar to</param>
+        /// <param name="maxValue">The max value to set the progress bar to</param>
+        protected override void SetStatusProgress(int value, int maxValue = 100)
+        {
+            DXSplashScreen.Progress(value, maxValue);
         }
     }
 }

@@ -216,6 +216,26 @@ namespace CDP4IME.Tests
         }
 
         [Test]
+        public void VerifyThatOpenDataSourceCommandExecutesOpenModelAndSessionIsLoaded()
+        {
+            Assert.IsFalse(this.viewModel.HasSessions);
+
+            var mockedSession = new Mock<ISession>();
+            var selectionResult = new DataSourceSelectionResult(true, mockedSession.Object, true);
+
+            this.navigationService.Setup(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>())).Returns(selectionResult);
+            this.viewModel.OpenDataSourceCommand.Execute(null);
+            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>()));
+
+            this.navigationService.Verify(x => x.NavigateModal(It.IsAny<ModelOpeningDialogViewModel>()));
+            CollectionAssert.IsNotEmpty(this.viewModel.Sessions);
+
+            Assert.IsTrue(this.viewModel.HasSessions);
+
+            Assert.AreEqual(mockedSession.Object, this.viewModel.SelectedSession.Session);
+        }
+
+        [Test]
         public void VerifyThatExecuteOpenAboutRequestNavigatesToAboutWindow()
         {
             this.viewModel.OpenAboutCommand.Execute(null);

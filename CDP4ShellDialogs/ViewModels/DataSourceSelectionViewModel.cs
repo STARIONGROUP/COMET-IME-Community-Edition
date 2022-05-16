@@ -169,8 +169,14 @@ namespace CDP4ShellDialogs.ViewModels
                     datasource != null && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && 
                     !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource));
 
-            this.OkCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteOk(), RxApp.MainThreadScheduler);
+            this.OkCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteOk(false), RxApp.MainThreadScheduler);
             this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
+            {
+                this.ErrorMessage = x.Message;
+            });
+
+            this.OkAndOpenCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteOk(true), RxApp.MainThreadScheduler);
+            this.OkAndOpenCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
             {
                 this.ErrorMessage = x.Message;
             });
@@ -432,6 +438,11 @@ namespace CDP4ShellDialogs.ViewModels
         public ReactiveCommand<Unit> OkCommand { get; private set; }
 
         /// <summary>
+        /// Gets the Ok and open model Command
+        /// </summary>
+        public ReactiveCommand<Unit> OkAndOpenCommand { get; private set; }
+
+        /// <summary>
         /// Gets the BrowseSource Command
         /// </summary>
         public ReactiveCommand<object> BrowseSourceCommand { get; private set; }
@@ -454,10 +465,11 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Executes the Ok Command
         /// </summary>
+        /// <param name="openModel">Indicates whether to proceed to opening model</param>
         /// <returns>
         /// The <see cref="Task"/>.
         /// </returns>
-        private async Task ExecuteOk()
+        private async Task ExecuteOk(bool openModel)
         {
             // when no trailing slash is provided it can lead to loss of nested paths
             // see https://stackoverflow.com/questions/22543723/create-new-uri-from-base-uri-and-relative-path-slash-makes-a-difference
@@ -497,7 +509,7 @@ namespace CDP4ShellDialogs.ViewModels
                     this.LoadingMessage = "Opening Session...";
                     await this.session.Open();
 
-                    this.DialogResult = new DataSourceSelectionResult(true, this.session);
+                    this.DialogResult = new DataSourceSelectionResult(true, this.session, openModel);
                 }
                 catch (Exception ex)
                 {

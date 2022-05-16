@@ -20,15 +20,21 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         /// <param name="res">An instance of <see cref="Nullable{T}"/> that gives the action of the user</param>
         /// <param name="session">The <see cref="ISession"/> that was opened</param>
-        public DataSourceSelectionResult(bool? res, ISession session)
+        public DataSourceSelectionResult(bool? res, ISession session, bool openModel = false)
             : base(res)
         {
             this.Session = session;
+            this.OpenModel = openModel;
         }
 
         /// <summary>
         /// Gets the <see cref="ISession"/> that was opened
         /// </summary>
         public ISession Session { get; private set; }
+
+        /// <summary>
+        /// Gets a value indicating whether to open the model selection dialog
+        /// </summary>
+        public bool OpenModel { get; private set; }
     }
 }
