@@ -71,22 +71,32 @@ namespace CDP4Reporting.SubmittableParameterValues
                         continue;
                     }
 
-                    string path;
+                    string path = null;
+                    bool isExactOptionPath = false;
 
-                    if (this.TryExtractPath(visualBrick.Value.ToString(), out var tagPath))
+                    if (SubmittableParameterValue.TryExtractValue(visualBrick.Value.ToString(), SubmittableParameterValue.PathKey, out path))
                     {
-                        path = tagPath;
+                    }
+                    else if (SubmittableParameterValue.TryExtractValue(visualBrick.Value.ToString(), SubmittableParameterValue.ExactPathKey, out path))
+                    {
+                        isExactOptionPath = true;
                     }
                     else
                     {
                         continue;
                     }
 
-                    var submittableParameterValue = submittableParameterValues.SingleOrDefault(x => x.Path == path);
+                    var submittableParameterValue = 
+                        submittableParameterValues
+                        .SingleOrDefault(
+                            x => 
+                            x.Path == path
+                            && x.IsExactOptionPath == isExactOptionPath);
+
 
                     if (submittableParameterValue == null)
                     {
-                        submittableParameterValue = new SubmittableParameterValue(path);
+                        submittableParameterValue = new SubmittableParameterValue(path, isExactOptionPath);
                         submittableParameterValues.Add(submittableParameterValue);
                     }
 
@@ -96,45 +106,6 @@ namespace CDP4Reporting.SubmittableParameterValues
             }
 
             return submittableParameterValues;
-        }
-
-        /// <summary>
-        /// Tries to extract a path value from a comma separated string that contains
-        /// key/value pairs divided by an '=' character
-        /// </summary>
-        /// <param name="extractFrom">The <see cref="string"/> to extract the path from</param>
-        /// <param name="path">The path</param>
-        /// <returns>true if the path was found, otherwise false</returns>
-        private bool TryExtractPath(string extractFrom, out string path)
-        {
-            path = null;
-            var extractArray = extractFrom.Split(',');
-
-            if (extractArray.Length == 0)
-            {
-                return false;
-            }
-
-            foreach (var tag in extractArray)
-            {
-                if (!tag.Contains("="))
-                {
-                    continue;
-                }
-
-                var tagSplit = tag.Split('=');
-
-                if (!tagSplit[0].ToLower().Equals("path"))
-                {
-                    continue;
-                }
-
-                path = tagSplit[1].Trim();
-
-                return true;
-            }
-
-            return false;
         }
     }
 }
