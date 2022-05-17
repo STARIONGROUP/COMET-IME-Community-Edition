@@ -259,7 +259,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var highlightObserver = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(typeof(ElementDefinition));
+                var highlightObserver = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>();
 
                 this.Disposables.Add(
                     this.MessageBusHandler.GetHandler<ElementUsageHighlightEvent>()
