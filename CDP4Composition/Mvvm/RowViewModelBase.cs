@@ -362,6 +362,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         protected virtual void InitializeSubscriptions()
         {
+            Action<HighlightByCategoryEvent> highlightByCategoryEventAction = _ => this.HighlightEventHandler();
+
             if (this.AllowMessageBusSubscriptions)
             {
                 var highlightSubscription = CDPMessageBus.Current.Listen<HighlightEvent>(this.Thing)
@@ -373,19 +375,12 @@ namespace CDP4Composition.Mvvm
                 // category highlighting
                 if (this.Thing is ICategorizableThing thingAsCategorizableThing)
                 {
-                    // TODO: if this is indeed a categorizable thing we also have to listen to changes on added/removed categories. Need to figure out how to do this best
-                    // as the list of Categories is not reactive. Currently you will need to close and open the view after applying a category to make
-                    // highlighting work.
-                    // Github ticket: https://github.com/RHEAGROUP/COMET-IME-Community-Edition/issues/1057
+                    var highlightCategorySubscription = CDPMessageBus.Current.Listen<HighlightByCategoryEvent>()
+                        .Where(e => thingAsCategorizableThing.IsMemberOfCategory(e.Category))
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(highlightByCategoryEventAction);
 
-                    foreach (var category in thingAsCategorizableThing.Category)
-                    {
-                        var highlightCategorySubscription = CDPMessageBus.Current.Listen<HighlightByCategoryEvent>(category)
-                            .ObserveOn(RxApp.MainThreadScheduler)
-                            .Subscribe(_ => this.HighlightEventHandler());
-
-                        this.Disposables.Add(highlightCategorySubscription);
-                    }
+                    this.Disposables.Add(highlightCategorySubscription);
                 }
  
                 this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Relationship))
@@ -399,14 +394,8 @@ namespace CDP4Composition.Mvvm
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<HighlightEvent>().RegisterEventHandler(
                     highlightObserver,
                     new MessageBusEventHandlerSubscription<HighlightEvent>(
-                        e => true,
-                        e => 
-                        {
-                            if (e.HighlightedThing == this.Thing)
-                            {
-                                this.HighlightEventHandler();
-                            }
-                        })));
+                        e => e.HighlightedThing == this.Thing,
+                        e => this.HighlightEventHandler())));
 
                 // category highlighting
                 if (this.Thing is ICategorizableThing thingAsCategorizableThing)
@@ -416,14 +405,9 @@ namespace CDP4Composition.Mvvm
                     this.Disposables.Add(this.MessageBusHandler.GetHandler<HighlightByCategoryEvent>().RegisterEventHandler(
                         highlightByCategoryObserver,
                         new MessageBusEventHandlerSubscription<HighlightByCategoryEvent>(
-                            e => true,
-                            e =>
-                            {
-                                if (thingAsCategorizableThing.Category.Contains(e.Category))
-                                {
-                                    this.HighlightEventHandler();
-                                }
-                            })));
+                            e => thingAsCategorizableThing.IsMemberOfCategory(e.Category), 
+                            highlightByCategoryEventAction
+                    )));
                 }
 
                 var relationshipObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Relationship));
