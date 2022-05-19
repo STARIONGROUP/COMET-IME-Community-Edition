@@ -128,6 +128,7 @@ namespace CDP4ProductTree.ViewModels
             this.Option = option;
             this.StateDependence = this.Thing.StateDependence;
 
+            this.UpdateModelCode();
             this.UpdateProperties();
         }
 
@@ -289,6 +290,7 @@ namespace CDP4ProductTree.ViewModels
         {
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
+            this.UpdateModelCode();
         }
 
         /// <summary>
@@ -322,7 +324,6 @@ namespace CDP4ProductTree.ViewModels
             this.Value = null;
             this.IsPublishable = false;
             this.UpdateOwnerNameAndShortName();
-            this.UpdateModelCode();
             this.UpdateCategories();
 
             if (this.StateDependence != this.Thing.StateDependence)
