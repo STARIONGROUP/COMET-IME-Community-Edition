@@ -105,7 +105,7 @@ namespace CDP4Composition.Services
         /// <returns>
         /// An instance of <see cref="BitmapSource"/>
         /// </returns>
-        public BitmapSource QueryOverlayBitmapSource(Uri uri, Uri overlayUri, OverlayPositionKind overlayPosition = OverlayPositionKind.TopLeft)
+        public BitmapSource QueryOverlayBitmapSource(Uri uri, Uri overlayUri, OverlayPositionKind overlayPosition = OverlayPositionKind.TopRight)
         {
             var key = (uri, uri, overlayPosition);
             this.bitmapWithOverlay.TryGetValue(key, out var bitmapSource);

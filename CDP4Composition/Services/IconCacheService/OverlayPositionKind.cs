@@ -12,19 +12,9 @@ namespace CDP4Composition.Services
     public enum OverlayPositionKind
     {
         /// <summary>
-        /// Asserts that the overlay shall be placed on the top left corner
-        /// </summary>
-        TopLeft,
-
-        /// <summary>
         /// Asserts that the overlay shall be placed on the top right corner
         /// </summary>
         TopRight,
-
-        /// <summary>
-        /// Asserts that the overlay shall be placed in the bottom left corner
-        /// </summary>
-        BottomLeft,
 
         /// <summary>
         /// Asserts that the overlay shall be palced on the bottom right corner

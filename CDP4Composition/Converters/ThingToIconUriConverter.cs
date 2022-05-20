@@ -1,24 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ThingToIconUriConverter.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -32,33 +31,37 @@ namespace CDP4Composition
     using System.Linq;
     using System.Windows.Data;
     using System.Windows.Media.Imaging;
+
     using CDP4Common.CommonData;
     using CDP4Common.Helpers;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
+
     using DevExpress.Xpf.Core;
+
     using Microsoft.Practices.ServiceLocation;
 
     /// <summary>
-    /// The purpose of the <see cref="ThingToIconUriConverter"/> is to return an icon based on the 
-    /// provided <see cref="Thing"/>. The icon is returned as a string
+    /// The purpose of the <see cref="ThingToIconUriConverter" /> is to return an icon based on the
+    /// provided <see cref="Thing" />. The icon is returned as a string
     /// </summary>
     public class ThingToIconUriConverter : IMultiValueConverter
     {
         /// <summary>
-        /// The <see cref="IIconCacheService"/>
+        /// The <see cref="IIconCacheService" />
         /// </summary>
         private IIconCacheService iconCacheService;
 
         /// <summary>
-        /// Returns an GetImage (icon) based on the <see cref="Thing"/> that is provided
+        /// Returns an GetImage (icon) based on the <see cref="Thing" /> that is provided
         /// </summary>
-        /// <param name="value">An instance of <see cref="Thing"/> for which an Icon needs to be returned</param>
+        /// <param name="value">An instance of <see cref="Thing" /> for which an Icon needs to be returned</param>
         /// <param name="targetType">The parameter is not used.</param>
         /// <param name="parameter">The parameter is not used.</param>
         /// <param name="culture">The parameter is not used.</param>
         /// <returns>
-        /// A <see cref="Uri"/> to an GetImage
+        /// A <see cref="Uri" /> to an GetImage
         /// </returns>
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -79,6 +82,7 @@ namespace CDP4Composition
             }
 
             var classKind = thing != null ? thing.ClassKind : thingStatus.Thing.ClassKind;
+
             switch (rowStatus)
             {
                 case RowStatusKind.Active:
@@ -98,10 +102,8 @@ namespace CDP4Composition
                 {
                     return this.QueryIIconCacheService().QueryErrorOverlayBitmapSource(uri);
                 }
-                else
-                {
-                    return this.QueryIIconCacheService().QueryBitmapImage(uri);
-                }
+
+                return this.QueryIIconCacheService().QueryBitmapImage(uri);
             }
 
             if (thingStatus.HasError)
@@ -111,12 +113,12 @@ namespace CDP4Composition
 
             if (thingStatus.IsLocked)
             {
-                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.LockedOverlayUri, OverlayPositionKind.TopLeft);
+                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.LockedOverlayUri, OverlayPositionKind.TopRight);
             }
 
             if (thingStatus.IsHidden)
             {
-                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.HiddenOverlayUri, OverlayPositionKind.TopLeft);
+                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.HiddenOverlayUri, OverlayPositionKind.TopRight);
             }
 
             if (thingStatus.HasRelationship)
@@ -126,7 +128,7 @@ namespace CDP4Composition
 
             if (thingStatus.IsFavorite)
             {
-                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.FavoriteOverlayUri, OverlayPositionKind.BottomLeft);
+                return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.FavoriteOverlayUri, OverlayPositionKind.BottomRight);
             }
 
             return this.QueryIIconCacheService().QueryBitmapImage(uri);
@@ -139,23 +141,23 @@ namespace CDP4Composition
         /// <param name="targetTypes">The parameter is not used.</param>
         /// <param name="parameter">The parameter is not used.</param>
         /// <param name="culture">The parameter is not used.</param>
-        /// <returns>a <see cref="NotSupportedException"/> is thrown</returns>
+        /// <returns>a <see cref="NotSupportedException" /> is thrown</returns>
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
         {
             throw new NotSupportedException();
         }
 
         /// <summary>
-        /// Returns an instance of <see cref="Image"/> based on the provided <see cref="ClassKind"/>
+        /// Returns an instance of <see cref="Image" /> based on the provided <see cref="ClassKind" />
         /// </summary>
         /// <param name="classKind">
-        /// the subject <see cref="ClassKind"/>
+        /// the subject <see cref="ClassKind" />
         /// </param>
         /// <param name="getsmallicon">
         /// Indicates whether a small or large icon should be returned.
         /// </param>
         /// <returns>
-        /// An of <see cref="Image"/> that corresponds to the subject <see cref="ClassKind"/>
+        /// An of <see cref="Image" /> that corresponds to the subject <see cref="ClassKind" />
         /// </returns>
         public Image GetImage(ClassKind classKind, bool getsmallicon = true)
         {
@@ -184,16 +186,16 @@ namespace CDP4Composition
         }
 
         /// <summary>
-        /// Returns the <see cref="Uri"/> of the resource in grayscale
+        /// Returns the <see cref="Uri" /> of the resource in grayscale
         /// </summary>
         /// <param name="classKind">
-        /// The <see cref="ClassKind"/> for which in icon needs to be provided
+        /// The <see cref="ClassKind" /> for which in icon needs to be provided
         /// </param>
         /// <param name="getsmallicon">
         /// Indicates whether a small or large icon should be returned.
         /// </param>
         /// <returns>
-        /// A <see cref="Uri"/> that points to a resource
+        /// A <see cref="Uri" /> that points to a resource
         /// </returns>
         private object GrayScaleImageUri(ClassKind classKind, bool getsmallicon = true)
         {
@@ -213,18 +215,18 @@ namespace CDP4Composition
                 case ClassKind.IterationSetup:
                     imagename = "grayscaleIterationSetup";
                     return $"{compositionroot}{imagename}{imagesize}{imageextension}";
-                 default:
-                     // Iteration Setup for now used as default
-                     imagename = "grayscaleIterationSetup";
-                     return $"{compositionroot}{imagename}{imagesize}{imageextension}";
+                default:
+                    // Iteration Setup for now used as default
+                    imagename = "grayscaleIterationSetup";
+                    return $"{compositionroot}{imagename}{imagesize}{imageextension}";
             }
         }
 
         /// <summary>
-        /// Queries the instance of the <see cref="IIconCacheService"/> that is to be used
+        /// Queries the instance of the <see cref="IIconCacheService" /> that is to be used
         /// </summary>
         /// <returns>
-        /// An instance of <see cref="IIconCacheService"/>
+        /// An instance of <see cref="IIconCacheService" />
         /// </returns>
         private IIconCacheService QueryIIconCacheService()
         {
