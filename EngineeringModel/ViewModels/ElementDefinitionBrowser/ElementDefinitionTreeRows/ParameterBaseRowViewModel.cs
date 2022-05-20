@@ -120,6 +120,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.ParameterTypeClassKind = this.Thing.ParameterType.ClassKind;
             this.valueSetListener = new List<IDisposable>();
             this.actualFiniteStateListener = new List<IDisposable>();
+            this.UpdateModelCode();
 
             this.UpdateProperties();
         }
@@ -318,6 +319,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
+            this.UpdateModelCode();
         }
 
         /// <summary>
@@ -366,7 +368,6 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateProperties()
         {
             this.UpdateThingStatus();
-            this.UpdateModelCode();
             this.Name = this.Thing.ParameterType.Name;
             this.UpdateCategories();
 

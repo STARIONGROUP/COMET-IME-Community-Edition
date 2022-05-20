@@ -135,6 +135,7 @@ namespace CDP4ProductTree.ViewModels
             this.parameterGroupCache = new Dictionary<ParameterGroup, ParameterGroupRowViewModel>();
             this.parameterGroupContainment = new Dictionary<ParameterGroup, ParameterGroup>();
             this.Option = option;
+            this.UpdateModelCode();
             this.UpdateProperties();
             this.UpdateTooltip();
         }
@@ -371,6 +372,7 @@ namespace CDP4ProductTree.ViewModels
         {
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
+            this.UpdateModelCode();
         }
 
         /// <summary>
@@ -412,7 +414,6 @@ namespace CDP4ProductTree.ViewModels
             this.PopulateElementUsages();
             this.PopulateParameterGroups();
             this.PopulateParameter();
-            this.UpdateModelCode();
         }
 
         /// <summary>

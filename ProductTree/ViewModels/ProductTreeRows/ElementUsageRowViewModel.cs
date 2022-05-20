@@ -143,6 +143,7 @@ namespace CDP4ProductTree.ViewModels
             this.parameterGroupCache = new Dictionary<ParameterGroup, ParameterGroupRowViewModel>();
             this.parameterGroupContainment = new Dictionary<ParameterGroup, ParameterGroup>();
 
+            this.UpdateModelCode();
             this.UpdateElementDefinitionProperties();
             this.UpdateProperties();
             this.UpdateTooltip();
@@ -427,6 +428,7 @@ namespace CDP4ProductTree.ViewModels
         {
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
+            this.UpdateModelCode();
         }
 
         /// <summary>
@@ -465,7 +467,6 @@ namespace CDP4ProductTree.ViewModels
             this.UpdateThingStatus();
             this.Name = this.Thing.Name + " : " + this.ElementDefinition.Name;
             this.ShortName = this.Thing.ShortName + " : " + this.ElementDefinition.ShortName;
-            this.UpdateModelCode();
 
             var builder = new CategoryStringBuilder()
                                 .AddCategories("EU", this.Thing.Category)
