@@ -101,7 +101,7 @@
                                       RowIndent="22"
                                       ShowNodeImages="True"
                                       NodeImageSelector="{StaticResource ElementDefinitionTreeListNodeSelector}"
-                                      NodeImageSize="200,16"
+                                      NodeImageSize="22,16"
                                       ShowVerticalLines="False"
                                       TreeDerivationMode="HierarchicalDataTemplate"
                                       TreeLineStyle="Solid"
