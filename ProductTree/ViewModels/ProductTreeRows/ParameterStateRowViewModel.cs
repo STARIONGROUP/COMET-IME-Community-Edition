@@ -122,7 +122,7 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public void UpdateModelCode()
         {
-            this.ModelCode = this.valueSet.ModelCode();
+            this.ModelCode = this.valueSet?.ModelCode();
 
             foreach (var containedRow in this.ContainedRows)
             {
