@@ -9,7 +9,8 @@
                                 Name="RpgCDP4RelationshipEditorRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="41"
-                                ShowCaptionButton="False">
+                                ShowCaptionButton="False"
+                                Caption="Graphical">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

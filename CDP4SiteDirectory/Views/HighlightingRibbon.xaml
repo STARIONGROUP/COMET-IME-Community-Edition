@@ -9,10 +9,12 @@
                                 xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ViewRibbonPageRegion}"
                                 ShowCaptionButton="False"
-                                MergeOrder="9000"
+                                Caption="Visibility"
+                                MergeOrder="2000"
                                 mc:Ignorable="d">
     <dxb:BarButtonItem Command="{Binding ClearHighlightingCommand}"
                        Content="Clear Highlighting"
+                       MergeOrder="2000"
                        Description="Clear highlighting of all things in all browsers"
                        Glyph="{dx:DXImage Image=HighlightField_16x16.png}"
                        Hint="Clear highlighting of all things in all browsers"

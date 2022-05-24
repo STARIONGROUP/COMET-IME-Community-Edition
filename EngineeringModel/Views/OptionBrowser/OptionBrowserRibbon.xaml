@@ -8,7 +8,8 @@
                                 xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                 Name="OptionRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
-                                MergeOrder="20"
+                                MergeOrder="30"
+                                Caption="Engineering Model"
                                 ShowCaptionButton="False">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
@@ -24,7 +25,8 @@
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=Properties_32x32.png}"
-                            Hint="Open an Option Browser for an Iteration of a Model">
+                            Hint="Open an Option Browser for an Iteration of a Model"
+                            MergeOrder="3">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>

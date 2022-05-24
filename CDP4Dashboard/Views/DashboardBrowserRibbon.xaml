@@ -9,6 +9,7 @@
                                 Name="DashboardViewRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="351"
+                                Caption="Synthesis"
                                 ShowCaptionButton="False">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>

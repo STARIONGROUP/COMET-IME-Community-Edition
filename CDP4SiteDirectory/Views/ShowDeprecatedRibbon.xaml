@@ -9,11 +9,13 @@
                                 xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ViewRibbonPageRegion}"
                                 ShowCaptionButton="False"
-                                MergeOrder="9000"
+                                Caption="Visibility"
+                                MergeOrder="1000"
                                 mc:Ignorable="d">
 
     <dxb:BarCheckItem IsChecked="{Binding ShowDeprecatedThings}"
                        Content="Show Deprecated Things"
+                       MergeOrder="1000"
                        Description="Show or hide deprecated things in all browsers."
                        Glyph="{dx:DXImage Image=Show_16x16.png}"
                        Hint="Show or hide deprecated things in all browsers."
