@@ -261,7 +261,12 @@ namespace CDP4ProductTree.ViewModels
             base.InitializeSubscriptions();
 
             Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
-            Action<ObjectChangedEvent> action = x => this.UpdateProperties();
+
+            Action<ObjectChangedEvent> action = x =>
+            {
+                this.UpdateProperties();
+                this.UpdateModelCode();
+            };
 
             IDisposable parameterTypeListener;
 
@@ -275,6 +280,7 @@ namespace CDP4ProductTree.ViewModels
             else
             {
                 var elementUsageObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType));
+
                 parameterTypeListener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>()
                     .RegisterEventHandler(elementUsageObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ParameterType, discriminator, action));
             }
