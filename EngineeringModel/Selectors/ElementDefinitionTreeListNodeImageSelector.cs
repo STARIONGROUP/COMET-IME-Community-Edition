@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequirementsTreeListNodeSelector.cs" company="RHEA System S.A.">
+// <copyright file="ElementDefinitionTreeListNodeImageSelector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -23,21 +23,26 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements.Selectors
+namespace CDP4EngineeringModel.Selectors
 {
     using System.Globalization;
     using System.Windows.Media;
 
-    using CDP4Composition;
+    using CDP4Common.CommonData;
+
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
+
+    using CDP4EngineeringModel.Converters;
+    using CDP4EngineeringModel.ViewModels;
 
     using DevExpress.Xpf.Grid;
     using DevExpress.Xpf.Grid.TreeList;
 
     /// <summary>
-    /// RequirementsTreeListNodeSelector used to select the tree nodes and adds the icons to it
+    /// ElementDefinitionTreeListNodeImageSelector used to select the tree nodes and adds the icons to it
     /// </summary>
-    public class RequirementsTreeListNodeSelector : TreeListNodeImageSelector
+    public class ElementDefinitionTreeListNodeImageSelector : TreeListNodeImageSelector
     {
         /// <summary>
         /// Select node and adds icon to it
@@ -48,9 +53,25 @@ namespace CDP4Requirements.Selectors
         {
             var thingStatus = ((IHaveThingStatus)rowData.Row).ThingStatus;
 
-            var converter = new ThingToIconUriConverter();
+            object classKindOverride = null;
 
-            var image = converter.Convert(new object[] { thingStatus }, null, null, CultureInfo.InvariantCulture);
+            if (rowData.Row is ParameterOptionRowViewModel optionRowViewModel)
+            {
+                classKindOverride = ClassKind.Option;
+            }
+
+            if (rowData.Row is ParameterStateRowViewModel stateRowViewModel)
+            {
+                classKindOverride = ClassKind.ActualFiniteState;
+            }
+
+            if (rowData.Row is ParameterComponentValueRowViewModel componentRowViewModel)
+            {
+                classKindOverride = ClassKind.ParameterTypeComponent;
+            }
+
+            var elementDefinitionBrowserIconConverter = new ElementDefinitionBrowserIconConverter();
+            var image = elementDefinitionBrowserIconConverter.Convert(new object[] { thingStatus }, null, classKindOverride, CultureInfo.InvariantCulture);
 
             return image as ImageSource;
         }

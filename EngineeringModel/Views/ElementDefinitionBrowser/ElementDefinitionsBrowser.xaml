@@ -35,7 +35,7 @@
             <converters:ElementUsageOptionsConverter x:Key="ElementUsageOptionsConverter" />
             <converters:DataTypeConverter x:Key="DataTypeConverter" />
             <converters:ElementUsageTypeToVisibilityConverter x:Key="ElementUsageTypeToVisibilityConverter" />
-            <selectors:ElementDefinitionTreeListNodeSelector x:Key="ElementDefinitionTreeListNodeSelector" />
+            <selectors:ElementDefinitionTreeListNodeImageSelector x:Key="ElementDefinitionTreeListNodeSelector" />
             
             <HierarchicalDataTemplate DataType="{x:Type viewModels:ElementDefinitionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
             </HierarchicalDataTemplate>

@@ -29,7 +29,7 @@
             </ResourceDictionary.MergedDictionaries>
             <converters:CategoryListConverter x:Key="CategoryListConverter" />
             <converters:NotConverter x:Key="NotConverter" />
-            <selectors:ProductTreeListNodeSelector x:Key="ProductTreeListNodeSelector" />
+            <selectors:ProductTreeListNodeImageSelector x:Key="ProductTreeListNodeSelector" />
             
             <HierarchicalDataTemplate DataType="{x:Type viewModels:ElementDefinitionRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
