@@ -11,7 +11,7 @@
                            Name="BuiltInRulesRibbon"
                            Caption="BuiltIn Rules"
                            IsInDefaultPageCategory="True"
-                           MergeOrder="9000"
+                           MergeOrder="14000"
                            mc:Ignorable="d">
     <dxr:RibbonPageGroup>
         <dxb:BarButtonItem Name="OpenBuiltInRuleBrowserBarButtonItem"

@@ -10,7 +10,7 @@
                            CustomPageCategoryName="default"
                            IsInDefaultPageCategory="True"
                            mc:Ignorable="d"
-                           MergeOrder="4500">
+                           MergeOrder="2000">
 
     <views:ModelRibbon/>
     <views:SiteRdlBrowserRibbon/>

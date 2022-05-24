@@ -15,7 +15,7 @@
 
     <dxb:BarCheckItem Name="OpenCloseLogPanel"
                       Command="{Binding OpenClosePanelCommand}"
-                      Content="Show the Log Panel"
+                      Content="Log"
                       Glyph="{dx:DXImage Image=info_128x128.png}"
                       Hint="Open or Close the Log Panel"
                       IsChecked="{Binding IsChecked,

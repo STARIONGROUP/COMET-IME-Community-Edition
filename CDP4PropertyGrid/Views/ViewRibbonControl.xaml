@@ -12,7 +12,7 @@
     ContainerRegionName="{x:Static cdp4Composition:RegionNames.ViewRibbonPageRegion}">
 
     <dxb:BarCheckItem Name="OpenClosePropertyGrid"
-                      Content="Show the Property Grid"
+                      Content="Property Grid"
                       Glyph="{dx:DXImage Image=InitialState_16x16.png}"
                       LargeGlyph="{dx:DXImage Image=InitialState_32x32.png}"
                       RibbonStyle="Large"
