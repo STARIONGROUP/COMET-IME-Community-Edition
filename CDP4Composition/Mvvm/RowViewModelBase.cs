@@ -63,7 +63,7 @@ namespace CDP4Composition.Mvvm
     /// The Base view-model class for rows
     /// </summary>
     /// <typeparam name="T">The <see cref="Thing"/> represented by the row</typeparam>
-    public abstract class RowViewModelBase<T> : ViewModelBase<T>, IRowViewModelBase<T> where T : Thing
+    public abstract class RowViewModelBase<T> : ViewModelBase<T>, IHaveThingStatus, IRowViewModelBase<T> where T : Thing
     {
         /// <summary>
         /// The <see cref="IDialogNavigationService"/> that is responsible for navigating to a <see cref="IDialogViewModel"/>

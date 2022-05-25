@@ -66,8 +66,31 @@ namespace CDP4EngineeringModel.ViewModels
             this.IsDefault = this.ActualState.IsDefault;
             this.Option = this.ActualOption;
 
+            this.InitializeOptionSubscriptions();
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="ActualFiniteState"/> associated with this row is the default value of the <see cref="PossibleFiniteStateList"/>
+        /// </summary>
+        public bool IsDefault
+        {
+            get => this.isDefault;
+            set => this.RaiseAndSetIfChanged(ref this.isDefault, value);
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="Option"/> related subscriptions
+        /// </summary>
+        private void InitializeOptionSubscriptions()
+        {
             Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
-            Action<ObjectChangedEvent> action = x => { this.Name = this.ActualState.Name; };
+
+            Action<ObjectChangedEvent> action = x =>
+            {
+                this.Name = this.ActualState.Name;
+                this.IsDefault = this.ActualState.IsDefault;
+                this.UpdateModelCode();
+            };
 
             if (this.AllowMessageBusSubscriptions)
             {
@@ -84,21 +107,12 @@ namespace CDP4EngineeringModel.ViewModels
             else
             {
                 var possibleFiniteStateObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(PossibleFiniteState));
+
                 foreach (var possibleFiniteState in this.ActualState.PossibleState)
                 {
-                    this.Disposables.Add( 
-                        this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(possibleFiniteStateObserver, new ObjectChangedMessageBusEventHandlerSubscription(possibleFiniteState, discriminator, action)));
+                    this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(possibleFiniteStateObserver, new ObjectChangedMessageBusEventHandlerSubscription(possibleFiniteState, discriminator, action)));
                 }
             }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="ActualFiniteState"/> associated with this row is the default value of the <see cref="PossibleFiniteStateList"/>
-        /// </summary>
-        public bool IsDefault
-        {
-            get { return this.isDefault; }
-            set { this.RaiseAndSetIfChanged(ref this.isDefault, value); }
         }
     }
 }

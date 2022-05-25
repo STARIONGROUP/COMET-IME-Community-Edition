@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OverlayPositionKind.cs" company="RHEA System S.A.">
+// <copyright file="RequirementsTreeListNodeImageSelector.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -23,21 +23,36 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services
+namespace CDP4Requirements.Selectors
 {
+    using System.Globalization;
+    using System.Windows.Media;
+
+    using CDP4Composition;
+    using CDP4Composition.Mvvm;
+
+    using DevExpress.Xpf.Grid;
+    using DevExpress.Xpf.Grid.TreeList;
+
     /// <summary>
-    /// Assertion on the overlay position
+    /// RequirementsTreeListNodeImageSelector used to select the tree nodes and adds the icons to it
     /// </summary>
-    public enum OverlayPositionKind
+    public class RequirementsTreeListNodeImageSelector : TreeListNodeImageSelector
     {
         /// <summary>
-        /// Asserts that the overlay shall be placed on the top right corner
+        /// Select node and adds icon to it
         /// </summary>
-        TopRight,
+        /// <param name="rowData"><see cref="TreeListRowData"/></param>
+        /// <returns>ImageSource</returns>
+        public override ImageSource Select(TreeListRowData rowData)
+        {
+            var thingStatus = ((IHaveThingStatus)rowData.Row).ThingStatus;
 
-        /// <summary>
-        /// Asserts that the overlay shall be palced on the bottom right corner
-        /// </summary>
-        BottomRight
+            var converter = new ThingToIconUriConverter();
+
+            var image = converter.Convert(new object[] { thingStatus }, null, null, CultureInfo.InvariantCulture);
+
+            return image as ImageSource;
+        }
     }
 }

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OverlayPositionKind.cs" company="RHEA System S.A.">
+// <copyright file="IHaveThingStatus.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -23,21 +23,16 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Services
+namespace CDP4Composition.Mvvm
 {
     /// <summary>
-    /// Assertion on the overlay position
+    /// Interface for rows having a ThingStatus
     /// </summary>
-    public enum OverlayPositionKind
+    public interface IHaveThingStatus
     {
         /// <summary>
-        /// Asserts that the overlay shall be placed on the top right corner
+        /// Gets the Thing Status of this row.
         /// </summary>
-        TopRight,
-
-        /// <summary>
-        /// Asserts that the overlay shall be palced on the bottom right corner
-        /// </summary>
-        BottomRight
+        ThingStatus ThingStatus { get; }
     }
 }

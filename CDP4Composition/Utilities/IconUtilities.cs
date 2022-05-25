@@ -166,7 +166,7 @@ namespace CDP4Common.Helpers
         /// <returns>
         /// The <see cref="BitmapSource"/>.
         /// </returns>
-        public static BitmapSource WithOverlay(Uri iconUri, Uri overlayUri, OverlayPositionKind overlayPosition = OverlayPositionKind.TopLeft)
+        public static BitmapSource WithOverlay(Uri iconUri, Uri overlayUri, OverlayPositionKind overlayPosition = OverlayPositionKind.TopRight)
         {
             var source = new BitmapImage(iconUri);
             var overlay = new BitmapImage(overlayUri);
@@ -175,7 +175,7 @@ namespace CDP4Common.Helpers
             var overlayBitMapImage = BitmapImage2Bitmap(overlay, (int)Math.Floor(thingBitMapImage.Width * 0.75D), (int)Math.Floor(thingBitMapImage.Height * 0.75D));
 
             var img = new Bitmap(
-                    (int)Math.Floor(thingBitMapImage.Width * 1.75D),
+                    (int)Math.Floor(thingBitMapImage.Width * 1.4D),
                     (int)Math.Floor(thingBitMapImage.Height * 1.0D),
                 System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
@@ -203,14 +203,8 @@ namespace CDP4Common.Helpers
 
             switch (overlayPosition)
             {
-                case OverlayPositionKind.BottomLeft:
-                    return new Point(0, bottomYpos);
-
                 case OverlayPositionKind.BottomRight:
                     return new Point(rightXpos, bottomYpos);
-
-                case OverlayPositionKind.TopLeft:
-                    return new Point(0, 0);
 
                 case OverlayPositionKind.TopRight:
                     return new Point(rightXpos, 0);
@@ -228,9 +222,7 @@ namespace CDP4Common.Helpers
         /// <returns>Starting <see cref="Point"/> where the main image needs to be drawn</returns>
         private static Point GetMainImagePoint(Image targetImage, Image thingBitMapImage)
         {
-            var rightXpos = (targetImage.Width - thingBitMapImage.Width) / 2;
-
-            return new Point(rightXpos, 0);
+            return new Point((targetImage.Width / 2) - (thingBitMapImage.Width / 2), 0);
         }
 
         /// <summary>
@@ -540,10 +532,14 @@ namespace CDP4Common.Helpers
                 case ClassKind.ScalarParameterType:
                 case ClassKind.TextParameterType:
                 case ClassKind.TimeOfDayParameterType:
-                case ClassKind.ParameterTypeComponent:
                 case ClassKind.SampledFunctionParameterType:
                 case ClassKind.ParameterType:
                     imagename = "NameManager";
+                    imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
+
+                    return imageInfo.MakeUri().ToString();
+                case ClassKind.ParameterTypeComponent:
+                    imagename = "Between";
                     imageInfo = new DXImageConverter().ConvertFrom($"{imagename}{imagesize}{imageextension}") as DXImageInfo;
 
                     return imageInfo.MakeUri().ToString();

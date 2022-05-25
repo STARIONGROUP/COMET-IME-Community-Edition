@@ -324,7 +324,12 @@ namespace CDP4ProductTree.ViewModels
             
             Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
 
-            Action<ObjectChangedEvent> elementDefAction = _ => this.UpdateElementDefinitionProperties();
+            Action<ObjectChangedEvent> elementDefAction = _ =>
+            {
+                this.UpdateElementDefinitionProperties();
+                this.UpdateModelCode();
+            };
+
             Action<ElementUsageHighlightEvent> highlightUsageAction = _ => this.HighlightEventHandler();
 
             if (this.AllowMessageBusSubscriptions)
