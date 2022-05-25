@@ -10,15 +10,6 @@
                            CustomPageCategoryName="default"
                            IsInDefaultPageCategory="True"
                            mc:Ignorable="d"
-                           MergeOrder="4500">
-
-    <views:ModelRibbon/>
-    <views:SiteRdlBrowserRibbon/>
-    <views:DomainOfExpertiseRibbon/>
-    <views:OrganizationBrowserRibbon/>
-    <views:PersonBrowserRibbon/>
-    <views:RoleBrowserRibbon/>
-    <views:TeamCompositionBrowserRibbon/>
-    <views:NaturalLanguageRibbon/>
+                           MergeOrder="2000">
 
 </ribbon:ExtendedRibbonPage>

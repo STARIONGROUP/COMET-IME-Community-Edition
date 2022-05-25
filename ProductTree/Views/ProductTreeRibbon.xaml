@@ -9,9 +9,10 @@
                                 xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
                                 Name="ProdcutTreeRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
-                                MergeOrder="10"
+                                MergeOrder="2"
                                 ShowCaptionButton="False"
-                                mc:Ignorable="d">
+                                mc:Ignorable="d"
+                                Caption="Engineering Model">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -26,7 +27,8 @@
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
-                            Hint="Open the Product Tree for the selected Option">
+                            Hint="Open the Product Tree for the selected Option"
+                            MergeOrder="2">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>

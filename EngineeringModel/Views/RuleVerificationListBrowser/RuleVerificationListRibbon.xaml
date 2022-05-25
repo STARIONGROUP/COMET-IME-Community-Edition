@@ -9,6 +9,7 @@
                                 Name="RuleVerificationPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="50"
+                                Caption="Model Verification"
                                 ShowCaptionButton="False">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>

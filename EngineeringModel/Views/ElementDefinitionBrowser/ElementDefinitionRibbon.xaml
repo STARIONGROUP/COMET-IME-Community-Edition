@@ -9,7 +9,8 @@
                                 Name="RpgCDP4EngineeringModelViewRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="1"
-                                ShowCaptionButton="False">
+                                ShowCaptionButton="False"
+                                Caption="Engineering Model">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -25,7 +26,8 @@
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=Version_32x32.png}"
                             Glyph="{dx:DXImage Image=Version_16x16.png}"
-                            Hint="Open an Element Definition Browser for an Iteration of a Model">
+                            Hint="Open an Element Definition Browser for an Iteration of a Model"
+                            MergeOrder="1">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>
