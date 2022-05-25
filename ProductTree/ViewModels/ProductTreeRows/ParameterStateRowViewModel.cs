@@ -25,16 +25,20 @@
 
 namespace CDP4ProductTree.ViewModels
 {
+    using System;
     using System.Linq;
+    using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services.NestedElementTreeService;
 
     using CDP4Dal;
+    using CDP4Dal.Events;
 
     using Microsoft.Practices.ServiceLocation;
 
@@ -97,6 +101,8 @@ namespace CDP4ProductTree.ViewModels
             {
                 this.Option = parameterOrOverrideBaseRowViewModel.Option;
             }
+
+            this.InitializeOptionSubscriptions();
         }
 
         /// <summary>
@@ -155,6 +161,44 @@ namespace CDP4ProductTree.ViewModels
         {
             get { return this.isDefault; }
             set { this.RaiseAndSetIfChanged(ref this.isDefault, value); }
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="Option"/> related subscriptions
+        /// </summary>
+        private void InitializeOptionSubscriptions()
+        {
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
+
+            Action<ObjectChangedEvent> action = x =>
+            {
+                this.Name = this.ActualState.Name;
+                this.IsDefault = this.ActualState.IsDefault;
+                this.UpdateModelCode();
+            };
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                foreach (var possibleFiniteState in this.ActualState.PossibleState)
+                {
+                    var stateListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(possibleFiniteState)
+                        .Where(discriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(action);
+
+                    this.Disposables.Add(stateListener);
+                }
+            }
+            else
+            {
+                var possibleFiniteStateObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(PossibleFiniteState));
+
+                foreach (var possibleFiniteState in this.ActualState.PossibleState)
+                {
+                    this.Disposables.Add( 
+                        this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(possibleFiniteStateObserver, new ObjectChangedMessageBusEventHandlerSubscription(possibleFiniteState, discriminator, action)));
+                }
+            }
         }
 
         /// <summary>

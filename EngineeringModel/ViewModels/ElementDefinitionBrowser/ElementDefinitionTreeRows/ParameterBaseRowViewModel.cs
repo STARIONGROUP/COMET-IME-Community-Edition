@@ -22,6 +22,7 @@
 //    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
@@ -29,7 +30,6 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
 
-    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.Comparers;
     using CDP4Common.EngineeringModelData;
@@ -40,7 +40,6 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Extensions;
     using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
-    using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
@@ -121,10 +120,9 @@ namespace CDP4EngineeringModel.ViewModels
             this.valueSetListener = new List<IDisposable>();
             this.actualFiniteStateListener = new List<IDisposable>();
             this.UpdateModelCode();
-
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Gets or sets the owner listener
         /// </summary>
@@ -135,8 +133,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public IEnumerable<Category> Category
         {
-            get { return this.category; }
-            private set { this.RaiseAndSetIfChanged(ref this.category, value); }
+            get => this.category;
+            private set => this.RaiseAndSetIfChanged(ref this.category, value);
         }
 
         /// <summary>
@@ -153,8 +151,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string ModelCode
         {
-            get { return this.modelCode; }
-            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+            get => this.modelCode;
+            private set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
         }
 
         /// <summary>
@@ -179,6 +177,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var enumValues = new ReactiveList<EnumerationValueDefinition>();
 
                 var enumPt = this.ParameterType as EnumerationParameterType;
+
                 if (enumPt != null)
                 {
                     enumValues.AddRange(enumPt.ValueDefinition);
@@ -193,8 +192,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string Formula
         {
-            get { return this.formula; }
-            set { this.RaiseAndSetIfChanged(ref this.formula, value); }
+            get => this.formula;
+            set => this.RaiseAndSetIfChanged(ref this.formula, value);
         }
 
         /// <summary>
@@ -205,18 +204,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="HasExcludes"/>. Property implemented here to fix binding errors.
         /// </summary>
-        public bool? HasExcludes
-        {
-            get { return null; }
-        }
+        public bool? HasExcludes => null;
 
         /// <summary>
         /// Gets the value indicating whether the row is a top element. Property implemented here to fix binding errors.
         /// </summary>
-        public bool IsTopElement
-        {
-            get { return false; }
-        }
+        public bool IsTopElement => false;
 
         /// <summary>
         /// Gets the <see cref="ClassKind"/> of the <see cref="ParameterType"/> represented by this <see cref="IValueSetRow"/>
@@ -270,7 +263,12 @@ namespace CDP4EngineeringModel.ViewModels
             base.InitializeSubscriptions();
 
             Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
-            Action<ObjectChangedEvent> action = x => this.UpdateProperties();
+
+            Action<ObjectChangedEvent> action = x =>
+            {
+                this.UpdateProperties();
+                this.UpdateModelCode();
+            };
 
             if (this.AllowMessageBusSubscriptions)
             {
@@ -285,8 +283,7 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var parameterTypeObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType));
 
-                this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterTypeObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ParameterType, discriminator, action)));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterTypeObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ParameterType, discriminator, action)));
             }
 
             this.SetOwnerListener();
@@ -352,6 +349,7 @@ namespace CDP4EngineeringModel.ViewModels
         public void UpdateModelCode()
         {
             this.ModelCode = this.Thing.ModelCode();
+
             foreach (var containedRow in this.ContainedRows)
             {
                 var modelCodeRow = containedRow as IHaveModelCode;
@@ -372,6 +370,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateCategories();
 
             this.ClearValues();
+
             // clear the listener on the unique value set represented
             foreach (var listener in this.valueSetListener)
             {
@@ -397,7 +396,7 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.actualFiniteStateListener.ForEach(x => x.Dispose());
                 this.actualFiniteStateListener.Clear();
-                
+
                 this.SetStateProperties(this, null);
                 this.CreateValueSetsSubscription();
             }
@@ -416,6 +415,7 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.currentGroup = this.Thing.Group;
                 var elementBaseRow = this.ContainerViewModel as IElementBaseRowViewModel;
+
                 if (elementBaseRow != null)
                 {
                     elementBaseRow.UpdateParameterBasePosition(this.Thing);
@@ -430,9 +430,10 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateCategories()
         {
             var builder = new CategoryStringBuilder()
-                                .AddCategories("PT", this.Thing.ParameterType.Category);
+                .AddCategories("PT", this.Thing.ParameterType.Category);
 
             var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
+
             if (elementBase != null)
             {
                 if (elementBase is ElementUsage elementUsage)
@@ -486,7 +487,7 @@ namespace CDP4EngineeringModel.ViewModels
                 {
                     row.SetValues();
                 }
-                
+
                 newRows.Add(row);
             }
 
@@ -506,6 +507,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var rowToRemove =
                     row.ContainedRows.OfType<ParameterStateRowViewModel>()
                         .SingleOrDefault(x => x.ActualState == actualState);
+
                 if (rowToRemove != null)
                 {
                     row.ContainedRows.RemoveAndDispose(rowToRemove);
@@ -516,13 +518,15 @@ namespace CDP4EngineeringModel.ViewModels
 
             // mandatory state
             var existingRow = row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                                .SingleOrDefault(x => x.ActualState == actualState);
+                .SingleOrDefault(x => x.ActualState == actualState);
+
             if (existingRow != null)
             {
                 return;
             }
 
             var stateRow = new ParameterStateRowViewModel(this.Thing, actualOption, actualState, this.Session, row, this.isParameterBaseReadOnlyInDataContext);
+
             if (this.Thing.ParameterType is CompoundParameterType)
             {
                 this.SetComponentProperties(stateRow, actualOption, actualState);
@@ -543,7 +547,12 @@ namespace CDP4EngineeringModel.ViewModels
         private void SetStateProperties(IRowViewModelBase<Thing> row, Option actualOption)
         {
             Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
-            Action<ObjectChangedEvent> action = x => this.UpdateActualStateRow(row, actualOption, x.ChangedThing as ActualFiniteState, row.ContainedRows);
+
+            Action<ObjectChangedEvent> action = x =>
+            {
+                this.UpdateActualStateRow(row, actualOption, x.ChangedThing as ActualFiniteState, row.ContainedRows);
+                this.UpdateModelCode();
+            };
 
             if (this.AllowMessageBusSubscriptions)
             {
@@ -563,8 +572,7 @@ namespace CDP4EngineeringModel.ViewModels
 
                 foreach (var state in this.Thing.StateDependence.ActualState)
                 {
-                    this.actualFiniteStateListener.Add(
-                        this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(stateObserver, new ObjectChangedMessageBusEventHandlerSubscription(state, discriminator, action)));
+                    this.actualFiniteStateListener.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(stateObserver, new ObjectChangedMessageBusEventHandlerSubscription(state, discriminator, action)));
                 }
             }
 
@@ -572,6 +580,7 @@ namespace CDP4EngineeringModel.ViewModels
             var actualFiniteStates = this.StateDependence.ActualState.Where(x => x.Kind == ActualFiniteStateKind.MANDATORY);
 
             var newRows = new List<IRowViewModelBase<Thing>>();
+
             foreach (var state in actualFiniteStates)
             {
                 this.UpdateActualStateRow(row, actualOption, state, newRows);
@@ -584,7 +593,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// Creates the component rows for this <see cref="CompoundParameterType"/> <see cref="ParameterRowViewModel"/>.
         /// </summary>
         private void SetComponentProperties(IRowViewModelBase<Thing> row, Option actualOption, ActualFiniteState actualState)
-        {         
+        {
             var rows = new List<IRowViewModelBase<Thing>>();
 
             for (var i = 0; i < ((CompoundParameterType)this.Thing.ParameterType).Component.Count; i++)

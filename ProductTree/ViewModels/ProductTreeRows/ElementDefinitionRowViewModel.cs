@@ -176,6 +176,40 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
+        /// Initializes the subscriptions
+        /// </summary>
+        protected override void InitializeSubscriptions()
+        {
+            base.InitializeSubscriptions();
+
+            Func<ObjectChangedEvent, bool> optionDiscriminator = 
+                objectChange => 
+                    objectChange.EventKind == EventKind.Updated 
+                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache 
+                    && objectChange.ChangedThing.TopContainer == this.Thing.TopContainer;
+
+            Action<ObjectChangedEvent> optionAction = x => this.UpdateModelCode();
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var optionRemoveListener =
+                    CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
+                        .Where(optionDiscriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(optionAction);
+
+                this.Disposables.Add(optionRemoveListener);
+            }
+            else
+            {
+                var optionObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option));
+
+                this.Disposables.Add(
+                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Option), optionDiscriminator, optionAction)));
+            }
+        }
+
+        /// <summary>
         /// Update the model code property of itself and all contained rows recursively
         /// </summary>
         public void UpdateModelCode()
