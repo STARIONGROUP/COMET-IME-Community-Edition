@@ -107,7 +107,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets or sets the ShortName
         /// </summary>
-        [ValidationOverride(true, "RDLShortName")]
+        [ValidationOverride(true, "EnumerationValueDefinitionShortName")]
         public override string ShortName
         {
             get => this.shortName;
@@ -117,7 +117,7 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets or sets the Name
         /// </summary>
-        [ValidationOverride(true, "RDLName")]
+        [ValidationOverride(true, "EnumerationValueDefinitionName")]
         public override string Name
         {
             get => this.name;
