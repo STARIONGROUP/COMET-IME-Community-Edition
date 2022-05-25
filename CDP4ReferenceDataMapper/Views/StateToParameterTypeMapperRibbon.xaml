@@ -9,6 +9,7 @@
                                 Name="StateToParameterTypeMapperPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="6000"
+                                Caption="Engineering Model"
                                 ShowCaptionButton="False">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
@@ -24,7 +25,8 @@
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=Stepline_32x32.png}"
-                            Hint="Parameter to ActualFiniteState Parameter Mapper">
+                            Hint="Parameter to ActualFiniteState Parameter Mapper"
+                            MergeOrder="7">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>

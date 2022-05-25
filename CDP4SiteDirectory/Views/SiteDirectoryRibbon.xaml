@@ -12,13 +12,4 @@
                            mc:Ignorable="d"
                            MergeOrder="2000">
 
-    <views:ModelRibbon/>
-    <views:SiteRdlBrowserRibbon/>
-    <views:DomainOfExpertiseRibbon/>
-    <views:OrganizationBrowserRibbon/>
-    <views:PersonBrowserRibbon/>
-    <views:RoleBrowserRibbon/>
-    <views:TeamCompositionBrowserRibbon/>
-    <views:NaturalLanguageRibbon/>
-
 </ribbon:ExtendedRibbonPage>

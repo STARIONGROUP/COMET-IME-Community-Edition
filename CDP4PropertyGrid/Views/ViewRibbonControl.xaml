@@ -9,11 +9,13 @@
     Name="PropertyGridViewRibbonPageGroup"
     ShowCaptionButton="False"
     MergeOrder="10000"
-    ContainerRegionName="{x:Static cdp4Composition:RegionNames.ViewRibbonPageRegion}">
+    ContainerRegionName="{x:Static cdp4Composition:RegionNames.ViewRibbonPageRegion}"
+    Caption="Data Inspection">
 
     <dxb:BarCheckItem Name="OpenClosePropertyGrid"
                       Content="Property Grid"
                       Glyph="{dx:DXImage Image=InitialState_16x16.png}"
+                      MergeOrder="1000"
                       LargeGlyph="{dx:DXImage Image=InitialState_32x32.png}"
                       RibbonStyle="Large"
                       Hint="Show or Hide the Property Grid"

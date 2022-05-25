@@ -9,7 +9,8 @@
                                 Name="RelationshipBrowserRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="40"
-                                ShowCaptionButton="False">
+                                ShowCaptionButton="False"
+                                Caption="Relationships">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

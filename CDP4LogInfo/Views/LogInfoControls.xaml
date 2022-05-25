@@ -10,12 +10,14 @@
                                 Name="LogInfoRibbonControls"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ViewRibbonPageRegion}"
                                 ShowCaptionButton="False"
+                                Caption="Data Inspection"
                                 MergeOrder="11000"
                                 mc:Ignorable="d">
 
     <dxb:BarCheckItem Name="OpenCloseLogPanel"
                       Command="{Binding OpenClosePanelCommand}"
                       Content="Log"
+                      MergeOrder="2000"
                       Glyph="{dx:DXImage Image=info_128x128.png}"
                       Hint="Open or Close the Log Panel"
                       IsChecked="{Binding IsChecked,

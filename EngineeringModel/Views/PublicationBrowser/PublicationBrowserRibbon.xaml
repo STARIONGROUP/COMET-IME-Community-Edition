@@ -9,7 +9,8 @@
                                 Name="PublicationRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="60"
-                                ShowCaptionButton="False">
+                                ShowCaptionButton="False"
+                                Caption="Engineering Model">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -24,7 +25,8 @@
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=CreateModelDifferences_32x32.png}"
-                            Hint="Open a Publication Browser for an Iteration of a Model">
+                            Hint="Open a Publication Browser for an Iteration of a Model"
+                            MergeOrder="6">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>

@@ -11,6 +11,7 @@
                                 Name="ReportingRibbonGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="399"
+                                Caption="Synthesis"
                                 ShowCaptionButton="False"
                                 mc:Ignorable="d">
     <dxr:RibbonPageGroup.Resources>

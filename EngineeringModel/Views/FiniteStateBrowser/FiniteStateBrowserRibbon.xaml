@@ -7,8 +7,9 @@
                                 xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                 Name="RpgCDP4EngineeringModelViewRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
-                                MergeOrder="30"
-                                ShowCaptionButton="False">
+                                MergeOrder="40"
+                                ShowCaptionButton="False"
+                                Caption="Engineering Model">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -23,7 +24,8 @@
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="pack://application:,,,/CDP4Composition;component/Resources/Images/Thing/PossibleFiniteState_48x48.png"
-                            Hint="Open a Finite State Browser for an Iteration of a Model">
+                            Hint="Open a Finite State Browser for an Iteration of a Model"
+                            MergeOrder="4">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>
