@@ -1,24 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ValidationService.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -29,19 +28,21 @@ namespace CDP4Composition.Services
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
-    using Attributes;
+
     using CDP4Common.CommonData;
-    using Mvvm;
+
+    using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm;
 
     /// <summary>
-    /// The purpose of the <see cref="ValidationService"/> is to check and report on the validity of a field in a 
+    /// The purpose of the <see cref="ValidationService" /> is to check and report on the validity of a field in a
     /// </summary>
     public static class ValidationService
     {
         /// <summary>
-        /// The validation map provides the mapping between field names and <see cref="ValidationRule"/>s.
+        /// The validation map provides the mapping between field names and <see cref="ValidationRule" />s.
         /// </summary>
-        private static readonly Dictionary<string, ValidationRule> ValidationMap = new Dictionary<string, ValidationRule>
+        private static readonly Dictionary<string, ValidationRule> ValidationMap = new()
         {
             { "SelectedSource", new ValidationRule { PropertyName = "SelectedSource", Rule = @"^(?!\s*$).+", ErrorText = "The SelectedSource must not be empty." } },
             { "ShortName", new ValidationRule { PropertyName = "ShortName", Rule = @"^[a-zA-Z][a-zA-Z0-9_]*$", ErrorText = "The ShortName must start with a letter and not contain any spaces or non alphanumeric characters." } },
@@ -67,38 +68,19 @@ namespace CDP4Composition.Services
             { "Extension", new ValidationRule { PropertyName = "Extension", Rule = @"^[a-z0-9]+$", ErrorText = "The Extension shall only contain lower cases or digits and cannot be empty." } },
             { "FileTypeName", new ValidationRule { PropertyName = "FileTypeName", Rule = @"^(application|audio|example|image|message|model|multipart|text|video)/\S+$", ErrorText = "The Name or short-name shall be consistent with the IANA standard and starts with either \"application/\", \"audio/\", \"example/\", \"image/\", \"message/\", \"model/\", \"multipart/\", \"text/\" or \"video/\" followed by any characters except white-spaces." } },
             { "Value", new ValidationRule { PropertyName = "Value", Rule = @"^(?!\s*$).+", ErrorText = "The Value must not be empty." } },
-            { "ModelSetupShortName", new ValidationRule { PropertyName = "ShortName", Rule =  @"^[a-zA-Z0-9_]*$", ErrorText = "The ShortName shall only contain alpha-numerical character." } },
+            { "ModelSetupShortName", new ValidationRule { PropertyName = "ShortName", Rule = @"^[a-zA-Z0-9_]*$", ErrorText = "The ShortName shall only contain alpha-numerical character." } },
             { "PersonShortName", new ValidationRule { PropertyName = "Value", Rule = @"^(?!\s*$).+", ErrorText = "The User Name must not be empty." } },
             { "RequirementShortName", new ValidationRule { PropertyName = "Value", Rule = @"^\w+[\w-]*$", ErrorText = "The Requirement ShortName cannot be empty and must contain only alphanumeric characters and dashes." } },
             { "ModelSetupName", new ValidationRule { PropertyName = "Name", Rule = @"^([^()\s][\S\s]*)$", ErrorText = "The Name can not be empty or start with a whitespace." } },
             { "ConversionFactor", new ValidationRule { PropertyName = "ConversionFactor", Rule = @"^(?!\s*$).+", ErrorText = "The ConversionFactor must not be empty" } },
             { "Description", new ValidationRule { PropertyName = "Description", Rule = @"^(?!\s*$).+", ErrorText = "The Description must not be empty." } },
-            { "Title", new ValidationRule { PropertyName = "Title", Rule = @"^(?!\s*$).+", ErrorText = "The Title must not be empty." } }
+            { "Title", new ValidationRule { PropertyName = "Title", Rule = @"^(?!\s*$).+", ErrorText = "The Title must not be empty." } },
+            { "EnumerationValueDefinitionShortName", new ValidationRule { PropertyName = "ShortName", Rule = @"^([^()\s][\S]*)$", ErrorText = "The ShortName can not be empty or start with a whitespace." } },
+            { "EnumerationValueDefinitionName", new ValidationRule { PropertyName = "Name", Rule = @"^([^()\s][\S]*)$", ErrorText = "The Name can not be empty or start with a whitespace." } }
         };
 
         /// <summary>
-        /// The validation rule contains the regex and the error text that goes with the rule.
-        /// </summary>
-        public class ValidationRule
-        {
-            /// <summary>
-            /// Gets or sets the name of the property
-            /// </summary>
-            public string PropertyName { get; set; }
-
-            /// <summary>
-            /// Gets or sets the rule, i.e. the Regex that must be matched for this rule to be satisfied.
-            /// </summary>
-            public string Rule { get; set; }
-
-            /// <summary>
-            /// Gets or sets the error text of this rule.
-            /// </summary>
-            public string ErrorText { get; set; }
-        }
-
-        /// <summary>
-        /// Validates a property of a <see cref="DialogViewModelBase{T}"/>.
+        /// Validates a property of a <see cref="DialogViewModelBase{T}" />.
         /// </summary>
         /// <param name="propertyName">
         /// The property name.
@@ -107,10 +89,10 @@ namespace CDP4Composition.Services
         /// The dialog view model base.
         /// </param>
         /// <typeparam name="T">
-        /// The <see cref="Thing"/> the <see cref="DialogViewModelBase{T}"/> is connected to.
+        /// The <see cref="Thing" /> the <see cref="DialogViewModelBase{T}" /> is connected to.
         /// </typeparam>
         /// <returns>
-        /// The <see cref="string"/> with the error text.
+        /// The <see cref="string" /> with the error text.
         /// </returns>
         public static string ValidateProperty<T>(string propertyName, DialogViewModelBase<T> dialogViewModelBase) where T : Thing
         {
@@ -141,7 +123,7 @@ namespace CDP4Composition.Services
             {
                 return null;
             }
-            
+
             // get the value, if the value is null set to empty string (assume user entered no value to begin with) and check against that
             var propertyValue = property.GetValue(dialogViewModelBase) ?? string.Empty;
 
@@ -176,7 +158,7 @@ namespace CDP4Composition.Services
         /// The view Model.
         /// </param>
         /// <returns>
-        /// The <see cref="string"/> with the error text.
+        /// The <see cref="string" /> with the error text.
         /// </returns>
         public static string ValidateProperty(string propertyName, object viewModel)
         {
@@ -220,7 +202,7 @@ namespace CDP4Composition.Services
         /// The view Model.
         /// </param>
         /// <returns>
-        /// The <see cref="string"/> with the error text, or null if there is no validation error
+        /// The <see cref="string" /> with the error text, or null if there is no validation error
         /// (either because there is no rule for the given property or because the given value is correct)
         /// </returns>
         public static string ValidateProperty(string propertyName, object value, object viewModel)
@@ -243,6 +225,27 @@ namespace CDP4Composition.Services
             var validationPass = Regex.IsMatch(newValue, rule.Rule);
 
             return validationPass ? null : rule.ErrorText;
+        }
+
+        /// <summary>
+        /// The validation rule contains the regex and the error text that goes with the rule.
+        /// </summary>
+        public class ValidationRule
+        {
+            /// <summary>
+            /// Gets or sets the name of the property
+            /// </summary>
+            public string PropertyName { get; set; }
+
+            /// <summary>
+            /// Gets or sets the rule, i.e. the Regex that must be matched for this rule to be satisfied.
+            /// </summary>
+            public string Rule { get; set; }
+
+            /// <summary>
+            /// Gets or sets the error text of this rule.
+            /// </summary>
+            public string ErrorText { get; set; }
         }
     }
 }
