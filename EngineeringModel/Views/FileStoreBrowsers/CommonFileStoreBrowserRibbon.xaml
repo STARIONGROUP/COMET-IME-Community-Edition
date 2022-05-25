@@ -11,7 +11,7 @@
                                 MergeOrder="70"
                                 Caption="File Storage"
                                 ShowCaptionButton="False"
-                                IsVisible="False">
+                                IsVisible="True">
     <dxr:RibbonPageGroup.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -26,7 +26,8 @@
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=Project_32x32.png}"
-                            Hint="Open a Common File Store Browser for an Iteration of a Model">
+                            Hint="Open a Common File Store Browser for an Iteration of a Model"
+                            IsVisible="False">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>
