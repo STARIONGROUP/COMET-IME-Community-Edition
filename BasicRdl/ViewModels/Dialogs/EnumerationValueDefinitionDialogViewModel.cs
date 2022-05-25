@@ -38,6 +38,8 @@ namespace BasicRdl.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using ReactiveUI;
+
     /// <summary>
     /// The purpose of the <see cref="EnumerationValueDefinitionDialogViewModel"/> is to provide a dialog view model
     /// for a <see cref="EnumerationValueDefinition"/>
@@ -88,6 +90,36 @@ namespace BasicRdl.ViewModels
         public EnumerationValueDefinitionDialogViewModel(EnumerationValueDefinition enumerationValueDefinition, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(enumerationValueDefinition, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
+        }
+
+        /// <summary>
+        /// The backing field for <see cref="ShortName"/>
+        /// </summary>
+        private string shortName;
+
+        /// <summary>
+        /// The backing field for <see cref="Name"/>
+        /// </summary>
+        private string name;
+
+        /// <summary>
+        /// Gets or sets the ShortName
+        /// </summary>
+        [ValidationOverride(true, "RDLShortName")]
+        public override string ShortName
+        {
+            get => this.shortName;
+            set => this.RaiseAndSetIfChanged(ref this.shortName, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Name
+        /// </summary>
+        [ValidationOverride(true, "RDLName")]
+        public override string Name
+        {
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
     }
 }
