@@ -215,14 +215,14 @@ namespace CDP4EngineeringModel.ViewModels
                 objectChange => 
                 objectChange.EventKind == EventKind.Added 
                 && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache 
-                && objectChange.ChangedThing.Container == this.Thing.Container.Container;
+                && objectChange.ChangedThing.TopContainer == this.Thing.TopContainer;
             Action<ObjectChangedEvent> optionAddAction = x => this.UpdateOptionLists();
 
             Func<ObjectChangedEvent, bool> optionRemoveDiscriminator = 
                 objectChange => 
                 objectChange.EventKind == EventKind.Removed 
                 && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache 
-                && objectChange.ChangedThing.Container == this.Thing.Container.Container;
+                && objectChange.ChangedThing.TopContainer == this.Thing.Container;
             Action<ObjectChangedEvent> optionRemoveAction = x => this.UpdateOptionLists();
 
             Func<ObjectChangedEvent, bool> elementDefinitionDiscriminator = objectChange => objectChange.EventKind == EventKind.Updated;
@@ -310,6 +310,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.PopulateParameters();
             this.UpdateTooltip();
             this.UpdateCategories();
+            this.UpdateModelCode();
         }
 
         /// <summary>

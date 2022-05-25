@@ -51,6 +51,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
 
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
 
     using NUnit.Framework;
@@ -70,6 +72,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IThingCreator> thingCreator;
+        private Mock<IMessageBoxService> messageBoxService;
+        private Mock<IServiceLocator> serviceLocator;
         private Uri uri;
         private Iteration iteration;
         private ModelReferenceDataLibrary modelReferenceDataLibrary;
@@ -90,6 +94,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.thingCreator = new Mock<IThingCreator>();
+            this.messageBoxService = new Mock<IMessageBoxService>();
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             var siteDirectory = new SiteDirectory();
             var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
