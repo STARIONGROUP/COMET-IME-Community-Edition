@@ -121,7 +121,7 @@ namespace CDP4Composition.Ribbon
         /// Handles the addition of <see cref="ExtendedRibbonPageGroup" /> to the <see cref="ExtendedRibbonPage" /> in a
         /// <see cref="RibbonControl" />
         /// </summary>
-        /// <param name="ribbonPageGroups">
+        /// <param name="ribbon">
         /// The <see cref="ExtendedRibbonPage" />s that need to be added to the <see cref="ExtendedRibbonPageGroup" />.
         /// </param>
         /// <remarks>
@@ -129,6 +129,7 @@ namespace CDP4Composition.Ribbon
         /// <see cref="ExtendedRibbonPage.RegionName" /> of an available
         /// <see cref="ExtendedRibbonPage" />, the <see cref="ExtendedRibbonPageGroup" /> will be added to that
         /// <see cref="ExtendedRibbonPage" />
+        /// If the <see cref="ExtendedRibbonPageGroup" /> already exists, it appends to the existing group.
         /// </remarks>
         private void ProcessRibbonPageGroups(RibbonControl ribbon)
         {
@@ -174,7 +175,9 @@ namespace CDP4Composition.Ribbon
         /// </summary>
         /// <param name="extractedItems">List of items in ribbon group</param>
         /// <param name="extractedItem">Item to be inserted in ribbon group</param>
-        /// <returns></returns>
+        /// <returns>
+        /// The position where the <see cref="RibbonPageGroup" /> will be added
+        /// </returns>
         private int GetPositionInsideRibbonGroup(CommonBarItemCollection extractedItems, IBarItem extractedItem)
         {
             var total = extractedItems.Count;
