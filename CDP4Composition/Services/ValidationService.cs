@@ -76,7 +76,7 @@ namespace CDP4Composition.Services
             { "Description", new ValidationRule { PropertyName = "Description", Rule = @"^(?!\s*$).+", ErrorText = "The Description must not be empty." } },
             { "Title", new ValidationRule { PropertyName = "Title", Rule = @"^(?!\s*$).+", ErrorText = "The Title must not be empty." } },
             { "EnumerationValueDefinitionShortName", new ValidationRule { PropertyName = "ShortName", Rule = @"^([^()\s][\S\s]*)$", ErrorText = "The ShortName can not be empty or start with a whitespace." } },
-            { "EnumerationValueDefinitionName", new ValidationRule { PropertyName = "ShortName", Rule = @"^([^()\s][\S\s]*)$", ErrorText = "The ShortName can not be empty or start with a whitespace." } }
+            { "EnumerationValueDefinitionName", new ValidationRule { PropertyName = "Name", Rule = @"^([^()\s][\S\s]*)$", ErrorText = "The Name can not be empty or start with a whitespace." } }
         };
 
         /// <summary>
