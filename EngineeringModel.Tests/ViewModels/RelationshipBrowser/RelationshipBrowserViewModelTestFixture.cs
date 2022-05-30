@@ -1,24 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
-//            Nathanael Smiechowski, Kamil Wojnowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -57,33 +56,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     [TestFixture]
     public class RelationshipBrowserViewModelTestFixture
     {
-        private readonly PropertyInfo revision = typeof(Thing).GetProperty("RevisionNumber");
-        private Mock<ISession> session;
-        private Assembler assembler;
-        private Mock<IPermissionService> permissionService;
-        private Mock<IThingDialogNavigationService> thingDialogNavigationService;
-        private Mock<IPanelNavigationService> panelNavigationService;
-        private readonly Uri uri = new Uri("http://test.com");
-
-        private SiteDirectory sitedir;
-        private EngineeringModelSetup modelsetup;
-        private IterationSetup iterationsetup;
-        private Person person;
-        private Participant participant;
-        private EngineeringModel model;
-        private Iteration iteration;
-        private ElementDefinition elementDefinition1;
-        private ElementDefinition elementDefinition2;
-        private ElementDefinition elementDefinition3;
-        private ElementDefinition elementDefinition4;
-        private ElementDefinition elementDefinition5;
-        private DomainOfExpertise domain;
-
-        private SiteReferenceDataLibrary srdl;
-        private ModelReferenceDataLibrary mrdl;
-
-        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
-
         [SetUp]
         public void Setup()
         {
@@ -109,7 +81,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain", ShortName = "DMN" };
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person, SelectedDomain = this.domain };
 
-            this.modelsetup.ActiveDomain = new List<DomainOfExpertise>() { this.domain };
+            this.modelsetup.ActiveDomain = new List<DomainOfExpertise> { this.domain };
             this.sitedir.Model.Add(this.modelsetup);
             this.sitedir.Person.Add(this.person);
             this.sitedir.Domain.Add(this.domain);
@@ -145,20 +117,32 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             CDPMessageBus.Current.ClearSubscriptions();
         }
 
-        [Test]
-        public void VerifyThatRelationsBrowserIsCreated()
-        {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object,
-                this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+        private readonly PropertyInfo revision = typeof(Thing).GetProperty("RevisionNumber");
+        private Mock<ISession> session;
+        private Assembler assembler;
+        private Mock<IPermissionService> permissionService;
+        private Mock<IThingDialogNavigationService> thingDialogNavigationService;
+        private Mock<IPanelNavigationService> panelNavigationService;
+        private readonly Uri uri = new Uri("http://test.com");
 
-            Assert.AreEqual(2, viewmodel.RelationshipTypes.Count);
+        private SiteDirectory sitedir;
+        private EngineeringModelSetup modelsetup;
+        private IterationSetup iterationsetup;
+        private Person person;
+        private Participant participant;
+        private EngineeringModel model;
+        private Iteration iteration;
+        private ElementDefinition elementDefinition1;
+        private ElementDefinition elementDefinition2;
+        private ElementDefinition elementDefinition3;
+        private ElementDefinition elementDefinition4;
+        private ElementDefinition elementDefinition5;
+        private DomainOfExpertise domain;
 
-            Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
-            Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
-            Assert.That(viewmodel.DataSource, Is.Not.Null.Or.Empty);
-            Assert.That(viewmodel.DomainOfExpertise, Is.Not.Null.Or.Empty);
-            Assert.That(viewmodel.CurrentModel, Is.Not.Null.Or.Empty);
-        }
+        private SiteReferenceDataLibrary srdl;
+        private ModelReferenceDataLibrary mrdl;
+
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         [Test]
         public void VerifyThatBinaryRelationshipsAreAddedModifiedRemoved()
@@ -180,7 +164,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.revision.SetValue(this.elementDefinition1, 1);
             CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinition1, EventKind.Updated);
 
-            Assert.IsTrue(((BinaryRelationshipRowViewModel) viewmodel.RelationshipTypes[0].ContainedRows[0]).Name.Contains("EX"));
+            Assert.IsTrue(((BinaryRelationshipRowViewModel)viewmodel.RelationshipTypes[0].ContainedRows[0]).Name.Contains("EX"));
 
             //Modify relationship
 
@@ -189,7 +173,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.revision.SetValue(relationship, 1);
             CDPMessageBus.Current.SendObjectChangeEvent(relationship, EventKind.Updated);
 
-            Assert.IsTrue(((BinaryRelationshipRowViewModel) viewmodel.RelationshipTypes[0].ContainedRows[0]).Name.Contains("E3"));
+            Assert.IsTrue(((BinaryRelationshipRowViewModel)viewmodel.RelationshipTypes[0].ContainedRows[0]).Name.Contains("E3"));
 
             //Remove relationships
 
@@ -198,48 +182,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
             Assert.AreEqual(0, viewmodel.RelationshipTypes[0].ContainedRows.Count);
-        }
-
-        [Test]
-        public void VerifyThatMultiRelationshipsAreAddedModifiedRemoved()
-        {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
-
-            //Add relationship1 and relationship2 and relationship3
-            var relationship = new MultiRelationship(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, ModifiedOn = DateTime.Now };
-            relationship.RelatedThing.Add(this.elementDefinition1);
-            relationship.RelatedThing.Add(this.elementDefinition2);
-            relationship.RelatedThing.Add(this.elementDefinition3);
-            this.iteration.Relationship.Add(relationship);
-
-            this.revision.SetValue(this.iteration, 1);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
-
-            Assert.AreEqual(1, viewmodel.RelationshipTypes[1].ContainedRows.Count);
-
-            //Modify element definition name
-            this.elementDefinition3.Name = "EG";
-
-            this.revision.SetValue(this.elementDefinition3, 1);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinition3, EventKind.Updated);
-
-            Assert.IsTrue(((MultiRelationshipRowViewModel) viewmodel.RelationshipTypes[1].ContainedRows[0]).Name.Contains("EG"));
-
-            //Modify relationship content
-
-            relationship.RelatedThing.Add(this.elementDefinition4);
-            this.revision.SetValue(relationship, 1);
-            CDPMessageBus.Current.SendObjectChangeEvent(relationship, EventKind.Updated);
-
-            Assert.IsTrue(((MultiRelationshipRowViewModel) viewmodel.RelationshipTypes[1].ContainedRows[0]).Name.Contains("E4"));
-
-            //Remove relationships
-
-            this.iteration.Relationship.Clear();
-            this.revision.SetValue(this.iteration, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
-
-            Assert.AreEqual(0, viewmodel.RelationshipTypes[1].ContainedRows.Count);
         }
 
         [Test]
@@ -253,7 +195,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             dropinfo.SetupProperty(x => x.Effects);
 
             creator.SourceViewModel.DragOver(dropinfo.Object);
-            dropinfo.VerifySet(x => x.Effects = DragDropEffects.Copy);
+            dropinfo.VerifySet(x => x.Effects = DragDropEffects.All);
 
             await creator.SourceViewModel.Drop(dropinfo.Object);
             Assert.AreSame(creator.SourceViewModel.RelatedThing, this.elementDefinition1);
@@ -303,6 +245,63 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             Assert.AreEqual(0, creator.RelatedThings.Count);
 
             creator.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatMultiRelationshipsAreAddedModifiedRemoved()
+        {
+            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            //Add relationship1 and relationship2 and relationship3
+            var relationship = new MultiRelationship(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, ModifiedOn = DateTime.Now };
+            relationship.RelatedThing.Add(this.elementDefinition1);
+            relationship.RelatedThing.Add(this.elementDefinition2);
+            relationship.RelatedThing.Add(this.elementDefinition3);
+            this.iteration.Relationship.Add(relationship);
+
+            this.revision.SetValue(this.iteration, 1);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+
+            Assert.AreEqual(1, viewmodel.RelationshipTypes[1].ContainedRows.Count);
+
+            //Modify element definition name
+            this.elementDefinition3.Name = "EG";
+
+            this.revision.SetValue(this.elementDefinition3, 1);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinition3, EventKind.Updated);
+
+            Assert.IsTrue(((MultiRelationshipRowViewModel)viewmodel.RelationshipTypes[1].ContainedRows[0]).Name.Contains("EG"));
+
+            //Modify relationship content
+
+            relationship.RelatedThing.Add(this.elementDefinition4);
+            this.revision.SetValue(relationship, 1);
+            CDPMessageBus.Current.SendObjectChangeEvent(relationship, EventKind.Updated);
+
+            Assert.IsTrue(((MultiRelationshipRowViewModel)viewmodel.RelationshipTypes[1].ContainedRows[0]).Name.Contains("E4"));
+
+            //Remove relationships
+
+            this.iteration.Relationship.Clear();
+            this.revision.SetValue(this.iteration, 2);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+
+            Assert.AreEqual(0, viewmodel.RelationshipTypes[1].ContainedRows.Count);
+        }
+
+        [Test]
+        public void VerifyThatRelationsBrowserIsCreated()
+        {
+            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object,
+                this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            Assert.AreEqual(2, viewmodel.RelationshipTypes.Count);
+
+            Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.DataSource, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.DomainOfExpertise, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.CurrentModel, Is.Not.Null.Or.Empty);
         }
     }
 }

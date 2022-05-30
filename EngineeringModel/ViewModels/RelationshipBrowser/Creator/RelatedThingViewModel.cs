@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelatedThingViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,78 +29,84 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
-    using CDP4Common;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition.DragDrop;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
-    /// The view-model representing a related thing for a <see cref="BinaryRelationship"/>
+    /// The view-model representing a related thing for a <see cref="BinaryRelationship" />
     /// </summary>
     public class RelatedThingViewModel : ReactiveObject, IDropTarget, IDisposable
     {
         /// <summary>
-        /// Backing field for <see cref="RelatedThing"/>
+        /// Backing field for <see cref="RelatedThing" />
         /// </summary>
         private Thing relatedThing;
 
         /// <summary>
-        /// Backing field for <see cref="RelatedThingDenomination"/>
+        /// Backing field for <see cref="RelatedThingDenomination" />
         /// </summary>
         private string relatedThingDenomination;
 
         /// <summary>
-        /// The collection of <see cref="IDisposable"/>
+        /// The collection of <see cref="IDisposable" />
         /// </summary>
         private IDisposable subscription;
 
         /// <summary>
-        /// Gets the source <see cref="Thing"/> for the <see cref="BinaryRelationship"/> to create
+        /// Gets the source <see cref="Thing" /> for the <see cref="BinaryRelationship" /> to create
         /// </summary>
         public Thing RelatedThing
         {
-            get { return this.relatedThing; }
-            private set { this.RaiseAndSetIfChanged(ref this.relatedThing, value); }
+            get => this.relatedThing;
+            private set => this.RaiseAndSetIfChanged(ref this.relatedThing, value);
         }
 
         /// <summary>
-        /// Gets the string to display associated with the <see cref="RelatedThing"/>
+        /// Gets the string to display associated with the <see cref="RelatedThing" />
         /// </summary>
         public string RelatedThingDenomination
         {
-            get { return this.relatedThingDenomination; }
-            set { this.RaiseAndSetIfChanged(ref this.relatedThingDenomination, value); }
+            get => this.relatedThingDenomination;
+            set => this.RaiseAndSetIfChanged(ref this.relatedThingDenomination, value);
         }
 
         /// <summary>
-        /// Reset the control
+        /// dispose of this view-model
         /// </summary>
-        public void ResetControl()
+        public void Dispose()
         {
-            this.RelatedThing = null;
-            this.RelatedThingDenomination = "";
+            if (this.subscription != null)
+            {
+                this.subscription.Dispose();
+            }
         }
 
         /// <summary>
         /// Updates the current drag state.
         /// </summary>
         /// <param name="dropInfo">
-        ///   Information about the drag.
+        /// Information about the drag.
         /// </param>
         /// <remarks>
-        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
-        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
-        /// and <see cref="DropInfo.Data"/> should be set to a non-null value.
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects" /> property on
+        /// <paramref name="dropInfo" /> should be set to a value other than <see cref="DragDropEffects.None" />
+        /// and <see cref="DropInfo.Data" /> should be set to a non-null value.
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
             var thing = dropInfo.Payload as Thing;
+
             if (thing != null && thing.TopContainer is EngineeringModel)
             {
-                dropInfo.Effects = DragDropEffects.Copy;
+                dropInfo.Effects = DragDropEffects.All;
             }
         }
 
@@ -89,11 +114,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// Performs a drop.
         /// </summary>
         /// <param name="dropInfo">
-        ///  Information about the drop.
+        /// Information about the drop.
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
             var thing = dropInfo.Payload as Thing;
+
             if (thing == null)
             {
                 this.RelatedThingDenomination = "";
@@ -112,14 +138,12 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// dispose of this view-model
+        /// Reset the control
         /// </summary>
-        public void Dispose()
+        public void ResetControl()
         {
-            if (this.subscription != null)
-            {
-                this.subscription.Dispose();
-            }
+            this.RelatedThing = null;
+            this.RelatedThingDenomination = "";
         }
     }
 }
