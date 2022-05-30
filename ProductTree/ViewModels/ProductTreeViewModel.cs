@@ -439,6 +439,7 @@ namespace CDP4ProductTree.ViewModels
 
                 this.CanCreateOverride = parameterOrOverrideRow.Thing is Parameter
                                          && ((parameterOrOverrideRow.Thing.Owner == activeDomain) || ((Parameter)parameterOrOverrideRow.Thing).AllowDifferentOwnerOfOverride)
+                                         && !this.TopElement.Contains(parameterOrOverrideRow.ContainerViewModel)
                                          && this.PermissionService.CanWrite(ClassKind.ParameterOverride, this.SelectedThing.ContainerViewModel.Thing);
             }
         }

@@ -471,6 +471,21 @@ namespace ProductTree.Tests
         }
 
         [Test]
+        public void VerifyCreateParameterOverrideIsDisabledForTopElement()
+        {
+            var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
+            revisionNumber.SetValue(this.iteration, 50);
+            var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
+            this.iteration.TopElement = elementdef;
+            var boolParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain, Container = elementdef, ParameterType = boolParamType };
+            elementdef.Parameter.Add(parameter);
+
+            Assert.IsFalse(vm.CreateOverrideCommand.CanExecute(parameter));
+        }
+
+        [Test]
         public void VerifyToggleNamesAndShortNames()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
