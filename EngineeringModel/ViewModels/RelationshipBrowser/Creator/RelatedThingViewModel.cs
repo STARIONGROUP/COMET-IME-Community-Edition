@@ -81,7 +81,7 @@ namespace CDP4EngineeringModel.ViewModels
             var thing = dropInfo.Payload as Thing;
             if (thing != null && thing.TopContainer is EngineeringModel)
             {
-                dropInfo.Effects = DragDropEffects.Copy;
+                dropInfo.Effects = DragDropEffects.All;
             }
         }
 
