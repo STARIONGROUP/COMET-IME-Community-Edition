@@ -232,6 +232,7 @@
                 <dxg:TreeListColumn FieldName="Name" />
                 <dxg:TreeListColumn FieldName="Definition" />
                 <dxg:TreeListColumn FieldName="OwnerName" />
+                <dxg:TreeListColumn FieldName="Categories" />
             </dxg:TreeListControl.Columns>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView x:Name="View"
