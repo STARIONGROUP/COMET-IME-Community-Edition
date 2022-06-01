@@ -74,16 +74,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string Categories
         {
-            get
-            {
-                if (this.Thing == null)
-                {
-                    return string.Empty;
-                }
-
-                var firstOrDefault = this.Thing.Category.FirstOrDefault();
-                return firstOrDefault != null ? string.Join(", ", this.Thing.Category.Select(x => x.Name)) : string.Empty;
-            }
+            get => this.Thing.Category.Any() ? string.Join(", ", this.Thing.Category.Select(x => x.Name)) : string.Empty;
         }
 
         /// <summary>
