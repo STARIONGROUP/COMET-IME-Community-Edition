@@ -7,6 +7,7 @@
 namespace CDP4Requirements.Tests.RequirementBrowser
 {
     using System;
+    using System.Collections.Generic;
     using System.Reactive.Concurrency;
     using System.Windows;
     using CDP4Common.CommonData;
@@ -40,6 +41,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private RequirementsGroup grp2;
         private Requirement req;
         private RequirementsSpecificationRowViewModel requirementSpecificationRow;
+        private List<Category> categories;
 
         private Assembler assembler;
 
@@ -69,9 +71,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.model.EngineeringModelSetup = this.modelSetup;
             this.model.Iteration.Add(this.iteration);
 
+            this.categories = new List<Category>(){new Category { Name = "category1"}, new Category { Name = "category2" } };
+
             this.grp1 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.grp11 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.grp2 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "requirement group 2", ShortName = "rg2" };
+            this.grp2 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "requirement group 2", ShortName = "rg2", Category = this.categories};
 
             this.reqSpec.Group.Add(this.grp1);
             this.reqSpec.Group.Add(this.grp2);
@@ -95,6 +99,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         
             Assert.AreEqual("requirement group 2", row.Name);
             Assert.AreEqual("rg2", row.ShortName);
+            Assert.AreEqual("category1, category2", row.Categories);
             Assert.That(row.Definition, Is.Null.Or.Empty);
         }
 

@@ -33,11 +33,16 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private readonly PropertyInfo revision = typeof (Thing).GetProperty("RevisionNumber");
 
         private RequirementsBrowserViewModel requirementBrowserViewModel;
+        private List<Category> categories;
 
         [SetUp]
         public override void Setup()
         {
             base.Setup();
+
+            this.categories = new List<Category>() { new Category { Name = "category1" }, new Category { Name = "category2" } };
+            this.spec1.Category = this.categories;
+
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.requirementBrowserViewModel = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, this.pluginService.Object);
         }
@@ -55,6 +60,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         
             Assert.AreEqual("spec1", row.Name);
             Assert.AreEqual("spec1", row.ShortName);
+            Assert.AreEqual("category1, category2", row.Categories);
             Assert.AreSame(this.domain, row.Owner);
             Assert.That(row.Definition, Is.Null.Or.Empty);
         }

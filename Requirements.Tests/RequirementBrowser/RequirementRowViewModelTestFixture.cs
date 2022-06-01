@@ -7,6 +7,7 @@
 namespace CDP4Requirements.Tests.RequirementBrowser
 {
     using System;
+    using System.Collections.Generic;
     using System.Reactive.Concurrency;
     using System.Reflection;
     using System.Threading.Tasks;
@@ -53,6 +54,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private RequirementsGroup grp1;
         private RequirementsGroup grp11;
         private RequirementsGroup grp2;
+        private List<Category> categories;
         private Requirement req;
         private Definition def;
         private Assembler assembler;
@@ -91,6 +93,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.iteration.IterationSetup = this.iterationSetup;
             this.model.EngineeringModelSetup = this.modelSetup;
             this.model.Iteration.Add(this.iteration);
+            this.categories = new List<Category>() { new Category { Name = "category1" }, new Category { Name = "category2" } };
 
             this.grp1 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.grp11 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -100,7 +103,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.reqSpec.Group.Add(this.grp2);
             this.grp1.Group.Add(this.grp11);
 
-            this.req = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "requirement1", ShortName = "r1", Owner = this.domain };
+            this.req = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "requirement1", ShortName = "r1", Owner = this.domain, Category = this.categories};
             this.def = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Content = "def" };
             this.reqSpec.Requirement.Add(this.req);
             this.req.Definition.Add(this.def);
@@ -121,6 +124,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             Assert.AreEqual("requirement1", row.Name);
             Assert.AreEqual("r1", row.ShortName);
+            Assert.AreEqual("category1, category2", row.Categories);
             Assert.AreSame(this.domain, row.Owner);
             Assert.AreEqual(this.def.Content, row.Definition);
         }
