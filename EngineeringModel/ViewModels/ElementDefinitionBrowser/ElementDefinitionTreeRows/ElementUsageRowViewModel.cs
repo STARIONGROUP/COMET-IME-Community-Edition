@@ -185,7 +185,18 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets an <see cref="IEnumerable{T}"/> containing all applied categories for this <see cref="ElementUsage"/>
         /// and its according <see cref="ElementDefinition"/>.
         /// </summary>
-        public new IEnumerable<Category> Category => this.Thing.Category.Union(this.Thing.ElementDefinition.Category).Distinct();
+        public new IEnumerable<Category> Category
+        {
+            get
+            {
+                if (this.Thing != null)
+                {
+                    return this.Thing.Category.Union(this.Thing.ElementDefinition.Category).Distinct();
+                }
+
+                return new List<Category>();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the Categories in display format
