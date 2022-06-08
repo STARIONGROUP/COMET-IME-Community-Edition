@@ -101,10 +101,14 @@ namespace CDP4EngineeringModel.ViewModels
             this.ExcludedOptions = new ReactiveList<Option>();
             this.SelectedOptions = new ReactiveList<Option>();
 
-            this.WhenAnyValue(vm => vm.SelectedOptions).Subscribe(_ => this.ExcludedOptions = new ReactiveList<Option>(this.AllOptions.Except(this.SelectedOptions)));
+            this.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(this.SelectedOptions))
+                {
+                    this.ExcludedOptions = new ReactiveList<Option>(this.AllOptions.Except(this.SelectedOptions));
+                }
 
-            this.WhenAnyValue(vm => vm.ExcludedOptions).Subscribe(
-                _ =>
+                if (e.PropertyName == nameof(this.ExcludedOptions))
                 {
                     if (!this.SelectedOptions.Any())
                     {
@@ -126,9 +130,10 @@ namespace CDP4EngineeringModel.ViewModels
                             this.OptionToolTip = "This ElementUsage is used in all options.";
                         }
                     }
-                });
 
-            this.WhenAnyValue(vm => vm.ExcludedOptions).Skip(1).Subscribe(_ => this.SendUpdateExcludedOptionOperation());
+                    this.SendUpdateExcludedOptionOperation();
+                }
+            };
 
             this.UpdateOptionLists();
             this.PopulateParameterGroups();

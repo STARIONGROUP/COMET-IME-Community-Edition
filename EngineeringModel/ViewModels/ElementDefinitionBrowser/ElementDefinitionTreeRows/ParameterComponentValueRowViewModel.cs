@@ -119,42 +119,41 @@ namespace CDP4EngineeringModel.ViewModels
             this.Option = this.ActualOption;
             this.State = (this.ActualState != null) ? this.ActualState.Name : string.Empty;
 
-            this.WhenAnyValue(x => x.Switch).Skip(1).Subscribe(
-                x =>
+            this.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(this.Switch))
                 {
-                    var valueBaseRow = this.ContainerViewModel as ParameterValueBaseRowViewModel;
-                    if (valueBaseRow != null)
+                    if (this.ContainerViewModel is ParameterValueBaseRowViewModel valueBaseRow)
                     {
                         foreach (ParameterComponentValueRowViewModel row in valueBaseRow.ContainedRows)
                         {
-                            row.Switch = x;
+                            row.Switch = this.Switch;
                         }
 
                         return;
                     }
 
-                    var parameterBaseRow = this.ContainerViewModel as ParameterOrOverrideBaseRowViewModel;
-                    if (parameterBaseRow != null)
+                    if (this.ContainerViewModel is ParameterOrOverrideBaseRowViewModel parameterBaseRow)
                     {
                         foreach (ParameterComponentValueRowViewModel row in parameterBaseRow.ContainedRows)
                         {
-                            row.Switch = x;
+                            row.Switch = this.Switch;
                         }
 
                         return;
                     }
 
-                    var subscriptionRow = this.ContainerViewModel as ParameterSubscriptionRowViewModel;
-                    if (subscriptionRow != null)
+                    if (this.ContainerViewModel is ParameterSubscriptionRowViewModel subscriptionRow)
                     {
                         foreach (ParameterComponentValueRowViewModel row in subscriptionRow.ContainedRows)
                         {
-                            row.Switch = x;
+                            row.Switch = this.Switch;
                         }
 
                         return;
                     }
-                });
+                }
+            };
         }
 
         /// <summary>
