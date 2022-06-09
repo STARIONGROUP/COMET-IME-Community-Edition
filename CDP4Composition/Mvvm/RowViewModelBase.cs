@@ -428,8 +428,6 @@ namespace CDP4Composition.Mvvm
                     this.HasError = !string.IsNullOrEmpty(this.ErrorMsg);
                 }
             };
-
-            this.ThrownExceptions.Subscribe(e => logger.Error(e));
         }
 
         /// <summary>
