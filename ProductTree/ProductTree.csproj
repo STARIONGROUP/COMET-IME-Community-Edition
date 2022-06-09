@@ -11,8 +11,8 @@
     <Product>ProductTree</Product>
     <Description>COMET Product Tree Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.2.0.3</AssemblyVersion>
-    <FileVersion>9.2.0.3</FileVersion>
+    <AssemblyVersion>9.2.0.5</AssemblyVersion>
+    <FileVersion>9.2.0.5</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
