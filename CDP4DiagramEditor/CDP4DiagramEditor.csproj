@@ -29,10 +29,10 @@
     <None Remove="Resources\not_a_implies_not_b_16x16.png" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0-716-PR210">
+    <PackageReference Include="CDP4Common-CE" Version="9.0.0-740-PR210">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-716-PR210">
+    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-740-PR210">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DynamicLanguageRuntime" Version="1.3.0" />

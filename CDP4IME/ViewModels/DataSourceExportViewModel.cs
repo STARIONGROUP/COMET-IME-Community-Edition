@@ -146,7 +146,8 @@ namespace CDP4IME.ViewModels
             {
                 { "ECSS-E-TM-10-25 (Version 2.4.1)", new Version("1.0.0") },
                 { "COMET 1.1.0", new Version("1.1.0") },
-                { "COMET 1.2.0", new Version("1.2.0") }
+                { "COMET 1.2.0", new Version("1.2.0") },
+                { "COMET 1.3.0", new Version("1.3.0") }
             };
 
             this.IsBusy = false;
@@ -163,7 +164,7 @@ namespace CDP4IME.ViewModels
                     }
                     else
                     {
-                        this.Versions = 
+                        this.Versions =
                             this.availableVersions
                                 .Where(y => y.Value <= x.DalVersion)
                                 .ToDictionary(k => k.Key, v => v.Value);
