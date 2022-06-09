@@ -128,7 +128,15 @@ namespace CDP4EngineeringModel.ViewModels
             this.currentDomain = currentDomain;
             this.UpdateOwnerProperties();
             this.UpdateObfuscationProperties();
-            this.WhenAnyValue(vm => vm.Owner).Subscribe(_ => this.UpdateOwnerProperties());
+            
+            this.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(this.Owner))
+                {
+                    this.UpdateOwnerProperties();
+                }
+            };
+
             this.UpdateModelCode();
         }
 

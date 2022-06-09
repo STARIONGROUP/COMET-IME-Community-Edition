@@ -78,7 +78,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Out property for the <see cref="HasError"/> property
         /// </summary>
-        private ObservableAsPropertyHelper<bool> hasError;
+        private bool hasError;
 
         /// <summary>
         /// Backing property for the <see cref="IsHighlighted"/>
@@ -184,7 +184,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public bool HasError
         {
-            get { return this.hasError.Value; }
+            get { return this.hasError; }
+            set { this.RaiseAndSetIfChanged(ref this.hasError, value); }
         }
 
         /// <summary>
@@ -420,11 +421,13 @@ namespace CDP4Composition.Mvvm
                         objectChange => this.UpdateThingStatus())));
             }
 
-            this.WhenAnyValue(vm => vm.ErrorMsg)
-                .Select(x => !string.IsNullOrEmpty(x))
-                .ToProperty(this, x => x.HasError, out this.hasError);
-
-            this.hasError.ThrownExceptions.Subscribe(e => logger.Error(e));
+            this.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == nameof(this.ErrorMsg))
+                {
+                    this.HasError = !string.IsNullOrEmpty(this.ErrorMsg);
+                }
+            };
         }
 
         /// <summary>
