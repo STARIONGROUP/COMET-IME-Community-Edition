@@ -234,6 +234,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\Dialogs\MultiRelationshipDialog.xaml.cs">
+      <DependentUpon>MultiRelationshipDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\Dialogs\CategoryDomainParameterTypeSelectorDialog.xaml.cs">
       <DependentUpon>CategoryDomainParameterTypeSelectorDialog.xaml</DependentUpon>
     </Compile>
@@ -356,6 +359,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\Dialogs\MultiRelationshipDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Dialogs\CategoryDomainParameterTypeSelectorDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
