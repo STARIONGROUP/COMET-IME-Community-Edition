@@ -106,6 +106,12 @@ namespace CDP4AddinCE
                 case "CDP4_Open":
                     var dataSelection = new DataSourceSelectionViewModel(this.DialogNavigationService);
                     var dataSelectionResult = this.DialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
+
+                    if (dataSelectionResult?.OpenModel ?? false)
+                    {
+                        this.OpenModelDialog();
+                    }
+
                     break;
                 case "CDP4_Close":
                     await this.session.Close();
@@ -115,9 +121,7 @@ namespace CDP4AddinCE
                     var proxyServerViewModelResult = this.DialogNavigationService.NavigateModal(proxyServerViewModel) as DataSourceSelectionResult;
                     break;
                 case "CDP4_SelectModelToOpen":
-                    var sessionsOpening = new List<ISession> { this.session };
-                    var modelOpeningDialogViewModel = new ModelOpeningDialogViewModel(sessionsOpening, null);
-                    var modelOpeningDialogViewModelResult = this.DialogNavigationService.NavigateModal(modelOpeningDialogViewModel) as DataSourceSelectionResult;
+                    this.OpenModelDialog();
                     break;
                 case "CDP4_SelectModelToClose":
                     var sessionsClosing = new List<ISession> { this.session };
@@ -132,6 +136,16 @@ namespace CDP4AddinCE
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
                     break;
             }
+        }
+
+        /// <summary>
+        /// Opens the Model Selection Dialog
+        /// </summary>
+        private void OpenModelDialog()
+        {
+            var sessionsOpening = new List<ISession> { this.session };
+            var modelOpeningDialogViewModel = new ModelOpeningDialogViewModel(sessionsOpening, null);
+            var modelOpeningDialogViewModelResult = this.DialogNavigationService.NavigateModal(modelOpeningDialogViewModel) as DataSourceSelectionResult;
         }
 
         /// <summary>
