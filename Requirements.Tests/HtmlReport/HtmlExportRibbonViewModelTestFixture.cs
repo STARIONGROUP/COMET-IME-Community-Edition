@@ -14,7 +14,7 @@ namespace CDP4Requirements.Tests.HtmlReport
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Requirements.ViewModels;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NUnit.Framework;
 

@@ -25,7 +25,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
     using CDP4RequirementsVerification;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

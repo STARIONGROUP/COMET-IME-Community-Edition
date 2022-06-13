@@ -35,7 +35,7 @@ namespace CDP4DiagramEditor.Helpers
     using DevExpress.Xpf.Bars.Native;
     using DevExpress.Xpf.Ribbon;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     /// <summary>
     /// A custom action for moving a RibbonGroup from one RibbonPage to another

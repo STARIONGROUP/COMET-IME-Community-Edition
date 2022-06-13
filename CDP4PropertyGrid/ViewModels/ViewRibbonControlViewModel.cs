@@ -33,7 +33,7 @@ namespace CDP4PropertyGrid.ViewModels
 
     using CDP4Dal;
     
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     
     using ReactiveUI;
 

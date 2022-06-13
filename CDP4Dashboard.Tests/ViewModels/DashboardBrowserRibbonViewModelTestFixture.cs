@@ -45,7 +45,7 @@ namespace CDP4Dashboard.Tests.ViewModels
 
     using CDP4Dashboard.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

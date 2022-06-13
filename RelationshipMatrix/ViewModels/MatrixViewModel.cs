@@ -49,7 +49,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
     using DevExpress.Xpf.Grid;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using NLog;
 

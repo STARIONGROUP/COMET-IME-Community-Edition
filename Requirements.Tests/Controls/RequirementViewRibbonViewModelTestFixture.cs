@@ -42,7 +42,7 @@ namespace CDP4Requirements.Tests.Controls
 
     using CDP4Requirements.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

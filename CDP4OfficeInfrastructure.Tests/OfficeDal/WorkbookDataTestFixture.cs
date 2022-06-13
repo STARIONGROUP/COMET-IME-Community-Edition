@@ -16,7 +16,7 @@ namespace CDP4OfficeInfrastructure.Tests.OfficeDal
     using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
     using CDP4OfficeInfrastructure.OfficeDal;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NUnit.Framework;
 

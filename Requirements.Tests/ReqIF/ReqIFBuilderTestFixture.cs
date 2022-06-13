@@ -39,7 +39,7 @@ namespace CDP4Requirements.Tests
 
     using CDP4Requirements.ReqIFDal;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

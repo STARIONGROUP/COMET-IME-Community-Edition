@@ -47,7 +47,7 @@ namespace CDP4DiagramEditor.Tests
 
     using CDP4DiagramEditor.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

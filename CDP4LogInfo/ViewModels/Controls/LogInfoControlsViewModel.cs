@@ -13,7 +13,7 @@ namespace CDP4LogInfo.ViewModels
     using CDP4Composition.Navigation.Events;
     using CDP4Dal;
     using CDP4LogInfo.Views;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using ReactiveUI;
 
     /// <summary>

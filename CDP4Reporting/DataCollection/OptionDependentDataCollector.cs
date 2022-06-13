@@ -32,7 +32,7 @@ namespace CDP4Reporting.DataCollection
 
     using CDP4Composition.Navigation;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     /// <summary>
     /// This class is a base class for classes that can be used in a Report Script that is <see cref="Option"/> dependent.

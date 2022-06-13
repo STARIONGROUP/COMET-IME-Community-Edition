@@ -41,7 +41,7 @@ namespace BasicRdl.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 

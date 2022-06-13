@@ -45,7 +45,7 @@ namespace BasicRdl.Tests.ViewModels
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

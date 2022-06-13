@@ -46,7 +46,7 @@ namespace CDP4Budget.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;

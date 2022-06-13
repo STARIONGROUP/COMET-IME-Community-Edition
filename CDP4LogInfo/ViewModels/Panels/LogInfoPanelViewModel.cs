@@ -39,7 +39,7 @@ namespace CDP4LogInfo.ViewModels
     using CDP4LogInfo.Views;
     using CDP4Composition.Navigation;
     using CDP4LogInfo.ViewModels.Dialogs;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using NLog;
     using ReactiveUI;
     using LogLevel = NLog.LogLevel;

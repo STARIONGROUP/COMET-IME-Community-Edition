@@ -73,7 +73,7 @@ namespace CDP4Reporting.ViewModels
 
     using ICSharpCode.AvalonEdit.Document;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using NLog;
 

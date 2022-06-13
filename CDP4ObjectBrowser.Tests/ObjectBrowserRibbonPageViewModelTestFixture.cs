@@ -42,7 +42,7 @@ namespace CDP4ObjectBrowser.Tests
 
     using CDP4ObjectBrowser.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

@@ -56,7 +56,7 @@ namespace CDP4AddinCE
 
     using DevExpress.Xpf.Core;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using NetOffice.ExcelApi.Tools;
     using NetOffice.OfficeApi;

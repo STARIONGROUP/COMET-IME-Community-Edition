@@ -174,7 +174,7 @@
     <PackageReference Include="NLog" Version="4.7.10">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="reactiveui" Version="6.4.0">
+    <PackageReference Include="ReactiveUI.WPF" Version="6.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="reactiveui-core" Version="6.4.0">

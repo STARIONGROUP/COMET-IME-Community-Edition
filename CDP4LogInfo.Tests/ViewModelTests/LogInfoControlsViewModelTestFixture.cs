@@ -14,7 +14,7 @@ namespace CDP4LogInfo.Tests.ViewModelTests
     using CDP4Composition.Navigation.Events;
     using CDP4Dal;
     using CDP4LogInfo.ViewModels;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NLog;
     using NLog.Config;

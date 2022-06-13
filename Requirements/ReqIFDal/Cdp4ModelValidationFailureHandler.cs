@@ -33,7 +33,7 @@ namespace CDP4Requirements.ReqIFDal
 
     using CDP4Composition.Services;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     /// <summary>
     /// Handles Cdp4ModelValidation errors during the ReqIf creation process

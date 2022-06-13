@@ -59,7 +59,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
     using ICSharpCode.AvalonEdit.Document;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

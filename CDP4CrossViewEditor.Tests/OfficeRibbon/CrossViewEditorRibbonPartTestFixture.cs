@@ -41,7 +41,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
 
     using CDP4OfficeInfrastructure;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

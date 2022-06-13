@@ -46,7 +46,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

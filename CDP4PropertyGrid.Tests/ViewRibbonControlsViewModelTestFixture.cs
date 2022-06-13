@@ -11,7 +11,7 @@ namespace CDP4PropertyGrid.Tests
     using CDP4Composition.Navigation.Events;
     using CDP4Dal;
     using CDP4PropertyGrid.ViewModels;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NUnit.Framework;
     using System;

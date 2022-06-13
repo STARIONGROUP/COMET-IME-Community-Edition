@@ -10,7 +10,7 @@ namespace CDP4Requirements.ViewModels
     using System.Linq;
     using CDP4Common.EngineeringModelData;
     using CDP4Composition.Navigation;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using ReactiveUI;
     using CDP4Dal;
     using CDP4Dal.Events;

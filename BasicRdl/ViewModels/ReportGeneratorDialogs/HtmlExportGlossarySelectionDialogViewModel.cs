@@ -33,7 +33,7 @@ namespace BasicRdl.ViewModels
 
     using CDP4Composition.Navigation;
     
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     
     using NLog;
     

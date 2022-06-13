@@ -47,7 +47,7 @@ namespace CDP4Requirements.Tests.ReqIF
     using CDP4Requirements.ReqIFDal;
     using CDP4Requirements.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

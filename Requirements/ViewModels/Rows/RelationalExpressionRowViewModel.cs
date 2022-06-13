@@ -46,7 +46,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4RequirementsVerification;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 

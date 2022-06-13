@@ -45,7 +45,7 @@ namespace CDP4RelationshipMatrix.Tests
 
     using CDP4RelationshipMatrix.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

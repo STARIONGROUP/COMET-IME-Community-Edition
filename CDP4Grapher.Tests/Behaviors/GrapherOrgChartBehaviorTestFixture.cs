@@ -46,7 +46,7 @@ namespace CDP4Grapher.Tests.Behaviors
     using DevExpress.Diagram.Core.Layout;
     using DevExpress.Xpf.Diagram;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

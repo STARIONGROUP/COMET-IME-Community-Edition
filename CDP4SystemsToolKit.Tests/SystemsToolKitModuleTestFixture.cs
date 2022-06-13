@@ -29,7 +29,7 @@ namespace CDP4SystemsToolKit.Tests
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

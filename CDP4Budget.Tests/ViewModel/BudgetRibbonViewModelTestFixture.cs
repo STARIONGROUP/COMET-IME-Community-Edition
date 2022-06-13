@@ -44,7 +44,7 @@ namespace CDP4Budget.Tests.ViewModel
     using CDP4Dal;
     using CDP4Dal.Permission;
     
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

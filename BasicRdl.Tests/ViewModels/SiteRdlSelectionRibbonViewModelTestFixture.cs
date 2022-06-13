@@ -41,7 +41,7 @@ namespace BasicRdl.Tests
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

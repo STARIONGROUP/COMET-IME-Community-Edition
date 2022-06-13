@@ -23,7 +23,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
     using CDP4OfficeInfrastructure;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NetOffice.ExcelApi;
     using NUnit.Framework;

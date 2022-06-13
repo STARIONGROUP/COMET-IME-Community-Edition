@@ -16,7 +16,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;    
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using ReactiveUI;
     using ReqIFDal;
     using ReqIFSharp;

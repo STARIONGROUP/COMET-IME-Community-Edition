@@ -34,7 +34,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4RelationshipMatrix.Settings;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NUnit.Framework;
     using ViewModels;

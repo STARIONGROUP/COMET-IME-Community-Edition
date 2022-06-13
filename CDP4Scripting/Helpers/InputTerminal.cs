@@ -176,7 +176,7 @@ namespace CDP4Scripting.Helpers
             if (line != string.Empty)
             {
                 this.PreviousCommands.Add(line);
-                await Task.Run(() => this.panelViewModel.Execute(line));
+                await this.panelViewModel.Execute(line);
             }
             
             this.indexInPreviousCommand = PreviousCommands.Count - 1;

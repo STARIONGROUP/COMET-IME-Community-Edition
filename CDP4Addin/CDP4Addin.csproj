@@ -77,7 +77,7 @@
     <PackageReference Include="NetOfficeFw.Word" Version="1.7.4.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="reactiveui" Version="6.4.0" />
+    <PackageReference Include="ReactiveUI.WPF" Version="6.4.0" />
     <PackageReference Include="reactiveui-core" Version="6.4.0" />
     <PackageReference Include="Rx-Core" Version="2.2.5" />
     <PackageReference Include="Rx-Interfaces" Version="2.2.5" />

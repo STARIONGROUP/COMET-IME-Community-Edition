@@ -29,7 +29,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Requirements.ReqIFDal;
     using CDP4Requirements.Settings.JsonConverters;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 

@@ -41,7 +41,7 @@ namespace CDP4Grapher.Behaviors
     using DevExpress.Diagram.Core.Layout;
     using DevExpress.Xpf.Diagram;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Direction = DevExpress.Diagram.Core.Direction;
 

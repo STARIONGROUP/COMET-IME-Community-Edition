@@ -32,7 +32,7 @@ namespace CDP4Reporting.Tests.Behaviour
 
     using CDP4Dal;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

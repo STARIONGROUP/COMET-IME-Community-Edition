@@ -45,7 +45,7 @@ namespace CDP4Requirements.Tests.Settings
     using CDP4Requirements.Settings.JsonConverters;
     using CDP4Requirements.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

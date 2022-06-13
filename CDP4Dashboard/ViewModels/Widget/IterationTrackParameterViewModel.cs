@@ -202,7 +202,7 @@ namespace CDP4Dashboard.ViewModels.Widget
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(async _ => await this.OnDeleteCommand.ExecuteAsyncTask());
 
-            this.OnRefreshCommand.Execute(null);
+            ((ICommand)this.OnRefreshCommand).Execute(null);
         }
 
         /// <summary>

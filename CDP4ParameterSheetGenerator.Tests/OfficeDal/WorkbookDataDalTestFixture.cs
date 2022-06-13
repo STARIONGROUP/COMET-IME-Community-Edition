@@ -12,7 +12,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeDal
     using System.Linq;
     using CDP4Common.MetaInfo;
     using CDP4OfficeInfrastructure.OfficeDal;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NetOffice.ExcelApi;
     using NUnit.Framework;

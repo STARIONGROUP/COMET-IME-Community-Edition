@@ -44,7 +44,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
     using CDP4Reporting.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

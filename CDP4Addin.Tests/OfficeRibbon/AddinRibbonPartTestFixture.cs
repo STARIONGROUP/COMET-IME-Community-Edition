@@ -52,7 +52,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
     using CDP4Dal.DAL;
     using CDP4Dal.Events;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
