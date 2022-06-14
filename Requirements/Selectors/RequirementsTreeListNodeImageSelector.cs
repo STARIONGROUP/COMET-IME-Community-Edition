@@ -28,8 +28,13 @@ namespace CDP4Requirements.Selectors
     using System.Globalization;
     using System.Windows.Media;
 
+    using CDP4Common.CommonData;
+
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+
+    using CDP4Requirements.ViewModels;
+    using CDP4Requirements.ViewModels.RequirementBrowser.Rows;
 
     using DevExpress.Xpf.Grid;
     using DevExpress.Xpf.Grid.TreeList;
@@ -47,10 +52,20 @@ namespace CDP4Requirements.Selectors
         public override ImageSource Select(TreeListRowData rowData)
         {
             var thingStatus = ((IHaveThingStatus)rowData.Row).ThingStatus;
+            Thing thing = null;
+
+            if (rowData.Row is ParametricConstraintsFolderRowViewModel parametricConstraintsFolderRow)
+            {
+                thing = parametricConstraintsFolderRow.Thing;
+            }
+            else if (rowData.Row is ParametricConstraintRowViewModel parametricConstraintRow)
+            {
+                thing = parametricConstraintRow.Thing;
+            }
 
             var converter = new ThingToIconUriConverter();
 
-            var image = converter.Convert(new object[] { thingStatus }, null, null, CultureInfo.InvariantCulture);
+            var image = converter.Convert(new object[] { thing, thingStatus }, null, null, CultureInfo.InvariantCulture);
 
             return image as ImageSource;
         }
