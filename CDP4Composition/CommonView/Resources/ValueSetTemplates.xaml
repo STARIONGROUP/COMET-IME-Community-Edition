@@ -74,6 +74,41 @@
                                                Converter={StaticResource BooleanToVisibilityConverter}}" />
     </av:DataTemplate>
 
+    <av:DataTemplate x:Key="ManualMultiEnumTemplateShortName">
+        <dxe:ComboBoxEdit Name="PART_Editor"
+                          VerticalContentAlignment="Center"
+                          DisplayMember="Name"
+                          IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                          IsTextEditable="False"
+                          ItemsSource="{Binding RowData.Row.EnumerationValueDefinition}"
+                          NullText="-"
+                          ShowBorder="True"
+                          ShowNullText="True"
+                          ValueMember="ShortName"
+                          Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                               Converter={StaticResource BooleanToVisibilityConverter}}">
+            <dxe:ComboBoxEdit.StyleSettings>
+                <dxe:CheckedComboBoxStyleSettings />
+            </dxe:ComboBoxEdit.StyleSettings>
+        </dxe:ComboBoxEdit>
+    </av:DataTemplate>
+
+    <av:DataTemplate x:Key="ManualSingleEnumTemplateShortName">
+        <dxe:ComboBoxEdit Name="PART_Editor"
+                          VerticalContentAlignment="Center"
+                          DisplayMember="Name"
+                          IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                          IsTextEditable="False"
+                          ItemsSource="{Binding RowData.Row.EnumerationValueDefinition}"
+                          NullText="-"
+                          ShowBorder="True"
+                          ShowCustomItems="true"
+                          ShowNullText="True"
+                          ValueMember="ShortName"
+                          Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                               Converter={StaticResource BooleanToVisibilityConverter}}" />
+    </av:DataTemplate>
+
     <av:DataTemplate x:Key="ManualDateTimeTemplate">
         <dxe:DateEdit Name="PART_Editor"
                       AllowNullInput="True"
@@ -132,6 +167,16 @@
                                          InactiveTemplate="{StaticResource InactiveTemplate}"
                                          MultiEnumTemplate="{StaticResource ManualMultiEnumTemplate}"
                                          SingleEnumTemplate="{StaticResource ManualSingleEnumTemplate}"
+                                         TextEditTemplate="{StaticResource ManualTextEditTemplate}"
+                                         TimeOfDayTemplate="{StaticResource ManualTimeTemplate}" />
+
+    <resources:ValueCellTemplateSelector x:Key="ManualValueCellTemplateSelectorShortNames"
+                                         BooleanTemplate="{StaticResource ManualBooleanTemplate}"
+                                         DateTemplate="{StaticResource ManualDateTemplate}"
+                                         DateTimeTemplate="{StaticResource ManualDateTimeTemplate}"
+                                         InactiveTemplate="{StaticResource InactiveTemplate}"
+                                         MultiEnumTemplate="{StaticResource ManualMultiEnumTemplateShortName}"
+                                         SingleEnumTemplate="{StaticResource ManualSingleEnumTemplateShortName}"
                                          TextEditTemplate="{StaticResource ManualTextEditTemplate}"
                                          TimeOfDayTemplate="{StaticResource ManualTimeTemplate}" />
     
