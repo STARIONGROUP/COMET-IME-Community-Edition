@@ -48,9 +48,10 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4EngineeringModel.Services;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
+
     using Utilities;
 
     using IDropTarget = CDP4Composition.DragDrop.IDropTarget;

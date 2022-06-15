@@ -1,26 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelSetupDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,8 +28,11 @@ namespace CDP4EngineeringModel.Tests
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;    
@@ -182,7 +184,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatWriteExecutesOnTheSessionAndThatPropertiesAreSetFromViewModel()
+        public async Task VerifyThatWriteExecutesOnTheSessionAndThatPropertiesAreSetFromViewModel()
         {
             var engineeringModelSetup = new EngineeringModelSetup
             {
@@ -196,7 +198,7 @@ namespace CDP4EngineeringModel.Tests
             
             Assert.That(this.viewModel["Name"], Is.Not.Null.Or.Empty);
 
-            Assert.IsFalse(this.viewModel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewModel.OkCommand).CanExecute(null));
 
             var newShortName = "updatedshortname";
             var newName = "updated name";
@@ -209,7 +211,7 @@ namespace CDP4EngineeringModel.Tests
             var newSourceModel = new EngineeringModelSetup(newSourceId, null, this.uri);
             this.viewModel.SourceEngineeringModelSetup = newSourceModel;
 
-            this.viewModel.OkCommand.Execute(null);
+            await this.viewModel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             Assert.IsNull(this.viewModel.WriteException);
@@ -236,7 +238,7 @@ namespace CDP4EngineeringModel.Tests
 
             this.viewModel = new EngineeringModelSetupDialogViewModel(engineeringModelSetup, transaction, this.sessionThatThrowsWriteException.Object, true, ThingDialogKind.Create, null, this.siteDirClone);
 
-            this.viewModel.OkCommand.Execute(null);
+            Observable.Return(Unit.Default).InvokeCommand(this.viewModel.OkCommand);
 
             Assert.IsTrue(this.viewModel.HasException);
 
@@ -244,7 +246,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatCancelDoesNotRecordAnyChanges()
+        public async Task VerifyThatCancelDoesNotRecordAnyChanges()
         {
             var shortname = "shortname";
             var name = "name";
@@ -274,7 +276,7 @@ namespace CDP4EngineeringModel.Tests
             this.viewModel.StudyPhase = newStudyPhase;
             this.viewModel.SourceEngineeringModelSetup = newSourceModel;
 
-            this.viewModel.CancelCommand.Execute(null);
+            await this.viewModel.CancelCommand.Execute();
 
             Assert.AreEqual(shortname, engineeringModelSetup.ShortName);
             Assert.AreEqual(name, engineeringModelSetup.Name);
@@ -288,7 +290,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyOkCommandWithoutSourceModel()
+        public async Task VerifyOkCommandWithoutSourceModel()
         {
             var engineeringModelSetup = new EngineeringModelSetup();
 
@@ -297,7 +299,7 @@ namespace CDP4EngineeringModel.Tests
             this.viewModel = new EngineeringModelSetupDialogViewModel(engineeringModelSetup, transaction, this.session.Object, true, ThingDialogKind.Create, null, this.siteDirClone);
             
             Assert.That(this.viewModel["Name"], Is.Not.Null.Or.Empty);
-            Assert.IsFalse(this.viewModel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewModel.OkCommand).CanExecute(null));
 
             var newShortName = "EMShortname";
             var newName = "EMName";
@@ -308,7 +310,7 @@ namespace CDP4EngineeringModel.Tests
             var srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, null) { Name = "testRDL", ShortName = "test" };
             this.viewModel.SelectedSiteReferenceDataLibrary = srdl;
 
-            this.viewModel.OkCommand.Execute(null);
+            await this.viewModel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             Assert.IsNull(this.viewModel.WriteException);

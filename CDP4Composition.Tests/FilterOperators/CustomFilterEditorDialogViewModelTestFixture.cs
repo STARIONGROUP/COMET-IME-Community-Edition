@@ -1,25 +1,25 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CustomFilterEditorDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,9 +29,11 @@ namespace CDP4Composition.Tests.FilterOperators
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -39,18 +41,16 @@ namespace CDP4Composition.Tests.FilterOperators
     using CDP4Composition.FilterOperators;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services.FilterEditorService;
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
 
     using DevExpress.Data.Filtering;
-    using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Core.FilteringUI;
     using DevExpress.Xpf.Grid;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -141,7 +141,6 @@ namespace CDP4Composition.Tests.FilterOperators
             this.customFilterOperatorsViewModel.Setup(x => x.CustomFilterOperators).Returns(customFilterOperators);
 
             this.dataViewBase.DataContext = this.customFilterOperatorsViewModel.Object;
-
         }
 
         [Test]
@@ -149,9 +148,9 @@ namespace CDP4Composition.Tests.FilterOperators
         {
             var vm = new CustomFilterEditorDialogViewModel(this.dialogNavigationService.Object, this.dataViewBase);
 
-            Assert.CatchAsync<NotSupportedException>(() => vm.QueryOperatorsCommand.ExecuteAsyncTask("fails"));
+            Assert.Catch<UnhandledErrorException>(() => ((ICommand)vm.QueryOperatorsCommand).Execute(default));
 
-            await vm.QueryOperatorsCommand.ExecuteAsyncTask(this.filterEditorQueryOperatorsEventArgs);
+            await vm.QueryOperatorsCommand.Execute(this.filterEditorQueryOperatorsEventArgs);
 
             Assert.AreEqual(2, this.filterEditorQueryOperatorsEventArgs.Operators.Count);
 

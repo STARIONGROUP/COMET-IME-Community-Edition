@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DisposableReactiveListTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Tests.Mvvm.Types
 {
@@ -11,13 +30,12 @@ namespace CDP4Composition.Tests.Mvvm.Types
     using System.Linq;
     using System.Reflection;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
 
     using Moq;
 
     using NUnit.Framework;
-
-    using ReactiveUI;
 
     /// <summary>
     /// Contains tests to check proper working of the <see cref="DisposableReactiveList{T}" /> class.
@@ -185,38 +203,28 @@ namespace CDP4Composition.Tests.Mvvm.Types
         [Test]
         public void VerifyThatReactiveListMethodsAreAsExpected()
         {
-            var expectedMethods = new[]
+            var expectedMethods = new Dictionary<string, int>
             {
-                "Add", 
-                "AddRange", 
-                "BinarySearch", 
-                "BinarySearch", 
-                "BinarySearch", 
-                "Clear", 
-                "Contains", 
-                "CopyTo", 
-                "Equals", 
-                "GetEnumerator", 
-                "GetHashCode", 
-                "GetType", 
-                "IndexOf", 
-                "Insert", 
-                "InsertRange", 
-                "Move", 
-                "Remove", 
-                "RemoveAll", 
-                "RemoveAt", 
-                "RemoveRange", 
-                "Reset", 
-                "Sort", 
-                "Sort", 
-                "Sort", 
-                "SuppressChangeNotifications", 
-                "ToString"
-            }
-                .GroupBy(x => x, x => x)
-                .Select(x => new KeyValuePair<string, int>(x.Key, x.Count()))
-                .ToList();
+                {"Add", 2}, 
+                {"AddRange", 1}, 
+                {"Clear", 1}, 
+                {"Contains", 2}, 
+                {"CopyTo", 1}, 
+                {"Equals", 1}, 
+                {"GetEnumerator", 1}, 
+                {"GetHashCode", 1}, 
+                {"GetType", 1}, 
+                {"IndexOf", 2}, 
+                {"Insert", 2}, 
+                {"Move", 1}, 
+                {"Remove", 1}, 
+                {"RemoveAll", 1}, 
+                {"RemoveAt", 1}, 
+                {"RemoveRange", 1}, 
+                {"Sort", 2},
+                {"SortedInsert", 1},
+                {"ToString", 1}
+            }.ToList();
 
             var overriddenMethods = new List<string>
             {
@@ -248,7 +256,7 @@ namespace CDP4Composition.Tests.Mvvm.Types
 
             var message = $"Method changes found in {nameof(ReactiveList<IDisposable>)}. Please check if {nameof(DisposableReactiveList<IDisposable>)} needs to be refactored, since all methods that result in removal of objects from {nameof(DisposableReactiveList<IDisposable>)} should be overridden. (see: https://github.com/RHEAGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt)";
 
-            Assert.AreEqual(22, currentMethods.Count, message);
+            Assert.AreEqual(19, currentMethods.Count, message);
             CollectionAssert.AreEquivalent(expectedMethods, currentMethods, message);
         }
     }

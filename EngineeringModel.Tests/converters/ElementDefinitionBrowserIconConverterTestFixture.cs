@@ -37,9 +37,9 @@ namespace CDP4EngineeringModel.Tests.Converters
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
-    using CDP4EngineeringModel.Selectors;
+    using CommonServiceLocator;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CDP4EngineeringModel.Selectors;
 
     using Moq;
 

@@ -42,7 +42,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
 
     using CDP4SiteDirectory.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

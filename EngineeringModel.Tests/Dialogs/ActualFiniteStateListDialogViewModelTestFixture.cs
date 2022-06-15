@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ActualFiniteStateListDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
@@ -11,19 +30,28 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Common.Types;
+    
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+    using CDP4Dal.Operations;
     using CDP4Dal.DAL;
+
     using CDP4EngineeringModel.ViewModels;
+    
     using Moq;
+    
     using NUnit.Framework;
 
     using ReactiveUI;
@@ -122,7 +150,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
-        public void VerifyThatPropertiesAreSet()
+        public async Task VerifyThatPropertiesAreSet()
         {
             var statelist = new ActualFiniteStateList();
             var containerClone = this.iteration.Clone(false);
@@ -141,15 +169,15 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual(0, vm.PossibleFiniteStateListRow.Count);
             Assert.AreEqual(0, vm.ActualState.Count);
 
-            Assert.IsTrue(vm.AddPossibleFiniteStateListCommand.CanExecute(null));
-            vm.AddPossibleFiniteStateListCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.AddPossibleFiniteStateListCommand).CanExecute(null));
+            await vm.AddPossibleFiniteStateListCommand.Execute();
             Assert.AreEqual(1, vm.PossibleFiniteStateListRow.Count);
 
             var pfsl1 = vm.PossibleFiniteStateListRow.First();
             Assert.AreEqual(2, pfsl1.PossiblePossibleFiniteStateList.Count);
 
-            Assert.IsTrue(vm.AddPossibleFiniteStateListCommand.CanExecute(null));
-            vm.AddPossibleFiniteStateListCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.AddPossibleFiniteStateListCommand).CanExecute(null));
+            await vm.AddPossibleFiniteStateListCommand.Execute();
             Assert.AreEqual(2, vm.PossibleFiniteStateListRow.Count);
 
             var pfsl2 = vm.PossibleFiniteStateListRow.Last();

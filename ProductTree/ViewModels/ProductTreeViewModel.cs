@@ -28,6 +28,7 @@ namespace CDP4ProductTree.ViewModels
     using System;
     using System.Diagnostics;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -222,11 +223,6 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
-        /// Gets the <see cref="ReactiveCommand"/> to create a <see cref="ParameterSubscription"/>
-        /// </summary>
-        public ReactiveCommand<object> CreateSubscriptionCommand { get; private set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether the <see cref="ISession"/> can create a <see cref="ParameterGroup"/>
         /// </summary>
         public bool CanCreateParameterGroup
@@ -236,29 +232,34 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to create a <see cref="ParameterSubscription"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CreateSubscriptionCommand { get; private set; }
+
+        /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to Copy Model Code to clipboard <see cref="ParameterRowViewModel"/>
         /// </summary>
-        public ReactiveCommand<object> CopyModelCodeToClipboardCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CopyModelCodeToClipboardCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to Copy Path to clipboard
         /// </summary>
-        public ReactiveCommand<object> CopyPathToClipboardCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CopyPathToClipboardCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to delete a <see cref="ParameterSubscription"/>
         /// </summary>
-        public ReactiveCommand<object> DeleteSubscriptionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteSubscriptionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to toggle <see cref="ElementUsage"/>s between Name and ShortName
         /// </summary>
-        public ReactiveCommand<object> ToggleUsageNamesCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ToggleUsageNamesCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ParameterGroup"/>
         /// </summary>
-        public ReactiveCommand<object> CreateParameterGroup { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterGroup { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the create override command shall be enabled
@@ -272,7 +273,7 @@ namespace CDP4ProductTree.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to create a <see cref="ParameterOverride"/>
         /// </summary>
-        public ReactiveCommand<object> CreateOverrideCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateOverrideCommand { get; private set; }
 
         /// <summary>
         /// Gets the Top <see cref="ElementDefinition"/> for this <see cref="Option"/>
@@ -353,37 +354,30 @@ namespace CDP4ProductTree.ViewModels
         }
 
         /// <summary>
-        /// Initialize the <see cref="ReactiveCommand"/>
+        /// Initialize the <see cref="ReactiveCommandCreator"/>
         /// </summary>
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-            this.CreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSubscription));
-            this.CreateSubscriptionCommand.Subscribe(_ => this.ExecuteCreateSubscriptionCommand());
-
-            this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create();
-            this.CopyModelCodeToClipboardCommand.Subscribe(_ => this.ExecuteCopyModelCodeToClipboardCommand());
-
-            this.CopyPathToClipboardCommand = ReactiveCommand.Create();
-            this.CopyPathToClipboardCommand.Subscribe(_ => this.ExecuteCopyPathToClipboardCommand());
-
-            this.DeleteSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDeleteSubscription));
+            this.CreateSubscriptionCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteCreateSubscriptionCommand, this.WhenAnyValue(x => x.CanCreateSubscription));
+            this.CopyModelCodeToClipboardCommand = ReactiveCommandCreator.Create(this.ExecuteCopyModelCodeToClipboardCommand);
+            this.CopyPathToClipboardCommand = ReactiveCommandCreator.Create(this.ExecuteCopyPathToClipboardCommand);
 
             this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
 
-            this.DeleteSubscriptionCommand.Subscribe(
-                _ => this.ExecuteDeleteCommand(
-                ((ParameterOrOverrideBase)this.SelectedThing.Thing).ParameterSubscription
-                .Single(s => (tuple != null) && s.Owner.Equals(tuple.Item1))));
+            this.DeleteSubscriptionCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteDeleteCommand(
+                    ((ParameterOrOverrideBase)this.SelectedThing.Thing).ParameterSubscription
+                    .Single(s => (tuple != null) && s.Owner.Equals(tuple.Item1))), 
+                this.WhenAnyValue(x => x.CanDeleteSubscription));
 
-            this.CreateParameterGroup = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
-            this.CreateParameterGroup.Subscribe(_ => this.ExecuteCreateCommand<ParameterGroup>(this.SelectedThing.Thing.GetContainerOfType<ElementDefinition>()));
+            this.CreateParameterGroup = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateCommand<ParameterGroup>(this.SelectedThing.Thing.GetContainerOfType<ElementDefinition>()),
+                this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
 
-            this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
-            this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
+            this.CreateOverrideCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteCreateParameterOverride, this.WhenAnyValue(vm => vm.CanCreateOverride));
 
-            this.ToggleUsageNamesCommand = ReactiveCommand.Create();
-            this.ToggleUsageNamesCommand.Subscribe(_ => this.ToggleDisplayShortNamesOn());
+            this.ToggleUsageNamesCommand = ReactiveCommandCreator.Create(this.ToggleDisplayShortNamesOn);
         }
 
         /// <summary>

@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
@@ -10,20 +29,30 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Permission;
+    using CDP4Dal.Operations;
+
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+
     using CDP4EngineeringModel.ViewModels;
+    
     using Moq;
+    
     using NUnit.Framework;
+    
     using ParameterComponentValueRowViewModel = CDP4EngineeringModel.ViewModels.Dialogs.ParameterComponentValueRowViewModel;
     using ParameterOptionRowViewModel = CDP4EngineeringModel.ViewModels.Dialogs.ParameterOptionRowViewModel;
     using ParameterStateRowViewModel = CDP4EngineeringModel.ViewModels.Dialogs.ParameterStateRowViewModel;
@@ -223,11 +252,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
                 ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
 
-            Assert.IsTrue(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
 
             vm.SelectedScale = this.integerScale;
 
-            Assert.IsFalse(vm.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
         }
 
         [Test]
@@ -236,38 +265,40 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
     ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
             
-            Assert.IsFalse(vm.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
 
             vm.SelectedScale = this.integerScale;
-            Assert.IsTrue(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
             var owner = vm.SelectedOwner;
 
             vm.SelectedOwner = null;
-            Assert.IsFalse(vm.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
             vm.SelectedOwner = owner;
         }
 
         [Test]
-        public void VerifyUpdateOkExecute()
+        public async Task VerifyUpdateOkExecute()
         {
             this.parameter.Scale = this.integerScale;
-            var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
-    ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
 
-            Assert.IsTrue(vm.OkCommand.CanExecute(null));
-            vm.OkCommand.Execute(null);
+            var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
+                ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
+
+            Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
+            await vm.OkCommand.Execute();
         }
 
         [Test]
-        public void VerifyInspectStateDependence()
+        public async Task VerifyInspectStateDependence()
         {
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
-    ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
+                ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
+
             Assert.IsNull(vm.SelectedStateDependence);
 
             vm.SelectedStateDependence = vm.PossibleStateDependence.First();
-            Assert.IsTrue(vm.InspectSelectedStateDependenceCommand.CanExecute(null));
-            vm.InspectSelectedStateDependenceCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectSelectedStateDependenceCommand).CanExecute(null));
+            await vm.InspectSelectedStateDependenceCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<ActualFiniteStateList>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, It.IsAny<Thing>(), null));
         }
 

@@ -1,30 +1,49 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AnnotationFloatingDialogViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015-2020 RHEA S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using EventAggregator;
+    using CDP4Dal.Operations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -97,8 +116,8 @@ namespace CDP4CommonView.ViewModels
         /// </summary>
         public string Title
         {
-            get { return this.title; }
-            private set { this.RaiseAndSetIfChanged(ref this.title, value); }
+            get => this.title;
+            private set => this.RaiseAndSetIfChanged(ref this.title, value);
         }
 
         /// <summary>
@@ -106,8 +125,8 @@ namespace CDP4CommonView.ViewModels
         /// </summary>
         public string Content
         {
-            get { return this.content; }
-            private set { this.RaiseAndSetIfChanged(ref this.content, value); }
+            get => this.content;
+            private set => this.RaiseAndSetIfChanged(ref this.content, value);
         }
 
         /// <summary>
@@ -115,8 +134,8 @@ namespace CDP4CommonView.ViewModels
         /// </summary>
         public string NewDiscussionItemText
         {
-            get { return this.newDiscussionItemText; }
-            set { this.RaiseAndSetIfChanged(ref this.newDiscussionItemText, value); }
+            get => this.newDiscussionItemText;
+            set => this.RaiseAndSetIfChanged(ref this.newDiscussionItemText, value);
         }
 
         /// <summary>
@@ -124,8 +143,8 @@ namespace CDP4CommonView.ViewModels
         /// </summary>
         public string ShortName
         {
-            get { return this.shortName; }
-            private set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
+            get => this.shortName;
+            private set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
         /// <summary>
@@ -133,8 +152,8 @@ namespace CDP4CommonView.ViewModels
         /// </summary>
         public bool CanCreateDiscussionItem
         {
-            get { return this.canCreateDiscussionItem; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateDiscussionItem, value); }
+            get => this.canCreateDiscussionItem;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateDiscussionItem, value);
         }
 
         /// <summary>
@@ -142,14 +161,14 @@ namespace CDP4CommonView.ViewModels
         /// </summary>
         public string PrimaryAnnotatedThingName
         {
-            get { return this.primaryAnnotatedThingName; }
-            private set { this.RaiseAndSetIfChanged(ref this.primaryAnnotatedThingName, value); }
+            get => this.primaryAnnotatedThingName;
+            private set => this.RaiseAndSetIfChanged(ref this.primaryAnnotatedThingName, value);
         }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to post a <see cref="DiscussionItem"/>
         /// </summary>
-        public ReactiveCommand<Unit> PostDiscussionItemCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> PostDiscussionItemCommand { get; private set; }
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
@@ -170,24 +189,22 @@ namespace CDP4CommonView.ViewModels
         private void InitializeCommand()
         {
             this.CanCreateDiscussionItem = this.Session.PermissionService.CanWrite(ClassKind.EngineeringModelDataDiscussionItem, this.Thing);
-            this.PostDiscussionItemCommand = ReactiveCommand.CreateAsyncTask
-                (
-                    this.WhenAny
-                    (
-                        x => x.CanCreateDiscussionItem, 
-                        x => x.NewDiscussionItemText, 
-                        (permission, text) => permission.Value && !string.IsNullOrWhiteSpace(text.Value)
-                    ),
-                    x => this.ExecutePostDiscussionItemCommand(),
-                    RxApp.MainThreadScheduler
-                );
 
-            this.PostDiscussionItemCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
-            {
-                logger.Error("The inline update operation failed: {0}", x.Message);
-                this.ErrorMessage = x.Message;
-                this.IsBusy = false;
-            });
+            this.PostDiscussionItemCommand = ReactiveCommandCreator.CreateAsyncTask(
+                this.ExecutePostDiscussionItemCommand,
+                this.WhenAny(
+                    x => x.CanCreateDiscussionItem,
+                    x => x.NewDiscussionItemText,
+                    (permission, text) => permission.Value && !string.IsNullOrWhiteSpace(text.Value)),
+                RxApp.MainThreadScheduler);
+
+            this.PostDiscussionItemCommand.ThrownExceptions.Select(ex => ex).Subscribe(
+                x =>
+                {
+                    logger.Error("The inline update operation failed: {0}", x.Message);
+                    this.ErrorMessage = x.Message;
+                    this.IsBusy = false;
+                });
         }
 
         /// <summary>
@@ -234,6 +251,7 @@ namespace CDP4CommonView.ViewModels
         private void RemoveDiscussionItem(EngineeringModelDataDiscussionItem discussionItem)
         {
             var vm = this.DiscussionRows.SingleOrDefault(x => x.Thing == discussionItem);
+
             if (vm != null)
             {
                 this.DiscussionRows.RemoveAndDispose(vm);

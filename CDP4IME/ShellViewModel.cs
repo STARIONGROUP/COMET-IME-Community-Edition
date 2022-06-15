@@ -1,29 +1,29 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShellViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME
+namespace COMET
 {
     using System;
     using System.ComponentModel;
@@ -31,9 +31,11 @@ namespace CDP4IME
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Composition.Events;
     using CDP4Composition.Log;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services.AppSettingService;
@@ -42,12 +44,14 @@ namespace CDP4IME
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using CDP4IME.Settings;
-    using CDP4IME.ViewModels;
-
     using CDP4ShellDialogs.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using COMET.Settings;
+    using COMET.ViewModels;
+
+    using CommonServiceLocator;
+
+    using DynamicData;
 
     using NLog;
 
@@ -142,7 +146,6 @@ namespace CDP4IME
             }
 
             this.OpenSessions = new ReactiveList<ISession>();
-            this.OpenSessions.ChangeTrackingEnabled = true;
             this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
@@ -157,40 +160,34 @@ namespace CDP4IME
             // Shall be done only once in the whole application
             CDP4SimpleConfigurator.AddTarget(this.ToString(), this.logTarget, LogLevel.Info);
 
-            this.Sessions = new ReactiveList<SessionViewModel>();
-            this.Sessions.ChangeTrackingEnabled = true;
+            this.Sessions = new TrackedReactiveList<SessionViewModel>();
 
-            this.Sessions.ItemChanged.Where(x => x.PropertyName == "IsClosed" && x.Sender.IsClosed)
-                .Subscribe(x => this.Sessions.Remove(x.Sender));
-
-            this.Sessions.ItemChanged.Where(x => x.PropertyName == "IsClosed" && x.Sender.IsClosed)
-                .Subscribe(x => this.CheckIfItIsSelectedSession(x.Sender));
+            this.Sessions.ItemChanged.WhenPropertyChanged(x => x.IsClosed)
+                .Where(x => x.Sender.IsClosed)
+                .Subscribe(
+                    x =>
+                    {
+                        this.Sessions.Remove(x.Sender);
+                        this.CheckIfItIsSelectedSession(x.Sender);
+                    });
 
             this.Sessions.CountChanged.Subscribe(x => this.HasSessions = x != 0);
 
-            this.OpenDataSourceCommand = ReactiveCommand.Create();
-            this.OpenDataSourceCommand.Subscribe(_ => this.ExecuteOpenDataSourceRequest());
+            this.OpenDataSourceCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteOpenDataSourceRequest, RxApp.MainThreadScheduler);
 
-            this.SaveSessionCommand = ReactiveCommand.Create();
-            this.SaveSessionCommand.Subscribe(_ => this.ExecuteSaveSessionCommand());
+            this.SaveSessionCommand = ReactiveCommandCreator.Create(this.ExecuteSaveSessionCommand);
 
-            this.OpenProxyConfigurationCommand = ReactiveCommand.Create();
-            this.OpenProxyConfigurationCommand.Subscribe(_ => this.ExecuteOpenProxyConfigurationCommand());
+            this.OpenProxyConfigurationCommand = ReactiveCommandCreator.Create(this.ExecuteOpenProxyConfigurationCommand);
 
-            this.OpenUriManagerCommand = ReactiveCommand.Create();
-            this.OpenUriManagerCommand.Subscribe(_ => this.ExecuteOpenUriManagerRequest());
+            this.OpenUriManagerCommand = ReactiveCommandCreator.Create(this.ExecuteOpenUriManagerRequest);
 
-            this.OpenPluginManagerCommand = ReactiveCommand.Create();
-            this.OpenPluginManagerCommand.Subscribe(_ => this.ExecuteOpenPluginManagerRequest());
+            this.OpenPluginManagerCommand = ReactiveCommandCreator.Create(this.ExecuteOpenPluginManagerRequest);
 
-            this.OpenSelectIterationsCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.HasSessions));
-            this.OpenSelectIterationsCommand.Subscribe(s => this.ExecuteOpenSelectIterationsCommand(s as ISession));
+            this.OpenSelectIterationsCommand = ReactiveCommandCreator.Create<ISession>(this.ExecuteOpenSelectIterationsCommand, this.WhenAnyValue(x => x.HasSessions));
 
-            this.CloseIterationsCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.HasOpenIterations));
-            this.CloseIterationsCommand.Subscribe(_ => this.ExecuteCloseIterationsCommand());
+            this.CloseIterationsCommand = ReactiveCommandCreator.Create(this.ExecuteCloseIterationsCommand, this.WhenAnyValue(x => x.HasOpenIterations));
 
-            this.OpenDomainSwitchDialogCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.HasOpenIterations));
-            this.OpenDomainSwitchDialogCommand.Subscribe(_ => this.ExecuteOpenDomainSwitchDialogCommand());
+            this.OpenDomainSwitchDialogCommand = ReactiveCommandCreator.Create(this.ExecuteOpenDomainSwitchDialogCommand, this.WhenAnyValue(x => x.HasOpenIterations));
 
             this.WhenAnyValue(x => x.SelectedSession)
                 .Select(x => (x != null))
@@ -198,11 +195,9 @@ namespace CDP4IME
 
             this.SelectedSession = null;
 
-            this.OpenLogDialogCommand = ReactiveCommand.Create();
-            this.OpenLogDialogCommand.Subscribe(_ => this.ExecuteOpenLogDialog());
+            this.OpenLogDialogCommand = ReactiveCommandCreator.Create(this.ExecuteOpenLogDialog);
 
-            this.OpenAboutCommand = ReactiveCommand.Create();
-            this.OpenAboutCommand.Subscribe(_ => this.ExecuteOpenAboutRequest());
+            this.OpenAboutCommand = ReactiveCommandCreator.Create(this.ExecuteOpenAboutRequest);
 
             this.subscription = CDPMessageBus.Current.Listen<IsBusyEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -212,10 +207,9 @@ namespace CDP4IME
                     this.LoadingMessage = x.Message;
                 });
 
-            this.CheckForUpdateCommand = ReactiveCommand.Create();
-            this.CheckForUpdateCommand.Subscribe(_ => this.ExecuteCheckForUpdateCommand());
+            this.CheckForUpdateCommand = ReactiveCommandCreator.Create(this.ExecuteCheckForUpdateCommand);
 
-            this.OnClosingCommand = ReactiveCommand.CreateAsyncTask(async x => this.OnClosing(x as CancelEventArgs), RxApp.MainThreadScheduler);
+            this.OnClosingCommand = ReactiveCommandCreator.Create<CancelEventArgs>(this.OnClosing, null);
 
             logger.Info("Welcome in the COMET Application");
         }
@@ -240,32 +234,32 @@ namespace CDP4IME
         /// <summary>
         /// Gets the OnClosing Command
         /// </summary>
-        public ReactiveCommand<Unit> OnClosingCommand { get; private set; }
+        public ReactiveCommand<CancelEventArgs, Unit> OnClosingCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to select and open a data-source
         /// </summary>
-        public ReactiveCommand<object> OpenDataSourceCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenDataSourceCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to save a session to a file
         /// </summary>
-        public ReactiveCommand<object> SaveSessionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveSessionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to open the web-proxy configuration
         /// </summary>
-        public ReactiveCommand<object> OpenProxyConfigurationCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenProxyConfigurationCommand { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to manage the configured uris
         /// </summary>
-        public ReactiveCommand<object> OpenUriManagerCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenUriManagerCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to select and open a data-source
         /// </summary>
-        public ReactiveCommand<object> OpenPluginManagerCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenPluginManagerCommand { get; private set; }
 
         /// <summary>
         /// Gets a list of open <see cref="ISession"/>s
@@ -275,37 +269,37 @@ namespace CDP4IME
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to select and open a Iteration Selection Window
         /// </summary>
-        public ReactiveCommand<object> OpenSelectIterationsCommand { get; private set; }
+        public ReactiveCommand<ISession, Unit> OpenSelectIterationsCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to switch the domain for an iteration
         /// </summary>
-        public ReactiveCommand<object> OpenDomainSwitchDialogCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenDomainSwitchDialogCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to select and close Site RDLs
         /// </summary>
-        public ReactiveCommand<object> CloseIterationsCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CloseIterationsCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to open the details of an error in the status bar
         /// </summary>
-        public ReactiveCommand<object> OpenLogDialogCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenLogDialogCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to open the About View
         /// </summary>
-        public ReactiveCommand<object> OpenAboutCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenAboutCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to verify last versions on the update server
         /// </summary>
-        public ReactiveCommand<object> CheckForUpdateCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CheckForUpdateCommand { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="SessionViewModel"/>s that represent the currently loaded <see cref="Session"/>s
         /// </summary>
-        public ReactiveList<SessionViewModel> Sessions { get; private set; }
+        public TrackedReactiveList<SessionViewModel> Sessions { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="SessionViewModel"/>
@@ -407,7 +401,7 @@ namespace CDP4IME
         /// <summary>
         /// Executes the <see cref="OpenDataSourceCommand"/> 
         /// </summary>
-        private void ExecuteOpenDataSourceRequest()
+        private async Task ExecuteOpenDataSourceRequest()
         {
             var openSessions = this.Sessions.Select(x => x.Session).ToList();
             var dataSelection = new DataSourceSelectionViewModel(this.dialogNavigationService, openSessions);
@@ -423,7 +417,7 @@ namespace CDP4IME
 
             if (result.OpenModel)
             {
-                this.OpenSelectIterationsCommand.Execute(result.Session);
+                await this.OpenSelectIterationsCommand.Execute(result.Session);
             }
         }
 

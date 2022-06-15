@@ -1,15 +1,39 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AnnotationFloatingDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2016 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
@@ -22,6 +46,8 @@ namespace CDP4CommonView.Tests.ViewModels
     using CDP4Dal.Permission;
     using Moq;
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     [TestFixture]
     internal class AnnotationFloatingDialogViewModelTestFixture
@@ -48,6 +74,7 @@ namespace CDP4CommonView.Tests.ViewModels
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.assembler = new Assembler(this.uri);
@@ -84,7 +111,7 @@ namespace CDP4CommonView.Tests.ViewModels
             this.session.Setup(x => x.OpenIterations).
                 Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> {{this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant)}});
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(() => null);
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask);
 
             this.assembler.Cache.TryAdd(new CacheKey(this.model.Iid, null), new Lazy<Thing>(() => this.model));
             this.assembler.Cache.TryAdd(new CacheKey(this.rid.Iid, null), new Lazy<Thing>(() => this.rid));
@@ -97,7 +124,7 @@ namespace CDP4CommonView.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatViewModelIsPopulatedAndCommandWorks()
+        public async Task VerifyThatViewModelIsPopulatedAndCommandWorks()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -111,17 +138,16 @@ namespace CDP4CommonView.Tests.ViewModels
             Assert.AreEqual(vm.Title, this.rid.Title);
             Assert.AreEqual(vm.Content, this.rid.Content);
             Assert.AreEqual(0, vm.DiscussionRows.Count);
-            Assert.IsFalse(vm.PostDiscussionItemCommand.CanExecute(null));
-
+            Assert.IsFalse(((ICommand)vm.PostDiscussionItemCommand).CanExecute(null));
             vm.NewDiscussionItemText = "test";
-            Assert.IsTrue(vm.PostDiscussionItemCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.PostDiscussionItemCommand).CanExecute(null));
 
-            vm.PostDiscussionItemCommand.Execute(null);
+            await vm.PostDiscussionItemCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
 
         [Test]
-        public void VerifyThatDiscussionsItemAreAddedAndRemoved()
+        public async Task VerifyThatDiscussionsItemAreAddedAndRemoved()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
@@ -137,10 +163,10 @@ namespace CDP4CommonView.Tests.ViewModels
             var discussionRow = vm.DiscussionRows.Single();
             discussionRow.Content = "mod";
 
-            discussionRow.SaveCommand.Execute(null);
+            await discussionRow.SaveCommand.Execute(default);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
-            discussionRow.CancelCommand.Execute(null);
+            await discussionRow.CancelCommand.Execute(default);
             Assert.AreEqual(discussion1.Content, discussionRow.Content);
 
             this.rid.Discussion.Clear();

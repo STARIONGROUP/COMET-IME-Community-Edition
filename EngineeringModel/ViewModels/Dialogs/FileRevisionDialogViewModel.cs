@@ -30,6 +30,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reactive;
     using System.Threading.Tasks;
     using System.Windows.Input;
 
@@ -38,6 +39,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
@@ -46,7 +48,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -335,37 +337,37 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to download a file to a locally available drive
         /// </summary>
-        public ReactiveCommand<object> DownloadFileCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> DownloadFileCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to add a physical file to the <see cref="FileRevision"/>
         /// </summary>
-        public ReactiveCommand<object> AddFileCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> AddFileCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to add a <see cref="FileType"/> to this <see cref="FileRevision"/>
         /// </summary>
-        public ReactiveCommand<object> AddFileTypeCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> AddFileTypeCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to remove a <see cref="FileType"/> from this <see cref="FileRevision"/>
         /// </summary>
-        public ReactiveCommand<object> DeleteFileTypeCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteFileTypeCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to move a <see cref="FileType"/> down in the ordering of <see cref="FileType"/>s
         /// </summary>
-        public ReactiveCommand<object> MoveUpFileTypeCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> MoveUpFileTypeCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to to move a <see cref="FileType"/> up in the ordering of <see cref="FileType"/>s
         /// </summary>
-        public ReactiveCommand<object> MoveDownFileTypeCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> MoveDownFileTypeCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to cancel download of a file
         /// </summary>
-        public ReactiveCommand<object> CancelDownloadCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelDownloadCommand { get; private set; }
 
         /// <summary>
         /// Update the properties
@@ -428,26 +430,13 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeCommands();
 
-            this.AddFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanAddFile));
-            this.Disposables.Add(this.AddFileCommand.Subscribe(_ => this.AddFile()));
-
-            this.AddFileTypeCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanAddFileType));
-            this.Disposables.Add(this.AddFileTypeCommand.Subscribe(_ => this.AddFileType()));
-
-            this.DeleteFileTypeCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDeleteFileType));
-            this.Disposables.Add(this.DeleteFileTypeCommand.Subscribe(_ => this.DeleteFileType()));
-
-            this.MoveUpFileTypeCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanMoveUpFileType));
-            this.Disposables.Add(this.MoveUpFileTypeCommand.Subscribe(_ => this.MoveUpFileType()));
-
-            this.MoveDownFileTypeCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanMoveDownFileType));
-            this.Disposables.Add(this.MoveDownFileTypeCommand.Subscribe(_ => this.MoveDownFileType()));
-
-            this.DownloadFileCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDownloadFile));
-            this.Disposables.Add(this.DownloadFileCommand.Subscribe(_ => this.downloadFileService.ExecuteDownloadFile(this, this.Thing)));
-
-            this.CancelDownloadCommand = ReactiveCommand.Create();
-            this.Disposables.Add(this.CancelDownloadCommand.Subscribe(_ => this.downloadFileService.CancelDownloadFile(this)));
+            this.AddFileCommand = ReactiveCommandCreator.Create(this.AddFile, this.WhenAnyValue(x => x.CanAddFile));
+            this.AddFileTypeCommand = ReactiveCommandCreator.Create(this.AddFileType, this.WhenAnyValue(x => x.CanAddFileType));
+            this.DeleteFileTypeCommand = ReactiveCommandCreator.Create(this.DeleteFileType, this.WhenAnyValue(x => x.CanDeleteFileType));
+            this.MoveUpFileTypeCommand = ReactiveCommandCreator.Create(this.MoveUpFileType, this.WhenAnyValue(x => x.CanMoveUpFileType));
+            this.MoveDownFileTypeCommand = ReactiveCommandCreator.Create(this.MoveDownFileType, this.WhenAnyValue(x => x.CanMoveDownFileType));
+            this.DownloadFileCommand = ReactiveCommandCreator.Create(() => this.downloadFileService.ExecuteDownloadFile(this, this.Thing), this.WhenAnyValue(x => x.CanDownloadFile));
+            this.CancelDownloadCommand = ReactiveCommandCreator.Create(() => this.downloadFileService.CancelDownloadFile(this));
         }
 
         /// <summary>

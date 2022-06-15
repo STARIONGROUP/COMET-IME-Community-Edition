@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ReferencerRule"/>
@@ -156,7 +157,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedReferencingCategory"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedReferencingCategoryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedReferencingCategoryCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -165,7 +166,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedReferencingCategoryCommand = this.WhenAny(vm => vm.SelectedReferencingCategory, v => v.Value != null);
-            this.InspectSelectedReferencingCategoryCommand = ReactiveCommand.Create(canExecuteInspectSelectedReferencingCategoryCommand);
+            this.InspectSelectedReferencingCategoryCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedReferencingCategoryCommand);
             this.InspectSelectedReferencingCategoryCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedReferencingCategory));
         }
 

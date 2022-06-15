@@ -15,8 +15,8 @@
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              xmlns:cdp4ProductTree="clr-namespace:CDP4ProductTree"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:selectors="clr-namespace:CDP4ProductTree.Selectors"
              d:DesignHeight="300"
              d:DesignWidth="300"
@@ -119,10 +119,10 @@
             <dxmvvm:Interaction.Behaviors>
                 <cdp4Composition:ContextMenuBehavior />
             </dxmvvm:Interaction.Behaviors>
-            <i:Interaction.Behaviors>
+            <b:Interaction.Behaviors>
                 <dragDrop:FrameworkElementDropBehavior />
                 <dragDrop:FrameworkElementDragBehavior />
-            </i:Interaction.Behaviors>
+            </b:Interaction.Behaviors>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView x:Name="View"
                                   AllowEditing="False"

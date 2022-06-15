@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SavedConfigurationDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,6 +32,7 @@ namespace CDP4Composition.ViewModels
 
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services.FilterEditorService;
     using CDP4Composition.ViewModels.DialogResult;
@@ -41,7 +42,7 @@ namespace CDP4Composition.ViewModels
     /// <summary>
     /// ViewModel for the dialog to save <see cref="UserPreference"/>s
     /// </summary>
-    public class SavedUserPreferenceDialogViewModel : DialogViewModelBase 
+    public class SavedUserPreferenceDialogViewModel : DialogViewModelBase
     {
         /// <summary>
         /// The <see cref="ISavedUserPreference"/>
@@ -84,12 +85,12 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// Gets the Ok Command
         /// </summary>
-        public ReactiveCommand<Unit> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel Command
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SavedUserPreferenceDialogViewModel"/> class.
@@ -110,15 +111,11 @@ namespace CDP4Composition.ViewModels
                 (n, d) =>
                     !string.IsNullOrEmpty(n) && !string.IsNullOrEmpty(d));
 
-            this.OkCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteOk(), RxApp.MainThreadScheduler);
+            this.OkCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteOk, canOk, RxApp.MainThreadScheduler);
 
-            this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
-            {
-                this.ErrorMessage = x.Message;
-            });
+            this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; });
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
 
             this.Name = savedUserPreference.Name;
             this.Description = savedUserPreference.Description;

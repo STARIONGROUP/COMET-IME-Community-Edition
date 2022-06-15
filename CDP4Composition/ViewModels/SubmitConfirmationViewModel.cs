@@ -1,38 +1,41 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SubmitConfirmationViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
+
 namespace CDP4Composition.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Validation;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Utilities;
 
@@ -75,22 +78,16 @@ namespace CDP4Composition.ViewModels
             this.SelectedParameters = new ReactiveList<SubmitParameterRowViewModel>();
             this.SelectedSubscriptions = new ReactiveList<SubmitParameterRowViewModel>();
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
-
-            this.SelectedParameters.ChangeTrackingEnabled = true;
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
+ 
             this.SelectedParameters.CountChanged.Subscribe(_ => this.ToggleParameterSelection());
-
             this.SelectedParameters.AddRange(this.ParameterOrOverrideSubmitParameterRowViewModels.Where(r => !r.HasValidationError));
 
-            this.SelectedSubscriptions.ChangeTrackingEnabled = true;
             this.SelectedSubscriptions.CountChanged.Subscribe(_ => this.ToggleSubscriptionsSelection());
-
             this.SelectedSubscriptions.AddRange(this.ParameterSubscriptionSubmitParameterRowViewModels.Where(r => !r.HasValidationError));
 
             var canOk = this.WhenAnyValue(vm => vm.OkCanExecute);
-            this.OkCommand = ReactiveCommand.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+            this.OkCommand = ReactiveCommandCreator.Create(this.ExecuteOk, canOk);
 
             if (this.ProcessedValueSets.Any() && this.ProcessedValueSets.Values.Any(x => x.ValidationResult != ValidationResultKind.Valid))
             {
@@ -117,12 +114,12 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the human readable message that describes the changes that have been made.

@@ -1,26 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DialogViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -37,25 +36,24 @@ namespace CDP4Composition.Mvvm
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
-  
+
     using CDP4Common.CommonData;
     using CDP4Common.Exceptions;
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Operations;
-    
+
     using CDP4JsonSerializer;
-    
+
     using DevExpress.Xpf.SpellChecker;
     using DevExpress.XtraSpellChecker;
-    
+
     using ReactiveUI;
-    
-    using Services;
-    
+
     /// <summary>
     /// Abstract base class from which all dialog view-models that represent a <see cref="Thing"/> need to derive
     /// </summary>
@@ -68,7 +66,7 @@ namespace CDP4Composition.Mvvm
         /// The relative location of the loading animation image.
         /// </summary>
         private const string CdpLogoAnimationPath = @"\Resources\Images\comet.ico";
-        
+
         /// <summary>
         /// The <see cref="IThingDialogNavigationService"/> used to navigate to <see cref="IThingDialogViewModel"/>s
         /// </summary>
@@ -129,12 +127,12 @@ namespace CDP4Composition.Mvvm
         /// The <see cref="ISpellDictionaryService"/> that is used to set the dictionaries of the <see cref="SpellChecker"/>
         /// </summary>
         private ISpellDictionaryService dictionaryService;
-        
+
         /// <summary>
         /// The <see cref="Cdp4JsonSerializer"/> that is used to serialize an <see cref="Thing"/> to the clipboard
         /// </summary>
         private readonly Cdp4JsonSerializer serializer;
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DialogViewModelBase{T}"/> class
         /// </summary>
@@ -163,7 +161,7 @@ namespace CDP4Composition.Mvvm
             : base(thingClone, session)
         {
             // add the animation uri path            
-            this.AnimationUri = $"{Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)}{CdpLogoAnimationPath}";            
+            this.AnimationUri = $"{Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)}{CdpLogoAnimationPath}";
             this.LoadingMessage = "Processing...";
 
             this.InitializeSpellingChecker();
@@ -177,31 +175,31 @@ namespace CDP4Composition.Mvvm
             this.dialogKind = dialogKind;
             this.serializer = new Cdp4JsonSerializer(this.Session.Dal.MetaDataProvider, this.Session.DalVersion);
 
-            this.ChainOfContainer = (chainOfContainers != null) ? chainOfContainers.ToList() : new List<Thing>();
+            this.ChainOfContainer = chainOfContainers != null ? chainOfContainers.ToList() : new List<Thing>();
             this.ChainOfContainer.Add(this.Container);
 
             this.WhenAnyValue(vm => vm.Container)
-                    .Where(x => x != null)
-                    .Subscribe(_ => this.UpdateChainOfContainer());
+                .Where(x => x != null)
+                .Subscribe(_ => this.UpdateChainOfContainer());
 
             this.Initialize();
             this.InitializeCommands();
             this.UpdateProperties();
 
             this.WhenAnyValue(x => x.WriteException).Select(x => x != null).ToProperty(this, x => x.HasException, out this.hasException);
-            
+
             switch (this.dialogKind)
             {
-                case ThingDialogKind.Create:                    
-                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);                    
+                case ThingDialogKind.Create:
+                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);
                     break;
-                case ThingDialogKind.Update:                    
-                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);                    
+                case ThingDialogKind.Update:
+                    this.transaction = new ThingTransaction(this.Thing, parentTransaction, container);
                     break;
                 case ThingDialogKind.Inspect:
                     break;
                 default:
-                    throw new InvalidEnumArgumentException("The provided dialogKind is Invalid");   
+                    throw new InvalidEnumArgumentException("The provided dialogKind is Invalid");
             }
         }
 
@@ -215,27 +213,27 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that represents an "confirmation" of the dialog
         /// </summary>
-        public ReactiveCommand<Unit> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that represents an "cancellation" of the dialog
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that represents an copy of the Uri to Clipboard
         /// </summary>
-        public ReactiveCommand<object> CopyUriCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CopyUriCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that represents a shallow export to Clipboard
         /// </summary>
-        public ReactiveCommand<object> ShallowExportCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ShallowExportCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that represents a deep export to Clipboard
         /// </summary>
-        public ReactiveCommand<object> DeepExportCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeepExportCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="OkCommand"/> can be executed
@@ -258,7 +256,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the chain of <see cref="Thing"/>s that contains the current one
         /// </summary>
-        public List<Thing> ChainOfContainer { get; private set; } 
+        public List<Thing> ChainOfContainer { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="SpellChecker"/> instance that the <see cref="SpellingCheckerService"/> provides
@@ -283,7 +281,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the inspect command for the selected container
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedContainerCommand { get; private set; } 
+        public ReactiveCommand<Unit, Unit> InspectSelectedContainerCommand { get; private set; }
 
         /// <summary>
         /// Gets an error message indicating what is wrong with this object.
@@ -383,7 +381,7 @@ namespace CDP4Composition.Mvvm
         /// Gets the <see cref="Uri"/> of the <see cref="Thing"/> with respect to it's data-source
         /// </summary>
         public string ThingUri { get; private set; }
-        
+
         /// <summary>
         /// Updates the property indicating whether it is possible to close the current dialog by clicking the OK button
         /// </summary>
@@ -404,38 +402,34 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Initialize the <see cref="ReactiveCommand"/>s of the current view-model
+        /// Initialize the <see cref="ReactiveCommandCreator"/>s of the current view-model
         /// </summary>
         protected virtual void InitializeCommands()
         {
             this.ValidationErrors = new ReactiveList<ValidationService.ValidationRule>();
-            this.ValidationErrors.ChangeTrackingEnabled = true;
 
             this.ValidationErrors.Changed.Subscribe(_ => this.UpdateOkCanExecute());
 
             var canExecute = this.WhenAnyValue(vm => vm.OkCanExecute);
 
-            this.OkCommand = ReactiveCommand.CreateAsyncTask(canExecute, x => this.ExecuteOkCommand(), RxApp.MainThreadScheduler);
-            this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
-            {
-                this.WriteException = x;
-                logger.Error(x);
-            });
+            this.OkCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteOkCommand, canExecute, RxApp.MainThreadScheduler);
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancelCommand());
+            this.OkCommand.ThrownExceptions.Subscribe(
+                x =>
+                {
+                    this.WriteException = x;
+                    logger.Error(x);
+                });
 
-            this.CopyUriCommand = ReactiveCommand.Create();
-            this.CopyUriCommand.Subscribe(_ => this.ExecuteCopyUriCommand());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancelCommand);
 
-            this.ShallowExportCommand = ReactiveCommand.Create();
-            this.ShallowExportCommand.Subscribe(_ => this.ExecuteShallowExportCommand());
+            this.CopyUriCommand = ReactiveCommandCreator.Create(this.ExecuteCopyUriCommand);
 
-            this.DeepExportCommand = ReactiveCommand.Create();
-            this.DeepExportCommand.Subscribe(_ => this.ExecuteDeepExportCommand());
+            this.ShallowExportCommand = ReactiveCommandCreator.Create(this.ExecuteShallowExportCommand);
 
-            this.InspectSelectedContainerCommand = ReactiveCommand.Create();
-            this.InspectSelectedContainerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.Container));
+            this.DeepExportCommand = ReactiveCommandCreator.Create(this.ExecuteDeepExportCommand);
+
+            this.InspectSelectedContainerCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.Container));
         }
 
         /// <summary>
@@ -560,7 +554,7 @@ namespace CDP4Composition.Mvvm
                 }
 
                 this.DialogResult = true;
-            }            
+            }
             finally
             {
                 this.IsBusy = false;
@@ -696,6 +690,7 @@ namespace CDP4Composition.Mvvm
         protected void ExecuteMoveDownCommand<TRow>(ReactiveList<TRow> orderedList, TRow selectedItem) where TRow : IRowViewModelBase<Thing>
         {
             var selectedIndex = orderedList.IndexOf(selectedItem);
+
             if (selectedIndex == orderedList.Count - 1)
             {
                 return;

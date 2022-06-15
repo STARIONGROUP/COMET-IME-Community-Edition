@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ConversionBasedUnit"/>
@@ -123,7 +124,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedReferenceUnit"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedReferenceUnitCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedReferenceUnitCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -132,7 +133,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedReferenceUnitCommand = this.WhenAny(vm => vm.SelectedReferenceUnit, v => v.Value != null);
-            this.InspectSelectedReferenceUnitCommand = ReactiveCommand.Create(canExecuteInspectSelectedReferenceUnitCommand);
+            this.InspectSelectedReferenceUnitCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedReferenceUnitCommand);
             this.InspectSelectedReferenceUnitCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedReferenceUnit));
         }
 

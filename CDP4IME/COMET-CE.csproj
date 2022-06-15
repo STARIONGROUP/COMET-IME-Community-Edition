@@ -1,0 +1,93 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>COMET</RootNamespace>
+    <AssemblyName>COMET</AssemblyName>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
+	<TargetFramework>net6.0-windows</TargetFramework>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <OutputPath>bin\$(Configuration)\net48\</OutputPath>
+    <AssemblyTitle>COMET</AssemblyTitle>
+    <Company>RHEA System S.A</Company>
+    <Product>COMET</Product>
+    <Description>The COMET Integrated Modelling Environment</Description>
+    <Copyright>Copyright © RHEA System S.A</Copyright>
+    <AssemblyVersion>9.2.0.0</AssemblyVersion>
+    <FileVersion>9.2.0.0</FileVersion>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>comet.ico</ApplicationIcon>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugType>full</DebugType>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <DebugType>pdbonly</DebugType>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236" />
+    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="9.0.0-750-PR236" />
+    <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
+    <PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
+    <PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
+    <PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
+    <PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" />
+    <PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+    <PackageReference Include="Markdown.Xaml" Version="1.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="NLog" Version="4.7.10" />
+    <PackageReference Include="ReactiveUI" Version="18.1.8" />
+    <PackageReference Include="ReactiveUI.WPF" Version="18.1.8" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="NLog.dll.nlog">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="license.rtf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ExceptionReporter.WinForms.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
+    <ProjectReference Include="..\CDP4ShellDialogs\CDP4ShellDialogs.csproj" />
+    <ProjectReference Include="..\CDP4UpdateServerDal\CDP4UpdateServerDal.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\PrepareProcess.ico" />
+    <Resource Include="Icons\user.ico" />
+    <Resource Include="Icons\users.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="comet.ico" />
+    <Resource Include="markdown.xaml License.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+</Project>

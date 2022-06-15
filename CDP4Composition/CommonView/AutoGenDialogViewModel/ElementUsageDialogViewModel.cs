@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ElementUsage"/>
@@ -161,27 +162,27 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedElementDefinition"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedElementDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedElementDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ParameterOverride
         /// </summary>
-        public ReactiveCommand<object> CreateParameterOverrideCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterOverrideCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ParameterOverride
         /// </summary>
-        public ReactiveCommand<object> DeleteParameterOverrideCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteParameterOverrideCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ParameterOverride
         /// </summary>
-        public ReactiveCommand<object> EditParameterOverrideCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditParameterOverrideCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ParameterOverride
         /// </summary>
-        public ReactiveCommand<object> InspectParameterOverrideCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectParameterOverrideCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -194,19 +195,19 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedParameterOverrideCommand = this.WhenAny(vm => vm.SelectedParameterOverride, v => v.Value != null);
             var canExecuteEditSelectedParameterOverrideCommand = this.WhenAny(vm => vm.SelectedParameterOverride, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateParameterOverrideCommand = ReactiveCommand.Create(canExecuteCreateParameterOverrideCommand);
+            this.CreateParameterOverrideCommand = ReactiveCommandCreator.Create(canExecuteCreateParameterOverrideCommand);
             this.CreateParameterOverrideCommand.Subscribe(_ => this.ExecuteCreateCommand<ParameterOverride>(this.PopulateParameterOverride));
 
-            this.DeleteParameterOverrideCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterOverrideCommand);
+            this.DeleteParameterOverrideCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterOverrideCommand);
             this.DeleteParameterOverrideCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedParameterOverride.Thing, this.PopulateParameterOverride));
 
-            this.EditParameterOverrideCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterOverrideCommand);
+            this.EditParameterOverrideCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterOverrideCommand);
             this.EditParameterOverrideCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedParameterOverride.Thing, this.PopulateParameterOverride));
 
-            this.InspectParameterOverrideCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterOverrideCommand);
+            this.InspectParameterOverrideCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterOverrideCommand);
             this.InspectParameterOverrideCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameterOverride.Thing));
             var canExecuteInspectSelectedElementDefinitionCommand = this.WhenAny(vm => vm.SelectedElementDefinition, v => v.Value != null);
-            this.InspectSelectedElementDefinitionCommand = ReactiveCommand.Create(canExecuteInspectSelectedElementDefinitionCommand);
+            this.InspectSelectedElementDefinitionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedElementDefinitionCommand);
             this.InspectSelectedElementDefinitionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedElementDefinition));
         }
 

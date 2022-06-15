@@ -1,26 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FileRevisionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +29,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
@@ -49,7 +49,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
 
     using CDP4EngineeringModel.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -263,7 +263,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             Assert.AreEqual(null, this.fileRevision.ContentHash);
 
             //No root
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()), Times.Never);
             Assert.IsNull(vm.WriteException);
             Assert.IsTrue(vm.DialogResult.Value);
@@ -273,7 +273,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
         }
 
         [Test]
-        public void VerifyMoveUpFileType()
+        public async Task VerifyMoveUpFileType()
         {
             var vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.file);
             Assert.IsFalse(vm.CanMoveUpFileType);
@@ -290,12 +290,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             vm.SelectedFileType = vm.FileType.Last();
             Assert.IsTrue(vm.CanMoveUpFileType);
 
-            vm.MoveUpFileTypeCommand.Execute(null);
+            await vm.MoveUpFileTypeCommand.Execute();
             Assert.AreEqual(vm.SelectedFileType, vm.FileType.First());
         }
 
         [Test]
-        public void VerifyMoveDownFileType()
+        public async Task VerifyMoveDownFileType()
         {
             var vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.file);
             Assert.IsFalse(vm.CanMoveDownFileType);
@@ -313,12 +313,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             Assert.IsFalse(vm.CanMoveDownFileType);
 
             vm.SelectedFileType = vm.FileType.First();
-            vm.MoveDownFileTypeCommand.Execute(null);
+            await vm.MoveDownFileTypeCommand.Execute();
             Assert.AreEqual(vm.SelectedFileType, vm.FileType.Last());
         }
 
         [Test]
-        public void VerifyDeleteFileType()
+        public async Task VerifyDeleteFileType()
         {
             var vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.file);
 
@@ -332,23 +332,23 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             vm.SelectedFileType = vm.FileType.First();
             Assert.IsTrue(vm.CanDeleteFileType);
 
-            vm.DeleteFileTypeCommand.Execute(null);
+            await vm.DeleteFileTypeCommand.Execute();
             CollectionAssert.IsEmpty(vm.FileType);
         }
 
         [Test]
-        public void VerifyAddFileType()
+        public async Task VerifyAddFileType()
         {
             var vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.file);
 
             CollectionAssert.IsEmpty(vm.FileType);
 
-            vm.AddFileTypeCommand.Execute(null);
+            await vm.AddFileTypeCommand.Execute();
             CollectionAssert.IsNotEmpty(vm.FileType);
             Assert.AreEqual(1, vm.FileType.Count);
 
             // Try to add the same one
-            vm.AddFileTypeCommand.Execute(null);
+            await vm.AddFileTypeCommand.Execute();
             Assert.AreEqual(1, vm.FileType.Count);
         }
 
@@ -361,7 +361,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, false, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, this.file);
             Assert.IsTrue(vm.CanDownloadFile);
 
-            vm.DownloadFileCommand.Execute(null);
+            await vm.DownloadFileCommand.Execute();
 
             this.downloadFileService.Verify(x => x.ExecuteDownloadFile(vm, vm.Thing), Times.Once);
         }
@@ -375,7 +375,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.Dialogs
             var vm = new FileRevisionDialogViewModel(this.fileRevision, this.thingTransaction, this.session.Object, true, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, this.file);
             Assert.IsTrue(vm.CanDownloadFile);
 
-            vm.AddFileCommand.Execute(null);
+            await vm.AddFileCommand.Execute();
 
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()));
             Assert.AreEqual(path, vm.LocalPath);

@@ -29,6 +29,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Iteration"/>
@@ -510,367 +511,367 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedIterationSetup"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedIterationSetupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedIterationSetupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedTopElement"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedTopElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedTopElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedDefaultOption"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedDefaultOptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedDefaultOptionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Option
         /// </summary>
-        public ReactiveCommand<object> CreateOptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateOptionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Option
         /// </summary>
-        public ReactiveCommand<object> DeleteOptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteOptionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Option
         /// </summary>
-        public ReactiveCommand<object> EditOptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditOptionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Option
         /// </summary>
-        public ReactiveCommand<object> InspectOptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectOptionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a Option 
         /// </summary>
-        public ReactiveCommand<object> MoveUpOptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpOptionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a Option
         /// </summary>
-        public ReactiveCommand<object> MoveDownOptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownOptionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Publication
         /// </summary>
-        public ReactiveCommand<object> CreatePublicationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreatePublicationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Publication
         /// </summary>
-        public ReactiveCommand<object> DeletePublicationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeletePublicationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Publication
         /// </summary>
-        public ReactiveCommand<object> EditPublicationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditPublicationCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Publication
         /// </summary>
-        public ReactiveCommand<object> InspectPublicationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectPublicationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a PossibleFiniteStateList
         /// </summary>
-        public ReactiveCommand<object> CreatePossibleFiniteStateListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreatePossibleFiniteStateListCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a PossibleFiniteStateList
         /// </summary>
-        public ReactiveCommand<object> DeletePossibleFiniteStateListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeletePossibleFiniteStateListCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a PossibleFiniteStateList
         /// </summary>
-        public ReactiveCommand<object> EditPossibleFiniteStateListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditPossibleFiniteStateListCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a PossibleFiniteStateList
         /// </summary>
-        public ReactiveCommand<object> InspectPossibleFiniteStateListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectPossibleFiniteStateListCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ElementDefinition
         /// </summary>
-        public ReactiveCommand<object> CreateElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ElementDefinition
         /// </summary>
-        public ReactiveCommand<object> DeleteElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ElementDefinition
         /// </summary>
-        public ReactiveCommand<object> EditElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditElementCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ElementDefinition
         /// </summary>
-        public ReactiveCommand<object> InspectElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Relationship
         /// </summary>
-        public ReactiveCommand<object> CreateRelationshipCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Relationship
         /// </summary>
-        public ReactiveCommand<object> DeleteRelationshipCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Relationship
         /// </summary>
-        public ReactiveCommand<object> EditRelationshipCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditRelationshipCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Relationship
         /// </summary>
-        public ReactiveCommand<object> InspectRelationshipCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ExternalIdentifierMap
         /// </summary>
-        public ReactiveCommand<object> CreateExternalIdentifierMapCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateExternalIdentifierMapCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ExternalIdentifierMap
         /// </summary>
-        public ReactiveCommand<object> DeleteExternalIdentifierMapCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteExternalIdentifierMapCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ExternalIdentifierMap
         /// </summary>
-        public ReactiveCommand<object> EditExternalIdentifierMapCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditExternalIdentifierMapCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ExternalIdentifierMap
         /// </summary>
-        public ReactiveCommand<object> InspectExternalIdentifierMapCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectExternalIdentifierMapCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a RequirementsSpecification
         /// </summary>
-        public ReactiveCommand<object> CreateRequirementsSpecificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateRequirementsSpecificationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a RequirementsSpecification
         /// </summary>
-        public ReactiveCommand<object> DeleteRequirementsSpecificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteRequirementsSpecificationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a RequirementsSpecification
         /// </summary>
-        public ReactiveCommand<object> EditRequirementsSpecificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditRequirementsSpecificationCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a RequirementsSpecification
         /// </summary>
-        public ReactiveCommand<object> InspectRequirementsSpecificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectRequirementsSpecificationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a DomainFileStore
         /// </summary>
-        public ReactiveCommand<object> CreateDomainFileStoreCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateDomainFileStoreCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a DomainFileStore
         /// </summary>
-        public ReactiveCommand<object> DeleteDomainFileStoreCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteDomainFileStoreCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a DomainFileStore
         /// </summary>
-        public ReactiveCommand<object> EditDomainFileStoreCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditDomainFileStoreCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a DomainFileStore
         /// </summary>
-        public ReactiveCommand<object> InspectDomainFileStoreCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectDomainFileStoreCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ActualFiniteStateList
         /// </summary>
-        public ReactiveCommand<object> CreateActualFiniteStateListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateActualFiniteStateListCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ActualFiniteStateList
         /// </summary>
-        public ReactiveCommand<object> DeleteActualFiniteStateListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteActualFiniteStateListCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ActualFiniteStateList
         /// </summary>
-        public ReactiveCommand<object> EditActualFiniteStateListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditActualFiniteStateListCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ActualFiniteStateList
         /// </summary>
-        public ReactiveCommand<object> InspectActualFiniteStateListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectActualFiniteStateListCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a RuleVerificationList
         /// </summary>
-        public ReactiveCommand<object> CreateRuleVerificationListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateRuleVerificationListCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a RuleVerificationList
         /// </summary>
-        public ReactiveCommand<object> DeleteRuleVerificationListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteRuleVerificationListCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a RuleVerificationList
         /// </summary>
-        public ReactiveCommand<object> EditRuleVerificationListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditRuleVerificationListCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a RuleVerificationList
         /// </summary>
-        public ReactiveCommand<object> InspectRuleVerificationListCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectRuleVerificationListCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Stakeholder
         /// </summary>
-        public ReactiveCommand<object> CreateStakeholderCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateStakeholderCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Stakeholder
         /// </summary>
-        public ReactiveCommand<object> DeleteStakeholderCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteStakeholderCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Stakeholder
         /// </summary>
-        public ReactiveCommand<object> EditStakeholderCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditStakeholderCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Stakeholder
         /// </summary>
-        public ReactiveCommand<object> InspectStakeholderCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectStakeholderCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Goal
         /// </summary>
-        public ReactiveCommand<object> CreateGoalCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateGoalCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Goal
         /// </summary>
-        public ReactiveCommand<object> DeleteGoalCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteGoalCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Goal
         /// </summary>
-        public ReactiveCommand<object> EditGoalCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditGoalCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Goal
         /// </summary>
-        public ReactiveCommand<object> InspectGoalCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectGoalCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ValueGroup
         /// </summary>
-        public ReactiveCommand<object> CreateValueGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateValueGroupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ValueGroup
         /// </summary>
-        public ReactiveCommand<object> DeleteValueGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteValueGroupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ValueGroup
         /// </summary>
-        public ReactiveCommand<object> EditValueGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditValueGroupCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ValueGroup
         /// </summary>
-        public ReactiveCommand<object> InspectValueGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectValueGroupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a StakeholderValue
         /// </summary>
-        public ReactiveCommand<object> CreateStakeholderValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateStakeholderValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a StakeholderValue
         /// </summary>
-        public ReactiveCommand<object> DeleteStakeholderValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteStakeholderValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a StakeholderValue
         /// </summary>
-        public ReactiveCommand<object> EditStakeholderValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditStakeholderValueCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a StakeholderValue
         /// </summary>
-        public ReactiveCommand<object> InspectStakeholderValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectStakeholderValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a StakeHolderValueMap
         /// </summary>
-        public ReactiveCommand<object> CreateStakeholderValueMapCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateStakeholderValueMapCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a StakeHolderValueMap
         /// </summary>
-        public ReactiveCommand<object> DeleteStakeholderValueMapCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteStakeholderValueMapCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a StakeHolderValueMap
         /// </summary>
-        public ReactiveCommand<object> EditStakeholderValueMapCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditStakeholderValueMapCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a StakeHolderValueMap
         /// </summary>
-        public ReactiveCommand<object> InspectStakeholderValueMapCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectStakeholderValueMapCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a SharedStyle
         /// </summary>
-        public ReactiveCommand<object> CreateSharedDiagramStyleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateSharedDiagramStyleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a SharedStyle
         /// </summary>
-        public ReactiveCommand<object> DeleteSharedDiagramStyleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteSharedDiagramStyleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a SharedStyle
         /// </summary>
-        public ReactiveCommand<object> EditSharedDiagramStyleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditSharedDiagramStyleCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a SharedStyle
         /// </summary>
-        public ReactiveCommand<object> InspectSharedDiagramStyleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSharedDiagramStyleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a DiagramCanvas
         /// </summary>
-        public ReactiveCommand<object> CreateDiagramCanvasCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateDiagramCanvasCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a DiagramCanvas
         /// </summary>
-        public ReactiveCommand<object> DeleteDiagramCanvasCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteDiagramCanvasCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a DiagramCanvas
         /// </summary>
-        public ReactiveCommand<object> EditDiagramCanvasCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditDiagramCanvasCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a DiagramCanvas
         /// </summary>
-        public ReactiveCommand<object> InspectDiagramCanvasCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectDiagramCanvasCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -883,287 +884,287 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedOptionCommand = this.WhenAny(vm => vm.SelectedOption, v => v.Value != null);
             var canExecuteEditSelectedOptionCommand = this.WhenAny(vm => vm.SelectedOption, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateOptionCommand = ReactiveCommand.Create(canExecuteCreateOptionCommand);
+            this.CreateOptionCommand = ReactiveCommandCreator.Create(canExecuteCreateOptionCommand);
             this.CreateOptionCommand.Subscribe(_ => this.ExecuteCreateCommand<Option>(this.PopulateOption));
 
-            this.DeleteOptionCommand = ReactiveCommand.Create(canExecuteEditSelectedOptionCommand);
+            this.DeleteOptionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedOptionCommand);
             this.DeleteOptionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedOption.Thing, this.PopulateOption));
 
-            this.EditOptionCommand = ReactiveCommand.Create(canExecuteEditSelectedOptionCommand);
+            this.EditOptionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedOptionCommand);
             this.EditOptionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedOption.Thing, this.PopulateOption));
 
-            this.InspectOptionCommand = ReactiveCommand.Create(canExecuteInspectSelectedOptionCommand);
+            this.InspectOptionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOptionCommand);
             this.InspectOptionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOption.Thing));
 
-            this.MoveUpOptionCommand = ReactiveCommand.Create(canExecuteEditSelectedOptionCommand);
+            this.MoveUpOptionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedOptionCommand);
             this.MoveUpOptionCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Option, this.SelectedOption));
 
-            this.MoveDownOptionCommand = ReactiveCommand.Create(canExecuteEditSelectedOptionCommand);
+            this.MoveDownOptionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedOptionCommand);
             this.MoveDownOptionCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Option, this.SelectedOption));
             
             var canExecuteCreatePublicationCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedPublicationCommand = this.WhenAny(vm => vm.SelectedPublication, v => v.Value != null);
             var canExecuteEditSelectedPublicationCommand = this.WhenAny(vm => vm.SelectedPublication, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreatePublicationCommand = ReactiveCommand.Create(canExecuteCreatePublicationCommand);
+            this.CreatePublicationCommand = ReactiveCommandCreator.Create(canExecuteCreatePublicationCommand);
             this.CreatePublicationCommand.Subscribe(_ => this.ExecuteCreateCommand<Publication>(this.PopulatePublication));
 
-            this.DeletePublicationCommand = ReactiveCommand.Create(canExecuteEditSelectedPublicationCommand);
+            this.DeletePublicationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPublicationCommand);
             this.DeletePublicationCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedPublication.Thing, this.PopulatePublication));
 
-            this.EditPublicationCommand = ReactiveCommand.Create(canExecuteEditSelectedPublicationCommand);
+            this.EditPublicationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPublicationCommand);
             this.EditPublicationCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedPublication.Thing, this.PopulatePublication));
 
-            this.InspectPublicationCommand = ReactiveCommand.Create(canExecuteInspectSelectedPublicationCommand);
+            this.InspectPublicationCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedPublicationCommand);
             this.InspectPublicationCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedPublication.Thing));
             
             var canExecuteCreatePossibleFiniteStateListCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedPossibleFiniteStateListCommand = this.WhenAny(vm => vm.SelectedPossibleFiniteStateList, v => v.Value != null);
             var canExecuteEditSelectedPossibleFiniteStateListCommand = this.WhenAny(vm => vm.SelectedPossibleFiniteStateList, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreatePossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteCreatePossibleFiniteStateListCommand);
+            this.CreatePossibleFiniteStateListCommand = ReactiveCommandCreator.Create(canExecuteCreatePossibleFiniteStateListCommand);
             this.CreatePossibleFiniteStateListCommand.Subscribe(_ => this.ExecuteCreateCommand<PossibleFiniteStateList>(this.PopulatePossibleFiniteStateList));
 
-            this.DeletePossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteEditSelectedPossibleFiniteStateListCommand);
+            this.DeletePossibleFiniteStateListCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPossibleFiniteStateListCommand);
             this.DeletePossibleFiniteStateListCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedPossibleFiniteStateList.Thing, this.PopulatePossibleFiniteStateList));
 
-            this.EditPossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteEditSelectedPossibleFiniteStateListCommand);
+            this.EditPossibleFiniteStateListCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPossibleFiniteStateListCommand);
             this.EditPossibleFiniteStateListCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedPossibleFiniteStateList.Thing, this.PopulatePossibleFiniteStateList));
 
-            this.InspectPossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteInspectSelectedPossibleFiniteStateListCommand);
+            this.InspectPossibleFiniteStateListCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedPossibleFiniteStateListCommand);
             this.InspectPossibleFiniteStateListCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedPossibleFiniteStateList.Thing));
             
             var canExecuteCreateElementCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedElementCommand = this.WhenAny(vm => vm.SelectedElement, v => v.Value != null);
             var canExecuteEditSelectedElementCommand = this.WhenAny(vm => vm.SelectedElement, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateElementCommand = ReactiveCommand.Create(canExecuteCreateElementCommand);
+            this.CreateElementCommand = ReactiveCommandCreator.Create(canExecuteCreateElementCommand);
             this.CreateElementCommand.Subscribe(_ => this.ExecuteCreateCommand<ElementDefinition>(this.PopulateElement));
 
-            this.DeleteElementCommand = ReactiveCommand.Create(canExecuteEditSelectedElementCommand);
+            this.DeleteElementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedElementCommand);
             this.DeleteElementCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedElement.Thing, this.PopulateElement));
 
-            this.EditElementCommand = ReactiveCommand.Create(canExecuteEditSelectedElementCommand);
+            this.EditElementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedElementCommand);
             this.EditElementCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedElement.Thing, this.PopulateElement));
 
-            this.InspectElementCommand = ReactiveCommand.Create(canExecuteInspectSelectedElementCommand);
+            this.InspectElementCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedElementCommand);
             this.InspectElementCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedElement.Thing));
             
             var canExecuteCreateRelationshipCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedRelationshipCommand = this.WhenAny(vm => vm.SelectedRelationship, v => v.Value != null);
             var canExecuteEditSelectedRelationshipCommand = this.WhenAny(vm => vm.SelectedRelationship, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateRelationshipCommand = ReactiveCommand.Create(canExecuteCreateRelationshipCommand);
+            this.CreateRelationshipCommand = ReactiveCommandCreator.Create(canExecuteCreateRelationshipCommand);
             this.CreateRelationshipCommand.Subscribe(_ => this.ExecuteCreateRelationshipCommand());
 
-            this.DeleteRelationshipCommand = ReactiveCommand.Create(canExecuteEditSelectedRelationshipCommand);
+            this.DeleteRelationshipCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRelationshipCommand);
             this.DeleteRelationshipCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedRelationship.Thing, this.PopulateRelationship));
 
-            this.EditRelationshipCommand = ReactiveCommand.Create(canExecuteEditSelectedRelationshipCommand);
+            this.EditRelationshipCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRelationshipCommand);
             this.EditRelationshipCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedRelationship.Thing, this.PopulateRelationship));
 
-            this.InspectRelationshipCommand = ReactiveCommand.Create(canExecuteInspectSelectedRelationshipCommand);
+            this.InspectRelationshipCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRelationshipCommand);
             this.InspectRelationshipCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRelationship.Thing));
             
             var canExecuteCreateExternalIdentifierMapCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedExternalIdentifierMapCommand = this.WhenAny(vm => vm.SelectedExternalIdentifierMap, v => v.Value != null);
             var canExecuteEditSelectedExternalIdentifierMapCommand = this.WhenAny(vm => vm.SelectedExternalIdentifierMap, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateExternalIdentifierMapCommand = ReactiveCommand.Create(canExecuteCreateExternalIdentifierMapCommand);
+            this.CreateExternalIdentifierMapCommand = ReactiveCommandCreator.Create(canExecuteCreateExternalIdentifierMapCommand);
             this.CreateExternalIdentifierMapCommand.Subscribe(_ => this.ExecuteCreateCommand<ExternalIdentifierMap>(this.PopulateExternalIdentifierMap));
 
-            this.DeleteExternalIdentifierMapCommand = ReactiveCommand.Create(canExecuteEditSelectedExternalIdentifierMapCommand);
+            this.DeleteExternalIdentifierMapCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedExternalIdentifierMapCommand);
             this.DeleteExternalIdentifierMapCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedExternalIdentifierMap.Thing, this.PopulateExternalIdentifierMap));
 
-            this.EditExternalIdentifierMapCommand = ReactiveCommand.Create(canExecuteEditSelectedExternalIdentifierMapCommand);
+            this.EditExternalIdentifierMapCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedExternalIdentifierMapCommand);
             this.EditExternalIdentifierMapCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedExternalIdentifierMap.Thing, this.PopulateExternalIdentifierMap));
 
-            this.InspectExternalIdentifierMapCommand = ReactiveCommand.Create(canExecuteInspectSelectedExternalIdentifierMapCommand);
+            this.InspectExternalIdentifierMapCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedExternalIdentifierMapCommand);
             this.InspectExternalIdentifierMapCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedExternalIdentifierMap.Thing));
             
             var canExecuteCreateRequirementsSpecificationCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedRequirementsSpecificationCommand = this.WhenAny(vm => vm.SelectedRequirementsSpecification, v => v.Value != null);
             var canExecuteEditSelectedRequirementsSpecificationCommand = this.WhenAny(vm => vm.SelectedRequirementsSpecification, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateRequirementsSpecificationCommand = ReactiveCommand.Create(canExecuteCreateRequirementsSpecificationCommand);
+            this.CreateRequirementsSpecificationCommand = ReactiveCommandCreator.Create(canExecuteCreateRequirementsSpecificationCommand);
             this.CreateRequirementsSpecificationCommand.Subscribe(_ => this.ExecuteCreateCommand<RequirementsSpecification>(this.PopulateRequirementsSpecification));
 
-            this.DeleteRequirementsSpecificationCommand = ReactiveCommand.Create(canExecuteEditSelectedRequirementsSpecificationCommand);
+            this.DeleteRequirementsSpecificationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRequirementsSpecificationCommand);
             this.DeleteRequirementsSpecificationCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedRequirementsSpecification.Thing, this.PopulateRequirementsSpecification));
 
-            this.EditRequirementsSpecificationCommand = ReactiveCommand.Create(canExecuteEditSelectedRequirementsSpecificationCommand);
+            this.EditRequirementsSpecificationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRequirementsSpecificationCommand);
             this.EditRequirementsSpecificationCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedRequirementsSpecification.Thing, this.PopulateRequirementsSpecification));
 
-            this.InspectRequirementsSpecificationCommand = ReactiveCommand.Create(canExecuteInspectSelectedRequirementsSpecificationCommand);
+            this.InspectRequirementsSpecificationCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRequirementsSpecificationCommand);
             this.InspectRequirementsSpecificationCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRequirementsSpecification.Thing));
             
             var canExecuteCreateDomainFileStoreCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedDomainFileStoreCommand = this.WhenAny(vm => vm.SelectedDomainFileStore, v => v.Value != null);
             var canExecuteEditSelectedDomainFileStoreCommand = this.WhenAny(vm => vm.SelectedDomainFileStore, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateDomainFileStoreCommand = ReactiveCommand.Create(canExecuteCreateDomainFileStoreCommand);
+            this.CreateDomainFileStoreCommand = ReactiveCommandCreator.Create(canExecuteCreateDomainFileStoreCommand);
             this.CreateDomainFileStoreCommand.Subscribe(_ => this.ExecuteCreateCommand<DomainFileStore>(this.PopulateDomainFileStore));
 
-            this.DeleteDomainFileStoreCommand = ReactiveCommand.Create(canExecuteEditSelectedDomainFileStoreCommand);
+            this.DeleteDomainFileStoreCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDomainFileStoreCommand);
             this.DeleteDomainFileStoreCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedDomainFileStore.Thing, this.PopulateDomainFileStore));
 
-            this.EditDomainFileStoreCommand = ReactiveCommand.Create(canExecuteEditSelectedDomainFileStoreCommand);
+            this.EditDomainFileStoreCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDomainFileStoreCommand);
             this.EditDomainFileStoreCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedDomainFileStore.Thing, this.PopulateDomainFileStore));
 
-            this.InspectDomainFileStoreCommand = ReactiveCommand.Create(canExecuteInspectSelectedDomainFileStoreCommand);
+            this.InspectDomainFileStoreCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDomainFileStoreCommand);
             this.InspectDomainFileStoreCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDomainFileStore.Thing));
             
             var canExecuteCreateActualFiniteStateListCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedActualFiniteStateListCommand = this.WhenAny(vm => vm.SelectedActualFiniteStateList, v => v.Value != null);
             var canExecuteEditSelectedActualFiniteStateListCommand = this.WhenAny(vm => vm.SelectedActualFiniteStateList, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateActualFiniteStateListCommand = ReactiveCommand.Create(canExecuteCreateActualFiniteStateListCommand);
+            this.CreateActualFiniteStateListCommand = ReactiveCommandCreator.Create(canExecuteCreateActualFiniteStateListCommand);
             this.CreateActualFiniteStateListCommand.Subscribe(_ => this.ExecuteCreateCommand<ActualFiniteStateList>(this.PopulateActualFiniteStateList));
 
-            this.DeleteActualFiniteStateListCommand = ReactiveCommand.Create(canExecuteEditSelectedActualFiniteStateListCommand);
+            this.DeleteActualFiniteStateListCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedActualFiniteStateListCommand);
             this.DeleteActualFiniteStateListCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedActualFiniteStateList.Thing, this.PopulateActualFiniteStateList));
 
-            this.EditActualFiniteStateListCommand = ReactiveCommand.Create(canExecuteEditSelectedActualFiniteStateListCommand);
+            this.EditActualFiniteStateListCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedActualFiniteStateListCommand);
             this.EditActualFiniteStateListCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedActualFiniteStateList.Thing, this.PopulateActualFiniteStateList));
 
-            this.InspectActualFiniteStateListCommand = ReactiveCommand.Create(canExecuteInspectSelectedActualFiniteStateListCommand);
+            this.InspectActualFiniteStateListCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedActualFiniteStateListCommand);
             this.InspectActualFiniteStateListCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedActualFiniteStateList.Thing));
             
             var canExecuteCreateRuleVerificationListCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedRuleVerificationListCommand = this.WhenAny(vm => vm.SelectedRuleVerificationList, v => v.Value != null);
             var canExecuteEditSelectedRuleVerificationListCommand = this.WhenAny(vm => vm.SelectedRuleVerificationList, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateRuleVerificationListCommand = ReactiveCommand.Create(canExecuteCreateRuleVerificationListCommand);
+            this.CreateRuleVerificationListCommand = ReactiveCommandCreator.Create(canExecuteCreateRuleVerificationListCommand);
             this.CreateRuleVerificationListCommand.Subscribe(_ => this.ExecuteCreateCommand<RuleVerificationList>(this.PopulateRuleVerificationList));
 
-            this.DeleteRuleVerificationListCommand = ReactiveCommand.Create(canExecuteEditSelectedRuleVerificationListCommand);
+            this.DeleteRuleVerificationListCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRuleVerificationListCommand);
             this.DeleteRuleVerificationListCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedRuleVerificationList.Thing, this.PopulateRuleVerificationList));
 
-            this.EditRuleVerificationListCommand = ReactiveCommand.Create(canExecuteEditSelectedRuleVerificationListCommand);
+            this.EditRuleVerificationListCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRuleVerificationListCommand);
             this.EditRuleVerificationListCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedRuleVerificationList.Thing, this.PopulateRuleVerificationList));
 
-            this.InspectRuleVerificationListCommand = ReactiveCommand.Create(canExecuteInspectSelectedRuleVerificationListCommand);
+            this.InspectRuleVerificationListCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRuleVerificationListCommand);
             this.InspectRuleVerificationListCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRuleVerificationList.Thing));
             
             var canExecuteCreateStakeholderCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedStakeholderCommand = this.WhenAny(vm => vm.SelectedStakeholder, v => v.Value != null);
             var canExecuteEditSelectedStakeholderCommand = this.WhenAny(vm => vm.SelectedStakeholder, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateStakeholderCommand = ReactiveCommand.Create(canExecuteCreateStakeholderCommand);
+            this.CreateStakeholderCommand = ReactiveCommandCreator.Create(canExecuteCreateStakeholderCommand);
             this.CreateStakeholderCommand.Subscribe(_ => this.ExecuteCreateCommand<Stakeholder>(this.PopulateStakeholder));
 
-            this.DeleteStakeholderCommand = ReactiveCommand.Create(canExecuteEditSelectedStakeholderCommand);
+            this.DeleteStakeholderCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedStakeholderCommand);
             this.DeleteStakeholderCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedStakeholder.Thing, this.PopulateStakeholder));
 
-            this.EditStakeholderCommand = ReactiveCommand.Create(canExecuteEditSelectedStakeholderCommand);
+            this.EditStakeholderCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedStakeholderCommand);
             this.EditStakeholderCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedStakeholder.Thing, this.PopulateStakeholder));
 
-            this.InspectStakeholderCommand = ReactiveCommand.Create(canExecuteInspectSelectedStakeholderCommand);
+            this.InspectStakeholderCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedStakeholderCommand);
             this.InspectStakeholderCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedStakeholder.Thing));
             
             var canExecuteCreateGoalCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedGoalCommand = this.WhenAny(vm => vm.SelectedGoal, v => v.Value != null);
             var canExecuteEditSelectedGoalCommand = this.WhenAny(vm => vm.SelectedGoal, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateGoalCommand = ReactiveCommand.Create(canExecuteCreateGoalCommand);
+            this.CreateGoalCommand = ReactiveCommandCreator.Create(canExecuteCreateGoalCommand);
             this.CreateGoalCommand.Subscribe(_ => this.ExecuteCreateCommand<Goal>(this.PopulateGoal));
 
-            this.DeleteGoalCommand = ReactiveCommand.Create(canExecuteEditSelectedGoalCommand);
+            this.DeleteGoalCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedGoalCommand);
             this.DeleteGoalCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedGoal.Thing, this.PopulateGoal));
 
-            this.EditGoalCommand = ReactiveCommand.Create(canExecuteEditSelectedGoalCommand);
+            this.EditGoalCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedGoalCommand);
             this.EditGoalCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedGoal.Thing, this.PopulateGoal));
 
-            this.InspectGoalCommand = ReactiveCommand.Create(canExecuteInspectSelectedGoalCommand);
+            this.InspectGoalCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedGoalCommand);
             this.InspectGoalCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedGoal.Thing));
             
             var canExecuteCreateValueGroupCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedValueGroupCommand = this.WhenAny(vm => vm.SelectedValueGroup, v => v.Value != null);
             var canExecuteEditSelectedValueGroupCommand = this.WhenAny(vm => vm.SelectedValueGroup, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateValueGroupCommand = ReactiveCommand.Create(canExecuteCreateValueGroupCommand);
+            this.CreateValueGroupCommand = ReactiveCommandCreator.Create(canExecuteCreateValueGroupCommand);
             this.CreateValueGroupCommand.Subscribe(_ => this.ExecuteCreateCommand<ValueGroup>(this.PopulateValueGroup));
 
-            this.DeleteValueGroupCommand = ReactiveCommand.Create(canExecuteEditSelectedValueGroupCommand);
+            this.DeleteValueGroupCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueGroupCommand);
             this.DeleteValueGroupCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedValueGroup.Thing, this.PopulateValueGroup));
 
-            this.EditValueGroupCommand = ReactiveCommand.Create(canExecuteEditSelectedValueGroupCommand);
+            this.EditValueGroupCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueGroupCommand);
             this.EditValueGroupCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedValueGroup.Thing, this.PopulateValueGroup));
 
-            this.InspectValueGroupCommand = ReactiveCommand.Create(canExecuteInspectSelectedValueGroupCommand);
+            this.InspectValueGroupCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedValueGroupCommand);
             this.InspectValueGroupCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedValueGroup.Thing));
             
             var canExecuteCreateStakeholderValueCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedStakeholderValueCommand = this.WhenAny(vm => vm.SelectedStakeholderValue, v => v.Value != null);
             var canExecuteEditSelectedStakeholderValueCommand = this.WhenAny(vm => vm.SelectedStakeholderValue, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateStakeholderValueCommand = ReactiveCommand.Create(canExecuteCreateStakeholderValueCommand);
+            this.CreateStakeholderValueCommand = ReactiveCommandCreator.Create(canExecuteCreateStakeholderValueCommand);
             this.CreateStakeholderValueCommand.Subscribe(_ => this.ExecuteCreateCommand<StakeholderValue>(this.PopulateStakeholderValue));
 
-            this.DeleteStakeholderValueCommand = ReactiveCommand.Create(canExecuteEditSelectedStakeholderValueCommand);
+            this.DeleteStakeholderValueCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedStakeholderValueCommand);
             this.DeleteStakeholderValueCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedStakeholderValue.Thing, this.PopulateStakeholderValue));
 
-            this.EditStakeholderValueCommand = ReactiveCommand.Create(canExecuteEditSelectedStakeholderValueCommand);
+            this.EditStakeholderValueCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedStakeholderValueCommand);
             this.EditStakeholderValueCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedStakeholderValue.Thing, this.PopulateStakeholderValue));
 
-            this.InspectStakeholderValueCommand = ReactiveCommand.Create(canExecuteInspectSelectedStakeholderValueCommand);
+            this.InspectStakeholderValueCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedStakeholderValueCommand);
             this.InspectStakeholderValueCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedStakeholderValue.Thing));
             
             var canExecuteCreateStakeholderValueMapCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedStakeholderValueMapCommand = this.WhenAny(vm => vm.SelectedStakeholderValueMap, v => v.Value != null);
             var canExecuteEditSelectedStakeholderValueMapCommand = this.WhenAny(vm => vm.SelectedStakeholderValueMap, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateStakeholderValueMapCommand = ReactiveCommand.Create(canExecuteCreateStakeholderValueMapCommand);
+            this.CreateStakeholderValueMapCommand = ReactiveCommandCreator.Create(canExecuteCreateStakeholderValueMapCommand);
             this.CreateStakeholderValueMapCommand.Subscribe(_ => this.ExecuteCreateCommand<StakeHolderValueMap>(this.PopulateStakeholderValueMap));
 
-            this.DeleteStakeholderValueMapCommand = ReactiveCommand.Create(canExecuteEditSelectedStakeholderValueMapCommand);
+            this.DeleteStakeholderValueMapCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedStakeholderValueMapCommand);
             this.DeleteStakeholderValueMapCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedStakeholderValueMap.Thing, this.PopulateStakeholderValueMap));
 
-            this.EditStakeholderValueMapCommand = ReactiveCommand.Create(canExecuteEditSelectedStakeholderValueMapCommand);
+            this.EditStakeholderValueMapCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedStakeholderValueMapCommand);
             this.EditStakeholderValueMapCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedStakeholderValueMap.Thing, this.PopulateStakeholderValueMap));
 
-            this.InspectStakeholderValueMapCommand = ReactiveCommand.Create(canExecuteInspectSelectedStakeholderValueMapCommand);
+            this.InspectStakeholderValueMapCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedStakeholderValueMapCommand);
             this.InspectStakeholderValueMapCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedStakeholderValueMap.Thing));
             
             var canExecuteCreateSharedDiagramStyleCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedSharedDiagramStyleCommand = this.WhenAny(vm => vm.SelectedSharedDiagramStyle, v => v.Value != null);
             var canExecuteEditSelectedSharedDiagramStyleCommand = this.WhenAny(vm => vm.SelectedSharedDiagramStyle, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateSharedDiagramStyleCommand = ReactiveCommand.Create(canExecuteCreateSharedDiagramStyleCommand);
+            this.CreateSharedDiagramStyleCommand = ReactiveCommandCreator.Create(canExecuteCreateSharedDiagramStyleCommand);
             this.CreateSharedDiagramStyleCommand.Subscribe(_ => this.ExecuteCreateCommand<SharedStyle>(this.PopulateSharedDiagramStyle));
 
-            this.DeleteSharedDiagramStyleCommand = ReactiveCommand.Create(canExecuteEditSelectedSharedDiagramStyleCommand);
+            this.DeleteSharedDiagramStyleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSharedDiagramStyleCommand);
             this.DeleteSharedDiagramStyleCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedSharedDiagramStyle.Thing, this.PopulateSharedDiagramStyle));
 
-            this.EditSharedDiagramStyleCommand = ReactiveCommand.Create(canExecuteEditSelectedSharedDiagramStyleCommand);
+            this.EditSharedDiagramStyleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSharedDiagramStyleCommand);
             this.EditSharedDiagramStyleCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedSharedDiagramStyle.Thing, this.PopulateSharedDiagramStyle));
 
-            this.InspectSharedDiagramStyleCommand = ReactiveCommand.Create(canExecuteInspectSelectedSharedDiagramStyleCommand);
+            this.InspectSharedDiagramStyleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedSharedDiagramStyleCommand);
             this.InspectSharedDiagramStyleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSharedDiagramStyle.Thing));
             
             var canExecuteCreateDiagramCanvasCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedDiagramCanvasCommand = this.WhenAny(vm => vm.SelectedDiagramCanvas, v => v.Value != null);
             var canExecuteEditSelectedDiagramCanvasCommand = this.WhenAny(vm => vm.SelectedDiagramCanvas, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateDiagramCanvasCommand = ReactiveCommand.Create(canExecuteCreateDiagramCanvasCommand);
+            this.CreateDiagramCanvasCommand = ReactiveCommandCreator.Create(canExecuteCreateDiagramCanvasCommand);
             this.CreateDiagramCanvasCommand.Subscribe(_ => this.ExecuteCreateCommand<DiagramCanvas>(this.PopulateDiagramCanvas));
 
-            this.DeleteDiagramCanvasCommand = ReactiveCommand.Create(canExecuteEditSelectedDiagramCanvasCommand);
+            this.DeleteDiagramCanvasCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDiagramCanvasCommand);
             this.DeleteDiagramCanvasCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedDiagramCanvas.Thing, this.PopulateDiagramCanvas));
 
-            this.EditDiagramCanvasCommand = ReactiveCommand.Create(canExecuteEditSelectedDiagramCanvasCommand);
+            this.EditDiagramCanvasCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDiagramCanvasCommand);
             this.EditDiagramCanvasCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedDiagramCanvas.Thing, this.PopulateDiagramCanvas));
 
-            this.InspectDiagramCanvasCommand = ReactiveCommand.Create(canExecuteInspectSelectedDiagramCanvasCommand);
+            this.InspectDiagramCanvasCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDiagramCanvasCommand);
             this.InspectDiagramCanvasCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDiagramCanvas.Thing));
             var canExecuteInspectSelectedIterationSetupCommand = this.WhenAny(vm => vm.SelectedIterationSetup, v => v.Value != null);
-            this.InspectSelectedIterationSetupCommand = ReactiveCommand.Create(canExecuteInspectSelectedIterationSetupCommand);
+            this.InspectSelectedIterationSetupCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedIterationSetupCommand);
             this.InspectSelectedIterationSetupCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedIterationSetup));
             var canExecuteInspectSelectedTopElementCommand = this.WhenAny(vm => vm.SelectedTopElement, v => v.Value != null);
-            this.InspectSelectedTopElementCommand = ReactiveCommand.Create(canExecuteInspectSelectedTopElementCommand);
+            this.InspectSelectedTopElementCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedTopElementCommand);
             this.InspectSelectedTopElementCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedTopElement));
             var canExecuteInspectSelectedDefaultOptionCommand = this.WhenAny(vm => vm.SelectedDefaultOption, v => v.Value != null);
-            this.InspectSelectedDefaultOptionCommand = ReactiveCommand.Create(canExecuteInspectSelectedDefaultOptionCommand);
+            this.InspectSelectedDefaultOptionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDefaultOptionCommand);
             this.InspectSelectedDefaultOptionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDefaultOption));
         }
 

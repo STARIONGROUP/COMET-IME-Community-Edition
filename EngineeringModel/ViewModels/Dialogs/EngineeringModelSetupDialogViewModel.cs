@@ -28,26 +28,19 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive.Linq;
-    using System.Windows;
 
     using CDP4Common.CommonData;
-
-    using CDP4Dal.Operations;
-
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
-
-    using CDP4Composition.Attributes;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
 
     using CDP4Dal;
+    using CDP4Dal.Operations;
 
-    using CDP4EngineeringModel.ViewModels.Dialogs.Rows;
 
-    using DevExpress.Xpf.Core.DragDrop.Native;
-    using DevExpress.Xpf.Editors;
+
+    using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm;
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
 
     using ReactiveUI;
 
@@ -77,13 +70,12 @@ namespace CDP4EngineeringModel.ViewModels
             this.PossibleOrganizations = new List<Organization>();
 
             this.PossibleActiveDomain = new ReactiveList<ActiveDomainRowViewModel>();
-            this.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel> { ChangeTrackingEnabled = true };
+            this.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel>();
 
             this.ActiveDomain.ItemsAdded.Subscribe(this.SetActiveState);
             this.ActiveDomain.ItemsRemoved.Subscribe(this.SetInactiveState);
 
             this.SelectedOrganizations = new ReactiveList<Organization>();
-            this.SelectedOrganizations.ChangeTrackingEnabled = true;
 
             this.WhenAnyValue(vm => vm.ShowDeprecatedDomains).Subscribe(_ => this.ShowHideDeprecatedDomains());
         }
@@ -383,13 +375,15 @@ namespace CDP4EngineeringModel.ViewModels
         public EngineeringModelSetupDialogViewModel(EngineeringModelSetup engineeringModelSetup, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container, IEnumerable<Thing> chainOfContainers = null)
             : base(engineeringModelSetup, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
-            this.ActiveDomain.ChangeTrackingEnabled = true;
-
             this.WhenAnyValue(x => x.SourceEngineeringModelSetup).Subscribe(v => this.IsOriginal = (v == null) || (v.Iid == default));
-            this.WhenAnyValue(x => x.ActiveDomain).Subscribe(_ => this.UpdateOkCanExecute());
-            this.WhenAnyValue(x => x.SelectedOrganizations).Subscribe(_ => this.UpdateOkCanExecute());
+
+            this.WhenAnyValue(
+                    x => x.ActiveDomain, 
+                    x => x.SelectedOrganizations,
+                    x => x.SelectedDefaultOrganization)
+                .Subscribe(_ => this.UpdateOkCanExecute());
+            
             this.SelectedOrganizations.Changed.Subscribe(_ => this.UpdateDefaultOrganization());
-            this.WhenAnyValue(x => x.SelectedDefaultOrganization).Subscribe(_ => this.UpdateOkCanExecute());
         }
 
         /// <summary>

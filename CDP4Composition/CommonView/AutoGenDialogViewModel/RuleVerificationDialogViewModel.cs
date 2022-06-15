@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="RuleVerification"/>
@@ -165,22 +166,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a RuleViolation
         /// </summary>
-        public ReactiveCommand<object> CreateViolationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateViolationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a RuleViolation
         /// </summary>
-        public ReactiveCommand<object> DeleteViolationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteViolationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a RuleViolation
         /// </summary>
-        public ReactiveCommand<object> EditViolationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditViolationCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a RuleViolation
         /// </summary>
-        public ReactiveCommand<object> InspectViolationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectViolationCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -193,16 +194,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedViolationCommand = this.WhenAny(vm => vm.SelectedViolation, v => v.Value != null);
             var canExecuteEditSelectedViolationCommand = this.WhenAny(vm => vm.SelectedViolation, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateViolationCommand = ReactiveCommand.Create(canExecuteCreateViolationCommand);
+            this.CreateViolationCommand = ReactiveCommandCreator.Create(canExecuteCreateViolationCommand);
             this.CreateViolationCommand.Subscribe(_ => this.ExecuteCreateCommand<RuleViolation>(this.PopulateViolation));
 
-            this.DeleteViolationCommand = ReactiveCommand.Create(canExecuteEditSelectedViolationCommand);
+            this.DeleteViolationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedViolationCommand);
             this.DeleteViolationCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedViolation.Thing, this.PopulateViolation));
 
-            this.EditViolationCommand = ReactiveCommand.Create(canExecuteEditSelectedViolationCommand);
+            this.EditViolationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedViolationCommand);
             this.EditViolationCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedViolation.Thing, this.PopulateViolation));
 
-            this.InspectViolationCommand = ReactiveCommand.Create(canExecuteInspectSelectedViolationCommand);
+            this.InspectViolationCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedViolationCommand);
             this.InspectViolationCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedViolation.Thing));
         }
 

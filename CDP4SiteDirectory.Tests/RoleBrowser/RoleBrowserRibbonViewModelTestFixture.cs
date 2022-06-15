@@ -44,7 +44,7 @@ namespace CDP4SiteDirectory.Tests
 
     using CDP4SiteDirectory.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

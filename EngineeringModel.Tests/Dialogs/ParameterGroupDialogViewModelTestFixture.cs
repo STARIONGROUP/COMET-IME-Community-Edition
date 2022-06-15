@@ -28,7 +28,9 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
@@ -45,8 +47,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
     using CDP4EngineeringModel.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
-
+    using CommonServiceLocator;
+    
     using Moq;
 
     using NUnit.Framework;
@@ -153,11 +155,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
-        public async Task VerifyThatExceptionAreCaught()
+        public void VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
-            this.viewmodel.OkCommand.Execute(null);
+            Observable.Return(Unit.Default).InvokeCommand(this.viewmodel.OkCommand);
+
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
             Assert.IsNotNull(this.viewmodel.WriteException);
@@ -167,7 +170,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [Test]
         public async Task VerifyThatOkCommandWorks()
         {
-            this.viewmodel.OkCommand.Execute(null);
+            await this.viewmodel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             Assert.IsNull(this.viewmodel.WriteException);

@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="SimpleParameterizableThing"/>
@@ -117,27 +118,27 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a SimpleParameterValue
         /// </summary>
-        public ReactiveCommand<object> CreateParameterValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a SimpleParameterValue
         /// </summary>
-        public ReactiveCommand<object> DeleteParameterValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteParameterValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a SimpleParameterValue
         /// </summary>
-        public ReactiveCommand<object> EditParameterValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditParameterValueCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a SimpleParameterValue
         /// </summary>
-        public ReactiveCommand<object> InspectParameterValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectParameterValueCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -150,19 +151,19 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedParameterValueCommand = this.WhenAny(vm => vm.SelectedParameterValue, v => v.Value != null);
             var canExecuteEditSelectedParameterValueCommand = this.WhenAny(vm => vm.SelectedParameterValue, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateParameterValueCommand = ReactiveCommand.Create(canExecuteCreateParameterValueCommand);
+            this.CreateParameterValueCommand = ReactiveCommandCreator.Create(canExecuteCreateParameterValueCommand);
             this.CreateParameterValueCommand.Subscribe(_ => this.ExecuteCreateCommand<SimpleParameterValue>(this.PopulateParameterValue));
 
-            this.DeleteParameterValueCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterValueCommand);
+            this.DeleteParameterValueCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterValueCommand);
             this.DeleteParameterValueCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedParameterValue.Thing, this.PopulateParameterValue));
 
-            this.EditParameterValueCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterValueCommand);
+            this.EditParameterValueCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterValueCommand);
             this.EditParameterValueCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedParameterValue.Thing, this.PopulateParameterValue));
 
-            this.InspectParameterValueCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterValueCommand);
+            this.InspectParameterValueCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterValueCommand);
             this.InspectParameterValueCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameterValue.Thing));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

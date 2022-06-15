@@ -45,7 +45,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     
     using CDP4EngineeringModel.ViewModels;
     
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     
     using Moq;
     

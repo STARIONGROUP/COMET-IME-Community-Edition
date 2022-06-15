@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+	<TargetFramework>net6.0-windows</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4Composition.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -8,6 +8,8 @@
     <Description>COMET Composition and Infrastructure library unit tests</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
     <LangVersion>latest</LangVersion>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -28,72 +30,29 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="1.13.0" />
-    <PackageReference Include="CommonServiceLocator" Version="1.3" />
-    <PackageReference Include="DevExpress.CodeParser" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Data" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Data.Desktop" Version="20.2.10" />
-    <PackageReference Include="DevExpress.DataAccess" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Diagram.Core" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Images" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Mvvm" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Office.Core" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Pdf.Core" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Printing.Core" Version="20.2.10" />
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.2.10" />
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.2.10" />
-    <PackageReference Include="DevExpress.SpellChecker.Core" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.Core" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.Diagram" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.Office" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="20.2.10" />
-    <PackageReference Include="DevExpress.Xpo" Version="20.2.10" />
-    <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
+	<PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236" />
+	<PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236" />
+	<PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236" />
+	<PackageReference Include="CDP4RequirementsVerification-CE" Version="9.0.0-750-PR236" />
+	<PackageReference Include="CommonServiceLocator" Version="2.0.5" />
+	<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
+	<PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
+	<PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
+	<PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" />
+	<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
+	<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
+	<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
+	<PackageReference Include="ReactiveUI" Version="18.1.8" />
+	<PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
+	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	<PackageReference Include="NLog" Version="4.7.10" />
+	<PackageReference Include="ReactiveUI.WPF" Version="18.1.8" />
+	<PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+	<PackageReference Include="Castle.Core" Version="4.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="NUnit" Version="3.13.2" />
-    <PackageReference Include="reactiveui" Version="6.4.0" />
-    <PackageReference Include="reactiveui-core" Version="6.4.0" />
-    <PackageReference Include="Rx-Core" Version="2.2.5" />
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
-    <PackageReference Include="Rx-Linq" Version="2.2.5" />
-    <PackageReference Include="Rx-Main" Version="2.2.5" />
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
-    <PackageReference Include="Rx-XAML" Version="2.2.5" />
-    <PackageReference Include="Splat" Version="1.6.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Modularity\AppSettingsTest.json">
@@ -114,7 +73,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
-    <ProjectReference Include="..\CDP4IME\CDP4IME-CE.csproj" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\RibbonXml\testribbon.xml" />

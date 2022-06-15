@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelIterationDomainSwitchDialogViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Omar Elebiary
-// 
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,10 +27,8 @@ namespace CDP4ShellDialogs.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
-    using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -131,13 +129,13 @@ namespace CDP4ShellDialogs.Tests.ViewModels
         {
             var sessions = new List<ISession> { this.session.Object };
             var viewmodel = new ModelIterationDomainSwitchDialogViewModel(sessions);
-            Assert.IsFalse(viewmodel.SwitchCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)viewmodel.SwitchCommand).CanExecute(null));
 
             Assert.AreEqual(1, viewmodel.SessionsAvailable.Count);
 
             viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iterationSetup11, this.participant, this.session.Object));
             Assert.AreEqual("Switch Domain", viewmodel.DialogTitle);
-            Assert.IsTrue(viewmodel.CancelCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.CancelCommand).CanExecute(null));
         }
     }
 }

@@ -49,13 +49,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
     using CDP4EngineeringModel.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
     using NUnit.Framework;
-
-    using ReactiveUI;
 
     [TestFixture]
     internal class ParameterRowViewModelTestFixture

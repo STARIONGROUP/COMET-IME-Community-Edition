@@ -38,9 +38,9 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
-    using CDP4Composition.Extensions;
     using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Services;
 
     using CDP4Dal;
@@ -259,6 +259,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="parameterGroup">The <see cref="ParameterGroup" /></param>
         public void UpdateParameterGroupPosition(ParameterGroup parameterGroup)
         {
+            this.UpdateParameterGroupPosition(parameterGroup, false, null);
+        }
+
+        /// <summary>
+        /// Update the row containment associated to a <see cref="ParameterGroup" />
+        /// </summary>
+        /// <param name="parameterGroup">The <see cref="ParameterGroup" /></param>
+        private void UpdateParameterGroupPosition(ParameterGroup parameterGroup, bool delaySort, HashSet<DisposableReactiveList<IRowViewModelBase<Thing>>> toBeSorted)
+        {
             try
             {
                 var oldContainer = this.parameterGroupContainment[parameterGroup];
@@ -268,7 +277,17 @@ namespace CDP4EngineeringModel.ViewModels
                 if (newContainer != null && oldContainer == null)
                 {
                     this.ContainedRows.RemoveWithoutDispose(associatedRow);
-                    this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+
+                    if (delaySort)
+                    {
+                        toBeSorted.Add(this.parameterGroupCache[newContainer].ContainedRows);
+                        this.parameterGroupCache[newContainer].ContainedRows.Add(associatedRow);
+                    }
+                    else
+                    {
+                        this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    }
+
                     this.parameterGroupContainment[parameterGroup] = newContainer;
                 }
                 else if (newContainer == null && oldContainer != null)
@@ -426,25 +445,41 @@ namespace CDP4EngineeringModel.ViewModels
                     this.parameterGroupContainment.Add(group, group.ContainingGroup);
                 }
 
+                var containers = new HashSet<ParameterGroupRowViewModel>();
+
                 // add the new group in the right position in the tree
                 foreach (var group in newgroup)
                 {
                     if (group.ContainingGroup == null)
                     {
-                        this.ContainedRows.SortedInsert(this.parameterGroupCache[group], ChildRowComparer);
+                        this.ContainedRows.Add(this.parameterGroupCache[group]);
                     }
                     else
                     {
                         var container = this.parameterGroupCache[group.ContainingGroup];
-                        container.ContainedRows.SortedInsert(this.parameterGroupCache[group], ParameterGroupRowViewModel.ChildRowComparer);
+                        containers.Add(container);
+                        container.ContainedRows.Add(this.parameterGroupCache[group]);
                     }
                 }
 
                 // Check if ContainingGroup for existing group might have been updated
+                var containedRowLists = new HashSet<DisposableReactiveList<IRowViewModelBase<Thing>>>();
                 foreach (var group in updatedGroups)
                 {
-                    this.UpdateParameterGroupPosition(group);
+                    this.UpdateParameterGroupPosition(group, true, containedRowLists);
                 }
+
+                foreach (var containedRowList in containedRowLists)
+                {
+                    containedRowList.Sort(ParameterGroupRowViewModel.ChildRowComparer);
+                }
+
+                foreach (var container in containers)
+                {
+                    container.ContainedRows.Sort(ParameterGroupRowViewModel.ChildRowComparer);
+                }
+
+                this.ContainedRows.Sort(ChildRowComparer);
             }
             catch (Exception exception)
             {
@@ -505,6 +540,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="addedParameterBase">The <see cref="ParameterBase" />s to add</param>
         protected void AddParameterBase(IEnumerable<ParameterBase> addedParameterBase)
         {
+            var groupContainers = new HashSet<DisposableReactiveList<IRowViewModelBase<Thing>>>();
+
             foreach (var parameterBase in addedParameterBase)
             {
                 IRowViewModelBase<ParameterBase> row = null;
@@ -557,7 +594,7 @@ namespace CDP4EngineeringModel.ViewModels
 
                 if (group == null)
                 {
-                    this.ContainedRows.SortedInsert(row, ChildRowComparer);
+                    this.ContainedRows.Add(row);
                 }
                 else
                 {
@@ -565,10 +602,18 @@ namespace CDP4EngineeringModel.ViewModels
 
                     if (this.parameterGroupCache.TryGetValue(group, out parameterGroupRowViewModel))
                     {
-                        parameterGroupRowViewModel.ContainedRows.SortedInsert(row, ParameterGroupRowViewModel.ChildRowComparer);
+                        groupContainers.Add(parameterGroupRowViewModel.ContainedRows);
+                        parameterGroupRowViewModel.ContainedRows.Add(row);
                     }
                 }
             }
+
+            foreach (var groupContainer in groupContainers)
+            {
+                groupContainer.Sort(ParameterGroupRowViewModel.ChildRowComparer);
+            }
+
+            this.ContainedRows.Sort(ChildRowComparer);
         }
 
         /// <summary>

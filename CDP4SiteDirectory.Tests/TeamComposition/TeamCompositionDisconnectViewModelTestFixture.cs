@@ -21,7 +21,7 @@ namespace CDP4SiteDirectory.Tests
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
     using CDP4SiteDirectory.ViewModels;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;

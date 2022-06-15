@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceSelectionViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2017 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,22 +28,32 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.DTO;
+
     using CDP4Composition.Navigation;
+    using CDP4Composition.Utilities;
+    
     using CDP4Dal;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
+    
     using CDP4ShellDialogs.ViewModels;
-    using Microsoft.Practices.ServiceLocation;
+    
+    using CommonServiceLocator;
+    
     using Moq;
+    
     using NUnit.Framework;
+    
     using ReactiveUI;
-    using CDP4Composition.Utilities;
-
+    
     /// <summary>
     /// Suite of tests for the <see cref="DataSourceSelectionViewModel"/>
     /// </summary>
@@ -86,11 +115,11 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         }
 
         [Test]
-        public void AssertThatOkCommandCanExecuteAndASessionObjectIsSet()
+        public async Task AssertThatOkCommandCanExecuteAndASessionObjectIsSet()
         {
             var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
 
-            Assert.IsTrue(viewmodel.CancelCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.CancelCommand).CanExecute(null));
 
             Assert.That(viewmodel.ErrorMessage, Is.Null.Or.Empty);
 
@@ -100,29 +129,29 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             viewmodel.Password = "Dow";
             viewmodel.Uri = "http://www.rheagroup.com";
 
-            Assert.IsTrue(viewmodel.OkCommand.CanExecute(null));
-            viewmodel.OkCommand.Execute(null);
+            Assert.IsTrue(((ICommand)viewmodel.OkCommand).CanExecute(null));
+            await viewmodel.OkCommand.Execute().Catch(Observable.Return(Unit.Default));
             Assert.NotNull(viewmodel.SelectedDataSourceKind);
 
-            Assert.False(viewmodel.BrowseSourceCommand.CanExecute(null));
+            Assert.False(((ICommand)viewmodel.BrowseSourceCommand).CanExecute(null));
             viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.Single(x => x.DalType == DalType.File);
-            Assert.IsTrue(viewmodel.BrowseSourceCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.BrowseSourceCommand).CanExecute(null));
         }
 
         [Test]
-        public void AssertThatUriManagerDoesNotThrow()
+        public async Task AssertThatUriManagerDoesNotThrow()
         {
             var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
-            Assert.IsTrue(viewmodel.OpenUriManagerCommand.CanExecute(null));
-            Assert.DoesNotThrow(() => viewmodel.OpenUriManagerCommand.Execute(null));
+            Assert.IsTrue(((ICommand)viewmodel.OpenUriManagerCommand).CanExecute(null));
+            Assert.DoesNotThrowAsync(async () => await viewmodel.OpenUriManagerCommand.Execute());
         }
 
         [Test]
-        public void AssertThatProxyManagerDoesNotThrow()
+        public async Task AssertThatProxyManagerDoesNotThrow()
         {
             var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
-            Assert.IsTrue(viewmodel.OpenProxyConfigurationCommand.CanExecute(null));
-            Assert.DoesNotThrow(() => viewmodel.OpenProxyConfigurationCommand.Execute(null));
+            Assert.IsTrue(((ICommand)viewmodel.OpenProxyConfigurationCommand).CanExecute(null));
+            Assert.DoesNotThrowAsync(async () => await viewmodel.OpenProxyConfigurationCommand.Execute());
         }
 
         [Test]
@@ -130,7 +159,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         {
             var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
 
-            Assert.IsTrue(viewmodel.CancelCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.CancelCommand).CanExecute(null));
             Assert.That(viewmodel.ErrorMessage, Is.Null.Or.Empty);
 
             Assert.IsNotEmpty(viewmodel.AvailableDataSourceKinds);
@@ -158,7 +187,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             viewmodel.SelectedDataSourceKind = daltype0;
             viewmodel.SelectedUri = viewmodel.AvailableUris.Last();
-            Assert.IsTrue(viewmodel.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.OkCommand).CanExecute(null));
             Assert.IsTrue(viewmodel.AvailableUris.Count == 2);
 
             viewmodel.SelectedDataSourceKind = daltype1;
@@ -166,17 +195,17 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         }
 
         [Test]
-        public void VerifyThatCancelWorks()
+        public async Task VerifyThatCancelWorks()
         {
             var viewmodel = new DataSourceSelectionViewModel(this.navService.Object);
 
-            viewmodel.CancelCommand.Execute(null);
+            await viewmodel.CancelCommand.Execute();
 
             Assert.IsFalse(viewmodel.HasError);
         }
 
         [Test]
-        public void VerifyThatIfDuplicateSessionExistsErrorExists()
+        public async Task VerifyThatIfDuplicateSessionExistsErrorExists()
         {
             var sessions = new List<ISession>();
             sessions.Add(this.session.Object);
@@ -186,13 +215,13 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             viewmodel.Password = "Dow";
             viewmodel.Uri = "http://www.rheagroup.com";
 
-            viewmodel.OkCommand.Execute(null);
+            await viewmodel.OkCommand.Execute();
 
             Assert.AreEqual("A session with the username John already exists", viewmodel.ErrorMessage);
 
             viewmodel.Uri = "http://www.rheagroup.com/";
 
-            viewmodel.OkCommand.Execute(null);
+            await viewmodel.OkCommand.Execute();
 
             Assert.AreEqual("A session with the username John already exists", viewmodel.ErrorMessage);
         }

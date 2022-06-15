@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="UserRuleVerification"/>
@@ -110,7 +111,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedRule"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedRuleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedRuleCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -119,7 +120,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedRuleCommand = this.WhenAny(vm => vm.SelectedRule, v => v.Value != null);
-            this.InspectSelectedRuleCommand = ReactiveCommand.Create(canExecuteInspectSelectedRuleCommand);
+            this.InspectSelectedRuleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRuleCommand);
             this.InspectSelectedRuleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRule));
         }
 

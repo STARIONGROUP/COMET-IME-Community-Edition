@@ -50,7 +50,7 @@ namespace CDP4ProductTree.ViewModels
 
     using CDP4ProductTree.Comparers;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 

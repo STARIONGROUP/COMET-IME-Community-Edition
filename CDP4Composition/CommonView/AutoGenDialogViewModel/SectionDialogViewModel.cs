@@ -28,6 +28,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Section"/>
@@ -191,37 +192,37 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Page
         /// </summary>
-        public ReactiveCommand<object> CreatePageCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreatePageCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Page
         /// </summary>
-        public ReactiveCommand<object> DeletePageCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeletePageCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Page
         /// </summary>
-        public ReactiveCommand<object> EditPageCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditPageCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Page
         /// </summary>
-        public ReactiveCommand<object> InspectPageCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectPageCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a Page 
         /// </summary>
-        public ReactiveCommand<object> MoveUpPageCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpPageCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a Page
         /// </summary>
-        public ReactiveCommand<object> MoveDownPageCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownPageCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -234,25 +235,25 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedPageCommand = this.WhenAny(vm => vm.SelectedPage, v => v.Value != null);
             var canExecuteEditSelectedPageCommand = this.WhenAny(vm => vm.SelectedPage, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreatePageCommand = ReactiveCommand.Create(canExecuteCreatePageCommand);
+            this.CreatePageCommand = ReactiveCommandCreator.Create(canExecuteCreatePageCommand);
             this.CreatePageCommand.Subscribe(_ => this.ExecuteCreateCommand<Page>(this.PopulatePage));
 
-            this.DeletePageCommand = ReactiveCommand.Create(canExecuteEditSelectedPageCommand);
+            this.DeletePageCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPageCommand);
             this.DeletePageCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedPage.Thing, this.PopulatePage));
 
-            this.EditPageCommand = ReactiveCommand.Create(canExecuteEditSelectedPageCommand);
+            this.EditPageCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPageCommand);
             this.EditPageCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedPage.Thing, this.PopulatePage));
 
-            this.InspectPageCommand = ReactiveCommand.Create(canExecuteInspectSelectedPageCommand);
+            this.InspectPageCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedPageCommand);
             this.InspectPageCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedPage.Thing));
 
-            this.MoveUpPageCommand = ReactiveCommand.Create(canExecuteEditSelectedPageCommand);
+            this.MoveUpPageCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPageCommand);
             this.MoveUpPageCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Page, this.SelectedPage));
 
-            this.MoveDownPageCommand = ReactiveCommand.Create(canExecuteEditSelectedPageCommand);
+            this.MoveDownPageCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPageCommand);
             this.MoveDownPageCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Page, this.SelectedPage));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

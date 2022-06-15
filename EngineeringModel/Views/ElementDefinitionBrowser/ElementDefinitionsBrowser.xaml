@@ -12,13 +12,13 @@
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
              xmlns:engineeringModelData="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:service="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:commonData="clr-namespace:CDP4Common.CommonData;assembly=CDP4Common"
              xmlns:behaviors="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:selectors="clr-namespace:CDP4EngineeringModel.Selectors"
              d:DesignHeight="400"
              d:DesignWidth="300"
@@ -79,10 +79,10 @@
                                  CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  SelectionMode="Row"
                                  service:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
-                <i:Interaction.Behaviors>
+                <b:Interaction.Behaviors>
                     <dragDrop:FrameworkElementDragBehavior />
                     <dragDrop:FrameworkElementDropBehavior />
-                </i:Interaction.Behaviors>
+                </b:Interaction.Behaviors>
                 <dxmvvm:Interaction.Behaviors>
                     <cdp4Composition:ContextMenuBehavior />
                 </dxmvvm:Interaction.Behaviors>

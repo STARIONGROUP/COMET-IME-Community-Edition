@@ -28,6 +28,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="FileRevision"/>
@@ -191,12 +192,12 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedCreator"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedCreatorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedCreatorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedContainingFolder"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedContainingFolderCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedContainingFolderCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -205,10 +206,10 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedCreatorCommand = this.WhenAny(vm => vm.SelectedCreator, v => v.Value != null);
-            this.InspectSelectedCreatorCommand = ReactiveCommand.Create(canExecuteInspectSelectedCreatorCommand);
+            this.InspectSelectedCreatorCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedCreatorCommand);
             this.InspectSelectedCreatorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedCreator));
             var canExecuteInspectSelectedContainingFolderCommand = this.WhenAny(vm => vm.SelectedContainingFolder, v => v.Value != null);
-            this.InspectSelectedContainingFolderCommand = ReactiveCommand.Create(canExecuteInspectSelectedContainingFolderCommand);
+            this.InspectSelectedContainingFolderCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedContainingFolderCommand);
             this.InspectSelectedContainingFolderCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedContainingFolder));
         }
 

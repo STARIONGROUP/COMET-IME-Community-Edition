@@ -40,7 +40,7 @@ namespace CDP4Composition
 
     using DevExpress.Xpf.Core;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     /// <summary>
     /// The purpose of the <see cref="ThingToIconUriConverter" /> is to return an icon based on the

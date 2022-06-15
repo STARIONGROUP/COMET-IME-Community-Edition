@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ParameterOverrideValueSet"/>
@@ -109,7 +110,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedParameterValueSet"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedParameterValueSetCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedParameterValueSetCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -118,7 +119,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedParameterValueSetCommand = this.WhenAny(vm => vm.SelectedParameterValueSet, v => v.Value != null);
-            this.InspectSelectedParameterValueSetCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterValueSetCommand);
+            this.InspectSelectedParameterValueSetCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterValueSetCommand);
             this.InspectSelectedParameterValueSetCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameterValueSet));
         }
 

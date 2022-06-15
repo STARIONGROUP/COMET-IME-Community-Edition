@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+	<TargetFramework>net6.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0" />
+	<PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="nunit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
@@ -16,10 +16,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CDP4UpdateServerDal\CDP4UpdateServerDal.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="System.Net.Http" />
   </ItemGroup>
 
   <ItemGroup>

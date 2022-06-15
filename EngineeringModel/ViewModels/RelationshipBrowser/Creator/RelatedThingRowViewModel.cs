@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelatedThingRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,11 +27,16 @@ namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Reactive;
     using System.Reactive.Linq;
-    using CDP4Common;
+
     using CDP4Common.CommonData;
+
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -36,7 +60,7 @@ namespace CDP4EngineeringModel.ViewModels
         private readonly List<IDisposable> Subscriptions = new List<IDisposable>();
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MultiRelationshipRelatedThingRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="RelatedThingRowViewModel"/> class
         /// </summary>
         /// <param name="thing">The associated <see cref="Thing"/></param>
         /// <param name="callBack">The <see cref="Action"/> to call back</param>
@@ -48,11 +72,10 @@ namespace CDP4EngineeringModel.ViewModels
                 .Where(msg => msg.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.SetProperties());
+
             this.Subscriptions.Add(subscriber);
 
-            this.RemoveRelatedThingCommand = ReactiveCommand.Create();
-            var commandDsubscriber = this.RemoveRelatedThingCommand.Subscribe(x => callBack(this));
-            this.Subscriptions.Add(commandDsubscriber);
+            this.RemoveRelatedThingCommand = ReactiveCommandCreator.Create(() => callBack(this));
 
             this.SetProperties();
         }
@@ -65,7 +88,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the command to remove the current represented <see cref="Thing"/> from the related things
         /// </summary>
-        public ReactiveCommand<object> RemoveRelatedThingCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> RemoveRelatedThingCommand { get; private set; }
 
         /// <summary>
         /// Gets the human-readable string that represents the current <see cref="Thing"/>

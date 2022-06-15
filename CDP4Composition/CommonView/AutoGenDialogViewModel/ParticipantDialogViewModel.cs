@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Participant"/>
@@ -180,17 +181,17 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedPerson"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedPersonCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedPersonCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedRole"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedRoleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedRoleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedSelectedDomain"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedSelectedDomainCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedSelectedDomainCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -199,13 +200,13 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedPersonCommand = this.WhenAny(vm => vm.SelectedPerson, v => v.Value != null);
-            this.InspectSelectedPersonCommand = ReactiveCommand.Create(canExecuteInspectSelectedPersonCommand);
+            this.InspectSelectedPersonCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedPersonCommand);
             this.InspectSelectedPersonCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedPerson));
             var canExecuteInspectSelectedRoleCommand = this.WhenAny(vm => vm.SelectedRole, v => v.Value != null);
-            this.InspectSelectedRoleCommand = ReactiveCommand.Create(canExecuteInspectSelectedRoleCommand);
+            this.InspectSelectedRoleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRoleCommand);
             this.InspectSelectedRoleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRole));
             var canExecuteInspectSelectedSelectedDomainCommand = this.WhenAny(vm => vm.SelectedSelectedDomain, v => v.Value != null);
-            this.InspectSelectedSelectedDomainCommand = ReactiveCommand.Create(canExecuteInspectSelectedSelectedDomainCommand);
+            this.InspectSelectedSelectedDomainCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedSelectedDomainCommand);
             this.InspectSelectedSelectedDomainCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSelectedDomain));
         }
 

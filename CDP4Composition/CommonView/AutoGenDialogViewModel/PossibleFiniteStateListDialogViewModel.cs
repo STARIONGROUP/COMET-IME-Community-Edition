@@ -28,6 +28,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="PossibleFiniteStateList"/>
@@ -168,42 +169,42 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedDefaultState"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedDefaultStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedDefaultStateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a PossibleFiniteState
         /// </summary>
-        public ReactiveCommand<object> CreatePossibleStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreatePossibleStateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a PossibleFiniteState
         /// </summary>
-        public ReactiveCommand<object> DeletePossibleStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeletePossibleStateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a PossibleFiniteState
         /// </summary>
-        public ReactiveCommand<object> EditPossibleStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditPossibleStateCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a PossibleFiniteState
         /// </summary>
-        public ReactiveCommand<object> InspectPossibleStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectPossibleStateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a PossibleFiniteState 
         /// </summary>
-        public ReactiveCommand<object> MoveUpPossibleStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpPossibleStateCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a PossibleFiniteState
         /// </summary>
-        public ReactiveCommand<object> MoveDownPossibleStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownPossibleStateCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -216,28 +217,28 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedPossibleStateCommand = this.WhenAny(vm => vm.SelectedPossibleState, v => v.Value != null);
             var canExecuteEditSelectedPossibleStateCommand = this.WhenAny(vm => vm.SelectedPossibleState, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreatePossibleStateCommand = ReactiveCommand.Create(canExecuteCreatePossibleStateCommand);
+            this.CreatePossibleStateCommand = ReactiveCommandCreator.Create(canExecuteCreatePossibleStateCommand);
             this.CreatePossibleStateCommand.Subscribe(_ => this.ExecuteCreateCommand<PossibleFiniteState>(this.PopulatePossibleState));
 
-            this.DeletePossibleStateCommand = ReactiveCommand.Create(canExecuteEditSelectedPossibleStateCommand);
+            this.DeletePossibleStateCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPossibleStateCommand);
             this.DeletePossibleStateCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedPossibleState.Thing, this.PopulatePossibleState));
 
-            this.EditPossibleStateCommand = ReactiveCommand.Create(canExecuteEditSelectedPossibleStateCommand);
+            this.EditPossibleStateCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPossibleStateCommand);
             this.EditPossibleStateCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedPossibleState.Thing, this.PopulatePossibleState));
 
-            this.InspectPossibleStateCommand = ReactiveCommand.Create(canExecuteInspectSelectedPossibleStateCommand);
+            this.InspectPossibleStateCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedPossibleStateCommand);
             this.InspectPossibleStateCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedPossibleState.Thing));
 
-            this.MoveUpPossibleStateCommand = ReactiveCommand.Create(canExecuteEditSelectedPossibleStateCommand);
+            this.MoveUpPossibleStateCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPossibleStateCommand);
             this.MoveUpPossibleStateCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.PossibleState, this.SelectedPossibleState));
 
-            this.MoveDownPossibleStateCommand = ReactiveCommand.Create(canExecuteEditSelectedPossibleStateCommand);
+            this.MoveDownPossibleStateCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPossibleStateCommand);
             this.MoveDownPossibleStateCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.PossibleState, this.SelectedPossibleState));
             var canExecuteInspectSelectedDefaultStateCommand = this.WhenAny(vm => vm.SelectedDefaultState, v => v.Value != null);
-            this.InspectSelectedDefaultStateCommand = ReactiveCommand.Create(canExecuteInspectSelectedDefaultStateCommand);
+            this.InspectSelectedDefaultStateCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDefaultStateCommand);
             this.InspectSelectedDefaultStateCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDefaultState));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

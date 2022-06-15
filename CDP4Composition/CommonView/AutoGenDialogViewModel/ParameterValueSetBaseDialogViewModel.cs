@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ParameterValueSetBase"/>
@@ -201,12 +202,12 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedActualState"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedActualStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedActualStateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedActualOption"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedActualOptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedActualOptionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -215,10 +216,10 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedActualStateCommand = this.WhenAny(vm => vm.SelectedActualState, v => v.Value != null);
-            this.InspectSelectedActualStateCommand = ReactiveCommand.Create(canExecuteInspectSelectedActualStateCommand);
+            this.InspectSelectedActualStateCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedActualStateCommand);
             this.InspectSelectedActualStateCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedActualState));
             var canExecuteInspectSelectedActualOptionCommand = this.WhenAny(vm => vm.SelectedActualOption, v => v.Value != null);
-            this.InspectSelectedActualOptionCommand = ReactiveCommand.Create(canExecuteInspectSelectedActualOptionCommand);
+            this.InspectSelectedActualOptionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedActualOptionCommand);
             this.InspectSelectedActualOptionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedActualOption));
         }
 

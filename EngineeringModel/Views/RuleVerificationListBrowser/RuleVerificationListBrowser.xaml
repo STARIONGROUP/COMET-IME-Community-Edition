@@ -8,12 +8,12 @@
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:cdp4CommonView="clr-namespace:CDP4CommonView;assembly=CDP4Composition"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -110,10 +110,10 @@
                                                     UpdateSourceTrigger=PropertyChanged}"
                              SelectionMode="Row"
                              services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
-                <i:Interaction.Behaviors>
+                <b:Interaction.Behaviors>
                     <dragDrop:FrameworkElementDragBehavior />
                     <dragDrop:FrameworkElementDropBehavior />
-                </i:Interaction.Behaviors>
+                </b:Interaction.Behaviors>
                 <dxmvvm:Interaction.Behaviors>
                     <cdp4Composition:ContextMenuBehavior />
                 </dxmvvm:Interaction.Behaviors>

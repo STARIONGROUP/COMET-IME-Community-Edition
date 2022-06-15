@@ -16,6 +16,6 @@
     <!-- at last running the tool -->
     <Message Importance="High" Text="------ PluginPackager tool Started ------ " />
       <Exec Command="&quot;..\CDP4PluginPackager\bin\$(Configuration)\$(TargetFramework)\CDP4PluginPackager.exe&quot; $(ShouldPack) config:$(Configuration) framework:$(TargetFramework)" YieldDuringToolExecution="True" ConsoleToMSBuild="True" />
-    <Message Importance="High" Text="------ PluginPackager tool has completed ------ " />
+      <Message Importance="High" Text="------ PluginPackager tool has completed ------ " />
   </Target>
 </Project>

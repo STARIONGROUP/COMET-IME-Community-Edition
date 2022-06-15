@@ -1,17 +1,41 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProxyServerViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ShellDialogs.ViewModels
 {
     using System;
+    using System.Reactive;
     using System.Reactive.Linq;
+
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
+
     using CDP4ShellDialogs.Proxy;
+
     using ReactiveUI;
-    
+
     /// <summary>
     /// dialog view=-model used to load and save web-proxy server settings
     /// </summary>
@@ -50,15 +74,14 @@ namespace CDP4ShellDialogs.ViewModels
                 (proxyAddress, proxyport) =>
                     this.isValidAddress(proxyAddress) && this.isValidPort(proxyport));
 
-            this.OkCommand = ReactiveCommand.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+            this.OkCommand = ReactiveCommandCreator.Create(this.ExecuteOk, canOk);
+
             this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
             {
                 this.ErrorMessage = x.Message;
             });
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
         }
 
         /// <summary>
@@ -126,12 +149,12 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets the Ok Command
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel Command
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Executes the Ok Command

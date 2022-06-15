@@ -15,7 +15,7 @@ namespace CDP4CommonView.Tests
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using CDP4Dal.Operations;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using ReactiveUI;
     using CDP4CommonView.ViewModels;

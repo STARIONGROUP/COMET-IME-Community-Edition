@@ -25,6 +25,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="DefinedThing"/>
@@ -162,62 +163,62 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Alias
         /// </summary>
-        public ReactiveCommand<object> CreateAliasCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateAliasCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Alias
         /// </summary>
-        public ReactiveCommand<object> DeleteAliasCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteAliasCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Alias
         /// </summary>
-        public ReactiveCommand<object> EditAliasCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditAliasCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Alias
         /// </summary>
-        public ReactiveCommand<object> InspectAliasCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectAliasCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Definition
         /// </summary>
-        public ReactiveCommand<object> CreateDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Definition
         /// </summary>
-        public ReactiveCommand<object> DeleteDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Definition
         /// </summary>
-        public ReactiveCommand<object> EditDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditDefinitionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Definition
         /// </summary>
-        public ReactiveCommand<object> InspectDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a HyperLink
         /// </summary>
-        public ReactiveCommand<object> CreateHyperLinkCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateHyperLinkCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a HyperLink
         /// </summary>
-        public ReactiveCommand<object> DeleteHyperLinkCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteHyperLinkCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a HyperLink
         /// </summary>
-        public ReactiveCommand<object> EditHyperLinkCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditHyperLinkCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a HyperLink
         /// </summary>
-        public ReactiveCommand<object> InspectHyperLinkCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectHyperLinkCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -230,48 +231,48 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedAliasCommand = this.WhenAny(vm => vm.SelectedAlias, v => v.Value != null);
             var canExecuteEditSelectedAliasCommand = this.WhenAny(vm => vm.SelectedAlias, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateAliasCommand = ReactiveCommand.Create(canExecuteCreateAliasCommand);
+            this.CreateAliasCommand = ReactiveCommandCreator.Create(canExecuteCreateAliasCommand);
             this.CreateAliasCommand.Subscribe(_ => this.ExecuteCreateCommand<Alias>(this.PopulateAlias));
 
-            this.DeleteAliasCommand = ReactiveCommand.Create(canExecuteEditSelectedAliasCommand);
+            this.DeleteAliasCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedAliasCommand);
             this.DeleteAliasCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedAlias.Thing, this.PopulateAlias));
 
-            this.EditAliasCommand = ReactiveCommand.Create(canExecuteEditSelectedAliasCommand);
+            this.EditAliasCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedAliasCommand);
             this.EditAliasCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedAlias.Thing, this.PopulateAlias));
 
-            this.InspectAliasCommand = ReactiveCommand.Create(canExecuteInspectSelectedAliasCommand);
+            this.InspectAliasCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedAliasCommand);
             this.InspectAliasCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedAlias.Thing));
             
             var canExecuteCreateDefinitionCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedDefinitionCommand = this.WhenAny(vm => vm.SelectedDefinition, v => v.Value != null);
             var canExecuteEditSelectedDefinitionCommand = this.WhenAny(vm => vm.SelectedDefinition, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateDefinitionCommand = ReactiveCommand.Create(canExecuteCreateDefinitionCommand);
+            this.CreateDefinitionCommand = ReactiveCommandCreator.Create(canExecuteCreateDefinitionCommand);
             this.CreateDefinitionCommand.Subscribe(_ => this.ExecuteCreateCommand<Definition>(this.PopulateDefinition));
 
-            this.DeleteDefinitionCommand = ReactiveCommand.Create(canExecuteEditSelectedDefinitionCommand);
+            this.DeleteDefinitionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDefinitionCommand);
             this.DeleteDefinitionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedDefinition.Thing, this.PopulateDefinition));
 
-            this.EditDefinitionCommand = ReactiveCommand.Create(canExecuteEditSelectedDefinitionCommand);
+            this.EditDefinitionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDefinitionCommand);
             this.EditDefinitionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedDefinition.Thing, this.PopulateDefinition));
 
-            this.InspectDefinitionCommand = ReactiveCommand.Create(canExecuteInspectSelectedDefinitionCommand);
+            this.InspectDefinitionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDefinitionCommand);
             this.InspectDefinitionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDefinition.Thing));
             
             var canExecuteCreateHyperLinkCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedHyperLinkCommand = this.WhenAny(vm => vm.SelectedHyperLink, v => v.Value != null);
             var canExecuteEditSelectedHyperLinkCommand = this.WhenAny(vm => vm.SelectedHyperLink, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateHyperLinkCommand = ReactiveCommand.Create(canExecuteCreateHyperLinkCommand);
+            this.CreateHyperLinkCommand = ReactiveCommandCreator.Create(canExecuteCreateHyperLinkCommand);
             this.CreateHyperLinkCommand.Subscribe(_ => this.ExecuteCreateCommand<HyperLink>(this.PopulateHyperLink));
 
-            this.DeleteHyperLinkCommand = ReactiveCommand.Create(canExecuteEditSelectedHyperLinkCommand);
+            this.DeleteHyperLinkCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedHyperLinkCommand);
             this.DeleteHyperLinkCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedHyperLink.Thing, this.PopulateHyperLink));
 
-            this.EditHyperLinkCommand = ReactiveCommand.Create(canExecuteEditSelectedHyperLinkCommand);
+            this.EditHyperLinkCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedHyperLinkCommand);
             this.EditHyperLinkCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedHyperLink.Thing, this.PopulateHyperLink));
 
-            this.InspectHyperLinkCommand = ReactiveCommand.Create(canExecuteInspectSelectedHyperLinkCommand);
+            this.InspectHyperLinkCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedHyperLinkCommand);
             this.InspectHyperLinkCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedHyperLink.Thing));
         }
 

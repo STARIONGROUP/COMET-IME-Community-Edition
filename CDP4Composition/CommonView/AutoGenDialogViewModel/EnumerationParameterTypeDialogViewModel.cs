@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="EnumerationParameterType"/>
@@ -124,32 +125,32 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a EnumerationValueDefinition
         /// </summary>
-        public ReactiveCommand<object> CreateValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateValueDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a EnumerationValueDefinition
         /// </summary>
-        public ReactiveCommand<object> DeleteValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteValueDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a EnumerationValueDefinition
         /// </summary>
-        public ReactiveCommand<object> EditValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditValueDefinitionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a EnumerationValueDefinition
         /// </summary>
-        public ReactiveCommand<object> InspectValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectValueDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a EnumerationValueDefinition 
         /// </summary>
-        public ReactiveCommand<object> MoveUpValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpValueDefinitionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a EnumerationValueDefinition
         /// </summary>
-        public ReactiveCommand<object> MoveDownValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownValueDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -162,22 +163,22 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedValueDefinitionCommand = this.WhenAny(vm => vm.SelectedValueDefinition, v => v.Value != null);
             var canExecuteEditSelectedValueDefinitionCommand = this.WhenAny(vm => vm.SelectedValueDefinition, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateValueDefinitionCommand = ReactiveCommand.Create(canExecuteCreateValueDefinitionCommand);
+            this.CreateValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteCreateValueDefinitionCommand);
             this.CreateValueDefinitionCommand.Subscribe(_ => this.ExecuteCreateCommand<EnumerationValueDefinition>(this.PopulateValueDefinition));
 
-            this.DeleteValueDefinitionCommand = ReactiveCommand.Create(canExecuteEditSelectedValueDefinitionCommand);
+            this.DeleteValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueDefinitionCommand);
             this.DeleteValueDefinitionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedValueDefinition.Thing, this.PopulateValueDefinition));
 
-            this.EditValueDefinitionCommand = ReactiveCommand.Create(canExecuteEditSelectedValueDefinitionCommand);
+            this.EditValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueDefinitionCommand);
             this.EditValueDefinitionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedValueDefinition.Thing, this.PopulateValueDefinition));
 
-            this.InspectValueDefinitionCommand = ReactiveCommand.Create(canExecuteInspectSelectedValueDefinitionCommand);
+            this.InspectValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedValueDefinitionCommand);
             this.InspectValueDefinitionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedValueDefinition.Thing));
 
-            this.MoveUpValueDefinitionCommand = ReactiveCommand.Create(canExecuteEditSelectedValueDefinitionCommand);
+            this.MoveUpValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueDefinitionCommand);
             this.MoveUpValueDefinitionCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.ValueDefinition, this.SelectedValueDefinition));
 
-            this.MoveDownValueDefinitionCommand = ReactiveCommand.Create(canExecuteEditSelectedValueDefinitionCommand);
+            this.MoveDownValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueDefinitionCommand);
             this.MoveDownValueDefinitionCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.ValueDefinition, this.SelectedValueDefinition));
         }
 

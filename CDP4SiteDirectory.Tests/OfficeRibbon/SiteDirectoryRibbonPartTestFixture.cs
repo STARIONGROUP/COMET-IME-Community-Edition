@@ -41,7 +41,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NUnit.Framework;
     using ReactiveUI;

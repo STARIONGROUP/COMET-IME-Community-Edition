@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="BinaryRelationshipRule"/>
@@ -175,17 +176,17 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedRelationshipCategory"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedRelationshipCategoryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedRelationshipCategoryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedSourceCategory"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedSourceCategoryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedSourceCategoryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedTargetCategory"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedTargetCategoryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedTargetCategoryCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -193,15 +194,21 @@ namespace CDP4CommonView
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
+
             var canExecuteInspectSelectedRelationshipCategoryCommand = this.WhenAny(vm => vm.SelectedRelationshipCategory, v => v.Value != null);
-            this.InspectSelectedRelationshipCategoryCommand = ReactiveCommand.Create(canExecuteInspectSelectedRelationshipCategoryCommand);
-            this.InspectSelectedRelationshipCategoryCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRelationshipCategory));
+            this.InspectSelectedRelationshipCategoryCommand = ReactiveCommandCreator.Create(
+                    () => this.ExecuteInspectCommand(this.SelectedRelationshipCategory), 
+                    canExecuteInspectSelectedRelationshipCategoryCommand);
+
             var canExecuteInspectSelectedSourceCategoryCommand = this.WhenAny(vm => vm.SelectedSourceCategory, v => v.Value != null);
-            this.InspectSelectedSourceCategoryCommand = ReactiveCommand.Create(canExecuteInspectSelectedSourceCategoryCommand);
-            this.InspectSelectedSourceCategoryCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSourceCategory));
+            this.InspectSelectedSourceCategoryCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteInspectCommand(this.SelectedSourceCategory), 
+                canExecuteInspectSelectedSourceCategoryCommand);
+
             var canExecuteInspectSelectedTargetCategoryCommand = this.WhenAny(vm => vm.SelectedTargetCategory, v => v.Value != null);
-            this.InspectSelectedTargetCategoryCommand = ReactiveCommand.Create(canExecuteInspectSelectedTargetCategoryCommand);
-            this.InspectSelectedTargetCategoryCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedTargetCategory));
+            this.InspectSelectedTargetCategoryCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteInspectCommand(this.SelectedTargetCategory), 
+                canExecuteInspectSelectedTargetCategoryCommand);
         }
 
         /// <summary>

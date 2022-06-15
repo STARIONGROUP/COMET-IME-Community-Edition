@@ -119,7 +119,7 @@ namespace CDP4Composition.Mvvm
         protected RowViewModelBase(T thing, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(thing, session, containerViewModel)
         {
-            this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>> { ChangeTrackingEnabled = true };
+            this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.HighlightCancelDisposables = new List<IDisposable>();
 
             var rowContainerViewModel = this.ContainerViewModel as IRowViewModelBase<Thing>;
@@ -370,7 +370,7 @@ namespace CDP4Composition.Mvvm
                 var highlightSubscription = CDPMessageBus.Current.Listen<HighlightEvent>(this.Thing)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.HighlightEventHandler());
-
+                
                 this.Disposables.Add(highlightSubscription);
 
                 // category highlighting

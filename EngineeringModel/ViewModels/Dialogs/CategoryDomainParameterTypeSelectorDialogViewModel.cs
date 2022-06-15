@@ -28,12 +28,16 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
 
     using ReactiveUI;
+
+    using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
     /// <summary>
     /// The purpose of the <see cref="CategoryDomainParameterTypeSelectorDialogViewModel"/> is to provide selection criteria
@@ -137,12 +141,12 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// <summary>
         /// Gets the Ok Command
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel Command
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// The initialize reactive commands.
@@ -155,11 +159,9 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                 (category, owner, parameterType) => 
                     category != 0 && owner != 0 && parameterType != 0);
 
-            this.OkCommand = ReactiveCommand.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+            this.OkCommand = ReactiveCommand.Create(this.ExecuteOk, canOk);
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommand.Create(this.ExecuteCancel);
         }
 
         /// <summary>

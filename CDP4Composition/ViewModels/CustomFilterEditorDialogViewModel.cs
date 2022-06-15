@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CustomFilterEditorDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ namespace CDP4Composition.ViewModels
     using DevExpress.Xpf.Core.FilteringUI;
     using DevExpress.Xpf.Grid;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -123,32 +123,32 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// Changes a list of QueryOperators in a FilterEditorControl
         /// </summary>
-        public ReactiveCommand<Unit> QueryOperatorsCommand { get; private set; }
+        public ReactiveCommand<FilterEditorQueryOperatorsEventArgs, Unit> QueryOperatorsCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to apply and close
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to cancel
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to apply
         /// </summary>
-        public ReactiveCommand<object> ApplyCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to save the <see cref="FilterEditorSavedUserPreference"/> in <see cref="SelectedFilterEditorSavedUserPreference"/>
         /// </summary>
-        public ReactiveCommand<object> SaveCurrentFilterEditorSavedUserPreferenceCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveCurrentFilterEditorSavedUserPreferenceCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to manage the <see cref="FilterEditorSavedUserPreference"/> in <see cref="FilterEditorSavedUserPreferences"/>
         /// </summary>
-        public ReactiveCommand<object> ManageSavedFilterEditorSavedUserPreferencesCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ManageSavedFilterEditorSavedUserPreferencesCommand { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConfirmationDialogViewModel"/> class
@@ -259,22 +259,12 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         private void InitializeCommands()
         {
-            this.QueryOperatorsCommand = ReactiveCommand.CreateAsyncTask(this.ExecuteQueryOperatorsCommand, RxApp.MainThreadScheduler);
-
-            this.OkCommand = ReactiveCommand.Create();
-            this.OkCommand.Subscribe(_ => this.ExecuteOkCommand());
-
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancelCommand());
-
-            this.ApplyCommand = ReactiveCommand.Create();
-            this.ApplyCommand.Subscribe(_ => this.ExecuteApplyCommand());
-
-            this.SaveCurrentFilterEditorSavedUserPreferenceCommand = ReactiveCommand.Create();
-            this.SaveCurrentFilterEditorSavedUserPreferenceCommand.Subscribe(_ => this.ExecuteSaveCurrentFilterEditorSettingCommand());
-
-            this.ManageSavedFilterEditorSavedUserPreferencesCommand = ReactiveCommand.Create();
-            this.ManageSavedFilterEditorSavedUserPreferencesCommand.Subscribe(_ => this.ExecuteManageSavedFilterEditorSavedUserPreferencesCommand());
+            this.QueryOperatorsCommand = ReactiveCommandCreator.Create<FilterEditorQueryOperatorsEventArgs>(this.ExecuteQueryOperatorsCommand);
+            this.OkCommand = ReactiveCommandCreator.Create(this.ExecuteOkCommand);
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancelCommand);
+            this.ApplyCommand = ReactiveCommandCreator.Create(this.ExecuteApplyCommand);
+            this.SaveCurrentFilterEditorSavedUserPreferenceCommand = ReactiveCommandCreator.Create(this.ExecuteSaveCurrentFilterEditorSettingCommand);
+            this.ManageSavedFilterEditorSavedUserPreferencesCommand = ReactiveCommandCreator.Create(this.ExecuteManageSavedFilterEditorSavedUserPreferencesCommand);
 
             this.WhenAnyValue(x => x.SelectedFilterEditorSavedUserPreference).Subscribe(_ => this.SetFilterString());
         }
@@ -406,7 +396,7 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// Executes the <see cref="QueryOperatorsCommand"/> command.
         /// </summary>
-        private async Task ExecuteQueryOperatorsCommand(object eventArgs)
+        private void ExecuteQueryOperatorsCommand(FilterEditorQueryOperatorsEventArgs eventArgs)
         {
             if (this.customFilterOperatorsViewModel == null)
             {

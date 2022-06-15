@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="StakeHolderValueMap"/>
@@ -205,22 +206,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a StakeHolderValueMapSettings
         /// </summary>
-        public ReactiveCommand<object> CreateSettingsCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateSettingsCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a StakeHolderValueMapSettings
         /// </summary>
-        public ReactiveCommand<object> DeleteSettingsCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteSettingsCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a StakeHolderValueMapSettings
         /// </summary>
-        public ReactiveCommand<object> EditSettingsCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditSettingsCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a StakeHolderValueMapSettings
         /// </summary>
-        public ReactiveCommand<object> InspectSettingsCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSettingsCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -233,16 +234,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedSettingsCommand = this.WhenAny(vm => vm.SelectedSettings, v => v.Value != null);
             var canExecuteEditSelectedSettingsCommand = this.WhenAny(vm => vm.SelectedSettings, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateSettingsCommand = ReactiveCommand.Create(canExecuteCreateSettingsCommand);
+            this.CreateSettingsCommand = ReactiveCommandCreator.Create(canExecuteCreateSettingsCommand);
             this.CreateSettingsCommand.Subscribe(_ => this.ExecuteCreateCommand<StakeHolderValueMapSettings>(this.PopulateSettings));
 
-            this.DeleteSettingsCommand = ReactiveCommand.Create(canExecuteEditSelectedSettingsCommand);
+            this.DeleteSettingsCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSettingsCommand);
             this.DeleteSettingsCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedSettings.Thing, this.PopulateSettings));
 
-            this.EditSettingsCommand = ReactiveCommand.Create(canExecuteEditSelectedSettingsCommand);
+            this.EditSettingsCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSettingsCommand);
             this.EditSettingsCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedSettings.Thing, this.PopulateSettings));
 
-            this.InspectSettingsCommand = ReactiveCommand.Create(canExecuteInspectSelectedSettingsCommand);
+            this.InspectSettingsCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedSettingsCommand);
             this.InspectSettingsCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSettings.Thing));
         }
 

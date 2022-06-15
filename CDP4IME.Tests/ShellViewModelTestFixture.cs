@@ -1,31 +1,53 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShellViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Tests
+namespace COMET.Tests
 {
-    using Microsoft.Practices.ServiceLocation;
+    using System;
+    using System.Collections.Generic;
+    using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Navigation;
+
+    using CDP4Dal;
+    using CDP4Dal.Composition;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Events;
+
+    using CDP4ShellDialogs.ViewModels;
+
+    using COMET.Settings;
+    using COMET.ViewModels;
+
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -35,26 +57,6 @@ namespace CDP4IME.Tests
     using NUnit.Framework;
 
     using ReactiveUI;
-
-    using System;
-    using System.Reactive.Concurrency;
-    using System.Collections.Generic;
-    
-    using CDP4Composition.Navigation;
-    
-    using CDP4Dal;
-    using CDP4Dal.Composition;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Events;
-
-    using CDP4IME;
-    using CDP4IME.ViewModels;
-    using CDP4IME.Settings;
-
-    using CDP4ShellDialogs.ViewModels;
-    
-    using CDP4Common.SiteDirectoryData;
-    using CDP4Common.EngineeringModelData;
 
     /// <summary>
     /// TestFixture for the <see cref="ShellViewModel"/>
@@ -159,45 +161,45 @@ namespace CDP4IME.Tests
         }
 
         [Test]
-        public void VerifyThatLogDetailCommandWorks()
+        public async Task VerifyThatLogDetailCommandWorks()
         {
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<LogDetailsViewModel>())).Returns(null as IDialogResult);
 
-            this.viewModel.OpenLogDialogCommand.Execute(null);
+            await this.viewModel.OpenLogDialogCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<LogDetailsViewModel>()));
         }
 
         [Test]
         public void VerifyThatOpenAboutCommandWorks()
         {
-            Assert.DoesNotThrow(() => this.viewModel.OpenAboutCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.viewModel.OpenAboutCommand.Execute());
         }
 
         [Test]
         public void Verify_that_OpenProxyConfigurationCommand_can_be_executed()
         {
-            Assert.DoesNotThrow(() => this.viewModel.OpenProxyConfigurationCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.viewModel.OpenProxyConfigurationCommand.Execute());
         }
 
         [Test]
-        public void VerifyThatOpenDataSourceCommandExecutesAndIfCancelledNoSessionLoaded()
+        public async Task VerifyThatOpenDataSourceCommandExecutesAndIfCancelledNoSessionLoaded()
         {
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>())).Returns(null as DataSourceSelectionResult);
-            this.viewModel.OpenDataSourceCommand.Execute(null);
+            await this.viewModel.OpenDataSourceCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>()));
 
             CollectionAssert.IsEmpty(this.viewModel.Sessions);
         }
 
         [Test]
-        public void VerifyThatOpenAPluginManagerCommandNavigatesToPluginWindow()
+        public async Task VerifyThatOpenAPluginManagerCommandNavigatesToPluginWindow()
         {
-            this.viewModel.OpenPluginManagerCommand.Execute(null);
+            await this.viewModel.OpenPluginManagerCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<PluginManagerViewModel<ImeAppSettings>>()));
         }
 
         [Test]
-        public void VerifyThatOpenDataSourceCommandExecutesAndSessionIsLoaded()
+        public async Task VerifyThatOpenDataSourceCommandExecutesAndSessionIsLoaded()
         {
             Assert.IsFalse(this.viewModel.HasSessions);
 
@@ -205,7 +207,7 @@ namespace CDP4IME.Tests
             var selectionResult = new DataSourceSelectionResult(true, mockedSession.Object);
 
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>())).Returns(selectionResult);
-            this.viewModel.OpenDataSourceCommand.Execute(null);
+            await this.viewModel.OpenDataSourceCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>()));
 
             CollectionAssert.IsNotEmpty(this.viewModel.Sessions);
@@ -216,7 +218,7 @@ namespace CDP4IME.Tests
         }
 
         [Test]
-        public void VerifyThatOpenDataSourceCommandExecutesOpenModelAndSessionIsLoaded()
+        public async Task VerifyThatOpenDataSourceCommandExecutesOpenModelAndSessionIsLoaded()
         {
             Assert.IsFalse(this.viewModel.HasSessions);
 
@@ -224,7 +226,7 @@ namespace CDP4IME.Tests
             var selectionResult = new DataSourceSelectionResult(true, mockedSession.Object, true);
 
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>())).Returns(selectionResult);
-            this.viewModel.OpenDataSourceCommand.Execute(null);
+            await this.viewModel.OpenDataSourceCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>()));
 
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<ModelOpeningDialogViewModel>()));
@@ -236,32 +238,32 @@ namespace CDP4IME.Tests
         }
 
         [Test]
-        public void VerifyThatExecuteOpenAboutRequestNavigatesToAboutWindow()
+        public async Task VerifyThatExecuteOpenAboutRequestNavigatesToAboutWindow()
         {
-            this.viewModel.OpenAboutCommand.Execute(null);
+            await this.viewModel.OpenAboutCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<AboutViewModel>()));
         }
 
         [Test]
-        public void VerifThatExecuteOpenLogDialogCommandNavigatesToLogWindow()
+        public async Task VerifThatExecuteOpenLogDialogCommandNavigatesToLogWindow()
         {
-            this.viewModel.OpenLogDialogCommand.Execute(null);
+            await this.viewModel.OpenLogDialogCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<LogDetailsViewModel>()));
         }
 
         [Test]
-        public void VerifThatSaveSessionCommandNavigatesToDataSourceExportViewModel()
+        public async Task VerifThatSaveSessionCommandNavigatesToDataSourceExportViewModel()
         {
-            this.viewModel.SaveSessionCommand.Execute(null);
+            await this.viewModel.SaveSessionCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<DataSourceExportViewModel>()));
         }
 
         [Test]
-        public void VerifyThatAOpenUriCommandCanBeExecuted()
+        public async Task VerifyThatAOpenUriCommandCanBeExecuted()
         {
-            Assert.IsTrue(this.viewModel.OpenUriManagerCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewModel.OpenUriManagerCommand).CanExecute(null));
 
-            this.viewModel.OpenUriManagerCommand.Execute(null);
+            await this.viewModel.OpenUriManagerCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<UriManagerViewModel>()));
         }
 
@@ -287,11 +289,11 @@ namespace CDP4IME.Tests
         }
         
         [Test]
-        public void VerifyCheckForUpdateCommand()
+        public async Task VerifyCheckForUpdateCommand()
         {
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<UpdateDownloaderInstallerViewModel>())).Returns(null as IDialogResult);
 
-            this.viewModel.CheckForUpdateCommand.Execute(null);
+            await this.viewModel.CheckForUpdateCommand.Execute();
             this.navigationService.Verify(x => x.NavigateModal(It.IsAny<UpdateDownloaderInstallerViewModel>()));
         }
     }

@@ -28,7 +28,6 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Reactive;
@@ -40,7 +39,9 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView.ViewModels;
+
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
@@ -56,13 +57,12 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels.Dialogs;
 
-    using DevExpress.Xpf.Core;
-
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using NLog;
 
@@ -283,62 +283,62 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to Copy Model Code to clipboard <see cref="ParameterRowViewModel"/>
         /// </summary>
-        public ReactiveCommand<object> CopyModelCodeToClipboardCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CopyModelCodeToClipboardCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to show the usages of specified element definition
         /// </summary>
-        public ReactiveCommand<object> HighlightElementUsagesCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> HighlightElementUsagesCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ParameterGroup"/>
         /// </summary>
-        public ReactiveCommand<object> CreateParameterGroup { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterGroup { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ElementDefinition"/>
         /// </summary>
-        public ReactiveCommand<object> CreateElementDefinition { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateElementDefinition { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to copy a <see cref="ElementDefinition"/>
         /// </summary>
-        public ReactiveCommand<object> CopyElementDefinitionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CopyElementDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterOverride"/>
         /// </summary>
-        public ReactiveCommand<object> CreateOverrideCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateOverrideCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterSubscription"/>
         /// </summary>
-        public ReactiveCommand<object> CreateSubscriptionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSubscriptionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create multiple <see cref="ParameterSubscription"/>s in batch operation mode
         /// </summary>
-        public ReactiveCommand<object> BatchCreateSubscriptionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> BatchCreateSubscriptionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to delete multiple <see cref="ParameterSubscription"/>s in batch operation mode
         /// </summary>
-        public ReactiveCommand<object> BatchDeleteSubscriptionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> BatchDeleteSubscriptionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to change the ownership of an <see cref="IOwnedThing"/> and its contained items
         /// </summary>
-        public ReactiveCommand<object> ChangeOwnershipCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ChangeOwnershipCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to set an <see cref="ElementDefinition"/> as the top element of the selected iteration
         /// </summary>
-        public ReactiveCommand<Unit> SetAsTopElementDefinitionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SetAsTopElementDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to unset an <see cref="ElementDefinition"/> as the top element of the selected iteration
         /// </summary>
-        public ReactiveCommand<Unit> UnsetAsTopElementDefinitionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> UnsetAsTopElementDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
@@ -574,7 +574,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Initializes the create <see cref="ReactiveCommand"/> that allow a user to create the different kinds of <see cref="ParameterType"/>s
+        /// Initializes the create <see cref="ReactiveCommandCreator"/> that allow a user to create the different kinds of <see cref="ParameterType"/>s
         /// </summary>
         protected override void InitializeCommands()
         {
@@ -582,39 +582,18 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.ComputeNotContextDependentPermission();
 
-            this.CreateParameterGroup = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
-            this.CreateParameterGroup.Subscribe(_ => this.ExecuteCreateParameterGroup());
-
-            this.CreateElementDefinition = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
-            this.CreateElementDefinition.Subscribe(_ => this.ExecuteCreateCommand<ElementDefinition>(this.Thing));
-
-            this.CopyElementDefinitionCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
-            this.CopyElementDefinitionCommand.Subscribe(_ => this.ExecuteCopyElementDefinition());
-
-            this.CreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSubscription));
-            this.CreateSubscriptionCommand.Subscribe(_ => this.ExecuteCreateSubscriptionCommand());
-
-            this.BatchCreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
-            this.BatchCreateSubscriptionCommand.Subscribe(_ => this.ExecuteBatchCreateSubscriptionCommand());
-
-            this.BatchDeleteSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDeleteBatchSubscriptions));
-            this.BatchDeleteSubscriptionCommand.Subscribe(_ => this.ExecuteBatchDeleteSubscriptionCommand());
-
-            this.ChangeOwnershipCommand = ReactiveCommand.Create();
-            this.ChangeOwnershipCommand.Subscribe(_ => this.ExecuteChangeOwnershipCommand());
-
-            this.SetAsTopElementDefinitionCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteSetAsTopElementDefinitionCommandAsync());
-
-            this.UnsetAsTopElementDefinitionCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteUnsetAsTopElementDefinitionCommandAsync());
-
-            this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
-            this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
-
-            this.HighlightElementUsagesCommand = ReactiveCommand.Create();
-            this.HighlightElementUsagesCommand.Subscribe(_ => this.ExecuteHighlightElementUsagesCommand());
-
-            this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create();
-            this.CopyModelCodeToClipboardCommand.Subscribe(_ => this.ExecuteCopyModelCodeToClipboardCommand());
+            this.CreateParameterGroup = ReactiveCommandCreator.Create(this.ExecuteCreateParameterGroup, this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
+            this.CreateElementDefinition = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ElementDefinition>(this.Thing), this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
+            this.CopyElementDefinitionCommand = ReactiveCommandCreator.Create(this.ExecuteCopyElementDefinition, this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
+            this.CreateSubscriptionCommand = ReactiveCommandCreator.Create(this.ExecuteCreateSubscriptionCommand, this.WhenAnyValue(x => x.CanCreateSubscription));
+            this.BatchCreateSubscriptionCommand = ReactiveCommandCreator.Create(this.ExecuteBatchCreateSubscriptionCommand, this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
+            this.BatchDeleteSubscriptionCommand = ReactiveCommandCreator.Create(this.ExecuteBatchDeleteSubscriptionCommand, this.WhenAnyValue(x => x.CanDeleteBatchSubscriptions));
+            this.ChangeOwnershipCommand = ReactiveCommandCreator.Create(this.ExecuteChangeOwnershipCommand);
+            this.SetAsTopElementDefinitionCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteSetAsTopElementDefinitionCommandAsync);
+            this.UnsetAsTopElementDefinitionCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteUnsetAsTopElementDefinitionCommandAsync);
+            this.CreateOverrideCommand = ReactiveCommandCreator.Create(this.ExecuteCreateParameterOverride, this.WhenAnyValue(vm => vm.CanCreateOverride));
+            this.HighlightElementUsagesCommand = ReactiveCommandCreator.Create(this.ExecuteHighlightElementUsagesCommand);
+            this.CopyModelCodeToClipboardCommand = ReactiveCommandCreator.Create(this.ExecuteCopyModelCodeToClipboardCommand);
         }
 
         /// <summary>
@@ -1170,7 +1149,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Executes the <see cref="CreateSubscriptionCommand"/>
         /// </summary>
-        private async Task ExecuteCreateSubscriptionCommand()
+        private async void ExecuteCreateSubscriptionCommand()
         {
             if (this.SelectedThing == null)
             {
@@ -1208,7 +1187,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Execute the <see cref="CreateCommand"/>
         /// </summary>
-        private async Task ExecuteCreateParameterOverride()
+        private async void ExecuteCreateParameterOverride()
         {
             if (this.SelectedThing == null)
             {
@@ -1253,7 +1232,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Execute the <see cref="CopyElementDefinitionCommand"/>
         /// </summary>
-        private async Task ExecuteCopyElementDefinition()
+        private async void ExecuteCopyElementDefinition()
         {
             var elementDef = this.SelectedThing.Thing as ElementDefinition;
             var copyUsage = true;
@@ -1288,7 +1267,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>
         /// an awaitable <see cref="Task"/>
         /// </returns>
-        private async Task ExecuteBatchCreateSubscriptionCommand()
+        private async void ExecuteBatchCreateSubscriptionCommand()
         {
             var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
             var model = (EngineeringModel)this.Thing.Container;
@@ -1328,7 +1307,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>
         /// an awaitable <see cref="Task"/>
         /// </returns>
-        private async Task ExecuteBatchDeleteSubscriptionCommand()
+        private async void ExecuteBatchDeleteSubscriptionCommand()
         {
             var owner = Session.QuerySelectedDomainOfExpertise(this.Thing);
             var filteredParameterTypes = this.Thing.Element.SelectMany(e => e.Parameter)
@@ -1436,7 +1415,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>
         /// an awaitable <see cref="Task"/>
         /// </returns>
-        private async Task ExecuteChangeOwnershipCommand()
+        private async void ExecuteChangeOwnershipCommand()
         {
             var model = (EngineeringModel)this.Thing.Container;
             var allowedDomainOfExpertises = model.EngineeringModelSetup.ActiveDomain;

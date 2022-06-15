@@ -1,26 +1,25 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DomainFileStoreBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +29,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
@@ -51,7 +51,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
     
     using CDP4EngineeringModel.ViewModels;
     
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     
     using Moq;
     
@@ -386,7 +386,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
         }
 
         [Test]
-        public void VerifyThatCreateFolderCommandWorks()
+        public async Task VerifyThatCreateFolderCommandWorks()
         {
             this.store.Folder.Add(this.folder1);
             this.store.Folder.Add(this.folder2);
@@ -401,7 +401,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             //DomainFileStore row selected
             this.vm.SelectedThing = this.vm.ContainedRows.First();
 
-            this.vm.CreateFolderCommand.Execute(null);
+            await this.vm.CreateFolderCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -417,7 +417,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             //Main folder row selected
             this.vm.SelectedThing = this.vm.ContainedRows.First().ContainedRows.First();
 
-            this.vm.CreateFolderCommand.Execute(null);
+            await this.vm.CreateFolderCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -433,7 +433,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             //Sub folder row selected
             this.vm.SelectedThing = this.vm.ContainedRows.First().ContainedRows.First().ContainedRows.First();
 
-            this.vm.CreateFolderCommand.Execute(null);
+            await this.vm.CreateFolderCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -448,7 +448,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
         }
 
         [Test]
-        public void VerifyThatCreateStoreCommandWorks()
+        public async Task VerifyThatCreateStoreCommandWorks()
         {
             this.model.Iteration.FirstOrDefault()?.DomainFileStore.Add(this.store);
             this.rev.SetValue(this.iteration, 2);
@@ -457,7 +457,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             this.vm.ComputePermission();
 
             //No row selected
-            this.vm.CreateStoreCommand.Execute(null);
+            await this.vm.CreateStoreCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -473,7 +473,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             //DomainFileStore row selected
             this.vm.SelectedThing = this.vm.ContainedRows.First();
 
-            this.vm.CreateStoreCommand.Execute(null);
+            await this.vm.CreateStoreCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -488,7 +488,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
         }
 
         [Test]
-        public void VerifyThatCreateFileCommandWorks()
+        public async Task VerifyThatCreateFileCommandWorks()
         {
             this.store.Folder.Add(this.folder1);
             this.store.Folder.Add(this.folder2);
@@ -503,7 +503,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             //DomainFileStore row selected
             this.vm.SelectedThing = this.vm.ContainedRows.First();
 
-            this.vm.CreateFileCommand.Execute(null);
+            await this.vm.CreateFileCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -519,7 +519,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             //Main folder row selected
             this.vm.SelectedThing = this.vm.ContainedRows.First().ContainedRows.First();
 
-            this.vm.CreateFileCommand.Execute(null);
+            await this.vm.CreateFileCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -535,7 +535,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
             //Sub folder row selected
             this.vm.SelectedThing = this.vm.ContainedRows.First().ContainedRows.First().ContainedRows.First();
 
-            this.vm.CreateFileCommand.Execute(null);
+            await this.vm.CreateFileCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -550,7 +550,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
         }
 
         [Test]
-        public void VerifyThatDownloadFileCommandWorks()
+        public async Task VerifyThatDownloadFileCommandWorks()
         {
             this.store.File.Add(this.file);
             this.model.Iteration.FirstOrDefault()?.DomainFileStore.Add(this.store);
@@ -560,12 +560,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
 
             this.vm.SelectedThing = this.vm.ContainedRows.First().ContainedRows.First(x => x.Thing is File);
 
-            this.vm.DownloadFileCommand.Execute(null);
+            await this.vm.DownloadFileCommand.Execute();
             this.downloadFileService.Verify(x => x.ExecuteDownloadFile(this.vm, this.file), Times.Once());
         }
 
         [Test]
-        public void VerifyThatCancelDownloadCommandWorks()
+        public async Task VerifyThatCancelDownloadCommandWorks()
         {
             this.store.File.Add(this.file);
             this.model.Iteration.FirstOrDefault()?.DomainFileStore.Add(this.store);
@@ -575,7 +575,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.DomainFileStoreBrowser
 
             this.vm.SelectedThing = this.vm.ContainedRows.First().ContainedRows.First(x => x.Thing is File);
 
-            this.vm.CancelDownloadCommand.Execute(null);
+            await this.vm.CancelDownloadCommand.Execute();
             this.downloadFileService.Verify(x => x.CancelDownloadFile(this.vm), Times.Once());
         }
 

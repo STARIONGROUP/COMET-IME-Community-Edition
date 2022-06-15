@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="EngineeringModelDataAnnotation"/>
@@ -155,52 +156,52 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedAuthor"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedAuthorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedAuthorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedPrimaryAnnotatedThing"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedPrimaryAnnotatedThingCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedPrimaryAnnotatedThingCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ModellingThingReference
         /// </summary>
-        public ReactiveCommand<object> CreateRelatedThingCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateRelatedThingCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ModellingThingReference
         /// </summary>
-        public ReactiveCommand<object> DeleteRelatedThingCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteRelatedThingCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ModellingThingReference
         /// </summary>
-        public ReactiveCommand<object> EditRelatedThingCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditRelatedThingCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ModellingThingReference
         /// </summary>
-        public ReactiveCommand<object> InspectRelatedThingCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectRelatedThingCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a EngineeringModelDataDiscussionItem
         /// </summary>
-        public ReactiveCommand<object> CreateDiscussionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateDiscussionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a EngineeringModelDataDiscussionItem
         /// </summary>
-        public ReactiveCommand<object> DeleteDiscussionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteDiscussionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a EngineeringModelDataDiscussionItem
         /// </summary>
-        public ReactiveCommand<object> EditDiscussionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditDiscussionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a EngineeringModelDataDiscussionItem
         /// </summary>
-        public ReactiveCommand<object> InspectDiscussionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectDiscussionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -213,38 +214,38 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedRelatedThingCommand = this.WhenAny(vm => vm.SelectedRelatedThing, v => v.Value != null);
             var canExecuteEditSelectedRelatedThingCommand = this.WhenAny(vm => vm.SelectedRelatedThing, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateRelatedThingCommand = ReactiveCommand.Create(canExecuteCreateRelatedThingCommand);
+            this.CreateRelatedThingCommand = ReactiveCommandCreator.Create(canExecuteCreateRelatedThingCommand);
             this.CreateRelatedThingCommand.Subscribe(_ => this.ExecuteCreateCommand<ModellingThingReference>(this.PopulateRelatedThing));
 
-            this.DeleteRelatedThingCommand = ReactiveCommand.Create(canExecuteEditSelectedRelatedThingCommand);
+            this.DeleteRelatedThingCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRelatedThingCommand);
             this.DeleteRelatedThingCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedRelatedThing.Thing, this.PopulateRelatedThing));
 
-            this.EditRelatedThingCommand = ReactiveCommand.Create(canExecuteEditSelectedRelatedThingCommand);
+            this.EditRelatedThingCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRelatedThingCommand);
             this.EditRelatedThingCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedRelatedThing.Thing, this.PopulateRelatedThing));
 
-            this.InspectRelatedThingCommand = ReactiveCommand.Create(canExecuteInspectSelectedRelatedThingCommand);
+            this.InspectRelatedThingCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRelatedThingCommand);
             this.InspectRelatedThingCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRelatedThing.Thing));
             
             var canExecuteCreateDiscussionCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedDiscussionCommand = this.WhenAny(vm => vm.SelectedDiscussion, v => v.Value != null);
             var canExecuteEditSelectedDiscussionCommand = this.WhenAny(vm => vm.SelectedDiscussion, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateDiscussionCommand = ReactiveCommand.Create(canExecuteCreateDiscussionCommand);
+            this.CreateDiscussionCommand = ReactiveCommandCreator.Create(canExecuteCreateDiscussionCommand);
             this.CreateDiscussionCommand.Subscribe(_ => this.ExecuteCreateCommand<EngineeringModelDataDiscussionItem>(this.PopulateDiscussion));
 
-            this.DeleteDiscussionCommand = ReactiveCommand.Create(canExecuteEditSelectedDiscussionCommand);
+            this.DeleteDiscussionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDiscussionCommand);
             this.DeleteDiscussionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedDiscussion.Thing, this.PopulateDiscussion));
 
-            this.EditDiscussionCommand = ReactiveCommand.Create(canExecuteEditSelectedDiscussionCommand);
+            this.EditDiscussionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDiscussionCommand);
             this.EditDiscussionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedDiscussion.Thing, this.PopulateDiscussion));
 
-            this.InspectDiscussionCommand = ReactiveCommand.Create(canExecuteInspectSelectedDiscussionCommand);
+            this.InspectDiscussionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDiscussionCommand);
             this.InspectDiscussionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDiscussion.Thing));
             var canExecuteInspectSelectedAuthorCommand = this.WhenAny(vm => vm.SelectedAuthor, v => v.Value != null);
-            this.InspectSelectedAuthorCommand = ReactiveCommand.Create(canExecuteInspectSelectedAuthorCommand);
+            this.InspectSelectedAuthorCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedAuthorCommand);
             this.InspectSelectedAuthorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedAuthor));
             var canExecuteInspectSelectedPrimaryAnnotatedThingCommand = this.WhenAny(vm => vm.SelectedPrimaryAnnotatedThing, v => v.Value != null);
-            this.InspectSelectedPrimaryAnnotatedThingCommand = ReactiveCommand.Create(canExecuteInspectSelectedPrimaryAnnotatedThingCommand);
+            this.InspectSelectedPrimaryAnnotatedThingCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedPrimaryAnnotatedThingCommand);
             this.InspectSelectedPrimaryAnnotatedThingCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedPrimaryAnnotatedThing));
         }
 

@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Citation"/>
@@ -165,7 +166,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedSource"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedSourceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedSourceCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -174,7 +175,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedSourceCommand = this.WhenAny(vm => vm.SelectedSource, v => v.Value != null);
-            this.InspectSelectedSourceCommand = ReactiveCommand.Create(canExecuteInspectSelectedSourceCommand);
+            this.InspectSelectedSourceCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedSourceCommand);
             this.InspectSelectedSourceCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSource));
         }
 

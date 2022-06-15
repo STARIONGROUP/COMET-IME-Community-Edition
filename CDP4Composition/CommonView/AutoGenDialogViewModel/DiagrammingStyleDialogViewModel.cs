@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="DiagrammingStyle"/>
@@ -280,37 +281,37 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedFillColor"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedFillColorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedFillColorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedStrokeColor"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedStrokeColorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedStrokeColorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedFontColor"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedFontColorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedFontColorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Color
         /// </summary>
-        public ReactiveCommand<object> CreateUsedColorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateUsedColorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Color
         /// </summary>
-        public ReactiveCommand<object> DeleteUsedColorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteUsedColorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Color
         /// </summary>
-        public ReactiveCommand<object> EditUsedColorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditUsedColorCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Color
         /// </summary>
-        public ReactiveCommand<object> InspectUsedColorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectUsedColorCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -323,25 +324,25 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedUsedColorCommand = this.WhenAny(vm => vm.SelectedUsedColor, v => v.Value != null);
             var canExecuteEditSelectedUsedColorCommand = this.WhenAny(vm => vm.SelectedUsedColor, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateUsedColorCommand = ReactiveCommand.Create(canExecuteCreateUsedColorCommand);
+            this.CreateUsedColorCommand = ReactiveCommandCreator.Create(canExecuteCreateUsedColorCommand);
             this.CreateUsedColorCommand.Subscribe(_ => this.ExecuteCreateCommand<Color>(this.PopulateUsedColor));
 
-            this.DeleteUsedColorCommand = ReactiveCommand.Create(canExecuteEditSelectedUsedColorCommand);
+            this.DeleteUsedColorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUsedColorCommand);
             this.DeleteUsedColorCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedUsedColor.Thing, this.PopulateUsedColor));
 
-            this.EditUsedColorCommand = ReactiveCommand.Create(canExecuteEditSelectedUsedColorCommand);
+            this.EditUsedColorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUsedColorCommand);
             this.EditUsedColorCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedUsedColor.Thing, this.PopulateUsedColor));
 
-            this.InspectUsedColorCommand = ReactiveCommand.Create(canExecuteInspectSelectedUsedColorCommand);
+            this.InspectUsedColorCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedUsedColorCommand);
             this.InspectUsedColorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedUsedColor.Thing));
             var canExecuteInspectSelectedFillColorCommand = this.WhenAny(vm => vm.SelectedFillColor, v => v.Value != null);
-            this.InspectSelectedFillColorCommand = ReactiveCommand.Create(canExecuteInspectSelectedFillColorCommand);
+            this.InspectSelectedFillColorCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedFillColorCommand);
             this.InspectSelectedFillColorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedFillColor));
             var canExecuteInspectSelectedStrokeColorCommand = this.WhenAny(vm => vm.SelectedStrokeColor, v => v.Value != null);
-            this.InspectSelectedStrokeColorCommand = ReactiveCommand.Create(canExecuteInspectSelectedStrokeColorCommand);
+            this.InspectSelectedStrokeColorCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedStrokeColorCommand);
             this.InspectSelectedStrokeColorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedStrokeColor));
             var canExecuteInspectSelectedFontColorCommand = this.WhenAny(vm => vm.SelectedFontColor, v => v.Value != null);
-            this.InspectSelectedFontColorCommand = ReactiveCommand.Create(canExecuteInspectSelectedFontColorCommand);
+            this.InspectSelectedFontColorCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedFontColorCommand);
             this.InspectSelectedFontColorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedFontColor));
         }
 

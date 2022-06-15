@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ParameterOrOverrideBase"/>
@@ -97,22 +98,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ParameterSubscription
         /// </summary>
-        public ReactiveCommand<object> CreateParameterSubscriptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterSubscriptionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ParameterSubscription
         /// </summary>
-        public ReactiveCommand<object> DeleteParameterSubscriptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteParameterSubscriptionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ParameterSubscription
         /// </summary>
-        public ReactiveCommand<object> EditParameterSubscriptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditParameterSubscriptionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ParameterSubscription
         /// </summary>
-        public ReactiveCommand<object> InspectParameterSubscriptionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectParameterSubscriptionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -125,16 +126,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedParameterSubscriptionCommand = this.WhenAny(vm => vm.SelectedParameterSubscription, v => v.Value != null);
             var canExecuteEditSelectedParameterSubscriptionCommand = this.WhenAny(vm => vm.SelectedParameterSubscription, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateParameterSubscriptionCommand = ReactiveCommand.Create(canExecuteCreateParameterSubscriptionCommand);
+            this.CreateParameterSubscriptionCommand = ReactiveCommandCreator.Create(canExecuteCreateParameterSubscriptionCommand);
             this.CreateParameterSubscriptionCommand.Subscribe(_ => this.ExecuteCreateCommand<ParameterSubscription>(this.PopulateParameterSubscription));
 
-            this.DeleteParameterSubscriptionCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterSubscriptionCommand);
+            this.DeleteParameterSubscriptionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterSubscriptionCommand);
             this.DeleteParameterSubscriptionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedParameterSubscription.Thing, this.PopulateParameterSubscription));
 
-            this.EditParameterSubscriptionCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterSubscriptionCommand);
+            this.EditParameterSubscriptionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterSubscriptionCommand);
             this.EditParameterSubscriptionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedParameterSubscription.Thing, this.PopulateParameterSubscription));
 
-            this.InspectParameterSubscriptionCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterSubscriptionCommand);
+            this.InspectParameterSubscriptionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterSubscriptionCommand);
             this.InspectParameterSubscriptionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameterSubscription.Thing));
         }
 

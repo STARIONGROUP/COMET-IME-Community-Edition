@@ -29,8 +29,11 @@ namespace ProductTree.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -49,7 +52,7 @@ namespace ProductTree.Tests
 
     using CDP4ProductTree.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -277,7 +280,7 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyExecuteCreateSubscriptionCommand()
+        public async Task VerifyExecuteCreateSubscriptionCommand()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -309,24 +312,24 @@ namespace ProductTree.Tests
             Assert.NotNull(paramRow);
             vm.SelectedThing = paramRow;
 
-            Assert.IsTrue(vm.CreateSubscriptionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.CreateSubscriptionCommand).CanExecute(null));
             Assert.AreEqual(0, paramRow.Thing.ParameterSubscription.Count);
 
             vm.SelectedThing = null;
-            vm.CreateSubscriptionCommand.Execute(null);
+            await vm.CreateSubscriptionCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
 
             vm.SelectedThing = vm.TopElement.Single();
-            vm.CreateSubscriptionCommand.Execute(null);
+            await vm.CreateSubscriptionCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
 
             vm.SelectedThing = paramRow;
-            vm.CreateSubscriptionCommand.Execute(null);
+            await vm.CreateSubscriptionCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
         }
 
         [Test]
-        public void VerifyExecuteDeleteSubscriptionCommand()
+        public async Task VerifyExecuteDeleteSubscriptionCommand()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
@@ -362,13 +365,13 @@ namespace ProductTree.Tests
             vm.PopulateContextMenu();
             Assert.AreEqual(8, vm.ContextMenu.Count);
 
-            Assert.IsTrue(vm.DeleteSubscriptionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.DeleteSubscriptionCommand).CanExecute(null));
             Assert.AreEqual(1, paramRow.Thing.ParameterSubscription.Count);
-            vm.DeleteSubscriptionCommand.Execute(null);
+            await vm.DeleteSubscriptionCommand.Execute();
         }
 
         [Test]
-        public void VerifyCopyPathToClipboardCommand()
+        public async Task VerifyCopyPathToClipboardCommand()
         {
             var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration, ShortName = "ELEMENT" };
             var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Not owned" };
@@ -399,7 +402,7 @@ namespace ProductTree.Tests
 
             Clipboard.SetText("Reset");
 
-            vm.CopyPathToClipboardCommand.Execute(null);
+            await vm.CopyPathToClipboardCommand.Execute();
 
             Assert.IsTrue(Clipboard.GetDataObject().GetData(typeof(string)).ToString().Contains($"{this.nestedParameterPath}"));
         }
@@ -418,7 +421,7 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyCreateParameterOverride()
+        public async Task VerifyCreateParameterOverride()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
@@ -452,18 +455,18 @@ namespace ProductTree.Tests
             this.iteration.TopElement = elementdef;
             vm.SelectedThing = parameterRow;
 
-            Assert.IsTrue(vm.CreateOverrideCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.CreateOverrideCommand).CanExecute(null));
 
             vm.SelectedThing = null;
-            vm.CreateOverrideCommand.Execute(null);
+            await vm.CreateOverrideCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
 
             vm.SelectedThing = vm.TopElement.Single();
-            vm.CreateOverrideCommand.Execute(null);
+            await vm.CreateOverrideCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
 
             vm.SelectedThing = parameterRow;
-            vm.CreateOverrideCommand.Execute(parameter);
+            await vm.CreateOverrideCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
             vm.PopulateContextMenu();
@@ -482,19 +485,19 @@ namespace ProductTree.Tests
             var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain, Container = elementdef, ParameterType = boolParamType };
             elementdef.Parameter.Add(parameter);
 
-            Assert.IsFalse(vm.CreateOverrideCommand.CanExecute(parameter));
+            Assert.IsFalse(((ICommand)vm.CreateOverrideCommand).CanExecute(parameter));
         }
 
         [Test]
-        public void VerifyToggleNamesAndShortNames()
+        public async Task VerifyToggleNamesAndShortNames()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             Assert.IsFalse(vm.IsDisplayShortNamesOn);
-            Assert.IsTrue(vm.ToggleUsageNamesCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.ToggleUsageNamesCommand).CanExecute(null));
 
-            vm.ToggleUsageNamesCommand.Execute(null);
+            await vm.ToggleUsageNamesCommand.Execute();
             Assert.IsTrue(vm.IsDisplayShortNamesOn);
-            vm.ToggleUsageNamesCommand.Execute(null);
+            await vm.ToggleUsageNamesCommand.Execute();
             Assert.IsFalse(vm.IsDisplayShortNamesOn);
             Assert.DoesNotThrow(vm.Dispose);
         }

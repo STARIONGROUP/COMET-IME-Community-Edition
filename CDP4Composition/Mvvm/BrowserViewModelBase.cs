@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BrowserViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -58,6 +58,7 @@ namespace CDP4Composition.Mvvm
     using NLog;
     
     using ReactiveUI;
+    using System.Reactive;
 
     using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
 
@@ -216,13 +217,13 @@ namespace CDP4Composition.Mvvm
             this.CreateContextMenu = new ReactiveList<ContextMenuItemViewModel>();
             this.SelectedRows = new ReactiveList<IRowViewModelBase<Thing>>();
 
-            this.WhenAnyValue(vm => vm.SelectedThing).Subscribe(_ =>
+            this.Disposables.Add(this.WhenAnyValue(vm => vm.SelectedThing).Subscribe(_ =>
             {
                 this.OnSelectedThingChanged();
                 this.ComputePermission();
                 this.PopulateContextMenu();
                 this.PopulateCreateContextMenu();
-            });
+            }));
 
             var activePerson = this.Session.ActivePerson;
             this.Person = (activePerson == null) ? string.Empty : this.Session.ActivePerson.Name;
@@ -356,57 +357,57 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets or sets the Create Command
         /// </summary>
-        public ReactiveCommand<object> CreateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the delete Command
         /// </summary>
-        public ReactiveCommand<object> DeleteCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the deprecate command
         /// </summary>
-        public ReactiveCommand<object> DeprecateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeprecateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit Command
         /// </summary>
-        public ReactiveCommand<object> UpdateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> UpdateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> InspectCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> RefreshCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> RefreshCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> ExportCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> ExportCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> HelpCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> HelpCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> that changes the focus of a grid
         /// </summary>
-        public ReactiveCommand<object> ChangeFocusCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ChangeFocusCommand { get; private set; }
 
         /// <summary>
         /// Gets the Expand Rows Command
         /// </summary>
-        public ReactiveCommand<object> ExpandRowsCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExpandRowsCommand { get; private set; }
 
         /// <summary>
         /// Gets the Expand Rows Command
         /// </summary>
-        public ReactiveCommand<object> CollpaseRowsCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CollpaseRowsCommand { get; private set; }
 
         /// <summary>
         /// Gets the Context Menu for this browser
@@ -865,35 +866,16 @@ namespace CDP4Composition.Mvvm
                 vm => vm.CanWriteSelectedThing,
                 (selection, canWrite) => selection != null && canWrite && !(selection.Thing is IDeprecatableThing) && !(selection.Thing is ActualFiniteState) && this.IsDeleteAllowed(selection.Thing));
 
-            this.DeleteCommand = ReactiveCommand.Create(canDelete);
-            this.DeleteCommand.Subscribe(_ => this.ExecuteDeleteCommand());
-
-            this.UpdateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanWriteSelectedThing));
-            this.UpdateCommand.Subscribe(_ => this.ExecuteUpdateCommand());
-
-            this.DeprecateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanWriteSelectedThing));
-            this.DeprecateCommand.Subscribe(_ => this.ExecuteDeprecateCommand());
-
-            this.InspectCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null && !(x.Thing is NotThing)));
-            this.InspectCommand.Subscribe(_ => this.ExecuteInspectCommand());
-
-            this.RefreshCommand = ReactiveCommand.Create();
-            this.RefreshCommand.Subscribe(_ => this.ExecuteRefreshCommand());
-
-            this.ExportCommand = ReactiveCommand.Create();
-            this.ExportCommand.Subscribe(_ => this.ExecuteExportCommand());
-
-            this.HelpCommand = ReactiveCommand.Create();
-            this.HelpCommand.Subscribe(_ => this.ExecuteHelpCommand());
-
-            this.ChangeFocusCommand = ReactiveCommand.Create();
-            this.ChangeFocusCommand.Subscribe(_ => this.ExecuteChangeFocusCommand());
-
-            this.ExpandRowsCommand = ReactiveCommand.Create();
-            this.ExpandRowsCommand.Subscribe(_ => this.ExecuteExpandRows());
-
-            this.CollpaseRowsCommand = ReactiveCommand.Create();
-            this.CollpaseRowsCommand.Subscribe(_ => this.ExecuteCollapseRows());
+            this.DeleteCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteCommand, canDelete);
+            this.UpdateCommand = ReactiveCommandCreator.Create(this.ExecuteUpdateCommand, this.WhenAnyValue(x => x.CanWriteSelectedThing));
+            this.DeprecateCommand = ReactiveCommandCreator.Create(this.ExecuteDeprecateCommand, this.WhenAnyValue(x => x.CanWriteSelectedThing));
+            this.InspectCommand = ReactiveCommandCreator.Create(this.ExecuteInspectCommand, this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null && !(x.Thing is NotThing)));
+            this.RefreshCommand = ReactiveCommandCreator.Create(this.ExecuteRefreshCommand);
+            this.ExportCommand = ReactiveCommandCreator.Create(this.ExecuteExportCommand);
+            this.HelpCommand = ReactiveCommandCreator.Create(this.ExecuteHelpCommand);
+            this.ChangeFocusCommand = ReactiveCommandCreator.Create(this.ExecuteChangeFocusCommand);
+            this.ExpandRowsCommand = ReactiveCommandCreator.Create(this.ExecuteExpandRows);
+            this.CollpaseRowsCommand = ReactiveCommandCreator.Create(this.ExecuteCollapseRows);
 
             var iteration = this.Thing as Iteration ?? this.Thing.GetContainerOfType<Iteration>();
             if (iteration != null)

@@ -1,25 +1,25 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelIterationDomainSwitchDialogViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Omar Elebiary
-// 
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -35,8 +35,6 @@ namespace CDP4ShellDialogs.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
-
-    using CDP4CommonView;
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
@@ -83,24 +81,24 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets the Switch <see cref="ICommand" />
         /// </summary>
-        public ReactiveCommand<Unit> SwitchCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SwitchCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ICommand" />
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// The initialize reactive commands.
         /// </summary>
         private void InitializeReactiveCommands()
         {
-            this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>> { ChangeTrackingEnabled = true };
+            this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>>();
             this.IsBusy = false;
 
             var canOk = this.WhenAnyValue(x => x.SelectedIterations.Count, count => count != 0);
 
-            this.SwitchCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteDomainSwitch(), RxApp.MainThreadScheduler);
+            this.SwitchCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteDomainSwitch, canOk, RxApp.MainThreadScheduler);
 
             this.SwitchCommand.ThrownExceptions.Select(ex => ex).Subscribe(
                 x =>
@@ -109,10 +107,8 @@ namespace CDP4ShellDialogs.ViewModels
                     this.IsBusy = false;
                 });
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
 
-            this.SelectedIterations.ChangeTrackingEnabled = true;
             this.SelectedIterations.ItemsAdded.Subscribe(this.FilterIterationSelectionItems);
         }
 

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,9 +29,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;    
     using CDP4Common.EngineeringModelData;
@@ -50,7 +52,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     
     using CDP4EngineeringModel.ViewModels;
     
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     
     using Moq;
     
@@ -223,12 +225,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         }
 
         [Test]
-        public void VerifyThatCreateCommandInvokesNavigationService()
+        public async Task VerifyThatCreateCommandInvokesNavigationService()
         {
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
-            Assert.IsTrue(viewmodel.CreateCommand.CanExecute(null));
-            viewmodel.CreateCommand.Execute(null);
+            Assert.IsTrue(((ICommand)viewmodel.CreateCommand).CanExecute(null));
+            await viewmodel.CreateCommand.Execute();
 
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<RuleVerificationList>(), It.IsAny<ThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<Thing>(), null));
         }
@@ -363,11 +365,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
             
             vm.SelectedThing = null;
-            Assert.IsFalse(vm.VerifyRuleVerificationList.CanExecute(null)); 
+            Assert.IsFalse(((ICommand)vm.VerifyRuleVerificationList).CanExecute(null)); 
         }
 
         [Test]
-        public void VerifyThatIfRuleVerificationListIsSelecedTheRulesCanBeVerified()
+        public async Task VerifyThatIfRuleVerificationListIsSelecedTheRulesCanBeVerified()
         {
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri)
             {
@@ -379,8 +381,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             vm.SelectedThing = vm.RuleVerificationListRowViewModels.FirstOrDefault();
             vm.ComputePermission();
 
-            Assert.IsTrue(vm.VerifyRuleVerificationList.CanExecute(null)); 
-            vm.VerifyRuleVerificationList.Execute(null);
+            Assert.IsTrue(((ICommand)vm.VerifyRuleVerificationList).CanExecute(null)); 
+            await vm.VerifyRuleVerificationList.Execute();
 
             this.ruleVerificationService.Verify(x => x.Execute(this.session.Object, ruleVerificationList));
         }

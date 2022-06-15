@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ModellingAnnotationItem"/>
@@ -223,27 +224,27 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Approval
         /// </summary>
-        public ReactiveCommand<object> CreateApprovedByCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateApprovedByCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Approval
         /// </summary>
-        public ReactiveCommand<object> DeleteApprovedByCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteApprovedByCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Approval
         /// </summary>
-        public ReactiveCommand<object> EditApprovedByCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditApprovedByCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Approval
         /// </summary>
-        public ReactiveCommand<object> InspectApprovedByCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectApprovedByCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -256,19 +257,19 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedApprovedByCommand = this.WhenAny(vm => vm.SelectedApprovedBy, v => v.Value != null);
             var canExecuteEditSelectedApprovedByCommand = this.WhenAny(vm => vm.SelectedApprovedBy, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateApprovedByCommand = ReactiveCommand.Create(canExecuteCreateApprovedByCommand);
+            this.CreateApprovedByCommand = ReactiveCommandCreator.Create(canExecuteCreateApprovedByCommand);
             this.CreateApprovedByCommand.Subscribe(_ => this.ExecuteCreateCommand<Approval>(this.PopulateApprovedBy));
 
-            this.DeleteApprovedByCommand = ReactiveCommand.Create(canExecuteEditSelectedApprovedByCommand);
+            this.DeleteApprovedByCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedApprovedByCommand);
             this.DeleteApprovedByCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedApprovedBy.Thing, this.PopulateApprovedBy));
 
-            this.EditApprovedByCommand = ReactiveCommand.Create(canExecuteEditSelectedApprovedByCommand);
+            this.EditApprovedByCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedApprovedByCommand);
             this.EditApprovedByCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedApprovedBy.Thing, this.PopulateApprovedBy));
 
-            this.InspectApprovedByCommand = ReactiveCommand.Create(canExecuteInspectSelectedApprovedByCommand);
+            this.InspectApprovedByCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedApprovedByCommand);
             this.InspectApprovedByCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedApprovedBy.Thing));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

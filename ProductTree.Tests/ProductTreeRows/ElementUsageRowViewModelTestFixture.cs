@@ -51,7 +51,7 @@ namespace ProductTree.Tests.ProductTreeRows
     using CDP4ProductTree.Tests.ProductTreeRows;
     using CDP4ProductTree.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 

@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="NotExpression"/>
@@ -109,7 +110,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedTerm"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedTermCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedTermCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -118,7 +119,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedTermCommand = this.WhenAny(vm => vm.SelectedTerm, v => v.Value != null);
-            this.InspectSelectedTermCommand = ReactiveCommand.Create(canExecuteInspectSelectedTermCommand);
+            this.InspectSelectedTermCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedTermCommand);
             this.InspectSelectedTermCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedTerm));
         }
 

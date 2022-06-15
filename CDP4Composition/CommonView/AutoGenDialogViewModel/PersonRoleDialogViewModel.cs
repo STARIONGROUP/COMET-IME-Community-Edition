@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="PersonRole"/>
@@ -123,22 +124,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a PersonPermission
         /// </summary>
-        public ReactiveCommand<object> CreatePersonPermissionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreatePersonPermissionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a PersonPermission
         /// </summary>
-        public ReactiveCommand<object> DeletePersonPermissionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeletePersonPermissionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a PersonPermission
         /// </summary>
-        public ReactiveCommand<object> EditPersonPermissionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditPersonPermissionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a PersonPermission
         /// </summary>
-        public ReactiveCommand<object> InspectPersonPermissionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectPersonPermissionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -151,16 +152,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedPersonPermissionCommand = this.WhenAny(vm => vm.SelectedPersonPermission, v => v.Value != null);
             var canExecuteEditSelectedPersonPermissionCommand = this.WhenAny(vm => vm.SelectedPersonPermission, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreatePersonPermissionCommand = ReactiveCommand.Create(canExecuteCreatePersonPermissionCommand);
+            this.CreatePersonPermissionCommand = ReactiveCommandCreator.Create(canExecuteCreatePersonPermissionCommand);
             this.CreatePersonPermissionCommand.Subscribe(_ => this.ExecuteCreateCommand<PersonPermission>(this.PopulatePersonPermission));
 
-            this.DeletePersonPermissionCommand = ReactiveCommand.Create(canExecuteEditSelectedPersonPermissionCommand);
+            this.DeletePersonPermissionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPersonPermissionCommand);
             this.DeletePersonPermissionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedPersonPermission.Thing, this.PopulatePersonPermission));
 
-            this.EditPersonPermissionCommand = ReactiveCommand.Create(canExecuteEditSelectedPersonPermissionCommand);
+            this.EditPersonPermissionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPersonPermissionCommand);
             this.EditPersonPermissionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedPersonPermission.Thing, this.PopulatePersonPermission));
 
-            this.InspectPersonPermissionCommand = ReactiveCommand.Create(canExecuteInspectSelectedPersonPermissionCommand);
+            this.InspectPersonPermissionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedPersonPermissionCommand);
             this.InspectPersonPermissionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedPersonPermission.Thing));
         }
 

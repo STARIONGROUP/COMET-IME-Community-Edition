@@ -28,6 +28,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ActualFiniteStateList"/>
@@ -168,27 +169,27 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ActualFiniteState
         /// </summary>
-        public ReactiveCommand<object> CreateActualStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateActualStateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ActualFiniteState
         /// </summary>
-        public ReactiveCommand<object> DeleteActualStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteActualStateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ActualFiniteState
         /// </summary>
-        public ReactiveCommand<object> EditActualStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditActualStateCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ActualFiniteState
         /// </summary>
-        public ReactiveCommand<object> InspectActualStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectActualStateCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -201,19 +202,19 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedActualStateCommand = this.WhenAny(vm => vm.SelectedActualState, v => v.Value != null);
             var canExecuteEditSelectedActualStateCommand = this.WhenAny(vm => vm.SelectedActualState, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateActualStateCommand = ReactiveCommand.Create(canExecuteCreateActualStateCommand);
+            this.CreateActualStateCommand = ReactiveCommandCreator.Create(canExecuteCreateActualStateCommand);
             this.CreateActualStateCommand.Subscribe(_ => this.ExecuteCreateCommand<ActualFiniteState>(this.PopulateActualState));
 
-            this.DeleteActualStateCommand = ReactiveCommand.Create(canExecuteEditSelectedActualStateCommand);
+            this.DeleteActualStateCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedActualStateCommand);
             this.DeleteActualStateCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedActualState.Thing, this.PopulateActualState));
 
-            this.EditActualStateCommand = ReactiveCommand.Create(canExecuteEditSelectedActualStateCommand);
+            this.EditActualStateCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedActualStateCommand);
             this.EditActualStateCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedActualState.Thing, this.PopulateActualState));
 
-            this.InspectActualStateCommand = ReactiveCommand.Create(canExecuteInspectSelectedActualStateCommand);
+            this.InspectActualStateCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedActualStateCommand);
             this.InspectActualStateCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedActualState.Thing));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

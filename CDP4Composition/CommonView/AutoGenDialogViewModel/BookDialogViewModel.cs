@@ -28,6 +28,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Book"/>
@@ -191,37 +192,37 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Section
         /// </summary>
-        public ReactiveCommand<object> CreateSectionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateSectionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Section
         /// </summary>
-        public ReactiveCommand<object> DeleteSectionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteSectionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Section
         /// </summary>
-        public ReactiveCommand<object> EditSectionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditSectionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Section
         /// </summary>
-        public ReactiveCommand<object> InspectSectionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSectionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a Section 
         /// </summary>
-        public ReactiveCommand<object> MoveUpSectionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpSectionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a Section
         /// </summary>
-        public ReactiveCommand<object> MoveDownSectionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownSectionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -234,25 +235,25 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedSectionCommand = this.WhenAny(vm => vm.SelectedSection, v => v.Value != null);
             var canExecuteEditSelectedSectionCommand = this.WhenAny(vm => vm.SelectedSection, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateSectionCommand = ReactiveCommand.Create(canExecuteCreateSectionCommand);
+            this.CreateSectionCommand = ReactiveCommandCreator.Create(canExecuteCreateSectionCommand);
             this.CreateSectionCommand.Subscribe(_ => this.ExecuteCreateCommand<Section>(this.PopulateSection));
 
-            this.DeleteSectionCommand = ReactiveCommand.Create(canExecuteEditSelectedSectionCommand);
+            this.DeleteSectionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSectionCommand);
             this.DeleteSectionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedSection.Thing, this.PopulateSection));
 
-            this.EditSectionCommand = ReactiveCommand.Create(canExecuteEditSelectedSectionCommand);
+            this.EditSectionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSectionCommand);
             this.EditSectionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedSection.Thing, this.PopulateSection));
 
-            this.InspectSectionCommand = ReactiveCommand.Create(canExecuteInspectSelectedSectionCommand);
+            this.InspectSectionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedSectionCommand);
             this.InspectSectionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSection.Thing));
 
-            this.MoveUpSectionCommand = ReactiveCommand.Create(canExecuteEditSelectedSectionCommand);
+            this.MoveUpSectionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSectionCommand);
             this.MoveUpSectionCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Section, this.SelectedSection));
 
-            this.MoveDownSectionCommand = ReactiveCommand.Create(canExecuteEditSelectedSectionCommand);
+            this.MoveDownSectionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSectionCommand);
             this.MoveDownSectionCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Section, this.SelectedSection));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

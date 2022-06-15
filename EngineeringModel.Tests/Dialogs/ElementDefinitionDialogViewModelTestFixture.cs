@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
@@ -11,6 +30,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -141,7 +162,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
-        public void VerifyOkExecuteWhenNotTopElement()
+        public async Task VerifyOkExecuteWhenNotTopElement()
         {
             var name = "name";
             var shortname = "shortname";
@@ -151,13 +172,13 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.elementDefinition.Owner = this.domainOfExpertise;
 
             var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
-            elementDefinitionDialogViewModel.OkCommand.Execute(null);
+            await elementDefinitionDialogViewModel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
 
         [Test]
-        public void VerifyOkExecuteWhenTopElement()
+        public async Task VerifyOkExecuteWhenTopElement()
         {
             var name = "name";
             var shortname = "shortname";
@@ -168,7 +189,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
             elementDefinitionDialogViewModel.IsTopElement = true;
-            elementDefinitionDialogViewModel.OkCommand.Execute(null);
+            await elementDefinitionDialogViewModel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }

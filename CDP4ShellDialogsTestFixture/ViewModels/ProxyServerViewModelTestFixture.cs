@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProxyServerViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,8 +28,14 @@ using CDP4ShellDialogs.Proxy;
 namespace CDP4ShellDialogs.Tests.ViewModels
 {
     using System;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4ShellDialogs.ViewModels;
+
     using Microsoft.Win32;
+    
     using NUnit.Framework;
 
     /// <summary>
@@ -53,9 +78,9 @@ namespace CDP4ShellDialogs.Tests.ViewModels
             Assert.IsNull(vm.UserName);
             Assert.IsNull(vm.Password);
 
-            Assert.IsTrue(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
 
-            Assert.IsTrue(vm.CancelCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.CancelCommand).CanExecute(null));
         }
 
         [Test]
@@ -65,11 +90,11 @@ namespace CDP4ShellDialogs.Tests.ViewModels
 
             vm.Address = "%$#@";
 
-            Assert.IsFalse(vm.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
 
             vm.Address = "proxy.cdp4.org";
 
-            Assert.IsTrue(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
         }
 
         [Test]
@@ -79,15 +104,15 @@ namespace CDP4ShellDialogs.Tests.ViewModels
             
             vm.Port = "rtyuio";
 
-            Assert.IsFalse(vm.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
 
             vm.Port = "8080";
 
-            Assert.IsTrue(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
         }
 
         [Test]
-        public void Verify_that_when_ok_executed_registry_is_written_and_result_is_true()
+        public async Task Verify_that_when_ok_executed_registry_is_written_and_result_is_true()
         {
             var vm = new ProxyServerViewModel();
             vm.Address = "192.168.0.100";
@@ -95,7 +120,7 @@ namespace CDP4ShellDialogs.Tests.ViewModels
             vm.UserName = "John";
             vm.Password = "Doe";
 
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
 
             Assert.AreEqual(true, vm.DialogResult.Result.Value);
 
@@ -108,7 +133,7 @@ namespace CDP4ShellDialogs.Tests.ViewModels
         }
 
         [Test]
-        public void Verify_that_when_cancel_executed_registry_is_not_written_and_result_is_false()
+        public async Task Verify_that_when_cancel_executed_registry_is_not_written_and_result_is_false()
         {
             var vm = new ProxyServerViewModel();
             vm.Address = "test.cdp4.org";
@@ -116,7 +141,7 @@ namespace CDP4ShellDialogs.Tests.ViewModels
             vm.UserName = "John";
             vm.Password = "Doe";
 
-            vm.CancelCommand.Execute(null);
+            await vm.CancelCommand.Execute();
 
             Assert.AreEqual(false, vm.DialogResult.Result.Value);
 

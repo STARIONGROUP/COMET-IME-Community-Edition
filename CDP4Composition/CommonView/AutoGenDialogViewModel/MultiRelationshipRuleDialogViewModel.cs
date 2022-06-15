@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="MultiRelationshipRule"/>
@@ -156,7 +157,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedRelationshipCategory"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedRelationshipCategoryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedRelationshipCategoryCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -165,7 +166,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedRelationshipCategoryCommand = this.WhenAny(vm => vm.SelectedRelationshipCategory, v => v.Value != null);
-            this.InspectSelectedRelationshipCategoryCommand = ReactiveCommand.Create(canExecuteInspectSelectedRelationshipCategoryCommand);
+            this.InspectSelectedRelationshipCategoryCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRelationshipCategoryCommand);
             this.InspectSelectedRelationshipCategoryCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRelationshipCategory));
         }
 

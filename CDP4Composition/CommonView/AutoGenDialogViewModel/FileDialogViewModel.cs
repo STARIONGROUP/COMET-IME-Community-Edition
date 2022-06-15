@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="File"/>
@@ -167,32 +168,32 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedLockedBy"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedLockedByCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedLockedByCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a FileRevision
         /// </summary>
-        public ReactiveCommand<object> CreateFileRevisionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateFileRevisionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a FileRevision
         /// </summary>
-        public ReactiveCommand<object> DeleteFileRevisionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteFileRevisionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a FileRevision
         /// </summary>
-        public ReactiveCommand<object> EditFileRevisionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditFileRevisionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a FileRevision
         /// </summary>
-        public ReactiveCommand<object> InspectFileRevisionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectFileRevisionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -205,22 +206,22 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedFileRevisionCommand = this.WhenAny(vm => vm.SelectedFileRevision, v => v.Value != null);
             var canExecuteEditSelectedFileRevisionCommand = this.WhenAny(vm => vm.SelectedFileRevision, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateFileRevisionCommand = ReactiveCommand.Create(canExecuteCreateFileRevisionCommand);
+            this.CreateFileRevisionCommand = ReactiveCommandCreator.Create(canExecuteCreateFileRevisionCommand);
             this.CreateFileRevisionCommand.Subscribe(_ => this.ExecuteCreateCommand<FileRevision>(this.PopulateFileRevision));
 
-            this.DeleteFileRevisionCommand = ReactiveCommand.Create(canExecuteEditSelectedFileRevisionCommand);
+            this.DeleteFileRevisionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedFileRevisionCommand);
             this.DeleteFileRevisionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedFileRevision.Thing, this.PopulateFileRevision));
 
-            this.EditFileRevisionCommand = ReactiveCommand.Create(canExecuteEditSelectedFileRevisionCommand);
+            this.EditFileRevisionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedFileRevisionCommand);
             this.EditFileRevisionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedFileRevision.Thing, this.PopulateFileRevision));
 
-            this.InspectFileRevisionCommand = ReactiveCommand.Create(canExecuteInspectSelectedFileRevisionCommand);
+            this.InspectFileRevisionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedFileRevisionCommand);
             this.InspectFileRevisionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedFileRevision.Thing));
             var canExecuteInspectSelectedLockedByCommand = this.WhenAny(vm => vm.SelectedLockedBy, v => v.Value != null);
-            this.InspectSelectedLockedByCommand = ReactiveCommand.Create(canExecuteInspectSelectedLockedByCommand);
+            this.InspectSelectedLockedByCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedLockedByCommand);
             this.InspectSelectedLockedByCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedLockedBy));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

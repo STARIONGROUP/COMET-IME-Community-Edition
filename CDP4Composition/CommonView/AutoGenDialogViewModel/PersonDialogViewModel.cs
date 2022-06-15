@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Person"/>
@@ -340,87 +341,87 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOrganization"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOrganizationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOrganizationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedDefaultDomain"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedDefaultDomainCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedDefaultDomainCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedRole"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedRoleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedRoleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedDefaultEmailAddress"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedDefaultEmailAddressCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedDefaultEmailAddressCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedDefaultTelephoneNumber"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedDefaultTelephoneNumberCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedDefaultTelephoneNumberCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a EmailAddress
         /// </summary>
-        public ReactiveCommand<object> CreateEmailAddressCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateEmailAddressCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a EmailAddress
         /// </summary>
-        public ReactiveCommand<object> DeleteEmailAddressCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteEmailAddressCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a EmailAddress
         /// </summary>
-        public ReactiveCommand<object> EditEmailAddressCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditEmailAddressCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a EmailAddress
         /// </summary>
-        public ReactiveCommand<object> InspectEmailAddressCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectEmailAddressCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a TelephoneNumber
         /// </summary>
-        public ReactiveCommand<object> CreateTelephoneNumberCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateTelephoneNumberCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a TelephoneNumber
         /// </summary>
-        public ReactiveCommand<object> DeleteTelephoneNumberCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteTelephoneNumberCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a TelephoneNumber
         /// </summary>
-        public ReactiveCommand<object> EditTelephoneNumberCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditTelephoneNumberCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a TelephoneNumber
         /// </summary>
-        public ReactiveCommand<object> InspectTelephoneNumberCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectTelephoneNumberCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a UserPreference
         /// </summary>
-        public ReactiveCommand<object> CreateUserPreferenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateUserPreferenceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a UserPreference
         /// </summary>
-        public ReactiveCommand<object> DeleteUserPreferenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteUserPreferenceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a UserPreference
         /// </summary>
-        public ReactiveCommand<object> EditUserPreferenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditUserPreferenceCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a UserPreference
         /// </summary>
-        public ReactiveCommand<object> InspectUserPreferenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectUserPreferenceCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -433,63 +434,63 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedEmailAddressCommand = this.WhenAny(vm => vm.SelectedEmailAddress, v => v.Value != null);
             var canExecuteEditSelectedEmailAddressCommand = this.WhenAny(vm => vm.SelectedEmailAddress, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateEmailAddressCommand = ReactiveCommand.Create(canExecuteCreateEmailAddressCommand);
+            this.CreateEmailAddressCommand = ReactiveCommandCreator.Create(canExecuteCreateEmailAddressCommand);
             this.CreateEmailAddressCommand.Subscribe(_ => this.ExecuteCreateCommand<EmailAddress>(this.PopulateEmailAddress));
 
-            this.DeleteEmailAddressCommand = ReactiveCommand.Create(canExecuteEditSelectedEmailAddressCommand);
+            this.DeleteEmailAddressCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedEmailAddressCommand);
             this.DeleteEmailAddressCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedEmailAddress.Thing, this.PopulateEmailAddress));
 
-            this.EditEmailAddressCommand = ReactiveCommand.Create(canExecuteEditSelectedEmailAddressCommand);
+            this.EditEmailAddressCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedEmailAddressCommand);
             this.EditEmailAddressCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedEmailAddress.Thing, this.PopulateEmailAddress));
 
-            this.InspectEmailAddressCommand = ReactiveCommand.Create(canExecuteInspectSelectedEmailAddressCommand);
+            this.InspectEmailAddressCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedEmailAddressCommand);
             this.InspectEmailAddressCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedEmailAddress.Thing));
             
             var canExecuteCreateTelephoneNumberCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedTelephoneNumberCommand = this.WhenAny(vm => vm.SelectedTelephoneNumber, v => v.Value != null);
             var canExecuteEditSelectedTelephoneNumberCommand = this.WhenAny(vm => vm.SelectedTelephoneNumber, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateTelephoneNumberCommand = ReactiveCommand.Create(canExecuteCreateTelephoneNumberCommand);
+            this.CreateTelephoneNumberCommand = ReactiveCommandCreator.Create(canExecuteCreateTelephoneNumberCommand);
             this.CreateTelephoneNumberCommand.Subscribe(_ => this.ExecuteCreateCommand<TelephoneNumber>(this.PopulateTelephoneNumber));
 
-            this.DeleteTelephoneNumberCommand = ReactiveCommand.Create(canExecuteEditSelectedTelephoneNumberCommand);
+            this.DeleteTelephoneNumberCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedTelephoneNumberCommand);
             this.DeleteTelephoneNumberCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedTelephoneNumber.Thing, this.PopulateTelephoneNumber));
 
-            this.EditTelephoneNumberCommand = ReactiveCommand.Create(canExecuteEditSelectedTelephoneNumberCommand);
+            this.EditTelephoneNumberCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedTelephoneNumberCommand);
             this.EditTelephoneNumberCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedTelephoneNumber.Thing, this.PopulateTelephoneNumber));
 
-            this.InspectTelephoneNumberCommand = ReactiveCommand.Create(canExecuteInspectSelectedTelephoneNumberCommand);
+            this.InspectTelephoneNumberCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedTelephoneNumberCommand);
             this.InspectTelephoneNumberCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedTelephoneNumber.Thing));
             
             var canExecuteCreateUserPreferenceCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedUserPreferenceCommand = this.WhenAny(vm => vm.SelectedUserPreference, v => v.Value != null);
             var canExecuteEditSelectedUserPreferenceCommand = this.WhenAny(vm => vm.SelectedUserPreference, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateUserPreferenceCommand = ReactiveCommand.Create(canExecuteCreateUserPreferenceCommand);
+            this.CreateUserPreferenceCommand = ReactiveCommandCreator.Create(canExecuteCreateUserPreferenceCommand);
             this.CreateUserPreferenceCommand.Subscribe(_ => this.ExecuteCreateCommand<UserPreference>(this.PopulateUserPreference));
 
-            this.DeleteUserPreferenceCommand = ReactiveCommand.Create(canExecuteEditSelectedUserPreferenceCommand);
+            this.DeleteUserPreferenceCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUserPreferenceCommand);
             this.DeleteUserPreferenceCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedUserPreference.Thing, this.PopulateUserPreference));
 
-            this.EditUserPreferenceCommand = ReactiveCommand.Create(canExecuteEditSelectedUserPreferenceCommand);
+            this.EditUserPreferenceCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUserPreferenceCommand);
             this.EditUserPreferenceCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedUserPreference.Thing, this.PopulateUserPreference));
 
-            this.InspectUserPreferenceCommand = ReactiveCommand.Create(canExecuteInspectSelectedUserPreferenceCommand);
+            this.InspectUserPreferenceCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedUserPreferenceCommand);
             this.InspectUserPreferenceCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedUserPreference.Thing));
             var canExecuteInspectSelectedOrganizationCommand = this.WhenAny(vm => vm.SelectedOrganization, v => v.Value != null);
-            this.InspectSelectedOrganizationCommand = ReactiveCommand.Create(canExecuteInspectSelectedOrganizationCommand);
+            this.InspectSelectedOrganizationCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOrganizationCommand);
             this.InspectSelectedOrganizationCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOrganization));
             var canExecuteInspectSelectedDefaultDomainCommand = this.WhenAny(vm => vm.SelectedDefaultDomain, v => v.Value != null);
-            this.InspectSelectedDefaultDomainCommand = ReactiveCommand.Create(canExecuteInspectSelectedDefaultDomainCommand);
+            this.InspectSelectedDefaultDomainCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDefaultDomainCommand);
             this.InspectSelectedDefaultDomainCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDefaultDomain));
             var canExecuteInspectSelectedRoleCommand = this.WhenAny(vm => vm.SelectedRole, v => v.Value != null);
-            this.InspectSelectedRoleCommand = ReactiveCommand.Create(canExecuteInspectSelectedRoleCommand);
+            this.InspectSelectedRoleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRoleCommand);
             this.InspectSelectedRoleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRole));
             var canExecuteInspectSelectedDefaultEmailAddressCommand = this.WhenAny(vm => vm.SelectedDefaultEmailAddress, v => v.Value != null);
-            this.InspectSelectedDefaultEmailAddressCommand = ReactiveCommand.Create(canExecuteInspectSelectedDefaultEmailAddressCommand);
+            this.InspectSelectedDefaultEmailAddressCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDefaultEmailAddressCommand);
             this.InspectSelectedDefaultEmailAddressCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDefaultEmailAddress));
             var canExecuteInspectSelectedDefaultTelephoneNumberCommand = this.WhenAny(vm => vm.SelectedDefaultTelephoneNumber, v => v.Value != null);
-            this.InspectSelectedDefaultTelephoneNumberCommand = ReactiveCommand.Create(canExecuteInspectSelectedDefaultTelephoneNumberCommand);
+            this.InspectSelectedDefaultTelephoneNumberCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDefaultTelephoneNumberCommand);
             this.InspectSelectedDefaultTelephoneNumberCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDefaultTelephoneNumber));
         }
 

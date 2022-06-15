@@ -1,29 +1,29 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PluginInstallerViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Tests.ViewModels
+namespace COMET.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -34,10 +34,10 @@ namespace CDP4IME.Tests.ViewModels
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reflection;
-    using System.Security.AccessControl;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Composition.Modularity;
     using CDP4Composition.Navigation;
@@ -45,17 +45,17 @@ namespace CDP4IME.Tests.ViewModels
     using CDP4Composition.Services.AppSettingService;
     using CDP4Composition.Utilities;
 
-    using CDP4IME.Behaviors;
-    using CDP4IME.Services;
-    using CDP4IME.Settings;
-    using CDP4IME.ViewModels;
-
     using CDP4UpdateServerDal;
     using CDP4UpdateServerDal.Enumerators;
 
-    using DevExpress.Mvvm.Native;
+    using COMET.Behaviors;
+    using COMET.Services;
+    using COMET.Settings;
+    using COMET.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
+
+    using DevExpress.Mvvm.Native;
 
     using Moq;
 
@@ -135,7 +135,8 @@ namespace CDP4IME.Tests.ViewModels
                 Returns(Task.FromResult<IEnumerable<(string ThingName, string Version)>>(this.updateResultFomApi));
             
             this.updateServerClient.Setup(x => x.DownloadIme(Version1, this.platform)).Returns(Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes("msi"))));
-            this.updateServerClient.Setup(x => x.DownloadPlugin(It.IsAny<string>(), It.IsAny<string>())).Returns(Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes("plugin"))));
+            this.updateServerClient.Setup(x => x.DownloadPlugin(PluginName0, It.IsAny<string>())).Returns(Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes("plugin"))));
+            this.updateServerClient.Setup(x => x.DownloadPlugin(PluginName1, It.IsAny<string>())).Returns(Task.FromResult<Stream>(new MemoryStream(Encoding.UTF8.GetBytes("plugin"))));
 
             this.assemblyInformationService = new Mock<IAssemblyInformationService>();
             this.assemblyInformationService.Setup(x => x.GetVersion()).Returns(new Version(Version0));
@@ -225,13 +226,13 @@ namespace CDP4IME.Tests.ViewModels
         {
             var vm = new UpdateDownloaderInstallerViewModel(true);
             Assert.AreEqual(this.updateResultFomApi, vm.DownloadableThings);
-            _ = await vm.DownloadCommand.ExecuteAsyncTask(null);
+            await vm.DownloadCommand.Execute();
 
             vm.AvailablePlugins.ForEach(p => p.IsSelected = true);
             vm.AvailableIme.ForEach(i => i.IsSelected = true);
-            Assert.IsTrue(vm.DownloadCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.DownloadCommand).CanExecute(null));
 
-            _ = await vm.DownloadCommand.ExecuteAsyncTask(null);
+            await vm.DownloadCommand.Execute();
             Thread.Sleep(100);
             var basePath = new DirectoryInfo(this.BasePath);
             var allCdp4Ck = basePath.EnumerateFiles("*.cdp4ck", SearchOption.AllDirectories).Select(f => f.Name).ToList();
@@ -244,20 +245,20 @@ namespace CDP4IME.Tests.ViewModels
         }
 
         [Test]
-        public void VerifySelectAllUpdateCheckBoxCommand()
+        public async Task VerifySelectAllUpdateCheckBoxCommand()
         {
             var vm = new UpdateDownloaderInstallerViewModel(this.updatablePlugins);
-            Assert.IsTrue(vm.SelectAllUpdateCheckBoxCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.SelectAllUpdateCheckBoxCommand).CanExecute(null));
 
-            vm.SelectAllUpdateCheckBoxCommand.Execute(null);
+            await vm.SelectAllUpdateCheckBoxCommand.Execute();
             Assert.IsTrue(vm.AvailablePlugins.All(p => p.IsSelected));
 
-            vm.SelectAllUpdateCheckBoxCommand.Execute(null);
+            await vm.SelectAllUpdateCheckBoxCommand.Execute();
             Assert.IsTrue(vm.AvailablePlugins.All(p => !p.IsSelected));
 
             vm = new UpdateDownloaderInstallerViewModel(true);
 
-            vm.SelectAllUpdateCheckBoxCommand.Execute(null);
+            await vm.SelectAllUpdateCheckBoxCommand.Execute();
             Assert.IsTrue(vm.AvailablePlugins.All(p => p.IsSelected));
         }
         
@@ -267,8 +268,8 @@ namespace CDP4IME.Tests.ViewModels
             this.viewModel.Behavior = this.behavior.Object;
 
             this.viewModel.IsInstallationOrDownloadInProgress = true;
-            Assert.IsTrue(this.viewModel.CancelCommand.CanExecute(null));
-            await this.viewModel.CancelCommand.ExecuteAsyncTask(null);
+            Assert.IsTrue(((ICommand)this.viewModel.CancelCommand).CanExecute(null));
+            await this.viewModel.CancelCommand.Execute();
             this.behavior.Verify(x => x.Close(), Times.Once);
             this.viewModel.IsInstallationOrDownloadInProgress = false;
         }
@@ -278,13 +279,13 @@ namespace CDP4IME.Tests.ViewModels
         {
             this.viewModel.Behavior = this.behavior.Object;
             this.viewModel.AvailablePlugins.First().FileSystem = this.UpdateFileSystem;
-            Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewModel.InstallCommand).CanExecute(null));
             this.viewModel.AvailablePlugins.First().IsSelected = false;
-            await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
+            await this.viewModel.InstallCommand.Execute();
             this.behavior.Verify(x => x.Close(), Times.Never);
 
             this.viewModel.AvailablePlugins.First().IsSelected = true;
-            await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
+            await this.viewModel.InstallCommand.Execute();
         }
         
         [Test]
@@ -293,9 +294,9 @@ namespace CDP4IME.Tests.ViewModels
             this.UpdateFileSystem.UpdateCdp4CkFileInfo.Delete();
             this.viewModel.Behavior = this.behavior.Object;
             this.viewModel.AvailablePlugins.First().FileSystem = this.UpdateFileSystem;
-            Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewModel.InstallCommand).CanExecute(null));
             this.viewModel.AvailablePlugins.First().IsSelected = true;
-            await this.viewModel.InstallCommand.ExecuteAsyncTask(null);
+            await this.viewModel.InstallCommand.Execute();
             this.behavior.Verify(x => x.Close(), Times.Never);
         }
 
@@ -318,25 +319,25 @@ namespace CDP4IME.Tests.ViewModels
 
             this.viewModel.Behavior = this.behavior.Object;
             this.viewModel.AvailablePlugins.First().FileSystem = this.UpdateFileSystem;
-            Assert.IsTrue(this.viewModel.InstallCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewModel.InstallCommand).CanExecute(null));
             this.viewModel.AvailablePlugins.First().IsSelected = true;
 
             await Task.WhenAll(
-                this.viewModel.InstallCommand.ExecuteAsyncTask(null),
-                this.viewModel.CancelCommand.ExecuteAsyncTask(null));
+                new Task(() => this.viewModel.InstallCommand.Execute()),
+                new Task(() => this.viewModel.CancelCommand.Execute()));
             
             this.AssertInstalledTestFileHasBeenRestored();
         }
 
         [Test]
-        public void VerifyRestartAfterDownloadCommand()
+        public async Task VerifyRestartAfterDownloadCommand()
         {
             var vm = new UpdateDownloaderInstallerViewModel(false);
-            Assert.IsTrue(vm.RestartAfterDownloadCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.RestartAfterDownloadCommand).CanExecute(null));
             Assert.IsFalse(vm.HasToRestartClientAfterDownload);
             vm.IsInstallationOrDownloadInProgress = false;
             var downloadText = vm.DownloadButtonText;
-            vm.RestartAfterDownloadCommand.Execute(null);
+            await vm.RestartAfterDownloadCommand.Execute();
             Assert.AreNotEqual(downloadText, vm.DownloadButtonText);
             Assert.IsTrue(vm.HasToRestartClientAfterDownload);
         }
@@ -347,10 +348,10 @@ namespace CDP4IME.Tests.ViewModels
             var vm = new UpdateDownloaderInstallerViewModel(true);
             vm.AvailablePlugins.First().IsSelected = true;
             vm.AvailableIme.First().IsSelected = true;
-            Assert.IsTrue(vm.DownloadCommand.CanExecute(null));
-            await vm.DownloadCommand.ExecuteAsyncTask(null);
-            Assert.IsTrue(vm.CancelCommand.CanExecute(null));
-            vm.CancelCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.DownloadCommand).CanExecute(null));
+            await vm.DownloadCommand.Execute();
+            Assert.IsTrue(((ICommand)vm.CancelCommand).CanExecute(null));
+            await vm.CancelCommand.Execute();
 
             Assert.False(
                 this.UpdateFileSystem.PluginDownloadPath.EnumerateFiles().Any(
@@ -410,7 +411,7 @@ namespace CDP4IME.Tests.ViewModels
             };
 
             vm.AvailablePlugins.Add(mockedRow.Object);
-            await  vm.InstallCommand.ExecuteAsyncTask();
+            await  vm.InstallCommand.Execute();
             mockedRow.Verify(x => x.Install(It.IsAny<CancellationToken>()), Times.Once);
             mockedRow.Verify(x => x.HandlingCancelationOfInstallation(), Times.Once);
             Assert.IsNull(vm.CancellationTokenSource);
@@ -438,7 +439,7 @@ namespace CDP4IME.Tests.ViewModels
 
             vm.AvailablePlugins.Add(mockedPluginRow.Object);
             vm.AvailableIme.Add(mockedImeRow.Object);
-            await vm.DownloadCommand.ExecuteAsyncTask();
+            await vm.DownloadCommand.Execute();
             mockedPluginRow.Verify(x => x.HandlingCancelationOfDownload(), Times.Once);
             mockedImeRow.Verify(x => x.HandlingCancelationOfDownload(), Times.Once);
             Assert.IsNull(vm.CancellationTokenSource);

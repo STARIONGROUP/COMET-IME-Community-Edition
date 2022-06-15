@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceSelectionViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -34,14 +34,19 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Threading.Tasks;
 
     using CDP4Composition.Extensions;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Utilities;
+
     using CDP4Dal;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
-    using Microsoft.Practices.ServiceLocation;
-    using ReactiveUI;
-    using CDP4Composition.Utilities;
+
     using CDP4ShellDialogs.Proxy;
+
+    using ReactiveUI;
+
+    using CommonServiceLocator;
 
     /// <summary>
     /// The purpose of the <see cref="DataSourceSelectionViewModel"/> is to allow a user to select an <see cref="IDal"/> implementation
@@ -98,7 +103,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// Backing field for the <see cref="Password"/> property.
         /// </summary>
         private string password;
-        
+
         /// <summary>
         /// Backing field for the <see cref="ShowBrowseButton"/> property.
         /// </summary>
@@ -118,7 +123,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// The session.
         /// </summary>
         private ISession session;
-       
+
         /// <summary>
         /// The existing correctly opened openSessions
         /// </summary>
@@ -154,11 +159,10 @@ namespace CDP4ShellDialogs.ViewModels
             this.openSessions = openSessions;
             this.dialogNavigationService = dialogNavigationService;
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
-            this.AvailableDataSourceKinds.ChangeTrackingEnabled = true;
 
             this.WhenAnyValue(vm => vm.IsProxyEnabled).Subscribe(_ => this.UpdateProxyAddressProperty());
             this.WhenAnyValue(vm => vm.IsPasswordVisible).Subscribe(_ => this.ChangeShowPasswordButtonText());
-            
+
             var canOk = this.WhenAnyValue(
                 vm => vm.UserName,
                 vm => vm.Password,
@@ -166,37 +170,27 @@ namespace CDP4ShellDialogs.ViewModels
                 vm => vm.Uri,
                 vm => vm.IsProxyEnabled,
                 (username, password, datasource, uri, isproxyenabled) =>
-                    datasource != null && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) && 
+                    datasource != null && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) &&
                     !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource));
 
-            this.OkCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteOk(false), RxApp.MainThreadScheduler);
-            this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
-            {
-                this.ErrorMessage = x.Message;
-            });
+            this.OkCommand = ReactiveCommandCreator.CreateAsyncTask(() => this.ExecuteOk(false), canOk, RxApp.MainThreadScheduler);
+            this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; });
 
-            this.OkAndOpenCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteOk(true), RxApp.MainThreadScheduler);
-            this.OkAndOpenCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
-            {
-                this.ErrorMessage = x.Message;
-            });
+            this.OkAndOpenCommand = ReactiveCommandCreator.CreateAsyncTask(() => this.ExecuteOk(true), canOk, RxApp.MainThreadScheduler);
+            this.OkAndOpenCommand.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; });
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
 
             var canBrowse = this.WhenAny(vm => vm.SelectedDataSourceKind, sd => sd.Value != null && sd.Value.DalType == DalType.File);
 
-            this.BrowseSourceCommand = ReactiveCommand.Create(canBrowse);
-            this.BrowseSourceCommand.Subscribe(_ => this.ExecuteBrowse());
+            this.BrowseSourceCommand = ReactiveCommandCreator.Create(this.ExecuteBrowse, canBrowse);
 
-            this.OpenUriManagerCommand = ReactiveCommand.Create();
-            this.OpenUriManagerCommand.Subscribe(_ => this.ExecuteOpenUriManagerRequest());
+            this.OpenUriManagerCommand = ReactiveCommandCreator.Create(this.ExecuteOpenUriManagerRequest);
 
-            this.OpenProxyConfigurationCommand = ReactiveCommand.Create();
-            this.OpenProxyConfigurationCommand.Subscribe(_ => this.ExecuteOpenProxyConfigurationCommand());
+            this.OpenProxyConfigurationCommand = ReactiveCommandCreator.Create(this.ExecuteOpenProxyConfigurationCommand);
 
             // Set the initial show password button value to Show         
-            this.IsPasswordVisible = false;      
+            this.IsPasswordVisible = false;
 
             canBrowse.Subscribe(_ => this.ResetBrowseButton());
 
@@ -204,7 +198,7 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.WhenAnyValue(vm => vm.SelectedDataSourceKind).Subscribe(_ => this.ReloadAvailableUris());
 
-            this.WhenAnyValue(vm => vm.SelectedUri, vm => vm.SelectedUriText ).Subscribe(_ => this.UpdateUri() );
+            this.WhenAnyValue(vm => vm.SelectedUri, vm => vm.SelectedUriText).Subscribe(_ => this.UpdateUri());
 
             this.ResetProperties();
         }
@@ -214,15 +208,9 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public IDalMetaData SelectedDataSourceKind
         {
-            get
-            {
-                return this.selectedDataSourceKind;
-            }
+            get => this.selectedDataSourceKind;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedDataSourceKind, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.selectedDataSourceKind, value);
         }
 
         /// <summary>
@@ -230,14 +218,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string Uri
         {
-            get
-            {
-                return this.uri;
-            }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.uri, value);
-            }
+            get => this.uri;
+            set => this.RaiseAndSetIfChanged(ref this.uri, value);
         }
 
         /// <summary>
@@ -245,14 +227,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public bool IsProxyEnabled
         {
-            get
-            {
-                return this.isProxyEnabled;
-            }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isProxyEnabled, value);
-            }
+            get => this.isProxyEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isProxyEnabled, value);
         }
 
         /// <summary>
@@ -260,14 +236,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string ProxyUri
         {
-            get
-            {
-                return this.proxyUri;
-            }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.proxyUri, value);
-            }
+            get => this.proxyUri;
+            set => this.RaiseAndSetIfChanged(ref this.proxyUri, value);
         }
 
         /// <summary>
@@ -275,29 +245,17 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string ProxyPort
         {
-            get
-            {
-                return this.proxyPort;
-            }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.proxyPort, value);
-            }
+            get => this.proxyPort;
+            set => this.RaiseAndSetIfChanged(ref this.proxyPort, value);
         }
-        
+
         /// <summary>
         /// Gets or sets the uri value that is hand edited by the user
         /// </summary>
         public string SelectedUriText
         {
-            get
-            {
-                return this.selectedUriText;
-            }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedUriText, value);
-            }
+            get => this.selectedUriText;
+            set => this.RaiseAndSetIfChanged(ref this.selectedUriText, value);
         }
 
         /// <summary>
@@ -305,14 +263,8 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public UriRowViewModel SelectedUri
         {
-            get
-            {
-                return this.selectedUri;
-            }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedUri, value);
-            }
+            get => this.selectedUri;
+            set => this.RaiseAndSetIfChanged(ref this.selectedUri, value);
         }
 
         /// <summary>
@@ -320,15 +272,9 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string UserName
         {
-            get
-            {
-                return this.userName;
-            }
+            get => this.userName;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.userName, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.userName, value);
         }
 
         /// <summary>
@@ -336,15 +282,9 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string Password
         {
-            get
-            {
-                return this.password;
-            }
+            get => this.password;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.password, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.password, value);
         }
 
         /// <summary>
@@ -352,15 +292,9 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public bool IsPasswordVisible
         {
-            get
-            {
-                return this.isPasswordVisible;
-            }
+            get => this.isPasswordVisible;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isPasswordVisible, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isPasswordVisible, value);
         }
 
         /// <summary>
@@ -368,15 +302,9 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public string ShowPasswordButtonText
         {
-            get
-            {
-                return this.showPasswordButtonText;
-            }
+            get => this.showPasswordButtonText;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.showPasswordButtonText, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.showPasswordButtonText, value);
         }
 
         /// <summary>
@@ -384,15 +312,9 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public bool ShowBrowseButton
         {
-            get
-            {
-                return this.showBrowseButton;
-            }
+            get => this.showBrowseButton;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.showBrowseButton, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.showBrowseButton, value);
         }
 
         /// <summary>
@@ -400,67 +322,55 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public ReactiveList<IDalMetaData> AvailableDataSourceKinds
         {
-            get
-            {
-                return this.availableDataSourceKinds;
-            }
+            get => this.availableDataSourceKinds;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.availableDataSourceKinds, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.availableDataSourceKinds, value);
         }
 
         /// <summary>
         /// Gets or sets the available data source kinds
         /// </summary>
-        public ReactiveList<UriRowViewModel> AllDefinedUris {  get; set; }
+        public ReactiveList<UriRowViewModel> AllDefinedUris { get; set; }
 
         /// <summary>
         /// Gets or sets the available data source kinds
         /// </summary>
         public ReactiveList<UriRowViewModel> AvailableUris
         {
-            get
-            {
-                return this.availableUris;
-            }
+            get => this.availableUris;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.availableUris, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.availableUris, value);
         }
 
         /// <summary>
         /// Gets the Ok Command
         /// </summary>
-        public ReactiveCommand<Unit> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Ok and open model Command
         /// </summary>
-        public ReactiveCommand<Unit> OkAndOpenCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkAndOpenCommand { get; private set; }
 
         /// <summary>
         /// Gets the BrowseSource Command
         /// </summary>
-        public ReactiveCommand<object> BrowseSourceCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> BrowseSourceCommand { get; private set; }
 
         /// <summary>
         /// Gets the Source Configuration open Command
         /// </summary>
-        public ReactiveCommand<object> OpenUriManagerCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenUriManagerCommand { get; private set; }
 
         /// <summary>
         /// Gets the proxy configuration Command
         /// </summary>
-        public ReactiveCommand<object> OpenProxyConfigurationCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenProxyConfigurationCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel Command
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Executes the Ok Command
@@ -488,14 +398,14 @@ namespace CDP4ShellDialogs.ViewModels
             else
             {
                 ProxySettings proxySettings = null;
-                
+
                 if (this.isProxyEnabled)
                 {
                     var proxyServerConfiguration = ProxyServerConfigurationManager.Read();
                     var proxyUri = new Uri($"http://{proxyServerConfiguration.Address}:{proxyServerConfiguration.Port}");
                     proxySettings = new ProxySettings(proxyUri, proxyServerConfiguration.UserName, proxyServerConfiguration.Password);
                 }
-                
+
                 var credentials = new Credentials(this.UserName, this.Password, providedUri, proxySettings);
                 var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
@@ -552,6 +462,7 @@ namespace CDP4ShellDialogs.ViewModels
                 if (System.Uri.IsWellFormedUriString(this.Uri, UriKind.Absolute) && new Uri(this.Uri).IsFile)
                 {
                     var fileinfo = new FileInfo(this.Uri);
+
                     if (fileinfo.Directory != null)
                     {
                         dlg.InitialDirectory = fileinfo.DirectoryName;
@@ -595,6 +506,7 @@ namespace CDP4ShellDialogs.ViewModels
             if (this.SelectedDataSourceKind != null)
             {
                 this.AvailableUris = new ReactiveList<UriRowViewModel>(this.AllDefinedUris.Where(x => x.DalType == this.SelectedDataSourceKind.DalType));
+
                 if (this.AvailableUris.Count > 0)
                 {
                     this.SelectedUri = this.AvailableUris.Last();
@@ -655,7 +567,7 @@ namespace CDP4ShellDialogs.ViewModels
 #if DEBUG
             this.UserName = "admin";
             this.Password = "pass";
-            var debugUri = new UriRowViewModel { Uri = "http://localhost:1234", DalType=DalType.Web };
+            var debugUri = new UriRowViewModel { Uri = "http://localhost:1234", DalType = DalType.Web };
             this.AllDefinedUris.Add(debugUri);
 #else
             this.UserName = string.Empty;
@@ -665,8 +577,8 @@ namespace CDP4ShellDialogs.ViewModels
             this.IsProxyEnabled = false;
             this.ProxyUri = string.Empty;
             this.ProxyPort = string.Empty;
-            
-            this.SelectedDataSourceKind = this.AvailableDataSourceKinds.FirstOrDefault(v => v.DalType == DalType.Web);            
+
+            this.SelectedDataSourceKind = this.AvailableDataSourceKinds.FirstOrDefault(v => v.DalType == DalType.Web);
         }
 
         /// <summary>
@@ -725,11 +637,11 @@ namespace CDP4ShellDialogs.ViewModels
         /// </returns>
         private bool IsValidUri(string uriToCheck, INameMetaData dataSourceKind)
         {
-            var dal = this.dals.Single(x => x.Metadata.Name == dataSourceKind.Name);   
+            var dal = this.dals.Single(x => x.Metadata.Name == dataSourceKind.Name);
             var result = dal.Value.IsValidUri(uriToCheck);
             return result;
         }
-        
+
         /// <summary>
         /// Queries the open openSessions to check if a session with the same uri and user name has already been opened
         /// </summary>
@@ -753,7 +665,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// <returns>The trimmed uri or the original if there is no slash.</returns>
         private string TrimUri(string input)
         {
-           return input.EndsWith("/") ? input.Substring(0, input.Length - 1) : input;
+            return input.EndsWith("/") ? input.Substring(0, input.Length - 1) : input;
         }
 
         /// <summary>

@@ -12,9 +12,8 @@
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
-             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -186,9 +185,9 @@
                     <dxmvvm:Interaction.Behaviors>
                         <cdp4Composition:ContextMenuBehavior />
                     </dxmvvm:Interaction.Behaviors>
-                    <i:Interaction.Behaviors>
+                    <b:Interaction.Behaviors>
                         <dragDrop:FrameworkElementDragBehavior />
-                    </i:Interaction.Behaviors>
+                    </b:Interaction.Behaviors>
 
                     <dxg:TreeListControl.Columns>
                         <dxg:TreeListColumn FieldName="Name" DefaultSortOrder="Ascending" SortIndex="0">

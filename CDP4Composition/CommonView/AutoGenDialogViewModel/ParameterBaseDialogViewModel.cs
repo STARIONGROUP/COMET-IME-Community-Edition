@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ParameterBase"/>
@@ -188,27 +189,27 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedScale"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedScaleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedStateDependence"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedStateDependenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedStateDependenceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedGroup"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedGroupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -217,19 +218,19 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedParameterTypeCommand = this.WhenAny(vm => vm.SelectedParameterType, v => v.Value != null);
-            this.InspectSelectedParameterTypeCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterTypeCommand);
+            this.InspectSelectedParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterTypeCommand);
             this.InspectSelectedParameterTypeCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameterType));
             var canExecuteInspectSelectedScaleCommand = this.WhenAny(vm => vm.SelectedScale, v => v.Value != null);
-            this.InspectSelectedScaleCommand = ReactiveCommand.Create(canExecuteInspectSelectedScaleCommand);
+            this.InspectSelectedScaleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedScaleCommand);
             this.InspectSelectedScaleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedScale));
             var canExecuteInspectSelectedStateDependenceCommand = this.WhenAny(vm => vm.SelectedStateDependence, v => v.Value != null);
-            this.InspectSelectedStateDependenceCommand = ReactiveCommand.Create(canExecuteInspectSelectedStateDependenceCommand);
+            this.InspectSelectedStateDependenceCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedStateDependenceCommand);
             this.InspectSelectedStateDependenceCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedStateDependence));
             var canExecuteInspectSelectedGroupCommand = this.WhenAny(vm => vm.SelectedGroup, v => v.Value != null);
-            this.InspectSelectedGroupCommand = ReactiveCommand.Create(canExecuteInspectSelectedGroupCommand);
+            this.InspectSelectedGroupCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedGroupCommand);
             this.InspectSelectedGroupCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedGroup));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

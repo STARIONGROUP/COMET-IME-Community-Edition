@@ -1,13 +1,13 @@
-﻿<Window x:Class="CDP4IME.Views.UpdateDownloaderInstaller"
+﻿<Window x:Class="COMET.Views.UpdateDownloaderInstaller"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:CDP4IME.Views"
-        xmlns:behaviors="clr-namespace:CDP4IME.Behaviors"
         xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+        xmlns:behaviors="clr-namespace:COMET.Behaviors"
+        xmlns:views="clr-namespace:COMET.Views"
         mc:Ignorable="d"
         Title="CDP4-Update" Height="600" Width="600" ResizeMode="NoResize" BorderThickness="0" Background="White">
     <Window.Resources>
@@ -46,7 +46,7 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <local:ImeRow/>
+                        <views:ImeRow/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
@@ -62,7 +62,7 @@
                 </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <local:PluginRow/>
+                        <views:PluginRow/>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>

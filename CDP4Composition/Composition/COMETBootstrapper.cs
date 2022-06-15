@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="COMETBootstrapper.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,15 +30,19 @@ namespace CDP4Composition.Composition
     using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics;
     using System.IO;
+    using System.Reactive.Concurrency;
     using System.Reflection;
+    using System.Windows;
 
     using CDP4Composition.Exceptions;
     using CDP4Composition.Modularity;
     using CDP4Composition.Services.AppSettingService;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using NLog;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Base class that provides basic bootstrapping using MEF
@@ -105,7 +109,7 @@ namespace CDP4Composition.Composition
                 throw new InvalidOperationException($"Cannot find directory path for {Assembly.GetExecutingAssembly().FullName}");
             }
 
-            var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");
+            var dllCatalog = new DirectoryCatalog(currentAssemblyPath, "CDP4*.dll");
 
             catalog.Catalogs.Add(dllCatalog);
         }
@@ -115,7 +119,7 @@ namespace CDP4Composition.Composition
         /// </summary>
         /// <param name="container">The <see cref="CompositionContainer"/></param>
         private void ConfigureServiceLocator(CompositionContainer container)
-        {            
+        {
             var serviceLocator = new MefServiceLocator(container);
             ServiceLocator.SetLocatorProvider(() => serviceLocator);
         }
@@ -127,7 +131,7 @@ namespace CDP4Composition.Composition
         private void AddPluginCatalogs(AggregateCatalog catalog)
         {
             this.UpdateBootstrapperStatus("Loading COMET Plugins");
-            
+
             var pluginLoader = new PluginLoader<T>();
             this.ResetStatusProgress();
             var counter = 1;
@@ -141,7 +145,7 @@ namespace CDP4Composition.Composition
 
                     catalog.Catalogs.Add(directoryCatalog);
                     this.UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
-                                        
+
                     counter++;
                 }
                 catch (ReflectionTypeLoadException reflectionTypeLoadException)

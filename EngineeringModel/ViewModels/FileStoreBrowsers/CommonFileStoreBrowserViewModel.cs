@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommonFileStoreBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,6 +27,7 @@ namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Windows.Controls;
 
@@ -44,7 +45,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -176,12 +177,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="Folder"/>
         /// </summary>
-        public ReactiveCommand<object> CreateFolderCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateFolderCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to upload a <see cref="CDP4Common.EngineeringModelData.File"/>
         /// </summary>
-        public ReactiveCommand<object> UploadFileCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> UploadFileCommand { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="CreateStoreCommand"/> can be executed
@@ -195,7 +196,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="CommonFileStore"/>
         /// </summary>
-        public ReactiveCommand<object> CreateStoreCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateStoreCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -208,14 +209,16 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-            this.CreateFolderCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateFolder));
-            this.CreateFolderCommand.Subscribe(_ => this.ExecuteCreateCommand<Folder>(this.commonFileStoreRow.Thing));
 
-            this.CreateStoreCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateStore));
-            this.CreateStoreCommand.Subscribe(_ => this.ExecuteCreateCommand<CommonFileStore>(this.Thing.TopContainer));
+            this.CreateFolderCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateCommand<Folder>(this.commonFileStoreRow.Thing), 
+                this.WhenAnyValue(x => x.CanCreateFolder));
 
-            this.UploadFileCommand = ReactiveCommand.Create();
-            this.UploadFileCommand.Subscribe(_ => this.ExecuteUploadFile());
+            this.CreateStoreCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateCommand<CommonFileStore>(this.Thing.TopContainer), 
+                this.WhenAnyValue(x => x.CanCreateStore));
+
+            this.UploadFileCommand = ReactiveCommandCreator.Create(this.ExecuteUploadFile);
         }
 
         /// <summary>

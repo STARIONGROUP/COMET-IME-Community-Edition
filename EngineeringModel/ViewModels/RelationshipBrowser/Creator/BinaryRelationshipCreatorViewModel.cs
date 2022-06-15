@@ -35,6 +35,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
 
@@ -65,7 +67,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Backing field for <see cref="AppliedCategories" />
         /// </summary>
-        private List<Category> appliedCategories;
+        private List<Category> appliedCategories = new();
 
         /// <summary>
         /// Backing field for <see cref="CanCreate" />
@@ -163,7 +165,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.Name = string.Empty;
             this.SourceViewModel.ResetControl();
             this.TargetViewModel.ResetControl();
-            this.AppliedCategories = null;
+            this.appliedCategories.Clear();
         }
 
         /// <summary>

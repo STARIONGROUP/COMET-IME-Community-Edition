@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="NestedParameter"/>
@@ -190,17 +191,17 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedAssociatedParameter"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedAssociatedParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedAssociatedParameterCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedActualState"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedActualStateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedActualStateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -209,13 +210,13 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedAssociatedParameterCommand = this.WhenAny(vm => vm.SelectedAssociatedParameter, v => v.Value != null);
-            this.InspectSelectedAssociatedParameterCommand = ReactiveCommand.Create(canExecuteInspectSelectedAssociatedParameterCommand);
+            this.InspectSelectedAssociatedParameterCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedAssociatedParameterCommand);
             this.InspectSelectedAssociatedParameterCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedAssociatedParameter));
             var canExecuteInspectSelectedActualStateCommand = this.WhenAny(vm => vm.SelectedActualState, v => v.Value != null);
-            this.InspectSelectedActualStateCommand = ReactiveCommand.Create(canExecuteInspectSelectedActualStateCommand);
+            this.InspectSelectedActualStateCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedActualStateCommand);
             this.InspectSelectedActualStateCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedActualState));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

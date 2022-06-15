@@ -1,26 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DialogViewModelBaseTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -33,6 +32,10 @@ namespace CDP4Composition.Tests.Mvvm
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive;
+    using System.Threading.Tasks;
+    using System.Reactive.Linq;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -49,7 +52,7 @@ namespace CDP4Composition.Tests.Mvvm
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -121,10 +124,10 @@ namespace CDP4Composition.Tests.Mvvm
         }
 
         [Test, Apartment(ApartmentState.STA)]
-        public void VerifThatCopyUriCommandWorks()
+        public async Task VerifThatCopyUriCommandWorks()
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, this.clone);
-            testdialog.CopyUriCommand.Execute(true);
+            await testdialog.CopyUriCommand.Execute();
             Assert.AreEqual(testdialog.ThingUri, Clipboard.GetText());
         }
 
@@ -137,12 +140,12 @@ namespace CDP4Composition.Tests.Mvvm
         }
 
         [Test, Apartment(ApartmentState.STA)]
-        public void VerifThatJsonExportCommandsWork()
+        public async Task VerifThatJsonExportCommandsWork()
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, this.clone);
-            testdialog.ShallowExportCommand.Execute(true);
+            await testdialog.ShallowExportCommand.Execute();
             Assert.IsTrue(Clipboard.GetText().Contains(this.personId));
-            testdialog.DeepExportCommand.Execute(true);
+            await testdialog.DeepExportCommand.Execute();
             Assert.IsTrue(Clipboard.GetText().Contains(this.personId));
         }
 
@@ -165,7 +168,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.navigation.Object, this.clone);
 
-            testdialog.OkCommand.Execute(null);
+            testdialog.OkCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
 
@@ -183,7 +186,7 @@ namespace CDP4Composition.Tests.Mvvm
 
             var testdialog = new TestFileRevisionDialogViewModel(fileRevision, fakeTransaction.Object, this.session.Object, true, ThingDialogKind.Create, this.navigation.Object, file);
 
-            testdialog.OkCommand.Execute(null);
+            testdialog.OkCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>(), It.IsAny<IEnumerable<string>>()));
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
         }
@@ -193,16 +196,16 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, this.clone);
 
-            testdialog.OkCommand.Execute(null);
+            testdialog.OkCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
         }
 
         [Test]
-        public void VerifyThatExecuteCancelWork()
+        public async Task VerifyThatExecuteCancelWork()
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, this.clone);
 
-            testdialog.CancelCommand.Execute(null);
+            await testdialog.CancelCommand.Execute();
             Assert.IsFalse(testdialog.DialogResult.Value);
             Assert.AreEqual(1, this.transaction.UpdatedThing.Count);
             Assert.AreEqual(0, this.transaction.AddedThing.Count());
@@ -219,16 +222,16 @@ namespace CDP4Composition.Tests.Mvvm
             testdialog.Name = "";
             Assert.That(testdialog["Name"], Is.Not.Null.Or.Not.Empty);
 
-            Assert.IsFalse(testdialog.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)testdialog.OkCommand).CanExecute(null));
 
             testdialog.Name = "ara";
             Assert.That(testdialog["Name"], Is.Null.Or.Empty);
 
-            Assert.IsTrue(testdialog.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)testdialog.OkCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyThatExecuteCreateWorks()
+        public async Task VerifyThatExecuteCreateWorks()
         {
             this.navigation.Setup(
                 x =>
@@ -237,7 +240,7 @@ namespace CDP4Composition.Tests.Mvvm
 
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, this.clone);
 
-            testdialog.CreateCommand.Execute(null);
+            await testdialog.CreateCommand.Execute();
 
             this.navigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), It.IsAny<bool>(),
                 It.IsAny<ThingDialogKind>(), this.navigation.Object, It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()));
@@ -246,7 +249,7 @@ namespace CDP4Composition.Tests.Mvvm
         }
 
         [Test]
-        public void VerifyThatExecuteCreateWorksOnCancel()
+        public async Task VerifyThatExecuteCreateWorksOnCancel()
         {
             this.navigation.Setup(
                 x =>
@@ -255,7 +258,7 @@ namespace CDP4Composition.Tests.Mvvm
 
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, this.clone);
 
-            testdialog.CreateCommand.Execute(null);
+            await testdialog.CreateCommand.Execute();
 
             this.navigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), It.IsAny<bool>(),
                 It.IsAny<ThingDialogKind>(), this.navigation.Object, It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()));
@@ -326,8 +329,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             this.UpdateTransactionCalled = false;
             this.PopulateCalled = false;
-            this.CreateCommand = ReactiveCommand.Create();
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<TelephoneNumber>(this.Populate));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<TelephoneNumber>(this.Populate));
             this.Phone = new ContainerList<TelephoneNumber>(this.Thing);
             this.OrderedRows = new ReactiveList<OrderedRow>();
         }
@@ -343,7 +345,7 @@ namespace CDP4Composition.Tests.Mvvm
             set { this.RaiseAndSetIfChanged(ref this.name, value); }
         }
 
-        public ReactiveCommand<object> CreateCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateCommand { get; private set; }
 
         public ReactiveList<OrderedRow> OrderedRows { get; private set; }
 

@@ -1,32 +1,35 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="BrowserViewModelBaseTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Tests.Mvvm
 {
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
+    using System.Threading.Tasks;
+    using System.Reactive.Linq;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -44,7 +47,7 @@ namespace CDP4Composition.Tests.Mvvm
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     
     using Moq;
     
@@ -53,7 +56,7 @@ namespace CDP4Composition.Tests.Mvvm
     using System;
 
     using ReactiveUI;
-    
+
     [TestFixture]
     public class BrowserViewModelBaseTestFixture
     {
@@ -105,12 +108,11 @@ namespace CDP4Composition.Tests.Mvvm
         }
 
         [Test]
-        public void AssertThatCreateCommandWorks()
+        public async Task AssertThatCreateCommandWorks()
         {
             var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            browser.CreateCommand.Execute(null);
+            await browser.CreateCommand.Execute();
 
-            
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
         }
 
@@ -118,29 +120,29 @@ namespace CDP4Composition.Tests.Mvvm
         public void AssertThatDeleteCommandWorks()
         {
             var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
         }
 
         [Test]
-        public void AssertThatEditCommandWorks()
+        public async Task AssertThatEditCommandWorks()
         {
             var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            Assert.IsFalse(browser.UpdateCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)browser.UpdateCommand).CanExecute(null));
 
             browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.dialogNavigation.Object);
-            browser.UpdateCommand.Execute(null);
+            await browser.UpdateCommand.Execute();
 
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Update, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
         }
 
         [Test]
-        public void AssertThatInspectCommandWorks()
+        public async Task AssertThatInspectCommandWorks()
         {
             var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            Assert.IsFalse(browser.UpdateCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)browser.UpdateCommand).CanExecute(null));
 
             browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.dialogNavigation.Object);
-            browser.InspectCommand.Execute(null);
+            await browser.InspectCommand.Execute();
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Inspect, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
         }
 
@@ -148,36 +150,36 @@ namespace CDP4Composition.Tests.Mvvm
         public void AssertThatRefreshCommandWorks()
         {
             var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            Assert.DoesNotThrow(() => browser.RefreshCommand.Execute(null));
-            session.Verify(session => session.Refresh());
+            Assert.DoesNotThrowAsync(async () => await browser.RefreshCommand.Execute());
+            this.session.Verify(session => session.Refresh());
         }
 
         [Test]
         public void AssertThatExportCommandWorks()
         {
             var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            Assert.DoesNotThrow(() => browser.ExportCommand.Execute(null));
+            Assert.DoesNotThrow(() => browser.ExportCommand.Execute());
         }
 
         [Test]
         public void AssertThatHelpCommandWorks()
         {
             var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            Assert.DoesNotThrow(() => browser.HelpCommand.Execute(null));
+            Assert.DoesNotThrow(() => browser.HelpCommand.Execute());
         }
 
         [Test]
-        public void VerifyThatDeprecateCommandWorks()
+        public async Task VerifyThatDeprecateCommandWorks()
         {
             this.permmissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            Assert.IsFalse(browser.DeprecateCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)browser.DeprecateCommand).CanExecute(null));
             browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.dialogNavigation.Object);
             
             browser.ComputePermission();
 
-            Assert.IsTrue(browser.DeprecateCommand.CanExecute(null));
-            browser.DeprecateCommand.Execute(null);
+            Assert.IsTrue(((ICommand)browser.DeprecateCommand).CanExecute(null));
+            await browser.DeprecateCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
@@ -205,8 +207,7 @@ namespace CDP4Composition.Tests.Mvvm
         internal BrowserTestClass(SiteDirectory siteDir, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(siteDir, session, dialogNav, panelNav, dialogNavigationService, pluginSettingsService)
         {
-            this.CreateCommand = ReactiveCommand.Create();
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Person>(siteDir));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Person>(siteDir));
         }
     }
 
@@ -215,8 +216,7 @@ namespace CDP4Composition.Tests.Mvvm
         internal IterationBrowserTestClass(Iteration it, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(it, session, dialogNav, panelNav, dialogNavigationService, pluginSettingsService)
         {
-            this.CreateCommand = ReactiveCommand.Create();
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Person>(it));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Person>(it));
         }
     }
 
@@ -225,8 +225,7 @@ namespace CDP4Composition.Tests.Mvvm
         internal OptionBrowserTestClass(Option op, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(op, session, dialogNav, panelNav, dialogNavigationService, pluginSettingsService)
         {
-            this.CreateCommand = ReactiveCommand.Create();
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Person>(op));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Person>(op));
         }
     }
 

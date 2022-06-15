@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="StakeHolderValueMapSettings"/>
@@ -148,17 +149,17 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedGoalToValueGroupRelationship"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedGoalToValueGroupRelationshipCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedGoalToValueGroupRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedValueGroupToStakeholderValueRelationship"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedValueGroupToStakeholderValueRelationshipCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedValueGroupToStakeholderValueRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedStakeholderValueToRequirementRelationship"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedStakeholderValueToRequirementRelationshipCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedStakeholderValueToRequirementRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -167,13 +168,13 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedGoalToValueGroupRelationshipCommand = this.WhenAny(vm => vm.SelectedGoalToValueGroupRelationship, v => v.Value != null);
-            this.InspectSelectedGoalToValueGroupRelationshipCommand = ReactiveCommand.Create(canExecuteInspectSelectedGoalToValueGroupRelationshipCommand);
+            this.InspectSelectedGoalToValueGroupRelationshipCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedGoalToValueGroupRelationshipCommand);
             this.InspectSelectedGoalToValueGroupRelationshipCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedGoalToValueGroupRelationship));
             var canExecuteInspectSelectedValueGroupToStakeholderValueRelationshipCommand = this.WhenAny(vm => vm.SelectedValueGroupToStakeholderValueRelationship, v => v.Value != null);
-            this.InspectSelectedValueGroupToStakeholderValueRelationshipCommand = ReactiveCommand.Create(canExecuteInspectSelectedValueGroupToStakeholderValueRelationshipCommand);
+            this.InspectSelectedValueGroupToStakeholderValueRelationshipCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedValueGroupToStakeholderValueRelationshipCommand);
             this.InspectSelectedValueGroupToStakeholderValueRelationshipCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedValueGroupToStakeholderValueRelationship));
             var canExecuteInspectSelectedStakeholderValueToRequirementRelationshipCommand = this.WhenAny(vm => vm.SelectedStakeholderValueToRequirementRelationship, v => v.Value != null);
-            this.InspectSelectedStakeholderValueToRequirementRelationshipCommand = ReactiveCommand.Create(canExecuteInspectSelectedStakeholderValueToRequirementRelationshipCommand);
+            this.InspectSelectedStakeholderValueToRequirementRelationshipCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedStakeholderValueToRequirementRelationshipCommand);
             this.InspectSelectedStakeholderValueToRequirementRelationshipCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedStakeholderValueToRequirementRelationship));
         }
 

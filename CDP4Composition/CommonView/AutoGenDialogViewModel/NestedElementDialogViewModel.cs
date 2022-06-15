@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="NestedElement"/>
@@ -162,27 +163,27 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedRootElement"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedRootElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedRootElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a NestedParameter
         /// </summary>
-        public ReactiveCommand<object> CreateNestedParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateNestedParameterCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a NestedParameter
         /// </summary>
-        public ReactiveCommand<object> DeleteNestedParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteNestedParameterCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a NestedParameter
         /// </summary>
-        public ReactiveCommand<object> EditNestedParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditNestedParameterCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a NestedParameter
         /// </summary>
-        public ReactiveCommand<object> InspectNestedParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectNestedParameterCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -195,19 +196,19 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedNestedParameterCommand = this.WhenAny(vm => vm.SelectedNestedParameter, v => v.Value != null);
             var canExecuteEditSelectedNestedParameterCommand = this.WhenAny(vm => vm.SelectedNestedParameter, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateNestedParameterCommand = ReactiveCommand.Create(canExecuteCreateNestedParameterCommand);
+            this.CreateNestedParameterCommand = ReactiveCommandCreator.Create(canExecuteCreateNestedParameterCommand);
             this.CreateNestedParameterCommand.Subscribe(_ => this.ExecuteCreateCommand<NestedParameter>(this.PopulateNestedParameter));
 
-            this.DeleteNestedParameterCommand = ReactiveCommand.Create(canExecuteEditSelectedNestedParameterCommand);
+            this.DeleteNestedParameterCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedNestedParameterCommand);
             this.DeleteNestedParameterCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedNestedParameter.Thing, this.PopulateNestedParameter));
 
-            this.EditNestedParameterCommand = ReactiveCommand.Create(canExecuteEditSelectedNestedParameterCommand);
+            this.EditNestedParameterCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedNestedParameterCommand);
             this.EditNestedParameterCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedNestedParameter.Thing, this.PopulateNestedParameter));
 
-            this.InspectNestedParameterCommand = ReactiveCommand.Create(canExecuteInspectSelectedNestedParameterCommand);
+            this.InspectNestedParameterCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedNestedParameterCommand);
             this.InspectNestedParameterCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedNestedParameter.Thing));
             var canExecuteInspectSelectedRootElementCommand = this.WhenAny(vm => vm.SelectedRootElement, v => v.Value != null);
-            this.InspectSelectedRootElementCommand = ReactiveCommand.Create(canExecuteInspectSelectedRootElementCommand);
+            this.InspectSelectedRootElementCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRootElementCommand);
             this.InspectSelectedRootElementCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRootElement));
         }
 

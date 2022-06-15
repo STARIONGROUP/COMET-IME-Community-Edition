@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="QuantityKindFactor"/>
@@ -123,7 +124,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedQuantityKind"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedQuantityKindCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedQuantityKindCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -132,7 +133,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedQuantityKindCommand = this.WhenAny(vm => vm.SelectedQuantityKind, v => v.Value != null);
-            this.InspectSelectedQuantityKindCommand = ReactiveCommand.Create(canExecuteInspectSelectedQuantityKindCommand);
+            this.InspectSelectedQuantityKindCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedQuantityKindCommand);
             this.InspectSelectedQuantityKindCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedQuantityKind));
         }
 

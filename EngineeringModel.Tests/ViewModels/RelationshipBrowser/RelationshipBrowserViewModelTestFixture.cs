@@ -29,9 +29,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
     using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -205,8 +207,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             dropinfo2.Setup(x => x.Payload).Returns(this.elementDefinition2);
             await creator.TargetViewModel.Drop(dropinfo2.Object);
 
-            Assert.IsTrue(viewmodel.RelationshipCreator.CreateRelationshipCommand.CanExecute(null));
-            viewmodel.RelationshipCreator.CreateRelationshipCommand.Execute(null);
+            Assert.IsTrue(((ICommand)viewmodel.RelationshipCreator.CreateRelationshipCommand).CanExecute(null));
+            await viewmodel.RelationshipCreator.CreateRelationshipCommand.Execute();
 
             creator.ReInitializeControl();
             Assert.IsNull(creator.SourceViewModel.RelatedThing);
@@ -235,11 +237,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             await creator.Drop(dropinfo2.Object);
 
             Assert.AreEqual(2, creator.RelatedThings.Count);
-            creator.RelatedThings.First().RemoveRelatedThingCommand.Execute(null);
+            await creator.RelatedThings.First().RemoveRelatedThingCommand.Execute();
             Assert.AreEqual(1, creator.RelatedThings.Count);
 
-            Assert.IsTrue(viewmodel.RelationshipCreator.CreateRelationshipCommand.CanExecute(null));
-            viewmodel.RelationshipCreator.CreateRelationshipCommand.Execute(null);
+            Assert.IsTrue(((ICommand)viewmodel.RelationshipCreator.CreateRelationshipCommand).CanExecute(null));
+            await viewmodel.RelationshipCreator.CreateRelationshipCommand.Execute();
 
             creator.ReInitializeControl();
             Assert.AreEqual(0, creator.RelatedThings.Count);

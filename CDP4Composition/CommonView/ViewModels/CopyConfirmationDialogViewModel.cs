@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CopyConfirmationDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2017 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView.ViewModels
 {
@@ -17,6 +36,10 @@ namespace CDP4CommonView.ViewModels
     using CDP4Composition.Navigation;
     
     using ReactiveUI;
+
+    using System.Reactive;
+
+    using CDP4Composition.Mvvm;
 
     /// <summary>
     /// The copy confirmation dialog view model to copy a <see cref="Thing"/>
@@ -61,11 +84,8 @@ namespace CDP4CommonView.ViewModels
         {
             this.Title = "Copy Confirmation";
 
-            this.ProceedCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanProceed));
-            this.ProceedCommand.Subscribe(_ => this.ExecuteProceedCommand());
-
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancelCommand());
+            this.ProceedCommand = ReactiveCommandCreator.Create(this.ExecuteProceedCommand, this.WhenAnyValue(x => x.CanProceed));
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancelCommand);
 
             var copyablethings = copyableThing.ToList();
             this.CopyPermissionMessage = copyablethings.Any() ? "A partial copy will be performed." : "The copy operation cannot be performed.";
@@ -134,12 +154,12 @@ namespace CDP4CommonView.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to proceed
         /// </summary>
-        public ReactiveCommand<object> ProceedCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ProceedCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to cancel
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Executes the <see cref="ProceedCommand"/>

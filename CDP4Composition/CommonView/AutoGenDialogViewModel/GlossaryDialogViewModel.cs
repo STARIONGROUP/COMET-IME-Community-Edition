@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Glossary"/>
@@ -142,22 +143,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Term
         /// </summary>
-        public ReactiveCommand<object> CreateTermCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateTermCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Term
         /// </summary>
-        public ReactiveCommand<object> DeleteTermCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteTermCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Term
         /// </summary>
-        public ReactiveCommand<object> EditTermCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditTermCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Term
         /// </summary>
-        public ReactiveCommand<object> InspectTermCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectTermCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -170,16 +171,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedTermCommand = this.WhenAny(vm => vm.SelectedTerm, v => v.Value != null);
             var canExecuteEditSelectedTermCommand = this.WhenAny(vm => vm.SelectedTerm, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateTermCommand = ReactiveCommand.Create(canExecuteCreateTermCommand);
+            this.CreateTermCommand = ReactiveCommandCreator.Create(canExecuteCreateTermCommand);
             this.CreateTermCommand.Subscribe(_ => this.ExecuteCreateCommand<Term>(this.PopulateTerm));
 
-            this.DeleteTermCommand = ReactiveCommand.Create(canExecuteEditSelectedTermCommand);
+            this.DeleteTermCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedTermCommand);
             this.DeleteTermCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedTerm.Thing, this.PopulateTerm));
 
-            this.EditTermCommand = ReactiveCommand.Create(canExecuteEditSelectedTermCommand);
+            this.EditTermCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedTermCommand);
             this.EditTermCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedTerm.Thing, this.PopulateTerm));
 
-            this.InspectTermCommand = ReactiveCommand.Create(canExecuteInspectSelectedTermCommand);
+            this.InspectTermCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedTermCommand);
             this.InspectTermCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedTerm.Thing));
         }
 
