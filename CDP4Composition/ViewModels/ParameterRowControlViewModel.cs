@@ -28,6 +28,8 @@ namespace CDP4Composition.ViewModels
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
     using CDP4Composition.Views;
 
@@ -67,17 +69,31 @@ namespace CDP4Composition.ViewModels
         }
 
         /// <summary>
-        /// Backing field for <see cref="Value"/>
+        /// Backing field for <see cref="ActualValue"/>
         /// </summary>
-        private string value;
+        private string actualValue;
 
         /// <summary>
-        /// Gets or sets the parameter name
+        /// Gets or sets the actual value
         /// </summary>
-        public string Value
+        public string ActualValue
         {
-            get => this.value;
-            set => this.RaiseAndSetIfChanged(ref this.value, value);
+            get => this.actualValue;
+            set => this.RaiseAndSetIfChanged(ref this.actualValue, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="PublishedValue"/>
+        /// </summary>
+        private string publishedValue;
+
+        /// <summary>
+        /// Gets or sets the published value
+        /// </summary>
+        public string PublishedValue
+        {
+            get => this.publishedValue;
+            set => this.RaiseAndSetIfChanged(ref this.publishedValue, value);
         }
 
         /// <summary>
@@ -160,6 +176,8 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         public Option ActualOption { get; private set; }
 
+        public ReactiveList<ParameterRowControlViewModel> ContainedRows { get; set; }
+
         /// <summary>
         /// Initializes a new instance of <see cref="ParameterRowControlViewModel"/>
         /// </summary>
@@ -167,6 +185,7 @@ namespace CDP4Composition.ViewModels
         /// <param name="actualOption">The actual Option</param>
         public ParameterRowControlViewModel(ParameterOrOverrideBase parameter, Option actualOption)
         {
+            this.ContainedRows = new ReactiveList<ParameterRowControlViewModel>();
             this.Parameter = parameter;
             this.ActualOption = actualOption;
             this.UpdateProperties();
@@ -181,18 +200,57 @@ namespace CDP4Composition.ViewModels
 
             this.Name = this.Parameter.ParameterType.Name;
             this.ShortName = this.Parameter.ParameterType.ShortName;
-            var actualvalue = valueSet?.Published.FirstOrDefault() ?? "-";
 
             var scaleShortName = this.Parameter.Scale is null 
                     ? string.Empty 
                     : $" [{this.Parameter.Scale.ShortName}]";
 
-            this.Value = $"{actualvalue}{scaleShortName}";
+            // Modify the values to show all the existing ones 
+            // in this format {"-", "-", "-", "-", "-"}
+
+            var actualValue = this.FormatValueString(valueSet?.ActualValue);
+            var publishedValue = this.FormatValueString(valueSet?.Published);
+
+            this.ActualValue = $"{actualValue}{scaleShortName}";
+            this.PublishedValue = $"{publishedValue}{scaleShortName}";
             this.OwnerShortName = this.Parameter.Owner.ShortName;
             this.Switch = valueSet?.ValueSwitch.ToString();
             this.Description = "-";
             this.ModelCode = this.Parameter.ModelCode();
             this.RowType = this.Parameter.ClassKind.ToString();
+
+            this.UpdateContainedRows();
+        }
+
+        private string FormatValueString(ValueArray<string> valueArray)
+        {
+            if (valueArray == null) return "-";
+            string valueString = string.Empty;
+
+            if (valueArray.Count == 1)
+            {
+                valueString = valueArray.FirstOrDefault();
+            }
+            else
+            {
+                valueString = string.Format("{{{0}}}", string.Join(", ", valueArray));
+            }
+
+            return valueString;
+        }
+
+        private void UpdateContainedRows()
+        {
+            // For compound parameter types
+            if (this.Parameter.ParameterType is CompoundParameterType compoundParameterType)
+            {
+                // Add the inner rows of the compound type to contained rows list
+                foreach (var parameterTypeComponent in compoundParameterType.Component.SortedItems)
+                {
+                    // var param = parameterTypeComponent.Value.
+                    // var row = new ParameterRowControlViewModel(parameterTypeComponent.Value, null);
+                }
+            }
         }
 
         /// <summary>
@@ -211,8 +269,21 @@ namespace CDP4Composition.ViewModels
             {
                 valueSet = parameter.ValueSet.FirstOrDefault(x => (!this.Parameter.IsOptionDependent || (x.ActualOption == this.ActualOption)));
             }
+            else
+            {
+                return null;
+            }
 
             return valueSet;
+        }
+    }
+
+    public class TestingH : ParameterRowControlViewModel
+    {
+        public ReactiveList<TestingH> ContainedRows2 { get; set; }
+        public TestingH(ParameterOrOverrideBase parameter, Option actualOption) : base(parameter, actualOption)
+        {
+            this.ContainedRows2 = new ReactiveList<TestingH>();
         }
     }
 }

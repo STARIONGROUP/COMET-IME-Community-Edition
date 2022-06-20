@@ -4,10 +4,25 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
+             xmlns:helpers="http://schemas.devexpress.com/winfx/2008/xaml/editors/internal"
+             xmlns:viewModels="clr-namespace:CDP4CommonView"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:viewModels1="clr-namespace:CDP4Composition.ViewModels"
              Name="ElementParameters"
              d:DesignHeight="300"
              d:DesignWidth="800"
              mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <HierarchicalDataTemplate DataType="{x:Type viewModels1:ParameterRowControlViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
+            <ContentPresenter x:Name="defaultRowPresenter" Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type viewModels1:TestingH}" ItemsSource="{Binding ContainedRows2, UpdateSourceTrigger=PropertyChanged}">
+            <ContentPresenter x:Name="defaultRowPresenter" Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+        </HierarchicalDataTemplate>
+    </UserControl.Resources>
+
     <Grid Background="AliceBlue" >
         <Grid.RowDefinitions>
             <RowDefinition Height="3*"></RowDefinition>
@@ -16,19 +31,81 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10,30,10,10" Grid.Row="0">
             <Label Content="{Binding ElementTooltipInfo}"></Label>
         </ScrollViewer>
-        <dxg:GridControl Grid.Row="1" AutoGenerateColumns="None"    
-                         EnableSmartColumnsGeneration="False" 
-                         ItemsSource="{Binding Parameters}">
-            <dxg:GridControl.Columns>
-                <dxg:GridColumn FieldName="Name" Fixed="Left" AllowEditing="False"/>
-                <dxg:GridColumn FieldName="ShortName" Fixed="Left" AllowEditing="False"/>
-                <dxg:GridColumn FieldName="Value" AllowEditing="False"/>
-                <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" AllowEditing="False"/>
-                <dxg:GridColumn FieldName="Switch" AllowEditing="False"/>
-                <dxg:GridColumn FieldName="Description" AllowEditing="False" Visible="False"/>
-                <dxg:GridColumn FieldName="ModelCode" Header="Model Code" AllowEditing="False" />
-                <dxg:GridColumn FieldName="RowType" Header="Row Type" AllowEditing="False"/>
-            </dxg:GridControl.Columns>
-        </dxg:GridControl>
+        <!-- <dxg:GridControl Grid.Row="1" AutoGenerateColumns="None"     -->
+        <!--                  EnableSmartColumnsGeneration="False"  -->
+        <!--                  ItemsSource="{Binding Parameters}"> -->
+        <!--     <dxg:GridControl.Columns> -->
+        <!--         <dxg:GridColumn FieldName="Name" Fixed="Left" AllowEditing="False"/> -->
+        <!--         <dxg:GridColumn FieldName="ShortName" Fixed="Left" AllowEditing="False"/> -->
+        <!--         <dxg:GridColumn FieldName="ActualValue" AllowEditing="False"/> -->
+        <!--         <dxg:GridColumn FieldName="PublishedValue" AllowEditing="False"/> -->
+        <!--         <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" AllowEditing="False"/> -->
+        <!--         <dxg:GridColumn FieldName="Switch" AllowEditing="False"/> -->
+        <!--         <dxg:GridColumn FieldName="Description" AllowEditing="False" Visible="False"/> -->
+        <!--         <dxg:GridColumn FieldName="ModelCode" Header="Model Code" AllowEditing="False" /> -->
+        <!--         <dxg:GridColumn FieldName="RowType" Header="Row Type" AllowEditing="False"/> -->
+        <!--     </dxg:GridControl.Columns> -->
+        <!-- </dxg:GridControl> -->
+
+        <dxg:TreeListControl x:Name="TreeList"
+                             Grid.Row="1"
+                             ItemsSource="{Binding Parameters}"
+                             SelectedItem="{Binding SelectedThing}"
+                             CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             SelectionMode="Row">
+
+            <dxg:TreeListControl.View>
+                <dxg:TreeListView Name="View"
+                                      AllowEditing="False"
+                                      AutoWidth="False"
+                                      ExpandCollapseNodesOnNavigation="True"
+                                      ExpandStateFieldName="IsExpanded"
+                                      FixedLineWidth="0"
+                                      HorizontalScrollbarVisibility="Auto"
+                                      NavigationStyle="Row"
+                                      ShowHorizontalLines="False"
+                                      ShowIndicator="False"
+                                      RowIndent="22"
+                                      ShowNodeImages="False"
+                                      ShowVerticalLines="False"
+                                      TreeDerivationMode="HierarchicalDataTemplate"
+                                      TreeLineStyle="Solid"
+                                      VerticalScrollbarVisibility="Auto">
+
+                    <dxg:TreeListView.FocusedRow>
+                        <dynamic:ExpandoObject />
+                    </dxg:TreeListView.FocusedRow>
+                </dxg:TreeListView>
+            </dxg:TreeListControl.View>
+            <dxg:TreeListControl.Columns>
+                <dxg:TreeListColumn FieldName="Name" Fixed="Left">
+                    <dxg:TreeListColumn.DisplayTemplate>
+                        <ControlTemplate>
+                            <TextBlock Margin="5,0,0,0"
+                                           VerticalAlignment="Center"
+                                           Text="{Binding Path=RowData.Row.Name}" />
+                            <ControlTemplate.Triggers>
+                                <DataTrigger Binding="{Binding Path=RowData.Row.IsTopElement, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Path=RowData.Row.IsDefault, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" Value="True">
+                                    <Setter Property="FontWeight" Value="Bold" />
+                                </DataTrigger>
+                            </ControlTemplate.Triggers>
+
+                        </ControlTemplate>
+                    </dxg:TreeListColumn.DisplayTemplate>
+                </dxg:TreeListColumn>
+
+                <dxg:TreeListColumn FieldName="ShortName" Header="Short Name"  Width="45"/>
+                <dxg:TreeListColumn FieldName="ActualValue" Header="Actual Value"/>
+                <dxg:TreeListColumn FieldName="PublishedValue" Header="Published Value"/>
+                <dxg:TreeListColumn FieldName="OwnerShortName" Header="Owner"/>
+                <dxg:TreeListColumn FieldName="Switch" Header="Switch"/>
+                <dxg:TreeListColumn FieldName="Description" Visible="False" />
+                <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
+                <dxg:TreeListColumn FieldName="RowType" Header="Row Type" />
+            </dxg:TreeListControl.Columns>
+        </dxg:TreeListControl>
     </Grid>
 </UserControl>    
