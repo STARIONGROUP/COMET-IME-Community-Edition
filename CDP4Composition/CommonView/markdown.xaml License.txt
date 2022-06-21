@@ -1,6 +1,6 @@
-﻿https://github.com/theunrepentantgeek/Markdown.XAML/blob/master/License.txt
+﻿https://github.com/whistyun/MdXaml/blob/master/LICENSE.txt
 
-Copyright (c) 2010 Bevan Arps
+Copyright (c) 2020 Bevan Arps, Whistyun
 
 Permission is hereby granted, free of charge, to any person obtaining a copy 
 of this software and associated documentation files (the "Software"), to deal 

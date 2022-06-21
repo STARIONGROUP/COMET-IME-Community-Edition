@@ -51,9 +51,9 @@
     <PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
     <PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
     <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
+    <PackageReference Include="MdXaml_migfree" Version="1.15.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
-    <PackageReference Include="Markdown.Xaml" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="ReactiveUI" Version="18.1.8" />
