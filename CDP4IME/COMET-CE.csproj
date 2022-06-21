@@ -71,9 +71,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="ExceptionReporter.WinForms.xml" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
     <ProjectReference Include="..\CDP4ShellDialogs\CDP4ShellDialogs.csproj" />
     <ProjectReference Include="..\CDP4UpdateServerDal\CDP4UpdateServerDal.csproj" />

@@ -7,7 +7,6 @@
     <ProjectGuid>2ee90906-5978-4c5a-a9be-1d8feb5adce9</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputType>Package</OutputType>
-    
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -100,7 +99,6 @@
     <Content Include="ThirdPartyLicense\DotNetZip.txt" />
     <Content Include="ThirdPartyLicense\DynamicLanguageRuntime.txt" />
     <Content Include="ThirdPartyLicense\ExceptionReporter.txt" />
-    <Content Include="ThirdPartyLicense\Hardcodet.Wpf.TaskbarNotification.txt" />
     <Content Include="ThirdPartyLicense\IronPython.txt" />
     <Content Include="ThirdPartyLicense\Markdown.Xaml.txt" />
     <Content Include="ThirdPartyLicense\Microsoft.AspNet.Mvc.txt" />
