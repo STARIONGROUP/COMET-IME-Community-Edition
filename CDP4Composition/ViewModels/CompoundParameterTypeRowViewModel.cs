@@ -62,7 +62,7 @@ namespace CDP4Composition.ViewModels
         /// <summary>
         /// Generate a list of <see cref="ParameterRowControlViewModel" /> that represents <see cref="CompoundParameterType" />
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A <see cref="List"/> of <see cref="ParameterRowControlViewModel"/></returns>
         public List<ParameterRowControlViewModel> GenerateCompoundParameterRowViewModels()
         {
             var rowList = new List<ParameterRowControlViewModel>();
@@ -83,7 +83,7 @@ namespace CDP4Composition.ViewModels
         /// The <see cref="ParameterTypeComponent" /> used to generate a
         /// <see cref="CompoundParameterType" /> row
         /// </param>
-        /// <returns></returns>
+        /// <returns><see cref="ParameterRowControlViewModel"/></returns>
         private ParameterRowControlViewModel GenerateCompoundParameterRowViewModel(ParameterTypeComponent parameter)
         {
             var index = parameter.Index;

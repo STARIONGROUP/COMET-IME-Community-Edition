@@ -183,6 +183,9 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         public ReactiveList<ParameterRowControlViewModel> ContainedRows { get; set; }
 
+        /// <summary>
+        /// Initializes an instance of <see cref="ParameterRowControlViewModel"/>
+        /// </summary>
         public ParameterRowControlViewModel()
         {
         }
