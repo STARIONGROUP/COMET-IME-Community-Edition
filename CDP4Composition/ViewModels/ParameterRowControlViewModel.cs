@@ -235,7 +235,7 @@ namespace CDP4Composition.ViewModels
         /// Converts the <see cref="ValueArray{T}"/> into a string to be displayed
         /// </summary>
         /// <param name="valueArray"></param>
-        /// <returns></returns>
+        /// <returns>A string representing the values</returns>
         protected string FormatValueString(ValueArray<string> valueArray)
         {
             if (valueArray == null) return "-";
