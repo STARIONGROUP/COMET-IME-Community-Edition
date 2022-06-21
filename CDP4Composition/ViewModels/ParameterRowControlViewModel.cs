@@ -220,8 +220,8 @@ namespace CDP4Composition.ViewModels
             var actualValue = this.FormatValueString(valueSet?.ActualValue);
             var publishedValue = this.FormatValueString(valueSet?.Published);
 
-            this.ActualValue = $"{actualValue}{scaleShortName}";
-            this.PublishedValue = $"{publishedValue}{scaleShortName}";
+            this.ActualValue = $"{actualValue} [{scaleShortName}]";
+            this.PublishedValue = $"{publishedValue} [{scaleShortName}]";
             this.OwnerShortName = this.Parameter.Owner.ShortName;
             this.Switch = valueSet?.ValueSwitch.ToString();
             this.Description = "-";

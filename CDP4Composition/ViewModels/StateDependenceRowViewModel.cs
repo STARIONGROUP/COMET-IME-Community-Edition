@@ -1,35 +1,47 @@
-﻿
-using System.Text;
-using System.Threading.Tasks;
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="StateDependenceRowViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Types;
 
     /// <summary>
-    /// Represents an element parameter to use in <see cref="ParameterRowControlViewModel"/> in the grapher
+    /// Represents an element parameter to use in <see cref="ParameterRowControlViewModel" /> in the grapher
     /// </summary>
     public class StateDependenceRowViewModel : ParameterRowControlViewModel
     {
         /// <summary>
-        /// Gets or sets the <see cref="ContainerList{T}"/> of <see cref="ActualFiniteStates"/>
+        /// Initializes a new instance of <see cref="StateDependenceRowViewModel" />
         /// </summary>
-        public ContainerList<ActualFiniteState> ActualFiniteStates { get; private set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="IEnumerable{T}"/> of <see cref="IValueSet"/>
-        /// </summary>
-        public IEnumerable<IValueSet> ValueSets { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of <see cref="StateDependenceRowViewModel"/>
-        /// </summary>
-        /// <param name="actualFiniteStates">The <see cref="ContainerList{T}"/> of <see cref="ActualFiniteStates"/></param>
-        /// <param name="valueSets">The <see cref="IEnumerable{T}"/> of <see cref="IValueSet"/></param>
+        /// <param name="actualFiniteStates">The <see cref="ContainerList{T}" /> of <see cref="ActualFiniteStates" /></param>
+        /// <param name="valueSets">The <see cref="IEnumerable{T}" /> of <see cref="IValueSet" /></param>
         public StateDependenceRowViewModel(ContainerList<ActualFiniteState> actualFiniteStates, IEnumerable<IValueSet> valueSets)
         {
             this.ActualFiniteStates = actualFiniteStates;
@@ -37,9 +49,19 @@ namespace CDP4Composition.ViewModels
         }
 
         /// <summary>
-        /// Generates a list of <see cref="ParameterRowControlViewModel"/>
+        /// Gets or sets the <see cref="ContainerList{T}" /> of <see cref="ActualFiniteStates" />
         /// </summary>
-        /// <returns>A <see cref="List{T}"/> of <see cref="ParameterRowControlViewModel"/></returns>
+        public ContainerList<ActualFiniteState> ActualFiniteStates { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="IEnumerable{T}" /> of <see cref="IValueSet" />
+        /// </summary>
+        public IEnumerable<IValueSet> ValueSets { get; private set; }
+
+        /// <summary>
+        /// Generates a list of <see cref="ParameterRowControlViewModel" />
+        /// </summary>
+        /// <returns>A <see cref="List{T}" /> of <see cref="ParameterRowControlViewModel" /></returns>
         public List<ParameterRowControlViewModel> GenerateStateRows()
         {
             var rowList = new List<ParameterRowControlViewModel>();
@@ -54,9 +76,9 @@ namespace CDP4Composition.ViewModels
         }
 
         /// <summary>
-        /// Generates a row of <see cref="ParameterRowControlViewModel"/> based on the current <see cref="ActualFiniteState"/>
+        /// Generates a row of <see cref="ParameterRowControlViewModel" /> based on the current <see cref="ActualFiniteState" />
         /// </summary>
-        /// <param name="actualFiniteState">The current <see cref="ActualFiniteState"/></param>
+        /// <param name="actualFiniteState">The current <see cref="ActualFiniteState" /></param>
         /// <returns></returns>
         private ParameterRowControlViewModel GenerateViewModelRow(ActualFiniteState actualFiniteState)
         {
@@ -69,7 +91,7 @@ namespace CDP4Composition.ViewModels
                 actualValue = this.FormatValueString(parameterValueSet.ActualValue);
                 publishedValue = this.FormatValueString(parameterValueSet.Published);
             }
-            
+
             var row = new ParameterRowControlViewModel
             {
                 Name = actualFiniteState.Name,
@@ -85,9 +107,9 @@ namespace CDP4Composition.ViewModels
         }
 
         /// <summary>
-        /// Gets the matching <see cref="IValueSet"/> for a given <see cref="ActualFiniteState"/> Iid
+        /// Gets the matching <see cref="IValueSet" /> for a given <see cref="ActualFiniteState" /> Iid
         /// </summary>
-        /// <param name="iid">The <see cref="Guid"/> for the current <see cref="ActualFiniteState"/></param>
+        /// <param name="iid">The <see cref="Guid" /> for the current <see cref="ActualFiniteState" /></param>
         /// <returns></returns>
         private IValueSet GetValueSet(Guid iid)
         {
