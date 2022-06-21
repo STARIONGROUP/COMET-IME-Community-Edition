@@ -25,6 +25,8 @@
 
 namespace CDP4Composition.ViewModels
 {
+    using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
@@ -176,7 +178,14 @@ namespace CDP4Composition.ViewModels
         /// </summary>
         public Option ActualOption { get; private set; }
 
+        /// <summary>
+        /// Gets or sets a list of <see cref="ParameterRowControlViewModel"/>
+        /// </summary>
         public ReactiveList<ParameterRowControlViewModel> ContainedRows { get; set; }
+
+        public ParameterRowControlViewModel()
+        {
+        }
 
         /// <summary>
         /// Initializes a new instance of <see cref="ParameterRowControlViewModel"/>
@@ -205,9 +214,6 @@ namespace CDP4Composition.ViewModels
                     ? string.Empty 
                     : $" [{this.Parameter.Scale.ShortName}]";
 
-            // Modify the values to show all the existing ones 
-            // in this format {"-", "-", "-", "-", "-"}
-
             var actualValue = this.FormatValueString(valueSet?.ActualValue);
             var publishedValue = this.FormatValueString(valueSet?.Published);
 
@@ -222,10 +228,15 @@ namespace CDP4Composition.ViewModels
             this.UpdateContainedRows();
         }
 
-        private string FormatValueString(ValueArray<string> valueArray)
+        /// <summary>
+        /// Converts the <see cref="ValueArray{T}"/> into a string to be displayed
+        /// </summary>
+        /// <param name="valueArray"></param>
+        /// <returns></returns>
+        protected string FormatValueString(ValueArray<string> valueArray)
         {
             if (valueArray == null) return "-";
-            string valueString = string.Empty;
+            var valueString = string.Empty;
 
             if (valueArray.Count == 1)
             {
@@ -239,17 +250,23 @@ namespace CDP4Composition.ViewModels
             return valueString;
         }
 
+        /// <summary>
+        /// Updates the <see cref="ContainedRows"/> list 
+        /// </summary>
         private void UpdateContainedRows()
         {
-            // For compound parameter types
-            if (this.Parameter.ParameterType is CompoundParameterType compoundParameterType)
+            if (this.Parameter.StateDependence != null)
             {
-                // Add the inner rows of the compound type to contained rows list
-                foreach (var parameterTypeComponent in compoundParameterType.Component.SortedItems)
-                {
-                    // var param = parameterTypeComponent.Value.
-                    // var row = new ParameterRowControlViewModel(parameterTypeComponent.Value, null);
-                }
+                var rowViewModel = new StateDependenceRowViewModel(this.Parameter.StateDependence.ActualState, this.Parameter.ValueSets);
+                var rows = rowViewModel.GenerateStateRows();
+                this.ContainedRows.AddRange(rows);
+            }
+            else if (this.Parameter.ParameterType is CompoundParameterType compoundParameterType)
+            {
+                var valueSet = this.GetValueSet();
+                var rowViewModel = new CompoundParameterTypeRowViewModel(compoundParameterType.Component.SortedItems, valueSet);
+                var rows = rowViewModel.GenerateCompoundParameterRowViewModels();
+                this.ContainedRows.AddRange(rows);
             }
         }
 
@@ -269,21 +286,8 @@ namespace CDP4Composition.ViewModels
             {
                 valueSet = parameter.ValueSet.FirstOrDefault(x => (!this.Parameter.IsOptionDependent || (x.ActualOption == this.ActualOption)));
             }
-            else
-            {
-                return null;
-            }
 
             return valueSet;
-        }
-    }
-
-    public class TestingH : ParameterRowControlViewModel
-    {
-        public ReactiveList<TestingH> ContainedRows2 { get; set; }
-        public TestingH(ParameterOrOverrideBase parameter, Option actualOption) : base(parameter, actualOption)
-        {
-            this.ContainedRows2 = new ReactiveList<TestingH>();
         }
     }
 }

@@ -150,7 +150,7 @@ namespace CDP4Composition.Tests.ViewModels
             Assert.AreSame(firstParameter.Name, Name);
             Assert.AreSame(firstParameter.ShortName, Name);
             Assert.AreSame(firstParameter.Parameter, this.parameter);
-            Assert.AreEqual($"2 [{Name}]", firstParameter.PublishedValue);
+            Assert.AreEqual($"{{2, 3, 4}} [{Name}]", firstParameter.PublishedValue);
             Assert.AreEqual("-", firstParameter.Description);
             Assert.AreSame(firstParameter.OwnerShortName, Name);
             Assert.AreEqual(firstParameter.Switch, ParameterSwitchKind.REFERENCE.ToString());
@@ -160,12 +160,12 @@ namespace CDP4Composition.Tests.ViewModels
 
             var lastParameter = vm.Parameters.LastOrDefault();
             Assert.IsNotNull(lastParameter);
-            Assert.AreEqual("-", lastParameter.ActualValue);
+            Assert.AreEqual("{}", lastParameter.ActualValue);
 
             vm = new ElementParameterRowControlViewModel(this.elementUsage, this.option);
             var rowParameterOverride = vm.Parameters.LastOrDefault();
             Assert.IsNotNull(rowParameterOverride);
-            Assert.AreEqual("-", rowParameterOverride.PublishedValue);
+            Assert.AreEqual("{}", rowParameterOverride.PublishedValue);
 
             vm = new ElementParameterRowControlViewModel(this.elementDefinition, null);
             Assert.IsEmpty(vm.Parameters);
@@ -177,7 +177,7 @@ namespace CDP4Composition.Tests.ViewModels
             this.parameter.IsOptionDependent = true;
             this.parameter.ValueSet.First().ActualOption = this.option;
             var vm = new ElementParameterRowControlViewModel(this.elementDefinition, this.option);
-            Assert.AreEqual($"2 [{Name}]", vm.Parameters.First().PublishedValue);
+            Assert.AreEqual($"{{2, 3, 4}} [{Name}]", vm.Parameters.First().PublishedValue);
 
             this.parameter.ValueSet.First().ActualOption = new Option(Guid.NewGuid(), this.assembler.Cache, this.dalUri)
             {
