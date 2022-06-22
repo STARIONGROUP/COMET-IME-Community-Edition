@@ -4,7 +4,7 @@
     <MinIMEVersion>9.2.0</MinIMEVersion>
     <RootNamespace>CDP4WspDalPlugin</RootNamespace>
     <AssemblyName>CDP4WspDalPlugin</AssemblyName>
-    <TargetFramework>net48</TargetFramework>
+	<TargetFramework>net6.0-windows</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4WspDal</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -13,6 +13,9 @@
     <Copyright>Copyright © RHEA System S.A.</Copyright>
     <AssemblyVersion>9.2.0.5</AssemblyVersion>
     <FileVersion>9.2.0.5</FileVersion>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -36,122 +39,40 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+    <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236">
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236">
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4WspDal-CE" Version="8.1.0">
-      <IncludeAssets></IncludeAssets>
+    <PackageReference Include="CDP4WspDal-CE" Version="9.0.0-750-PR236">
     </PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="1.3">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+    <PackageReference Include="CommonServiceLocator" Version="2.0.5">
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="NLog" Version="4.7.10">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Rx-Core" Version="2.2.5">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Rx-Interfaces" Version="2.2.5">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Rx-Linq" Version="2.2.5">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
-      <IncludeAssets></IncludeAssets>
-      <ExcludeAssets>runtime</ExcludeAssets>
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Net">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Net.Http">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Core">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Data">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Drawing">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.IO.Compression.FileSystem">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Numerics">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml.Linq">
-      <Private>false</Private>
-    </Reference>
+	<PackageReference Include="System.ComponentModel.Composition" Version="6.0.0">
+		<ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
   </ItemGroup>
 </Project>
