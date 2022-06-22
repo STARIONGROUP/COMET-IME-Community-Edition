@@ -1,7 +1,6 @@
-﻿name: ExceptionReporter
-version: 4.0.2
+﻿name: ExceptionReporter coding ideas
 project url: https://github.com/PandaWood/ExceptionReporter.NET
-license url: https://raw.githubusercontent.com/PandaWood/ExceptionReporter.NET/master/LICENSE.txt
+license url: https://github.com/PandaWood/ExceptionReporter.NET/blob/master/LICENSE.txt
 
 MIT License
 

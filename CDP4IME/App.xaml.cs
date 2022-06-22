@@ -33,6 +33,7 @@ namespace CDP4IME
     using System.Windows;
 
     using CDP4Composition;
+    using CDP4Composition.ErrorReporting.Views;
 
     using COMET;
     using COMET.Modularity;
@@ -181,7 +182,7 @@ namespace CDP4IME
                 return;
             }
 
-            MessageBox.Show($"{ex.Message}\n{ex.StackTrace}");
+            ErrorReporter.ShowDialog(ex);
 
             Environment.Exit(1);
         }
