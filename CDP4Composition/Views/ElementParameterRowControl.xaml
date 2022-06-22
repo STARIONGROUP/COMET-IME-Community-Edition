@@ -9,6 +9,7 @@
              xmlns:viewModels="clr-namespace:CDP4CommonView"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:viewModels1="clr-namespace:CDP4Composition.ViewModels"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition"
              Name="ElementParameters"
              d:DesignHeight="300"
              d:DesignWidth="800"
@@ -37,6 +38,9 @@
                              CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                              SelectionMode="Row">
 
+            <dxg:TreeListControl.Resources>
+                <cdp4Composition:ParameterTreeListNodeImageSelector x:Key="ParameterTreeListNodeImageSelector" />
+            </dxg:TreeListControl.Resources>
             <dxg:TreeListControl.View>
                 <dxg:TreeListView Name="View"
                                       AllowEditing="False"
@@ -49,7 +53,8 @@
                                       ShowHorizontalLines="False"
                                       ShowIndicator="False"
                                       RowIndent="22"
-                                      ShowNodeImages="False"
+                                      ShowNodeImages="True"
+                                      NodeImageSelector="{StaticResource ParameterTreeListNodeImageSelector}"
                                       ShowVerticalLines="False"
                                       TreeDerivationMode="HierarchicalDataTemplate"
                                       TreeLineStyle="Solid"
