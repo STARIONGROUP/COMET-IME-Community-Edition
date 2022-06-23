@@ -390,7 +390,7 @@ namespace CDP4Composition.Mvvm
         /// </remarks>
         protected virtual void UpdateOkCanExecute()
         {
-            this.OkCanExecute = this.Container != null && !this.ValidationErrors.Any();
+            this.OkCanExecute = this.Container != null && (!this.ValidationErrors?.Any() ?? false);
         }
 
         /// <summary>

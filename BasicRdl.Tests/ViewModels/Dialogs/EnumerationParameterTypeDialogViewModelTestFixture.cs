@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EnumerationParameterTypeDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -30,25 +30,28 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using BasicRdl.ViewModels;
 
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
- 
+
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
- 
+
     using CommonServiceLocator;
- 
+
     using Moq;
- 
+
     using NUnit.Framework;
 
     using ReactiveUI;
@@ -121,9 +124,9 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyUpdateOkCanExecute()
         {
             Assert.AreEqual(1, this.viewmodel.ValueDefinition.Count);
-            Assert.IsTrue(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
             this.viewmodel.ValueDefinition.Clear();
-            Assert.IsFalse(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
         }
 
         [Test]
@@ -146,29 +149,29 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifValueDefinitionCommands()
         {
-            Assert.IsTrue(this.viewmodel.CreateValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.InspectValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.EditValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.DeleteValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.MoveUpValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.MoveDownValueDefinitionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.CreateValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.InspectValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.EditValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.DeleteValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.MoveUpValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.MoveDownValueDefinitionCommand).CanExecute(null));
 
             this.viewmodel.SelectedValueDefinition = this.viewmodel.ValueDefinition.First();
 
-            Assert.IsTrue(this.viewmodel.InspectValueDefinitionCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.EditValueDefinitionCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.DeleteValueDefinitionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.InspectValueDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.EditValueDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.DeleteValueDefinitionCommand).CanExecute(null));
 
-            Assert.IsTrue(this.viewmodel.MoveUpValueDefinitionCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.MoveDownValueDefinitionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.MoveUpValueDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.MoveDownValueDefinitionCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyInspectValueDefinition()
+        public async Task VerifyInspectValueDefinition()
         {
             this.viewmodel.SelectedValueDefinition = this.viewmodel.ValueDefinition.First();
-            Assert.IsTrue(this.viewmodel.InspectValueDefinitionCommand.CanExecute(null));
-            this.viewmodel.InspectValueDefinitionCommand.Execute(null);
+            Assert.IsTrue((this.viewmodel.InspectValueDefinitionCommand as ICommand).CanExecute(null));
+            await this.viewmodel.InspectValueDefinitionCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<EnumerationValueDefinition>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
     }

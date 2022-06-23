@@ -9,7 +9,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              Width="500"
              Height="500"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"

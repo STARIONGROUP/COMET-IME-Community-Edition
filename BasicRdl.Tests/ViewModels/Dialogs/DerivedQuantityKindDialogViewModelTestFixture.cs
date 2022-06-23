@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DerivedQuantityKindDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -30,7 +30,9 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using BasicRdl.ViewModels;
 
@@ -124,7 +126,7 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public async Task VerifyThatOkCommandWorks()
         {
-            this.viewmodel.OkCommand.Execute(null);
+            await this.viewmodel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             Assert.IsNull(this.viewmodel.WriteException);
@@ -136,7 +138,7 @@ namespace BasicRdl.Tests.ViewModels
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
-            this.viewmodel.OkCommand.Execute(null);
+            ((ICommand)this.viewmodel.OkCommand).Execute(default);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
             Assert.IsNotNull(this.viewmodel.WriteException);
@@ -158,9 +160,9 @@ namespace BasicRdl.Tests.ViewModels
         {
             Assert.IsNotEmpty(this.viewmodel.QuantityKindFactor);
             Assert.IsNull(this.viewmodel.SelectedDefaultScale);
-            Assert.IsFalse(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
             this.viewmodel.SelectedDefaultScale = new RatioScale();
-            Assert.IsTrue(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
         }
 
         [Test]
@@ -180,32 +182,32 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifQuantityKindFactorCommands()
         {
-            Assert.IsTrue(this.viewmodel.CreateQuantityKindFactorCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.InspectQuantityKindFactorCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.EditQuantityKindFactorCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.DeleteQuantityKindFactorCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.MoveUpQuantityKindFactorCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.MoveDownQuantityKindFactorCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.CreateQuantityKindFactorCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.InspectQuantityKindFactorCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.EditQuantityKindFactorCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.DeleteQuantityKindFactorCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.MoveUpQuantityKindFactorCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.MoveDownQuantityKindFactorCommand).CanExecute(null));
 
             this.viewmodel.SelectedQuantityKindFactor = this.viewmodel.QuantityKindFactor.First();
 
-            Assert.IsTrue(this.viewmodel.InspectQuantityKindFactorCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.EditQuantityKindFactorCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.DeleteQuantityKindFactorCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.InspectQuantityKindFactorCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.EditQuantityKindFactorCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.DeleteQuantityKindFactorCommand).CanExecute(null));
 
-            Assert.IsTrue(this.viewmodel.MoveUpQuantityKindFactorCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.MoveDownQuantityKindFactorCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.MoveUpQuantityKindFactorCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.MoveDownQuantityKindFactorCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyInspectQuantityKindFactor()
+        public async Task VerifyInspectQuantityKindFactor()
         {
             var vm = new DerivedQuantityKindDialogViewModel(this.derivedQuantityKind, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.navigation.Object, this.rdl);
             Assert.IsNull(vm.SelectedQuantityKindFactor);
 
             vm.SelectedQuantityKindFactor = vm.QuantityKindFactor.First();
-            Assert.IsTrue(vm.InspectQuantityKindFactorCommand.CanExecute(null));
-            vm.InspectQuantityKindFactorCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectQuantityKindFactorCommand).CanExecute(null));
+            await vm.InspectQuantityKindFactorCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<QuantityKindFactor>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 
@@ -217,14 +219,14 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyInspectSelectedDefaultScale()
+        public async Task VerifyInspectSelectedDefaultScale()
         {
             var scale1 = new LogarithmicScale(Guid.NewGuid(), null, null);
             var vm = new DerivedQuantityKindDialogViewModel(this.derivedQuantityKind, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.navigation.Object, this.rdl);
-            Assert.IsFalse(vm.InspectSelectedScaleCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.InspectSelectedScaleCommand).CanExecute(null));
             vm.SelectedDefaultScale = scale1;
-            Assert.IsTrue(vm.InspectSelectedScaleCommand.CanExecute(null));
-            vm.InspectSelectedScaleCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectSelectedScaleCommand).CanExecute(null));
+            await vm.InspectSelectedScaleCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<MeasurementScale>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
     }

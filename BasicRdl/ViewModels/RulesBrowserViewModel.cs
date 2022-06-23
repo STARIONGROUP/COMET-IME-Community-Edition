@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RulesBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -27,6 +27,7 @@ namespace BasicRdl.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
@@ -81,8 +82,6 @@ namespace BasicRdl.ViewModels
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
             this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
-            this.rules.ChangeTrackingEnabled = true;
-
             this.AddSubscriptions();
         }
 
@@ -103,27 +102,27 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="BinaryRelationshipRule"/>
         /// </summary>
-        public ReactiveCommand<object> CreateBinaryRelationshipRule { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateBinaryRelationshipRule { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="DecompositionRule"/>
         /// </summary>
-        public ReactiveCommand<object> CreateDecompositionRule { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateDecompositionRule { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="MultiRelationshipRule"/>
         /// </summary>
-        public ReactiveCommand<object> CreateMultiRelationshipRule { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateMultiRelationshipRule { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ParameterizedCategoryRule"/>
         /// </summary>
-        public ReactiveCommand<object> CreateParameterizedCategoryRule { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterizedCategoryRule { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ReferencerRule"/>
         /// </summary>
-        public ReactiveCommand<object> CreateReferencerRule { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateReferencerRule { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -240,19 +239,19 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateBinaryRelationshipRule = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateBinaryRelationshipRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateBinaryRelationshipRule.Subscribe(_ => this.ExecuteCreateCommand<BinaryRelationshipRule>());
 
-            this.CreateDecompositionRule = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateDecompositionRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateDecompositionRule.Subscribe(_ => this.ExecuteCreateCommand<DecompositionRule>());
 
-            this.CreateMultiRelationshipRule = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateMultiRelationshipRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateMultiRelationshipRule.Subscribe(_ => this.ExecuteCreateCommand<MultiRelationshipRule>());
 
-            this.CreateParameterizedCategoryRule = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateParameterizedCategoryRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateParameterizedCategoryRule.Subscribe(_ => this.ExecuteCreateCommand<ParameterizedCategoryRule>());
 
-            this.CreateReferencerRule = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateReferencerRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateReferencerRule.Subscribe(_ => this.ExecuteCreateCommand<ReferencerRule>());
         }
 

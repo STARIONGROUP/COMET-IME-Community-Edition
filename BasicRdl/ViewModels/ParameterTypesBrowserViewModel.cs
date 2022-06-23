@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypesBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -28,6 +28,7 @@ namespace BasicRdl.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -44,12 +45,12 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
     using CDP4Composition.Services.FavoritesService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    
+
     using CommonServiceLocator;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -113,8 +114,6 @@ namespace BasicRdl.ViewModels
 
             this.favoritesService = favoritesService;
 
-            this.parameterTypes.ChangeTrackingEnabled = true;
-
             this.RefreshFavorites(
                 this.favoritesService.GetFavoriteItemsCollectionByType(this.Session, typeof(ParameterType)));
 
@@ -152,67 +151,67 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="TextParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> CreateTextParameterType { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateTextParameterType { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="BooleanParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> CreateBooleanParameterType { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateBooleanParameterType { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="DateParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> CreateDateParameterType { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateDateParameterType { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="EnumerationParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> CreateEnumerationParameterType { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateEnumerationParameterType { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="TimeOfDayParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> CreateTimeOfDayParameterType { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateTimeOfDayParameterType { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="DateTimeParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> CreateDateTimeParameterType { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateDateTimeParameterType { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="SimpleQuantityKind"/>
         /// </summary>
-        public ReactiveCommand<object> CreateSimpleQuantityKind { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSimpleQuantityKind { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="SpecializedQuantityKind"/>
         /// </summary>
-        public ReactiveCommand<object> CreateSpecializedQuantityKind { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSpecializedQuantityKind { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="DerivedQuantityKind"/>
         /// </summary>
-        public ReactiveCommand<object> CreateDerivedQuantityKind { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateDerivedQuantityKind { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CompoundParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> CreateCompoundParameterType { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateCompoundParameterType { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ArrayParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> CreateArrayParameterType { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateArrayParameterType { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="SampledFunctionParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> CreateSampledFunctionParameterType { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSampledFunctionParameterType { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to toggle the state of <see cref="IsFavorite"/> for a perticulat row.
         /// </summary>
-        public ReactiveCommand<object> ToggleFavoriteCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ToggleFavoriteCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -266,50 +265,50 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateTextParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateTextParameterType = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.CreateTextParameterType.Subscribe(_ => this.ExecuteCreateCommand<TextParameterType>());
 
             this.CreateBooleanParameterType =
-                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
             this.Disposables.Add(this.CreateBooleanParameterType.Subscribe(_ => this.ExecuteCreateCommand<BooleanParameterType>()));
 
-            this.CreateDateParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateDateParameterType = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateDateParameterType.Subscribe(_ => this.ExecuteCreateCommand<DateParameterType>()));
 
             this.CreateDateTimeParameterType =
-                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateDateTimeParameterType.Subscribe(_ => this.ExecuteCreateCommand<DateTimeParameterType>()));
 
             this.CreateEnumerationParameterType =
-                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateEnumerationParameterType.Subscribe(_ => this.ExecuteCreateCommand<EnumerationParameterType>()));
 
             this.CreateTimeOfDayParameterType =
-                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateTimeOfDayParameterType.Subscribe(_ => this.ExecuteCreateCommand<TimeOfDayParameterType>()));
 
-            this.CreateSimpleQuantityKind = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateSimpleQuantityKind = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateSimpleQuantityKind.Subscribe(_ => this.ExecuteCreateCommand<SimpleQuantityKind>()));
 
             this.CreateSpecializedQuantityKind =
-                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateSpecializedQuantityKind.Subscribe(_ => this.ExecuteCreateCommand<SpecializedQuantityKind>()));
 
-            this.CreateDerivedQuantityKind = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateDerivedQuantityKind = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateDerivedQuantityKind.Subscribe(_ => this.ExecuteCreateCommand<DerivedQuantityKind>()));
 
             this.CreateCompoundParameterType =
-                ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateCompoundParameterType.Subscribe(_ => this.ExecuteCreateCommand<CompoundParameterType>()));
 
-            this.CreateArrayParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateArrayParameterType = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateArrayParameterType.Subscribe(_ => this.ExecuteCreateCommand<ArrayParameterType>()));
 
-            this.CreateSampledFunctionParameterType = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+            this.CreateSampledFunctionParameterType = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
             this.Disposables.Add(this.CreateSampledFunctionParameterType.Subscribe(_ => this.ExecuteCreateCommand<SampledFunctionParameterType>()));
 
-            this.ToggleFavoriteCommand = ReactiveCommand.Create();
+            this.ToggleFavoriteCommand = ReactiveCommandCreator.Create();
             this.Disposables.Add(this.ToggleFavoriteCommand.Subscribe(_ => this.ExecuteToggleFavoriteCommand()));
         }
 

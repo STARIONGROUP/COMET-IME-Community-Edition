@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MeasurementScalesBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -27,6 +27,7 @@ namespace BasicRdl.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
@@ -38,10 +39,10 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -86,8 +87,6 @@ namespace BasicRdl.ViewModels
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
             this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
-            this.measurementScales.ChangeTrackingEnabled = true;
-
             this.AddSubscriptions();
         }
 
@@ -111,27 +110,27 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="IntervalScale"/>
         /// </summary>
-        public ReactiveCommand<object> CreateIntervalScale { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateIntervalScale { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="LogarithmicScale"/>
         /// </summary>
-        public ReactiveCommand<object> CreateLogarithmicScale { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateLogarithmicScale { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="OrdinalScale"/>
         /// </summary>
-        public ReactiveCommand<object> CreateOrdinalScale { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateOrdinalScale { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="RatioScale"/>
         /// </summary>
-        public ReactiveCommand<object> CreateRatioScale { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateRatioScale { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CyclicRatioScale"/>
         /// </summary>
-        public ReactiveCommand<object> CreateCyclicRatioScale { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateCyclicRatioScale { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -245,19 +244,19 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateRatioScale = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateRatioScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateRatioScale.Subscribe(_ => this.ExecuteCreateCommand<RatioScale>());
 
-            this.CreateIntervalScale = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateIntervalScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateIntervalScale.Subscribe(_ => this.ExecuteCreateCommand<IntervalScale>());
 
-            this.CreateLogarithmicScale = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateLogarithmicScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateLogarithmicScale.Subscribe(_ => this.ExecuteCreateCommand<LogarithmicScale>());
 
-            this.CreateOrdinalScale = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateOrdinalScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateOrdinalScale.Subscribe(_ => this.ExecuteCreateCommand<OrdinalScale>());
 
-            this.CreateCyclicRatioScale = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
+            this.CreateCyclicRatioScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
             this.CreateCyclicRatioScale.Subscribe(_ => this.ExecuteCreateCommand<CyclicRatioScale>());
         }
 

@@ -149,8 +149,7 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedUnitFactorCommand = this.WhenAny(vm => vm.SelectedUnitFactor, v => v.Value != null);
             var canExecuteEditSelectedUnitFactorCommand = this.WhenAny(vm => vm.SelectedUnitFactor, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateUnitFactorCommand = ReactiveCommandCreator.Create(canExecuteCreateUnitFactorCommand);
-            this.CreateUnitFactorCommand.Subscribe(_ => this.ExecuteCreateCommand<UnitFactor>(this.PopulateUnitFactor));
+            this.CreateUnitFactorCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<UnitFactor>(this.PopulateUnitFactor), canExecuteCreateUnitFactorCommand);
 
             this.DeleteUnitFactorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUnitFactorCommand);
             this.DeleteUnitFactorCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedUnitFactor.Thing, this.PopulateUnitFactor));

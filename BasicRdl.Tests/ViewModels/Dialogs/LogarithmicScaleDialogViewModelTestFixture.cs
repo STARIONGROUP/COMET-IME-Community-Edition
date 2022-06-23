@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="LogarithmicScaleDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -29,6 +29,9 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
@@ -136,34 +139,34 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyUpdateOkCanExecute()
         {
             Assert.IsNull(this.viewmodel.SelectedUnit);
-            Assert.IsFalse(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
 
             this.viewmodel.SelectedUnit = this.viewmodel.PossibleUnit.First();
-            Assert.IsTrue(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
         }
 
         [Test]
         public void VerifValueDefinitionCommands()
         {
-            Assert.IsTrue(this.viewmodel.CreateValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.InspectValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.EditValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.DeleteValueDefinitionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.CreateValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.InspectValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.EditValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.DeleteValueDefinitionCommand).CanExecute(null));
 
             this.viewmodel.SelectedValueDefinition = this.viewmodel.ValueDefinition.First();
 
-            Assert.IsTrue(this.viewmodel.InspectValueDefinitionCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.EditValueDefinitionCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.DeleteValueDefinitionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.InspectValueDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.EditValueDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.DeleteValueDefinitionCommand).CanExecute(null));
         }
 
         [Test]
         public void VerifMappingToReferenceScaleCommands()
         {
-            Assert.IsTrue(this.viewmodel.CreateMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.InspectMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.EditMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.DeleteMappingToReferenceScaleCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.CreateMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.InspectMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.EditMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.DeleteMappingToReferenceScaleCommand).CanExecute(null));
 
             var mtrs = new MappingToReferenceScale(Guid.NewGuid(), null, null);
             var mtrsr = new MappingToReferenceScaleRowViewModel(mtrs, this.session.Object, null);
@@ -171,47 +174,47 @@ namespace BasicRdl.Tests.ViewModels
             this.viewmodel.SelectedMappingToReferenceScale = this.viewmodel.MappingToReferenceScale.First();
             this.viewmodel.SelectedMappingToReferenceScale = this.viewmodel.MappingToReferenceScale.First();
 
-            Assert.IsTrue(this.viewmodel.InspectMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.EditMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.DeleteMappingToReferenceScaleCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.InspectMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.EditMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.DeleteMappingToReferenceScaleCommand).CanExecute(null));
 
             this.viewmodel.ValueDefinition.Clear();
-            Assert.IsFalse(this.viewmodel.CreateMappingToReferenceScaleCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.CreateMappingToReferenceScaleCommand).CanExecute(null));
         }
 
         [Test]
         public void VerifReferenceQuantityKindCommands()
         {
-            Assert.IsFalse(this.viewmodel.CreateReferenceQuantityValueCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.InspectReferenceQuantityValueCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.EditReferenceQuantityValueCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.DeleteReferenceQuantityValueCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.CreateReferenceQuantityValueCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.InspectReferenceQuantityValueCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.EditReferenceQuantityValueCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.DeleteReferenceQuantityValueCommand).CanExecute(null));
 
             this.viewmodel.SelectedReferenceQuantityValue = this.viewmodel.ReferenceQuantityValue.First();
 
-            Assert.IsTrue(this.viewmodel.InspectReferenceQuantityValueCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.EditReferenceQuantityValueCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.DeleteReferenceQuantityValueCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.CreateReferenceQuantityValueCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.InspectReferenceQuantityValueCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.EditReferenceQuantityValueCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.DeleteReferenceQuantityValueCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.CreateReferenceQuantityValueCommand).CanExecute(null));
 
             this.viewmodel.ReferenceQuantityValue.Clear();
-            Assert.IsTrue(this.viewmodel.CreateReferenceQuantityValueCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.CreateReferenceQuantityValueCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyInspectValueDefinition()
+        public async Task VerifyInspectValueDefinition()
         {
             var vm = this.viewmodel;
             Assert.IsNull(vm.SelectedValueDefinition);
 
             vm.SelectedValueDefinition = vm.ValueDefinition.First();
-            Assert.IsTrue(vm.InspectValueDefinitionCommand.CanExecute(null));
-            vm.InspectValueDefinitionCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectValueDefinitionCommand).CanExecute(null));
+            await vm.InspectValueDefinitionCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<ScaleValueDefinition>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 
         [Test]
-        public void VerifyInspectMappingToReferenceScale()
+        public async Task VerifyInspectMappingToReferenceScale()
         {
             var vm = this.viewmodel;
             Assert.IsNull(vm.SelectedMappingToReferenceScale);
@@ -220,28 +223,28 @@ namespace BasicRdl.Tests.ViewModels
             var mtrsr = new MappingToReferenceScaleRowViewModel(mtrs, this.session.Object, null);
             vm.MappingToReferenceScale.Add(mtrsr);
             vm.SelectedMappingToReferenceScale = vm.MappingToReferenceScale.First();
-            Assert.IsTrue(vm.InspectMappingToReferenceScaleCommand.CanExecute(null));
-            vm.InspectMappingToReferenceScaleCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectMappingToReferenceScaleCommand).CanExecute(null));
+            await vm.InspectMappingToReferenceScaleCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<MappingToReferenceScale>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 
         [Test]
-        public void VerifyInspectReferenceQuantityKindValue()
+        public async Task VerifyInspectReferenceQuantityKindValue()
         {
             var vm = this.viewmodel;
             this.viewmodel.SelectedReferenceQuantityValue = this.viewmodel.ReferenceQuantityValue.First();
-            Assert.IsTrue(vm.InspectReferenceQuantityValueCommand.CanExecute(null));
-            vm.InspectReferenceQuantityValueCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectReferenceQuantityValueCommand).CanExecute(null));
+            await vm.InspectReferenceQuantityValueCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<ScaleReferenceQuantityValue>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 
         [Test]
-        public void VerifyInspectReferenceQuantityKind()
+        public async Task VerifyInspectReferenceQuantityKind()
         {
             var vm = this.viewmodel;
             this.viewmodel.SelectedReferenceQuantityKind = this.viewmodel.PossibleReferenceQuantityKind.First();
-            Assert.IsTrue(vm.InspectSelectedReferenceQuantityKindCommand.CanExecute(null));
-            vm.InspectSelectedReferenceQuantityKindCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectSelectedReferenceQuantityKindCommand).CanExecute(null));
+            await vm.InspectSelectedReferenceQuantityKindCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<QuantityKind>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 
