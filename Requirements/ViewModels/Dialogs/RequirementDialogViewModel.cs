@@ -1,32 +1,57 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Dal;
+    using CDP4Dal.Operations;
+    
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Dal;
+    using CDP4Composition.Mvvm.Types;
+    using CDP4Composition.Utilities;
+
     using ReactiveUI;
+
     using System;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
+    using System.Windows.Input;
+
     using CDP4CommonView.ViewModels;
-
-    using CDP4Composition.Mvvm.Types;
-    using CDP4Composition.Utilities;
-
+    
     /// <summary>
     /// The purpose of the <see cref="RequirementDialogViewModel"/> is to provide a dialog view model
     /// for a <see cref="Requirement"/>
@@ -178,22 +203,22 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a SimpleParameterValue
         /// </summary>
-        public ReactiveCommand<object> CreateSimpleParameterValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateSimpleParameterValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a SimpleParameterValue
         /// </summary>
-        public ReactiveCommand<object> DeleteSimpleParameterValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteSimpleParameterValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a SimpleParameterValue
         /// </summary>
-        public ReactiveCommand<object> EditSimpleParameterValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditSimpleParameterValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a SimpleParameterValue
         /// </summary>
-        public ReactiveCommand<object> InspectSimpleParameterValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSimpleParameterValueCommand { get; protected set; }
         
         /// <summary>
         /// Initializes the properties of this <see cref="Requirement"/>
@@ -222,17 +247,13 @@ namespace CDP4Requirements.ViewModels
             var canExecuteInspectSelectedSimpleParameterValueCommand = this.WhenAny(vm => vm.SelectedSimpleParameterValue, v => v.Value != null);
             var canExecuteEditSelectedSimpleParameterValueCommand = this.WhenAny(vm => vm.SelectedSimpleParameterValue, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateSimpleParameterValueCommand = ReactiveCommand.Create(canExecuteCreateSimpleParameterValueCommand);
-            this.CreateSimpleParameterValueCommand.Subscribe(_ => this.ExecuteCreateCommand<SimpleParameterValue>(this.PopulateSimpleParameterValues));
+            this.CreateSimpleParameterValueCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<SimpleParameterValue>(this.PopulateSimpleParameterValues), canExecuteCreateSimpleParameterValueCommand);
 
-            this.DeleteSimpleParameterValueCommand = ReactiveCommand.Create(canExecuteEditSelectedSimpleParameterValueCommand);
-            this.DeleteSimpleParameterValueCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedSimpleParameterValue.Thing, this.PopulateSimpleParameterValues));
+            this.DeleteSimpleParameterValueCommand = ReactiveCommandCreator.Create(() => this.ExecuteDeleteCommand(this.SelectedSimpleParameterValue.Thing, this.PopulateSimpleParameterValues), canExecuteEditSelectedSimpleParameterValueCommand);
 
-            this.EditSimpleParameterValueCommand = ReactiveCommand.Create(canExecuteEditSelectedSimpleParameterValueCommand);
-            this.EditSimpleParameterValueCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedSimpleParameterValue.Thing, this.PopulateSimpleParameterValues));
+            this.EditSimpleParameterValueCommand = ReactiveCommandCreator.Create(() => this.ExecuteEditCommand(this.SelectedSimpleParameterValue.Thing, this.PopulateSimpleParameterValues), canExecuteEditSelectedSimpleParameterValueCommand);
 
-            this.InspectSimpleParameterValueCommand = ReactiveCommand.Create(canExecuteInspectSelectedSimpleParameterValueCommand);
-            this.InspectSimpleParameterValueCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSimpleParameterValue.Thing));
+            this.InspectSimpleParameterValueCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedSimpleParameterValue.Thing), canExecuteInspectSelectedSimpleParameterValueCommand);
 
             this.WhenAnyValue(x => x.SelectedLanguageCode).Where(x => x != null).Subscribe(x => this.UpdateRequirementText());
         }

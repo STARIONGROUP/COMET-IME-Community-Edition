@@ -7,18 +7,16 @@
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
-             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:viewModels="clr-namespace:CDP4Requirements.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4Requirements.Converters"
              xmlns:userControls="clr-namespace:CDP4Requirements.Views.UserControls"
              xmlns:rows="clr-namespace:CDP4Requirements.ViewModels.RequirementBrowser.Rows"
              xmlns:selectors="clr-namespace:CDP4Requirements.Selectors"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -223,10 +221,10 @@
             <dxmvvm:Interaction.Behaviors>
                 <cdp4Composition:ContextMenuBehavior />
             </dxmvvm:Interaction.Behaviors>
-            <i:Interaction.Behaviors>
+            <b:Interaction.Behaviors>
                 <dragDrop:FrameworkElementDragBehavior />
                 <dragDrop:FrameworkElementDropBehavior />
-            </i:Interaction.Behaviors>
+            </b:Interaction.Behaviors>
             <dxg:TreeListControl.Columns>
                 <dxg:TreeListColumn FieldName="ShortName" Fixed="Left"/>
                 <dxg:TreeListColumn FieldName="Name" />

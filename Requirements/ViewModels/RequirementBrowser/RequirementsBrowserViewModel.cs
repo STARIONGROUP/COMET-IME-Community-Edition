@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +29,7 @@ namespace CDP4Requirements.ViewModels
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -219,22 +220,22 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="BinaryRelationship"/>
         /// </summary>
-        public ReactiveCommand<object> CreateRelationshipCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateRelationshipCommand { get; private set; }
 
         /// <summary>
         /// Gets the Create Requirement command
         /// </summary>
-        public ReactiveCommand<object> CreateRequirementCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateRequirementCommand { get; private set; }
 
         /// <summary>
         /// Gets the Create Requirement Group command
         /// </summary>
-        public ReactiveCommand<object> CreateRequirementGroupCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateRequirementGroupCommand { get; private set; }
 
         /// <summary>
         /// Gets the Navigate To <see cref="RequirementsSpecification"/> Editor Command
         /// </summary>
-        public ReactiveCommand<object> NavigateToRequirementsSpecificationEditorCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> NavigateToRequirementsSpecificationEditorCommand { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the create <see cref="RequirementsSpecification"/> command can be executed
@@ -531,22 +532,15 @@ namespace CDP4Requirements.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateReqSpec));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<RequirementsSpecification>(this.Thing));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<RequirementsSpecification>(this.Thing), this.WhenAnyValue(x => x.CanCreateReqSpec));
 
-            this.CreateRelationshipCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRelationship));
-            this.CreateRelationshipCommand.Subscribe(_ => this.ExecuteCreateCommand<BinaryRelationship>(this.Thing));
+            this.CreateRelationshipCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<BinaryRelationship>(this.Thing), this.WhenAnyValue(x => x.CanCreateRelationship));
 
-            this.CreateRequirementGroupCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirementGroup));
-            this.CreateRequirementGroupCommand.Subscribe(_ =>
-                this.ExecuteCreateCommand<RequirementsGroup>(this.SelectedThing.Thing));
+            this.CreateRequirementGroupCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<RequirementsGroup>(this.SelectedThing.Thing), this.WhenAnyValue(x => x.CanCreateRequirementGroup));
 
-            this.CreateRequirementCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequirement));
-            this.CreateRequirementCommand.Subscribe(_ => this.ExecuteCreateRequirement());
+            this.CreateRequirementCommand = ReactiveCommandCreator.Create(this.ExecuteCreateRequirement, this.WhenAnyValue(x => x.CanCreateRequirement));
 
-            this.NavigateToRequirementsSpecificationEditorCommand = ReactiveCommand.Create();
-            this.NavigateToRequirementsSpecificationEditorCommand.Subscribe(_ =>
-                this.ExecuteNavigateToRequirementsSpecificationEditor());
+            this.NavigateToRequirementsSpecificationEditorCommand = ReactiveCommandCreator.Create(this.ExecuteNavigateToRequirementsSpecificationEditor);
         }
 
         /// <summary>

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfImportDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +30,7 @@ namespace CDP4Requirements.Tests.ReqIF
     using System.IO;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
@@ -172,16 +173,16 @@ namespace CDP4Requirements.Tests.ReqIF
         }
 
         [Test]
-        public void VerifyThatCancelCommandWorks()
+        public async Task VerifyThatCancelCommandWorks()
         {
-            this.dialog.CancelCommand.Execute(null);
+            await this.dialog.CancelCommand.Execute();
             Assert.IsFalse(this.dialog.DialogResult.Result.Value);
         }
 
         [Test]
-        public void VerifyBrowseCommand()
+        public async Task VerifyBrowseCommand()
         {
-            this.dialog.BrowseCommand.Execute(null);
+            await this.dialog.BrowseCommand.Execute();
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1), Times.Once);
             Assert.IsNotNull(this.dialog.Path);
         }
@@ -194,7 +195,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.dialog.SelectedIteration = this.dialog.Iterations.First();
 
             Assert.IsTrue(this.dialog.CanExecuteImport);
-            _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
+            await this.dialog.OkCommand.Execute();
             this.reqIfSerialiser.Verify(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null), Times.Once);
             this.pluginSettingService.Verify(x => x.Read<RequirementsModuleSettings>(true, It.IsAny<JsonConverter[]>()), Times.Once);
             var result = this.dialog.DialogResult as ReqIfImportResult;
@@ -217,7 +218,7 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.NoConfigurationText);
 
             Assert.IsTrue(this.dialog.CanExecuteImport);
-            _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
+            await this.dialog.OkCommand.Execute();
             var resultNoConfiguration = this.dialog.DialogResult as ReqIfImportResult;
             Assert.IsNotNull(resultNoConfiguration);
             Assert.IsTrue(resultNoConfiguration?.Result.Value);
@@ -228,7 +229,7 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == ReqIfImportDialogViewModel.AutoConfigurationText);
 
             Assert.IsTrue(this.dialog.CanExecuteImport);
-            _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
+            await this.dialog.OkCommand.Execute();
 
             Assert.IsNotNull(this.dialog.SelectedMappingConfiguration);
             var resultAutoSelectedConfiguration = this.dialog.DialogResult as ReqIfImportResult;
@@ -241,7 +242,7 @@ namespace CDP4Requirements.Tests.ReqIF
             Assert.IsTrue(this.dialog.SelectedMappingConfiguration.Name == this.settings.SavedConfigurations.Last().Name);
 
             Assert.IsTrue(this.dialog.CanExecuteImport);
-            _ = await this.dialog.OkCommand.ExecuteAsyncTask(null);
+            await this.dialog.OkCommand.Execute();
             Assert.IsNotNull(this.dialog.SelectedMappingConfiguration);
             var result = this.dialog.DialogResult as ReqIfImportResult;
             Assert.IsNotNull(result);

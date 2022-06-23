@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementSpecificationMappingDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
@@ -11,12 +30,14 @@ namespace CDP4Requirements.ViewModels
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
-    using System.Web.UI;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Dal;
     using CDP4Dal.Operations;
+    
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
@@ -25,7 +46,6 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.ViewModels;
 
-    using CDP4Dal;
     using CDP4Requirements.ReqIFDal;
     using CDP4Requirements.Settings.JsonConverters;
 
@@ -99,22 +119,22 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the back <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> BackCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> BackCommand { get; private set; }
 
         /// <summary>
         /// Gets the "Ok" <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<Unit> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Save mapping configuration <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> SaveMappingCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveMappingCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> InspectCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="RequirementsSpecificationRowViewModel"/> rows
@@ -226,10 +246,9 @@ namespace CDP4Requirements.ViewModels
                 vm => vm.SelectedThing,
                 (ses, selection) => ses != null && selection != null);
 
-            this.BackCommand = ReactiveCommand.Create();
-            this.BackCommand.Subscribe(_ => this.ExecuteBackCommand());
+            this.BackCommand = ReactiveCommandCreator.Create(this.ExecuteBackCommand);
 
-            this.OkCommand = ReactiveCommand.CreateAsyncTask(x => this.ExecuteOkCommand(), RxApp.MainThreadScheduler);
+            this.OkCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteOkCommand);
             
             this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
             {
@@ -237,11 +256,9 @@ namespace CDP4Requirements.ViewModels
                 this.IsBusy = false;
             });
 
-            this.SaveMappingCommand = ReactiveCommand.Create();
-            this.SaveMappingCommand.Subscribe(_ => this.SaveMappingCommandExecute());
+            this.SaveMappingCommand = ReactiveCommandCreator.Create(this.SaveMappingCommandExecute);
 
-            this.InspectCommand = ReactiveCommand.Create(canExecuteCommand);
-            this.InspectCommand.Subscribe(_ => this.ExecuteInspectCommand());
+            this.InspectCommand = ReactiveCommandCreator.Create(this.ExecuteInspectCommand, canExecuteCommand);
         }
 
         /// <summary>
