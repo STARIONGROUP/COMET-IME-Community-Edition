@@ -244,20 +244,15 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateRatioScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateRatioScale.Subscribe(_ => this.ExecuteCreateCommand<RatioScale>());
+            this.CreateRatioScale = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<RatioScale>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateIntervalScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateIntervalScale.Subscribe(_ => this.ExecuteCreateCommand<IntervalScale>());
+            this.CreateIntervalScale = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<IntervalScale>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateLogarithmicScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateLogarithmicScale.Subscribe(_ => this.ExecuteCreateCommand<LogarithmicScale>());
+            this.CreateLogarithmicScale = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<LogarithmicScale>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateOrdinalScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateOrdinalScale.Subscribe(_ => this.ExecuteCreateCommand<OrdinalScale>());
+            this.CreateOrdinalScale = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<OrdinalScale>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateCyclicRatioScale = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateCyclicRatioScale.Subscribe(_ => this.ExecuteCreateCommand<CyclicRatioScale>());
+            this.CreateCyclicRatioScale = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<CyclicRatioScale>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
         }
 
         /// <summary>

@@ -265,51 +265,37 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateTextParameterType = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.CreateTextParameterType.Subscribe(_ => this.ExecuteCreateCommand<TextParameterType>());
+            this.CreateTextParameterType = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<TextParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
             this.CreateBooleanParameterType =
-                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
+                ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<BooleanParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
-            this.Disposables.Add(this.CreateBooleanParameterType.Subscribe(_ => this.ExecuteCreateCommand<BooleanParameterType>()));
-
-            this.CreateDateParameterType = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateDateParameterType.Subscribe(_ => this.ExecuteCreateCommand<DateParameterType>()));
+            this.CreateDateParameterType = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<DateParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
             this.CreateDateTimeParameterType =
-                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateDateTimeParameterType.Subscribe(_ => this.ExecuteCreateCommand<DateTimeParameterType>()));
+                ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<DateTimeParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
             this.CreateEnumerationParameterType =
-                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateEnumerationParameterType.Subscribe(_ => this.ExecuteCreateCommand<EnumerationParameterType>()));
+                ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<EnumerationParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
             this.CreateTimeOfDayParameterType =
-                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateTimeOfDayParameterType.Subscribe(_ => this.ExecuteCreateCommand<TimeOfDayParameterType>()));
+                ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<TimeOfDayParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
-            this.CreateSimpleQuantityKind = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateSimpleQuantityKind.Subscribe(_ => this.ExecuteCreateCommand<SimpleQuantityKind>()));
+            this.CreateSimpleQuantityKind = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<SimpleQuantityKind>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
             this.CreateSpecializedQuantityKind =
-                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateSpecializedQuantityKind.Subscribe(_ => this.ExecuteCreateCommand<SpecializedQuantityKind>()));
+                ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<SpecializedQuantityKind>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
-            this.CreateDerivedQuantityKind = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateDerivedQuantityKind.Subscribe(_ => this.ExecuteCreateCommand<DerivedQuantityKind>()));
+            this.CreateDerivedQuantityKind = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<DerivedQuantityKind>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
             this.CreateCompoundParameterType =
-                ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateCompoundParameterType.Subscribe(_ => this.ExecuteCreateCommand<CompoundParameterType>()));
+                ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<CompoundParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
-            this.CreateArrayParameterType = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateArrayParameterType.Subscribe(_ => this.ExecuteCreateCommand<ArrayParameterType>()));
+            this.CreateArrayParameterType = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ArrayParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
-            this.CreateSampledFunctionParameterType = ReactiveCommandCreator.Create(this.WhenAnyValue(vm => vm.CanCreateParameterType));
-            this.Disposables.Add(this.CreateSampledFunctionParameterType.Subscribe(_ => this.ExecuteCreateCommand<SampledFunctionParameterType>()));
+            this.CreateSampledFunctionParameterType = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<SampledFunctionParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
-            this.ToggleFavoriteCommand = ReactiveCommandCreator.Create();
-            this.Disposables.Add(this.ToggleFavoriteCommand.Subscribe(_ => this.ExecuteToggleFavoriteCommand()));
+            this.ToggleFavoriteCommand = ReactiveCommandCreator.Create(this.ExecuteToggleFavoriteCommand);
         }
 
         /// <summary>

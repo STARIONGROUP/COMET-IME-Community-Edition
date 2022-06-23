@@ -235,29 +235,21 @@ namespace BasicRdl.ViewModels
             var canExecuteEditSelectedIndependentParameterTypeAssignmentCommand = this.WhenAny(vm => vm.SelectedIndependentParameterType, v => v.Value != null && !this.IsReadOnly && this.dialogKind == ThingDialogKind.Create);
             var canExecuteEditSelectedDependentParameterTypeAssignmentCommand = this.WhenAny(vm => vm.SelectedDependentParameterType, v => v.Value != null && !this.IsReadOnly && this.dialogKind == ThingDialogKind.Create);
 
-            this.CreateIndependentParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteCreateParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.CreateIndependentParameterTypeCommand.Subscribe(_ => this.ExecuteCreateIndependentParameterType()));
+            this.CreateIndependentParameterTypeCommand = ReactiveCommandCreator.Create(this.ExecuteCreateIndependentParameterType, canExecuteCreateParameterTypeAssignmentCommand);
 
-            this.DeleteIndependentParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.DeleteIndependentParameterTypeCommand.Subscribe(_ => this.ExecuteDeleteIndependentParameterType()));
+            this.DeleteIndependentParameterTypeCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteIndependentParameterType, canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
 
-            this.CreateDependentParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteCreateParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.CreateDependentParameterTypeCommand.Subscribe(_ => this.ExecuteCreateDependentParameterType()));
+            this.CreateDependentParameterTypeCommand = ReactiveCommandCreator.Create(this.ExecuteCreateDependentParameterType, canExecuteCreateParameterTypeAssignmentCommand);
 
-            this.DeleteDependentParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.DeleteDependentParameterTypeCommand.Subscribe(_ => this.ExecuteDeleteDependentParameterType()));
+            this.DeleteDependentParameterTypeCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteDependentParameterType, canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
 
-            this.MoveUpIndependentParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.MoveUpIndependentParameterTypeCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.IndependentParameterTypes, this.SelectedIndependentParameterType)));
+            this.MoveUpIndependentParameterTypeCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveUpCommand(this.IndependentParameterTypes, this.SelectedIndependentParameterType), canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
 
-            this.MoveDownIndependentParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.MoveDownIndependentParameterTypeCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.IndependentParameterTypes, this.SelectedIndependentParameterType)));
+            this.MoveDownIndependentParameterTypeCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveDownCommand(this.IndependentParameterTypes, this.SelectedIndependentParameterType), canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
 
-            this.MoveUpDependentParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.MoveUpDependentParameterTypeCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.DependentParameterTypes, this.SelectedDependentParameterType)));
-
-            this.MoveDownDependentParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.MoveDownDependentParameterTypeCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.DependentParameterTypes, this.SelectedDependentParameterType)));
+            this.MoveUpDependentParameterTypeCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveUpCommand(this.DependentParameterTypes, this.SelectedDependentParameterType), canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
+            
+            this.MoveDownDependentParameterTypeCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveDownCommand(this.DependentParameterTypes, this.SelectedDependentParameterType), canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
 
             this.WhenAnyValue(x => x.Container).Subscribe(_ =>
             {

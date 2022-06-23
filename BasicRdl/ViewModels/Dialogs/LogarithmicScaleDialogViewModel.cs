@@ -144,12 +144,10 @@ namespace BasicRdl.ViewModels
             base.InitializeCommands();
 
             var canExecuteCreateMappingToReferenceScaleCommand = this.WhenAny(vm => vm.ValueDefinition.Count, v => v.Value > 0 && !this.IsReadOnly);
-            this.CreateMappingToReferenceScaleCommand = ReactiveCommandCreator.Create(canExecuteCreateMappingToReferenceScaleCommand);
-            this.CreateMappingToReferenceScaleCommand.Subscribe(_ => this.ExecuteCreateCommand<MappingToReferenceScale>(this.PopulateMappingToReferenceScale));
+            this.CreateMappingToReferenceScaleCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<MappingToReferenceScale>(this.PopulateMappingToReferenceScale), canExecuteCreateMappingToReferenceScaleCommand);
 
             var canExecuteCreateReferenceQuantityValueCommand = this.WhenAny(vm => vm.ReferenceQuantityValue.Count, v => v.Value == 0 && !this.IsReadOnly);
-            this.CreateReferenceQuantityValueCommand = ReactiveCommandCreator.Create(canExecuteCreateReferenceQuantityValueCommand);
-            this.CreateReferenceQuantityValueCommand.Subscribe(_ => this.ExecuteCreateCommand<ScaleReferenceQuantityValue>(this.PopulateReferenceQuantityValue));       
+            this.CreateReferenceQuantityValueCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ScaleReferenceQuantityValue>(this.PopulateReferenceQuantityValue), canExecuteCreateReferenceQuantityValueCommand);
         }
 
         /// <summary>

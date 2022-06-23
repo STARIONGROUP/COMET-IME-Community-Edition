@@ -115,8 +115,7 @@ namespace BasicRdl.ViewModels
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-            this.CreateCommand = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<ReferenceSource>());
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ReferenceSource>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
         }
 
         /// <summary>

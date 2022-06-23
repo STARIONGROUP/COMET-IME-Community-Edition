@@ -102,8 +102,7 @@ namespace BasicRdl.ViewModels
             : base(derivedUnit, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
             var canCreateCondition = this.WhenAnyValue(vm => vm.Container).Select(x => x != null);
-            this.CreateUnitFactorCommand = ReactiveCommandCreator.Create(canCreateCondition);
-            this.CreateUnitFactorCommand.Subscribe(_ => this.ExecuteCreateCommand<UnitFactor>(this.PopulateUnitFactor));
+            this.CreateUnitFactorCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<UnitFactor>(this.PopulateUnitFactor), canCreateCondition);
 
             this.WhenAnyValue(vm => vm.Container).Subscribe(_ => this.UpdateOkCanExecute());
         }

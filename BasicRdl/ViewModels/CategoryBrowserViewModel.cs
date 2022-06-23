@@ -161,11 +161,9 @@ namespace BasicRdl.ViewModels
             var canSelectableCommandsExecute =
                 this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null && !(x.Thing is NotThing));
 
-            this.HighlightCommand = ReactiveCommandCreator.Create(canSelectableCommandsExecute);
-            this.HighlightCommand.Subscribe(_ => this.ExecuteHighlightCommand());
+            this.HighlightCommand = ReactiveCommandCreator.Create(this.ExecuteHighlightCommand, canSelectableCommandsExecute);
 
-            this.CreateCommand = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Category>());
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Category>(),this.WhenAnyValue(x => x.CanCreateRdlElement));
         }
 
         /// <summary>

@@ -245,17 +245,13 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateSimpleUnit = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateSimpleUnit.Subscribe(_ => this.ExecuteCreateCommand<SimpleUnit>());
+            this.CreateSimpleUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<SimpleUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateDerivedUnit = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateDerivedUnit.Subscribe(_ => this.ExecuteCreateCommand<DerivedUnit>());
+            this.CreateDerivedUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<DerivedUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateLinearConversionUnit = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateLinearConversionUnit.Subscribe(_ => this.ExecuteCreateCommand<LinearConversionUnit>());
+            this.CreateLinearConversionUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<LinearConversionUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreatePrefixedUnit = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreatePrefixedUnit.Subscribe(_ => this.ExecuteCreateCommand<PrefixedUnit>());
+            this.CreatePrefixedUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<PrefixedUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
         }
 
         /// <summary>

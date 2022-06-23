@@ -246,13 +246,11 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateTermCommand = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateTerm));
-            this.CreateTermCommand.Subscribe(_ =>
+            this.CreateTermCommand = ReactiveCommandCreator.Create(() =>
                 this.ExecuteCreateCommand<Term>(this.SelectedThing.Thing as Glossary ??
-                                                this.SelectedThing.Thing.GetContainerOfType<Glossary>()));
+                                                this.SelectedThing.Thing.GetContainerOfType<Glossary>()), this.WhenAnyValue(x => x.CanCreateTerm));
 
-            this.CreateGlossaryCommand = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateGlossary));
-            this.CreateGlossaryCommand.Subscribe(_ => this.ExecuteCreateCommand<Glossary>());
+            this.CreateGlossaryCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Glossary>(), this.WhenAnyValue(x => x.CanCreateGlossary));
         }
 
         /// <summary>

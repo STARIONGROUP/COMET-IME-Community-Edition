@@ -239,20 +239,15 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateBinaryRelationshipRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateBinaryRelationshipRule.Subscribe(_ => this.ExecuteCreateCommand<BinaryRelationshipRule>());
+            this.CreateBinaryRelationshipRule = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<BinaryRelationshipRule>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateDecompositionRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateDecompositionRule.Subscribe(_ => this.ExecuteCreateCommand<DecompositionRule>());
+            this.CreateDecompositionRule = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<DecompositionRule>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateMultiRelationshipRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateMultiRelationshipRule.Subscribe(_ => this.ExecuteCreateCommand<MultiRelationshipRule>());
+            this.CreateMultiRelationshipRule = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<MultiRelationshipRule>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateParameterizedCategoryRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateParameterizedCategoryRule.Subscribe(_ => this.ExecuteCreateCommand<ParameterizedCategoryRule>());
+            this.CreateParameterizedCategoryRule = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ParameterizedCategoryRule>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateReferencerRule = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateReferencerRule.Subscribe(_ => this.ExecuteCreateCommand<ReferencerRule>());
+            this.CreateReferencerRule = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ReferencerRule>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
         }
 
         /// <summary>

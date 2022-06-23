@@ -80,11 +80,9 @@ namespace BasicRdl.ViewModels
             this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            this.OpenSiteRdlSelectorCommand = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.HasSession));
-            this.OpenSiteRdlSelectorCommand.Subscribe(_ => this.ExecuteOpenSiteRdlSelectorCommand());
+            this.OpenSiteRdlSelectorCommand = ReactiveCommandCreator.Create(this.ExecuteOpenSiteRdlSelectorCommand, this.WhenAnyValue(x => x.HasSession));
 
-            this.CloseSiteRdlCommand = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.HasOpenSiteRdl));
-            this.CloseSiteRdlCommand.Subscribe(_ => this.ExecuteCloseSiteRdlSelectorCommand());
+            this.CloseSiteRdlCommand = ReactiveCommandCreator.Create(this.ExecuteCloseSiteRdlSelectorCommand, this.WhenAnyValue(x => x.HasOpenSiteRdl));
         }
 
         /// <summary>

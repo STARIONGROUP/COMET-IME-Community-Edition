@@ -85,14 +85,11 @@ namespace BasicRdl.ViewModels
                 vm => vm.HtmlReportPath, 
                 path => !string.IsNullOrEmpty(path));
 
-            this.OkCommand = ReactiveCommandCreator.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+            this.OkCommand = ReactiveCommandCreator.Create(this.ExecuteOk, canOk);
 
-            this.BrowseCommand = ReactiveCommandCreator.Create();
-            this.BrowseCommand.Subscribe(_ => this.ExecuteBrowse());
+            this.BrowseCommand = ReactiveCommandCreator.Create(this.ExecuteBrowse);
 
-            this.CancelCommand = ReactiveCommandCreator.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
         }
 
         /// <summary>

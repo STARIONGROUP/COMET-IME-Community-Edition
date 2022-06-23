@@ -143,8 +143,7 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedDefaultScaleCommand = this.WhenAny(vm => vm.SelectedDefaultScale, v => v.Value != null);
-            this.InspectSelectedScaleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDefaultScaleCommand);
-            this.InspectSelectedScaleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDefaultScale));
+            this.InspectSelectedScaleCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedDefaultScale), canExecuteInspectSelectedDefaultScaleCommand);
         }
     }
 }

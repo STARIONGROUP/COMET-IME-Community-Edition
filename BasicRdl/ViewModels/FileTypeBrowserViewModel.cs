@@ -208,8 +208,7 @@ namespace BasicRdl.ViewModels
                 }
             }
 
-            this.CreateCommand = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.CanWriteFileType));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<FileType>());
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<FileType>(), this.WhenAnyValue(x => x.CanWriteFileType));
         }
 
         /// <summary>

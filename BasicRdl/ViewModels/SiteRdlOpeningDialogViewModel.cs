@@ -100,8 +100,7 @@ namespace BasicRdl.ViewModels
                 this.IsBusy = false;
             });
 
-            this.CancelCommand = ReactiveCommandCreator.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
         }
 
         /// <summary>

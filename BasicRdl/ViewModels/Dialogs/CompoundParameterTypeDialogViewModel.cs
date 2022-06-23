@@ -108,11 +108,9 @@ namespace BasicRdl.ViewModels
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-            this.CreateComponentCommand = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.IsReadOnly).Select(x => !x));
-            this.CreateComponentCommand.Subscribe(_ => this.ExecuteCreateComponent());
+            this.CreateComponentCommand = ReactiveCommandCreator.Create(this.ExecuteCreateComponent, this.WhenAnyValue(x => x.IsReadOnly).Select(x => !x));
 
-            this.DeleteComponentCommand = ReactiveCommandCreator.Create(this.WhenAnyValue(x => x.IsReadOnly).Select(x => !x));
-            this.DeleteComponentCommand.Subscribe(_ => this.ExecuteDeleteComponent());
+            this.DeleteComponentCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteComponent, this.WhenAnyValue(x => x.IsReadOnly).Select(x => !x));
 
             this.WhenAnyValue(x => x.Container).Subscribe(_ =>
             {
