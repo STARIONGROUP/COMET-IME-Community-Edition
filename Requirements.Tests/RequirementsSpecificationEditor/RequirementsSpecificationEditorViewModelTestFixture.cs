@@ -1,30 +1,57 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsSpecificationEditorViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
 {
+    using System;
+    using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
-    using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using CDP4Requirements.ViewModels;
+    
     using Moq;
+    
     using NUnit.Framework;
-    using System;
-    using System.Linq;
-    using CDP4Dal.Operations;
+    
     using CDP4CommonView.EventAggregator;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -151,7 +178,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
         }
 
         [Test]
-        public void VefifyThatRequirementCanBeEdited()
+        public async Task VefifyThatRequirementCanBeEdited()
         {
             var requirementA = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "REQA", Owner = this.domain };
             var requirementB = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "REQB", Owner = this.domain };
@@ -177,13 +204,13 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             var received = false;
             var observable = requirementARow.EventPublisher.GetEvent<ConfirmationEvent>().Subscribe(x => received = true);
 
-            requirementARow.SaveCommand.Execute(null);
+            await requirementARow.SaveCommand.Execute();
             Assert.IsTrue(received);
             observable.Dispose();
         }
 
         [Test]
-        public void VefifyThatRequirementEditCanBeCancelled()
+        public async Task VefifyThatRequirementEditCanBeCancelled()
         {
             var requirementA = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "REQA", Owner = this.domain };
             var requirementB = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "REQB", Owner = this.domain };
@@ -211,7 +238,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
 
             this.dialogNavigation.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(new BaseDialogResult(true));
 
-            requirementARow.CancelCommand.Execute(null);
+            await requirementARow.CancelCommand.Execute();
 
             Assert.AreEqual(requirementARow.DefinitionContent, defA.Content);
             Assert.IsTrue(received);

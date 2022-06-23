@@ -140,12 +140,12 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
         /// <summary>
         /// Gets or sets the Save <see cref="ReactiveCommand" /> to save the content of the note.
         /// </summary>
-        public ReactiveCommand<Unit> SaveCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> SaveCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Cancel <see cref="ReactiveCommand" /> to save the content of the note.
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the content of the <see cref="Definition" /> of the <see cref="Requirement" />
@@ -291,10 +291,10 @@ namespace CDP4Requirements.ViewModels.RequirementsSpecificationEditor
             var canSave = this.WhenAnyValue(vm => vm.IsDirty).Select(_ => this.IsDirty);
 
             this.SaveCommand =
-                ReactiveCommand.CreateAsyncTask(canSave, x => this.WriteDefinitionUpdate(), RxApp.MainThreadScheduler);
+                ReactiveCommandCreator.CreateAsyncTask(this.WriteDefinitionUpdate, canSave);
 
-            this.CancelCommand = ReactiveCommand.Create(canSave);
-            this.CancelCommand.Subscribe(_ => this.ResetContent(true));
+            this.CancelCommand = 
+                ReactiveCommandCreator.Create(() => this.ResetContent(true), canSave);
         }
 
         /// <summary>

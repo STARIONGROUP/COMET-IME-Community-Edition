@@ -117,12 +117,12 @@ namespace CDP4CommonView
         /// <summary>
         /// Backing field for Value
         /// </summary>
-        public ReactiveList<PrimitiveRow<string>> value;
+        public TrackedReactiveList<PrimitiveRow<string>> value;
 
         /// <summary>
         /// Gets or sets the Value
         /// </summary>
-        public ReactiveList<PrimitiveRow<string>> Value
+        public TrackedReactiveList<PrimitiveRow<string>> Value
         {
             get { return this.value; }
             set { this.RaiseAndSetIfChanged(ref this.value, value); }
@@ -201,7 +201,7 @@ namespace CDP4CommonView
         protected override void Initialize()
         {
             base.Initialize();
-            this.Value = new ReactiveList<PrimitiveRow<string>>();
+            this.Value = new TrackedReactiveList<PrimitiveRow<string>>();
             this.PossibleParameterType = new ReactiveList<ParameterType>();
             this.PossibleScale = new ReactiveList<MeasurementScale>();
         }
