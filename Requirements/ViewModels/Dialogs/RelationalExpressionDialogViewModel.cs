@@ -43,6 +43,8 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
+    using DynamicData;
+
     using ReactiveUI;
 
     /// <summary>
@@ -93,7 +95,7 @@ namespace CDP4Requirements.ViewModels
             : base(relationalExpression, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
             this.WhenAnyValue(vm => vm.SelectedScale).Subscribe(_ => this.UpdateOkCanExecute());
-            this.Value.ItemChanged.Subscribe(_ => this.UpdateOkCanExecute());
+            this.Value.ItemChanged.WhenAnyPropertyChanged().Subscribe(_ => this.UpdateOkCanExecute());
 
             this.WhenAnyValue(vm => vm.SelectedParameterType).Subscribe(_ =>
             {
