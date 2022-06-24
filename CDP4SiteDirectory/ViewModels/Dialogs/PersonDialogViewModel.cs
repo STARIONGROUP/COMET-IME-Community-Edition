@@ -9,6 +9,7 @@ namespace CDP4SiteDirectory.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using CDP4Common;
     using CDP4Common.CommonData;
@@ -16,6 +17,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4CommonView;
     using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
@@ -125,12 +127,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to set the default <see cref="TelephoneNumber"/>
         /// </summary>
-        public ReactiveCommand<object> SetDefaultTelephoneNumberCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SetDefaultTelephoneNumberCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to set the default <see cref="EmailAddress"/>
         /// </summary>
-        public ReactiveCommand<object> SetDefaultEmailAddressCommand { get; private set; } 
+        public ReactiveCommand<Unit, Unit> SetDefaultEmailAddressCommand { get; private set; } 
 
         /// <summary>
         /// Gets the error message for the property with the given name.
@@ -195,12 +197,10 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.InitializeCommands();
             this.SetDefaultTelephoneNumberCommand =
-                ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedTelephoneNumber).Select(x => x != null && !this.IsReadOnly));
-            this.SetDefaultTelephoneNumberCommand.Subscribe(_ => this.ExecuteSetDefaultTelephoneNumberCommand());
+                ReactiveCommandCreator.Create(this.ExecuteSetDefaultTelephoneNumberCommand, this.WhenAnyValue(x => x.SelectedTelephoneNumber).Select(x => x != null && !this.IsReadOnly));
 
             this.SetDefaultEmailAddressCommand =
-                ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedEmailAddress).Select(x => x != null && !this.IsReadOnly));
-            this.SetDefaultEmailAddressCommand.Subscribe(_ => this.ExecuteSetDefaultEmailAddressCommand());
+                ReactiveCommandCreator.Create(this.ExecuteSetDefaultEmailAddressCommand, this.WhenAnyValue(x => x.SelectedEmailAddress).Select(x => x != null && !this.IsReadOnly));
         }
 
         /// <summary>

@@ -10,7 +10,11 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.Types;
     using CDP4Dal.Operations;
@@ -138,9 +142,9 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         public void VerifyThatReactiveCommandCanExecuteProperly()
         {
             var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            Assert.IsTrue(vm.CreateCommand.CanExecute(null));
-            Assert.IsFalse(vm.InspectCommand.CanExecute(null));
-            Assert.IsFalse(vm.UpdateCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.CreateCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.InspectCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.UpdateCommand).CanExecute(null));
 
             var organization = new Organization(Guid.NewGuid(), null, this.uri) { Name = "1", ShortName = "1" };
             CDPMessageBus.Current.SendObjectChangeEvent(organization, EventKind.Added);
@@ -148,29 +152,29 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
             vm.SelectedThing = vm.Organizations.Single();
             vm.ComputePermission();
 
-            Assert.IsTrue(vm.InspectCommand.CanExecute(null));
-            Assert.IsTrue(vm.UpdateCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.InspectCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.UpdateCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyThatReactiveCommandsOpenDialogsOnExecute()
+        public async Task VerifyThatReactiveCommandsOpenDialogsOnExecute()
         {
             var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
-            vm.CreateCommand.Execute(null);
+            await vm.CreateCommand.Execute();
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Organization>(), It.IsAny<ThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
 
             var organization = new Organization(Guid.NewGuid(), null, this.uri) { Name = "1", ShortName = "1" };
             CDPMessageBus.Current.SendObjectChangeEvent(organization, EventKind.Added);
 
-            vm.InspectCommand.Execute(null);
+            await vm.InspectCommand.Execute();
             Assert.Throws<MockException>(() => this.dialogNavigation.Verify(x => x.Navigate(organization, It.IsAny<ThingTransaction>(), this.session.Object, true, ThingDialogKind.Inspect, this.dialogNavigation.Object, It.IsAny<Thing>(), null)));
 
             vm.SelectedThing = vm.Organizations.Single();
 
-            vm.InspectCommand.Execute(null);
+            await vm.InspectCommand.Execute();
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Organization>(), It.IsAny<ThingTransaction>(), this.session.Object, true, ThingDialogKind.Inspect, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
             
-            vm.UpdateCommand.Execute(null);
+            await vm.UpdateCommand.Execute();
         }
 
         [Test]

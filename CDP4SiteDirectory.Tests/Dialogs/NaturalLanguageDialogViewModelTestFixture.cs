@@ -10,7 +10,10 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.Types;
@@ -91,7 +94,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         {
             var vm = new NaturalLanguageDialogViewModel(this.naturalLanguage, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
 
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             Assert.IsTrue(vm.DialogResult.Value);
@@ -104,7 +107,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
-            vm.OkCommand.Execute(null);
+            ((ICommand)vm.OkCommand).Execute(default);
             Assert.IsNotNull(vm.WriteException);
             Assert.IsNull(vm.DialogResult);
         }
@@ -118,7 +121,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             vm.LanguageCode = "t";
             vm.NativeName = "tt";
 
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never());
             var clone = (NaturalLanguage)this.transaction.AddedThing.Single();

@@ -10,7 +10,10 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -113,28 +116,28 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 
             var vm = new EngineeringModelSetupSelectionDialogViewModel(availableSessions);
 
-            Assert.IsFalse(vm.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
 
             vm.SelectedEngineeringModelSetup = engineeringModelSetup;
 
-            Assert.IsTrue(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyThatWhenCancelledIsExecutedEmptyResultIsReturned()
+        public async Task VerifyThatWhenCancelledIsExecutedEmptyResultIsReturned()
         {
             var availableSessions = new List<ISession>();
             availableSessions.Add(this.session.Object);
 
             var vm = new EngineeringModelSetupSelectionDialogViewModel(availableSessions);
 
-            vm.CancelCommand.Execute(null);
+            await vm.CancelCommand.Execute();
 
             Assert.IsFalse(vm.DialogResult.Result.Value);
         }
 
         [Test]
-        public void VerifyThatPopulatedDialogResultIsReturnedWhenOkExecuted()
+        public async Task VerifyThatPopulatedDialogResultIsReturnedWhenOkExecuted()
         {
             var availableSessions = new List<ISession>();
             availableSessions.Add(this.session.Object);
@@ -151,7 +154,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             vm.SelectedSession = this.session.Object;
             vm.SelectedEngineeringModelSetup = engineeringModelSetup;
 
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
 
             var dialogResult = (EngineeringModelSetupSelectionResult)vm.DialogResult;
             Assert.IsTrue(dialogResult.Result.Value);

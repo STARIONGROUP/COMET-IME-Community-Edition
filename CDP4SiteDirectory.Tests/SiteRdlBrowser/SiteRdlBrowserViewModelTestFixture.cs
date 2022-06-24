@@ -10,7 +10,10 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.Types;
     using CDP4Dal.Operations;
@@ -119,7 +122,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         }
 
         [Test]
-        public void VerifyThatCreateCommandWorks()
+        public async Task VerifyThatCreateCommandWorks()
         {
             this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
 
@@ -132,7 +135,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
             viewModel.PopulateContextMenu();
             Assert.AreEqual(1, viewModel.ContextMenu.Count);
 
-            viewModel.CreateCommand.Execute(null);
+            await viewModel.CreateCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<SiteReferenceDataLibrary>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<SiteDirectory>(), null));
         }
 

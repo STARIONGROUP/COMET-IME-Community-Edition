@@ -7,6 +7,9 @@
 namespace CDP4SiteDirectory.Tests.Dialogs
 {
     using System;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Common.MetaInfo;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
@@ -48,7 +51,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
-        public void VerifyThatSetDefaultWorks()
+        public async Task VerifyThatSetDefaultWorks()
         {
             var person = new Person();
             var email = new EmailAddress();
@@ -59,7 +62,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             var vm = new EmailAddressDialogViewModel(email, transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, person);
 
             vm.IsDefault = true;
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
 
             Assert.AreSame(person.DefaultEmailAddress, email);
         }

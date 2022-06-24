@@ -29,6 +29,7 @@ namespace CDP4SiteDirectory.Tests
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -119,8 +120,8 @@ namespace CDP4SiteDirectory.Tests
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
 
-            Assert.IsTrue(viewmodel.CreateParticipantRoleCommand.CanExecute(null));
-            Assert.IsTrue(viewmodel.CreatePersonRoleCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.CreateParticipantRoleCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.CreatePersonRoleCommand).CanExecute(null));
 
             var personRoleRow = viewmodel.Roles.First();
             var participantRoleRow = viewmodel.Roles.Last();

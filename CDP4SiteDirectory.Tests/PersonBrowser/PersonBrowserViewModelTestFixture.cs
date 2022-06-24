@@ -10,7 +10,10 @@ namespace CDP4SiteDirectory.Tests
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.Types;
     using CDP4Dal.Operations;
@@ -101,21 +104,21 @@ namespace CDP4SiteDirectory.Tests
         }
 
         [Test]
-        public void VerifyThatExecuteCreateWorks()
+        public async Task VerifyThatExecuteCreateWorks()
         {
             var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
-            vm.CreateCommand.Execute(null);
+            await vm.CreateCommand.Execute();
 
             this.navigation.Verify(x => x.Navigate(It.IsAny<Person>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 
         [Test]
-        public void VerifyThatEditCommandWorks()
+        public async Task VerifyThatEditCommandWorks()
         {
             var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
             vm.SelectedThing = vm.PersonRowViewModels.First();
 
-            vm.UpdateCommand.Execute(null);
+            await vm.UpdateCommand.Execute();
 
             this.navigation.Verify(x => x.Navigate(It.IsAny<Person>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, It.IsAny<Thing>(), null));
         }

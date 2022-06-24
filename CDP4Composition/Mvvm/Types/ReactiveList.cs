@@ -141,6 +141,11 @@ namespace CDP4Composition.Mvvm
         public int Count => this.SourceList.Count;
 
         /// <summary>
+        /// Returns true if the <see cref="ReactiveList{T}"/> is empty.
+        /// </summary>
+        public bool IsEmpty => this.SourceList.Count == 0;
+
+        /// <summary>
         /// Observable.FromEvent implementation that wraps the <see cref="observableCollection"/>'s NotifyCollectionChanged event
         /// </summary>
         public IObservable<NotifyCollectionChangedEventArgs> Changed

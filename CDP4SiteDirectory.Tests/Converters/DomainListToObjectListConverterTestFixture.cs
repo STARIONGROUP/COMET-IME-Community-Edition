@@ -10,6 +10,9 @@ namespace CDP4SiteDirectory.Tests.Converters
     using System.Collections.Generic;
     using System.Linq;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm;
+
     using CDP4SiteDirectory.Converters;
     using NUnit.Framework;
     using ReactiveUI;

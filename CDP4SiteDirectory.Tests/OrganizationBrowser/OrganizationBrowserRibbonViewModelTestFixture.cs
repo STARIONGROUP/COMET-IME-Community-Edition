@@ -27,6 +27,8 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
 {
     using System;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -119,19 +121,19 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         }
 
         [Test]
-        public void VerifyThatOpenCloseSingleBrowserWorks()
+        public async Task VerifyThatOpenCloseSingleBrowserWorks()
         {
             var vm = new OrganizationBrowserRibbonViewModel();
 
-            vm.OpenSingleBrowserCommand.Execute(null);
+            await vm.OpenSingleBrowserCommand.Execute();
             Assert.Throws<MockException>(() => this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>())));
 
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            vm.OpenSingleBrowserCommand.Execute(null);
+            await vm.OpenSingleBrowserCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
-            vm.OpenSingleBrowserCommand.Execute(null);
+            await vm.OpenSingleBrowserCommand.Execute();
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
         }
 

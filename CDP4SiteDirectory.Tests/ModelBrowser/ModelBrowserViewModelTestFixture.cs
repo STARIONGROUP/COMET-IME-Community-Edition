@@ -27,7 +27,10 @@ namespace CDP4SiteDirectory.Tests
 {
     using System;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.Types;
     using CDP4Dal.Operations;
@@ -402,7 +405,7 @@ namespace CDP4SiteDirectory.Tests
         }
 
         [Test]
-        public void VerifyThatCreateParticipantCommandWorks()
+        public async Task VerifyThatCreateParticipantCommandWorks()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
@@ -434,12 +437,12 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.PopulateContextMenu();
             Assert.AreEqual(7, viewmodel.ContextMenu.Count);
 
-            viewmodel.CreateParticipantCommand.Execute(null);
+            await viewmodel.CreateParticipantCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<Participant>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<EngineeringModelSetup>(), null));
         }
 
         [Test]
-        public void VerifyThatCreateIterationCommandWorks()
+        public async Task VerifyThatCreateIterationCommandWorks()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
@@ -473,12 +476,12 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.PopulateContextMenu();
             Assert.AreEqual(2, viewmodel.ContextMenu.Count);
 
-            viewmodel.CreateIterationSetupCommand.Execute(null);
+            await viewmodel.CreateIterationSetupCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<IterationSetup>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<EngineeringModelSetup>(), null));
         }
 
         [Test]
-        public void VerifyThatCreateModelSetupCommandWorks()
+        public async Task VerifyThatCreateModelSetupCommandWorks()
         {
             this.assembler.Cache.TryAdd(new CacheKey(this.siteDirectory.Iid, null),
                 new Lazy<Thing>(() => this.siteDirectory));
@@ -510,7 +513,7 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.PopulateContextMenu();
             Assert.AreEqual(7, viewmodel.ContextMenu.Count);
 
-            viewmodel.CreateCommand.Execute(null);
+            await viewmodel.CreateCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<EngineeringModelSetup>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<SiteDirectory>(), null));
         }
     }

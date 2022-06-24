@@ -9,6 +9,10 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.Types;
@@ -88,11 +92,11 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             
             Assert.AreEqual(0, vm.ValidationErrors.Count);
 
-            Assert.IsTrue(vm.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyThatUpdateTransactionDoesnotUpdatePassword()
+        public async Task VerifyThatUpdateTransactionDoesnotUpdatePassword()
         {
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext, this.clone);
@@ -100,14 +104,14 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             var vm = new PersonDialogViewModel(this.person.Clone(false), transaction, this.session.Object, true,
                 ThingDialogKind.Update, null, this.clone);
 
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
             var personclone = transaction.UpdatedThing.Select(x => x.Value).OfType<Person>().Single();
 
             Assert.AreEqual(this.person.Password, personclone.Password);
         }
 
         [Test]
-        public void VerifyThatUpdateTransactionUpdatesPassword()
+        public async Task VerifyThatUpdateTransactionUpdatesPassword()
         {
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext, this.clone);
@@ -117,14 +121,14 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             vm.PwdEditIsChecked = true;
             vm.Password = "456";
 
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
             var personclone = transaction.UpdatedThing.Select(x => x.Value).OfType<Person>().Single();
 
             Assert.AreEqual("456", personclone.Password);
         }
 
         [Test]
-        public void VerifyThatSetDefaultTelephoneNumberWorks()
+        public async Task VerifyThatSetDefaultTelephoneNumberWorks()
         {
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext, this.clone);
@@ -137,13 +141,13 @@ namespace CDP4SiteDirectory.Tests.Dialogs
                 ThingDialogKind.Create, null, this.clone);
 
             vm.SelectedTelephoneNumber = vm.TelephoneNumber.Single();
-            vm.SetDefaultTelephoneNumberCommand.Execute(null);
+            await vm.SetDefaultTelephoneNumberCommand.Execute();
 
             Assert.AreSame(vm.SelectedDefaultTelephoneNumber, phone);
         }
 
         [Test]
-        public void VerifyThatSetDefaultEmailAddressWorks()
+        public async Task VerifyThatSetDefaultEmailAddressWorks()
         {
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext, this.clone);
@@ -157,7 +161,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
                 ThingDialogKind.Create, null, this.clone);
 
             vm.SelectedEmailAddress = vm.EmailAddress.Single();
-            vm.SetDefaultEmailAddressCommand.Execute(null);
+            await vm.SetDefaultEmailAddressCommand.Execute();
 
             Assert.AreSame(vm.SelectedDefaultEmailAddress, email);
         }

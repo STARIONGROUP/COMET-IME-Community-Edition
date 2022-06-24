@@ -9,6 +9,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System;
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
@@ -95,7 +96,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             var vm = new IterationSetupDialogViewModel(iterationSetup, this.transaction, this.session.Object, true,
                 ThingDialogKind.Create, this.navigation.Object, this.clone);
 
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
             Assert.IsNotNull(iterationSetup.SourceIterationSetup);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             Assert.IsTrue(vm.DialogResult.Value);

@@ -8,6 +8,9 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.Types;
@@ -55,7 +58,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
-        public void VerifyThatSetDefaultWorks()
+        public async Task VerifyThatSetDefaultWorks()
         {
             var person = new Person();
             var phone = new TelephoneNumber();
@@ -66,7 +69,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             var vm = new TelephoneNumberDialogViewModel(phone, transaction, this.session.Object, false, ThingDialogKind.Create, this.navigation.Object, person);
 
             vm.IsDefault = true;
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
 
             Assert.AreSame(person.DefaultTelephoneNumber, phone);
         }
