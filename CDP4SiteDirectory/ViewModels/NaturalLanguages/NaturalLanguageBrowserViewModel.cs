@@ -159,8 +159,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateLanguage));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<NaturalLanguage>(this.Thing));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<NaturalLanguage>(this.Thing), this.WhenAnyValue(x => x.CanCreateLanguage));
         }
         
         /// <summary>

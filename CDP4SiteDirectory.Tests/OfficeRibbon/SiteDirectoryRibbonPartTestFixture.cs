@@ -100,7 +100,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
                 .Returns(this.dialogNavigationService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
 
-            this.ribbonPart = new SiteDirectoryRibbonPart(this.order, this.panelNavigationService.Object, null, null, null);
+            this.ribbonPart = new SiteDirectoryRibbonPart(this.order, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
 
             
         }
@@ -125,7 +125,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine(ex);
+                Console.WriteLine(ex);
             }
         }
 

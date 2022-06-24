@@ -28,6 +28,7 @@ namespace CDP4SiteDirectory.ViewModels
     using System;
     using System.ComponentModel.Composition;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -108,12 +109,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand" /> to create a new <see cref="Participant" />
         /// </summary>
-        public ReactiveCommand<object> CreateParticipantCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateParticipantCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand" /> to create a new <see cref="IterationSetup" />
         /// </summary>
-        public ReactiveCommand<object> CreateIterationSetupCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateIterationSetupCommand { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the current user can create a <see cref="IterationSetup" />
@@ -165,13 +166,9 @@ namespace CDP4SiteDirectory.ViewModels
             base.InitializeCommands();
 
             this.ComputeStaticPermission();
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateEngineeringModelSetup));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<EngineeringModelSetup>(this.Thing));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<EngineeringModelSetup>(this.Thing), this.WhenAnyValue(x => x.CanCreateEngineeringModelSetup));
 
-            this.CreateParticipantCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateParticipant));
-
-            this.CreateParticipantCommand.Subscribe(
-                _ =>
+            this.CreateParticipantCommand = ReactiveCommandCreator.Create(() =>
                 {
                     var container = this.GetSelectedModelSetupContainer();
 
@@ -181,12 +178,10 @@ namespace CDP4SiteDirectory.ViewModels
                     }
 
                     this.ExecuteCreateCommand<Participant>(container);
-                });
+                }, 
+                this.WhenAnyValue(x => x.CanCreateParticipant));
 
-            this.CreateIterationSetupCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateIterationSetup));
-
-            this.CreateIterationSetupCommand.Subscribe(
-                _ =>
+            this.CreateIterationSetupCommand = ReactiveCommandCreator.Create(() =>
                 {
                     var container = this.GetSelectedModelSetupContainer();
 
@@ -196,7 +191,8 @@ namespace CDP4SiteDirectory.ViewModels
                     }
 
                     this.ExecuteCreateCommand<IterationSetup>(container);
-                });
+                }, 
+                this.WhenAnyValue(x => x.CanCreateIterationSetup));
         }
 
         /// <summary>

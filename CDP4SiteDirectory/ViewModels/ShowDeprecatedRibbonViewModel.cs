@@ -31,6 +31,7 @@ namespace CDP4SiteDirectory.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.Events;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
     using CDP4Dal;
@@ -72,7 +73,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
             
-            this.openSessions = new ReactiveList<ISession> { ChangeTrackingEnabled = true };
+            this.openSessions = new ReactiveList<ISession>();
             this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);

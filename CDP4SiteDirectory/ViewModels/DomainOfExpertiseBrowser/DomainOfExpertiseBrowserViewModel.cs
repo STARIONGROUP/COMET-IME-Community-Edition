@@ -121,8 +121,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateDomain));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<DomainOfExpertise>(this.Thing));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<DomainOfExpertise>(this.Thing), this.WhenAnyValue(x => x.CanCreateDomain));
         }
 
         /// <summary>

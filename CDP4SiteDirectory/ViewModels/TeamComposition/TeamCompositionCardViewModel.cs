@@ -9,6 +9,7 @@ namespace CDP4SiteDirectory.ViewModels
 
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
@@ -97,7 +98,6 @@ namespace CDP4SiteDirectory.ViewModels
             : base(thing, session, containerViewModel)
         {
             this.Domains = new ReactiveList<DomainOfExpertise>();
-            this.Domains.ChangeTrackingEnabled = true;
 
             this.WhenAnyValue(row => row.Domains)
                 .Select(
@@ -109,8 +109,7 @@ namespace CDP4SiteDirectory.ViewModels
             this.domainShortnames.ThrownExceptions.Subscribe(e => Logger.Error(e));
 
             var canEmail = this.WhenAnyValue(vm => vm.EmailAddress).Select(x => !string.IsNullOrEmpty(x));
-            this.OpenEmail = ReactiveCommand.Create(canEmail);
-            this.OpenEmail.Subscribe(_ => this.OpenEmailExecute());
+            this.OpenEmail = ReactiveCommandCreator.Create(this.OpenEmailExecute, canEmail);
 
             this.UpdateProperties();
         }
@@ -118,7 +117,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to open an email browser
         /// </summary>
-        public ReactiveCommand<object> OpenEmail { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenEmail { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="DomainOfExpertise"/> list that is referenced by the <see cref="Participant"/>

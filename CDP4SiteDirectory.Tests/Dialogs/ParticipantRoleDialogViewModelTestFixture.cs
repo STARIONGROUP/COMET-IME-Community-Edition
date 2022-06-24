@@ -9,7 +9,10 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.Types;
@@ -89,7 +92,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         [Test]
         public async Task VerifyThatOkCommandWorks()
         {
-            this.viewmodel.OkCommand.Execute(null);
+            await this.viewmodel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             Assert.IsNull(this.viewmodel.WriteException);
@@ -102,7 +105,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
-            this.viewmodel.OkCommand.Execute(null);
+            ((ICommand)this.viewmodel.OkCommand).Execute(default);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
             Assert.IsNotNull(this.viewmodel.WriteException);
@@ -139,13 +142,13 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
-        public void VerifyParticipantRoleUpdate()
+        public async Task VerifyParticipantRoleUpdate()
         {
             var vm = new ParticipantRoleDialogViewModel(this.participantRole, this.transaction, this.session.Object, true, ThingDialogKind.Update, null, this.clone);
             Assert.AreEqual(ParticipantAccessRightKind.NONE, vm.ParticipantPermission.First().AccessRight);
 
             vm.ParticipantPermission.First().AccessRight = ParticipantAccessRightKind.READ;
-            vm.OkCommand.Execute(null);
+            await vm.OkCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             CDPMessageBus.Current.SendObjectChangeEvent(this.participantRole, EventKind.Updated);
 

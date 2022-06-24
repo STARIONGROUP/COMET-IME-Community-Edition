@@ -145,8 +145,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreatePerson));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Person>(this.Thing));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Person>(this.Thing), this.WhenAnyValue(x => x.CanCreatePerson));
         }
 
         /// <summary>

@@ -9,6 +9,8 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
     using System;
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -159,7 +161,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
             
             Assert.That(this.teamCompositionCardViewModel.EmailAddress, Is.Null.Or.Empty);
 
-            Assert.IsFalse(this.teamCompositionCardViewModel.OpenEmail.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.teamCompositionCardViewModel.OpenEmail).CanExecute(null));
         }
 
         [Test]
@@ -172,7 +174,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
 
             Assert.AreEqual(email.Value, this.teamCompositionCardViewModel.EmailAddress);
 
-            Assert.IsTrue(this.teamCompositionCardViewModel.OpenEmail.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.teamCompositionCardViewModel.OpenEmail).CanExecute(null));
         }
 
         [Test]

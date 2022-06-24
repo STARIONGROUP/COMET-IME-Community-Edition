@@ -71,7 +71,6 @@ namespace CDP4SiteDirectory.ViewModels
             : base(participant, session, containerViewModel)
         {
             this.Domains = new ReactiveList<DomainOfExpertise>();
-            this.Domains.ChangeTrackingEnabled = true;
 
             this.WhenAnyValue(row => row.Domains)
                 .Select(domains => domains.Aggregate(string.Empty,

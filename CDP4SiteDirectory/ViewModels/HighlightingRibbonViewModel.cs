@@ -27,9 +27,11 @@ namespace CDP4SiteDirectory.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Composition.Events;
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -56,13 +58,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public HighlightingRibbonViewModel()
         {
-            this.openSessions = new ReactiveList<ISession> { ChangeTrackingEnabled = true };
+            this.openSessions = new ReactiveList<ISession>();
             this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            this.ClearHighlightingCommand = ReactiveCommand.Create();
-            this.ClearHighlightingCommand.Subscribe(_ => this.ExecuteClearHighlightingCommand());
+            this.ClearHighlightingCommand = ReactiveCommandCreator.Create(this.ExecuteClearHighlightingCommand);
         }
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to clear highlighting.
         /// </summary>
-        public ReactiveCommand<object> ClearHighlightingCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ClearHighlightingCommand { get; private set; }
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates

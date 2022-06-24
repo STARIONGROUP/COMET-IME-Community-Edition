@@ -46,6 +46,8 @@ namespace CDP4SiteDirectory.Tests.ViewModels
     using NUnit.Framework;
 
     using System;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -146,14 +148,14 @@ namespace CDP4SiteDirectory.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatOpenSinglePanelCommandWorks()
+        public async Task VerifyThatOpenSinglePanelCommandWorks()
         {
             var viewmodel = new NaturalLanguageRibbonViewModel();
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             CDPMessageBus.Current.SendMessage(sessionEvent);
 
             // Simulate a click on the button open when theres a unique session open
-            viewmodel.OpenSingleBrowserCommand.Execute(null);
+            await viewmodel.OpenSingleBrowserCommand.Execute();
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
         }
 

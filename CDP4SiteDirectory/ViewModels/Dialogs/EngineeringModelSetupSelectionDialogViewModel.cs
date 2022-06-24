@@ -9,8 +9,11 @@ namespace CDP4SiteDirectory.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Dal;
     using ReactiveUI;
@@ -48,11 +51,9 @@ namespace CDP4SiteDirectory.ViewModels
             this.WhenAnyValue(x => x.SelectedSession).Subscribe(this.PopulateEngineeringModelSetups);
 
             var canOk = this.WhenAnyValue(vm => vm.SelectedSession, vm => vm.SelectedEngineeringModelSetup, (session, model) => session != null && model != null);
-            this.OkCommand = ReactiveCommand.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+            this.OkCommand = ReactiveCommandCreator.Create(this.ExecuteOk, canOk);
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
         }
 
         /// <summary>
@@ -94,12 +95,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the Select <see cref="ReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Executes the cancel <see cref="ReactiveCommand"/>

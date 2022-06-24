@@ -28,6 +28,8 @@ namespace CDP4SiteDirectory.Tests
     using System;
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -125,16 +127,16 @@ namespace CDP4SiteDirectory.Tests
         }
 
         [Test]
-        public void VerifyThatOpenCloseSingleBrowserWorks()
+        public async Task VerifyThatOpenCloseSingleBrowserWorks()
         {
             var vm = new RoleBrowserRibbonViewModel();
 
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            vm.OpenSingleBrowserCommand.Execute(null);
+            await vm.OpenSingleBrowserCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
-            vm.OpenSingleBrowserCommand.Execute(null);
+            await vm.OpenSingleBrowserCommand.Execute();
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
         }
 
