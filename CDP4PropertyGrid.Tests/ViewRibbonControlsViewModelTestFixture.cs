@@ -15,6 +15,8 @@ namespace CDP4PropertyGrid.Tests
     using Moq;
     using NUnit.Framework;
     using System;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     [TestFixture]
     public class ViewRibbonControlsViewModelTestFixture
@@ -42,17 +44,17 @@ namespace CDP4PropertyGrid.Tests
         }
 
         [Test]
-        public void VerifyThatCommandWorks()
+        public async Task VerifyThatCommandWorks()
         {
             var vm = new ViewRibbonControlViewModel();
 
             vm.IsChecked = true;
-            vm.OpenClosePanelCommand.Execute(null);
+            await vm.OpenClosePanelCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
 
             vm.IsChecked = false;
-            vm.OpenClosePanelCommand.Execute(null);
+            await vm.OpenClosePanelCommand.Execute();
             this.navigationService.Verify(x => x.CloseInDock(It.IsAny<Type>()));
 
             // Verify PanelEVentClosed

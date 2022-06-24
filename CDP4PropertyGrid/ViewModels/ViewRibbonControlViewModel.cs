@@ -26,8 +26,10 @@
 namespace CDP4PropertyGrid.ViewModels
 {
     using System;
+    using System.Reactive;
     using System.Reactive.Linq;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
 
@@ -52,8 +54,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         public ViewRibbonControlViewModel()
         {
-            this.OpenClosePanelCommand = ReactiveCommand.Create();
-            this.OpenClosePanelCommand.Subscribe(_ => this.ExecuteOpenClosePanel());
+            this.OpenClosePanelCommand = ReactiveCommandCreator.Create(this.ExecuteOpenClosePanel);
 
             CDPMessageBus.Current.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel.GetType() == typeof(PropertyGridViewModel) && x.PanelStatus == PanelStatus.Closed)
@@ -73,7 +74,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// <summary>
         /// Gets the open or close Log Panel
         /// </summary>
-        public ReactiveCommand<object> OpenClosePanelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenClosePanelCommand { get; private set; }
 
         /// <summary>
         /// Executes the Open or Close panel command
