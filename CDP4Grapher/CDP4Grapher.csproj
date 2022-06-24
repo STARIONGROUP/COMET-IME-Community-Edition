@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{7DEDB709-7B9D-4CEC-B98C-CC29874E357B}</ProjectGuid>
     <MinIMEVersion>9.2.0</MinIMEVersion>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4Grapher</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -11,6 +11,9 @@
     <Copyright>Copyright © RHEA System S.A.</Copyright>
     <AssemblyVersion>0.2.0.4</AssemblyVersion>
     <FileVersion>0.2.0.4</FileVersion>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -28,80 +31,19 @@
     <None Remove="Models\**" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Views\Grapher.xaml" />
-    <None Remove="Views\GrapherDiagramControl.xaml" />
-    <None Remove="Views\GrapherRibbon.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="1.3">
+	<PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+    <PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DynamicLanguageRuntime" Version="1.3.0" />
-    <PackageReference Include="ReactiveUI.WPF" Version="6.4.0">
+    <PackageReference Include="ReactiveUI.WPF" Version="18.1.8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="reactiveui-core" Version="6.4.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Core" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Linq" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Main" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-XAML" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Splat" Version="1.6.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.CSharp">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationCore">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
@@ -109,64 +51,5 @@
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Core">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Data">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Drawing">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.IO.Compression.FileSystem">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Numerics">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml.Linq">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\GrapherDiagramControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Grapher.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\GrapherRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
 </Project>

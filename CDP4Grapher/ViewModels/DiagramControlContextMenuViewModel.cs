@@ -27,8 +27,11 @@ namespace CDP4Grapher.ViewModels
 {
     using System.Collections.Generic;
     using System;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Windows.Input;
+
+    using CDP4Composition.Mvvm;
 
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Utilities;
@@ -101,92 +104,92 @@ namespace CDP4Grapher.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to Isolate the <see cref="HoveredElement"/>
         /// </summary>
-        public ReactiveCommand<object> IsolateCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> IsolateCommand { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to exit isolation
         /// </summary>
-        public ReactiveCommand<object> ExitIsolationCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExitIsolationCommand { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
         /// </summary>
-        public ReactiveCommand<object> ExportGraphAsJpg { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExportGraphAsJpg { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as pdf
         /// </summary>
-        public ReactiveCommand<object> ExportGraphAsPdf { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExportGraphAsPdf { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the circular layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyCircularLayout { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyCircularLayout { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Fugiyama Right to Left layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyFugiyamaLayoutRightToLeft { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyFugiyamaLayoutRightToLeft { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Fugiyama Left to Right layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyFugiyamaLayoutLeftToRight { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyFugiyamaLayoutLeftToRight { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Fugiyama Top to Bottom layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyFugiyamaLayoutTopToBottom { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyFugiyamaLayoutTopToBottom { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Fugiyama Bottom to Top layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyFugiyamaLayoutBottomToTop { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyFugiyamaLayoutBottomToTop { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Tree view Right to Left layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyTreeViewLayoutRightToLeft { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyTreeViewLayoutRightToLeft { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Tree view Left to Right layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyTreeViewLayoutLeftToRight { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyTreeViewLayoutLeftToRight { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Tree view Top to Bottom layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyTreeViewLayoutTopToBottom { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyTreeViewLayoutTopToBottom { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Tree view Bottom to Top layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyTreeViewLayoutBottomToTop { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyTreeViewLayoutBottomToTop { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Tip over Left to Right layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyTipOverLayoutLeftToRight { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyTipOverLayoutLeftToRight { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Tip over Right to Left layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyTipOverLayoutRightToLeft { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyTipOverLayoutRightToLeft { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Mind map layout from bottom to top to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyMindMapLayoutBottomToTop { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyMindMapLayoutBottomToTop { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Mind map layout from left to right to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyMindMapLayoutLeftToRight { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyMindMapLayoutLeftToRight { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> that apply the Org chart layout to the diagram elements
         /// </summary>
-        public ReactiveCommand<object> ApplyOrganisationalChartLayout { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyOrganisationalChartLayout { get; private set; }
 
         /// <summary>
         /// Instiate a new <see cref="DiagramControlContextMenuViewModel"/>
@@ -202,56 +205,45 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void InitializeCommands()   
         {
-            this.IsolateCommand = ReactiveCommand.Create(
+            this.IsolateCommand = ReactiveCommandCreator.Create(this.ExecuteIsolate,
                 this.WhenAnyValue(x => x.HoveredElement)
                     .Select(x => x != null).ObserveOn(RxApp.MainThreadScheduler));
 
-            this.IsolateCommand.Subscribe(_ => this.ExecuteIsolate());
-
-            this.ExitIsolationCommand = ReactiveCommand.Create(
+            this.ExitIsolationCommand = ReactiveCommandCreator.Create(this.ExecuteExitIsolation,
                 this.WhenAnyValue(x => x.CanExitIsolation)
                     .ObserveOn(RxApp.MainThreadScheduler));
 
-            this.ExitIsolationCommand.Subscribe(_ => this.ExecuteExitIsolation());
+            this.ExportGraphAsJpg = ReactiveCommandCreator.Create(this.ExecuteExportGraphAsPng, this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
+            
+            this.ExportGraphAsPdf = ReactiveCommandCreator.Create(this.ExecuteExportGraphAsPdf, this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
 
-            this.ExportGraphAsJpg = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
-            this.ExportGraphAsJpg.Subscribe(_ => this.ExecuteExportGraphAsPng());
-            this.ExportGraphAsPdf = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
-            this.ExportGraphAsPdf.Subscribe(_ => this.ExecuteExportGraphAsPdf());
+            this.ApplyFugiyamaLayoutLeftToRight = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Fugiyama, Direction.Right));
+            
+            this.ApplyFugiyamaLayoutRightToLeft = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Fugiyama, Direction.Left));
+            
+            this.ApplyFugiyamaLayoutTopToBottom = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Fugiyama, Direction.Down));
+            
+            this.ApplyFugiyamaLayoutBottomToTop = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Fugiyama, Direction.Up));
 
-            this.ApplyFugiyamaLayoutLeftToRight = ReactiveCommand.Create();
-            this.ApplyFugiyamaLayoutLeftToRight.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Fugiyama, Direction.Right));
-            this.ApplyFugiyamaLayoutRightToLeft = ReactiveCommand.Create();
-            this.ApplyFugiyamaLayoutRightToLeft.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Fugiyama, Direction.Left));
-            this.ApplyFugiyamaLayoutTopToBottom = ReactiveCommand.Create();
-            this.ApplyFugiyamaLayoutTopToBottom.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Fugiyama, Direction.Down));
-            this.ApplyFugiyamaLayoutBottomToTop = ReactiveCommand.Create();
-            this.ApplyFugiyamaLayoutBottomToTop.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Fugiyama, Direction.Up));
+            this.ApplyTreeViewLayoutLeftToRight = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TreeView, LayoutDirection.LeftToRight));
+            
+            this.ApplyTreeViewLayoutRightToLeft = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TreeView, LayoutDirection.RightToLeft));
+            
+            this.ApplyTreeViewLayoutTopToBottom = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TreeView, LayoutDirection.TopToBottom));
+            
+            this.ApplyTreeViewLayoutBottomToTop = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TreeView, LayoutDirection.BottomToTop));
 
-            this.ApplyTreeViewLayoutLeftToRight = ReactiveCommand.Create();
-            this.ApplyTreeViewLayoutLeftToRight.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TreeView, LayoutDirection.LeftToRight));
-            this.ApplyTreeViewLayoutRightToLeft = ReactiveCommand.Create();
-            this.ApplyTreeViewLayoutRightToLeft.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TreeView, LayoutDirection.RightToLeft));
-            this.ApplyTreeViewLayoutTopToBottom = ReactiveCommand.Create();
-            this.ApplyTreeViewLayoutTopToBottom.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TreeView, LayoutDirection.TopToBottom));
-            this.ApplyTreeViewLayoutBottomToTop = ReactiveCommand.Create();
-            this.ApplyTreeViewLayoutBottomToTop.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TreeView, LayoutDirection.BottomToTop));
+            this.ApplyMindMapLayoutBottomToTop = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.MindMap, OrientationKind.Vertical));
+            
+            this.ApplyMindMapLayoutLeftToRight = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.MindMap, OrientationKind.Horizontal));
 
-            this.ApplyMindMapLayoutBottomToTop = ReactiveCommand.Create();
-            this.ApplyMindMapLayoutBottomToTop.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.MindMap, OrientationKind.Vertical));
-            this.ApplyMindMapLayoutLeftToRight = ReactiveCommand.Create();
-            this.ApplyMindMapLayoutLeftToRight.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.MindMap, OrientationKind.Horizontal));
+            this.ApplyTipOverLayoutLeftToRight = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TipOver, TipOverDirection.LeftToRight));
+            
+            this.ApplyTipOverLayoutRightToLeft = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TipOver, TipOverDirection.RightToLeft));
 
-            this.ApplyTipOverLayoutLeftToRight = ReactiveCommand.Create();
-            this.ApplyTipOverLayoutLeftToRight.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TipOver, TipOverDirection.LeftToRight));
-            this.ApplyTipOverLayoutRightToLeft = ReactiveCommand.Create();
-            this.ApplyTipOverLayoutRightToLeft.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.TipOver, TipOverDirection.RightToLeft));
+            this.ApplyOrganisationalChartLayout = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.OrganisationalChart));
 
-            this.ApplyOrganisationalChartLayout = ReactiveCommand.Create();
-            this.ApplyOrganisationalChartLayout.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.OrganisationalChart));
-
-            this.ApplyCircularLayout = ReactiveCommand.Create();
-            this.ApplyCircularLayout.Subscribe(_ => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Circular));
+            this.ApplyCircularLayout = ReactiveCommandCreator.Create(() => this.Behavior.ApplySpecifiedLayout(LayoutEnumeration.Circular));
         }
         
         /// <summary>

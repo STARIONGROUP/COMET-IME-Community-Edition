@@ -25,6 +25,7 @@
 
 namespace CDP4Grapher.ViewModels
 {
+    using CDP4Composition.Mvvm;
     using CDP4Composition.ViewModels;
 
     using CDP4Grapher.Behaviors;
