@@ -34,6 +34,7 @@ namespace CDP4Grapher.Tests.Behaviors
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
 
     using CDP4Grapher.Behaviors;
