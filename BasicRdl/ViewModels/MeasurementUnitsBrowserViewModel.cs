@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MeasurementUnitsBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -27,21 +27,22 @@ namespace BasicRdl.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -86,8 +87,6 @@ namespace BasicRdl.ViewModels
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
             this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
-            this.measurementUnits.ChangeTrackingEnabled = true;
-
             this.AddSubscriptions();
         }
 
@@ -111,22 +110,22 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="SimpleUnit"/>
         /// </summary>
-        public ReactiveCommand<object> CreateSimpleUnit { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSimpleUnit { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="DerivedUnit"/>
         /// </summary>
-        public ReactiveCommand<object> CreateDerivedUnit { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateDerivedUnit { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="LinearConversionUnit"/>
         /// </summary>
-        public ReactiveCommand<object> CreateLinearConversionUnit { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateLinearConversionUnit { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="PrefixedUnit"/>
         /// </summary>
-        public ReactiveCommand<object> CreatePrefixedUnit { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreatePrefixedUnit { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -246,17 +245,13 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateSimpleUnit = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateSimpleUnit.Subscribe(_ => this.ExecuteCreateCommand<SimpleUnit>());
+            this.CreateSimpleUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<SimpleUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateDerivedUnit = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateDerivedUnit.Subscribe(_ => this.ExecuteCreateCommand<DerivedUnit>());
+            this.CreateDerivedUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<DerivedUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreateLinearConversionUnit = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateLinearConversionUnit.Subscribe(_ => this.ExecuteCreateCommand<LinearConversionUnit>());
+            this.CreateLinearConversionUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<LinearConversionUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
-            this.CreatePrefixedUnit = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreatePrefixedUnit.Subscribe(_ => this.ExecuteCreateCommand<PrefixedUnit>());
+            this.CreatePrefixedUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<PrefixedUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
         }
 
         /// <summary>

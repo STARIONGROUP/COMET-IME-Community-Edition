@@ -8,7 +8,6 @@
              xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
-             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              Width="650"

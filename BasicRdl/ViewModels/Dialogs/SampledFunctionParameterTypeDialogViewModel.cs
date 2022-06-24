@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SampledFunctionParameterTypeDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -28,11 +28,10 @@ namespace BasicRdl.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive.Linq;
+    using System.Reactive;
 
     using BasicRdl.ViewModels.Dialogs.Rows;
 
-    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -40,13 +39,12 @@ namespace BasicRdl.ViewModels
     using CDP4CommonView;
 
     using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
-
-    using DotLiquid.Util;
 
     using ReactiveUI;
 
@@ -158,42 +156,42 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a <see cref="IndependentParameterTypeAssignment"/>
         /// </summary>
-        public ReactiveCommand<object> CreateIndependentParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateIndependentParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to delete a <see cref="IndependentParameterTypeAssignment"/>
         /// </summary>
-        public ReactiveCommand<object> DeleteIndependentParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteIndependentParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a <see cref="DependentParameterTypeAssignment"/>
         /// </summary>
-        public ReactiveCommand<object> CreateDependentParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateDependentParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to delete a <see cref="DependentParameterTypeAssignment"/>
         /// </summary>
-        public ReactiveCommand<object> DeleteDependentParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteDependentParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to move up a <see cref="IndependentParameterTypeAssignment"/>
         /// </summary>
-        public ReactiveCommand<object> MoveUpIndependentParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpIndependentParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to move down a <see cref="IndependentParameterTypeAssignment"/>
         /// </summary>
-        public ReactiveCommand<object> MoveDownIndependentParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownIndependentParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to move up a <see cref="DependentParameterTypeAssignment"/>
         /// </summary>
-        public ReactiveCommand<object> MoveUpDependentParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpDependentParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to move down a <see cref="DependentParameterTypeAssignment"/>
         /// </summary>
-        public ReactiveCommand<object> MoveDownDependentParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownDependentParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Update the <see cref="OkCanExecute"/> property
@@ -218,15 +216,9 @@ namespace BasicRdl.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            this.IndependentParameterTypes = new ReactiveList<IndependentParameterTypeAssignmentRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.IndependentParameterTypes = new ReactiveList<IndependentParameterTypeAssignmentRowViewModel>();
 
-            this.DependentParameterTypes = new ReactiveList<DependentParameterTypeAssignmentRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.DependentParameterTypes = new ReactiveList<DependentParameterTypeAssignmentRowViewModel>();
 
             this.PossibleParameterTypes = new ReactiveList<ParameterType>();
             this.PopulatePossibleContainer();
@@ -243,29 +235,21 @@ namespace BasicRdl.ViewModels
             var canExecuteEditSelectedIndependentParameterTypeAssignmentCommand = this.WhenAny(vm => vm.SelectedIndependentParameterType, v => v.Value != null && !this.IsReadOnly && this.dialogKind == ThingDialogKind.Create);
             var canExecuteEditSelectedDependentParameterTypeAssignmentCommand = this.WhenAny(vm => vm.SelectedDependentParameterType, v => v.Value != null && !this.IsReadOnly && this.dialogKind == ThingDialogKind.Create);
 
-            this.CreateIndependentParameterTypeCommand = ReactiveCommand.Create(canExecuteCreateParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.CreateIndependentParameterTypeCommand.Subscribe(_ => this.ExecuteCreateIndependentParameterType()));
+            this.CreateIndependentParameterTypeCommand = ReactiveCommandCreator.Create(this.ExecuteCreateIndependentParameterType, canExecuteCreateParameterTypeAssignmentCommand);
 
-            this.DeleteIndependentParameterTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.DeleteIndependentParameterTypeCommand.Subscribe(_ => this.ExecuteDeleteIndependentParameterType()));
+            this.DeleteIndependentParameterTypeCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteIndependentParameterType, canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
 
-            this.CreateDependentParameterTypeCommand = ReactiveCommand.Create(canExecuteCreateParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.CreateDependentParameterTypeCommand.Subscribe(_ => this.ExecuteCreateDependentParameterType()));
+            this.CreateDependentParameterTypeCommand = ReactiveCommandCreator.Create(this.ExecuteCreateDependentParameterType, canExecuteCreateParameterTypeAssignmentCommand);
 
-            this.DeleteDependentParameterTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.DeleteDependentParameterTypeCommand.Subscribe(_ => this.ExecuteDeleteDependentParameterType()));
+            this.DeleteDependentParameterTypeCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteDependentParameterType, canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
 
-            this.MoveUpIndependentParameterTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.MoveUpIndependentParameterTypeCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.IndependentParameterTypes, this.SelectedIndependentParameterType)));
+            this.MoveUpIndependentParameterTypeCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveUpCommand(this.IndependentParameterTypes, this.SelectedIndependentParameterType), canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
 
-            this.MoveDownIndependentParameterTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.MoveDownIndependentParameterTypeCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.IndependentParameterTypes, this.SelectedIndependentParameterType)));
+            this.MoveDownIndependentParameterTypeCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveDownCommand(this.IndependentParameterTypes, this.SelectedIndependentParameterType), canExecuteEditSelectedIndependentParameterTypeAssignmentCommand);
 
-            this.MoveUpDependentParameterTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.MoveUpDependentParameterTypeCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.DependentParameterTypes, this.SelectedDependentParameterType)));
-
-            this.MoveDownDependentParameterTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
-            this.Disposables.Add(this.MoveDownDependentParameterTypeCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.DependentParameterTypes, this.SelectedDependentParameterType)));
+            this.MoveUpDependentParameterTypeCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveUpCommand(this.DependentParameterTypes, this.SelectedDependentParameterType), canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
+            
+            this.MoveDownDependentParameterTypeCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveDownCommand(this.DependentParameterTypes, this.SelectedDependentParameterType), canExecuteEditSelectedDependentParameterTypeAssignmentCommand);
 
             this.WhenAnyValue(x => x.Container).Subscribe(_ =>
             {

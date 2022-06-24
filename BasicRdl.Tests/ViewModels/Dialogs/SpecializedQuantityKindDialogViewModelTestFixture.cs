@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SpecializedQuantityKindDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
-//
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
-//
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    Copyright (c) 2015-2022 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -29,6 +29,9 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using BasicRdl.ViewModels;
 
@@ -129,14 +132,14 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyUpdateOkCanExecute()
         {
             Assert.IsEmpty(this.viewmodel.PossibleScale);
-            Assert.IsFalse(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
             Assert.IsNull(this.viewmodel.SelectedDefaultScale);
             Assert.IsNull(this.viewmodel.SelectedGeneral);
 
             this.viewmodel.SelectedDefaultScale = new RatioScale();
-            Assert.IsFalse(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
             this.viewmodel.SelectedGeneral = new SimpleQuantityKind();
-            Assert.IsTrue(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
         }
 
         [Test]
@@ -187,29 +190,29 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyInspectSelectedGeneral()
+        public async Task VerifyInspectSelectedGeneral()
         {
             var simpleQuantityKind = new SimpleQuantityKind();
             this.rdl.ParameterType.Add(simpleQuantityKind);
             var vm = new SpecializedQuantityKindDialogViewModel(this.specializedQuantityKind, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.navigation.Object, this.rdl);
             Assert.IsNull(vm.SelectedGeneral);
-            Assert.IsFalse(vm.InspectSelectedGeneralCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.InspectSelectedGeneralCommand).CanExecute(null));
 
             vm.SelectedGeneral = simpleQuantityKind;
-            Assert.IsTrue(vm.InspectSelectedGeneralCommand.CanExecute(null));
-            vm.InspectSelectedGeneralCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectSelectedGeneralCommand).CanExecute(null));
+            await vm.InspectSelectedGeneralCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<SimpleQuantityKind>(), It.IsAny<ThingTransaction>(), this.session.Object,false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));            
         }
 
         [Test]
-        public void VerifyInspectSelectedDefaultScale()
+        public async Task VerifyInspectSelectedDefaultScale()
         {
             var scale1 = new LogarithmicScale(Guid.NewGuid(), null, null);
             var vm = new SpecializedQuantityKindDialogViewModel(this.specializedQuantityKind, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.navigation.Object, this.rdl);
-            Assert.IsFalse(vm.InspectSelectedDefaultScaleCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.InspectSelectedDefaultScaleCommand).CanExecute(null));
             vm.SelectedDefaultScale = scale1;
-            Assert.IsTrue(vm.InspectSelectedDefaultScaleCommand.CanExecute(null));
-            vm.InspectSelectedDefaultScaleCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectSelectedDefaultScaleCommand).CanExecute(null));
+            await vm.InspectSelectedDefaultScaleCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<MeasurementScale>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 

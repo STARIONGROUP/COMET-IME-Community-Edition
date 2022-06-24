@@ -9,7 +9,6 @@
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
-             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              Height="300"
