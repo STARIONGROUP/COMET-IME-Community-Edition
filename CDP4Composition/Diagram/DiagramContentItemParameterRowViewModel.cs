@@ -25,8 +25,10 @@
 
 namespace CDP4Composition.Diagram
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Text;
 
     using CDP4Common.CommonData;
@@ -61,6 +63,16 @@ namespace CDP4Composition.Diagram
         public DiagramContentItemParameterRowViewModel(Parameter parameter, ISession session, IViewModelBase<Thing> containerViewModel) : base(parameter, session, containerViewModel)
         {
             this.UpdateProperties();
+
+            foreach (var vs in parameter.ValueSet.ToList())
+            {
+                var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(vs)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(this.ObjectChangeEventHandler);
+
+                this.Disposables.Add(thingSubscription);
+            }
         }
 
         /// <summary>
