@@ -47,6 +47,11 @@ namespace CDP4EngineeringModel.ViewModels
         private string name;
 
         /// <summary>
+        /// Backing field for the <see cref="Categories"/> property.
+        /// </summary>
+        private string categories;
+
+        /// <summary>
         /// Disctionary to map the related things and the related observables to be able to dispose them
         /// </summary>
         private Dictionary<Thing, IDisposable> oldRelatedThingSubcriptions = new Dictionary<Thing, IDisposable>();
@@ -104,6 +109,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.UpdateName();
+            this.UpdateCategories();
         }
 
         /// <summary>
@@ -138,6 +144,14 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Updates the relationship categories
+        /// </summary>
+        protected void UpdateCategories()
+        {
+            this.Categories = string.Join(", ", this.Thing.Category.Select(c => c.Name));
+        }
+
+        /// <summary>
         /// Gets or sets the name of the <see cref="MultiRelationship"/> that is represented by the current row-view-model
         /// </summary>
         public string Name
@@ -150,6 +164,15 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.RaiseAndSetIfChanged(ref this.name, value);
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the categories of the <see cref="BinaryRelationship"/> that is represented by the current row-view-model
+        /// </summary>
+        public string Categories
+        {
+            get => this.categories;
+            set => this.RaiseAndSetIfChanged(ref this.categories, value);
         }
 
     }
