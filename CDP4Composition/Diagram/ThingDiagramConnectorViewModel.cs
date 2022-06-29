@@ -105,6 +105,16 @@ namespace CDP4Composition.Diagram
         private string displayedText;
 
         /// <summary>
+        /// Backing field for <see cref="BeginItemPointIndex" />
+        /// </summary>
+        private int beginItemPointIndex;
+
+        /// <summary>
+        /// Backing field for <see cref="EndItemPointIndex" />
+        /// </summary>
+        private int endItemPointIndex;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ThingDiagramConnectorViewModel" /> class.
         /// </summary>
         public ThingDiagramConnectorViewModel(DiagramEdge diagramThing, ISession session, IDiagramEditorViewModel containerViewModel)
@@ -120,8 +130,17 @@ namespace CDP4Composition.Diagram
             this.containerViewModel = containerViewModel;
             this.Thing = diagramThing.DepictedThing;
 
+            this.BeginItemPointIndex = -1;
+            this.EndItemPointIndex = -1;
+
             this.SetSource(((DiagramEdge)this.DiagramThing).Source);
             this.SetTarget(((DiagramEdge)this.DiagramThing).Target);
+
+            if (this.Source == this.Target)
+            {
+                this.BeginItemPointIndex = 0;
+                this.EndItemPointIndex = 1;
+            }
 
             this.InitializeSubscriptions();
         }
@@ -200,6 +219,24 @@ namespace CDP4Composition.Diagram
         {
             get { return this.isDirty; }
             private set { this.RaiseAndSetIfChanged(ref this.isDirty, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the begin point index
+        /// </summary>
+        public int BeginItemPointIndex
+        {
+            get { return this.beginItemPointIndex; }
+            set { this.RaiseAndSetIfChanged(ref this.beginItemPointIndex, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the end point index
+        /// </summary>
+        public int EndItemPointIndex
+        {
+            get { return this.endItemPointIndex; }
+            set { this.RaiseAndSetIfChanged(ref this.endItemPointIndex, value); }
         }
 
         /// <summary>

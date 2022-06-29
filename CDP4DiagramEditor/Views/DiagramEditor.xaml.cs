@@ -72,5 +72,19 @@ namespace CDP4DiagramEditor.Views
                     });
             }
         }
+
+        /// <summary>
+        /// Disable certain actions on diagram
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The arguments</param>
+        private void Diagram_QueryItemsAction(object sender, DiagramQueryItemsActionEventArgs e)
+        {
+            // disable ctrl+drag to copy
+            if (e.Action == ItemsActionKind.MoveCopy)
+            {
+                e.Allow = false;
+            }
+        }
     }
 }

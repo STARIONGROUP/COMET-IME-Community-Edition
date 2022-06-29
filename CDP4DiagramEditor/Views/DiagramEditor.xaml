@@ -402,6 +402,8 @@
             <DataTemplate x:Key="ConstraintConnectorTemplate">
                 <dxdiag:DiagramConnector EndArrow="(none)"
                                          BeginArrow="(none)"
+                                         BeginItemPointIndex="{Binding DataItem.BeginItemPointIndex}"
+                                         EndItemPointIndex="{Binding DataItem.EndItemPointIndex}"
                                          Type="RightAngle"
                                          Stroke="{Binding DataItem.ConstraintKind, Converter={StaticResource ConstraintKindToBrushConverter},  UpdateSourceTrigger=PropertyChanged}" />
             </DataTemplate>
@@ -480,6 +482,7 @@
                                          SortMode="Value"
                                          SortOrder="Ascending"
                                          FilteringMode="ParentBranch"
+                                         
                                          SelectionMode="Row"
                                          SelectedItems="{Binding SelectedTreeRowViewModels, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                          IsNodeMenuEnabled="True"
@@ -514,6 +517,8 @@
                                         dxb:MergingProperties.ElementMergingBehavior="All"
                                         ShowPageBreaks="False"
                                         CanvasSizeMode="Fill"
+                                        AllowCopyItems="False"
+                                        QueryItemsAction="Diagram_QueryItemsAction"
                                         ConnectorsSeparationMode="AllLines"
                                         IsManipulationEnabled="True"
                                         AllowRotateItems="False"

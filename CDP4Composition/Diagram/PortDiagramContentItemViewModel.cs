@@ -170,16 +170,16 @@ namespace CDP4Composition.Diagram
             switch (this.PortContainerShapeSide)
             {
                 case PortContainerShapeSide.Top:
-                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.5, 0) });
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.3, 0), new Point(0.7, 0) });
                     break;
                 case PortContainerShapeSide.Left:
-                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0, 0.5) });
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0, 0.3), new Point(0, 0.7) });
                     break;
                 case PortContainerShapeSide.Right:
-                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(1, 0.5) });
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(1, 0.3), new Point(1, 0.7) });
                     break;
                 case PortContainerShapeSide.Bottom:
-                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.5, 1) });
+                    this.ConnectionPoints = new DiagramPointCollection(new[] { new Point(0.3, 1), new Point(0.7, 1) });
                     break;
             }
         }
