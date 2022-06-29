@@ -30,6 +30,7 @@ namespace CDP4Composition.Diagram
     using System.Threading.Tasks;
     using System.Windows;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -175,6 +176,14 @@ namespace CDP4Composition.Diagram
             if (this.elementUsage.Category.Any(x => x.Equals(category)))
             {
                 Logger.Warn("The category is already applied.");
+                dropinfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            // A category's permissable classes check
+            if (!category.PermissibleClass.Contains(ClassKind.ElementUsage))
+            {
+                Logger.Warn("The category cannot be applied to this type.");
                 dropinfo.Effects = DragDropEffects.None;
                 return;
             }
