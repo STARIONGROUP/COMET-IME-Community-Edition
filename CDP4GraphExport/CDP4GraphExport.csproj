@@ -23,10 +23,10 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" /> 
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0">
+    <PackageReference Include="CDP4Common-CE" Version="8.2.1-747-PR240">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
+    <PackageReference Include="CDP4Dal-CE" Version="8.1.1-747-PR240">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">
