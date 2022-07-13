@@ -524,8 +524,8 @@ namespace CDP4ParameterSheetGenerator.Generator
                     ParameterSheetUtilities.ConvertDoubleToDateTimeObject(ref referenceValue, parameterType);
                     ParameterSheetUtilities.ConvertDoubleToDateTimeObject(ref actualValue, parameterType);
                 }
-
-                if (parameterType is EnumerationParameterType)
+                
+                if (parameterType is EnumerationParameterType || parameterType is TextParameterType)
                 {
                     ParameterSheetUtilities.ConvertObjectToString(ref manualValue);
                     ParameterSheetUtilities.ConvertObjectToString(ref computedValue);
