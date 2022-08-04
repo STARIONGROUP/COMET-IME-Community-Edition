@@ -8,8 +8,8 @@
     <Product>CDP4Scripting</Product>
     <Description>COMET Scripting Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.2.0.5</AssemblyVersion>
-    <FileVersion>9.2.0.5</FileVersion>
+    <AssemblyVersion>9.2.0.7</AssemblyVersion>
+    <FileVersion>9.2.0.7</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

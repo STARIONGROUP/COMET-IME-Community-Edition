@@ -17,7 +17,6 @@
     <assembly path="CDP4Scripting.Tests/bin/Debug/net48/CDP4Scripting.Tests.dll" />
     <assembly path="CDP4ShellDialogsTestFixture/bin/Debug/net48/CDP4ShellDialogs.Tests.dll" />
     <assembly path="CDP4SiteDirectory.Tests/bin/Debug/net48/CDP4SiteDirectory.Tests.dll" />
-    <assembly path="CDP4SystemsToolKit.Tests/bin/Debug/net48/CDP4SystemsToolKit.Tests.dll" />
     <assembly path="EngineeringModel.Tests/bin/Debug/net48/CDP4EngineeringModel.Tests.dll" />
     <assembly path="ProductTree.Tests/bin/Debug/net48/ProductTree.Tests.dll" />
     <assembly path="RelationshipMatrix.Tests/bin/Debug/net48/CDP4RelationshipMatrix.Tests.dll" />
@@ -47,7 +46,6 @@
     <assembly path="CDP4Scripting.Tests/bin/Release/net48/CDP4Scripting.Tests.dll" />
     <assembly path="CDP4ShellDialogsTestFixture/bin/Release/net48/CDP4ShellDialogs.Tests.dll" />
     <assembly path="CDP4SiteDirectory.Tests/bin/Release/net48/CDP4SiteDirectory.Tests.dll" />
-    <assembly path="CDP4SystemsToolKit.Tests/bin/Release/net48/CDP4SystemsToolKit.Tests.dll" />
     <assembly path="EngineeringModel.Tests/bin/Release/net48/CDP4EngineeringModel.Tests.dll" />
     <assembly path="ProductTree.Tests/bin/Release/net48/ProductTree.Tests.dll" />
     <assembly path="RelationshipMatrix.Tests/bin/Release/net48/CDP4RelationshipMatrix.Tests.dll" />

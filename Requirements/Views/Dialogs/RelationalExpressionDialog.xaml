@@ -76,7 +76,7 @@
                             </dxg:TableView>
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
-                            <dxg:GridColumn FieldName="Value" CellTemplateSelector="{StaticResource ManualValueCellTemplateSelector}"/>
+                            <dxg:GridColumn FieldName="Value" CellTemplateSelector="{StaticResource ManualValueCellTemplateSelectorShortNames}"/>
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </dxlc:LayoutItem>
