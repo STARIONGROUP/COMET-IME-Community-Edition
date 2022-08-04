@@ -30,6 +30,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs.Rows
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
 
     using CDP4CommonView;
 
@@ -110,10 +111,9 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs.Rows
         {
             this.PossibleClassKind = new ReactiveList<ClassKind>();
 
-            var allClassKinds = typeof(Thing).Assembly.GetTypes().Where(t => typeof(Thing).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface)
-                .OrderBy(x => x.Name).Select(x => (ClassKind)Enum.Parse(typeof(ClassKind), x.Name));
+            var possibleClassKinds = IterationContainmentClassType.ClassKindArray;
 
-            this.PossibleClassKind.AddRange(allClassKinds);
+            this.PossibleClassKind.AddRange(possibleClassKinds);
         }
 
         /// <summary>
