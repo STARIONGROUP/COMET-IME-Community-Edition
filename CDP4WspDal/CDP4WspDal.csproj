@@ -36,7 +36,7 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0">
+    <PackageReference Include="CDP4Common-CE" Version="8.3.0-752-PR242">
       <IncludeAssets></IncludeAssets>
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>

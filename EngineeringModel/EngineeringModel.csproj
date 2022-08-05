@@ -37,7 +37,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0">
+    <PackageReference Include="CDP4Common-CE" Version="8.3.0-752-PR242">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
@@ -234,6 +234,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Views\Dialogs\MultiRelationshipDialog.xaml.cs">
+      <DependentUpon>MultiRelationshipDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\Dialogs\CategoryDomainParameterTypeSelectorDialog.xaml.cs">
       <DependentUpon>CategoryDomainParameterTypeSelectorDialog.xaml</DependentUpon>
     </Compile>
@@ -356,6 +359,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Views\Dialogs\MultiRelationshipDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\Dialogs\CategoryDomainParameterTypeSelectorDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

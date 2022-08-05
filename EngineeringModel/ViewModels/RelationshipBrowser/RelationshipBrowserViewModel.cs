@@ -151,6 +151,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
+        public ReactiveCommand<object> CreateMultiRelationshipCommand { get; set; }
+
         /// <summary>
         /// Updates all the Binary relationships
         /// </summary>
@@ -308,6 +310,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.PopulateContextMenu();
             
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Binary Relationship", "", this.CreateCommand, MenuItemKind.Create, ClassKind.BinaryRelationship));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Multi Relationship", "", this.CreateMultiRelationshipCommand, MenuItemKind.Create, ClassKind.MultiRelationship));
         }
 
         /// <summary>
@@ -320,6 +323,9 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRelationship));
             this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<BinaryRelationship>(this.Thing));
+
+            this.CreateMultiRelationshipCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRelationship));
+            this.CreateMultiRelationshipCommand.Subscribe(_ => this.ExecuteCreateCommand<MultiRelationship>(this.Thing));
         }
     }
 }
