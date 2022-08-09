@@ -36,10 +36,10 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.3.0-752-PR242">
+    <PackageReference Include="CDP4Common-CE" Version="8.3.0-756-PR245">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
+    <PackageReference Include="CDP4Dal-CE" Version="8.1.1-756-PR245">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0">
