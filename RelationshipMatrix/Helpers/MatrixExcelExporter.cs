@@ -41,8 +41,7 @@ namespace CDP4RelationshipMatrix.Helpers
     public class MatrixExcelExporter
     {
         /// <summary>
-        public MatrixExcelExporter(SourceConfigurationViewModel sourceXConfiguration, SourceConfigurationViewModel sourceYConfiguration, RelationshipConfigurationViewModel relationshipConfiguration, MatrixViewModel matrix, Iteration iteration)
-        /// Initializes a new instance of the <see cref="ReqIfRibbonViewModel"/> class
+        /// Initializes a new instance of the <see cref="MatrixExcelExporter"/> class
         /// </summary>
         public MatrixExcelExporter(SourceConfigurationViewModel sourceXConfiguration, SourceConfigurationViewModel sourceYConfiguration, RelationshipConfigurationViewModel relationshipConfiguration, MatrixViewModel matrix, Iteration iteration)
         {
