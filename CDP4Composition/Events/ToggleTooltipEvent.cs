@@ -25,8 +25,6 @@
 
 namespace CDP4Composition.Events
 {
-    using CDP4Common.CommonData;
-
     /// <summary>
     /// The purpose of the <see cref="ToggleTooltipEvent"/> is to notify an observer
     /// whether tooltip shall be displayed
