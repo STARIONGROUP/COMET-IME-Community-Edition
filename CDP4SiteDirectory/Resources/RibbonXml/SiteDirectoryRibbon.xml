@@ -1,6 +1,7 @@
 ﻿<ribbonxml>
   <group id="SiteDirectory" label="Site Directory">
     <button id="ShowHideDeprecatedThings" size="large" getLabel="GetLabel" supertip="Show or hide deprecated things in all browsers" onAction="OnAction" getEnabled="GetEnabled" imageMso="AutoFilterClassic"></button>
+	<button id="ShowHideTooltips" size="large" getLabel="GetLabel" supertip="Show or hide tooltips in all browsers" onAction="OnAction" getEnabled="GetEnabled" imageMso="AutoFilterClassic"></button>
     <button id="ShowDomainsOfExpertise" size="large" label="Domains of expertise" supertip="Manage Domains of expertise" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
     <button id="ShowModels" size="large" label="Models" supertip="Manage Engineering Models" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>
     <button id="ShowLanguages" size="large" label="Languages" supertip="Manage Languages" onAction="OnAction" getEnabled="GetEnabled" getImage="GetImage"></button>

@@ -284,6 +284,9 @@
     <Compile Update="Views\RoleBrowser\RoleBrowserRibbon.xaml.cs">
       <DependentUpon>RoleBrowserRibbon.xaml</DependentUpon>
     </Compile>
+    <Compile Update="Views\ShowTooltipRibbon.xaml.cs">
+      <DependentUpon>ShowTooltipRibbon.xaml</DependentUpon>
+    </Compile>
     <Compile Update="Views\ShowDeprecatedRibbon.xaml.cs">
       <DependentUpon>ShowDeprecatedRibbon.xaml</DependentUpon>
     </Compile>
@@ -415,6 +418,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\RoleBrowser\RoleBrowserRibbon.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ShowTooltipRibbon.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

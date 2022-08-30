@@ -354,28 +354,25 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Update this <see cref="Tooltip"/> with extra information.
         /// </summary>
-        protected override void UpdateTooltip()
+        protected override void UpdateDetails()
         {
-            base.UpdateTooltip();
+            base.UpdateDetails();
 
-            var sb = new StringBuilder(this.Tooltip);
+            var sb = new StringBuilder(this.Details);
 
             sb.AppendLine();
             sb.AppendLine();
             sb.AppendLine("When dragging and dropping Element Definitions between models, the following modifier keys can be used:");
             sb.AppendLine();
             sb.AppendLine("- None: The ownership in the target model is set to the Active Domain. The values are set to the default \"-\".");
-            sb.AppendLine();
             sb.AppendLine("- Ctrl: The ownership in the target model is set to the Active Domain. The values are set to values as defined in the source Model.");
-            sb.AppendLine();
             sb.AppendLine("- Shift: The ownership in the target model is set to the ownership as defined in the source model. The values are set to the default \"-\".");
-            sb.AppendLine();
             sb.AppendLine("- Ctrl + Shift: The ownership in the target model is set to the ownership as defined in the source model. The values are set to values as defined in the source Model.");
             sb.AppendLine();
             sb.AppendLine("NOTE: The Element Definition is always copied, including the contained Element Usages and Parameters.");
             sb.AppendLine("NOTE: This functionality is only supported if the target server is COMET.");
 
-            this.Tooltip = sb.ToString();
+            this.Details = sb.ToString();
         }
 
         /// <summary>
