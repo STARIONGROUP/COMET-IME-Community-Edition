@@ -262,7 +262,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             
             Assert.AreEqual(RequirementStateOfCompliance.Unknown, reqSpecRow.RequirementStateOfCompliance);
             
-            messageBoxService.Verify(
+            this.messageBoxService.Verify(
                 x => x.Show(
                     It.IsAny<string>(),
                     It.IsAny<string>(),
