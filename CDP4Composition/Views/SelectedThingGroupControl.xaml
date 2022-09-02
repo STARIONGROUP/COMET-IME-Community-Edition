@@ -18,7 +18,7 @@
                       ScrollBars="Auto"
                       GroupBoxDisplayMode="Normal">
         <dxlc:LayoutItem VerticalAlignment="Stretch">
-            <dxe:TextEdit EditValue="{Binding Path=SelectedThing.Tooltip, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+            <dxe:TextEdit EditValue="{Binding Path=SelectedThing.Details, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
                           MinHeight="120" MaxHeight="300"
                           VerticalScrollBarVisibility="Auto"
                           VerticalContentAlignment="Top"
