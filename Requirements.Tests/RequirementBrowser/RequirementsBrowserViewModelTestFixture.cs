@@ -267,7 +267,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<MessageBoxButton>(),
-                    MessageBoxImage.Error
+                    MessageBoxImage.Warning
                     )
                 );
         }

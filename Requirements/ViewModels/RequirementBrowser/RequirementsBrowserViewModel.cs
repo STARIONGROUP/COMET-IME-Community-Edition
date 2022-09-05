@@ -757,7 +757,7 @@ namespace CDP4Requirements.ViewModels
                     ElementDefinition topElement = ((Iteration)option.Container).TopElement;
                     if (topElement == null)
                     {
-                        this.messageBoxService.Show("Requirements can't be verified.\nTop Element is not set.", "Verification failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                        this.messageBoxService.Show("Verification not performed.\nTop Element is not set.", "Verification failed", MessageBoxButton.OK, MessageBoxImage.Warning);
                         return;
                     }
 
@@ -776,7 +776,7 @@ namespace CDP4Requirements.ViewModels
                 }
                 catch (NestedElementTreeException e)
                 {
-                    this.messageBoxService.Show($"Requirements can't be verified.\n{e.Message}", "Verification failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    this.messageBoxService.Show($"Verification not performed.\n{e.Message}", "Verification failed", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 finally
                 {
