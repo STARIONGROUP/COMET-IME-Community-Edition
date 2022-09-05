@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{C268DF5F-FB28-46AE-AA9B-08E074E6AEF5}</ProjectGuid>
-    <MinIMEVersion>9.2.0</MinIMEVersion>
+    <MinIMEVersion>9.3.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4SiteDirectory</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4SiteDirectory</Product>
     <Description>COMET SiteDirectory Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.2.0.7</AssemblyVersion>
-    <FileVersion>9.2.0.7</FileVersion>
+    <AssemblyVersion>9.3.0.1</AssemblyVersion>
+    <FileVersion>9.3.0.1</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

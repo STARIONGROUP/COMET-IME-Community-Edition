@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{C31FF150-E45C-4136-96CD-58FBF9B00C08}</ProjectGuid>
-	  <MinIMEVersion>9.2.0</MinIMEVersion>
+	  <MinIMEVersion>9.3.0</MinIMEVersion>
 	  <AssemblyName>CDP4Reporting</AssemblyName>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -10,8 +10,8 @@
     <Product>CDP4Reporting</Product>
     <Description>COMET Reporting Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.2.0.7</AssemblyVersion>
-    <FileVersion>9.2.0.7</FileVersion>
+    <AssemblyVersion>9.3.0.1</AssemblyVersion>
+    <FileVersion>9.3.0.1</FileVersion>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

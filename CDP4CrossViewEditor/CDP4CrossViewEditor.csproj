@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{A9113A52-C31F-4C76-B87F-AB28E079284C}</ProjectGuid>
-    <MinIMEVersion>9.2.0</MinIMEVersion>
+    <MinIMEVersion>9.3.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4CrossViewEditor</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4CrossViewEditor</Product>
     <Description>COMET Excel Addin CrossView Editor</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.2.0.7</AssemblyVersion>
-    <FileVersion>9.2.0.7</FileVersion>
+    <AssemblyVersion>9.3.0.1</AssemblyVersion>
+    <FileVersion>9.3.0.1</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
