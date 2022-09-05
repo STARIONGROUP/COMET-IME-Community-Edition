@@ -54,7 +54,7 @@ namespace CDP4Composition.Services
         protected static Logger Logger = LogManager.GetLogger(typeof(DownloadFileService).FullName);
 
         /// <summary>
-        /// The (injected) <see cref="DevExpress.Mvvm.IMessageBoxService"/>
+        /// The <see cref="IMessageBoxService"/> used to show user messages.
         /// </summary>
         private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 

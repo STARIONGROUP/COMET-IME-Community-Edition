@@ -35,6 +35,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Exceptions;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     
@@ -47,7 +48,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -60,7 +61,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4RequirementsVerification;
     using CDP4RequirementsVerification.Events;
     using CDP4RequirementsVerification.Verifiers;
-
+    using Microsoft.Practices.ServiceLocation;
     using NLog;
     
     using ReactiveUI;
@@ -75,6 +76,11 @@ namespace CDP4Requirements.ViewModels
         /// The logger for the current class
         /// </summary>
         private static Logger logger = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> used to show user messages.
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService;
 
         /// <summary>
         ///  The comparer for <see cref="RequirementsSpecification"/>
@@ -164,6 +170,7 @@ namespace CDP4Requirements.ViewModels
             var model = (EngineeringModel)this.Thing.Container;
             this.ActiveParticipant = model.GetActiveParticipant(this.Session.ActivePerson);
             this.openRequirementsSpecificationEditorViewModels = new List<RequirementsSpecificationEditorViewModel>();
+            this.messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
             this.ExecuteLongRunningDispatcherAction(
                 () => 
@@ -747,6 +754,13 @@ namespace CDP4Requirements.ViewModels
 
                     var targetOption = option as Option;
 
+                    ElementDefinition topElement = ((Iteration)option.Container).TopElement;
+                    if (topElement == null)
+                    {
+                        this.messageBoxService.Show("Verification not performed.\nTop Element is not set.", "Verification failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+
                     var configuration = new RequirementVerificationConfiguration
                     {
                         Option = targetOption
@@ -759,6 +773,10 @@ namespace CDP4Requirements.ViewModels
                     }
 
                     await Task.WhenAll(tasks.ToArray());
+                }
+                catch (NestedElementTreeException e)
+                {
+                    this.messageBoxService.Show($"Verification not performed.\n{e.Message}", "Verification failed", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
                 finally
                 {
