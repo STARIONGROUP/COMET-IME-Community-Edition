@@ -252,7 +252,7 @@
                               TreeDerivationMode="HierarchicalDataTemplate"
                               TreeLineStyle="Solid"
                               VerticalScrollbarVisibility="Auto"
-                              ShowFilterPanelMode="Never">
+                              ShowFilterPanelMode="Default">
 
                     <dxg:TreeListView.FocusedRow>
                         <dynamic:ExpandoObject />
