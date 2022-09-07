@@ -16,9 +16,14 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4Requirements.Converters"
+             xmlns:behaviors="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              xmlns:userControls="clr-namespace:CDP4Requirements.Views.UserControls"
              xmlns:rows="clr-namespace:CDP4Requirements.ViewModels.RequirementBrowser.Rows"
              xmlns:selectors="clr-namespace:CDP4Requirements.Selectors"
+             xmlns:compositionConverters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             xmlns:engineeringModelData="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
+             xmlns:service="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
+             xmlns:commonData="clr-namespace:CDP4Common.CommonData;assembly=CDP4Common"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -227,32 +232,25 @@
                 <dragDrop:FrameworkElementDragBehavior />
                 <dragDrop:FrameworkElementDropBehavior />
             </i:Interaction.Behaviors>
-            <dxg:TreeListControl.Columns>
-                <dxg:TreeListColumn FieldName="ShortName" Fixed="Left"/>
-                <dxg:TreeListColumn FieldName="Name" />
-                <dxg:TreeListColumn FieldName="Definition" />
-                <dxg:TreeListColumn FieldName="OwnerName" />
-                <dxg:TreeListColumn FieldName="Categories" />
-            </dxg:TreeListControl.Columns>
             <dxg:TreeListControl.View>
-                <dxg:TreeListView x:Name="View"
-                              AllowEditing="False"
-                              AutoWidth="False"
-                              ExpandStateFieldName="IsExpanded"
-                              HorizontalScrollbarVisibility="Auto"
-                              NavigationStyle="Cell"
-                              ShowHorizontalLines="False"
-                              RowStyle="{StaticResource RowStyleDeprecatedRequirement}"
-                              ShowIndicator="False"
-                              ShowNodeImages="True"
-                              NodeImageSelector="{StaticResource RequirementsTreeListNodeSelector}"
-                              NodeImageSize="20,16"
-                              ShowVerticalLines="False"
-                              FixedLineWidth="0"
-                              TreeDerivationMode="HierarchicalDataTemplate"
-                              TreeLineStyle="Solid"
-                              VerticalScrollbarVisibility="Auto"
-                              ShowFilterPanelMode="Default">
+                <dxg:TreeListView Name="View"
+                                  AllowEditing="False"
+                                  AutoWidth="False"
+                                  ExpandStateFieldName="IsExpanded"
+                                  HorizontalScrollbarVisibility="Auto"
+                                  NavigationStyle="Cell"
+                                  ShowHorizontalLines="False"
+                                  RowStyle="{StaticResource RowStyleDeprecatedRequirement}"
+                                  ShowIndicator="False"
+                                  ShowNodeImages="True"
+                                  NodeImageSelector="{StaticResource RequirementsTreeListNodeSelector}"
+                                  NodeImageSize="20,16"
+                                  ShowVerticalLines="False"
+                                  FixedLineWidth="0"
+                                  TreeDerivationMode="HierarchicalDataTemplate"
+                                  TreeLineStyle="Solid"
+                                  VerticalScrollbarVisibility="Auto"
+                                  ShowFilterPanelMode="Default">
 
                     <dxg:TreeListView.FocusedRow>
                         <dynamic:ExpandoObject />
@@ -263,7 +261,22 @@
                     </dxg:TreeListView.ContextMenu>
                 </dxg:TreeListView>
             </dxg:TreeListControl.View>
-            <dxg:TreeListControl.InputBindings>
+
+            <dxg:TreeListControl.Columns>
+                <dxg:TreeListColumn FieldName="ShortName" Fixed="Left"/>
+                <dxg:TreeListColumn FieldName="Name" />
+                <dxg:TreeListColumn FieldName="Definition" />
+                <dxg:TreeListColumn FieldName="OwnerName" />
+                <dxg:TreeListColumn FieldName="Categories" Header="Categories" Visible="True" ShowInColumnChooser="True" AllowColumnFiltering="False" />
+                <dxg:TreeListColumn FieldName="CategoryList" Header="Category" Visible="False" ShowInColumnChooser="False">
+                    <dxmvvm:Interaction.Behaviors>
+                        <behaviors:FilterOperatorBehavior CustomFilterOperatorType="Category" ItemsSource="{Binding ReqSpecificationRows}"/>
+                    </dxmvvm:Interaction.Behaviors>
+                </dxg:TreeListColumn>
+
+            </dxg:TreeListControl.Columns>
+
+           <dxg:TreeListControl.InputBindings>
                 <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
                 <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
             </dxg:TreeListControl.InputBindings>
