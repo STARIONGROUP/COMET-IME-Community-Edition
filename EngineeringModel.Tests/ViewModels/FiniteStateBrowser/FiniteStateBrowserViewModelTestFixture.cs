@@ -35,10 +35,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-
+    using CDP4Composition.PluginSettingService;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -46,7 +46,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
-    
+    using DevExpress.Xpf.Editors.ExpressionEditor;
+    using Microsoft.Practices.ServiceLocation;
     using Moq;
     
     using NUnit.Framework;
@@ -60,6 +61,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         private PropertyInfo rev;
 
         private Mock<ISession> session;
+        private Mock<IServiceLocator> serviceLocator;
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> panelNavigationService;
@@ -84,6 +86,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.rev = typeof (Thing).GetProperty("RevisionNumber");
 
             this.session = new Mock<ISession>();
+            this.serviceLocator = new Mock<IServiceLocator>();
             this.assembler = new Assembler(this.uri);
             this.permissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
@@ -92,6 +95,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
             this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
@@ -331,6 +335,41 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Exactly(1));
 
             this.parameterActualFiniteStateListApplicationBatchService.Verify(x => x.Update(this.session.Object, this.iteration, It.IsAny<ActualFiniteStateList>(), false, It.IsAny<IEnumerable<Category>>(), It.IsAny<IEnumerable<DomainOfExpertise>>(), It.IsAny<IEnumerable<ParameterType>>()), Times.Exactly(1));
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandWorks()
+        {            
+            var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
+            var rowViewModelBase = new Mock<IRowViewModelBase<Thing>>();
+            rowViewModelBase.SetupGet(x => x.ContainedRows).Returns(new CDP4Composition.Mvvm.Types.DisposableReactiveList<IRowViewModelBase<Thing>>());
+            rowViewModelBase.SetupGet(x => x.Thing).Returns(this.sitedir);
+            browser.IsDeleteCommandOverrideAllowed = true;
+            browser.SelectedThing = rowViewModelBase.Object;
+
+            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
+        }
+
+
+        internal class FiniteStateBrowserDeleteCommandTestClass : FiniteStateBrowserViewModel
+        {
+            internal FiniteStateBrowserDeleteCommandTestClass(Iteration iteration, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService)
+            : base(iteration, session, dialogNav, panelNav, dialogNavigationService, pluginSettingsService, parameterActualFiniteStateListApplicationBatchService)
+            {
+
+            }
+
+            public bool? IsDeleteCommandOverrideAllowed { get; set; }
+
+            protected override bool IsDeleteCommandAllowed()
+            {
+                if (!this.IsDeleteCommandOverrideAllowed.HasValue)
+                {
+                    return base.IsDeleteCommandAllowed();
+                }
+                return this.IsDeleteCommandOverrideAllowed.Value;
+            }
         }
     }
 }

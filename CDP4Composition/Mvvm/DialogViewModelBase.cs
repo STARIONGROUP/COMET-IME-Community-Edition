@@ -636,8 +636,21 @@ namespace CDP4Composition.Mvvm
         /// <param name="repopulateMethod">the repopulate method to refresh the rows</param>
         protected void ExecuteDeleteCommand(Thing thing, Action repopulateMethod)
         {
-            this.transaction.Delete(thing.Clone(false), this.Thing);
-            repopulateMethod();
+            if (IsExecuteDeleteCommandAllowed())
+            {
+                this.transaction.Delete(thing.Clone(false), this.Thing);
+                repopulateMethod();
+            }
+        }
+
+
+        /// <summary>
+        /// Checks if the Delete command is Allowed.
+        /// </summary>
+        /// <returns>If the Delete command is Allowed or not. Default true.</returns>
+        protected virtual bool IsExecuteDeleteCommandAllowed()
+        {
+            return true;
         }
 
         /// <summary>

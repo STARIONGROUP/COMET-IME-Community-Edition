@@ -19,14 +19,16 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using ReactiveUI;
+    using CDP4Composition.Services;
+    using Microsoft.Practices.ServiceLocation;
+    using System.Windows;
 
     /// <summary>
     /// The dialog-view model to create, edit or inspect a <see cref="PossibleFiniteStateList"/>
     /// </summary>
     [ThingDialogViewModelExport(ClassKind.PossibleFiniteStateList)]
     public class PossibleFiniteStateListDialogViewModel : CDP4CommonView.PossibleFiniteStateListDialogViewModel, IThingDialogViewModel
-    {
-        #region Constructors
+    {        
         /// <summary>
         /// Initializes a new instance of the <see cref="PossibleFiniteStateListDialogViewModel"/> class.
         /// </summary>
@@ -67,18 +69,18 @@ namespace CDP4EngineeringModel.ViewModels
             : base(possibleFiniteStateList, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
         }
-        #endregion
 
-        #region properties
+
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> used to show user messages.
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to set the default <see cref="PossibleFiniteState"/>
         /// </summary>
         public ReactiveCommand<object> SetDefaultStateCommand { get; private set; } 
-        #endregion
-
-        #region DialogBase Methods
-
+        
         /// <summary>
         /// Initialize the <see cref="ICommand"/>s and listeners
         /// </summary>
@@ -151,7 +153,24 @@ namespace CDP4EngineeringModel.ViewModels
             base.UpdateOkCanExecute();
             this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null && this.PossibleState.Count > 0;
         }
-        #endregion
+
+        /// <summary>
+        /// Checks if the Delete command is Allowed.
+        /// </summary>
+        /// <returns>If the Delete command is Allowed or not. Default true.</returns>
+        protected override bool IsExecuteDeleteCommandAllowed()
+        {
+            var message = "Deleting a Possible Finite State or State List will delete ALL parameter values that may be dependent on this through Actual Finite State Lists that use it." +
+                 "\r\n\r\nCare should be taken not to delete states and their dependent parameter values in the product tree inadvertently." +
+                 "\r\n\r\nAre you sure you want to delete these?";
+
+            if (this.messageBoxService.Show(message, "Deleting Finite State", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                return true;
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// Executes the <see cref="SetDefaultStateCommand"/>

@@ -43,7 +43,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;    
     using CDP4Composition.PluginSettingService;
-
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -51,7 +51,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels.Dialogs;
     using CDP4EngineeringModel.Views;
-
+    using Microsoft.Practices.ServiceLocation;
     using ReactiveUI;
 
     /// <summary>
@@ -59,6 +59,11 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class FiniteStateBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> used to show user messages.
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -161,6 +166,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
+
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -615,6 +621,23 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.IsBusy = false;
             }
+        }
+
+        /// <summary>
+        /// Check if the Delete Command asociated to this ViewModel is allowed.
+        /// </summary>
+        /// <returns>True if the Delete Command is allowed, false otherwise</returns>
+        protected override bool IsDeleteCommandAllowed()
+        {
+            var message = "Deleting a Possible Finite State or State List will delete ALL parameter values that may be dependent on this through Actual Finite State Lists that use it." +
+                 "\r\n\r\nCare should be taken not to delete states and their dependent parameter values in the product tree inadvertently." +
+                 "\r\n\r\nAre you sure you want to delete these?";
+
+            if (this.messageBoxService.Show(message, "Deleting Finite State", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
