@@ -33,6 +33,10 @@ namespace CDP4CommonView
 
     using CDP4Composition.Mvvm;
 
+    /// <summary>
+    /// dialog-view-model class representing a <see cref="DefinedThing"/>
+    /// this part of the class is not auto generated and will be persisted
+    /// </summary>
     public abstract partial class DefinedThingDialogViewModel<T> : DialogViewModelBase<T> where T : DefinedThing
     {
         /// <summary>
