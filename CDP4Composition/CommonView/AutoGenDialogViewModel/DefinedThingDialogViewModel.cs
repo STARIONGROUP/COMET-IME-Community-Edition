@@ -127,19 +127,6 @@ namespace CDP4CommonView
         }
 
         /// <summary>
-        /// Gets first <see cref="Alias"/> from <see cref="AliasRowViewModel"/>
-        /// and returns it and it's language code as a string
-        /// </summary>
-        public string FirstAlias
-        {
-            get
-            {
-                var firstAlias = this.Alias.FirstOrDefault();
-                return firstAlias == null ? string.Empty : $"{firstAlias.Content} [{firstAlias.LanguageCode}]";
-            }
-        }
-
-        /// <summary>
         /// Gets or sets the list of <see cref="Alias"/>
         /// </summary>
         public ReactiveList<AliasRowViewModel> Alias { get; protected set; }
@@ -151,19 +138,6 @@ namespace CDP4CommonView
         {
             get { return this.selectedDefinition; }
             set { this.RaiseAndSetIfChanged(ref this.selectedDefinition, value); }
-        }
-
-        /// <summary>
-        /// Gets first <see cref="Definition"/> from <see cref="DefinitionRowViewModel"/>
-        /// and returns it's content as a string
-        /// </summary>
-        public string FirstDefinition
-        {
-            get
-            {
-                var firstDefinition = this.Definition.FirstOrDefault();
-                return firstDefinition?.Content;
-            }
         }
 
         /// <summary>
