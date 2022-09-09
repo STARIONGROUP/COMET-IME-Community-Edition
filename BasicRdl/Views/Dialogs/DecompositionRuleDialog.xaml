@@ -117,6 +117,8 @@
                 </lc:LayoutItem>
 
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
             
             <items:AliasLayoutGroup />

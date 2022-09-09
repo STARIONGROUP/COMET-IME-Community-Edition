@@ -21,6 +21,8 @@
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
                 <items:NameLayoutItem/>
                 <items:ShortNameLayoutItem/>
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
             <items:AliasLayoutGroup/>
             <items:DefinitionLayoutGroup/>

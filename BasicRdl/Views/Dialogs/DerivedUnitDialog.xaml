@@ -114,6 +114,8 @@
 
                     </dxg:GridControl.Columns>
                 </dxg:GridControl>
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
 
             <items:AliasLayoutGroup />
