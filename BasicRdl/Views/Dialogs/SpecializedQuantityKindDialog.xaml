@@ -139,7 +139,8 @@
                 </dxlc:LayoutItem>
                 
                 <items:ScaleLayoutItem/>
-                
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:CategoryLayoutGroup />
             <items:AliasLayoutGroup />

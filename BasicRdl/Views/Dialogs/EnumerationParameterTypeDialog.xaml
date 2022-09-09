@@ -33,6 +33,8 @@
                     <dxe:CheckEdit Name="AllowMultiSelect" IsChecked="{Binding Path=AllowMultiSelect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </dxlc:LayoutItem>
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <dxlc:LayoutGroup Name="EnumerationValueDefinitions" Header="Values" Orientation="Vertical">
                 <dxlc:LayoutItem>

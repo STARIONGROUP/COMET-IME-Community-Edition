@@ -33,6 +33,8 @@
                 <items:IsMinimumInclusiveLayoutItem/>
                 <items:IsMaximumInclusiveLayoutItem />
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:ValueDefinitionLayoutGroup/>
             <items:MappingToReferenceScaleLayoutGroup/>

@@ -378,6 +378,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CommonView\Items\DefinitionDisplayLayoutItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CommonView\Items\AliasLayoutGroup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -459,6 +463,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CommonView\Items\NumberSetLayoutItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CommonView\Items\AliasDisplayLayoutItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -674,6 +682,8 @@
     <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="CommonView\Items\AliasDisplayLayoutItem.xaml" />
+    <None Remove="CommonView\Items\DefinitionDisplayLayoutItem.xaml" />
     <None Remove="Resources\Images\cometlogo.png" />
     <None Remove="Resources\Images\cometlogo_48x48.png" />
     <None Remove="Views\CustomFilterEditorDialog.xaml" />

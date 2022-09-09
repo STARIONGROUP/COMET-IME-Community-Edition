@@ -23,6 +23,8 @@
                 <items:NameLayoutItem />
                 <items:ShortNameContainerLayoutItem />
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:AliasLayoutGroup />
             <items:DefinitionLayoutGroup />

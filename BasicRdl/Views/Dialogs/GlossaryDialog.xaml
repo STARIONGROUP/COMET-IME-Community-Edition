@@ -35,6 +35,8 @@
                 <items:NameLayoutItem />
                 <items:ShortNameContainerLayoutItem/>
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
 
             <lc:LayoutGroup Header="Terms" Orientation="Vertical">

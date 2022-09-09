@@ -41,6 +41,8 @@
                 </dxlc:LayoutItem>
                 <items:IsDeprecatedLayoutItem />
                 <items:ScaleLayoutItem/>
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <dxlc:LayoutGroup Name="QuantityKindFactors" Header="Factors" Orientation="Vertical">
                 <dxlc:LayoutItem>

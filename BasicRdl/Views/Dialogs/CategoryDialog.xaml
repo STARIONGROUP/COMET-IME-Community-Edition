@@ -38,7 +38,8 @@
                                    IsReadOnly="{Binding IsReadOnly}" />
                 </lc:LayoutItem>
                 <items:ShortNameContainerLayoutItem />
-
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
             <lc:LayoutGroup Header="Permissible Classes" Orientation="Vertical">
                 <lc:LayoutItem>

@@ -46,6 +46,8 @@
                                   Text="{Binding Path=ModelCode, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                   IsReadOnly="True"/>
                 </lc:LayoutItem>
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
             <items:CategoryLayoutGroup/>
             <lc:LayoutGroup Header="Organizations" Orientation="Vertical" IsEnabled="{Binding AreOrganizationsVisible}">

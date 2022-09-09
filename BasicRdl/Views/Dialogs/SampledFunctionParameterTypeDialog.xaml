@@ -268,7 +268,8 @@
                 </dxlc:LayoutGroup>
 
                 <items:IsDeprecatedLayoutItem/>
-
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:CategoryLayoutGroup />
             <items:AliasLayoutGroup />

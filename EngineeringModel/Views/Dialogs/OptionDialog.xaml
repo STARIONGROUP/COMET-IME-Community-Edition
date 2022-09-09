@@ -31,6 +31,8 @@
                                IsChecked="{Binding Path=IsDefault, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
                                IsReadOnly="{Binding IsReadOnly}"/>
                 </lc:LayoutItem>
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
             <items:CategoryLayoutGroup />
             <items:AliasLayoutGroup/>

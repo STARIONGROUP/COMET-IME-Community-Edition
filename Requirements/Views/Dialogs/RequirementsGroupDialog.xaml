@@ -34,6 +34,8 @@
                 <items:ShortNameLayoutItem/>
                 <items:NameLayoutItem/>
                 <items:OwnerLayoutItem/>
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:CategoryLayoutGroup/>
             <items:AliasLayoutGroup/>

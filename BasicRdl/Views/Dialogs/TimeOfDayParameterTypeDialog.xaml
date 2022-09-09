@@ -26,6 +26,8 @@
                 <items:SymbolLayoutItem/>
                 <items:ShortNameContainerLayoutItem />
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:CategoryLayoutGroup />
             <items:AliasLayoutGroup />
