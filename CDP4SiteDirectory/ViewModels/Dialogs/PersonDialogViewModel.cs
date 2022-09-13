@@ -146,7 +146,7 @@ namespace CDP4SiteDirectory.ViewModels
                 if ((columnName == "Password" || columnName == "PasswordConfirmation") && !this.PwdEditIsChecked)
                 {
                     var validationErrorToRemove =
-                        this.ValidationErrors.SingleOrDefault(
+                        this.ValidationErrors.FirstOrDefault(
                             x => x.PropertyName == "Password" || x.PropertyName == "PasswordConfirmation");
                     if (validationErrorToRemove != null)
                     {
