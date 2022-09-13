@@ -231,7 +231,8 @@
                         <dxe:PasswordBoxEdit Name="PasswordConfirmation" Text="{Binding Path=PasswordConfirmation, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                 </lc:LayoutItem>
-                <lc:LayoutItem Label=" " Visibility="{Binding PwdEditIsChecked, Converter={StaticResource BooleanToVisibilityConverter }, ConverterParameter=Invert }">
+                <!-- Label is set to " " for positioning purposes --> 
+                <lc:LayoutItem Label=" " Visibility="{Binding ShoudDisplayPasswordNotSetWarning, Converter={StaticResource BooleanToVisibilityConverter } }">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="20" />

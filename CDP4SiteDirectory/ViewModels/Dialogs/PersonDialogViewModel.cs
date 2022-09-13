@@ -109,7 +109,11 @@ namespace CDP4SiteDirectory.ViewModels
         public bool PwdEditIsChecked
         {
             get { return this.pwdEditIsChecked; }
-            set { this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value); }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value);
+                this.RaisePropertyChanged(nameof(this.ShoudDisplayPasswordNotSetWarning));
+            }
         }
 
         /// <summary>
@@ -130,7 +134,15 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to set the default <see cref="EmailAddress"/>
         /// </summary>
-        public ReactiveCommand<object> SetDefaultEmailAddressCommand { get; private set; } 
+        public ReactiveCommand<object> SetDefaultEmailAddressCommand { get; private set; }
+        
+        /// <summary>
+        /// Returns true if new <see cref="Person"/> nas no passwords set
+        /// </summary>
+        public bool ShoudDisplayPasswordNotSetWarning
+        {
+            get { return this.dialogKind == ThingDialogKind.Create && this.PwdEditIsChecked; }
+        }
 
         /// <summary>
         /// Gets the error message for the property with the given name.
