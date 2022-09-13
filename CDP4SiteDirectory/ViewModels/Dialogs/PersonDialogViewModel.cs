@@ -141,7 +141,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public bool ShoudDisplayPasswordNotSetWarning
         {
-            get { return this.dialogKind == ThingDialogKind.Create && this.PwdEditIsChecked; }
+            get { return this.dialogKind == ThingDialogKind.Create && !this.PwdEditIsChecked; }
         }
 
         /// <summary>
