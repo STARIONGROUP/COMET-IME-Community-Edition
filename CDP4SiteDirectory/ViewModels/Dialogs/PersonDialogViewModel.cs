@@ -91,6 +91,7 @@ namespace CDP4SiteDirectory.ViewModels
             {
                 this.RaisePropertyChanged("Password");
                 this.RaisePropertyChanged("PasswordConfirmation");
+                this.RaisePropertyChanged(nameof(this.ShoudDisplayPasswordNotSetWarning));
             });
 
             this.WhenAnyValue(vm => vm.SelectedRole).Subscribe(x =>
@@ -122,11 +123,7 @@ namespace CDP4SiteDirectory.ViewModels
         public bool PwdEditIsChecked
         {
             get { return this.pwdEditIsChecked; }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value);
-                this.RaisePropertyChanged(nameof(this.ShoudDisplayPasswordNotSetWarning));
-            }
+            set { this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value); }
         }
 
         /// <summary>
