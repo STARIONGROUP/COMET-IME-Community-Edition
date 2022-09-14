@@ -168,5 +168,47 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             var personDialogViewModel = new PersonDialogViewModel();
             Assert.IsNotNull(personDialogViewModel);
         }
+
+        [Test]
+        public void VerifyThatPasswordWarningIsDisplayedWhenCreatingUserWithoutPassword()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext, this.clone);
+
+            var vm = new PersonDialogViewModel(this.person.Clone(false), transaction, this.session.Object, true,
+                ThingDialogKind.Create, null, this.clone);
+
+            vm.PwdEditIsChecked = false;
+
+            Assert.IsTrue(vm.ShoudDisplayPasswordNotSetWarning);
+        }
+        
+        [Test]
+        public void VerifyThatPasswordWarningIsNotDisplayedWhenCreatingUserWithPassword()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext, this.clone);
+
+            var vm = new PersonDialogViewModel(this.person.Clone(false), transaction, this.session.Object, true,
+                ThingDialogKind.Create, null, this.clone);
+
+            vm.PwdEditIsChecked = true;
+
+            Assert.IsFalse(vm.ShoudDisplayPasswordNotSetWarning);
+        }
+
+        [Test]
+        public void VerifyThatPasswordWarningIsNotDisplayedWhenEditingUserWithoutPassword()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext, this.clone);
+
+            var vm = new PersonDialogViewModel(this.person.Clone(false), transaction, this.session.Object, true,
+                ThingDialogKind.Update, null, this.clone);
+
+            vm.PwdEditIsChecked = false;
+
+            Assert.IsFalse(vm.ShoudDisplayPasswordNotSetWarning);
+        }
     }
 }
