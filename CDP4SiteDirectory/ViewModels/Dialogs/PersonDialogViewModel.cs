@@ -21,8 +21,6 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition.Services;
     using CDP4Dal;
 
-    using DevExpress.Pdf;
-
     using ReactiveUI;
 
     /// <summary>
