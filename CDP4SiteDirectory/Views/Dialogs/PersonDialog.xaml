@@ -234,7 +234,6 @@
                         <dxe:PasswordBoxEdit Name="PasswordConfirmation" Text="{Binding Path=PasswordConfirmation, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                 </lc:LayoutItem>
-                <!-- Label is set to " " for positioning purposes -->
                 <items:WarningLayoutItem
                     Visibility="{Binding ShoudDisplayPasswordNotSetWarning, Converter={StaticResource BooleanToVisibilityConverter }}"
                     WarningText="The new user will not be able to log in as long as the password is not set."/>

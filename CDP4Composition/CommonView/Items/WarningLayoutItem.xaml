@@ -8,6 +8,7 @@
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              mc:Ignorable="d"
              Label=" ">
+    <!-- Label above is set to " " for positioning purposes -->
     <dxlc:LayoutItem.Resources>
     </dxlc:LayoutItem.Resources>
         <Grid>
