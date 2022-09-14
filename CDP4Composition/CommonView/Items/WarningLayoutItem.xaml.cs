@@ -32,12 +32,18 @@ namespace CDP4CommonView.Items
     /// </summary>
     public partial class WarningLayoutItem : LayoutItem
     {
+        /// <summary>
+        /// Gets or sets the warning text
+        /// </summary>
         public string WarningText
         {
             get { return this.WarningBlock.Text; }
             set { this.WarningBlock.Text = value; }
         }
 
+        /// <summary>
+        /// Initializes a new instanec of the WarningLayoutItem
+        /// </summary>
         public WarningLayoutItem()
         {
             InitializeComponent();
