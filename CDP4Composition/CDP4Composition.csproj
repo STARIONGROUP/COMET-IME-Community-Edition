@@ -374,6 +374,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="CommonView\Items\WarningLayoutItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CommonView\Items\AdvancedLayoutGroup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -684,6 +688,7 @@
   <ItemGroup>
     <None Remove="CommonView\Items\AliasDisplayLayoutItem.xaml" />
     <None Remove="CommonView\Items\DefinitionDisplayLayoutItem.xaml" />
+    <None Remove="CommonView\Items\WarningLayoutItem.xaml" />
     <None Remove="Resources\Images\cometlogo.png" />
     <None Remove="Resources\Images\cometlogo_48x48.png" />
     <None Remove="Views\CustomFilterEditorDialog.xaml" />

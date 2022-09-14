@@ -91,7 +91,12 @@ namespace CDP4SiteDirectory.ViewModels
                 this.UpdateOkCanExecute();
             });
 
-            this.WhenAnyValue(vm => vm.SelectedRole).Subscribe(_ => this.UpdateOkCanExecute());
+            this.WhenAnyValue(vm => vm.SelectedRole).Subscribe(
+                _ =>
+                {
+                    this.UpdateOkCanExecute();
+                    this.RaisePropertyChanged(nameof(this.IsSelectedRoleDeprecated));
+                });
             this.WhenAnyValue(vm => vm.SelectedSelectedDomain).Subscribe(_ => this.UpdateOkCanExecute());
 
             this.WhenAnyValue(vm => vm.Domain).Subscribe(_ =>
@@ -100,6 +105,14 @@ namespace CDP4SiteDirectory.ViewModels
                 this.domainSubScription = this.Domain?.Changed.Subscribe(x => this.SetSelectedDomain());
                 this.SetSelectedDomain();
             });
+        }
+        
+        /// <summary>
+        /// Returns true if <see cref="ParticipantRole"/> is selected and is deprecated
+        /// </summary>
+        public bool IsSelectedRoleDeprecated
+        {
+            get { return this.SelectedRole != null && this.SelectedRole.IsDeprecated; }
         }
 
         /// <summary>

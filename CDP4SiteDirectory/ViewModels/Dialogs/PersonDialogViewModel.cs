@@ -92,6 +92,19 @@ namespace CDP4SiteDirectory.ViewModels
                 this.RaisePropertyChanged("Password");
                 this.RaisePropertyChanged("PasswordConfirmation");
             });
+
+            this.WhenAnyValue(vm => vm.SelectedRole).Subscribe(x =>
+            {
+                this.RaisePropertyChanged(nameof(this.IsSelectedRoleDeprecated));
+            });
+        }
+
+        /// <summary>
+        /// Returns true if <see cref="PersonRole"/> is selected and is deprecated
+        /// </summary>
+        public bool IsSelectedRoleDeprecated
+        {
+            get { return this.SelectedRole != null && this.SelectedRole.IsDeprecated; }
         }
 
         /// <summary>

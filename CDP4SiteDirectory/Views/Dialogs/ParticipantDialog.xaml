@@ -8,14 +8,16 @@
              xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
-             xmlns:converters="clr-namespace:CDP4SiteDirectory.Converters"
+             xmlns:cdp4SiteDirectoryConverters="clr-namespace:CDP4SiteDirectory.Converters"
+             xmlns:cdp4CompositionConverters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              Height="300"
              d:DesignWidth="600"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
     <dx:DXWindow.Resources>
         <ResourceDictionary>
-            <converters:DomainListToObjectListConverter x:Key="ReactiveDomainToObjectListConverter" />
+            <cdp4SiteDirectoryConverters:DomainListToObjectListConverter x:Key="ReactiveDomainToObjectListConverter" />
+            <cdp4CompositionConverters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </dx:DXWindow.Resources>
     <lc:LayoutControl Margin="5"
@@ -98,7 +100,9 @@
                         </Button>
                     </Grid>
                 </lc:LayoutItem>
-
+                <items:WarningLayoutItem Visibility="{Binding Path=IsSelectedRoleDeprecated, UpdateSourceTrigger=PropertyChanged,
+                    Converter={StaticResource BooleanToVisibilityConverter }}"
+                                         WarningText="The selected role is deprecated."/>
                 <lc:LayoutItem Label="Domain of expertise" LabelPosition="Top">
                     <dxe:ListBoxEdit Name="DomainsList"
                                      MaxHeight="250"

@@ -145,6 +145,9 @@
                     </Grid>
 
                 </lc:LayoutItem>
+                <items:WarningLayoutItem Visibility="{Binding Path=IsSelectedRoleDeprecated, UpdateSourceTrigger=PropertyChanged,
+                    Converter={StaticResource BooleanToVisibilityConverter }}"
+                                         WarningText="The selected role is deprecated."/>
                 <lc:LayoutItem Label="Default Domain:">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -231,17 +234,10 @@
                         <dxe:PasswordBoxEdit Name="PasswordConfirmation" Text="{Binding Path=PasswordConfirmation, Mode=TwoWay, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}" />
                     </Grid>
                 </lc:LayoutItem>
-                <!-- Label is set to " " for positioning purposes --> 
-                <lc:LayoutItem Label=" " Visibility="{Binding ShoudDisplayPasswordNotSetWarning, Converter={StaticResource BooleanToVisibilityConverter } }">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="20" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Image Source="{dx:DXImage Image=Warning_16x16.png}" Width="16" Height="16"/>
-                        <TextBlock Grid.Column="1">The new user will not be able to log in as long as the password is not set.</TextBlock>
-                    </Grid>
-                </lc:LayoutItem>
+                <!-- Label is set to " " for positioning purposes -->
+                <items:WarningLayoutItem
+                    Visibility="{Binding ShoudDisplayPasswordNotSetWarning, Converter={StaticResource BooleanToVisibilityConverter }}"
+                    WarningText="The new user will not be able to log in as long as the password is not set."/>
             </lc:LayoutGroup>
             <lc:LayoutGroup Header="E-Mails" Orientation="Vertical">
                 <lc:LayoutItem>
