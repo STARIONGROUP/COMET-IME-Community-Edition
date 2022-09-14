@@ -95,8 +95,8 @@ namespace CDP4SiteDirectory.ViewModels
                 _ =>
                 {
                     this.UpdateOkCanExecute();
-                    this.RaisePropertyChanged(nameof(this.IsSelectedRoleDeprecated));
                 });
+
             this.WhenAnyValue(vm => vm.SelectedSelectedDomain).Subscribe(_ => this.UpdateOkCanExecute());
 
             this.WhenAnyValue(vm => vm.Domain).Subscribe(_ =>
@@ -105,15 +105,21 @@ namespace CDP4SiteDirectory.ViewModels
                 this.domainSubScription = this.Domain?.Changed.Subscribe(x => this.SetSelectedDomain());
                 this.SetSelectedDomain();
             });
+
+            this.isSelectedRoleDeprecated =
+                this.WhenAny(x => x.SelectedRole, selectedRole => selectedRole.Value?.IsDeprecated == true)
+                    .ToProperty(this, x => x.IsSelectedRoleDeprecated, out this.isSelectedRoleDeprecated);
         }
-        
+
         /// <summary>
         /// Returns true if <see cref="ParticipantRole"/> is selected and is deprecated
         /// </summary>
         public bool IsSelectedRoleDeprecated
         {
-            get { return this.SelectedRole != null && this.SelectedRole.IsDeprecated; }
+            get { return this.isSelectedRoleDeprecated.Value; }
         }
+
+        private readonly ObservableAsPropertyHelper<bool> isSelectedRoleDeprecated;
 
         /// <summary>
         /// Initializes the lists and subscription

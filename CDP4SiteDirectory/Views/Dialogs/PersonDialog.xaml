@@ -235,7 +235,8 @@
                     </Grid>
                 </lc:LayoutItem>
                 <items:WarningLayoutItem
-                    Visibility="{Binding ShoudDisplayPasswordNotSetWarning, Converter={StaticResource BooleanToVisibilityConverter }}"
+                    Visibility="{Binding ShoudDisplayPasswordNotSetWarning, UpdateSourceTrigger=PropertyChanged,
+                    Converter={StaticResource BooleanToVisibilityConverter }}"
                     WarningText="The new user will not be able to log in as long as the password is not set."/>
             </lc:LayoutGroup>
             <lc:LayoutGroup Header="E-Mails" Orientation="Vertical">
