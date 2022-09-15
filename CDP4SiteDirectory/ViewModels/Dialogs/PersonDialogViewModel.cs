@@ -20,6 +20,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
     using CDP4Dal;
+
     using ReactiveUI;
 
     /// <summary>
@@ -92,8 +93,26 @@ namespace CDP4SiteDirectory.ViewModels
                 this.RaisePropertyChanged("Password");
                 this.RaisePropertyChanged("PasswordConfirmation");
             });
+
+            this.isSelectedRoleDeprecated =
+                this.WhenAny(x => x.SelectedRole, selectedRole => selectedRole.Value?.IsDeprecated == true)
+                    .ToProperty(this, x => x.IsSelectedRoleDeprecated, out this.isSelectedRoleDeprecated);
+
+            this.shoudDisplayPasswordNotSetWarning =
+                this.WhenAny(x => x.PwdEditIsChecked, x => !x.Value && this.dialogKind == ThingDialogKind.Create)
+                    .ToProperty(this, x => x.ShoudDisplayPasswordNotSetWarning, out this.shoudDisplayPasswordNotSetWarning);
         }
 
+        /// <summary>
+        /// Returns true if <see cref="PersonRole"/> is selected and is deprecated
+        /// </summary>
+        public bool IsSelectedRoleDeprecated
+        {
+            get { return this.isSelectedRoleDeprecated.Value; }
+        }
+
+        private readonly ObservableAsPropertyHelper<bool> isSelectedRoleDeprecated;
+        
         /// <summary>
         /// Gets or sets the password confirmation value
         /// </summary>
@@ -109,11 +128,7 @@ namespace CDP4SiteDirectory.ViewModels
         public bool PwdEditIsChecked
         {
             get { return this.pwdEditIsChecked; }
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value);
-                this.RaisePropertyChanged(nameof(this.ShoudDisplayPasswordNotSetWarning));
-            }
+            set { this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value); }
         }
 
         /// <summary>
@@ -141,8 +156,10 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public bool ShoudDisplayPasswordNotSetWarning
         {
-            get { return this.dialogKind == ThingDialogKind.Create && !this.PwdEditIsChecked; }
+            get { return this.shoudDisplayPasswordNotSetWarning.Value; }
         }
+
+        private readonly ObservableAsPropertyHelper<bool> shoudDisplayPasswordNotSetWarning;
 
         /// <summary>
         /// Gets the error message for the property with the given name.
