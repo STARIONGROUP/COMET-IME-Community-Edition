@@ -25,7 +25,7 @@
 
 namespace BasicRdl.Views
 {
-    using System.ComponentModel.Composition;
+    using System.ComponentModel.Composition;using System.Web.UI;
 
     using CDP4Composition;
 
@@ -35,7 +35,7 @@ namespace BasicRdl.Views
     /// Interaction logic for ConstantsBrowser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class ConstantsBrowser : IPanelView
+    public partial class ConstantsBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

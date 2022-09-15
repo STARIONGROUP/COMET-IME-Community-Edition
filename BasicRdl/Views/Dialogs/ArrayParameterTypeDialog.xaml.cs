@@ -30,11 +30,13 @@ namespace BasicRdl.Views
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 
+    using DevExpress.Xpf.Core;
+
     /// <summary>
     /// Interaction logic for <see cref="ArrayParameterTypeDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.ArrayParameterType)]
-    public partial class ArrayParameterTypeDialog : IThingDialogView
+    public partial class ArrayParameterTypeDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ArrayParameterTypeDialog"/> class.
