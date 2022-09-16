@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FiniteStateBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Jaime Bernar
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
@@ -26,6 +26,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -629,15 +630,56 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>True if the Delete Command is allowed, false otherwise</returns>
         protected override bool IsDeleteCommandAllowed()
         {
-            var message = "Deleting a Possible Finite State or State List will delete ALL parameter values that may be dependent on this through Actual Finite State Lists that use it." +
-                 "\r\n\r\nCare should be taken not to delete states and their dependent parameter values in the product tree inadvertently." +
-                 "\r\n\r\nAre you sure you want to delete these?";
+            var iterationElements = this.Thing.Element;
+            var ParametersWithStateDependencies = 0;
+            var FirstPhrase = "";
 
-            if (this.messageBoxService.Show(message, "Deleting Finite State", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            switch (this.SelectedThing.Thing)
             {
-                return true;
+                case ActualFiniteStateList actualFiniteStateList:
+  
+                    ParametersWithStateDependencies = iterationElements.SelectMany(elem => elem.Parameter.Where(param => param.StateDependence == actualFiniteStateList)).Count();
+                    FirstPhrase = $"Deleting an {nameof(ActualFiniteStateList)} will delete ALL parameter values that may be dependent on this.";
+                    break;
+
+                case PossibleFiniteStateList possibleFiniteStateList:
+                    ParametersWithStateDependencies = iterationElements.SelectMany(elem => 
+                                                      elem.Parameter.Where(param => 
+                                                      param.StateDependence != null).SelectMany(param => 
+                                                      param.StateDependence.PossibleFiniteStateList.Where(finiteStateList => 
+                                                      finiteStateList == possibleFiniteStateList))).Count();
+
+                    FirstPhrase = $"Deleting a {nameof(PossibleFiniteStateList)} List will delete ALL parameter values that may be dependent on this through {nameof(ActualFiniteStateList)} that use it.";
+                    break;
+
+                case PossibleFiniteState possibleFiniteState:
+                    ParametersWithStateDependencies = iterationElements.SelectMany(elem =>
+                                  elem.Parameter.Where(param =>
+                                  param.StateDependence != null).SelectMany(param =>
+                                  param.StateDependence.PossibleFiniteStateList.SelectMany(finiteStateList =>
+                                  finiteStateList.PossibleState.Where(finiteState => 
+                                  finiteState == possibleFiniteState)))).Count();
+
+                    FirstPhrase = $"Deleting a {nameof(PossibleFiniteState)} will delete ALL parameter values that may be dependent on this through {nameof(ActualFiniteState)} that use it.";
+                    break;
             }
-            return false;
+
+            
+            if(ParametersWithStateDependencies > 0)
+            {
+                var message = FirstPhrase +
+                "\r\n\r\nCare should be taken not to delete states and their dependent parameter values in the product tree inadvertently." +
+                "\r\n\r\nAre you sure you want to delete these?" +
+                $"\r\n\r\n{ParametersWithStateDependencies} parameter(s) will be affected by this deletion";
+
+                if (this.messageBoxService.Show(message, "Deleting Finite State", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            return true;
         }
     }
 }
