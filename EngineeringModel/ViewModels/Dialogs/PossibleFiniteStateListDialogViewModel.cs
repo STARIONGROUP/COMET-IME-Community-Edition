@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="PossibleFiniteStateDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="PossibleFiniteStateListDialogViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2022 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Jaime Bernar
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
@@ -19,14 +38,16 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Dal;
     using ReactiveUI;
+    using CDP4Composition.Services;
+    using Microsoft.Practices.ServiceLocation;
+    using System.Windows;
 
     /// <summary>
     /// The dialog-view model to create, edit or inspect a <see cref="PossibleFiniteStateList"/>
     /// </summary>
     [ThingDialogViewModelExport(ClassKind.PossibleFiniteStateList)]
     public class PossibleFiniteStateListDialogViewModel : CDP4CommonView.PossibleFiniteStateListDialogViewModel, IThingDialogViewModel
-    {
-        #region Constructors
+    {        
         /// <summary>
         /// Initializes a new instance of the <see cref="PossibleFiniteStateListDialogViewModel"/> class.
         /// </summary>
@@ -67,18 +88,18 @@ namespace CDP4EngineeringModel.ViewModels
             : base(possibleFiniteStateList, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
         }
-        #endregion
 
-        #region properties
+
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> used to show user messages.
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to set the default <see cref="PossibleFiniteState"/>
         /// </summary>
         public ReactiveCommand<object> SetDefaultStateCommand { get; private set; } 
-        #endregion
-
-        #region DialogBase Methods
-
+        
         /// <summary>
         /// Initialize the <see cref="ICommand"/>s and listeners
         /// </summary>
@@ -151,7 +172,43 @@ namespace CDP4EngineeringModel.ViewModels
             base.UpdateOkCanExecute();
             this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null && this.PossibleState.Count > 0;
         }
-        #endregion
+
+        /// <summary>
+        /// Checks if the Delete command is Allowed.
+        /// </summary>
+        /// <returns>If the Delete command is Allowed or not. Default true.</returns>
+        protected override bool IsExecuteDeleteCommandAllowed()
+        {
+            var iteration = this.Container as Iteration;
+            var iterationElements = iteration.Element;
+
+            var possibleFiniteStateToDelete = this.SelectedPossibleState.Thing;
+
+            var ParametersWithStateDependencies = 0;
+            ParametersWithStateDependencies = iterationElements.SelectMany(elem =>
+                          elem.Parameter.Where(param =>
+                          param.StateDependence != null).SelectMany(param =>
+                          param.StateDependence.PossibleFiniteStateList.SelectMany(finiteStateList =>
+                          finiteStateList.PossibleState.Where(finiteState =>
+                          finiteState == possibleFiniteStateToDelete)))).Count();
+
+            if(ParametersWithStateDependencies > 0)
+            {
+                var message = $"Deleting a {nameof(PossibleFiniteState)} will delete ALL parameter values that may be dependent on this through {nameof(ActualFiniteStateList)} that use it." +
+                     "\r\n\r\nCare should be taken not to delete states and their dependent parameter values in the product tree inadvertently." +
+                     "\r\n\r\nAre you sure you want to delete these?"+
+                     $"\r\n\r\n{ParametersWithStateDependencies} parameter(s) will be affected by this deletion";
+
+                if (this.messageBoxService.Show(message, "Deleting Finite State", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            return true;
+        }
+
 
         /// <summary>
         /// Executes the <see cref="SetDefaultStateCommand"/>
