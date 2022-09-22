@@ -62,7 +62,7 @@ namespace CDP4PluginPackager.Models
         /// Gets or set the target framework of the Plugin
         /// </summary>
         public string TargetFramework { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the release note related to the target Plugin version
         /// </summary>
