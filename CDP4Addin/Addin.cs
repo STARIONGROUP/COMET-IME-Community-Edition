@@ -415,20 +415,20 @@ namespace CDP4AddinCE
         /// </summary>
         private void SetupEventListeners()
         {
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
-                .Where(x => x.PanelStatus == PanelStatus.Open)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.HandleOpenPanel);
+            //CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            //    .Where(x => x.PanelStatus == PanelStatus.Open)
+            //    .ObserveOn(RxApp.MainThreadScheduler)
+            //    .Subscribe(this.HandleOpenPanel);
 
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
-                .Where(x => x.PanelStatus == PanelStatus.Closed)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.HandleClosePanel);
+            //CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            //    .Where(x => x.PanelStatus == PanelStatus.Closed)
+            //    .ObserveOn(RxApp.MainThreadScheduler)
+            //    .Subscribe(this.HandleClosePanel);
 
-            CDPMessageBus.Current.Listen<SessionEvent>()
-                .Where(x => x.Status == SessionStatus.Closed)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.HandleCloseSession);
+            //CDPMessageBus.Current.Listen<SessionEvent>()
+            //    .Where(x => x.Status == SessionStatus.Closed)
+            //    .ObserveOn(RxApp.MainThreadScheduler)
+            //    .Subscribe(this.HandleCloseSession);
         }
 
         /// <summary>
