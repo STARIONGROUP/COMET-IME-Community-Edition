@@ -130,30 +130,30 @@ namespace BasicRdl.Tests.ViewModels
         {
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext);
-            
             var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null, null);
-
             Assert.IsEmpty(viewmodel.Component);
+
             viewmodel.CreateComponentCommand.Execute(null);
             Assert.AreEqual(1, viewmodel.Component.Count);
-
             Assert.IsFalse(viewmodel.OkCommand.CanExecute(null));
 
             var componentRow = (ParameterTypeComponentRowViewModel)viewmodel.Component.Single();
             componentRow.ParameterType = componentRow.PossibleParameterType.First();
-
+            var newValue = componentRow["ShortName"]; //Normally gets called from the UI
             Assert.IsFalse(viewmodel.OkCommand.CanExecute(null));
+
             viewmodel.Component.First().ShortName = "FirstComponent";
+            newValue = componentRow["ShortName"]; //Normally gets called from the UI
             Assert.IsTrue(viewmodel.OkCommand.CanExecute(null));
+
             viewmodel.CreateComponentCommand.Execute(null);
             viewmodel.Component.Last().ShortName = "SecondComponent";
+            newValue = componentRow["ShortName"]; //Normally gets called from the UI
             Assert.AreEqual(2, viewmodel.Component.Count);
-
             Assert.IsFalse(viewmodel.OkCommand.CanExecute(null));
+
             var c2Row = (ParameterTypeComponentRowViewModel)viewmodel.Component.Last();
-
             c2Row.ParameterType = c2Row.PossibleParameterType.Single(x => x is SimpleQuantityKind);
-
             Assert.IsNotNull(c2Row.Scale);
             Assert.IsTrue(viewmodel.OkCommand.CanExecute(null));
         }
@@ -174,13 +174,11 @@ namespace BasicRdl.Tests.ViewModels
             var parameterTypeComponent = new ParameterTypeComponent(Guid.NewGuid(), this.cache, null) { ShortName = "Acc", ParameterType = this.bpt, Scale = this.scale };
             var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(parameterTypeComponent, this.session.Object, viewmodel);
             viewmodel.Component.Add(parameterTypeComponentVm);
-            viewmodel.UpdateOkCanExecuteStatus();
 
             Assert.IsTrue(viewmodel.OkCanExecute);
 
             parameterTypeComponentVm.ShortName = "";
             var newValue = parameterTypeComponentVm["ShortName"]; //Normally gets called from the UI
-            viewmodel.UpdateOkCanExecuteStatus();
 
             Assert.IsFalse(viewmodel.OkCanExecute);
         }

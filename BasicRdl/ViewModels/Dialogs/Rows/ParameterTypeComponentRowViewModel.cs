@@ -83,12 +83,6 @@ namespace BasicRdl.ViewModels
             this.WhenAnyValue(x => x.ParameterType).Subscribe(_ => { this.PopulatePossibleScale(); containerViewModel.UpdateOkCanExecuteStatus();});
             this.IsReadOnly = containerViewModel.IsReadOnly;
 
-            this.WhenAnyValue(x => x.ShortName).Subscribe(x =>
-            {
-                this.ErrorMsg = (string.IsNullOrWhiteSpace(this.ShortName)) ? "The short-name may not be null." : string.Empty;
-                containerViewModel.UpdateOkCanExecuteStatus();
-            });
-
             this.SelectedFilter = null;
             this.WhenAnyValue(x => x.SelectedFilter).Subscribe(_ => this.FilterPossibleParameterType());
         }
