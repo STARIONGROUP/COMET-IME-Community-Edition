@@ -2,7 +2,7 @@
 // <copyright file="CompoundParameterTypeDialogViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Jaime Bernar
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -44,11 +44,10 @@ namespace BasicRdl.Tests.ViewModels
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-    
     using Moq;
-    
+
     using NUnit.Framework;
-    
+
     using ReactiveUI;
 
     [TestFixture]
@@ -163,6 +162,27 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyThatParameterlessContructorExists()
         {
             Assert.DoesNotThrow(() => new CompoundParameterTypeDialogViewModel());
+        }
+
+        [Test]
+        public void VerifyThatParameterTypeComponentHasValidShortName()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext);
+            var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
+
+            var parameterTypeComponent = new ParameterTypeComponent(Guid.NewGuid(), this.cache, null) { ShortName = "Acc", ParameterType = this.bpt, Scale = this.scale };
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(parameterTypeComponent, this.session.Object, viewmodel);
+            viewmodel.Component.Add(parameterTypeComponentVm);
+            viewmodel.UpdateOkCanExecuteStatus();
+
+            Assert.IsTrue(viewmodel.OkCanExecute);
+
+            parameterTypeComponentVm.ShortName = "";
+            var newValue = parameterTypeComponentVm["ShortName"]; //Normally gets called from the UI
+            viewmodel.UpdateOkCanExecuteStatus();
+
+            Assert.IsFalse(viewmodel.OkCanExecute);
         }
     }
 }

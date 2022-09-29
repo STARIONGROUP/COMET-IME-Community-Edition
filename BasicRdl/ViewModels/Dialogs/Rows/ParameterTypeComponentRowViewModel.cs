@@ -2,7 +2,7 @@
 // <copyright file="ParameterTypeComponentRowViewModel.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 // 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Jaime Bernar
 // 
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -28,12 +28,11 @@ namespace BasicRdl.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
-    
+    using CDP4Composition.Services;
     using CDP4Dal;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -83,12 +82,6 @@ namespace BasicRdl.ViewModels
 
             this.WhenAnyValue(x => x.ParameterType).Subscribe(_ => { this.PopulatePossibleScale(); containerViewModel.UpdateOkCanExecuteStatus();});
             this.IsReadOnly = containerViewModel.IsReadOnly;
-
-            this.WhenAnyValue(x => x.ShortName).Subscribe(x =>
-            {
-                this.ErrorMsg = (string.IsNullOrWhiteSpace(this.ShortName)) ? "The short-name may not be null." : string.Empty;
-                containerViewModel.UpdateOkCanExecuteStatus();
-            });
 
             this.SelectedFilter = null;
             this.WhenAnyValue(x => x.SelectedFilter).Subscribe(_ => this.FilterPossibleParameterType());
@@ -186,9 +179,10 @@ namespace BasicRdl.ViewModels
             {
                 if (columnName == "ShortName")
                 {
-                    return (string.IsNullOrWhiteSpace(this.ShortName))
-                        ? "The short name of this component cannot be empty."
-                        : string.Empty;
+                    var validationResult = ValidationService.ValidateProperty(columnName, this);
+                    this.ErrorMsg = validationResult;
+                    ((CompoundParameterTypeDialogViewModel)this.ContainerViewModel).UpdateOkCanExecuteStatus();
+                    return validationResult != null ? validationResult : string.Empty;
                 }
 
                 return string.Empty;
