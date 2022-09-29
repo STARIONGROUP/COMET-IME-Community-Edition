@@ -26,6 +26,7 @@
 namespace BasicRdl.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -35,7 +36,7 @@ namespace BasicRdl.Views
     /// Interaction logic for <see cref="MeasurementUnitsBrowser"/>
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class MeasurementUnitsBrowser : IPanelView
+    public partial class MeasurementUnitsBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

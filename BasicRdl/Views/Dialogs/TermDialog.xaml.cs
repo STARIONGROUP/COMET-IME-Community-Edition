@@ -30,11 +30,13 @@ namespace BasicRdl.Views
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 
+    using DevExpress.Xpf.Core;
+
     /// <summary>
     /// Interaction logic for TermDialog
     /// </summary>
     [ThingDialogViewExport(ClassKind.Term)]
-    public partial class TermDialog : IThingDialogView
+    public partial class TermDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TermDialog"/> class.
