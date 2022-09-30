@@ -29,6 +29,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -294,6 +295,8 @@ namespace CDP4EngineeringModel.ViewModels
                 this.Disposables.Add(
                     this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(elementDefinitionObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ElementDefinition, elementDefinitionDiscriminator, elementDefinitionAction)));
             }
+
+            this.WhenAnyValue(x => x.ExcludedOptions).Subscribe(_ => this.UpdateDetails());
         }
 
         /// <summary>
@@ -384,6 +387,58 @@ namespace CDP4EngineeringModel.ViewModels
             var addedParameterOrOverride = definedParameterOrOverrides.Except(currentParameterOrOverride).ToList();
             this.AddParameterBase(addedParameterOrOverride);
         }
+
+        /// <summary>
+        /// Update this <see cref="Tooltip"/> with extra information.
+        /// </summary>
+        protected override void UpdateDetails()
+        {
+            base.UpdateDetails();
+
+            var sb = new StringBuilder(this.Details);
+
+            if(this.ExcludedOptions != null)
+            {
+                sb.AppendLine();
+                if (this.ExcludedOptions.Count == 0)
+                {
+                    sb.AppendLine($"Excluded Options: -");
+                }
+                else
+                {
+                    string excludedOptionsString = $"Excluded Options: ";
+
+                    foreach (Option option in this.ExcludedOptions)
+                    {
+                        excludedOptionsString += option.Name;
+                        excludedOptionsString += "; ";
+                    }
+                    sb.AppendLine(excludedOptionsString);
+                }
+            }
+
+            if(this.AllOptions != null)
+            {
+                if (this.AllOptions.Count == 0)
+                {
+                    sb.AppendLine($"Included Options: -");
+                }
+                else
+                {
+                    string includedOptionsString = $"Included Options: ";
+
+                    foreach (Option option in this.AllOptions.Except(this.ExcludedOptions))
+                    {
+                        includedOptionsString += option.Name;
+                        includedOptionsString += "; ";
+                    }
+                    sb.AppendLine(includedOptionsString);
+                }
+            }
+
+            this.Details = sb.ToString();
+        }
+
 
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
