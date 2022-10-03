@@ -37,7 +37,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
-  <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows'">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net6'))">
 	  <PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
 	  <PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
 	  <PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
@@ -46,7 +46,7 @@
 	  <PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
 	  <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
 	  <PackageReference Include="DevExpress.CodeParser" Version="20.2.11" />
 	  <PackageReference Include="DevExpress.Wpf.Diagram" Version="20.2.11" />
 	  <PackageReference Include="DevExpress.Data" Version="20.2.11" />
