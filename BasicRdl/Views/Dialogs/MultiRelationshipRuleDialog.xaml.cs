@@ -30,11 +30,13 @@ namespace BasicRdl.Views
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 
+    using DevExpress.Xpf.Core;
+
     /// <summary>
     /// Interaction logic for MultiRelationshipRuleDialog.xaml
     /// </summary>
     [ThingDialogViewExport(ClassKind.MultiRelationshipRule)]
-    public partial class MultiRelationshipRuleDialog : IThingDialogView
+    public partial class MultiRelationshipRuleDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiRelationshipRuleDialog"/> class.

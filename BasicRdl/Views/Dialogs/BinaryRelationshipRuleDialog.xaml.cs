@@ -30,11 +30,13 @@ namespace BasicRdl.Views
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 
+    using DevExpress.Xpf.Core;
+
     /// <summary>
     /// Interaction logic for <see cref="BinaryRelationshipRuleDialog"/>
     /// </summary>
     [ThingDialogViewExport(ClassKind.BinaryRelationshipRule)]
-    public partial class BinaryRelationshipRuleDialog : IThingDialogView
+    public partial class BinaryRelationshipRuleDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BinaryRelationshipRuleDialog"/> class.

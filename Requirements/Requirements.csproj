@@ -4,7 +4,7 @@
     <MinIMEVersion>9.2.0</MinIMEVersion>
     <RootNamespace>CDP4Requirements</RootNamespace>
     <AssemblyName>CDP4Requirements</AssemblyName>
-	  <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
+	  <TargetFrameworks>net6.0-windows;net48</TargetFrameworks>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4Requirements</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

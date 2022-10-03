@@ -30,11 +30,13 @@ namespace BasicRdl.Views
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 
+    using DevExpress.Xpf.Core;
+
     /// <summary>
     /// Interaction logic for <see cref="MappingToReferenceScaleDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.MappingToReferenceScale)]
-    public partial class MappingToReferenceScaleDialog : IThingDialogView
+    public partial class MappingToReferenceScaleDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MappingToReferenceScaleDialog"/> class.

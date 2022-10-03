@@ -25,7 +25,8 @@
 
 namespace BasicRdl.Views
 {
-    using System.ComponentModel.Composition;using System.Web.UI;
+    using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
