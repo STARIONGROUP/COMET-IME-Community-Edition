@@ -36,7 +36,7 @@ namespace CDP4ObjectBrowser.Views
     /// Interaction logic for ObjectBrowserRibbon
     /// </summary>
     [Export(typeof(ExtendedRibbonPageGroup))]
-    public partial class ObjectBrowserRibbonPage : IView
+    public partial class ObjectBrowserRibbonPage : ExtendedRibbonPageGroup, IView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectBrowserRibbonPage"/> class.

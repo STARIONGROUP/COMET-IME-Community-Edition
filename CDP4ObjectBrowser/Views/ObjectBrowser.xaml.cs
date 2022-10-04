@@ -7,6 +7,7 @@
 namespace CDP4ObjectBrowser
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
     
@@ -14,7 +15,7 @@ namespace CDP4ObjectBrowser
     /// Interaction logic for ObjectBrowserView
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class ObjectBrowser : IPanelView
+    public partial class ObjectBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectBrowser"/> class.
