@@ -410,8 +410,8 @@ namespace CDP4EngineeringModel.ViewModels
 
                     foreach (Option option in this.ExcludedOptions)
                     {
-                        excludedOptionsString += option.Name;
-                        excludedOptionsString += "; ";
+                        excludedOptionsString = string.Join(string.Empty, excludedOptionsString, option.Name);
+                        excludedOptionsString = string.Join(string.Empty, excludedOptionsString, "; "); 
                     }
                     sb.AppendLine(excludedOptionsString);
                 }
@@ -429,8 +429,8 @@ namespace CDP4EngineeringModel.ViewModels
 
                     foreach (Option option in this.AllOptions.Except(this.ExcludedOptions))
                     {
-                        includedOptionsString += option.Name;
-                        includedOptionsString += "; ";
+                        includedOptionsString = string.Join(string.Empty, includedOptionsString, option.Name);
+                        includedOptionsString = string.Join(string.Empty, includedOptionsString, "; ");
                     }
                     sb.AppendLine(includedOptionsString);
                 }
