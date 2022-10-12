@@ -127,9 +127,6 @@
     <PackageReference Include="NLog" Version="4.7.10">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="ReactiveUI.WPF" Version="6.4.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
     <PackageReference Include="reactiveui-core" Version="6.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -157,6 +154,14 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.Security" Version="4.8.1" />
+    <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />
+    <PackageReference Include="ReactiveUI.WPF" Version="8.7.2" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore">
@@ -168,13 +173,7 @@
     <Reference Include="System.ComponentModel.Composition">
       <Private>false</Private>
     </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
     <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
       <Private>false</Private>
     </Reference>
     <Reference Include="System.Transactions">
