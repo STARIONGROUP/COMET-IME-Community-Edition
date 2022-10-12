@@ -406,14 +406,7 @@ namespace CDP4EngineeringModel.ViewModels
                 }
                 else
                 {
-                    string excludedOptionsString = $"Excluded Options: ";
-
-                    foreach (Option option in this.ExcludedOptions)
-                    {
-                        excludedOptionsString = string.Join(string.Empty, excludedOptionsString, option.Name);
-                        excludedOptionsString = string.Join(string.Empty, excludedOptionsString, "; "); 
-                    }
-                    sb.AppendLine(excludedOptionsString);
+                    sb.AppendLine($"Excluded Options: {string.Join("; ", this.ExcludedOptions.Select(x => x.Name))}");
                 }
             }
 
@@ -425,14 +418,7 @@ namespace CDP4EngineeringModel.ViewModels
                 }
                 else
                 {
-                    string includedOptionsString = $"Included Options: ";
-
-                    foreach (Option option in this.AllOptions.Except(this.ExcludedOptions))
-                    {
-                        includedOptionsString = string.Join(string.Empty, includedOptionsString, option.Name);
-                        includedOptionsString = string.Join(string.Empty, includedOptionsString, "; ");
-                    }
-                    sb.AppendLine(includedOptionsString);
+                    sb.AppendLine($"Excluded Options: {string.Join("; ", this.AllOptions.Except(this.ExcludedOptions).Select(x => x.Name))}");
                 }
             }
 
