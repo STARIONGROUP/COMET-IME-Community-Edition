@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{05B9FB71-DFFD-40BC-BF35-F05A1F3CF217}</ProjectGuid>
     <MinIMEVersion>9.2.0</MinIMEVersion>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ParameterSheetGenerator</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -11,6 +11,10 @@
     <Copyright>Copyright © RHEA System S.A.</Copyright>
     <AssemblyVersion>9.2.0.5</AssemblyVersion>
     <FileVersion>9.2.0.5</FileVersion>
+	<UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableDefaultPageItems>false</EnableDefaultPageItems>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -33,20 +37,17 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
-  <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.2.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="1.3">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.CodeParser" Version="20.2.11">
+    	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows'">
+		<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
+		<PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
+		<PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
+		<PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" />
+		<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
+		<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
+		<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+	    <PackageReference Include="DevExpress.CodeParser" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.Data" Version="20.2.11">
@@ -133,25 +134,24 @@
     <PackageReference Include="DevExpress.Xpo" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
+	</ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CDP4Common-CE" Version="8.2.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CDP4Dal-CE" Version="8.1.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CommonServiceLocator" Version="1.3">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
     <PackageReference Include="NetOfficeFw.Core" Version="1.7.4.8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="NetOfficeFw.Excel" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.MSProject" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.Outlook" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.PowerPoint" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.Visio" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.Word" Version="1.7.4.8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1">

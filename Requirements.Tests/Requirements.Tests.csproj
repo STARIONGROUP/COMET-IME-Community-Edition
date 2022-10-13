@@ -49,11 +49,6 @@
 	<PackageReference Include="NUnit" Version="3.13.2" />
 	<PackageReference Include="NetOfficeFw.Core" Version="1.7.4.8" />
 	<PackageReference Include="NetOfficeFw.Excel" Version="1.7.4.8" />
-	<PackageReference Include="NetOfficeFw.MSProject" Version="1.7.4.8" />
-	<PackageReference Include="NetOfficeFw.Outlook" Version="1.7.4.8" />
-	<PackageReference Include="NetOfficeFw.PowerPoint" Version="1.7.4.8" />
-	<PackageReference Include="NetOfficeFw.Visio" Version="1.7.4.8" />
-	<PackageReference Include="NetOfficeFw.Word" Version="1.7.4.8" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
