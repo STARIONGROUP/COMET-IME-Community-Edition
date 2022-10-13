@@ -2,7 +2,7 @@
 // <copyright file="IHaveContainedRows.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2020 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Jaime Bernar
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
@@ -39,5 +39,11 @@ namespace CDP4Composition.Mvvm
         /// Gets the Contained <see cref="IRowViewModelBase{T}"/> viewmodels
         /// </summary>
         DisposableReactiveList<IRowViewModelBase<Thing>> ContainedRows { get; }
+
+        /// <summary>
+        /// Checks if all the descendant rows are expanded.
+        /// </summary>
+        /// <returns>True if all the descendants are expanded or if the row has no descendants, false otherwise</returns>
+        bool AllChildRowsExpanded();
     }
 }

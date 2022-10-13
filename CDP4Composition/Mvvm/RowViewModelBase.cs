@@ -2,7 +2,7 @@
 // <copyright file="RowViewModelBase.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Jaime Bernar
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -669,6 +669,20 @@ namespace CDP4Composition.Mvvm
         protected void ShowConfirmation(string title, string message, NotificationKind notificationKind)
         {
             CDPMessageBus.Current.SendMessage(new TaskbarNotificationEvent(title, message, notificationKind));
+        }
+
+        /// <summary>
+        /// Checks if all the descendant rows are expanded.
+        /// </summary>
+        /// <returns>True if all the descendants are expanded or if the row has no descendants, false otherwise</returns>
+        public bool AllChildRowsExpanded()
+        {
+            if (!this.IsExpanded)
+            {
+                return false;
+            }
+
+            return !this.ContainedRows.Where(x => { return x.ContainedRows != null && x.ContainedRows.Count > 0; }).Any(x => !x.AllChildRowsExpanded());
         }
     }
 }
