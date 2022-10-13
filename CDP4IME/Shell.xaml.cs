@@ -33,9 +33,9 @@ namespace CDP4IME
     using CDP4Composition.Events;
     using CDP4Composition.Ribbon;
     using CDP4Dal;
-
+    using CDP4IME.Views;
     using DevExpress.Xpf.Ribbon;
-
+    using DevExpress.XtraEditors;
     using Hardcodet.Wpf.TaskbarNotification;
 
     using ReactiveUI;
@@ -68,6 +68,14 @@ namespace CDP4IME
             this.subscription = CDPMessageBus.Current.Listen<TaskbarNotificationEvent>()
                                 .ObserveOn(RxApp.MainThreadScheduler)
                                 .Subscribe(this.ShowTaskBarNotification);
+
+            this.Ribbon.MouseUp += (sender, e) => 
+            {
+                if (e.OriginalSource is RibbonApplicationButtonControl)
+                {
+                    viewModel.OpenAboutCommand.Execute(true);
+                }
+            };
         }
 
         /// <summary>
