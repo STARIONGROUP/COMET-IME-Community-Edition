@@ -682,19 +682,7 @@ namespace CDP4Composition.Mvvm
                 return false;
             }
 
-            foreach (var row in this.ContainedRows)
-            {
-                if (row.ContainedRows == null || row.ContainedRows.Count == 0)
-                {
-                    continue;
-                }
-                    
-                if (!row.AllChildRowsExpanded())
-                {
-                    return false;
-                }                    
-            }
-            return true;
+            return !this.ContainedRows.Where(x => { return x.ContainedRows != null && x.ContainedRows.Count > 0; }).Any(x => !x.AllChildRowsExpanded());
         }
     }
 }
