@@ -226,7 +226,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateFileRevisionProperties()
         {
             this.Name = this.fileRevision.Name;
-            this.CreatedOn = this.fileRevision.CreatedOn.ToString(CultureInfo.InvariantCulture);
+            this.CreatedOn = this.fileRevision.CreatedOn.ToString();
             this.CreatorValue = this.fileRevision.Creator.Person.Name;
         }
     }
