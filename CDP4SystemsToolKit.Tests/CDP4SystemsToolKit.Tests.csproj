@@ -23,15 +23,8 @@
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
-    <PackageReference Include="ReactiveUI.WPF" Version="18.1.8" />
-    <PackageReference Include="reactiveui-core" Version="6.4.0" />
-    <PackageReference Include="Rx-Core" Version="2.2.5" />
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
-    <PackageReference Include="Rx-Linq" Version="2.2.5" />
-    <PackageReference Include="Rx-Main" Version="2.2.5" />
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
-    <PackageReference Include="Rx-XAML" Version="2.2.5" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
+    <PackageReference Include="ReactiveUI.WPF" Version="18.3.8" />
     <PackageReference Include="Splat" Version="14.2.8" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />

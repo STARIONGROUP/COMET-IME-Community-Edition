@@ -351,12 +351,12 @@ namespace CDP4Reporting.ViewModels
             this.openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 
             this.ExportScriptCommand = ReactiveCommand.Create();
-            this.ExportScriptCommand.Subscribe(_ => this.ExportScript());
+            this.ExportScriptCommand .Subscribe(_ => this.ExportScript());
 
             this.ImportScriptCommand = ReactiveCommand.Create();
             this.ImportScriptCommand.Subscribe(_ => this.ImportScript());
 
-            this.CompileScriptCommand = ReactiveCommand.CreateAsyncTask(async _ =>
+            this.CompileScriptCommand = ReactiveCommand.CreateFromTask(async _ =>
             {
                 var source = this.Document.Text;
                 await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
@@ -377,10 +377,10 @@ namespace CDP4Reporting.ViewModels
             this.DataSourceTextChangedCommand = ReactiveCommand.Create();
             this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoCompileScript());
 
-            this.RebuildDatasourceCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteRebuildDatasourceCommand());
-            this.RebuildDatasourceAndRefreshPreviewCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteRebuildDatasourceAndRefreshPreviewCommand());
+            this.RebuildDatasourceCommand = ReactiveCommand.CreateFromTask(async _ => await this.ExecuteRebuildDatasourceCommand());
+            this.RebuildDatasourceAndRefreshPreviewCommand = ReactiveCommand.CreateFromTask(async _ => await this.ExecuteRebuildDatasourceAndRefreshPreviewCommand());
 
-            this.SubmitParameterValuesCommand = ReactiveCommand.CreateAsyncTask(
+            this.SubmitParameterValuesCommand = ReactiveCommand.CreateFromTask(
                 this.WhenAnyValue(x => x.CanSubmitParameterValues),
                 x => this.SubmitParameterValues(),
                 RxApp.MainThreadScheduler);
@@ -388,7 +388,7 @@ namespace CDP4Reporting.ViewModels
             this.ClearOutputCommand = ReactiveCommand.Create();
             this.ClearOutputCommand.Subscribe(_ => { this.Output = string.Empty; });
 
-            this.ActiveDocumentChangedCommand = ReactiveCommand.CreateAsyncTask(x =>
+            this.ActiveDocumentChangedCommand = ReactiveCommand.CreateFromTask(x =>
                 this.SetReportDesigner(((DependencyPropertyChangedEventArgs) x).NewValue), RxApp.MainThreadScheduler);
 
             this.WhenAnyValue(x => x.CurrentReport).Subscribe(x =>

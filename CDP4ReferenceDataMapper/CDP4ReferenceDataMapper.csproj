@@ -177,27 +177,6 @@
     <PackageReference Include="NLog" Version="4.7.10">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="reactiveui-core" Version="6.4.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Core" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Linq" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Main" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-XAML" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
     <PackageReference Include="Splat" Version="14.2.8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>

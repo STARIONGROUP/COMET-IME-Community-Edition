@@ -308,7 +308,7 @@ namespace CDP4DiagramEditor.ViewModels
             base.InitializeCommands();
 
             var canExecute = this.WhenAnyValue(x => x.CanCreateDiagram, x => x.IsDirty, (x, y) => x && y);
-            this.SaveDiagramCommand = ReactiveCommand.CreateAsyncTask(canExecute, x => this.ExecuteSaveDiagramCommand(), RxApp.MainThreadScheduler);
+            this.SaveDiagramCommand = ReactiveCommand.CreateFromTask(canExecute, x => this.ExecuteSaveDiagramCommand(), RxApp.MainThreadScheduler);
             this.SaveDiagramCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
 
             this.GenerateDiagramCommandShallow = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));

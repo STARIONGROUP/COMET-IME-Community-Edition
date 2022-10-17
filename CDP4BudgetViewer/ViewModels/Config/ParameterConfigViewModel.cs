@@ -10,6 +10,9 @@ namespace CDP4Budget.ViewModels
     using System;
     using System.Collections.Generic;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm;
+
     using ReactiveUI;
 
     /// <summary>

@@ -8,6 +8,9 @@ namespace CDP4Budget.ViewModels
 {
     using System;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using Config;
     using Exceptions;

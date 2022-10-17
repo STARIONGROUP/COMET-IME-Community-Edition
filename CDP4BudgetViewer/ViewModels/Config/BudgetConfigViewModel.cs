@@ -12,6 +12,8 @@ namespace CDP4Budget.ViewModels
     using System.Reactive.Linq;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using Config;
     using ConfigFile;

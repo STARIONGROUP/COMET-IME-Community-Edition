@@ -10,6 +10,9 @@ namespace CDP4Budget.ViewModels
     using System.Dynamic;
     using System.Linq;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.Mvvm;
+
     using ReactiveUI;
     using Services;
 

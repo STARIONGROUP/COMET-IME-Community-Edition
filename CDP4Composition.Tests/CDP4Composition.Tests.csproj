@@ -42,17 +42,17 @@
 	<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
 	<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
 	<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
-	<PackageReference Include="ReactiveUI" Version="18.1.8" />
+	<PackageReference Include="ReactiveUI" Version="18.3.8" />
 	<PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
 	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	<PackageReference Include="NLog" Version="4.7.10" />
-	<PackageReference Include="ReactiveUI.WPF" Version="18.1.8" />
+	<PackageReference Include="ReactiveUI.WPF" Version="18.3.8" />
 	<PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
 	<PackageReference Include="Castle.Core" Version="4.4.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
+    <PackageReference Include="NUnit" Version="3.13.3" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Modularity\AppSettingsTest.json">

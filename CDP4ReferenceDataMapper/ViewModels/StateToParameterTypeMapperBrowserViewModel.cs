@@ -353,7 +353,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
             this.SelectedMappingParameterChangedCommand = ReactiveCommand.Create();
             this.SelectedMappingParameterChangedCommand.Subscribe(this.ExecuteSelectedMappingParameterChangedCommand);
 
-            this.SaveValuesCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteSaveValuesCommand(), RxApp.MainThreadScheduler);
+            this.SaveValuesCommand = ReactiveCommand.CreateFromTask(_ => this.ExecuteSaveValuesCommand(), RxApp.MainThreadScheduler);
         }
 
         /// <summary>

@@ -72,14 +72,7 @@
     <PackageReference Include="NetOfficeFw.Excel" Version="1.7.4.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="ReactiveUI.WPF" Version="18.1.8" />
-    <!--<PackageReference Include="Rx-Core" Version="2.2.5" />-->
-    <!--<PackageReference Include="Rx-Interfaces" Version="2.2.5" />-->
-    <!--<PackageReference Include="Rx-Linq" Version="2.2.5" />-->
-    <!--<PackageReference Include="Rx-Main" Version="2.2.5" />-->
-    <!--<PackageReference Include="Rx-PlatformServices" Version="2.2.5" />-->
-    <!--<PackageReference Include="Rx-XAML" Version="2.2.5" />-->
-    <!--<PackageReference Include="Splat" Version="14.2.8" />-->
+    <PackageReference Include="ReactiveUI.WPF" Version="18.3.8" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>

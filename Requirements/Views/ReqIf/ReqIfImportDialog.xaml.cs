@@ -14,7 +14,7 @@ namespace CDP4Requirements.Views
     /// <summary>
     /// Interaction logic for ReqIfImportDialog.xaml
     /// </summary>
-    [DialogViewExport("ReqIfImportDialog", "The ReqIF import dialog")]
+    [CDP4Composition.Attributes.DialogViewExport("ReqIfImportDialog", "The ReqIF import dialog")]
     public partial class ReqIfImportDialog : DXWindow, IDialogView
     {
         [ImportingConstructor]

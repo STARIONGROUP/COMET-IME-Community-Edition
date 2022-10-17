@@ -19,7 +19,6 @@ namespace CDP4ObjectBrowser.Tests
     using ReactiveUI;
     using System;
     using System.Reactive.Concurrency;
-
     /// <summary>
     /// TestFixture for the <see cref="ObjectBrowserViewModel"/>
     /// </summary>

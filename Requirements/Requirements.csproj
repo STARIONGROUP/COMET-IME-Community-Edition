@@ -164,6 +164,7 @@
 	  <Reference Include="System.Net.Http" />
 	  <Reference Include="System.Security" />
 	  <Reference Include="System.Web" />
+	  
 	</ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows'">
 	  <PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11">
@@ -189,7 +190,8 @@
 	  </PackageReference>
   </ItemGroup>
   <ItemGroup>
-	<PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
+	  <Reference Include="System.ComponentModel.Composition" />
+	  <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
 		<ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236">
@@ -217,10 +219,10 @@
     <PackageReference Include="NLog" Version="4.7.10">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="ReactiveUI.WPF" Version="18.1.8">
+    <PackageReference Include="ReactiveUI.WPF" Version="18.3.8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="reactiveui" Version="18.1.8">
+    <PackageReference Include="ReactiveUI" Version="18.3.8">
 	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="System.ComponentModel.Composition" Version="6.0.0">

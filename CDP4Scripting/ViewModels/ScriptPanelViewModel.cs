@@ -40,6 +40,7 @@ namespace CDP4Scripting.ViewModels
     using System.Xml;
 
     using CDP4Composition;
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
 
@@ -210,7 +211,7 @@ namespace CDP4Scripting.ViewModels
             this.SaveScriptCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsDirty));
             this.SaveScriptCommand.Subscribe(_ => this.SaveScript());
 
-            this.ExecuteScriptCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.CanExecuteScript), _ => this.ExecuteScript(), RxApp.MainThreadScheduler);
+            this.ExecuteScriptCommand = ReactiveCommand.CreateFromTask(this.WhenAnyValue(x => x.CanExecuteScript), _ => this.ExecuteScript(), RxApp.MainThreadScheduler);
 
             this.StopScriptCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsScriptExecuted));
             this.StopScriptCommand.Subscribe(_ => this.StopScript());

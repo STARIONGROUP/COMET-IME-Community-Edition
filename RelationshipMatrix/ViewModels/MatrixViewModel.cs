@@ -54,6 +54,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using NLog;
 
     using ReactiveUI;
+    using CDP4Composition.Mvvm;
 
     /// <summary>
     /// The view-model associated to the actual relationship matrix that makes up rows and columns
@@ -180,44 +181,44 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.session = session;
             this.iteration = iteration;
 
-            this.CreateSourceYToSourceXLink = ReactiveCommand.CreateAsyncTask(
+            this.CreateSourceYToSourceXLink = ReactiveCommand.CreateFromTask(
                 this.WhenAnyValue(x => x.CanCreateSourceYToSourceX),
                 x => this.CreateRelationship(RelationshipDirectionKind.RowThingToColumnThing),
                 RxApp.MainThreadScheduler);
 
-            this.CreateSourceXToSourceYLink = ReactiveCommand.CreateAsyncTask(
+            this.CreateSourceXToSourceYLink = ReactiveCommand.CreateFromTask(
                 this.WhenAnyValue(x => x.CanCreateSourceXToSourceY),
                 x => this.CreateRelationship(RelationshipDirectionKind.ColumnThingToRowThing),
                 RxApp.MainThreadScheduler);
 
-            this.DeleteSourceYToSourceXLink = ReactiveCommand.CreateAsyncTask(
+            this.DeleteSourceYToSourceXLink = ReactiveCommand.CreateFromTask(
                 this.WhenAnyValue(x => x.CanDelete),
                 x => this.DeleteRelationship(RelationshipDirectionKind.RowThingToColumnThing),
                 RxApp.MainThreadScheduler);
 
-            this.DeleteSourceXToSourceYLink = ReactiveCommand.CreateAsyncTask(
+            this.DeleteSourceXToSourceYLink = ReactiveCommand.CreateFromTask(
                 this.WhenAnyValue(x => x.CanDelete),
                 x => this.DeleteRelationship(RelationshipDirectionKind.ColumnThingToRowThing),
                 RxApp.MainThreadScheduler);
 
-            this.DeleteAllRelationships = ReactiveCommand.CreateAsyncTask(
+            this.DeleteAllRelationships = ReactiveCommand.CreateFromTask(
                 this.WhenAnyValue(x => x.CanDelete),
                 x => this.DeleteRelationship(RelationshipDirectionKind.BiDirectional),
                 RxApp.MainThreadScheduler);
 
             this.ProcessCellCommand =
-                ReactiveCommand.CreateAsyncTask(x => this.ProcessCellCommandExecute((List<object>)x),
-                    RxApp.MainThreadScheduler);
+                ReactiveCommand.CreateFromTask<List<object>>(this.ProcessCellCommandExecute,null
+                    ,RxApp.MainThreadScheduler);
 
             this.ProcessAltCellCommand =
-                ReactiveCommand.CreateAsyncTask(x => this.ProcessAltCellCommandExecute((List<object>)x),
+                ReactiveCommand.CreateFromTask<List<object>>(this.ProcessAltCellCommandExecute,null,
                     RxApp.MainThreadScheduler);
 
-            this.ProcessAltControlCellCommand = ReactiveCommand.CreateAsyncTask(
-                x => this.ProcessAltControlCellCommandExecute((List<object>)x), RxApp.MainThreadScheduler);
+            this.ProcessAltControlCellCommand = ReactiveCommand.CreateFromTask<List<object>>(
+                this.ProcessAltControlCellCommandExecute,null, RxApp.MainThreadScheduler);
 
-            this.ToggleColumnHighlightCommand = ReactiveCommand.CreateAsyncTask(
-                x => this.ToggleColumnHighlightCommandExecute(x as GridColumn), RxApp.MainThreadScheduler);
+            this.ToggleColumnHighlightCommand = ReactiveCommand.CreateFromTask<GridColumn>(
+                this.ToggleColumnHighlightCommandExecute,null, RxApp.MainThreadScheduler);
 
             this.MouseDownCommand = ReactiveCommand.Create();
             this.MouseDownCommand.Subscribe(x => this.MouseDownCommandExecute((MatrixAddress)x));

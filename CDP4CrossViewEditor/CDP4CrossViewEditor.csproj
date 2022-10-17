@@ -14,7 +14,6 @@
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
 	<EnableDefaultPageItems>false</EnableDefaultPageItems>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -149,182 +148,7 @@
 		  <ExcludeAssets>runtime</ExcludeAssets>
 		</PackageReference>
 	</ItemGroup>
-	<ItemGroup>
-	  <Compile Include="ActionItemRowViewModel.cs" />
-	  <Compile Include="ActualFiniteStateListRowViewModel.cs" />
-	  <Compile Include="ActualFiniteStateRowViewModel.cs" />
-	  <Compile Include="AliasRowViewModel.cs" />
-	  <Compile Include="AndExpressionRowViewModel.cs" />
-	  <Compile Include="ApprovalRowViewModel.cs" />
-	  <Compile Include="ArrayParameterTypeRowViewModel.cs" />
-	  <Compile Include="BinaryNoteRowViewModel.cs" />
-	  <Compile Include="BinaryRelationshipRowViewModel.cs" />
-	  <Compile Include="BinaryRelationshipRuleRowViewModel.cs" />
-	  <Compile Include="BookRowViewModel.cs" />
-	  <Compile Include="BooleanExpressionRowViewModel.cs" />
-	  <Compile Include="BooleanParameterTypeRowViewModel.cs" />
-	  <Compile Include="BoundsRowViewModel.cs" />
-	  <Compile Include="BuiltInRuleVerificationRowViewModel.cs" />
-	  <Compile Include="CategoryRowViewModel.cs" />
-	  <Compile Include="ChangeProposalRowViewModel.cs" />
-	  <Compile Include="ChangeRequestRowViewModel.cs" />
-	  <Compile Include="CitationRowViewModel.cs" />
-	  <Compile Include="ColorRowViewModel.cs" />
-	  <Compile Include="CommonFileStoreRowViewModel.cs" />
-	  <Compile Include="CompoundParameterTypeRowViewModel.cs" />
-	  <Compile Include="ConstantRowViewModel.cs" />
-	  <Compile Include="ContractChangeNoticeRowViewModel.cs" />
-	  <Compile Include="ContractDeviationRowViewModel.cs" />
-	  <Compile Include="ConversionBasedUnitRowViewModel.cs" />
-	  <Compile Include="CyclicRatioScaleRowViewModel.cs" />
-	  <Compile Include="DateParameterTypeRowViewModel.cs" />
-	  <Compile Include="DateTimeParameterTypeRowViewModel.cs" />
-	  <Compile Include="DecompositionRuleRowViewModel.cs" />
-	  <Compile Include="DefinedThingRowViewModel.cs" />
-	  <Compile Include="DefinitionRowViewModel.cs" />
-	  <Compile Include="DerivedQuantityKindRowViewModel.cs" />
-	  <Compile Include="DerivedUnitRowViewModel.cs" />
-	  <Compile Include="DiagramCanvasRowViewModel.cs" />
-	  <Compile Include="DiagramEdgeRowViewModel.cs" />
-	  <Compile Include="DiagramElementContainerRowViewModel.cs" />
-	  <Compile Include="DiagramElementThingRowViewModel.cs" />
-	  <Compile Include="DiagrammingStyleRowViewModel.cs" />
-	  <Compile Include="DiagramObjectRowViewModel.cs" />
-	  <Compile Include="DiagramShapeRowViewModel.cs" />
-	  <Compile Include="DiagramThingBaseRowViewModel.cs" />
-	  <Compile Include="DiscussionItemRowViewModel.cs" />
-	  <Compile Include="DomainFileStoreRowViewModel.cs" />
-	  <Compile Include="DomainOfExpertiseGroupRowViewModel.cs" />
-	  <Compile Include="DomainOfExpertiseRowViewModel.cs" />
-	  <Compile Include="ElementBaseRowViewModel.cs" />
-	  <Compile Include="ElementDefinitionRowViewModel.cs" />
-	  <Compile Include="ElementUsageRowViewModel.cs" />
-	  <Compile Include="EmailAddressRowViewModel.cs" />
-	  <Compile Include="EngineeringModelDataAnnotationRowViewModel.cs" />
-	  <Compile Include="EngineeringModelDataDiscussionItemRowViewModel.cs" />
-	  <Compile Include="EngineeringModelDataNoteRowViewModel.cs" />
-	  <Compile Include="EngineeringModelRowViewModel.cs" />
-	  <Compile Include="EngineeringModelSetupRowViewModel.cs" />
-	  <Compile Include="EnumerationParameterTypeRowViewModel.cs" />
-	  <Compile Include="EnumerationValueDefinitionRowViewModel.cs" />
-	  <Compile Include="ExclusiveOrExpressionRowViewModel.cs" />
-	  <Compile Include="ExternalIdentifierMapRowViewModel.cs" />
-	  <Compile Include="FileRevisionRowViewModel.cs" />
-	  <Compile Include="FileRowViewModel.cs" />
-	  <Compile Include="FileStoreRowViewModel.cs" />
-	  <Compile Include="FileTypeRowViewModel.cs" />
-	  <Compile Include="FolderRowViewModel.cs" />
-	  <Compile Include="GenericAnnotationRowViewModel.cs" />
-	  <Compile Include="GlossaryRowViewModel.cs" />
-	  <Compile Include="GoalRowViewModel.cs" />
-	  <Compile Include="HyperLinkRowViewModel.cs" />
-	  <Compile Include="IdCorrespondenceRowViewModel.cs" />
-	  <Compile Include="IntervalScaleRowViewModel.cs" />
-	  <Compile Include="IterationRowViewModel.cs" />
-	  <Compile Include="IterationSetupRowViewModel.cs" />
-	  <Compile Include="LinearConversionUnitRowViewModel.cs" />
-	  <Compile Include="LogarithmicScaleRowViewModel.cs" />
-	  <Compile Include="MappingToReferenceScaleRowViewModel.cs" />
-	  <Compile Include="MeasurementScaleRowViewModel.cs" />
-	  <Compile Include="MeasurementUnitRowViewModel.cs" />
-	  <Compile Include="ModellingAnnotationItemRowViewModel.cs" />
-	  <Compile Include="ModellingThingReferenceRowViewModel.cs" />
-	  <Compile Include="ModelLogEntryRowViewModel.cs" />
-	  <Compile Include="ModelReferenceDataLibraryRowViewModel.cs" />
-	  <Compile Include="MultiRelationshipRowViewModel.cs" />
-	  <Compile Include="MultiRelationshipRuleRowViewModel.cs" />
-	  <Compile Include="NaturalLanguageRowViewModel.cs" />
-	  <Compile Include="NestedElementRowViewModel.cs" />
-	  <Compile Include="NestedParameterRowViewModel.cs" />
-	  <Compile Include="NoteRowViewModel.cs" />
-	  <Compile Include="NotExpressionRowViewModel.cs" />
-	  <Compile Include="OptionRowViewModel.cs" />
-	  <Compile Include="OrdinalScaleRowViewModel.cs" />
-	  <Compile Include="OrExpressionRowViewModel.cs" />
-	  <Compile Include="OrganizationRowViewModel.cs" />
-	  <Compile Include="OwnedStyleRowViewModel.cs" />
-	  <Compile Include="PageRowViewModel.cs" />
-	  <Compile Include="ParameterBaseRowViewModel.cs" />
-	  <Compile Include="ParameterGroupRowViewModel.cs" />
-	  <Compile Include="ParameterizedCategoryRuleRowViewModel.cs" />
-	  <Compile Include="ParameterOrOverrideBaseRowViewModel.cs" />
-	  <Compile Include="ParameterOverrideRowViewModel.cs" />
-	  <Compile Include="ParameterOverrideValueSetRowViewModel.cs" />
-	  <Compile Include="ParameterRowViewModel.cs" />
-	  <Compile Include="ParameterSubscriptionRowViewModel.cs" />
-	  <Compile Include="ParameterSubscriptionValueSetRowViewModel.cs" />
-	  <Compile Include="ParameterTypeComponentRowViewModel.cs" />
-	  <Compile Include="ParameterTypeRowViewModel.cs" />
-	  <Compile Include="ParameterValueRowViewModel.cs" />
-	  <Compile Include="ParameterValueSetBaseRowViewModel.cs" />
-	  <Compile Include="ParameterValueSetRowViewModel.cs" />
-	  <Compile Include="ParametricConstraintRowViewModel.cs" />
-	  <Compile Include="ParticipantPermissionRowViewModel.cs" />
-	  <Compile Include="ParticipantRoleRowViewModel.cs" />
-	  <Compile Include="ParticipantRowViewModel.cs" />
-	  <Compile Include="PersonPermissionRowViewModel.cs" />
-	  <Compile Include="PersonRoleRowViewModel.cs" />
-	  <Compile Include="PersonRowViewModel.cs" />
-	  <Compile Include="PointRowViewModel.cs" />
-	  <Compile Include="PossibleFiniteStateListRowViewModel.cs" />
-	  <Compile Include="PossibleFiniteStateRowViewModel.cs" />
-	  <Compile Include="PrefixedUnitRowViewModel.cs" />
-	  <Compile Include="PublicationRowViewModel.cs" />
-	  <Compile Include="QuantityKindFactorRowViewModel.cs" />
-	  <Compile Include="QuantityKindRowViewModel.cs" />
-	  <Compile Include="RatioScaleRowViewModel.cs" />
-	  <Compile Include="ReferenceDataLibraryRowViewModel.cs" />
-	  <Compile Include="ReferencerRuleRowViewModel.cs" />
-	  <Compile Include="ReferenceSourceRowViewModel.cs" />
-	  <Compile Include="RelationalExpressionRowViewModel.cs" />
-	  <Compile Include="RelationshipParameterValueRowViewModel.cs" />
-	  <Compile Include="RelationshipRowViewModel.cs" />
-	  <Compile Include="RequestForDeviationRowViewModel.cs" />
-	  <Compile Include="RequestForWaiverRowViewModel.cs" />
-	  <Compile Include="RequirementRowViewModel.cs" />
-	  <Compile Include="RequirementsContainerParameterValueRowViewModel.cs" />
-	  <Compile Include="RequirementsContainerRowViewModel.cs" />
-	  <Compile Include="RequirementsGroupRowViewModel.cs" />
-	  <Compile Include="RequirementsSpecificationRowViewModel.cs" />
-	  <Compile Include="ReviewItemDiscrepancyRowViewModel.cs" />
-	  <Compile Include="RuleRowViewModel.cs" />
-	  <Compile Include="RuleVerificationListRowViewModel.cs" />
-	  <Compile Include="RuleVerificationRowViewModel.cs" />
-	  <Compile Include="RuleViolationRowViewModel.cs" />
-	  <Compile Include="ScalarParameterTypeRowViewModel.cs" />
-	  <Compile Include="ScaleReferenceQuantityValueRowViewModel.cs" />
-	  <Compile Include="ScaleValueDefinitionRowViewModel.cs" />
-	  <Compile Include="SectionRowViewModel.cs" />
-	  <Compile Include="SharedStyleRowViewModel.cs" />
-	  <Compile Include="SimpleParameterizableThingRowViewModel.cs" />
-	  <Compile Include="SimpleParameterValueRowViewModel.cs" />
-	  <Compile Include="SimpleQuantityKindRowViewModel.cs" />
-	  <Compile Include="SimpleUnitRowViewModel.cs" />
-	  <Compile Include="SiteDirectoryDataAnnotationRowViewModel.cs" />
-	  <Compile Include="SiteDirectoryDataDiscussionItemRowViewModel.cs" />
-	  <Compile Include="SiteDirectoryRowViewModel.cs" />
-	  <Compile Include="SiteDirectoryThingReferenceRowViewModel.cs" />
-	  <Compile Include="SiteLogEntryRowViewModel.cs" />
-	  <Compile Include="SiteReferenceDataLibraryRowViewModel.cs" />
-	  <Compile Include="SolutionRowViewModel.cs" />
-	  <Compile Include="SpecializedQuantityKindRowViewModel.cs" />
-	  <Compile Include="StakeholderRowViewModel.cs" />
-	  <Compile Include="StakeHolderValueMapRowViewModel.cs" />
-	  <Compile Include="StakeHolderValueMapSettingsRowViewModel.cs" />
-	  <Compile Include="StakeholderValueRowViewModel.cs" />
-	  <Compile Include="TelephoneNumberRowViewModel.cs" />
-	  <Compile Include="TermRowViewModel.cs" />
-	  <Compile Include="TextParameterTypeRowViewModel.cs" />
-	  <Compile Include="TextualNoteRowViewModel.cs" />
-	  <Compile Include="ThingReferenceRowViewModel.cs" />
-	  <Compile Include="TimeOfDayParameterTypeRowViewModel.cs" />
-	  <Compile Include="TopContainerRowViewModel.cs" />
-	  <Compile Include="UnitFactorRowViewModel.cs" />
-	  <Compile Include="UnitPrefixRowViewModel.cs" />
-	  <Compile Include="UserPreferenceRowViewModel.cs" />
-	  <Compile Include="UserRuleVerificationRowViewModel.cs" />
-	  <Compile Include="ValueGroupRowViewModel.cs" />
-	</ItemGroup>
+	
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
       <ExcludeAssets>runtime</ExcludeAssets>
@@ -350,28 +174,7 @@
     <PackageReference Include="NLog" Version="4.7.10">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="ReactiveUI.WPF" Version="18.1.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="reactiveui-core" Version="6.4.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Core" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Linq" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Main" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-XAML" Version="2.2.5">
+    <PackageReference Include="ReactiveUI.WPF" Version="18.3.8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Splat" Version="14.2.8">
