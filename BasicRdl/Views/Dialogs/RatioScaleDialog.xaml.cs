@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="RatioScaleDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.RatioScale)]
-    public partial class RatioScaleDialog : IThingDialogView
+    public partial class RatioScaleDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RatioScaleDialog"/> class.

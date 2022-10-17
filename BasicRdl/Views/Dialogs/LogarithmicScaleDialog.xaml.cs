@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="LogarithmicScaleDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.LogarithmicScale)]
-    public partial class LogarithmicScaleDialog : IThingDialogView
+    public partial class LogarithmicScaleDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LogarithmicScaleDialog"/> class.

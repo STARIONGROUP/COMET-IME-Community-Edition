@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for UnitPrefixDialog
     /// </summary>
     [ThingDialogViewExport(ClassKind.UnitPrefix)]
-    public partial class UnitPrefixDialog : IThingDialogView
+    public partial class UnitPrefixDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="UnitPrefixDialog"/> class.

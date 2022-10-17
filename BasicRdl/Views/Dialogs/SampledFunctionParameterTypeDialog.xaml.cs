@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="SampledFunctionParameterTypeDialog" /> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.SampledFunctionParameterType)]
-    public partial class SampledFunctionParameterTypeDialog : IThingDialogView
+    public partial class SampledFunctionParameterTypeDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SampledFunctionParameterTypeDialog" /> class.

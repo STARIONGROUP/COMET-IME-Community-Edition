@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="TimeOfDayParameterTypeDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.TimeOfDayParameterType)]
-    public partial class TimeOfDayParameterTypeDialog : IThingDialogView
+    public partial class TimeOfDayParameterTypeDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TimeOfDayParameterTypeDialog"/> class.

@@ -30,11 +30,13 @@ namespace BasicRdl.Views
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 
+    using DevExpress.Xpf.Core;
+
     /// <summary>
     /// Interaction logic for <see cref="DerivedUnitDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.DerivedUnit)]
-    public partial class DerivedUnitDialog : IThingDialogView
+    public partial class DerivedUnitDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DerivedUnitDialog"/> class.

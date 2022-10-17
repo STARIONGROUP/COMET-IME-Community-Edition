@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="EnumerationParameterTypeDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.EnumerationParameterType)]
-    public partial class EnumerationParameterTypeDialog : IThingDialogView
+    public partial class EnumerationParameterTypeDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="EnumerationParameterTypeDialog"/> class.

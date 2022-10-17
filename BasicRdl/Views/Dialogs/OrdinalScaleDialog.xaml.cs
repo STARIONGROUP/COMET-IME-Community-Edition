@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="OrdinalScaleDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.OrdinalScale)]
-    public partial class OrdinalScaleDialog : IThingDialogView
+    public partial class OrdinalScaleDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="OrdinalScaleDialog"/> class.

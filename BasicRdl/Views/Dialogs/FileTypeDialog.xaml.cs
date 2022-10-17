@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for FileTypeDialog
     /// </summary>
     [ThingDialogViewExport(ClassKind.FileType)]
-    public partial class FileTypeDialog : IThingDialogView
+    public partial class FileTypeDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FileTypeDialog"/> class.

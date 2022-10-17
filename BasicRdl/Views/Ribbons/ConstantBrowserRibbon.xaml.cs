@@ -25,6 +25,8 @@
 
 namespace BasicRdl.Views
 {
+    using System.Windows.Controls;
+
     using BasicRdl.ViewModels;
 
     using CDP4Composition.Mvvm;

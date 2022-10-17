@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="SimpleQuantityKindDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.SimpleQuantityKind)]
-    public partial class SimpleQuantityKindDialog : IThingDialogView
+    public partial class SimpleQuantityKindDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleQuantityKindDialog"/> class.

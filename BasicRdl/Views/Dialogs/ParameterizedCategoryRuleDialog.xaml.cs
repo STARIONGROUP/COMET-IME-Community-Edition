@@ -41,7 +41,7 @@ namespace BasicRdl.Views
     /// Interaction logic for ParameterizedCategoryRuleDialog.xaml
     /// </summary>
     [ThingDialogViewExport(ClassKind.ParameterizedCategoryRule)]
-    public partial class ParameterizedCategoryRuleDialog : IThingDialogView
+    public partial class ParameterizedCategoryRuleDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// The view model for this view.

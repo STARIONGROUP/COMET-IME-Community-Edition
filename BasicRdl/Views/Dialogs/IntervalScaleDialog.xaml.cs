@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="IntervalScaleDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.IntervalScale)]
-    public partial class IntervalScaleDialog : IThingDialogView
+    public partial class IntervalScaleDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="IntervalScaleDialog"/> class.

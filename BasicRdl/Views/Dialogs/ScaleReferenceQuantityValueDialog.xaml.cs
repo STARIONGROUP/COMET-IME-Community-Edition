@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="DerivedQuantityKindDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.ScaleReferenceQuantityValue)]
-    public partial class ScaleReferenceQuantityValueDialog : IThingDialogView
+    public partial class ScaleReferenceQuantityValueDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ScaleReferenceQuantityValueDialog"/> class.

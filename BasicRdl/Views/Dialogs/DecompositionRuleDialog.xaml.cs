@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="DecompositionRuleDialog"/>
     /// </summary>
     [ThingDialogViewExport(ClassKind.DecompositionRule)]
-    public partial class DecompositionRuleDialog : IThingDialogView
+    public partial class DecompositionRuleDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DecompositionRuleDialog"/> class.

@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for GlossaryDialog
     /// </summary>
     [ThingDialogViewExport(ClassKind.Glossary)]
-    public partial class GlossaryDialog : IThingDialogView
+    public partial class GlossaryDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="GlossaryDialog"/> class.

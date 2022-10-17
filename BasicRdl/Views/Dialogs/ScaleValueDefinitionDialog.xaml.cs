@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="ScaleValueDefinitionDialog"/> XAML
     /// </summary>
-    [ThingDialogViewExport(ClassKind.ScaleValueDefinition)]
-    public partial class ScaleValueDefinitionDialog : IThingDialogView
+    [ThingDialogViewExport(ClassKind.ScaleValueDefinitDXWindow, ion)]
+    public partial class ScaleValueDefinitionDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ScaleValueDefinitionDialog"/> class.

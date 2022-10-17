@@ -26,6 +26,7 @@
 namespace BasicRdl.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using BasicRdl.ViewModels;
 
@@ -37,7 +38,7 @@ namespace BasicRdl.Views
     /// Interaction logic for CategoryRibbon.xaml
     /// </summary>
     [Export(typeof(CategoryRibbon))]
-    public partial class CategoryRibbon : IView, IBarItem
+    public partial class CategoryRibbon : UserControl, IView, IBarItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CategoryRibbon"/> class.

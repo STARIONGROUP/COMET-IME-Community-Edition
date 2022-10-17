@@ -29,12 +29,13 @@ namespace BasicRdl.Views
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
+    using DevExpress.Xpf.Core;
 
     /// <summary>
     /// Interaction logic for <see cref="LinearConversionUnitDialog"/> XAML
     /// </summary>
     [ThingDialogViewExport(ClassKind.LinearConversionUnit)]
-    public partial class LinearConversionUnitDialog : IThingDialogView
+    public partial class LinearConversionUnitDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LinearConversionUnitDialog"/> class.
