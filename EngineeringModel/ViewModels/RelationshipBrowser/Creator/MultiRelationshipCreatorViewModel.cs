@@ -51,7 +51,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Backing field for <see cref="AppliedCategories"/>
         /// </summary>
-        private List<Category> appliedCategories = new();
+        private List<Category> appliedCategories = new List<Category>();
 
         /// <summary>
         /// Backing field for <see cref="CanCreate"/>

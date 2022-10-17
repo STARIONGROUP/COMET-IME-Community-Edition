@@ -130,7 +130,7 @@
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Splat" Version="14.2.8">
+    <PackageReference Include="Splat" Version="14.4.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
