@@ -156,7 +156,7 @@
     <PackageReference Include="System.ServiceModel.NetTcp" Version="4.8.1" />
     <PackageReference Include="System.ServiceModel.Security" Version="4.8.1" />
     <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />
-    <PackageReference Include="ReactiveUI.WPF" Version="18.3.8" />
+    <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore">
