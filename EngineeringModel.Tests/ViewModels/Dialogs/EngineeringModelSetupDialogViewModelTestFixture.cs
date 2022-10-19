@@ -390,9 +390,6 @@ namespace CDP4EngineeringModel.Tests
             visibleDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsVisible);
             Assert.AreEqual(4, visibleDomains);
 
-            var enabledDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsEnabled);
-            Assert.AreEqual(2, enabledDomains);
-
             var deprecatedDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsDeprecated);
             Assert.AreEqual(2, deprecatedDomains);
 
