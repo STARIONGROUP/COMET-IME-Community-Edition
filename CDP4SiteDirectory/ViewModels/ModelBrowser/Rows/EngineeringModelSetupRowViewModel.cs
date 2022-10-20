@@ -42,13 +42,14 @@ namespace CDP4SiteDirectory.ViewModels
 
     using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
     using DomainOfExpertiseRowViewModel = ModelBrowser.Rows.DomainOfExpertiseRowViewModel;
+    using System.Reactive.Linq;
+    using DevExpress.Mvvm.Native;
 
     /// <summary>
     /// The Row-view-model representing a <see cref="EngineeringModelSetup"/>
     /// </summary>
     public class EngineeringModelSetupRowViewModel : CDP4CommonView.EngineeringModelSetupRowViewModel
     {
-        #region Fields
 
         /// <summary>
         /// The row containing all the <see cref="Participant"/> in this <see cref="EngineeringModelSetup"/> row
@@ -80,9 +81,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private readonly UnderscoreCapitalsToSpacedTitleCaseConverter titleConverter = new UnderscoreCapitalsToSpacedTitleCaseConverter();
 
-        #endregion
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="EngineeringModelSetupRowViewModel"/> class
         /// </summary>
@@ -110,10 +109,9 @@ namespace CDP4SiteDirectory.ViewModels
             this.ContainedRows.Add(this.organizationFolderRow);
 
             this.UpdateProperties();
+            this.participantFolderRow.ContainedRows.ForEach(x => x.ContainedRows.CollectionChanged += (s, e) => this.UpdateContainers());
         }
-        #endregion
 
-        #region Public Properties
         /// <summary>
         /// Gets or sets the description of the <see cref="EngineeringModelSetup"/> that is represented by the current row-view-model
         /// </summary>
@@ -122,9 +120,7 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.description; }
             set { this.RaiseAndSetIfChanged(ref this.description, value); }
         }
-        #endregion
 
-        #region override row-base
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -134,7 +130,6 @@ namespace CDP4SiteDirectory.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
 
         /// <summary>
         /// Update the properties of the current row-view-model
