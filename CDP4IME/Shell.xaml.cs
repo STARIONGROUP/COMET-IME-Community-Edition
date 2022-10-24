@@ -2,7 +2,7 @@
 // <copyright file="Shell.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2021 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood, Jaime Bernar
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -33,9 +33,7 @@ namespace CDP4IME
     using CDP4Composition.Events;
     using CDP4Composition.Ribbon;
     using CDP4Dal;
-
     using DevExpress.Xpf.Ribbon;
-
     using Hardcodet.Wpf.TaskbarNotification;
 
     using ReactiveUI;
@@ -68,6 +66,14 @@ namespace CDP4IME
             this.subscription = CDPMessageBus.Current.Listen<TaskbarNotificationEvent>()
                                 .ObserveOn(RxApp.MainThreadScheduler)
                                 .Subscribe(this.ShowTaskBarNotification);
+
+            this.Ribbon.MouseUp += (sender, e) => 
+            {
+                if (e.OriginalSource is RibbonApplicationButtonControl)
+                {
+                    viewModel.OpenAboutCommand.Execute(true);
+                }
+            };
         }
 
         /// <summary>
