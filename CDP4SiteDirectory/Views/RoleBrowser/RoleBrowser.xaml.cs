@@ -16,7 +16,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for Role browser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class RoleBrowser : IPanelView
+    public partial class RoleBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

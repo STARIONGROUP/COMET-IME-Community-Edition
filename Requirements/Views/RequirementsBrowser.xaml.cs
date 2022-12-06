@@ -16,7 +16,7 @@ namespace CDP4Requirements.Views
     /// Interaction logic for RequirementsBrowser.xaml
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class RequirementsBrowser : IPanelView
+    public partial class RequirementsBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

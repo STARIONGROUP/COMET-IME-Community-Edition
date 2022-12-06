@@ -84,6 +84,6 @@ namespace CDP4Budget.ViewModels
         /// <summary>
         /// Gets the command to remove an extra mass contribution
         /// </summary>
-        public ReactiveCommand<object> RemoveExtraMassContributionCommand { get; }
+        public ReactiveCommand<object, object> RemoveExtraMassContributionCommand { get; }
     }
 }

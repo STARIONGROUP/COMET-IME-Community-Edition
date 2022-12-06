@@ -83,12 +83,12 @@ namespace CDP4BuiltInRules.ViewModels
         /// <summary>
         /// Gets or sets the Highlight Command
         /// </summary>
-        public ReactiveCommand<object> HighlightCommand { get; protected set; }
+        public ReactiveCommand<object, object> HighlightCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Copy Command
         /// </summary>
-        public ReactiveCommand<object> CopyErrorCommand { get; protected set; }
+        public ReactiveCommand<object, object> CopyErrorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening

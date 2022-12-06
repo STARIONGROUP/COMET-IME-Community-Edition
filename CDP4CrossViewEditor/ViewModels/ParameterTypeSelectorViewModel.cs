@@ -81,7 +81,7 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets/sets the move power parameter types command <see cref="ReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> PowerParametersCommand { get; private set; }
+        public ReactiveCommand<object, object> PowerParametersCommand { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeSelectorViewModel"/> class.

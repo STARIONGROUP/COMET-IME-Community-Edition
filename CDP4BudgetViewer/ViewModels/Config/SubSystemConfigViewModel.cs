@@ -32,7 +32,7 @@ namespace CDP4Budget.ViewModels
         /// <summary>
         /// Gets the command that remove a new sub-system definition
         /// </summary>
-        public ReactiveCommand<object> RemoveSubSystemDefinitionCommand { get; private set; }
+        public ReactiveCommand<object, object> RemoveSubSystemDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the view-model of the sub-system definition 

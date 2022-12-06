@@ -15,7 +15,7 @@ namespace CDP4Scripting.Interfaces
     /// <summary>
     /// Represents the interface of the <see cref="ScriptPanelViewModel"/>
     /// </summary>
-    public interface IScriptPanelViewModel : IPanelViewModel
+    public interface IScriptPanelViewModel : UserControl, IPanelViewModel
     {
 
         /// <summary>

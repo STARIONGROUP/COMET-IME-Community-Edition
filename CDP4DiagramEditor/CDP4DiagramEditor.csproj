@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{F541DA64-5C66-45FE-822C-CF93964A3F52}</ProjectGuid>
     <MinIMEVersion>9.2.0</MinIMEVersion>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4DiagramEditor</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

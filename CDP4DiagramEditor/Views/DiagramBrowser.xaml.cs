@@ -33,7 +33,7 @@ namespace CDP4DiagramEditor.Views
     /// Interaction logic for DiagramBrowser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class DiagramBrowser : IPanelView
+    public partial class DiagramBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramBrowser"/> class.

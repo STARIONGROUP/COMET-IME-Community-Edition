@@ -26,6 +26,7 @@
 namespace BasicRdl.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -35,7 +36,7 @@ namespace BasicRdl.Views
     /// Interaction logic for GlossaryBrowser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class GlossaryBrowser : IPanelView
+    public partial class GlossaryBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

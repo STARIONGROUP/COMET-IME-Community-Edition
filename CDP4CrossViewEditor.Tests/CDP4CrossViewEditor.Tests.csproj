@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ParameterSheetGenerator.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -42,8 +42,8 @@
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.7.4.8" />
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.7.4.8" />
+    <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="NUnit" Version="3.13.3" />

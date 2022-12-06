@@ -7,6 +7,7 @@
 namespace CDP4SiteDirectory.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -16,7 +17,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for DomainOfExpertiseBrowser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class DomainOfExpertiseBrowser : IPanelView
+    public partial class DomainOfExpertiseBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

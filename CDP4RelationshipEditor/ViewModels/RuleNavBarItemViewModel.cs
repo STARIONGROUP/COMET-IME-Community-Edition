@@ -37,7 +37,7 @@ namespace CDP4RelationshipEditor.ViewModels
         /// <summary>
         /// Gets the public command to create a relationship.
         /// </summary>
-        public ReactiveCommand<object> CreateRelationshipCommand { get; private set; }
+        public ReactiveCommand<object, object> CreateRelationshipCommand { get; private set; }
 
         /// <summary>
         /// Initializes the commands.

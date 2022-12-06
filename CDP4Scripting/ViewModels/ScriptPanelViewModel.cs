@@ -436,22 +436,22 @@ namespace CDP4Scripting.ViewModels
         /// <summary>
         /// Saves the data that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<object> SaveScriptCommand { get; private set; }
+        public ReactiveCommand<object, object> SaveScriptCommand { get; private set; }
 
         /// <summary>
         /// Gets the code from the texteditor, execute it and show the result
         /// </summary>
-        public ReactiveCommand<Unit> ExecuteScriptCommand { get; private set; }
+        public ReactiveCommand<Unit, object> ExecuteScriptCommand { get; private set; }
 
         /// <summary>
         /// Stops the script executed.
         /// </summary>
-        public ReactiveCommand<object> StopScriptCommand { get; private set; }
+        public ReactiveCommand<object, object> StopScriptCommand { get; private set; }
 
         /// <summary>
         /// Clears the content of the output.
         /// </summary>
-        public ReactiveCommand<object> ClearOutputCommand { get; private set; }
+        public ReactiveCommand<object, object> ClearOutputCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening

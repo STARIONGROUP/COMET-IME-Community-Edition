@@ -34,7 +34,7 @@ namespace CDP4EngineeringModel.Views
     /// Interaction logic for ElementDefinitions view
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class ElementDefinitionsBrowser : IPanelView
+    public partial class ElementDefinitionsBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionsBrowser"/> class

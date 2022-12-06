@@ -147,7 +147,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the selected <see cref="BinaryRelationshipRule"/>
         /// </summary>
-        public ReactiveCommand<object> InspectRuleCommand { get; protected set; }
+        public ReactiveCommand<object, object> InspectRuleCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog

@@ -16,7 +16,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for PersonBrowser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class PersonBrowser : IPanelView
+    public partial class PersonBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

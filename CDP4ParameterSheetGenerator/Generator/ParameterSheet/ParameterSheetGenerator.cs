@@ -50,6 +50,8 @@ namespace CDP4ParameterSheetGenerator.ParameterSheet
 
     using CDP4ParameterSheetGenerator.Generator;
 
+    using Range = NetOffice.ExcelApi.Range;
+
     /// <summary>
     /// The purpose of the <see cref="ParameterSheetGenerator"/> is to generate in Excel
     /// the Parameter sheet that contains the Parameters, ParameterOverrides, and Subscriptions

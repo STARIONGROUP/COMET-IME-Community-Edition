@@ -59,7 +59,7 @@ namespace CDP4LogInfo.ViewModels
         /// <summary>
         /// Gets the open or close Log Panel
         /// </summary>
-        public ReactiveCommand<object> OpenClosePanelCommand { get; private set; }
+        public ReactiveCommand<object, object> OpenClosePanelCommand { get; private set; }
 
         /// <summary>
         /// Executes the Open or Close panel command

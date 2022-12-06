@@ -38,7 +38,7 @@ namespace BasicRdl.Views
     /// Interaction logic for CategoryRibbon.xaml
     /// </summary>
     [Export(typeof(CategoryRibbon))]
-    public partial class CategoryRibbon : UserControl, IView, IBarItem
+    public partial class CategoryRibbon : IView, IBarItem
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CategoryRibbon"/> class.

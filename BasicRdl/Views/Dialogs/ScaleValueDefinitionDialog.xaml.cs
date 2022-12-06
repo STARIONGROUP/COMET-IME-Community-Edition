@@ -34,7 +34,7 @@ namespace BasicRdl.Views
     /// <summary>
     /// Interaction logic for <see cref="ScaleValueDefinitionDialog"/> XAML
     /// </summary>
-    [ThingDialogViewExport(ClassKind.ScaleValueDefinitDXWindow, ion)]
+    [ThingDialogViewExport(ClassKind.ScaleValueDefinition)]
     public partial class ScaleValueDefinitionDialog : DXWindow, IThingDialogView
     {
         /// <summary>

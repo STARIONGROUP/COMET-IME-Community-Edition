@@ -26,6 +26,7 @@
 namespace CDP4Composition.Tests.Converters
 {
     using System;
+    using System.Windows.Controls;
 
     using CDP4Composition.Converters;
 
@@ -60,7 +61,7 @@ namespace CDP4Composition.Tests.Converters
         }
     }
 
-    public class TestAssemblyPanel : IPanelView
+    public class TestAssemblyPanel : UserControl, IPanelView
     {
         public TestAssemblyPanel(bool testParameter)
         {
@@ -69,7 +70,7 @@ namespace CDP4Composition.Tests.Converters
         public object DataContext { get; set; }
     }
 
-    public class TestAssemblyPanelViewModel : IPanelViewModel
+    public class TestAssemblyPanelViewModel : UserControl, IPanelViewModel
     {
         public string Caption { get; } 
 

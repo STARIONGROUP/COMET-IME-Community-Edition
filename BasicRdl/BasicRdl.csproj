@@ -3,7 +3,7 @@
     <ProjectGuid>{BEDCC5C5-83B2-41ED-AC9F-895757553BF2}</ProjectGuid>
     <MinIMEVersion>9.2.0</MinIMEVersion>
     <AssemblyName>CDP4BasicRdl</AssemblyName>
-    <TargetFrameworks>net6.0-windows;net48</TargetFrameworks>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4BasicRdl</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -37,7 +37,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net6'))">
+  <ItemGroup>
 	  <PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
 	  <PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
 	  <PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
@@ -46,27 +46,7 @@
 	  <PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
 	  <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
   </ItemGroup>
-  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
-	  <PackageReference Include="DevExpress.CodeParser" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Wpf.Diagram" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Data" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Data.Desktop" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Images" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.MVVM" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Wpf.Core" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Wpf.Grid" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Wpf.Layout" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="20.2.11" />
-	  <!--
-			Those references have to be added manually, see:
-			https://stackoverflow.com/questions/62074980/
-		-->
-	  <Reference Include="System.Net.Http" />
-	  <Reference Include="System.Web" />
-  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
       <ExcludeAssets>runtime</ExcludeAssets>

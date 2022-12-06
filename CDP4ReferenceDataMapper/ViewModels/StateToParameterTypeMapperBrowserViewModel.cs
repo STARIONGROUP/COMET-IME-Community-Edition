@@ -295,27 +295,27 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to start the mapping - populate the row-view-models
         /// </summary>
-        public ReactiveCommand<object> StartMappingCommand { get; protected set; }
+        public ReactiveCommand<object, object> StartMappingCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to clear the mapping settings
         /// </summary>
-        public ReactiveCommand<object> ClearSettingsCommand { get; protected set; }
+        public ReactiveCommand<object, object> ClearSettingsCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to remove the <see cref="SelectedSourceParameterType"/> from  the mapping settings <see cref="SourceParameterTypes"/>
         /// </summary>
-        public ReactiveCommand<object> RemoveSelectedSourceParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<object, object> RemoveSelectedSourceParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to execute when the selected item from <see cref="SourceParameterTypes"/> was changed
         /// </summary>
-        public ReactiveCommand<object> SelectedMappingParameterChangedCommand { get; protected set; }
+        public ReactiveCommand<object, object> SelectedMappingParameterChangedCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to execute when changed values need to be saved
         /// </summary>
-        public ReactiveCommand<Unit> SaveValuesCommand { get; protected set; }
+        public ReactiveCommand<Unit, object> SaveValuesCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening

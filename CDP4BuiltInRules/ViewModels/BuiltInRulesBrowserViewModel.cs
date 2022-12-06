@@ -131,7 +131,7 @@ namespace CDP4BuiltInRules.ViewModels
         /// <summary>
         /// Gets or sets the Create Command
         /// </summary>
-        public ReactiveCommand<object> InspectCommand { get; protected set; }
+        public ReactiveCommand<object, object> InspectCommand { get; protected set; }
 
         /// <summary>
         /// Gets the list of <see cref="BuiltInRuleRowViewModel"/>.

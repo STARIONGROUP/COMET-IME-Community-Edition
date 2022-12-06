@@ -44,8 +44,8 @@
 	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
 	<PackageReference Include="Moq" Version="4.16.1" />
 	<PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.7.4.8" />
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.7.4.8" />
+    <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4OfficeInfrastructure\CDP4OfficeInfrastructure.csproj" />

@@ -93,12 +93,12 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<object, object> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<object, object> CancelCommand { get; private set; }
 
         /// <summary>
         /// populate the workbook row view-models that represent workbooks that are open in the

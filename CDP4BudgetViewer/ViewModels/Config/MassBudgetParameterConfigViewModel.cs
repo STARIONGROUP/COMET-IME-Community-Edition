@@ -62,7 +62,7 @@ namespace CDP4Budget.ViewModels
         /// <summary>
         /// Gets the command to add an extra mass contribution
         /// </summary>
-        public ReactiveCommand<object> AddExtraMassContributionCommand { get; private set; }
+        public ReactiveCommand<object, object> AddExtraMassContributionCommand { get; private set; }
 
         /// <summary>
         /// Gets the list of <see cref="ExtraMassContributionConfigurationViewModel"/>

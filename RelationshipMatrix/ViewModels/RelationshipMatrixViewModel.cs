@@ -370,57 +370,57 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets the command to edit the current row thing
         /// </summary>
-        public ReactiveCommand<object> EditSourceYCommand { get; private set; }
+        public ReactiveCommand<object, object> EditSourceYCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to inspect the current row thing
         /// </summary>
-        public ReactiveCommand<object> InspectSourceYCommand { get; private set; }
+        public ReactiveCommand<object, object> InspectSourceYCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to edit the current column thing
         /// </summary>
-        public ReactiveCommand<object> EditSourceXCommand { get; private set; }
+        public ReactiveCommand<object, object> EditSourceXCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to inspect the current column thing
         /// </summary>
-        public ReactiveCommand<object> InspectSourceXCommand { get; private set; }
+        public ReactiveCommand<object, object> InspectSourceXCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to inspect the current relation from column to row
         /// </summary>
-        public ReactiveCommand<object> InspectSourceXToSourceYCommand { get; set; }
+        public ReactiveCommand<object, object> InspectSourceXToSourceYCommand { get; set; }
 
         /// <summary>
         /// Gets the command to inspect the current relation from row to column
         /// </summary>
-        public ReactiveCommand<object> InspectSourceYToSourceXCommand { get; set; }
+        public ReactiveCommand<object, object> InspectSourceYToSourceXCommand { get; set; }
 
         /// <summary>
         /// Gets the command to inspect the current relation from column to row
         /// </summary>
-        public ReactiveCommand<object> EditSourceXToSourceYCommand { get; set; }
+        public ReactiveCommand<object, object> EditSourceXToSourceYCommand { get; set; }
 
         /// <summary>
         /// Gets the command to inspect the current relation from row to column
         /// </summary>
-        public ReactiveCommand<object> EditSourceYToSourceXCommand { get; set; }
+        public ReactiveCommand<object, object> EditSourceYToSourceXCommand { get; set; }
 
         /// <summary>
         /// Gets the command to switch axis
         /// </summary>
-        public ReactiveCommand<object> SwitchAxisCommand { get; private set; }
+        public ReactiveCommand<object, object> SwitchAxisCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to manage saved configurations.
         /// </summary>
-        public ReactiveCommand<object> ManageSavedConfigurations { get; private set; }
+        public ReactiveCommand<object, object> ManageSavedConfigurations { get; private set; }
 
         /// <summary>
         /// Gets the command to save current.
         /// </summary>
-        public ReactiveCommand<object> SaveCurrentConfiguration { get; private set; }
+        public ReactiveCommand<object, object> SaveCurrentConfiguration { get; private set; }
 
         /// <summary>
         /// Gets or sets whether directionality is displayed

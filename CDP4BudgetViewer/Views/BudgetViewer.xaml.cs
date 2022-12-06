@@ -7,13 +7,15 @@
 namespace CDP4Budget.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
+
     using CDP4Composition;
 
     /// <summary>
     /// Interaction logic for BudgetViewer view
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class BudgetViewer : IPanelView
+    public partial class BudgetViewer : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BudgetViewer"/> class

@@ -226,17 +226,17 @@ namespace CDP4Budget.ViewModels
         /// <summary>
         /// Gets the command that add a new sub-system definition
         /// </summary>
-        public ReactiveCommand<object> AddSubSystemDefinitionCommand { get; private set; }
+        public ReactiveCommand<object, object> AddSubSystemDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the OK command
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<object, object> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel command
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<object, object> CancelCommand { get; private set; }
         #endregion
 
         /// <summary>

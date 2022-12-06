@@ -305,52 +305,52 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets the command to create a <see cref="BinaryRelationship" /> from sourceY to sourceX
         /// </summary>
-        public ReactiveCommand<Unit> CreateSourceYToSourceXLink { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSourceYToSourceXLink { get; private set; }
 
         /// <summary>
         /// Gets the command to create a <see cref="BinaryRelationship" /> from sourceX to sourceY
         /// </summary>
-        public ReactiveCommand<Unit> CreateSourceXToSourceYLink { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSourceXToSourceYLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete a <see cref="BinaryRelationship" /> from sourceY to sourceX
         /// </summary>
-        public ReactiveCommand<Unit> DeleteSourceYToSourceXLink { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteSourceYToSourceXLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete a <see cref="BinaryRelationship" /> from sourceX to sourceY
         /// </summary>
-        public ReactiveCommand<Unit> DeleteSourceXToSourceYLink { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteSourceXToSourceYLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete all <see cref="BinaryRelationship" /> currently displayed
         /// </summary>
-        public ReactiveCommand<Unit> DeleteAllRelationships { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteAllRelationships { get; private set; }
 
         /// <summary>
         /// Gets the command to process cell double click.
         /// </summary>
-        public ReactiveCommand<Unit> ProcessCellCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ProcessCellCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to process Alt + cell double click.
         /// </summary>
-        public ReactiveCommand<Unit> ProcessAltCellCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ProcessAltCellCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to process Alt + Ctrl + cell double click.
         /// </summary>
-        public ReactiveCommand<Unit> ProcessAltControlCellCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ProcessAltControlCellCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to process the mousedown click.
         /// </summary>
-        public ReactiveCommand<object> MouseDownCommand { get; private set; }
+        public ReactiveCommand<object, object> MouseDownCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to process column highlight toggle.
         /// </summary>
-        public ReactiveCommand<Unit> ToggleColumnHighlightCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ToggleColumnHighlightCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the selected cell

@@ -14,7 +14,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for NaturalLanguageBrowser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class NaturalLanguageBrowser : IPanelView
+    public partial class NaturalLanguageBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NaturalLanguageBrowser"/> class.

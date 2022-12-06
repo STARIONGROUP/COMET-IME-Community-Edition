@@ -70,17 +70,17 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets/sets the move command <see cref="ReactiveCommand"/> from target to source
         /// </summary>
-        public ReactiveCommand<object> MoveItemsToSource { get; private set; }
+        public ReactiveCommand<object, object> MoveItemsToSource { get; private set; }
 
         /// <summary>
         /// Gets/sets the move command <see cref="ReactiveCommand"/> from source to target
         /// </summary>
-        public ReactiveCommand<object> MoveItemsToTarget { get; private set; }
+        public ReactiveCommand<object, object> MoveItemsToTarget { get; private set; }
 
         /// <summary>
         /// Gets/sets the clearing list command <see cref="ReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> ClearItems { get; private set; }
+        public ReactiveCommand<object, object> ClearItems { get; private set; }
 
         /// <summary>
         /// Gets/sets current user selection thing ids

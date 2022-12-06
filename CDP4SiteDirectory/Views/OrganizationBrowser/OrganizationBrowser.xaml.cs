@@ -16,7 +16,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for OrganizationBrowser.xaml
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class OrganizationBrowser : IPanelView
+    public partial class OrganizationBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

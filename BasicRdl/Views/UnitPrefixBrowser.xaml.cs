@@ -26,6 +26,7 @@
 namespace BasicRdl.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -35,7 +36,7 @@ namespace BasicRdl.Views
     /// Interaction logic for UnitPrefixBrowser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class UnitPrefixBrowser : IPanelView
+    public partial class UnitPrefixBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

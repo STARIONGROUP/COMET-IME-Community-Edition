@@ -35,6 +35,7 @@ namespace BasicRdl.Views
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 
+    using DevExpress.Xpf.Core;
     using DevExpress.Xpf.Grid;
 
     /// <summary>

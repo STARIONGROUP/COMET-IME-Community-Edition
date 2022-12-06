@@ -350,17 +350,17 @@ namespace CDP4LogInfo.ViewModels
         /// <summary>
         /// Gets the Clear command
         /// </summary>
-        public ReactiveCommand<object> ClearCommand { get; private set; }
+        public ReactiveCommand<object, object> ClearCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to Export the log
         /// </summary>
-        public ReactiveCommand<object> ExportCommand { get; private set; }
+        public ReactiveCommand<object, object> ExportCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to show the details of the selected Log item
         /// </summary>
-        public ReactiveCommand<object> ShowDetailsDialogCommand { get; private set; }
+        public ReactiveCommand<object, object> ShowDetailsDialogCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening

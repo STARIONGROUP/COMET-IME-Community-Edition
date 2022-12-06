@@ -55,7 +55,7 @@ namespace CDP4BuiltInRules.ViewModels
         /// <summary>
         /// Gets the Close Command
         /// </summary>
-        public ReactiveCommand<object> CloseCommand { get; private set; }
+        public ReactiveCommand<object, object> CloseCommand { get; private set; }
 
         /// <summary>
         /// Gets the author of the <see cref="BuiltInRule"/>.

@@ -88,7 +88,7 @@ namespace CDP4BuiltInRules.ViewModels
         /// <summary>
         /// Gets or sets the Create Command
         /// </summary>
-        public ReactiveCommand<object> OpenBrowser { get; protected set; }
+        public ReactiveCommand<object, object> OpenBrowser { get; protected set; }
 
         /// <summary>
         /// Executes the <see cref="OpenBrowser"/> <see cref="ICommand"/>

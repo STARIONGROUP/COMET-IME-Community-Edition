@@ -241,7 +241,9 @@ namespace CDP4Composition.Tests.Navigation
 
 namespace CDP4Composition.Tests.Views
 {
-    public class Test : IPanelView
+    using System.Windows.Controls;
+
+    public class Test : UserControl, IPanelView
     {
         public Test()
         {
@@ -254,7 +256,7 @@ namespace CDP4Composition.Tests.Views
         public object DataContext { get; set; }
     }
 
-    public class TestGrid : IPanelView
+    public class TestGrid : UserControl, IPanelView
     {
         public TestGrid()
         {
@@ -272,6 +274,7 @@ namespace CDP4Composition.Tests.Views
 namespace CDP4Composition.Tests.ViewModels
 {
     using System;
+    using System.Windows.Controls;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -281,7 +284,7 @@ namespace CDP4Composition.Tests.ViewModels
 
     using CDP4Dal;
 
-    public class TestViewModel : IPanelViewModel
+    public class TestViewModel : UserControl, IPanelViewModel
     {
         public TestViewModel(string uri = default(string))
         {
@@ -340,7 +343,7 @@ namespace CDP4Composition.Tests.ViewModels
         }
     }
 
-    public class ExceptionViewModel : IPanelViewModel
+    public class ExceptionViewModel : UserControl, IPanelViewModel
     {
         public ExceptionViewModel(string uri = default(string))
         {
@@ -374,7 +377,7 @@ namespace CDP4Composition.Tests.ViewModels
         }
     }
 
-    public class TestGridViewModel : IPanelViewModel
+    public class TestGridViewModel : UserControl, IPanelViewModel
     {
         public TestGridViewModel()
         {

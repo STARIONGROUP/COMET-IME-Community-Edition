@@ -282,12 +282,12 @@ namespace CDP4RelationshipEditor.ViewModels
         /// <summary>
         /// Gets or sets the Create Binary Relationship Command
         /// </summary>
-        public ReactiveCommand<object> CreateBinaryRelationshipCommand { get; protected set; }
+        public ReactiveCommand<object, object> CreateBinaryRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create Multi Relationship Command
         /// </summary>
-        public ReactiveCommand<object> CreateMultiRelationshipCommand { get; protected set; }
+        public ReactiveCommand<object, object> CreateMultiRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the active <see cref="Participant"/> of this editor.

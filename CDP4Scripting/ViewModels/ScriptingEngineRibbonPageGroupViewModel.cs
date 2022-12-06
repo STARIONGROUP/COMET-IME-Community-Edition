@@ -157,27 +157,27 @@ namespace CDP4Scripting.ViewModels
         /// <summary>
         /// Creates a new python tab.
         /// </summary>
-        public ReactiveCommand<object> NewPythonScriptCommand { get; private set; }
+        public ReactiveCommand<object, object> NewPythonScriptCommand { get; private set; }
 
         /// <summary>
         /// Creates a new Lua tab.
         /// </summary>
-        public ReactiveCommand<object> NewLuaScriptCommand { get; private set; }
+        public ReactiveCommand<object, object> NewLuaScriptCommand { get; private set; }
 
         /// <summary>
         /// Creates a new text tab.
         /// </summary>
-        public ReactiveCommand<object> NewTextScriptCommand { get; private set; }
+        public ReactiveCommand<object, object> NewTextScriptCommand { get; private set; }
 
         /// <summary>
         /// Shows a dialog window to select a python file and import it into the texteditor
         /// </summary>
-        public ReactiveCommand<object> OpenScriptCommand { get; private set; }
+        public ReactiveCommand<object, object> OpenScriptCommand { get; private set; }
 
         /// <summary>
         /// Saves all the scripts currently open.
         /// </summary>
-        public ReactiveCommand<object> SaveAllCommand { get; private set; }
+        public ReactiveCommand<object, object> SaveAllCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the list of the paths that correspond to the files open in the scripting engine.

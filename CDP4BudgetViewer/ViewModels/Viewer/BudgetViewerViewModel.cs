@@ -186,22 +186,22 @@ namespace CDP4Budget.ViewModels
         /// <summary>
         /// Gets the open-config <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> OpenConfigCommand { get; private set; }
+        public ReactiveCommand<object, object> OpenConfigCommand { get; private set; }
 
         /// <summary>
         /// Gets the refresh <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> RefreshBudgetCommand { get; private set; }
+        public ReactiveCommand<object, object> RefreshBudgetCommand { get; private set; }
 
         /// <summary>
         /// Gets the save config <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> SaveConfigCommand { get; private set; }
+        public ReactiveCommand<object, object> SaveConfigCommand { get; private set; }
 
         /// <summary>
         /// Gets the load config <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> LoadConfigCommand { get; private set; }
+        public ReactiveCommand<object, object> LoadConfigCommand { get; private set; }
 
         /// <summary>
         /// Gets the computation error message

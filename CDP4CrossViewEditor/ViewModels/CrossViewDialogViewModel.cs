@@ -72,12 +72,12 @@ namespace CDP4CrossViewEditor.ViewModels
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<object, object> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<object, object> CancelCommand { get; private set; }
 
         /// <summary>
         /// ViewModel that corresponds to the element selector area

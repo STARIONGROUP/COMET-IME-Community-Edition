@@ -35,7 +35,7 @@ namespace CDP4Reporting.Views
     /// </summary>
     [Export(typeof(IPanelView))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public partial class ReportDesigner : IPanelView
+    public partial class ReportDesigner : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ReportDesigner"/> class.

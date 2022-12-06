@@ -271,9 +271,9 @@ namespace CDP4CrossViewEditor
         /// <summary>
         /// Store manually filled values on each cell content change
         /// </summary>
-        /// <param name="target"> Excel target <see cref="Range"/></param>
+        /// <param name="target"> Excel target <see cref="NetOffice.ExcelApi.Range"/></param>
         [ExcludeFromCodeCoverage]
-        private void Worksheet_ChangeEvent(Range target)
+        private void Worksheet_ChangeEvent(NetOffice.ExcelApi.Range target)
         {
             string cellName;
 

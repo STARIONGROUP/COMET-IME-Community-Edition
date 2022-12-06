@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{7D862014-4CE6-41AC-940C-49D7DE4C485D}</ProjectGuid>
     <MinIMEVersion>9.2.0</MinIMEVersion>
-    <TargetFrameworks>net48;net6.0-windows</TargetFrameworks>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <AssemblyTitle>CDP4BudgetViewer</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4BudgetViewer</Product>
@@ -24,7 +24,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
-  	<ItemGroup Condition="'$(TargetFramework)' == 'net6.0-windows'">
+  	<ItemGroup>
 		<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
 		<PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
 		<PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
@@ -32,97 +32,6 @@
 		<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
 		<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
 		<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
-	</ItemGroup>
-	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-	<PackageReference Include="DevExpress.CodeParser" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Data" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Data.Desktop" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.DataAccess" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Diagram.Core" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Images" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Mvvm" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Office.Core" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Core" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Printing.Core" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.SpellChecker.Core" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Core" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Diagram" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Office" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="DevExpress.Xpo" Version="20.2.11">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-	<Reference Include="System.Net.Http" />
-	<Reference Include="System.Web" />
 	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">

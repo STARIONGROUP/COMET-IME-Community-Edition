@@ -40,6 +40,8 @@ namespace CDP4ParameterSheetGenerator.Generator
     
     using NLog;
 
+    using Range = NetOffice.ExcelApi.Range;
+
     /// <summary>
     /// The purpose of the <see cref="ParameterSheetRowHighligter"/> is to highlight the rows of specific <see cref="Thing"/>s
     /// in the Parameter sheet

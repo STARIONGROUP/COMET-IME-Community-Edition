@@ -26,6 +26,7 @@
 namespace CDP4DiagramEditor.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -33,7 +34,7 @@ namespace CDP4DiagramEditor.Views
     /// Interaction logic for CDP4DiagramEditor.xaml
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class DiagramEditor : IPanelView
+    public partial class DiagramEditor : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramEditor"/> class

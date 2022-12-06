@@ -77,12 +77,12 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// <summary>
         /// Gets the Select <see cref="ICommand{T}"/>
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<object, object> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ICommand{T}"/>
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<object, object> CancelCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="RebuildKind"/>

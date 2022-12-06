@@ -7,6 +7,7 @@
 namespace CDP4RelationshipMatrix.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
     
@@ -14,7 +15,7 @@ namespace CDP4RelationshipMatrix.Views
     /// Interaction logic for RelationshipMatrix view
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class RelationshipMatrix : IPanelView
+    public partial class RelationshipMatrix : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrix"/> class
