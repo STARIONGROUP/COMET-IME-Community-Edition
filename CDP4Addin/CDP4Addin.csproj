@@ -75,7 +75,7 @@
     <PackageReference Include="NetOfficeFw.PowerPoint" Version="1.7.4.8" />
     <PackageReference Include="NetOfficeFw.Visio" Version="1.7.4.8" />
     <PackageReference Include="NetOfficeFw.Word" Version="1.7.4.8" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="reactiveui" Version="6.4.0" />
     <PackageReference Include="reactiveui-core" Version="6.4.0" />

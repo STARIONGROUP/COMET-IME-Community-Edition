@@ -59,7 +59,7 @@
     <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="20.2.11" />
     <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="20.2.11" />
     <PackageReference Include="DevExpress.Xpo" Version="20.2.11" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="reactiveui" Version="6.4.0" />
     <PackageReference Include="reactiveui-core" Version="6.4.0" />
