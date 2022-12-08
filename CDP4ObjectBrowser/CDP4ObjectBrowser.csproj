@@ -133,7 +133,7 @@
     <PackageReference Include="DevExpress.Xpo" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="NLog" Version="4.7.10">
