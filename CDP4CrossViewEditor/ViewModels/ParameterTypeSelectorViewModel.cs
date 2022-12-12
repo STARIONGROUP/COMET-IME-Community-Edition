@@ -32,6 +32,8 @@ namespace CDP4CrossViewEditor.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.Mvvm;
+
     using CDP4CrossViewEditor.Generator;
     using CDP4CrossViewEditor.RowModels;
 
@@ -92,27 +94,16 @@ namespace CDP4CrossViewEditor.ViewModels
         public ParameterTypeSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids)
             : base(iteration, session, ClassKind.ParameterType, preservedIids)
         {
-            this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.ParameterTypeSourceList = new ReactiveList<ParameterTypeRowViewModel>();
 
-            this.ParameterTypeTargetList = new ReactiveList<ParameterTypeRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.ParameterTypeTargetList = new ReactiveList<ParameterTypeRowViewModel>();
 
-            this.SelectedSourceList = new ReactiveList<ParameterTypeRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.SelectedSourceList = new ReactiveList<ParameterTypeRowViewModel>();
 
-            this.SelectedTargetList = new ReactiveList<ParameterTypeRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.SelectedTargetList = new ReactiveList<ParameterTypeRowViewModel>();
 
-            this.PowerParametersCommand = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+            this.PowerParametersCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.PowerParametersCommand.Subscribe(_ => this.ExecutePowerParametersCommand());
         }
 

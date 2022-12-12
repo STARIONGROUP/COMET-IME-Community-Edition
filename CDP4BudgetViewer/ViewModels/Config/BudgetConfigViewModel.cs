@@ -397,13 +397,15 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         private void InitializeCommand()
         {
-            this.AddSubSystemDefinitionCommand = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+
+            this.AddSubSystemDefinitionCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.AddSubSystemDefinitionCommand.Subscribe(_ => this.ExecuteAddSubSystemDefinition());
 
-            this.OkCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanOk));
+            this.OkCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanOk));
             this.OkCommand.Subscribe(_ => this.ExecuteOkCommand());
 
-            this.CancelCommand = ReactiveCommand.Create();
+            this.CancelCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.CancelCommand.Subscribe(_ => this.ExecuteCancelCommand());
 
             this.WhenAnyValue(vm => vm.SelectedBudgetKind).Subscribe(

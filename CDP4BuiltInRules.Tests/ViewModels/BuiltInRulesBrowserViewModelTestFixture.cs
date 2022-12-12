@@ -28,6 +28,8 @@ namespace CDP4BuiltInRules.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4BuiltInRules.ViewModels;
 
@@ -89,22 +91,22 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatIfNoRowIsSelectedTheInspectCommandCanNotExecute()
+        public async Task VerifyThatIfNoRowIsSelectedTheInspectCommandCanNotExecute()
         {
             var viewmodel = new BuiltInRulesBrowserViewModel(this.ruleVerificationService.Object, this.dialogNavigationService.Object);
             viewmodel.SelectedRule = null;
 
-            Assert.IsFalse(viewmodel.InspectCommand.CanExecute(null));
+            Assert.IsFalse(await viewmodel.InspectCommand.CanExecute);
         }
 
         [Test]
-        public void VerifyThatIfRowIsSelectedInspectCommanCanExecute()
+        public async Task VerifyThatIfRowIsSelectedInspectCommanCanExecute()
         {
             var viewmodel = new BuiltInRulesBrowserViewModel(this.ruleVerificationService.Object, this.dialogNavigationService.Object);
             var row = viewmodel.BuiltInRules.Single();
             viewmodel.SelectedRule = row;
 
-            Assert.IsTrue(viewmodel.InspectCommand.CanExecute(null));
+            Assert.IsTrue(await viewmodel.InspectCommand.CanExecute);
         }
 
         [Test]

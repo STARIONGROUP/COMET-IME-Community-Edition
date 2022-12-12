@@ -141,11 +141,13 @@ namespace CDP4RelationshipEditor.ViewModels
             var canCreateMultiRelationship =
                 this.SelectedItems.Changed.Select(_ => this.CanCreateMultiRelationship());
 
-            this.CreateBinaryRelationshipCommand = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+
+            this.CreateBinaryRelationshipCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.CreateBinaryRelationshipCommand.Subscribe(_ => this.CreateBinaryRelationshipCommandExecute());
 
             // creation of multi relationship requires selected nodes
-            this.CreateMultiRelationshipCommand = ReactiveCommand.Create(canCreateMultiRelationship);
+            this.CreateMultiRelationshipCommand = ReactiveCommand.Create<object, object>(NoOp, canCreateMultiRelationship);
             this.CreateMultiRelationshipCommand.Subscribe(_ => this.CreateMultiRelationshipCommandExecute());
         }
 
@@ -198,9 +200,9 @@ namespace CDP4RelationshipEditor.ViewModels
         {
             base.Initialize();
 
-            this.RelationshipRules = new DisposableReactiveList<RuleNavBarItemViewModel> { ChangeTrackingEnabled = true };
-            this.ThingDiagramItems = new ReactiveList<object> { ChangeTrackingEnabled = true };
-            this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
+            this.RelationshipRules = new DisposableReactiveList<RuleNavBarItemViewModel>();
+            this.ThingDiagramItems = new ReactiveList<object>();
+            this.SelectedItems = new ReactiveList<DiagramItem>();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
 

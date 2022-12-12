@@ -45,7 +45,6 @@ namespace CDP4LogInfo.Views
         [ImportingConstructor]
         public LogInfoControls(IDialogNavigationService dialogNavigationService)
         {
-            this.InitializeComponent();
             this.DataContext = new LogInfoControlsViewModel(dialogNavigationService);
         }
     }

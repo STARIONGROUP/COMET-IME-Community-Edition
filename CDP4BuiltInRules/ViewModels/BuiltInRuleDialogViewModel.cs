@@ -48,7 +48,9 @@ namespace CDP4BuiltInRules.ViewModels
         {
             this.SetProperties(builtInRule);
 
-            this.CloseCommand = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+
+            this.CloseCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.CloseCommand.Subscribe(_ => this.ExecuteClose());
         }
 

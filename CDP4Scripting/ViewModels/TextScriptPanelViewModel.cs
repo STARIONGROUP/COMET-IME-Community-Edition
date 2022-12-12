@@ -25,6 +25,8 @@
 
 namespace CDP4Scripting.ViewModels
 {
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
 
     using Interfaces;

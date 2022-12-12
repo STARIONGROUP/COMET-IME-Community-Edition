@@ -114,13 +114,15 @@ namespace CDP4BuiltInRules.ViewModels
         {
             base.InitializeCommands();
 
+            object NoOp(object param) => param;
+
             var canSelectableCommandsExecute =
                 this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null && !(x.Thing is NotThing));
 
-            this.HighlightCommand = ReactiveCommand.Create(canSelectableCommandsExecute);
+            this.HighlightCommand = ReactiveCommand.Create<object, object>(NoOp, canSelectableCommandsExecute);
             this.HighlightCommand.Subscribe(_ => this.ExecuteHighlightCommand());
 
-            this.CopyErrorCommand = ReactiveCommand.Create(canSelectableCommandsExecute);
+            this.CopyErrorCommand = ReactiveCommand.Create<object, object>(NoOp, canSelectableCommandsExecute);
             this.CopyErrorCommand.Subscribe(_ => this.ExecuteCopyErrorCommand());
         }
 

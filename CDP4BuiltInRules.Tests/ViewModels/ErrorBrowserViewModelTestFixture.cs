@@ -30,6 +30,7 @@ namespace CDP4BuiltInRules.Tests
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4BuiltInRules.ViewModels;
@@ -123,7 +124,7 @@ namespace CDP4BuiltInRules.Tests
         }
 
         [Test]
-        public void VerifyThatRefreshCommandExecutes()
+        public async Task VerifyThatRefreshCommandExecutes()
         {
             var id = Guid.NewGuid();
             var pocoConstant = new Constant(id, this.assembler.Cache, this.uri);
@@ -140,8 +141,8 @@ namespace CDP4BuiltInRules.Tests
 
             this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
-            Assert.IsTrue(this.browser.RefreshCommand.CanExecute(null));
-            Assert.DoesNotThrow(() => this.browser.RefreshCommand.Execute(null));
+            Assert.IsTrue(await this.browser.RefreshCommand.CanExecute);
+            Assert.DoesNotThrow(() => this.browser.RefreshCommand.Execute());
         }
 
         [Test]
@@ -162,7 +163,7 @@ namespace CDP4BuiltInRules.Tests
         }
 
         [Test]
-        public void VerifyThatHighlightCommandSendsMessage()
+        public async Task VerifyThatHighlightCommandSendsMessage()
         {
             var id = Guid.NewGuid();
             var pocoConstant = new Constant(id, this.assembler.Cache, this.uri);
@@ -179,7 +180,7 @@ namespace CDP4BuiltInRules.Tests
 
             this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
-            Assert.IsFalse(this.browser.HighlightCommand.CanExecute(null));
+            Assert.IsFalse(await this.browser.HighlightCommand.CanExecute);
 
             this.browser.SelectedThing = this.browser.Errors.First();
 
@@ -187,7 +188,7 @@ namespace CDP4BuiltInRules.Tests
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
 
-            Assert.IsTrue(this.browser.HighlightCommand.CanExecute(null));
+            Assert.IsTrue(await this.browser.HighlightCommand.CanExecute);
 
             Assert.DoesNotThrow(() => this.browser.HighlightCommand.Execute(null));
 
@@ -203,7 +204,7 @@ namespace CDP4BuiltInRules.Tests
         }
 
         [Test, Apartment(ApartmentState.STA)]
-        public void VerifyThatCopyCommandExecutes()
+        public async Task VerifyThatCopyCommandExecutes()
         {
             var id = Guid.NewGuid();
             var pocoConstant = new Constant(id, this.assembler.Cache, this.uri);
@@ -218,11 +219,11 @@ namespace CDP4BuiltInRules.Tests
 
             this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
-            Assert.IsFalse(this.browser.CopyErrorCommand.CanExecute(null));
+            Assert.IsFalse(await this.browser.CopyErrorCommand.CanExecute);
 
             this.browser.SelectedThing = this.browser.Errors.First();
 
-            Assert.IsTrue(this.browser.CopyErrorCommand.CanExecute(null));
+            Assert.IsTrue(await this.browser.CopyErrorCommand.CanExecute);
 
             Assert.DoesNotThrow(()=>this.browser.CopyErrorCommand.Execute(null));
 

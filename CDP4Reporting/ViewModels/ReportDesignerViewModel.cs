@@ -35,6 +35,7 @@ namespace CDP4Reporting.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
@@ -271,7 +272,7 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Build code that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<Unit, object> CompileScriptCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> CompileScriptCommand { get; set; }
 
         /// <summary>
         /// Create a new Report 
@@ -301,12 +302,12 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Rebuild the DataSource
         /// </summary>
-        public ReactiveCommand<Unit, object> RebuildDatasourceCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> RebuildDatasourceCommand { get; set; }
 
         /// <summary>
         /// Rebuild the DataSource and refresh the preview panel
         /// </summary>
-        public ReactiveCommand<Unit, object> RebuildDatasourceAndRefreshPreviewCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> RebuildDatasourceAndRefreshPreviewCommand { get; set; }
 
         /// <summary>
         /// Submit data from a previewed report
@@ -350,10 +351,12 @@ namespace CDP4Reporting.ViewModels
 
             this.openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 
-            this.ExportScriptCommand = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+
+            this.ExportScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.ExportScriptCommand .Subscribe(_ => this.ExportScript());
 
-            this.ImportScriptCommand = ReactiveCommand.Create();
+            this.ImportScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.ImportScriptCommand.Subscribe(_ => this.ImportScript());
 
             this.CompileScriptCommand = ReactiveCommand.CreateFromTask(async _ =>
@@ -362,30 +365,30 @@ namespace CDP4Reporting.ViewModels
                 await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
             });
 
-            this.NewReportCommand = ReactiveCommand.Create();
+            this.NewReportCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.NewReportCommand.Subscribe(_ => this.CreateNewReport());
 
-            this.OpenReportCommand = ReactiveCommand.Create();
+            this.OpenReportCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.OpenReportCommand.Subscribe(_ => this.OpenReportProject());
 
-            this.SaveReportCommand = ReactiveCommand.Create();
+            this.SaveReportCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.SaveReportCommand.Subscribe(_ => this.SaveReportProject());
 
-            this.SaveReportAsCommand = ReactiveCommand.Create();
+            this.SaveReportAsCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.SaveReportAsCommand.Subscribe(_ => this.SaveReportProject(true));
 
-            this.DataSourceTextChangedCommand = ReactiveCommand.Create();
+            this.DataSourceTextChangedCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoCompileScript());
 
             this.RebuildDatasourceCommand = ReactiveCommand.CreateFromTask(async _ => await this.ExecuteRebuildDatasourceCommand());
             this.RebuildDatasourceAndRefreshPreviewCommand = ReactiveCommand.CreateFromTask(async _ => await this.ExecuteRebuildDatasourceAndRefreshPreviewCommand());
 
-            this.SubmitParameterValuesCommand = ReactiveCommand.CreateFromTask(
+            this.SubmitParameterValuesCommand = ReactiveCommand.Create<Unit, object>(
+                x => this.SubmitParameterValues().ToObservable(),
                 this.WhenAnyValue(x => x.CanSubmitParameterValues),
-                x => this.SubmitParameterValues(),
                 RxApp.MainThreadScheduler);
 
-            this.ClearOutputCommand = ReactiveCommand.Create();
+            this.ClearOutputCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.ClearOutputCommand.Subscribe(_ => { this.Output = string.Empty; });
 
             this.ActiveDocumentChangedCommand = ReactiveCommand.CreateFromTask(x =>

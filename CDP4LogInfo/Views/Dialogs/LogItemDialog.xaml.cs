@@ -31,7 +31,7 @@ namespace CDP4LogInfo.Views.Dialogs
         /// </param>
         public LogItemDialog(bool initializeComponent)
         {
-            InitializeComponent();
+            //InitializeComponent();
         }
     }
 }

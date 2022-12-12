@@ -123,11 +123,11 @@ namespace CDP4BuiltInRules.Tests.ViewModels
             var vm = new ErrorBrowserRibbonViewModel();
 
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            vm.OpenSingleBrowserCommand.Execute(null);
+            vm.OpenSingleBrowserCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
-            vm.OpenSingleBrowserCommand.Execute(null);
+            vm.OpenSingleBrowserCommand.Execute();
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
         }
     }

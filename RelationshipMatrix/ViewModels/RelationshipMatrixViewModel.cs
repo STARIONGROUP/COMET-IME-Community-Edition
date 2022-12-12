@@ -192,7 +192,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.settings = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
 
-            this.SavedConfigurations = new ReactiveList<SavedConfiguration> { ChangeTrackingEnabled = true };
+            this.SavedConfigurations = new ReactiveList<SavedConfiguration>();
 
             this.ReloadSavedConfigurations();
 
@@ -614,39 +614,41 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(deprecateSubscription);
 
-            this.ManageSavedConfigurations = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+
+            this.ManageSavedConfigurations = ReactiveCommand.Create<object, object>(NoOp);
 
             this.Disposables.Add(
                 this.ManageSavedConfigurations.Subscribe(_ => this.ExecuteManageSavedConfigurations()));
 
-            this.SaveCurrentConfiguration = ReactiveCommand.Create();
+            this.SaveCurrentConfiguration = ReactiveCommand.Create<object, object>(NoOp);
             this.Disposables.Add(this.SaveCurrentConfiguration.Subscribe(_ => this.ExecuteSaveCurrentConfiguration()));
 
-            this.EditSourceYCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSourceY));
+            this.EditSourceYCommand = ReactiveCommand.Create<object,object>(NoOp, this.WhenAnyValue(x => x.CanEditSourceY));
             this.Disposables.Add(this.EditSourceYCommand.Subscribe(_ => this.ExecuteEditSourceYCommand()));
 
-            this.EditSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSourceX));
+            this.EditSourceXCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanEditSourceX));
             this.Disposables.Add(this.EditSourceXCommand.Subscribe(_ => this.ExecuteEditSourceXCommand()));
 
-            this.InspectSourceYCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceY));
+            this.InspectSourceYCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanInspectSourceY));
             this.Disposables.Add(this.InspectSourceYCommand.Subscribe(_ => this.ExecuteInspectSourceYCommand()));
 
-            this.InspectSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceX));
+            this.InspectSourceXCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanInspectSourceX));
             this.Disposables.Add(this.InspectSourceXCommand.Subscribe(_ => this.ExecuteInspectSourceXCommand()));
 
-            this.EditSourceYToSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSourceYToSourceX));
+            this.EditSourceYToSourceXCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanEditSourceYToSourceX));
             this.Disposables.Add(this.EditSourceYToSourceXCommand.Subscribe(_ => this.ExecuteEditSourceYToSourceXCommand()));
 
-            this.EditSourceXToSourceYCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanEditSourceXToSourceY));
+            this.EditSourceXToSourceYCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanEditSourceXToSourceY));
             this.Disposables.Add(this.EditSourceXToSourceYCommand.Subscribe(_ => this.ExecuteEditSourceXToSourceYCommand()));
 
-            this.InspectSourceYToSourceXCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceYToSourceX));
+            this.InspectSourceYToSourceXCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanInspectSourceYToSourceX));
             this.Disposables.Add(this.InspectSourceYToSourceXCommand.Subscribe(_ => this.ExecuteInspectSourceYToSourceXCommand()));
 
-            this.InspectSourceXToSourceYCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanInspectSourceXToSourceY));
+            this.InspectSourceXToSourceYCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanInspectSourceXToSourceY));
             this.Disposables.Add(this.InspectSourceXToSourceYCommand.Subscribe(_ => this.ExecuteInspectSourceXToSourceYCommand()));
 
-            this.SwitchAxisCommand = ReactiveCommand.Create();
+            this.SwitchAxisCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.Disposables.Add(this.SwitchAxisCommand.Subscribe(_ => this.ExecuteSwitchAxisCommand()));
 
             this.Disposables.Add(this.WhenAnyValue(x => x.Matrix.SelectedCell)

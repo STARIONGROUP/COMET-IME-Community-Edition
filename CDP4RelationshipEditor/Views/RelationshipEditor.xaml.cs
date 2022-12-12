@@ -34,7 +34,7 @@ namespace CDP4RelationshipEditor.Views
         {
             if (initializeComponent)
             {
-                this.InitializeComponent();
+                //this.InitializeComponent();
             }
         }
     }

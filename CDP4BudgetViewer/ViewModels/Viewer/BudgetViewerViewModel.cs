@@ -28,6 +28,7 @@ namespace CDP4Budget.ViewModels
     using System;
     using System.IO;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using Config;
@@ -54,6 +55,7 @@ namespace CDP4Budget.ViewModels
     using NLog;
     
     using ReactiveUI;
+    using System.Diagnostics;
 
     /// <summary>
     /// 
@@ -123,17 +125,19 @@ namespace CDP4Budget.ViewModels
             this.OptionOverviewViewModel = new OptionOverviewViewModel();
             this.BudgetViewModels = new ReactiveList<OptionBudgetViewModel>();
 
-            this.OpenConfigCommand = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+
+            this.OpenConfigCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.OpenConfigCommand.Subscribe(_ => this.ExecuteOpenConfigCommand());
 
             var confObs = this.WhenAnyValue(x => x.BudgetConfig).Select(x => x != null);
-            this.RefreshBudgetCommand = ReactiveCommand.Create(confObs);
-            this.RefreshBudgetCommand.CanExecuteObservable.Subscribe(_ => this.ComputeBudgets());
+            this.RefreshBudgetCommand = ReactiveCommand.Create<object, object>(NoOp, confObs);
+            this.RefreshBudgetCommand.CanExecute.Subscribe(_ => this.ComputeBudgets());
 
-            this.SaveConfigCommand = ReactiveCommand.Create(confObs);
+            this.SaveConfigCommand = ReactiveCommand.Create<object, object>(NoOp, confObs);
             this.SaveConfigCommand.Subscribe(_ => this.ExecuteSaveConfigCommand());
 
-            this.LoadConfigCommand = ReactiveCommand.Create();
+            this.LoadConfigCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.LoadConfigCommand.Subscribe(_ => this.ExecuteLoadConfigCommand());
             this.ComputeBudgets();
         }

@@ -6,6 +6,8 @@
 
 namespace CDP4Scripting.Interfaces
 {
+    using System.Windows.Controls;
+
     using CDP4Composition;
     using CDP4Dal;
     using Helpers;
@@ -15,7 +17,7 @@ namespace CDP4Scripting.Interfaces
     /// <summary>
     /// Represents the interface of the <see cref="ScriptPanelViewModel"/>
     /// </summary>
-    public interface IScriptPanelViewModel : UserControl, IPanelViewModel
+    public interface IScriptPanelViewModel : IPanelViewModel
     {
 
         /// <summary>

@@ -77,11 +77,13 @@ namespace CDP4BuiltInRules.ViewModels
         /// </param>
         public BuiltInRulesRibbonPageViewModel(IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IRuleVerificationService ruleVerificationService)
         {
+            object NoOp(object param) => param;
+
             this.panelNavigationService = panelNavigationService;
             this.dialogNavigationService = dialogNavigationService;
             this.ruleVerificationService = ruleVerificationService;
 
-            this.OpenBrowser = ReactiveCommand.Create();
+            this.OpenBrowser = ReactiveCommand.Create<object, object>(NoOp);
             this.OpenBrowser.Subscribe(_ => this.ExecuteOpenBrowser());
         }
 

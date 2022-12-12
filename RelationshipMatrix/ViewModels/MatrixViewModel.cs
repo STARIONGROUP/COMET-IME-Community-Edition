@@ -31,6 +31,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -181,29 +182,31 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.session = session;
             this.iteration = iteration;
 
-            this.CreateSourceYToSourceXLink = ReactiveCommand.CreateFromTask(
+            object NoOp(object param) => param;
+
+            this.CreateSourceYToSourceXLink = ReactiveCommand.Create<Unit, object>(
+                x => this.CreateRelationship(RelationshipDirectionKind.RowThingToColumnThing).ToObservable(),
                 this.WhenAnyValue(x => x.CanCreateSourceYToSourceX),
-                x => this.CreateRelationship(RelationshipDirectionKind.RowThingToColumnThing),
                 RxApp.MainThreadScheduler);
 
-            this.CreateSourceXToSourceYLink = ReactiveCommand.CreateFromTask(
+            this.CreateSourceXToSourceYLink = ReactiveCommand.Create<Unit, object>(
+                x => this.CreateRelationship(RelationshipDirectionKind.ColumnThingToRowThing).ToObservable(),
                 this.WhenAnyValue(x => x.CanCreateSourceXToSourceY),
-                x => this.CreateRelationship(RelationshipDirectionKind.ColumnThingToRowThing),
                 RxApp.MainThreadScheduler);
 
-            this.DeleteSourceYToSourceXLink = ReactiveCommand.CreateFromTask(
+            this.DeleteSourceYToSourceXLink = ReactiveCommand.Create<Unit, object>(
+                x => this.DeleteRelationship(RelationshipDirectionKind.RowThingToColumnThing).ToObservable(),
                 this.WhenAnyValue(x => x.CanDelete),
-                x => this.DeleteRelationship(RelationshipDirectionKind.RowThingToColumnThing),
                 RxApp.MainThreadScheduler);
 
-            this.DeleteSourceXToSourceYLink = ReactiveCommand.CreateFromTask(
+            this.DeleteSourceXToSourceYLink = ReactiveCommand.Create<Unit, object>(
+                x => this.DeleteRelationship(RelationshipDirectionKind.ColumnThingToRowThing).ToObservable(),
                 this.WhenAnyValue(x => x.CanDelete),
-                x => this.DeleteRelationship(RelationshipDirectionKind.ColumnThingToRowThing),
                 RxApp.MainThreadScheduler);
 
-            this.DeleteAllRelationships = ReactiveCommand.CreateFromTask(
+            this.DeleteAllRelationships = ReactiveCommand.Create<Unit, object>(
+                x => this.DeleteRelationship(RelationshipDirectionKind.BiDirectional).ToObservable(),
                 this.WhenAnyValue(x => x.CanDelete),
-                x => this.DeleteRelationship(RelationshipDirectionKind.BiDirectional),
                 RxApp.MainThreadScheduler);
 
             this.ProcessCellCommand =
@@ -220,7 +223,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.ToggleColumnHighlightCommand = ReactiveCommand.CreateFromTask<GridColumn>(
                 this.ToggleColumnHighlightCommandExecute,null, RxApp.MainThreadScheduler);
 
-            this.MouseDownCommand = ReactiveCommand.Create();
+            this.MouseDownCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.MouseDownCommand.Subscribe(x => this.MouseDownCommandExecute((MatrixAddress)x));
 
             this.SubscribeCommandExceptions();
@@ -305,42 +308,42 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets the command to create a <see cref="BinaryRelationship" /> from sourceY to sourceX
         /// </summary>
-        public ReactiveCommand<Unit, Unit> CreateSourceYToSourceXLink { get; private set; }
+        public ReactiveCommand<Unit, object> CreateSourceYToSourceXLink { get; private set; }
 
         /// <summary>
         /// Gets the command to create a <see cref="BinaryRelationship" /> from sourceX to sourceY
         /// </summary>
-        public ReactiveCommand<Unit, Unit> CreateSourceXToSourceYLink { get; private set; }
+        public ReactiveCommand<Unit, object> CreateSourceXToSourceYLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete a <see cref="BinaryRelationship" /> from sourceY to sourceX
         /// </summary>
-        public ReactiveCommand<Unit, Unit> DeleteSourceYToSourceXLink { get; private set; }
+        public ReactiveCommand<Unit, object> DeleteSourceYToSourceXLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete a <see cref="BinaryRelationship" /> from sourceX to sourceY
         /// </summary>
-        public ReactiveCommand<Unit, Unit> DeleteSourceXToSourceYLink { get; private set; }
+        public ReactiveCommand<Unit, object> DeleteSourceXToSourceYLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete all <see cref="BinaryRelationship" /> currently displayed
         /// </summary>
-        public ReactiveCommand<Unit, Unit> DeleteAllRelationships { get; private set; }
+        public ReactiveCommand<Unit, object> DeleteAllRelationships { get; private set; }
 
         /// <summary>
         /// Gets the command to process cell double click.
         /// </summary>
-        public ReactiveCommand<Unit, Unit> ProcessCellCommand { get; private set; }
+        public ReactiveCommand<List<object>, Unit> ProcessCellCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to process Alt + cell double click.
         /// </summary>
-        public ReactiveCommand<Unit, Unit> ProcessAltCellCommand { get; private set; }
+        public ReactiveCommand<List<object>, Unit> ProcessAltCellCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to process Alt + Ctrl + cell double click.
         /// </summary>
-        public ReactiveCommand<Unit, Unit> ProcessAltControlCellCommand { get; private set; }
+        public ReactiveCommand<List<object>, Unit> ProcessAltControlCellCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to process the mousedown click.
@@ -350,7 +353,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets the command to process column highlight toggle.
         /// </summary>
-        public ReactiveCommand<Unit, Unit> ToggleColumnHighlightCommand { get; private set; }
+        public ReactiveCommand<GridColumn, Unit> ToggleColumnHighlightCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the selected cell
@@ -611,7 +614,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             var columns = new List<ColumnDefinition>();
 
-            foreach (var definedThing in source.DistinctBy(x => x.ShortName))
+            foreach (var definedThing in IEnumerableExtensions.DistinctBy(source, x => x.ShortName))
             {
                 if (showRelatedOnly && !relationships.Any(x =>
                         x.Source.Iid.Equals(definedThing.Iid) || x.Target.Iid.Equals(definedThing.Iid)))
@@ -898,14 +901,14 @@ namespace CDP4RelationshipMatrix.ViewModels
             // if relationship from y to x does not exist create one, if it does, delete it
             if (this.CanCreateSourceYToSourceX)
             {
-                await this.CreateSourceYToSourceXLink.ExecuteAsync();
+                await this.CreateSourceYToSourceXLink.Execute();
 
                 return;
             }
 
             if (this.CanDelete && this.IsVisibleDeleteYToX)
             {
-                await this.DeleteSourceYToSourceXLink.ExecuteAsync();
+                await this.DeleteSourceYToSourceXLink.Execute();
 
                 return;
             }
@@ -925,14 +928,14 @@ namespace CDP4RelationshipMatrix.ViewModels
             // if relationship from x to y does not exist create one, if it does, delete it
             if (this.CanCreateSourceXToSourceY)
             {
-                await this.CreateSourceXToSourceYLink.ExecuteAsync();
+                await this.CreateSourceXToSourceYLink.Execute();
 
                 return;
             }
 
             if (this.CanDelete && this.IsVisibleDeleteXToY)
             {
-                await this.DeleteSourceXToSourceYLink.ExecuteAsync();
+                await this.DeleteSourceXToSourceYLink.Execute();
 
                 return;
             }
@@ -952,7 +955,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             // if bidirectional
             if (this.CanDelete && this.IsVisibleDeleteAll)
             {
-                await this.DeleteAllRelationships.ExecuteAsync();
+                await this.DeleteAllRelationships.Execute();
 
                 return;
             }
@@ -960,7 +963,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             // if 1 to 2
             if (this.CanDelete && this.IsVisibleDeleteYToX)
             {
-                await this.DeleteSourceYToSourceXLink.ExecuteAsync();
+                await this.DeleteSourceYToSourceXLink.Execute();
 
                 return;
             }
@@ -968,7 +971,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             // if 2 - 1
             if (this.CanDelete && this.IsVisibleDeleteXToY)
             {
-                await this.DeleteSourceXToSourceYLink.ExecuteAsync();
+                await this.DeleteSourceXToSourceYLink.Execute();
 
                 return;
             }

@@ -22,10 +22,12 @@ namespace CDP4Budget.ViewModels
         /// <param name="remove">The action to remove this view-model</param>
         public SubSystemConfigViewModel(IReadOnlyList<Category> usedCategory, Action validateMainForm, Action<SubSystemConfigViewModel> remove)
         {
+            object NoOp(object param) => param;
+
             this.SubSystemDefinitions = new CategorySelectionViewModel(usedCategory, validateMainForm);
             this.SubSystemElementDefinition = new CategorySelectionViewModel(usedCategory, validateMainForm);
 
-            this.RemoveSubSystemDefinitionCommand = ReactiveCommand.Create();
+            this.RemoveSubSystemDefinitionCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.RemoveSubSystemDefinitionCommand.Subscribe(x => remove(this));
         }
 

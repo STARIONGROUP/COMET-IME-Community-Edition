@@ -26,6 +26,7 @@
 namespace CDP4EngineeringModel.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
     using CDP4Composition.Attributes;

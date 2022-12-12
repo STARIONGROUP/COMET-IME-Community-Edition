@@ -35,6 +35,8 @@ namespace CDP4LogInfo.ViewModels
     using System.Windows.Data;
     using CDP4Composition;
     using CDP4Composition.Log;
+    using CDP4Composition.Mvvm;
+
     using CDP4LogInfo.ViewModels.Panels.LogInfoRows;
     using CDP4LogInfo.Views;
     using CDP4Composition.Navigation;
@@ -134,15 +136,17 @@ namespace CDP4LogInfo.ViewModels
             this.WhenAnyValue(vm => vm.SelectedLogLevel)
                 .Subscribe(logLevel => CDP4SimpleConfigurator.ChangeTargetRule(this.logTarget, this.SelectedLogLevel));
 
+            object NoOp(object param) => param;
+
             var canClear = this.LogEventInfo.CountChanged.Select(count => count > 0);
-            this.ClearCommand = ReactiveCommand.Create(canClear);
+            this.ClearCommand = ReactiveCommand.Create<object,object>(NoOp, canClear);
             this.ClearCommand.Subscribe(_ => this.ExecuteClearLog());
 
             var canExport = this.LogEventInfo.CountChanged.Select(count => count > 0);
-            this.ExportCommand = ReactiveCommand.Create(canExport);
+            this.ExportCommand = ReactiveCommand.Create<object, object>(NoOp, canExport);
             this.ExportCommand.Subscribe(_ => this.ExecuteExportCommand());
 
-            this.ShowDetailsDialogCommand = ReactiveCommand.Create();
+            this.ShowDetailsDialogCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.ShowDetailsDialogCommand.Subscribe(_ => this.ExecuteShowDetailsDialogCommand());
 
             Observable.Merge(

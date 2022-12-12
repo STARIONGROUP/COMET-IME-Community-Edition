@@ -62,6 +62,7 @@ namespace CDP4AddinCE
     using NetOffice.OfficeApi;
     using NetOffice.Tools;
     using NetOffice.Tools.Native;
+    using NetOffice.OfficeApi.Tools.Contribution;
 
     using NLog;
 

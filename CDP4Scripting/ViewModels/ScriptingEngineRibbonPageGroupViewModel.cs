@@ -34,6 +34,7 @@ namespace CDP4Scripting.ViewModels
     using System.Reactive.Linq;
 
     using CDP4Composition;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
 
@@ -115,7 +116,6 @@ namespace CDP4Scripting.ViewModels
                 .Subscribe(this.HandleClosedPanel);
 
             this.OpenSessions = new ReactiveList<ISession>();
-            this.OpenSessions.ChangeTrackingEnabled = true;
             this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
@@ -124,19 +124,21 @@ namespace CDP4Scripting.ViewModels
             this.CollectionScriptPanelViewModels = new ObservableCollection<IScriptPanelViewModel>();
             CDPMessageBus.Current.Listen<ScriptPanelEvent>().Subscribe(this.ScriptPanelEventHandler);
 
-            this.NewPythonScriptCommand = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+
+            this.NewPythonScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.NewPythonScriptCommand.Subscribe(_ => this.ExecuteCreateNewScript("python", ScriptingLaguageKindSupported.Python));
 
-            this.NewLuaScriptCommand = ReactiveCommand.Create();
+            this.NewLuaScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.NewLuaScriptCommand.Subscribe(_ => this.ExecuteCreateNewScript("lua", ScriptingLaguageKindSupported.Lua));
 
-            this.NewTextScriptCommand = ReactiveCommand.Create();
+            this.NewTextScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.NewTextScriptCommand.Subscribe(_ => this.ExecuteCreateNewScript("text", ScriptingLaguageKindSupported.Text));
 
-            this.OpenScriptCommand = ReactiveCommand.Create();
+            this.OpenScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.OpenScriptCommand.Subscribe(_ => this.OpenScriptFile());
 
-            this.SaveAllCommand = ReactiveCommand.Create();
+            this.SaveAllCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.SaveAllCommand.Subscribe(_ => this.SaveAllScripts());
         }
 

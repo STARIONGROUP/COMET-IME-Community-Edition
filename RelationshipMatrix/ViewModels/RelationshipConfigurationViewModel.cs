@@ -33,6 +33,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -154,8 +155,10 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void InitializeCommands()
         {
+            object NoOp(object param) => param;
+
             var canExecuteInpsectRuleCommand = this.WhenAny(vm => vm.SelectedRule, v => v.Value != null);
-            this.InspectRuleCommand = ReactiveCommand.Create(canExecuteInpsectRuleCommand);
+            this.InspectRuleCommand = ReactiveCommand.Create<object, object>(NoOp, canExecuteInpsectRuleCommand);
             this.InspectRuleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRule));
         }
 

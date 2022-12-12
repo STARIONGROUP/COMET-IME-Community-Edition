@@ -35,7 +35,9 @@ namespace CDP4Budget.ViewModels
             this.DryMassConfig = new ParameterConfigViewModel(possibleParameterTypes, validateMainForm);
             this.ExtraMassContributions = new ReactiveList<ExtraMassContributionConfigurationViewModel>();
 
-            this.AddExtraMassContributionCommand = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+
+            this.AddExtraMassContributionCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.AddExtraMassContributionCommand.Subscribe(_ => this.ExtraMassContributions.Add(new ExtraMassContributionConfigurationViewModel(possibleCategories, validateMainForm, this.RemoveExtraMassConfigViewModel)));
         }
 

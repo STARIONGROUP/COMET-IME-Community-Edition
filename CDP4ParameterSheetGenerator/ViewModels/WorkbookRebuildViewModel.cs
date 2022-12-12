@@ -60,12 +60,14 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         public WorkbookRebuildViewModel(IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets, ValueSetKind valueSetKind)
             : base(processedValueSets, valueSetKind)
         {
+            object NoOp(object param) => param;
+
             this.DialogTitle = "Rebuild Workbook...";
             
-            this.CancelCommand = ReactiveCommand.Create();
+            this.CancelCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
 
-            this.OkCommand = ReactiveCommand.Create();
+            this.OkCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.OkCommand.Subscribe(_ => this.ExecuteOk());
         }
 

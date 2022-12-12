@@ -42,8 +42,10 @@ namespace CDP4Budget.ViewModels
         /// <param name="removeAction">The action to remove the current view-model</param>
         public ExtraMassContributionConfigurationViewModel(IReadOnlyList<Category> possibleCategories, Action validateForm, Action<ExtraMassContributionConfigurationViewModel> removeAction)
         {
+            object NoOp(object param) => param;
+
             this.PossibleCategories = new ReactiveList<Category>(possibleCategories);
-            this.RemoveExtraMassContributionCommand = ReactiveCommand.Create();
+            this.RemoveExtraMassContributionCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.RemoveExtraMassContributionCommand.Subscribe(_ => removeAction(this));
 
             this.WhenAnyValue(x => x.SelectedCategories, x => x.SelectedParameter).Subscribe(x => validateForm());

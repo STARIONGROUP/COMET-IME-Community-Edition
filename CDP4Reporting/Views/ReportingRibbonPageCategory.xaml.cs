@@ -34,11 +34,11 @@ namespace CDP4Reporting.Views
     /// Interaction logic for ReportingRibbonPageCategory.xaml
     /// </summary>
     [Export(typeof(ExtendedRibbonPageCategory))]
-    public partial class ReportingRibbonPageCategory : IView
+    public partial class ReportingRibbonPageCategory : ExtendedRibbonPageCategory, IView
     {
         public ReportingRibbonPageCategory()
         {
-            this.InitializeComponent();
+            //this.InitializeComponent();
         }
     }
 }

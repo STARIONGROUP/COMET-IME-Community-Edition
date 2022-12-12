@@ -32,6 +32,8 @@ namespace CDP4Scripting.ViewModels
     using System.Windows;
     using System.Windows.Threading;
 
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
 
     using Interfaces;

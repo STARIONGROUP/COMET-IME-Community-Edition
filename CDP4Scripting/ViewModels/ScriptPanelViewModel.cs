@@ -30,6 +30,7 @@ namespace CDP4Scripting.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
@@ -208,15 +209,17 @@ namespace CDP4Scripting.ViewModels
 
             this.ScriptVariables = new List<KeyValuePair<string, dynamic>>();
 
-            this.SaveScriptCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsDirty));
+            object NoOp(object param) => param;
+
+            this.SaveScriptCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.IsDirty));
             this.SaveScriptCommand.Subscribe(_ => this.SaveScript());
 
-            this.ExecuteScriptCommand = ReactiveCommand.CreateFromTask(this.WhenAnyValue(x => x.CanExecuteScript), _ => this.ExecuteScript(), RxApp.MainThreadScheduler);
+            this.ExecuteScriptCommand = ReactiveCommand.Create<Unit, object>( _ => this.ExecuteScript().ToObservable(), this.WhenAnyValue(x => x.CanExecuteScript), RxApp.MainThreadScheduler);
 
-            this.StopScriptCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsScriptExecuted));
+            this.StopScriptCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.IsScriptExecuted));
             this.StopScriptCommand.Subscribe(_ => this.StopScript());
 
-            this.ClearOutputCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanClearOutput));
+            this.ClearOutputCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanClearOutput));
             this.ClearOutputCommand.Subscribe(_ => this.ClearOutput());
 
             this.WhenAnyValue(vm => vm.OpenSessions.Count)

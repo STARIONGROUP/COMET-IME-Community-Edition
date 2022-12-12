@@ -107,6 +107,8 @@ namespace CDP4BuiltInRules.ViewModels
         /// </param>
         public BuiltInRulesBrowserViewModel(IRuleVerificationService ruleVerificationService, IDialogNavigationService dialogNavigationService)
         {
+            object NoOp(object param) => param;
+
             this.Identifier = Guid.NewGuid();
             this.ruleVerificationService = ruleVerificationService;
             this.dialogNavigationService = dialogNavigationService;
@@ -115,7 +117,7 @@ namespace CDP4BuiltInRules.ViewModels
             this.PopulateBuiltInRuleRowViewModel();
 
             var canInspect = this.WhenAnyValue(x => x.SelectedRule).Select(x => x != null);
-            this.InspectCommand = ReactiveCommand.Create(canInspect);
+            this.InspectCommand = ReactiveCommand.Create<object, object>(NoOp, canInspect);
             this.InspectCommand.Subscribe(_ => this.ExecuteInspectCommand());
         }
 

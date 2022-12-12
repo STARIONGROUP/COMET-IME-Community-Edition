@@ -22,7 +22,7 @@ namespace CDP4Scripting.Views
         /// </summary>
         public ScriptPanel()
         {
-            this.InitializeComponent();
+            //this.InitializeComponent();
         }
 
         /// <summary>

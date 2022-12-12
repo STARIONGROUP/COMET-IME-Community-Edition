@@ -7,6 +7,7 @@
 namespace CDP4Requirements.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 

@@ -34,6 +34,8 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
 
@@ -134,11 +136,9 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.possibleDisplayKinds.AddRange(this.PluginSetting.PossibleDisplayKinds.OrderBy(x => x.ToString()));
 
             this.PossibleCategories = new ReactiveList<Category>();
-            this.PossibleCategories.ChangeTrackingEnabled = true;
             this.SelectedCategories = new List<Category>();
 
             this.PossibleOwners = new ReactiveList<DomainOfExpertise>();
-            this.PossibleOwners.ChangeTrackingEnabled = true;
             this.SelectedOwners= new List<DomainOfExpertise>();
 
             // default boolean operator is AND

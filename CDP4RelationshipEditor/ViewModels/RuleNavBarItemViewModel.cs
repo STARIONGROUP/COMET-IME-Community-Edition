@@ -44,10 +44,12 @@ namespace CDP4RelationshipEditor.ViewModels
         /// </summary>
         private void InitializeCommands()
         {
+            object NoOp(object param) => param;
+
             var canCreateRelationshipBasedOnRule = this.Thing is BinaryRelationshipRule ? Observable.Return(true) :
                 ((RelationshipEditorViewModel)this.ContainerViewModel).SelectedItems.Changed.Select(_ => this.CanCreateRelationship());
 
-            this.CreateRelationshipCommand = ReactiveCommand.Create(canCreateRelationshipBasedOnRule);
+            this.CreateRelationshipCommand = ReactiveCommand.Create<object, object>(NoOp, canCreateRelationshipBasedOnRule);
             this.CreateRelationshipCommand.Subscribe(_ => this.ExecuteCreateRelationshipCommand());
         }
 

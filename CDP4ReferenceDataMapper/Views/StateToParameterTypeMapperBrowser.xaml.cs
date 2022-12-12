@@ -56,7 +56,7 @@ namespace CDP4ReferenceDataMapper.Views
         {
             if (initializeComponent)
             {
-                this.InitializeComponent();
+                //this.InitializeComponent();
             }
         }
     }

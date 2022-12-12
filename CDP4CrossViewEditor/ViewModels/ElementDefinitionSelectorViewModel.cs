@@ -78,25 +78,13 @@ namespace CDP4CrossViewEditor.ViewModels
         public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids)
             : base(iteration, session, ClassKind.ElementDefinition, preservedIids)
         {
-            this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>();
 
-            this.ElementDefinitionTargetList = new ReactiveList<ElementDefinitionRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.ElementDefinitionTargetList = new ReactiveList<ElementDefinitionRowViewModel>();
 
-            this.SelectedSourceList = new ReactiveList<ElementDefinitionRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.SelectedSourceList = new ReactiveList<ElementDefinitionRowViewModel>();
 
-            this.SelectedTargetList = new ReactiveList<ElementDefinitionRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.SelectedTargetList = new ReactiveList<ElementDefinitionRowViewModel>();
 
             this.Categories = new List<Category>();
         }

@@ -32,6 +32,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -329,6 +330,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
         {
             base.InitializeCommands();
 
+            object NoOp(object param) => param;
+
             var canExecuteStartMappingCommand = this.WhenAnyValue(
                 vm => vm.SelectedElementDefinitionCategory,
                 vm => vm.SelectedActualFiniteStateList,
@@ -337,23 +340,23 @@ namespace CDP4ReferenceDataMapper.ViewModels
                 (a, b, c, d) =>
                     a != null && b != null && c != null && d != null);
 
-            this.StartMappingCommand = ReactiveCommand.Create(canExecuteStartMappingCommand);
+            this.StartMappingCommand = ReactiveCommand.Create<object, object>(NoOp, canExecuteStartMappingCommand);
             this.StartMappingCommand.Subscribe(_ => this.ExecuteStartMappingCommand());
 
-            this.ClearSettingsCommand = ReactiveCommand.Create();
+            this.ClearSettingsCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.ClearSettingsCommand.Subscribe(_ => this.ExecuteClearSettingsCommand());
 
             var canExecuteRemoveSelectedSourceParameterTypeCommand =
                 this.WhenAnyValue(vm => vm.SelectedSourceParameterType)
                     .Select(x => x != null);
 
-            this.RemoveSelectedSourceParameterTypeCommand = ReactiveCommand.Create(canExecuteRemoveSelectedSourceParameterTypeCommand);
+            this.RemoveSelectedSourceParameterTypeCommand = ReactiveCommand.Create<object, object>(NoOp, canExecuteRemoveSelectedSourceParameterTypeCommand);
             this.RemoveSelectedSourceParameterTypeCommand.Subscribe(_ => this.ExecuteRemoveSelectedSourceParameterCommand());
 
-            this.SelectedMappingParameterChangedCommand = ReactiveCommand.Create();
+            this.SelectedMappingParameterChangedCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.SelectedMappingParameterChangedCommand.Subscribe(this.ExecuteSelectedMappingParameterChangedCommand);
 
-            this.SaveValuesCommand = ReactiveCommand.CreateFromTask(_ => this.ExecuteSaveValuesCommand(), RxApp.MainThreadScheduler);
+            this.SaveValuesCommand = ReactiveCommand.Create<Unit, object>(_ => this.ExecuteSaveValuesCommand().ToObservable());
         }
 
         /// <summary>
@@ -410,7 +413,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
             if (result.HasChanges && result.Result)
             {
-                await this.StartMappingCommand.ExecuteAsync();
+                await this.StartMappingCommand.Execute();
             }
         }
 

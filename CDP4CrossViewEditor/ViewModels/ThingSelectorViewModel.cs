@@ -32,6 +32,7 @@ namespace CDP4CrossViewEditor.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
 
     using CDP4Dal;
@@ -163,13 +164,15 @@ namespace CDP4CrossViewEditor.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            this.MoveItemsToSource = ReactiveCommand.Create();
+            object NoOp(object param) => param;
+
+            this.MoveItemsToSource = ReactiveCommand.Create<object, object>(NoOp);
             this.MoveItemsToSource.Subscribe(_ => this.ExecuteMoveToSource());
 
-            this.MoveItemsToTarget = ReactiveCommand.Create();
+            this.MoveItemsToTarget = ReactiveCommand.Create<object, object>(NoOp);
             this.MoveItemsToTarget.Subscribe(_ => this.ExecuteMoveToTarget());
 
-            this.ClearItems = ReactiveCommand.Create();
+            this.ClearItems = ReactiveCommand.Create<object, object>(NoOp);
             this.ClearItems.Subscribe(_ => this.ExecuteClear());
         }
     }

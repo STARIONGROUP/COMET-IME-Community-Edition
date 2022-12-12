@@ -41,7 +41,7 @@ namespace CDP4RelationshipEditor.Views
     {
         public RelationshipEditorRibbon()
         {
-            this.InitializeComponent();
+            //this.InitializeComponent();
             this.DataContext = new RelationshipEditorRibbonViewModel();
         }
     }

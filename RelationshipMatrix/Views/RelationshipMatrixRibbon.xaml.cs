@@ -44,7 +44,6 @@ namespace CDP4RelationshipMatrix.Views
         [ImportingConstructor]
         public RelationshipMatrixRibbon()
         {
-            this.InitializeComponent();
             this.DataContext = new RelationshipMatrixRibbonViewModel();
         }
     }

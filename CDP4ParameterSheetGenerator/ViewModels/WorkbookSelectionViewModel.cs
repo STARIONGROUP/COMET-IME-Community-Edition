@@ -41,6 +41,8 @@ namespace CDP4ParameterSheetGenerator.ViewModels
         /// </param>
         public WorkbookSelectionViewModel(Application application, EngineeringModelSetup engineeringModelSetup, IterationSetup iterationSetup, DomainOfExpertise domain)
         {
+            object NoOp(object param) => param;
+
             this.Workbooks = new List<WorkbookRowViewModel>();
             this.DialogTitle = "Select the workbook to rebuild";
             this.Model = engineeringModelSetup;
@@ -48,11 +50,11 @@ namespace CDP4ParameterSheetGenerator.ViewModels
             this.Domain = domain;
             this.PopulateWorkbooks(application);
 
-            this.CancelCommand = ReactiveCommand.Create();
+            this.CancelCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
 
             var canOk = this.WhenAny(vm => vm.SelectedWorkbook, vm => vm.Value != null);
-            this.OkCommand = ReactiveCommand.Create(canOk);
+            this.OkCommand = ReactiveCommand.Create<object, object>(NoOp, canOk);
             this.OkCommand.Subscribe(_ => this.ExecuteOk());
         }
 
