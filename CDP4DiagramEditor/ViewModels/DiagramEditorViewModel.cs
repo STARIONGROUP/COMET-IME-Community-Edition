@@ -29,6 +29,7 @@ namespace CDP4DiagramEditor.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
@@ -228,17 +229,17 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets the save command
         /// </summary>
-        public ReactiveCommand<Unit> SaveDiagramCommand { get; private set; }
+        public ReactiveCommand<Unit, object> SaveDiagramCommand { get; private set; }
 
         /// <summary>
         /// Gets the diagram generator command
         /// </summary>
-        public ReactiveCommand<object> GenerateDiagramCommandShallow { get; private set; }
+        public ReactiveCommand<object, object> GenerateDiagramCommandShallow { get; private set; }
 
         /// <summary>
         /// Gets the diagram generator command
         /// </summary>
-        public ReactiveCommand<object> GenerateDiagramCommandDeep { get; private set; }
+        public ReactiveCommand<object, object> GenerateDiagramCommandDeep { get; private set; }
 
         /// <summary>
         /// Gets or sets the RelationshipRules
@@ -261,17 +262,17 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets or sets the Create Port Command
         /// </summary>
-        public ReactiveCommand<object> CreatePortCommand { get; private set; }
+        public ReactiveCommand<object, object> CreatePortCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the Create RelationShip Command
         /// </summary>
-        public ReactiveCommand<object> CreateInterfaceCommand { get; private set; }
+        public ReactiveCommand<object, object> CreateInterfaceCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the Create BinaryRelationShip Command
         /// </summary>
-        public ReactiveCommand<object> CreateBinaryRelationshipCommand { get; protected set; }
+        public ReactiveCommand<object, object> CreateBinaryRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -292,12 +293,12 @@ namespace CDP4DiagramEditor.ViewModels
             var deleteObservable = this.EventPublisher.GetEvent<DiagramDeleteEvent>().ObserveOn(RxApp.MainThreadScheduler).Subscribe(this.OnDiagramDeleteEvent);
 
             this.Disposables.Add(deleteObservable);
-            this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel> { ChangeTrackingEnabled = true };
-            this.ThingDiagramItems = new DisposableReactiveList<ThingDiagramContentItem> { ChangeTrackingEnabled = true };
-            this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
+            this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel>();
+            this.ThingDiagramItems = new DisposableReactiveList<ThingDiagramContentItem>();
+            this.SelectedItems = new ReactiveList<DiagramItem> ();
 
-            this.DiagramPortCollection = new ReactiveList<DiagramPortViewModel> { ChangeTrackingEnabled = true };
-            this.DiagramConnectorCollection = new ReactiveList<DiagramEdgeViewModel> { ChangeTrackingEnabled = true };
+            this.DiagramPortCollection = new ReactiveList<DiagramPortViewModel> ();
+            this.DiagramConnectorCollection = new ReactiveList<DiagramEdgeViewModel> ();
         }
 
         /// <summary>
@@ -305,22 +306,27 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         protected override void InitializeCommands()
         {
+            object NoOp(object param) => param;
+
             base.InitializeCommands();
 
             var canExecute = this.WhenAnyValue(x => x.CanCreateDiagram, x => x.IsDirty, (x, y) => x && y);
-            this.SaveDiagramCommand = ReactiveCommand.CreateFromTask(canExecute, x => this.ExecuteSaveDiagramCommand(), RxApp.MainThreadScheduler);
+            this.SaveDiagramCommand = ReactiveCommand.Create<Unit, object>(x => this.ExecuteSaveDiagramCommand(), canExecute, RxApp.MainThreadScheduler);
             this.SaveDiagramCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
 
-            this.GenerateDiagramCommandShallow = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
+            this.GenerateDiagramCommandShallow = ReactiveCommand.Create<object, object>(NoOp,
+                this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
             this.GenerateDiagramCommandShallow.Subscribe(x => this.ExecuteGenerateDiagramCommand(false));
 
-            this.GenerateDiagramCommandDeep = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
+            this.GenerateDiagramCommandDeep = ReactiveCommand.Create<object, object>(NoOp,
+                this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
             this.GenerateDiagramCommandDeep.Subscribe(x => this.ExecuteGenerateDiagramCommand(true));
 
-            this.CreatePortCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => (s as DiagramContentItem)?.Content is PortContainerDiagramContentItem));
+            this.CreatePortCommand = ReactiveCommand.Create<object, object>(NoOp,
+                this.WhenAnyValue(x => x.SelectedItem).Select(s => (s as DiagramContentItem)?.Content is PortContainerDiagramContentItem));
             this.CreatePortCommand.Subscribe(_ => this.CreatePortCommandExecute());
 
-            this.CreateInterfaceCommand = ReactiveCommand.Create();
+            this.CreateInterfaceCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.CreateInterfaceCommand.Subscribe(_ => this.CreateInterfaceCommandExecute());
         }
 

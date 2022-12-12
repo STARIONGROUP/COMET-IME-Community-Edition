@@ -322,7 +322,7 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Fires when the Active Document changes in the Report Designer
         /// </summary>
-        public ReactiveCommand<Unit, object> ActiveDocumentChangedCommand { get; set; }
+        public ReactiveCommand<DependencyPropertyChangedEventArgs, object> ActiveDocumentChangedCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -391,8 +391,8 @@ namespace CDP4Reporting.ViewModels
             this.ClearOutputCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.ClearOutputCommand.Subscribe(_ => { this.Output = string.Empty; });
 
-            this.ActiveDocumentChangedCommand = ReactiveCommand.CreateFromTask(x =>
-                this.SetReportDesigner(((DependencyPropertyChangedEventArgs) x).NewValue), RxApp.MainThreadScheduler);
+            this.ActiveDocumentChangedCommand = ReactiveCommand.Create<DependencyPropertyChangedEventArgs, object>(x =>
+                this.SetReportDesigner(((DependencyPropertyChangedEventArgs) x).NewValue));
 
             this.WhenAnyValue(x => x.CurrentReport).Subscribe(x =>
             {

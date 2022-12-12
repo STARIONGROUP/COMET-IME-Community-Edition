@@ -30,7 +30,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             vm.Name = "adda";
             vm.Description = "dde";
 
-            Assert.DoesNotThrowAsync(() => vm.OkCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => vm.OkCommand.Execute());
         }
     }
 }

@@ -31,9 +31,11 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public LogInfoControlsViewModel(IDialogNavigationService dialogNavigationService)
         {
+            object NoOp(object param) => param;
+
             this.LogInfoPanel = new LogInfoPanelViewModel(dialogNavigationService);
 
-            this.OpenClosePanelCommand = ReactiveCommand.Create();
+            this.OpenClosePanelCommand = ReactiveCommand.Create<object, object>(NoOp);
             this.OpenClosePanelCommand.Subscribe(_ => this.ExecuteOpenClosePanel());
             
             CDPMessageBus.Current.Listen<NavigationPanelEvent>()

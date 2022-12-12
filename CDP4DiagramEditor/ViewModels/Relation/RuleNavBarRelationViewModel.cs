@@ -62,16 +62,18 @@ namespace CDP4DiagramEditor.ViewModels.Relation
         /// <summary>
         /// Gets the public command to create a relationship.
         /// </summary>
-        public ReactiveCommand<object> CreateRelationshipCommand { get; private set; }
+        public ReactiveCommand<object, object> CreateRelationshipCommand { get; private set; }
 
         /// <summary>
         /// Initializes the commands.
         /// </summary>
         private void InitializeCommands()
         {
+            object NoOp(object param) => param;
+
             var canCreateRelationshipBasedOnRule = this.Thing is BinaryRelationshipRule ? Observable.Return(true) : ((DiagramEditorViewModel) this.ContainerViewModel).SelectedItems.Changed.Select(_ => this.CanCreateRelationship());
 
-            this.CreateRelationshipCommand = ReactiveCommand.Create(canCreateRelationshipBasedOnRule);
+            this.CreateRelationshipCommand = ReactiveCommand.Create<object, object>(NoOp, canCreateRelationshipBasedOnRule);
             this.CreateRelationshipCommand.Subscribe(_ => this.ExecuteCreateRelationshipCommand());
         }
 

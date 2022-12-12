@@ -27,6 +27,9 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 {
     using System;
     using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition.Navigation;
@@ -68,15 +71,15 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         }
 
         [Test]
-        public void Verify_that_the_rule_inspect_command_is_active_when_rule_is_selected()
+        public async Task Verify_that_the_rule_inspect_command_is_active_when_rule_is_selected()
         {
-            Assert.IsFalse(this.relationshipConfigurationViewModel.InspectRuleCommand.CanExecute(null));
+            Assert.IsFalse(await this.relationshipConfigurationViewModel.InspectRuleCommand.CanExecute);
 
             this.relationshipConfigurationViewModel.PossibleRules.Add(this.rule);
 
             this.relationshipConfigurationViewModel.SelectedRule = this.relationshipConfigurationViewModel.PossibleRules.First();
 
-            Assert.IsTrue(this.relationshipConfigurationViewModel.InspectRuleCommand.CanExecute(null)); 
+            Assert.IsTrue(await this.relationshipConfigurationViewModel.InspectRuleCommand.CanExecute); 
         }
 
         [Test]

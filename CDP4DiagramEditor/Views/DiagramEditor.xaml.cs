@@ -59,7 +59,7 @@ namespace CDP4DiagramEditor.Views
         {
             if (initializeComponent)
             {
-                this.InitializeComponent();
+                //this.InitializeComponent();
             }
         }
     }

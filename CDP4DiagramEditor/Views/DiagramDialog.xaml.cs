@@ -29,11 +29,13 @@ namespace CDP4DiagramEditor.Views
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 
+    using DevExpress.Xpf.Core;
+
     /// <summary>
     /// Interaction logic for CategoryDialog
     /// </summary>
     [ThingDialogViewExport(ClassKind.DiagramCanvas)]
-    public partial class DiagramDialog : IThingDialogView
+    public partial class DiagramDialog : DXWindow, IThingDialogView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramDialog"/> class.
@@ -58,7 +60,7 @@ namespace CDP4DiagramEditor.Views
         {
             if (initializeComponent)
             {
-                this.InitializeComponent();
+                //this.InitializeComponent();
             }
         }
     }

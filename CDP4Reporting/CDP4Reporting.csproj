@@ -13,6 +13,8 @@
     <AssemblyVersion>9.2.0.5</AssemblyVersion>
     <FileVersion>9.2.0.5</FileVersion>
     <LangVersion>latest</LangVersion>
+	<UseWPF>true</UseWPF>
+	  <EnableDefaultPageItems>false</EnableDefaultPageItems>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

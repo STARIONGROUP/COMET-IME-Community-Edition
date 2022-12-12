@@ -36,14 +36,14 @@ namespace CDP4DiagramEditor.Views
     /// Interaction logic for CDP4DiagramEditorRibbon.xaml
     /// </summary>
     [Export(typeof(ExtendedRibbonPageGroup))]
-    public partial class CDP4DiagramEditorRibbon : IView
+    public partial class CDP4DiagramEditorRibbon : ExtendedRibbonPageGroup, IView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CDP4DiagramEditorRibbon" /> class.
         /// </summary>
         public CDP4DiagramEditorRibbon()
         {
-            this.InitializeComponent();
+            //this.InitializeComponent();
             this.DataContext = new DiagramEditorRibbonViewModel();
         }
     }

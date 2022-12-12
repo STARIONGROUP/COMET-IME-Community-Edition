@@ -44,10 +44,10 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             vm.SelectedConfiguration = savedConfig1;
 
-            vm.DeleteSelectedCommand.Execute(null);
+            vm.DeleteSelectedCommand.Execute();
 
             Assert.AreEqual(1, vm.SavedConfigurations.Count);
-            Assert.DoesNotThrowAsync(() => vm.OkCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => vm.OkCommand.Execute());
         }
     }
 }

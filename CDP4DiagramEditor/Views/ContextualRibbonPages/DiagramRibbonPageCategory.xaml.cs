@@ -34,11 +34,11 @@ namespace CDP4DiagramEditor.Views.ContextualRibbonPages
     /// Interaction logic for DiagramRibbonPageCategory.xaml
     /// </summary>
     [Export(typeof(ExtendedRibbonPageCategory))]
-    public partial class DiagramRibbonPageCategory : IView
+    public partial class DiagramRibbonPageCategory : ExtendedRibbonPageCategory, IView
     {
         public DiagramRibbonPageCategory()
         {
-            this.InitializeComponent();
+            //this.InitializeComponent();
         }
     }
 }

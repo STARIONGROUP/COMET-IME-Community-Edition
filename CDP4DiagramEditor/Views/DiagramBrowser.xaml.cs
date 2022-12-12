@@ -26,6 +26,7 @@
 namespace CDP4DiagramEditor.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -55,7 +56,7 @@ namespace CDP4DiagramEditor.Views
         {
             if (initializeComponent)
             {
-                this.InitializeComponent();
+                //this.InitializeComponent();
             }
         }
     }

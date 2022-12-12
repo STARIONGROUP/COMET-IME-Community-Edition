@@ -48,7 +48,6 @@ namespace CDP4Scripting.Views
         [ImportingConstructor]
         public ScriptingEngineRibbon(IPanelNavigationService panelNavigationService, IOpenSaveFileDialogService fileDialogService, IScriptingProxy scriptingProxy)
         {
-            this.InitializeComponent();
             this.DataContext = new ScriptingEngineRibbonPageGroupViewModel(panelNavigationService, fileDialogService, scriptingProxy);
         }
     }

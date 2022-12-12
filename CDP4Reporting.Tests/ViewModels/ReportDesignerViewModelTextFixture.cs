@@ -30,6 +30,7 @@ namespace CDP4Reporting.Tests.ViewModels
     using System.IO;
     using System.IO.Compression;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -570,7 +571,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             await this.reportDesignerViewModel.CurrentReport.CreateDocumentAsync();
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.SubmitParameterValuesCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.SubmitParameterValuesCommand.Execute());
 
             if (!tuple.found)
             {
@@ -747,7 +748,7 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public void VerifyThatCompileScriptCommandWorks()
         {
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.CompileScriptCommand.Execute());
         }
 
         [Test]
@@ -759,7 +760,7 @@ namespace CDP4Reporting.Tests.ViewModels
             };
 
             this.reportDesignerViewModel.Document = textDocument;
-            await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null);
+            await this.reportDesignerViewModel.CompileScriptCommand.Execute();
 
             Assert.AreEqual(0, this.reportDesignerViewModel.CompileResult.Errors.Count);
             Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Errors);
@@ -774,7 +775,7 @@ namespace CDP4Reporting.Tests.ViewModels
             };
 
             this.reportDesignerViewModel.Document = textDocument;
-            await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null);
+            await this.reportDesignerViewModel.CompileScriptCommand.Execute();
 
             Assert.AreNotEqual(0, this.reportDesignerViewModel.CompileResult.Errors.Count);
             Assert.AreNotEqual(string.Empty, this.reportDesignerViewModel.Errors);
@@ -846,7 +847,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("File succesfully compiled"));
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.RebuildDatasourceCommand.Execute());
 
             Assert.Zero(this.reportDesignerViewModel.Errors.Length);
         }
@@ -879,7 +880,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("File succesfully compiled"));
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.RebuildDatasourceCommand.Execute());
 
             Assert.Zero(this.reportDesignerViewModel.Errors.Length);
         }
@@ -912,7 +913,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("File succesfully compiled"));
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceAndRefreshPreviewCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.RebuildDatasourceAndRefreshPreviewCommand.Execute());
 
             Assert.Zero(this.reportDesignerViewModel.Errors.Length);
 
@@ -932,7 +933,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("File succesfully compiled"));
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceAndRefreshPreviewCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.RebuildDatasourceAndRefreshPreviewCommand.Execute());
 
             Assert.Zero(this.reportDesignerViewModel.Errors.Length);
 
@@ -976,7 +977,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             Assert.NotZero(this.reportDesignerViewModel.Errors.Length);
 
-            await this.reportDesignerViewModel.RebuildDatasourceCommand.ExecuteAsyncTask(null);
+            await this.reportDesignerViewModel.RebuildDatasourceCommand.Execute();
 
             Assert.NotZero(this.reportDesignerViewModel.Errors.Length);
         }
@@ -984,7 +985,7 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public void VerifyThatRebuildDataSourceCommandWorksWithNoDataSource()
         {
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => this.reportDesignerViewModel.RebuildDatasourceCommand.Execute());
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("Nothing to compile"));
         }

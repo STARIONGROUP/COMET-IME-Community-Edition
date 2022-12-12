@@ -38,7 +38,7 @@ namespace CDP4Scripting.Views
         {
             if (initializeComponent)
             {
-                this.InitializeComponent();
+                //this.InitializeComponent();
             }
         }
     }

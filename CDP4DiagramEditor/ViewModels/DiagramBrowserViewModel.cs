@@ -28,6 +28,7 @@ namespace CDP4DiagramEditor.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
@@ -149,19 +150,23 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         protected override void InitializeCommands()
         {
+            Unit NoOp(Unit param) => param;
+
             var canDelete = this.WhenAnyValue(
                 vm => vm.SelectedThing,
                 vm => vm.CanWriteSelectedThing,
                 (selection, canWrite) => selection != null && canWrite);
 
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateDiagram));
+            this.CreateCommand = ReactiveCommand.Create<Unit, Unit>(NoOp, 
+                this.WhenAnyValue(vm => vm.CanCreateDiagram));
             this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<DiagramCanvas>(this.Thing));
 
-            this.DeleteCommand = ReactiveCommand.Create(canDelete);
+            this.DeleteCommand = ReactiveCommand.Create<Unit, Unit>(NoOp, canDelete);
             this.DeleteCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedThing.Thing));
-            this.UpdateCommand = ReactiveCommand.Create(canDelete);
+            this.UpdateCommand = ReactiveCommand.Create<Unit, Unit>(NoOp, canDelete);
             this.UpdateCommand.Subscribe(_ => this.ExecuteUpdateCommand());
-            this.InspectCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null));
+            this.InspectCommand = ReactiveCommand.Create<Unit, Unit>(NoOp,
+                this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null));
             this.InspectCommand.Subscribe(_ => this.ExecuteUpdateCommand());
         }
 

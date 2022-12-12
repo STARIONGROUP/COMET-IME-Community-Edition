@@ -25,6 +25,9 @@
 
 namespace CDP4BuiltInRules.Tests.ViewModels
 {
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4BuiltInRules.ViewModels;
 
     using CDP4Composition.Navigation;
@@ -53,11 +56,11 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatBuiltInRulesRibbonPageViewModelCanBeConstructed()
+        public async Task VerifyThatBuiltInRulesRibbonPageViewModelCanBeConstructed()
         {
             var viewmodel = new BuiltInRulesRibbonPageViewModel(this.panelNavigationService.Object, this.dialogNavigationService.Object, this.ruleVerificationService.Object);
 
-            Assert.IsTrue(viewmodel.OpenBrowser.CanExecute(null));
+            Assert.IsTrue(await viewmodel.OpenBrowser.CanExecute);
         }
     }
 }

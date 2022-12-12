@@ -29,6 +29,8 @@ namespace CDP4DiagramEditor.Tests
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
@@ -112,7 +114,7 @@ namespace CDP4DiagramEditor.Tests
         }
 
         [Test]
-        public void VerifyThatRowsAreCreated()
+        public async Task VerifyThatRowsAreCreated()
         {
             var viewmodel = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -129,24 +131,24 @@ namespace CDP4DiagramEditor.Tests
 
             viewmodel.SelectedThing = diagramrow;
 
-            viewmodel.UpdateCommand.Execute(null);
+            await viewmodel.UpdateCommand.Execute();
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<DiagramEditorViewModel>()));
         }
 
         [Test]
-        public void VerifyComputePermissions()
+        public async Task VerifyComputePermissions()
         {
             var vm = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
             var diagramrow = vm.Diagrams.Single();
             Assert.That(diagramrow.Name, Is.Not.Null.Or.Empty);
 
-            Assert.IsFalse(vm.UpdateCommand.CanExecute(null));
+            Assert.IsFalse(await vm.UpdateCommand.CanExecute);
             vm.SelectedThing = diagramrow;
             vm.ComputePermission();
-            Assert.IsTrue(vm.UpdateCommand.CanExecute(null));
+            Assert.IsTrue(await vm.UpdateCommand.CanExecute);
 
-            vm.UpdateCommand.Execute(null);
+            _ = vm.UpdateCommand.Execute();
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<DiagramEditorViewModel>()));
         }
 

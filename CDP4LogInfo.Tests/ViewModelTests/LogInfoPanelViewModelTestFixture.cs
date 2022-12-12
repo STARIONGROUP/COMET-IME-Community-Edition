@@ -8,6 +8,9 @@ namespace CDP4LogInfo.Tests.ViewModelTests
 {
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Composition.Navigation;
     using CDP4LogInfo.ViewModels;
     using CDP4LogInfo.ViewModels.Dialogs;
@@ -87,30 +90,30 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         }
 
         [Test]
-        public void VerifyThatClearWorks()
+        public async Task VerifyThatClearWorks()
         {
             var vm = new LogInfoPanelViewModel(this.dialogNavigationService.Object);
-            Assert.IsFalse(vm.ClearCommand.CanExecute(null));
+            Assert.IsFalse(await vm.ClearCommand.CanExecute);
 
             var msg = "err";
             logger.Log(LogLevel.Error, msg);
 
-            Assert.IsTrue(vm.ClearCommand.CanExecute(null));
+            Assert.IsTrue(await vm.ClearCommand.CanExecute);
 
-            vm.ClearCommand.Execute(null);
+            await vm.ClearCommand.Execute();
             Assert.AreEqual(0, vm.LogEventInfo.Count);
         }
 
         [Test]
-        public void verifyThatExportCanExecute()
+        public async Task verifyThatExportCanExecute()
         {
             var vm = new LogInfoPanelViewModel(this.dialogNavigationService.Object);
-            Assert.IsFalse(vm.ExportCommand.CanExecute(null));
+            Assert.IsFalse(await vm.ExportCommand.CanExecute);
 
             var msg = "err";
             logger.Log(LogLevel.Error, msg);
 
-            Assert.IsTrue(vm.ExportCommand.CanExecute(null));
+            Assert.IsTrue(await vm.ExportCommand.CanExecute);
         }
 
         [Test]
@@ -130,13 +133,13 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         }
 
         [Test]
-        public void VerifyThatUpdatingExportIsOnlyEnabledWhenMesagesArePresent()
+        public async Task VerifyThatUpdatingExportIsOnlyEnabledWhenMesagesArePresent()
         {
             var vm = new LogInfoPanelViewModel(this.dialogNavigationService.Object);
-            Assert.IsFalse(vm.ExportCommand.CanExecute(null));
+            Assert.IsFalse(await vm.ExportCommand.CanExecute);
             logger.Log(LogLevel.Error, "an error message");
             Assert.AreEqual(1, vm.LogEventInfo.Count);
-            Assert.IsTrue(vm.ExportCommand.CanExecute(null));
+            Assert.IsTrue(await vm.ExportCommand.CanExecute);
         }
 
         [Test]
