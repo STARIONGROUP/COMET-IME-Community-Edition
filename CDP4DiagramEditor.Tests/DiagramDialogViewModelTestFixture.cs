@@ -29,6 +29,8 @@ namespace CDP4DiagramEditor.Tests
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
@@ -119,7 +121,7 @@ namespace CDP4DiagramEditor.Tests
         }
 
         [Test]
-        public void VerifyThatCreateDiagramWorks()
+        public async Task VerifyThatCreateDiagramWorks()
         {
             var clone = this.iteration.Clone(false);
             this.transaction.CreateOrUpdate(clone);
@@ -134,7 +136,7 @@ namespace CDP4DiagramEditor.Tests
             nameCheck = viewmodel["Name"];
             Assert.IsTrue(viewmodel.OkCanExecute);
 
-            var result = viewmodel.OkCommand.ExecuteAsync(null);
+            var result = await viewmodel.OkCommand.Execute();
             Assert.AreNotEqual(default, diagram.CreatedOn);
         }
     }

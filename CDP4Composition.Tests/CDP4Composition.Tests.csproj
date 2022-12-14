@@ -35,13 +35,6 @@
 	<PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236" />
 	<PackageReference Include="CDP4RequirementsVerification-CE" Version="9.0.0-750-PR236" />
 	<PackageReference Include="CommonServiceLocator" Version="2.0.5" />
-	<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
 	<PackageReference Include="ReactiveUI" Version="18.3.1" />
 	<PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
 	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />

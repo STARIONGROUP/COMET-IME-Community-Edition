@@ -29,6 +29,7 @@ namespace CDP4DiagramEditor.Tests
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
@@ -320,7 +321,7 @@ namespace CDP4DiagramEditor.Tests
             await viewModel.Drop(drop1.Object);
             await viewModel.Drop(drop2.Object);
 
-            viewModel.SaveDiagramCommand.Execute(null);
+            await viewModel.SaveDiagramCommand.Execute();
             this.cache.TryAdd(new CacheKey(this.diagram.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.diagram));
             this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => op.Operations.Count() == 5)));
             viewModel.Dispose();
@@ -416,14 +417,14 @@ namespace CDP4DiagramEditor.Tests
         }
 
         [Test]
-        public void VerifyThatIsDirtyIsTrueOnThingDeleted()
+        public async Task VerifyThatIsDirtyIsTrueOnThingDeleted()
         {
             var viewModel = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
             viewModel.UpdateProperties();
-            viewModel.SaveDiagramCommand.Execute(null);
+            await viewModel.SaveDiagramCommand.Execute();
             Assert.IsFalse(viewModel.IsDirty);
 
             var thingNumber = viewModel.ThingDiagramItems.Count;

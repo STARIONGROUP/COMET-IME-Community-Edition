@@ -30,7 +30,9 @@ namespace CDP4Scripting.Tests.ViewModels
     using System.Linq;
     using System.Threading;
     using System.Windows.Documents;
-    
+
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
 
     using CDP4Scripting.ViewModels;

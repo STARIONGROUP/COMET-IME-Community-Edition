@@ -47,91 +47,91 @@
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CsvHelper" Version="27.1.1" />
-    <PackageReference Include="DevExpress.CodeParser" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data.Desktop" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.DataAccess" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.DataAccess" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Diagram.Core" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Diagram.Core" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Images" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Mvvm" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Office.Core" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Office.Core" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Core" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Pdf.Core" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Pdf.Drawing" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Printing.Core" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Printing.Core" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.RichEdit.Core" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.RichEdit.Export" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.SpellChecker.Core" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.SpellChecker.Core" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Core" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Diagram" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Diagram" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.DocumentViewer.Core" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.ExpressionEditor" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Grid" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Grid.Core" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Layout" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Navigation" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Office" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Office" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Printing" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.PropertyGrid" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.RichEdit" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.SpellChecker" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Xpo" Version="20.2.11">
+    <PackageReference Include="DevExpress.WindowsDesktop.Xpo" Version="20.2.11">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0">

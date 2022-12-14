@@ -12,6 +12,7 @@ namespace CDP4Scripting.Tests.ViewModels
     using System.Reactive.Concurrency;
     using System.Threading;
     using CDP4Composition;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
     using CDP4Dal;

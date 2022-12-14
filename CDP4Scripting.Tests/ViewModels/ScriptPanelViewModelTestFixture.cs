@@ -27,8 +27,12 @@
 namespace CDP4Scripting.Tests.ViewModels
 {
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows.Documents;
+
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     
@@ -85,7 +89,7 @@ namespace CDP4Scripting.Tests.ViewModels
         [Test]
         public void VerifyThatCommandsWork()
         {
-            Assert.DoesNotThrow(() => this.scriptPanelViewModel.Object.ExecuteScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptPanelViewModel.Object.ExecuteScriptCommand.Execute());
             Assert.DoesNotThrow(() => this.scriptPanelViewModel.Object.StopScriptCommand.Execute(null));
             Assert.DoesNotThrow(() => this.scriptPanelViewModel.Object.SaveScriptCommand.Execute(null));
         }
