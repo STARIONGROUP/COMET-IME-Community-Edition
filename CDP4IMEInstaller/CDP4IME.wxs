@@ -34,7 +34,77 @@
 
       <!-- CDP4-IME and CDP4-AddIn dependencies -->
 
-      <Component Id="_0023C8C8A530" Guid="{2EAB5754-130B-4335-80A1-0023C8C8A530}" Location="local" Win64="$(var.Win64)">
+		<Component Id="_B8A43C47" Guid="{B8A43C47-5365-4E74-BD76-406DF1F7C333}" Win64="$(var.Win64)">
+			<File Id="_406DF1F7C333" Vital="yes" Source="$(var.COMET-CE.TargetDir)CommonServiceLocator.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_D1AB2FC7" Guid="{D1AB2FC7-4A79-488C-A628-389D866C59B1}" Win64="$(var.Win64)">
+			<File Id="_389D866C59B1" Vital="yes" Source="$(var.COMET-CE.TargetDir)DynamicData.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_E4DC26AA" Guid="{E4DC26AA-F7F9-4298-B11F-4588745D47DA}" Win64="$(var.Win64)">
+			<File Id="_4588745D47DA" Vital="yes" Source="$(var.COMET-CE.TargetDir)Hardcodet.NotifyIcon.Wpf.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_55784171" Guid="{55784171-5F51-48FD-B6DC-69E991CED1C8}" Win64="$(var.Win64)">
+			<File Id="_69E991CED1C8" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.Configuration.Abstractions.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_DCCD8B63" Guid="{DCCD8B63-A3AF-4DF7-9393-DF341655E29A}" Win64="$(var.Win64)">
+			<File Id="_DF341655E29A" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.Configuration.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_AF90B66A" Guid="{AF90B66A-8E9E-432C-9274-891C8A8BE5C7}" Win64="$(var.Win64)">
+			<File Id="_891C8A8BE5C7" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.Configuration.FileExtensions.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_86873FA6" Guid="{86873FA6-DED0-4A51-8365-C8D7AA5024C3}" Win64="$(var.Win64)">
+			<File Id="_C8D7AA5024C3" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.Configuration.Json.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_CD93126B" Guid="{CD93126B-CB6A-405A-8E1E-F8ABA8679C4C}" Win64="$(var.Win64)">
+			<File Id="_F8ABA8679C4C" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_37A64483" Guid="{37A64483-BF59-43CD-83AF-64B349614334}" Win64="$(var.Win64)">
+			<File Id="_64B349614334" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.DependencyInjection.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_998D9012" Guid="{998D9012-4AE2-4413-AD7E-3A5AD62873A9}" Win64="$(var.Win64)">
+			<File Id="_3A5AD62873A9" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.FileProviders.Abstractions.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_C4DA1749" Guid="{C4DA1749-7A20-45F9-8EA3-4CCD6A06B30B}" Win64="$(var.Win64)">
+			<File Id="_4CCD6A06B30B" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.FileProviders.Physical.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_12C29C8D" Guid="{12C29C8D-A457-473D-8448-818C072FB435}" Win64="$(var.Win64)">
+			<File Id="_818C072FB435" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.FileSystemGlobbing.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_A43A548C" Guid="{A43A548C-C270-4302-B4DF-C318F14A0A43}" Win64="$(var.Win64)">
+			<File Id="_C318F14A0A43" Vital="yes" Source="$(var.COMET-CE.TargetDir)Microsoft.Extensions.Primitives.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_5D33E3E5" Guid="{5D33E3E5-43D7-4B2E-9C52-35C7E8C66F46}" Win64="$(var.Win64)">
+			<File Id="_35C7E8C66F46" Vital="yes" Source="$(var.COMET-CE.TargetDir)stdole.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_EF754B32" Guid="{EF754B32-8FD1-4C3E-9F3F-AFCA2F8BFA7E}" Win64="$(var.Win64)">
+			<File Id="_AFCA2F8BFA7E" Vital="yes" Source="$(var.COMET-CE.TargetDir)System.ComponentModel.Composition.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_D02370BC" Guid="{D02370BC-9088-4E6C-A8E8-FA29C2FCF57A}" Win64="$(var.Win64)">
+			<File Id="_FA29C2FCF57A" Vital="yes" Source="$(var.COMET-CE.TargetDir)System.Data.SqlClient.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_A783137D" Guid="{A783137D-9D83-4484-A5D5-4611E94D0F95}" Win64="$(var.Win64)">
+			<File Id="_4611E94D0F95" Vital="yes" Source="$(var.COMET-CE.TargetDir)System.Private.ServiceModel.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_D2AEC1F4" Guid="{D2AEC1F4-0FA2-43B8-8EDE-7CC051C0FE60}" Win64="$(var.Win64)">
+			<File Id="_7CC051C0FE60" Vital="yes" Source="$(var.COMET-CE.TargetDir)System.Reactive.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_9445DCFD" Guid="{9445DCFD-7704-48D4-A1BB-2FC6FAB2DADE}" Win64="$(var.Win64)">
+			<File Id="_2FC6FAB2DADE" Vital="yes" Source="$(var.COMET-CE.TargetDir)System.ServiceModel.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_E3298E79" Guid="{E3298E79-1DE0-4547-A623-2AE4C50F16B0}" Win64="$(var.Win64)">
+			<File Id="_2AE4C50F16B0" Vital="yes" Source="$(var.COMET-CE.TargetDir)System.ServiceModel.Http.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_A76D31DE" Guid="{A76D31DE-389C-43C5-89FF-90EF6D8F9E3F}" Win64="$(var.Win64)">
+			<File Id="_90EF6D8F9E3F" Vital="yes" Source="$(var.COMET-CE.TargetDir)System.ServiceModel.NetTcp.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_F5150F14" Guid="{F5150F14-2458-45B8-9D1A-C7D871967731}" Win64="$(var.Win64)">
+			<File Id="_C7D871967731" Vital="yes" Source="$(var.COMET-CE.TargetDir)System.ServiceModel.Primitives.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+		<Component Id="_3D1149E9" Guid="{3D1149E9-2E62-491E-8681-B086F49944B0}" Win64="$(var.Win64)">
+			<File Id="_B086F49944B0" Vital="yes" Source="$(var.COMET-CE.TargetDir)System.ServiceModel.Security.dll" KeyPath="yes" Assembly=".net"></File>
+		</Component>
+
+		<Component Id="_0023C8C8A530" Guid="{2EAB5754-130B-4335-80A1-0023C8C8A530}" Location="local" Win64="$(var.Win64)">
         <File Id="_2EAB5754" Vital="yes" Source="$(var.CDP4Composition.TargetPath)" KeyPath="yes" />
       </Component>
 
