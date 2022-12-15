@@ -14,10 +14,6 @@
         <File Id="fil_Manifest_CDP4Reporting"  Vital="yes" Source="$(var.CDP4Reporting.TargetDir)CDP4Reporting.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_avalonedit_CDP4Reporting" Guid="{EDDA5952-9111-491A-9AAC-A781D60B062F}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_avalonedit_CDP4Reporting" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)ICSharpCode.AvalonEdit.dll" KeyPath="yes" />
-      </Component>
-
     </ComponentGroup>
   </Fragment>
 </Wix>

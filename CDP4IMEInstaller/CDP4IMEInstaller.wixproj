@@ -188,6 +188,14 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
+    <ProjectReference Include="..\CDP4IME\COMET-CE.csproj">
+      <Name>COMET-CE</Name>
+      <Project>{fa8ecaf5-d8f6-46f0-b775-b2054ba96ec6}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
     <ProjectReference Include="..\CDP4JsonFileDal\CDP4JsonFileDal.csproj">
       <Name>CDP4JsonFileDal</Name>
       <Project>{7c432d61-867c-4dd2-8b14-ee8aefd0b3a4}</Project>

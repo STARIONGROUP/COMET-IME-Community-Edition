@@ -8,78 +8,26 @@
 	<Fragment>
     <ComponentGroup Id="DEPENDENCIES" Directory="BIN">
 
-	  <Component Id="comp_ExceptionReporter_WinForms" Guid="{DDBBAB53-5E15-4461-85BB-4B0456A090F6}" Location="local" Win64="$(var.Win64)">
-		<File Id="fil_ExceptionReporter_NET" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)ExceptionReporter.NET.dll" KeyPath="yes" />
-	  </Component>		
-
-      <Component Id="comp_Hardcodet_Wpf_TaskbarNotification" Guid="{71968271-91D9-4BE8-9B53-0637495B0157}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_Hardcodet_Wpf_TaskbarNotification" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Hardcodet.Wpf.TaskbarNotification.dll" KeyPath="yes" />
-      </Component>
-
       <Component Id="_7D7C7995B7FC" Guid="{DE458569-7B72-45C5-A2A2-7D7C7995B7FC}" Location="local" Win64="$(var.Win64)">
-        <File Id="_DE458569"  Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Markdown.Xaml.dll" KeyPath="yes"></File>
+        <File Id="_DE458569"  Vital="yes" Source="$(var.COMET-CE.TargetDir)Markdown.Xaml.dll" KeyPath="yes"></File>
       </Component>
 
       <Component Id="comp_Newtonsoft_Json" Guid="{92569C63-3D66-4F94-83CA-B81D0CB55958}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_Newtonsoft_Json" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Newtonsoft.Json.dll" KeyPath="yes" />
+        <File Id="fil_Newtonsoft_Json" Vital="yes" Source="$(var.COMET-CE.TargetDir)Newtonsoft.Json.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="comp_NLog" Guid="{1AD65224-46C7-42CA-8A2D-51C2C48633BC}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_NLog" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)NLog.dll" KeyPath="yes" />
+        <File Id="fil_NLog" Vital="yes" Source="$(var.COMET-CE.TargetDir)NLog.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="comp_ReactiveUI" Guid="{D942F4F1-5B90-480D-97F3-36D55C68DCD2}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_ReactiveUI" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)ReactiveUI.dll" KeyPath="yes" />
+        <File Id="fil_ReactiveUI" Vital="yes" Source="$(var.COMET-CE.TargetDir)ReactiveUI.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="comp_Splat" Guid="{618C780F-E4E6-45AA-8538-97405890369D}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_Splat" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Splat.dll" KeyPath="yes" />
+        <File Id="fil_Splat" Vital="yes" Source="$(var.COMET-CE.TargetDir)Splat.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="comp_System_Reactive_Core" Guid="{8694E649-5C78-4BFE-B7CE-CA74AA762766}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_Reactive_Core" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Reactive.Core.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_System_Reactive_Interfaces" Guid="{3A74F591-E006-4BF6-95ED-C589A70FF3A3}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_Reactive_Interfaces" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Reactive.Interfaces.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_" Guid="{AD3CA5FE-598F-451C-873C-2E785EF7D8DC}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Reactive.Linq.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_System_Reactive_PlatformServices" Guid="{C5BB718A-BA11-43F1-9858-D7F1E4D1B238}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_Reactive_PlatformServices" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Reactive.PlatformServices.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_System_Reactive_Windows_Threading" Guid="{EAC298A2-DFE1-4481-BE63-2250A767D399}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_Reactive_Windows_Threading" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Reactive.Windows.Threading.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_System_Runtime_CompilerServices_Unsafe" Guid="{69698B74-9B9D-455F-84DC-76CEAF803657}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_Runtime_CompilerServices_Unsafe" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_System_Threading_Tasks_Extensions" Guid="{4759486C-4B80-44FB-B814-EDF847F97634}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_Threading_Tasks_Extensions" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Threading.Tasks.Extensions.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_System_ValueTuple" Guid="{D1C5CC93-8E1F-491B-A6D7-BC80F14B238C}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_ValueTuple" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.ValueTuple.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_System_Windows_Interactivity" Guid="{D4434DAD-D0BF-46FF-BEAD-250FAD669AC6}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_Windows_Interactivity" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Windows.Interactivity.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_System_Net_Http_Formatting" Guid="{482518C9-788F-4177-B29D-23A2DC581782}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_System_Net_Http_Formatting" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)System.Net.Http.Formatting.dll" KeyPath="yes" />
-      </Component>
-		
-	  <Component Id="comp_prism_ServiceLocation" Guid="{BD87EF72-75C3-49F8-B720-911947894B5C}" Location="local" Win64="$(var.Win64)">
-		<File Id="fil_prism_ServiceLocation" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)Microsoft.Practices.ServiceLocation.dll" KeyPath="yes" />
-	  </Component>
-		
 	</ComponentGroup>
   </Fragment>
 </Wix>

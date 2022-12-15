@@ -6,30 +6,30 @@
   <?include variables.wxi ?>
 
 	<Fragment>
-    <ComponentGroup Id="CDP4IME" Directory="BIN">
-      <Component Id="comp_CDP4IME" Guid="{AE6145E3-4432-4E7C-B634-BB1C32DFD4F8}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_CDP4IME" Vital="yes" Source="$(var.CDP4IME-CE.TargetPath)" KeyPath="yes" />
-        <File Id="fil_license" Vital="yes" Source="$(var.CDP4IME-CE.ProjectDir)license.rtf" />
-        <File Id="fil_NLog.dll.nlog" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)NLog.dll.nlog" />
-        <File Id="fil_app.config" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)COMET.exe.config" />
+    <ComponentGroup Id="COMET-CE" Directory="BIN">
+      <Component Id="comp_COMET_CE" Guid="{AE6145E3-4432-4E7C-B634-BB1C32DFD4F8}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_COMET_CE" Vital="yes" Source="$(var.COMET-CE.TargetPath)" KeyPath="yes" />
+        <File Id="fil_license" Vital="yes" Source="$(var.COMET-CE.ProjectDir)license.rtf" />
+        <File Id="fil_NLog.dll.nlog" Vital="yes" Source="$(var.COMET-CE.TargetDir)NLog.dll.nlog" />
+        <!--<File Id="fil_app.config" Vital="yes" Source="$(var.COMET-CE.TargetDir)COMET.exe.config" />-->
       </Component>
 
       <!-- CDP4-SDK dependencies -->
 
       <Component Id="_7D02A345F596" Guid="{CCCB3900-4B60-4FC8-AE87-7D02A345F596}" Location="local" Win64="$(var.Win64)">
-        <File Id="_CCCB3900" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)CDP4Common.dll" KeyPath="yes" />
+        <File Id="_CCCB3900" Vital="yes" Source="$(var.COMET-CE.TargetDir)CDP4Common.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="_45FDB1056059" Guid="{D28C464F-5B94-4A9B-8F8B-45FDB1056059}" Location="local" Win64="$(var.Win64)">
-        <File Id="_D28C464F" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)CDP4Dal.dll" KeyPath="yes" />
+        <File Id="_D28C464F" Vital="yes" Source="$(var.COMET-CE.TargetDir)CDP4Dal.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="_BEA8A4A3A59D" Guid="{F78B2EE0-16C9-4FDF-8BD8-BEA8A4A3A59D}" Location="local" Win64="$(var.Win64)">
-        <File Id="_F78B2EE0" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)CDP4JsonSerializer.dll" KeyPath="yes" />
+        <File Id="_F78B2EE0" Vital="yes" Source="$(var.COMET-CE.TargetDir)CDP4JsonSerializer.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="_A50B23D361AB" Guid="{01D00026-4359-44BE-9B07-A50B23D361AB}" Location="local" Win64="$(var.Win64)">
-        <File Id="_01D00026" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)CDP4RequirementsVerification.dll" KeyPath="yes" />
+        <File Id="_01D00026" Vital="yes" Source="$(var.COMET-CE.TargetDir)CDP4RequirementsVerification.dll" KeyPath="yes" />
       </Component>
 
       <!-- CDP4-IME and CDP4-AddIn dependencies -->
@@ -46,33 +46,6 @@
         <File Id="_8A0C86D0" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)CDP4UpdateServerDal.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="_4FCE2A4CFC36" Guid="{5548D940-7CB2-45FD-AC59-4FCE2A4CFC36}" Location="local" Win64="$(var.Win64)">
-        <File Id="_5548D940" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)Microsoft.Web.Infrastructure.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="_6D720DCD465E" Guid="{893269E3-D690-4A57-A11D-6D720DCD465E}" Location="local" Win64="$(var.Win64)">
-        <File Id="_893269E3" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.Helpers.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="_FEABE3418FF3" Guid="{C8228B58-6B85-4F2D-BA8A-FEABE3418FF3}" Location="local" Win64="$(var.Win64)">
-        <File Id="_C8228B58" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.Mvc.dll" KeyPath="yes" />
-      </Component>
-      
-      <Component Id="_EEF397B38B08" Guid="{51FAF09F-FA44-45C3-8E0F-EEF397B38B08}" Location="local" Win64="$(var.Win64)">
-        <File Id="_51FAF09F" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.Razor.dll" KeyPath="yes" />
-      </Component>
-      
-      <Component Id="_3CF6F0369232" Guid="{510C49BC-ADCD-43E0-B7B0-3CF6F0369232}" Location="local" Win64="$(var.Win64)">
-        <File Id="_510C49BC" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.WebPages.Deployment.dll" KeyPath="yes" />
-      </Component>
-      
-      <Component Id="_FD5285E2B91A" Guid="{9130FB95-EA85-424C-8776-FD5285E2B91A}" Location="local" Win64="$(var.Win64)">
-        <File Id="_9130FB95" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.WebPages.dll" KeyPath="yes" />
-      </Component>
-      
-      <Component Id="_3753BF54D1CB" Guid="{04240947-6EED-4E5C-993C-3753BF54D1CB}" Location="local" Win64="$(var.Win64)">
-        <File Id="_04240947" Vital="yes" Source="$(var.CDP4UpdateServerDal.TargetDir)System.Web.WebPages.Razor.dll" KeyPath="yes" />
-      </Component>
     </ComponentGroup>
   </Fragment>
 </Wix>
