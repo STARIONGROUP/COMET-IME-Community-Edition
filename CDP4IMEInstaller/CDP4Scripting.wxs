@@ -15,7 +15,7 @@
       </Component>
 
       <!-- scripting -->
-      <!--<Component Id="comp_MicrosoftDynamic" Guid="{C7C64703-240D-4C83-9D14-119276A9E4D5}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_MicrosoftDynamic" Guid="{C7C64703-240D-4C83-9D14-119276A9E4D5}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MicrosoftDynamic"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Dynamic.dll" KeyPath="yes"></File>
       </Component>
 
@@ -25,10 +25,10 @@
 
       <Component Id="comp_MicrosoftScriptingMetadata" Guid="{F8FEBC24-58F4-406F-B1E8-2DA0A0D9EF5A}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MicrosoftScriptingMetadata"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Scripting.Metadata.dll" KeyPath="yes"></File>
-      </Component>-->
+      </Component>
       
       <!-- Iron Python -->
-      <!--<Component Id="comp_IronPython" Guid="{3E0A049E-C4E4-4D07-BCEA-A504D8744861}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_IronPython" Guid="{3E0A049E-C4E4-4D07-BCEA-A504D8744861}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_IronPython" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)IronPython.dll" KeyPath="yes" />
       </Component>
 
@@ -42,12 +42,12 @@
 
       <Component Id="comp_IronPythonWpf" Guid="{D9C6D9D4-10F9-49A2-AA43-835C9AF7023A}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_IronPythonWpf" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)IronPython.Wpf.dll" KeyPath="yes" />
-      </Component>-->
+      </Component>
 
       <!-- Lua / Moonsharp -->
-      <!--<Component Id="comp_MoonSharpInterpreter" Guid="{120B0CF9-17E7-47AA-9B1D-1AC213DFAEE3}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_MoonSharpInterpreter" Guid="{120B0CF9-17E7-47AA-9B1D-1AC213DFAEE3}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MoonSharpInterpreter" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)MoonSharp.Interpreter.dll" KeyPath="yes" />
-      </Component>-->
+      </Component>
       
     </ComponentGroup>
 	</Fragment>
