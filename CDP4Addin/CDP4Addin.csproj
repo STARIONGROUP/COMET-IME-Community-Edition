@@ -13,6 +13,7 @@
     <AssemblyVersion>9.2.0.5</AssemblyVersion>
     <FileVersion>9.2.0.5</FileVersion>
     <RegisterForComInterop>true</RegisterForComInterop>
+	  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

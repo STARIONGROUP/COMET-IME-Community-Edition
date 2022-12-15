@@ -37,10 +37,7 @@
 		<Component Id="_B8A43C47" Guid="{B8A43C47-5365-4E74-BD76-406DF1F7C333}" Win64="$(var.Win64)">
 			<File Id="_406DF1F7C333" Vital="yes" Source="$(var.COMET-CE.TargetDir)CommonServiceLocator.dll" KeyPath="yes" Assembly=".net"></File>
 		</Component>
-		<Component Id="_D1AB2FC7" Guid="{D1AB2FC7-4A79-488C-A628-389D866C59B1}" Win64="$(var.Win64)">
-			<File Id="_389D866C59B1" Vital="yes" Source="$(var.COMET-CE.TargetDir)DynamicData.dll" KeyPath="yes" Assembly=".net"></File>
-		</Component>
-		<Component Id="_E4DC26AA" Guid="{E4DC26AA-F7F9-4298-B11F-4588745D47DA}" Win64="$(var.Win64)">
+      <Component Id="_E4DC26AA" Guid="{E4DC26AA-F7F9-4298-B11F-4588745D47DA}" Win64="$(var.Win64)">
 			<File Id="_4588745D47DA" Vital="yes" Source="$(var.COMET-CE.TargetDir)Hardcodet.NotifyIcon.Wpf.dll" KeyPath="yes" Assembly=".net"></File>
 		</Component>
 		<Component Id="_55784171" Guid="{55784171-5F51-48FD-B6DC-69E991CED1C8}" Win64="$(var.Win64)">
