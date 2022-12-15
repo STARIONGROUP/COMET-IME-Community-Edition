@@ -27,6 +27,7 @@
   <PropertyGroup>
     <ApplicationIcon>comet.ico</ApplicationIcon>
     <LangVersion>latest</LangVersion>
+    <StartupObject>CDP4IME.App</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugType>full</DebugType>
