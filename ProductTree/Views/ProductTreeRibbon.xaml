@@ -7,7 +7,7 @@
                                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                 xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                 xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
-                                Name="ProdcutTreeRibbonPageGroup"
+                                Name="ProductTreeRibbonPageGroup"
                                 ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 MergeOrder="2"
                                 ShowCaptionButton="False"

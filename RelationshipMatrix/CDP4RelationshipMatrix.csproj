@@ -11,7 +11,9 @@
     <Copyright>Copyright © RHEA System S.A.</Copyright>
     <AssemblyVersion>9.2.0.5</AssemblyVersion>
     <FileVersion>9.2.0.5</FileVersion>
-	  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -144,6 +146,9 @@
     <PackageReference Include="NLog" Version="4.7.10">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
+    <PackageReference Include="ReactiveUI" Version="18.3.1">
+	    <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -159,58 +164,12 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Data.Linq">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UIAutomationProvider">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UIAutomationTypes">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\RelationshipMatrix.xaml.cs">
-      <DependentUpon>RelationshipMatrix.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\RelationshipMatrixRibbon.xaml.cs">
-      <DependentUpon>RelationshipMatrixRibbon.xaml</DependentUpon>
-    </Compile>
+    <PackageReference Include="System.ComponentModel.Composition" Version="6.0.0">
+	    <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39">
+	    <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
@@ -220,76 +179,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\RelationshipMatrix.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\RelationshipMatrixRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Resources\Images\bidir.png" />
     <Resource Include="Resources\Images\nodir.png" />
     <Resource Include="Resources\Images\xtoy.png" />
     <Resource Include="Resources\Images\ytox.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ManageConfigurationsDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ManageConfigurationsDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RelationshipMatrix.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RelationshipMatrix.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RelationshipMatrixRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RelationshipMatrixRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SavedConfigurationDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SavedConfigurationDialog.g.i.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Core">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Data">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Drawing">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.IO.Compression.FileSystem">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Numerics">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml.Linq">
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
 </Project>

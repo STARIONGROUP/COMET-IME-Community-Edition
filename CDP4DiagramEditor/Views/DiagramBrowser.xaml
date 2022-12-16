@@ -11,7 +11,7 @@
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              d:DesignHeight="300"
              d:DesignWidth="300"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -49,9 +49,9 @@
             <dxmvvm:Interaction.Behaviors>
                 <cdp4Composition:ContextMenuBehavior />
             </dxmvvm:Interaction.Behaviors>
-            <i:Interaction.Behaviors>
+            <b:Interaction.Behaviors>
                 <dragDrop:FrameworkElementDragBehavior />
-            </i:Interaction.Behaviors>
+            </b:Interaction.Behaviors>
             <dxg:GridControl.View>
                 <dxg:TableView Name="View"
                                HorizontalAlignment="Stretch"

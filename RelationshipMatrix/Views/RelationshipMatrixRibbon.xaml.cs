@@ -22,7 +22,6 @@
 //    along with this program. If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
-
 namespace CDP4RelationshipMatrix.Views
 {
     using System.ComponentModel.Composition;
@@ -36,6 +35,7 @@ namespace CDP4RelationshipMatrix.Views
     /// Interaction logic for ProductTreeRibbon.xaml
     /// </summary>
     [Export(typeof(ExtendedRibbonPageGroup))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class RelationshipMatrixRibbon : ExtendedRibbonPageGroup, IView
     {
         /// <summary>
@@ -44,6 +44,7 @@ namespace CDP4RelationshipMatrix.Views
         [ImportingConstructor]
         public RelationshipMatrixRibbon()
         {
+            this.InitializeComponent();
             this.DataContext = new RelationshipMatrixRibbonViewModel();
         }
     }

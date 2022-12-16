@@ -49,13 +49,27 @@
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
-	<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
+	<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" >
+		<ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" >
+		<ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" >
+		<ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" >
+		<ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" >
+		<ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" >
+		<ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" >
+		<ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>

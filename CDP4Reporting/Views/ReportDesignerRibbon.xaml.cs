@@ -45,7 +45,7 @@ namespace CDP4Reporting.Views
         [ImportingConstructor]
         public ReportDesignerRibbon()
         {
-            //this.InitializeComponent();
+            this.InitializeComponent();
             this.DataContext = new ReportDesignerRibbonViewModel();
         }
     }

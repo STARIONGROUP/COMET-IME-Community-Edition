@@ -35,6 +35,7 @@
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
     <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
+    <PackageReference Include="NetOfficeFw.Office" Version="1.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="ReactiveUI" Version="18.3.1" />
