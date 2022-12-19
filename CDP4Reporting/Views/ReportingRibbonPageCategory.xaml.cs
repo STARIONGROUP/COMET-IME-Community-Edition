@@ -38,7 +38,7 @@ namespace CDP4Reporting.Views
     {
         public ReportingRibbonPageCategory()
         {
-            //this.InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

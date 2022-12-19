@@ -22,7 +22,7 @@ namespace CDP4Scripting.Views
         /// </summary>
         public ScriptPanel()
         {
-            //this.InitializeComponent();
+            this.InitializeComponent();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace CDP4Scripting.Views
         {
             if (initializeComponent)
             {
-                //this.InitializeComponent();
+                this.InitializeComponent();
             }
         }
     }

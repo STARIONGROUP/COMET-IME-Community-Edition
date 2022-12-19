@@ -6,7 +6,8 @@
   <Fragment>
     <ComponentGroup Id="CDP4DASHBOARD_CG" Directory="DASHBOARD">
       
-      <!--<Component Id="comp_CDP4Dashboard" Guid="{60DCB213-9D8E-4C5F-984F-94755EDB0397}" Location="local" Win64="$(var.Win64)">
+      <!--TODO:
+	  <Component Id="comp_CDP4Dashboard" Guid="{60DCB213-9D8E-4C5F-984F-94755EDB0397}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_CDP4Dashboard"  Vital="yes" Source="$(var.CDP4Dashboard.TargetPath)" KeyPath="yes"></File>
       </Component>
 

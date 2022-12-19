@@ -22,7 +22,7 @@ namespace CDP4LogInfo.Views
         /// </summary>
         public LogInfoPanel()
         {
-            //this.InitializeComponent();
+            this.InitializeComponent();
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace CDP4LogInfo.Views
         {
             if (initializeComponent)
             {
-                //this.InitializeComponent();
+                this.InitializeComponent();
             }
         }
     }

@@ -23,44 +23,43 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4DiagramEditor.Views
-{
-    using System.ComponentModel.Composition;
-    using System.Windows.Controls;
+namespace CDP4DiagramEditor.Views;
 
-    using CDP4Composition;
+using System.ComponentModel.Composition;
+using System.Windows.Controls;
+
+using CDP4Composition;
+
+/// <summary>
+/// Interaction logic for CDP4DiagramEditor.xaml
+/// </summary>
+[Export(typeof(IPanelView))]
+public partial class DiagramEditor : UserControl, IPanelView
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DiagramEditor"/> class
+    /// </summary>
+    /// <remarks>
+    /// Called by MEF
+    /// </remarks>
+    public DiagramEditor()
+    {
+    }
 
     /// <summary>
-    /// Interaction logic for CDP4DiagramEditor.xaml
+    /// Initializes a new instance of the <see cref="DiagramEditor"/> class.
     /// </summary>
-    [Export(typeof(IPanelView))]
-    public partial class DiagramEditor : UserControl, IPanelView
+    /// <param name="initializeComponent">
+    /// a value indicating whether the contained Components shall be loaded
+    /// </param>
+    /// <remarks>
+    /// This constructor is called by the navigation service
+    /// </remarks>
+    public DiagramEditor(bool initializeComponent)
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DiagramEditor"/> class
-        /// </summary>
-        /// <remarks>
-        /// Called by MEF
-        /// </remarks>
-        public DiagramEditor()
+        if (initializeComponent)
         {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DiagramEditor"/> class.
-        /// </summary>
-        /// <param name="initializeComponent">
-        /// a value indicating whether the contained Components shall be loaded
-        /// </param>
-        /// <remarks>
-        /// This constructor is called by the navigation service
-        /// </remarks>
-        public DiagramEditor(bool initializeComponent)
-        {
-            if (initializeComponent)
-            {
-                //this.InitializeComponent();
-            }
+            this.InitializeComponent();
         }
     }
 }

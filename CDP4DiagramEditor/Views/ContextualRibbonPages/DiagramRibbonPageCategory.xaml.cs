@@ -38,7 +38,7 @@ namespace CDP4DiagramEditor.Views.ContextualRibbonPages
     {
         public DiagramRibbonPageCategory()
         {
-            //this.InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

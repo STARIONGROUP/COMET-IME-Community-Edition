@@ -43,7 +43,7 @@ namespace CDP4DiagramEditor.Views
         /// </summary>
         public CDP4DiagramEditorRibbon()
         {
-            //this.InitializeComponent();
+            this.InitializeComponent();
             this.DataContext = new DiagramEditorRibbonViewModel();
         }
     }

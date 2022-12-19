@@ -44,7 +44,7 @@ namespace CDP4ReferenceDataMapper.Views
         [ImportingConstructor]
         public StateToParameterTypeMapperRibbon()
         {
-            //this.InitializeComponent();
+            this.InitializeComponent();
             this.DataContext = new StateToParameterTypeMapperRibbonViewModel();
         }
     }

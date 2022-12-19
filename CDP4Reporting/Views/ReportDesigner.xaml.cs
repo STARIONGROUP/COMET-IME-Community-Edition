@@ -55,7 +55,7 @@ namespace CDP4Reporting.Views
         {
             if (initializeComponent)
             {
-                //this.InitializeComponent();
+                this.InitializeComponent();
             }
         }
 
