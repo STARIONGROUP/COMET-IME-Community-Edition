@@ -10,15 +10,18 @@ namespace CDP4Dashboard.ViewModels.Widget
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
+    using System.Windows.Input;
     using System.Windows.Media;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Utilities;
 
     using CDP4Dal;
@@ -141,22 +144,22 @@ namespace CDP4Dashboard.ViewModels.Widget
         /// <summary>
         /// Gets the Delete command
         /// </summary>
-        public ReactiveCommand<object> OnDeleteCommand { get; }
+        public ReactiveCommand<Unit, Unit> OnDeleteCommand { get; }
 
         /// <summary>
         /// Gets the Show chart command
         /// </summary>
-        public ReactiveCommand<object> OnToggleChartVisibilityCommand { get; }
+        public ReactiveCommand<Unit, Unit> OnToggleChartVisibilityCommand { get; }
 
         /// <summary>
         /// Gets the Refresh data command
         /// </summary>
-        public ReactiveCommand<object> OnRefreshCommand { get; }
+        public ReactiveCommand<Unit, Unit> OnRefreshCommand { get; }
 
         /// <summary>
         /// Gets the Copy data command
         /// </summary>
-        public ReactiveCommand<object> OnCopyDataCommand { get; }
+        public ReactiveCommand<Unit, Unit> OnCopyDataCommand { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IterationTrackParameterViewModel{TThing, TValueSet}"/> class.
@@ -168,16 +171,13 @@ namespace CDP4Dashboard.ViewModels.Widget
         public IterationTrackParameterViewModel(ISession session, Iteration iteration, IterationTrackParameter iterationTrackParameter)
         {
             this.lineSeriesCollection = new ReactiveList<LineSeries>();
-            this.OnDeleteCommand = ReactiveCommand.Create();
+            this.OnDeleteCommand = ReactiveCommandCreator.Create();
 
-            this.OnToggleChartVisibilityCommand = ReactiveCommand.Create();
-            this.OnToggleChartVisibilityCommand.Subscribe(_ => this.ToggleChartVisibility());
+            this.OnToggleChartVisibilityCommand = ReactiveCommandCreator.Create(this.ToggleChartVisibility);
 
-            this.OnRefreshCommand = ReactiveCommand.Create();
-            this.OnRefreshCommand.Subscribe(async _ => await this.RefreshData());
+            this.OnRefreshCommand = ReactiveCommandCreator.CreateAsyncTask(this.RefreshData);
 
-            this.OnCopyDataCommand = ReactiveCommand.Create();
-            this.OnCopyDataCommand.Subscribe(_ => this.CopyTextToClipboard());
+            this.OnCopyDataCommand = ReactiveCommandCreator.Create(this.CopyTextToClipboard);
 
             this.Session = session;
             this.iteration = iteration;
@@ -200,7 +200,7 @@ namespace CDP4Dashboard.ViewModels.Widget
             CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationTrackParameter.ParameterOrOverride)
                 .Where(objectChange => objectChange.EventKind == EventKind.Removed)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(async _ => await this.OnDeleteCommand.ExecuteAsyncTask());
+                .Subscribe(async _ => await this.OnDeleteCommand.Execute());
 
             ((ICommand)this.OnRefreshCommand).Execute(null);
         }

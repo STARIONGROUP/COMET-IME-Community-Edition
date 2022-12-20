@@ -13,8 +13,7 @@
     <FileVersion>0.3.0.4</FileVersion>
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <EnableDefaultPageItems>false</EnableDefaultPageItems>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+	<EnableDefaultPageItems>true</EnableDefaultPageItems>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -27,13 +26,27 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
     	<ItemGroup>
-		<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
+		<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" >
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
+		<PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" >
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
+		<PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" >
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
+		<PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" >
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
+		<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" >
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
+		<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" >
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
+		<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" >
+			<ExcludeAssets>runtime</ExcludeAssets>
+		</PackageReference>
 	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
@@ -72,144 +85,19 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
+	  <PackageReference Include="System.ComponentModel.Composition" Version="6.0.0">
+		  <ExcludeAssets>runtime</ExcludeAssets>
+	  </PackageReference>
+	  <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" >
+		  <ExcludeAssets>runtime</ExcludeAssets>
+	  </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Microsoft.CSharp">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationCore">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Expression.Blend.Sdk.1.0.2\lib\net45\System.Windows.Interactivity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\DashboardBrowserRibbon.xaml.cs">
-      <DependentUpon>DashboardBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\DashboardRibbon.xaml.cs">
-      <DependentUpon>DashboardRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\DashboardBrowser.xaml.cs">
-      <DependentUpon>DashboardBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Widget\DummyParameterView.xaml.cs">
-      <DependentUpon>DummyParameterView.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Widget\IterationTrackParameterDetail.xaml.cs">
-      <DependentUpon>IterationTrackParameterDetail.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Widget\IterationTrackParameterView.xaml.cs">
-      <DependentUpon>IterationTrackParameterView.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\DashboardBrowserRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\DashboardRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\DashboardBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Widget\DummyParameterView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Widget\IterationTrackParameterDetail.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Widget\IterationTrackParameterView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\RibbonXml\DashboardBrowserRibbon.xml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Core">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Data">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Drawing">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.IO.Compression.FileSystem">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Numerics">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml.Linq">
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
 </Project>

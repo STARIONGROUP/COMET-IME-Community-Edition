@@ -8,6 +8,8 @@ namespace CDP4Dashboard.ViewModels.Widget
 {
     using System.Windows;
 
+    using CDP4Composition.Mvvm;
+
     using CDP4Dashboard.ViewModels.Charts;
 
     using ReactiveUI;

@@ -13,6 +13,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
     using System.Reflection;
     using System.Threading;
     using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -137,7 +138,8 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         {
             var text = "no_text_please";
             Clipboard.SetData(DataFormats.UnicodeText, text);
-            this.iterationTrackParameterViewModel.OnCopyDataCommand.Execute(null);
+            ((ICommand)this.iterationTrackParameterViewModel.OnCopyDataCommand).Execute(default);
+           
             Assert.AreNotEqual(text, Clipboard.GetData(DataFormats.UnicodeText));
         }
 
