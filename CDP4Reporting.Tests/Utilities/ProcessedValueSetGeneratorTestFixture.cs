@@ -32,6 +32,7 @@ namespace CDP4Reporting.Tests.DataCollection
     using CDP4Reporting.DataCollection;
     using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.Utilities;
+
     using Moq;
 
     using NUnit.Framework;

@@ -67,6 +67,8 @@ namespace CDP4Reporting.Tests.ViewModels
 
     using ReactiveUI;
 
+    using CDP4Reporting.DynamicTableChecker;
+
     /// <summary>
     /// Suite of tests for the <see cref="ReportDesignerViewModel"/> class
     /// </summary>
@@ -115,6 +117,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private const string DATASOURCE_CODE_WITH_PARAMS = @"namespace CDP4Reporting
         {
+            using CDP4Reporting.DataCollection;
             using CDP4Reporting.DataCollection;
             using CDP4Reporting.Parameters;
             using System.Collections.Generic;
@@ -177,7 +180,7 @@ namespace CDP4Reporting.Tests.ViewModels
         private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<IOpenSaveFileDialogService> openSaveFileDialogService;
         private Mock<ISubmittableParameterValuesCollector> submittableParameterValuesCollector;
-        private Mock<IDynamicTableChecker> dynamicTableChecker;
+        private Mock<IDynamicTableChecker<XtraReport>> dynamicTableChecker;
         private Mock<IPermissionService> permissionService;
         private Mock<IMessageBoxService> messageBoxService;
 
@@ -223,7 +226,7 @@ namespace CDP4Reporting.Tests.ViewModels
             this.openSaveFileDialogService = new Mock<IOpenSaveFileDialogService>();
             this.submittableParameterValuesCollector = new Mock<ISubmittableParameterValuesCollector>();
             this.permissionService = new Mock<IPermissionService>();
-            this.dynamicTableChecker = new Mock<IDynamicTableChecker>();
+            this.dynamicTableChecker = new Mock<IDynamicTableChecker<XtraReport>>();
             this.messageBoxService = new Mock<IMessageBoxService>();
 
             this.serviceLocator = new Mock<IServiceLocator>();
@@ -231,7 +234,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.openSaveFileDialogService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<ISubmittableParameterValuesCollector>()).Returns(this.submittableParameterValuesCollector.Object);
-            this.serviceLocator.Setup(x => x.GetInstance<IDynamicTableChecker>()).Returns(this.dynamicTableChecker.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IDynamicTableChecker<XtraReport>>()).Returns(this.dynamicTableChecker.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
 
             this.assembler = new Assembler(this.uri);
@@ -761,7 +764,7 @@ namespace CDP4Reporting.Tests.ViewModels
             this.reportDesignerViewModel.Document = textDocument;
             await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null);
 
-            Assert.AreEqual(0, this.reportDesignerViewModel.CompileResult.Errors.Count);
+            Assert.AreEqual(0, this.reportDesignerViewModel.ReportScriptHandler.CompileResults.Errors.Count);
             Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Errors);
         }
 
@@ -776,7 +779,7 @@ namespace CDP4Reporting.Tests.ViewModels
             this.reportDesignerViewModel.Document = textDocument;
             await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null);
 
-            Assert.AreNotEqual(0, this.reportDesignerViewModel.CompileResult.Errors.Count);
+            Assert.AreNotEqual(0, this.reportDesignerViewModel.ReportScriptHandler.CompileResults.Errors.Count);
             Assert.AreNotEqual(string.Empty, this.reportDesignerViewModel.Errors);
         }
 

@@ -23,25 +23,27 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+// The namespace for this class should be CDP4Reporting.DynamicTableChecker to be sure that all reports work
+// in every environment with different DevExpress libraries (WPF, Blazor, etc...)
 namespace CDP4Reporting.DynamicTableChecker
 {
     using System;
     using System.ComponentModel.Composition;
     using System.Diagnostics.CodeAnalysis;
 
-    using CDP4Reporting.DataCollection;
-
     using DevExpress.XtraReports.UI;
 
+    using CDP4Reporting.DataCollection;
+
     /// <summary>
-    /// The implementation of the injectable interface <see cref="IDynamicTableChecker"/> that is used to check dynamic tables in a report
+    /// The implementation of the injectable interface <see cref="IDynamicTableChecker{T}"/> that is used to check dynamic tables in a report
     /// </summary>
-    [Export(typeof(IDynamicTableChecker))]
+    [Export(typeof(IDynamicTableChecker<XtraReport>))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     [ExcludeFromCodeCoverage]
-    public class DynamicTableChecker : IDynamicTableChecker
+    public class DynamicTableChecker : IDynamicTableChecker<XtraReport>
     {
-        public void Check(XtraReport report, IDataCollector dataCollector)
+        public void Check(XtraReport report, IDataCollector dataCollector) 
         {
             if (report == null || dataCollector == null)
             {
