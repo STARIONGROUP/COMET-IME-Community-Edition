@@ -18,6 +18,10 @@
         <File Id="fil_avalonedit_CDP4Reporting" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)ICSharpCode.AvalonEdit.dll" KeyPath="yes" />
       </Component>
 
+	    <Component Id="comp_CDP4Reporting_plugin" Guid="{8E62D565-3002-46D0-8306-981FB2BE5D86}" Location="local" Win64="$(var.Win64)">
+		    <File Id="fil_CDP4Reporting_plugin" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)CDP4ReportingPlugin.dll" KeyPath="yes" />
+	    </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>
