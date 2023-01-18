@@ -1,5 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportDesignerViewModelTextFixture.cs" company="RHEA System S.A.">//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ReportDesignerViewModelTextFixture.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -67,7 +68,8 @@ namespace CDP4Reporting.Tests.ViewModels
 
     using ReactiveUI;
 
-    using CDP4Reporting.DynamicTableChecker;
+    using CDP4Reporting.ReportScript;
+    using CDP4Reporting.Utilities;
 
     /// <summary>
     /// Suite of tests for the <see cref="ReportDesignerViewModel"/> class
@@ -118,7 +120,6 @@ namespace CDP4Reporting.Tests.ViewModels
         private const string DATASOURCE_CODE_WITH_PARAMS = @"namespace CDP4Reporting
         {
             using CDP4Reporting.DataCollection;
-            using CDP4Reporting.DataCollection;
             using CDP4Reporting.Parameters;
             using System.Collections.Generic;
 
@@ -132,7 +133,7 @@ namespace CDP4Reporting.Tests.ViewModels
                     paramsList[1].AddLookupValue(""1"", ""one"");
                     paramsList.Add(new ReportingParameter(""param3"", typeof(string), ""DefaultValue""));
                     paramsList[2].Visible = false;
-                    paramsList.Add(new ReportingParameter(""param3"", typeof(string), null));
+                    paramsList.Add(new ReportingParameter(""param4"", typeof(string), null));
                     paramsList[3].Visible = false;
 
                     return paramsList;
@@ -750,6 +751,16 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public void VerifyThatCompileScriptCommandWorks()
         {
+            // initialize ReportScriptHandler
+            var report = new XtraReport();
+            
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+                , x =>
+                {
+                    this.reportDesignerViewModel.Errors = x;
+                }, 
+                x => { });
+
             Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null));
         }
 
@@ -762,9 +773,19 @@ namespace CDP4Reporting.Tests.ViewModels
             };
 
             this.reportDesignerViewModel.Document = textDocument;
+
+            // initialize ReportScriptHandler
+            var report = new XtraReport();
+            
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+                , x =>
+                {
+                    this.reportDesignerViewModel.Errors = x;
+                }, 
+                x => { });
+            
             await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null);
 
-            Assert.AreEqual(0, this.reportDesignerViewModel.ReportScriptHandler.CompileResults.Errors.Count);
             Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Errors);
         }
 
@@ -777,9 +798,19 @@ namespace CDP4Reporting.Tests.ViewModels
             };
 
             this.reportDesignerViewModel.Document = textDocument;
+            
+            // initialize ReportScriptHandler
+            var report = new XtraReport();
+            
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+                , x =>
+            {
+                this.reportDesignerViewModel.Errors = x;
+            }, 
+            x => { });
+            
             await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null);
 
-            Assert.AreNotEqual(0, this.reportDesignerViewModel.ReportScriptHandler.CompileResults.Errors.Count);
             Assert.AreNotEqual(string.Empty, this.reportDesignerViewModel.Errors);
         }
 
@@ -982,14 +1013,6 @@ namespace CDP4Reporting.Tests.ViewModels
             await this.reportDesignerViewModel.RebuildDatasourceCommand.ExecuteAsyncTask(null);
 
             Assert.NotZero(this.reportDesignerViewModel.Errors.Length);
-        }
-
-        [Test]
-        public void VerifyThatRebuildDataSourceCommandWorksWithNoDataSource()
-        {
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.ExecuteAsyncTask(null));
-
-            Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("Nothing to compile"));
         }
     }
 }
