@@ -34,13 +34,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="8.3.0">
+    <PackageReference Include="CDP4Common-CE" Version="9.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.1-756-PR245">
+    <PackageReference Include="CDP4Dal-CE" Version="9.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="ClosedXML" Version="0.96.0" />

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{C31FF150-E45C-4136-96CD-58FBF9B00C08}</ProjectGuid>
 	  <MinIMEVersion>9.3.0</MinIMEVersion>
-	  <AssemblyName>CDP4Reporting</AssemblyName>
+	  <AssemblyName>CDP4ReportingPlugin</AssemblyName>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4Reporting</AssemblyTitle>
@@ -45,13 +45,14 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
-    <PackageReference Include="CDP4Common-CE" Version="8.3.0">
+    <PackageReference Include="CDP4Reporting-CE" Version="1.0.0" />
+    <PackageReference Include="CDP4Common-CE" Version="9.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="8.1.1-756-PR245">
+    <PackageReference Include="CDP4Dal-CE" Version="9.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="8.1.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="1.3">
@@ -209,6 +210,9 @@
     </PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CommonServiceLocator" Version="1.3">
+	  <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
