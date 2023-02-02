@@ -7,8 +7,8 @@
     <Product>CDP4OfficeInfrastructure</Product>
     <Description>COMET Office Infrastucture library</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.3.0.1</AssemblyVersion>
-    <FileVersion>9.3.0.1</FileVersion>
+    <AssemblyVersion>9.4.0.1</AssemblyVersion>
+    <FileVersion>9.4.0.1</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

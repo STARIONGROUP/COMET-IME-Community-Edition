@@ -40,7 +40,7 @@ namespace CDP4Grapher.Utilities
         /// <summary>
         /// Base resource path for devexpress svg
         /// </summary>
-        private const string DevExpressResourceBasePath = "DevExpress.Images.v20.2;component/SvgImages/";
+        private const string DevExpressResourceBasePath = "DevExpress.Images.v22.2;component/SvgImages/";
 
         /// <summary>
         /// Converts Svg bytes to ImageSource

@@ -42,12 +42,14 @@ namespace CDP4IMEInstaller.Tests
         private readonly Dictionary<string, string> knownAssemblies = new Dictionary<string, string>
         {
             { "DevExpress.Charts.{VERSION}.Core.dll", "C02CAE1D-68F8-4826-A781-7022D5D88555"} ,
+            { "DevExpress.Charts.Designer.{VERSION}.dll", "83A0095C-244D-44A1-B876-F64146008CFE"} ,
             { "DevExpress.CodeParser.{VERSION}.dll", "71D12292-68AC-4BBF-9DF5-C5E614A3A683"} ,
             { "DevExpress.Data.{VERSION}.dll", "90BBA601-EC72-48D0-B370-A726CFBE26D5"} ,
             { "DevExpress.Data.Desktop.{VERSION}.dll", "461C5BA0-DBDB-4F35-B87C-F0F0E94FA752" },
             { "DevExpress.DataAccess.{VERSION}.dll", "A159A34F-C2BC-4E62-AB7A-2992F34AA343"} ,
             { "DevExpress.DataVisualization.{VERSION}.Core.dll", "10A6ACDC-91F1-4880-B0B1-E349BD871077" },
             { "DevExpress.Diagram.{VERSION}.Core.dll", "0D4DF5E0-C0AA-47CA-9523-F754919BF970"} ,
+            { "DevExpress.Drawing.{VERSION}.dll", "4CB6552B-C60B-4800-A508-DFD301714730"} ,
             { "DevExpress.Images.{VERSION}.dll", "B9BFD73B-BF82-4742-9F04-0A5F0F537F43"} ,
             { "DevExpress.Mvvm.{VERSION}.dll", "0D612BC9-69A2-4237-93E4-E69CF726B87B"} ,
             { "DevExpress.Office.{VERSION}.Core.dll", "6B2516CB-D935-4E94-A2E0-CFD96232C662"} ,
@@ -65,7 +67,6 @@ namespace CDP4IMEInstaller.Tests
             { "DevExpress.Xpf.CodeView.{VERSION}.dll", "C5377FD4-C05C-40C4-8951-B1F873E71FA5"} ,
             { "DevExpress.Xpf.Core.{VERSION}.dll", "41F121BD-75AC-4107-B5FC-1124878A5524"} ,
             { "DevExpress.Xpf.Controls.{VERSION}.dll", "D695D0A9-3115-49ED-82A5-B485AC75052B"} ,
-            { "DevExpress.Xpf.Core.{VERSION}.Extensions.dll", "CCADFC40-14FF-4E7A-A8DC-3B7CD09F474C"} ,
             { "DevExpress.Xpf.DataAccess.{VERSION}.dll", "E44FC402-03B0-4E2A-A918-438245661AE1" },
             { "DevExpress.Xpf.Diagram.{VERSION}.dll", "14D51648-6A12-48D7-BD14-87990B9C4AC7"} ,
             { "DevExpress.Xpf.Docking.{VERSION}.dll", "CED11B3D-8D6D-442E-B6EB-329DDD3B3028"} ,

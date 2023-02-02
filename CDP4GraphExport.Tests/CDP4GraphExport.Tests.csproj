@@ -19,26 +19,29 @@
     <PackageReference Include="CDP4Common-CE" Version="9.0.0" />
     <PackageReference Include="CDP4Dal-CE" Version="9.0.0" />
     <PackageReference Include="CDP4RequirementsVerification-CE" Version="2.0.0" />
-    <PackageReference Include="DevExpress.Charts.Core" Version="20.2.11" />
-    <PackageReference Include="DevExpress.CodeParser" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Data" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Data.Desktop" Version="20.2.11" />
-    <PackageReference Include="DevExpress.DataAccess" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Mvvm" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Office.Core" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Pdf.Core" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Printing.Core" Version="20.2.11" />
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="20.2.11" />
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Wpf.Charts" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Wpf.Core" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Wpf.Layout" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Wpf.Navigation" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="20.2.11" />
-    <PackageReference Include="DevExpress.Xpo" Version="20.2.11" />
+    <PackageReference Include="DevExpress.Charts.Core" Version="22.2.4" />
+    <PackageReference Include="DevExpress.CodeParser" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Data" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.4" />
+    <PackageReference Include="DevExpress.DataAccess" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Mvvm" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Office.Core" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.4" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.4" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.Charts" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.4" />
+    <PackageReference Include="DevExpress.Xpo" Version="22.2.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
