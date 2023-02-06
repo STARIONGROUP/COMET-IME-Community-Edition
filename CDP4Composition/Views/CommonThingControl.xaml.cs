@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="CommonThingControl.xaml.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smieckowski
 //
@@ -33,7 +33,6 @@ namespace CDP4Composition.Views
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.ViewModels;
 
-    using DevExpress.Utils;
     using DevExpress.Xpf.Bars;
 
     using NLog;
@@ -126,7 +125,7 @@ namespace CDP4Composition.Views
         /// <param name="commonThingControl">The <see cref="CommonThingControl"/></param>
         private static void SetGridViewProperties(CommonThingControl commonThingControl)
         {
-            commonThingControl.GridView?.SetValue(DataViewBase.AllowFilterEditorProperty, DefaultBoolean.False);
+            commonThingControl.GridView.ShowGridMenu += GridView_ShowGridMenu;
 
             if (commonThingControl.GridView is TreeListView treeListView)
             {
@@ -135,6 +134,20 @@ namespace CDP4Composition.Views
                     commonThingControl.FilteringMode ?? TreeListFilteringMode.EntireBranch);
 
                 treeListView.SetValue(TreeListView.EnableDynamicLoadingProperty, false);
+            }
+        }
+
+        /// <summary>
+        /// Customize grid menu.
+        ///     - Remove FilterEditor option from column context menu
+        /// </summary>
+        /// <param name="sender">The sender <see cref="GridDataViewBase"/></param>
+        /// <param name="e">The <see cref="GridMenuEventArgs"/></param>
+        private static void GridView_ShowGridMenu(object sender, GridMenuEventArgs e)
+        {
+            if (e.MenuType == GridMenuType.Column) 
+            {
+                e.Customizations.Add(new RemoveAction { ElementName = DefaultColumnMenuItemNamesBase.FilterEditor });
             }
         }
 
