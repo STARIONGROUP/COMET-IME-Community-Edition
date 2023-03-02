@@ -27,6 +27,8 @@ namespace CDP4ObjectBrowser.Tests
 {
     using System;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -106,7 +108,7 @@ namespace CDP4ObjectBrowser.Tests
         }
 
         [Test]
-        public void VerifyThatCommandWorks()
+        public async Task VerifyThatCommandWorks()
         {
             var vm = new ObjectBrowserRibbonPageViewModel();
             Assert.IsEmpty(vm.OpenSessions);
@@ -115,11 +117,11 @@ namespace CDP4ObjectBrowser.Tests
 
             Assert.AreEqual(1, vm.OpenSessions.Count);
 
-            vm.OpenSingleBrowserCommand.Execute();
+            await vm.OpenSingleBrowserCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
-            vm.OpenSingleBrowserCommand.Execute();
+            await vm.OpenSingleBrowserCommand.Execute();
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
         }
 

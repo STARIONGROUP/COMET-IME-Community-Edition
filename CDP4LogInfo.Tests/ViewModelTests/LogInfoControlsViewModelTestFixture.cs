@@ -1,23 +1,30 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="LogInfoControlsViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//   Copyright (c) 2015-2023 RHEA System S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4LogInfo.Tests.ViewModelTests
 {
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Composition;
-    using CDP4Composition.Log;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
+
     using CDP4Dal;
+
     using CDP4LogInfo.ViewModels;
+
     using CommonServiceLocator;
+
     using Moq;
+
     using NLog;
     using NLog.Config;
+
     using NUnit.Framework;
 
     using ReactiveUI;
@@ -44,6 +51,7 @@ namespace CDP4LogInfo.Tests.ViewModelTests
             this.panelView = new Mock<IPanelView>();
 
             ServiceLocator.SetLocatorProvider(() => this.servicelocator.Object);
+
             this.servicelocator.Setup(x => x.GetInstance<IPanelNavigationService>())
                 .Returns(this.navigationService.Object);
 
@@ -57,17 +65,17 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         }
 
         [Test]
-        public void VerifyThatCommandWorks()
+        public async Task VerifyThatCommandWorks()
         {
             var vm = new LogInfoControlsViewModel(this.dialogNavigationService.Object);
 
             vm.IsChecked = true;
-            vm.OpenClosePanelCommand.Execute(null);
+            await vm.OpenClosePanelCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
 
             vm.IsChecked = false;
-            vm.OpenClosePanelCommand.Execute(null);
+            await vm.OpenClosePanelCommand.Execute();
             this.navigationService.Verify(x => x.CloseInDock(It.IsAny<IPanelViewModel>()));
 
             // Verify PanelEVentClosed

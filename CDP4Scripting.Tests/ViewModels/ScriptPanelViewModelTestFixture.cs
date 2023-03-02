@@ -95,10 +95,10 @@ namespace CDP4Scripting.Tests.ViewModels
         }
 
         [Test]
-        public void VerfifyThatClearOutputCommandWorks()
+        public async Task VerfifyThatClearOutputCommandWorks()
         {
             this.scriptPanelViewModel.Object.OutputTerminal.AppendText("Content of the output");
-            Assert.DoesNotThrow(() => this.scriptPanelViewModel.Object.ClearOutputCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptPanelViewModel.Object.ClearOutputCommand.Execute(null));
             var outputContent = new TextRange(this.scriptPanelViewModel.Object.OutputTerminal.Document.ContentStart, this.scriptPanelViewModel.Object.OutputTerminal.Document.ContentEnd);
             Assert.AreEqual(true, outputContent.IsEmpty);
         }

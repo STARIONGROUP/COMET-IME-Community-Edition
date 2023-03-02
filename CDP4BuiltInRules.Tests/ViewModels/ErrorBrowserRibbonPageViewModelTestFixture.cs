@@ -28,6 +28,8 @@ namespace CDP4BuiltInRules.Tests.ViewModels
     using System;
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4BuiltInRules.ViewModels;
 
@@ -118,16 +120,16 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatOpenCloseSingleBrowserWorks()
+        public async Task VerifyThatOpenCloseSingleBrowserWorks()
         {
             var vm = new ErrorBrowserRibbonViewModel();
 
             CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            vm.OpenSingleBrowserCommand.Execute();
+            await vm.OpenSingleBrowserCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
-            vm.OpenSingleBrowserCommand.Execute();
+            await vm.OpenSingleBrowserCommand.Execute();
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
         }
     }

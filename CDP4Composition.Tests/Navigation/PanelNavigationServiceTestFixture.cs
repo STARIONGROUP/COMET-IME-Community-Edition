@@ -30,6 +30,7 @@ namespace CDP4Composition.Tests.Navigation
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Threading;
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
@@ -49,7 +50,7 @@ namespace CDP4Composition.Tests.Navigation
 
     using ReactiveUI;
 
-    [TestFixture]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class PanelNavigationServiceTestFixture
     {
         private Mock<IDialogNavigationService> dialogNavigationService;

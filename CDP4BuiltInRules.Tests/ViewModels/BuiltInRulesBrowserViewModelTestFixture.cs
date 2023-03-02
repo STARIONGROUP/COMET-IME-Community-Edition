@@ -30,6 +30,7 @@ namespace CDP4BuiltInRules.Tests.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4BuiltInRules.ViewModels;
 
@@ -91,26 +92,26 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatIfNoRowIsSelectedTheInspectCommandCanNotExecute()
+        public void VerifyThatIfNoRowIsSelectedTheInspectCommandCanNotExecute()
         {
             var viewmodel = new BuiltInRulesBrowserViewModel(this.ruleVerificationService.Object, this.dialogNavigationService.Object);
             viewmodel.SelectedRule = null;
 
-            Assert.IsFalse(await viewmodel.InspectCommand.CanExecute);
+            Assert.IsFalse(((ICommand)viewmodel.InspectCommand).CanExecute(null));
         }
 
         [Test]
-        public async Task VerifyThatIfRowIsSelectedInspectCommanCanExecute()
+        public void VerifyThatIfRowIsSelectedInspectCommanCanExecute()
         {
             var viewmodel = new BuiltInRulesBrowserViewModel(this.ruleVerificationService.Object, this.dialogNavigationService.Object);
             var row = viewmodel.BuiltInRules.Single();
             viewmodel.SelectedRule = row;
 
-            Assert.IsTrue(await viewmodel.InspectCommand.CanExecute);
+            Assert.IsTrue(((ICommand)viewmodel.InspectCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyThatIfInspectCommanIsExecutedNaviationServiceIsInvoked()
+        public async Task VerifyThatIfInspectCommanIsExecutedNaviationServiceIsInvoked()
         {
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<BuiltInRuleDialogViewModel>())).Returns(null as IDialogResult);
 
@@ -118,7 +119,7 @@ namespace CDP4BuiltInRules.Tests.ViewModels
             var row = viewmodel.BuiltInRules.Single();
             viewmodel.SelectedRule = row;
 
-            viewmodel.InspectCommand.Execute(null);
+            await viewmodel.InspectCommand.Execute(null);
 
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<BuiltInRuleDialogViewModel>()));
         }

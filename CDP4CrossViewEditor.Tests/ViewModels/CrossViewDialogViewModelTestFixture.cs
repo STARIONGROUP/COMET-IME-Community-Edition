@@ -29,6 +29,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reactive.Linq;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -305,7 +306,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.DoesNotThrow(() => viewModel.ElementSelectorViewModel.BindData());
             Assert.DoesNotThrow(() => viewModel.ParameterSelectorViewModel.BindData());
 
-            Assert.DoesNotThrow(() => viewModel.OkCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await viewModel.OkCommand.Execute(null));
 
             Assert.IsTrue(viewModel.DialogResult.Result);
         }
@@ -327,7 +328,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.DoesNotThrow(() => viewModel.ElementSelectorViewModel.BindData());
             Assert.DoesNotThrow(() => viewModel.ParameterSelectorViewModel.BindData());
 
-            Assert.DoesNotThrow(() => viewModel.OkCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await viewModel.OkCommand.Execute(null));
 
             Assert.IsTrue(viewModel.DialogResult.Result);
 
@@ -343,7 +344,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         {
             var viewModel = new CrossViewDialogViewModel(null, this.iteration, this.session.Object, null);
 
-            Assert.DoesNotThrow(() => viewModel.CancelCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await viewModel.CancelCommand.Execute());
 
             Assert.IsFalse(viewModel.DialogResult.Result);
         }
@@ -403,11 +404,11 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             parameterTypeSelectorViewModel.BindData();
 
             parameterTypeSelectorViewModel.PowerParametersEnabled = true;
-            Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.PowerParametersCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await parameterTypeSelectorViewModel.PowerParametersCommand.Execute(null));
             Assert.IsTrue(parameterTypeSelectorViewModel.PowerParametersEnabled);
 
             parameterTypeSelectorViewModel.PowerParametersEnabled = false;
-            Assert.DoesNotThrow(() => parameterTypeSelectorViewModel.PowerParametersCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await parameterTypeSelectorViewModel.PowerParametersCommand.Execute(null));
             Assert.IsFalse(parameterTypeSelectorViewModel.PowerParametersEnabled);
         }
     }

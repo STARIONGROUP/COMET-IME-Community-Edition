@@ -667,9 +667,9 @@ namespace CDP4Reporting.Tests.ViewModels
             }
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathSave });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.OpenReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute(null));
 
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.SaveReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.SaveReportCommand.Execute(null));
             Assert.AreEqual(this.zipPathSave, this.reportDesignerViewModel.CurrentReportProjectFilePath);
         }
 

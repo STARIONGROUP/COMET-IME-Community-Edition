@@ -26,13 +26,14 @@
 namespace CDP4Composition.Tests.Converters
 {
     using System;
+    using System.Threading;
     using System.Windows.Controls;
 
     using CDP4Composition.Converters;
 
     using NUnit.Framework;
 
-    [TestFixture]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class PanelViewConverterTestFixture
     {
         private PanelViewConverter panelViewConverter;

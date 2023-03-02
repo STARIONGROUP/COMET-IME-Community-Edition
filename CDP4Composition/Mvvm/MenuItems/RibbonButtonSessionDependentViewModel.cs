@@ -64,8 +64,7 @@ namespace CDP4Composition.Mvvm
             this.OpenSessions = new ReactiveList<RibbonMenuItemViewModelBase>();
             this.OpenSessions.CountChanged.Subscribe(x => this.HasSession = x != 0);
 
-            this.OpenSingleBrowserCommand = ReactiveCommandCreator.Create();
-            this.OpenSingleBrowserCommand.Subscribe(_ => this.ExecuteOpenSingleBrowser());
+            this.OpenSingleBrowserCommand = ReactiveCommandCreator.Create(this.ExecuteOpenSingleBrowser);
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
         }
