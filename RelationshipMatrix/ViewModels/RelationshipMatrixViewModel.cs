@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipMatrixViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +28,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
@@ -370,57 +371,57 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets the command to edit the current row thing
         /// </summary>
-        public ReactiveCommand<object, object> EditSourceYCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> EditSourceYCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to inspect the current row thing
         /// </summary>
-        public ReactiveCommand<object, object> InspectSourceYCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> InspectSourceYCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to edit the current column thing
         /// </summary>
-        public ReactiveCommand<object, object> EditSourceXCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> EditSourceXCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to inspect the current column thing
         /// </summary>
-        public ReactiveCommand<object, object> InspectSourceXCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> InspectSourceXCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to inspect the current relation from column to row
         /// </summary>
-        public ReactiveCommand<object, object> InspectSourceXToSourceYCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> InspectSourceXToSourceYCommand { get; set; }
 
         /// <summary>
         /// Gets the command to inspect the current relation from row to column
         /// </summary>
-        public ReactiveCommand<object, object> InspectSourceYToSourceXCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> InspectSourceYToSourceXCommand { get; set; }
 
         /// <summary>
         /// Gets the command to inspect the current relation from column to row
         /// </summary>
-        public ReactiveCommand<object, object> EditSourceXToSourceYCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> EditSourceXToSourceYCommand { get; set; }
 
         /// <summary>
         /// Gets the command to inspect the current relation from row to column
         /// </summary>
-        public ReactiveCommand<object, object> EditSourceYToSourceXCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> EditSourceYToSourceXCommand { get; set; }
 
         /// <summary>
         /// Gets the command to switch axis
         /// </summary>
-        public ReactiveCommand<object, object> SwitchAxisCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SwitchAxisCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to manage saved configurations.
         /// </summary>
-        public ReactiveCommand<object, object> ManageSavedConfigurations { get; private set; }
+        public ReactiveCommand<Unit, Unit> ManageSavedConfigurations { get; private set; }
 
         /// <summary>
         /// Gets the command to save current.
         /// </summary>
-        public ReactiveCommand<object, object> SaveCurrentConfiguration { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveCurrentConfiguration { get; private set; }
 
         /// <summary>
         /// Gets or sets whether directionality is displayed
@@ -614,42 +615,27 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(deprecateSubscription);
 
-            object NoOp(object param) => param;
+            this.ManageSavedConfigurations = ReactiveCommandCreator.Create(this.ExecuteManageSavedConfigurations);
 
-            this.ManageSavedConfigurations = ReactiveCommand.Create<object, object>(NoOp);
+            this.SaveCurrentConfiguration = ReactiveCommandCreator.Create(this.ExecuteSaveCurrentConfiguration);
 
-            this.Disposables.Add(
-                this.ManageSavedConfigurations.Subscribe(_ => this.ExecuteManageSavedConfigurations()));
+            this.EditSourceYCommand = ReactiveCommandCreator.Create(this.ExecuteEditSourceYCommand, this.WhenAnyValue(x => x.CanEditSourceY));
 
-            this.SaveCurrentConfiguration = ReactiveCommand.Create<object, object>(NoOp);
-            this.Disposables.Add(this.SaveCurrentConfiguration.Subscribe(_ => this.ExecuteSaveCurrentConfiguration()));
+            this.EditSourceXCommand = ReactiveCommandCreator.Create(this.ExecuteEditSourceXCommand, this.WhenAnyValue(x => x.CanEditSourceX));
 
-            this.EditSourceYCommand = ReactiveCommand.Create<object,object>(NoOp, this.WhenAnyValue(x => x.CanEditSourceY));
-            this.Disposables.Add(this.EditSourceYCommand.Subscribe(_ => this.ExecuteEditSourceYCommand()));
+            this.InspectSourceYCommand = ReactiveCommandCreator.Create(this.ExecuteInspectSourceYCommand, this.WhenAnyValue(x => x.CanInspectSourceY));
 
-            this.EditSourceXCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanEditSourceX));
-            this.Disposables.Add(this.EditSourceXCommand.Subscribe(_ => this.ExecuteEditSourceXCommand()));
+            this.InspectSourceXCommand = ReactiveCommandCreator.Create(this.ExecuteInspectSourceXCommand, this.WhenAnyValue(x => x.CanInspectSourceX));
 
-            this.InspectSourceYCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanInspectSourceY));
-            this.Disposables.Add(this.InspectSourceYCommand.Subscribe(_ => this.ExecuteInspectSourceYCommand()));
+            this.EditSourceYToSourceXCommand = ReactiveCommandCreator.Create(this.ExecuteEditSourceYToSourceXCommand, this.WhenAnyValue(x => x.CanEditSourceYToSourceX));
 
-            this.InspectSourceXCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanInspectSourceX));
-            this.Disposables.Add(this.InspectSourceXCommand.Subscribe(_ => this.ExecuteInspectSourceXCommand()));
+            this.EditSourceXToSourceYCommand = ReactiveCommandCreator.Create(this.ExecuteEditSourceXToSourceYCommand, this.WhenAnyValue(x => x.CanEditSourceXToSourceY));
 
-            this.EditSourceYToSourceXCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanEditSourceYToSourceX));
-            this.Disposables.Add(this.EditSourceYToSourceXCommand.Subscribe(_ => this.ExecuteEditSourceYToSourceXCommand()));
+            this.InspectSourceYToSourceXCommand = ReactiveCommandCreator.Create(this.ExecuteInspectSourceYToSourceXCommand, this.WhenAnyValue(x => x.CanInspectSourceYToSourceX));
 
-            this.EditSourceXToSourceYCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanEditSourceXToSourceY));
-            this.Disposables.Add(this.EditSourceXToSourceYCommand.Subscribe(_ => this.ExecuteEditSourceXToSourceYCommand()));
+            this.InspectSourceXToSourceYCommand = ReactiveCommandCreator.Create(this.ExecuteInspectSourceXToSourceYCommand, this.WhenAnyValue(x => x.CanInspectSourceXToSourceY));
 
-            this.InspectSourceYToSourceXCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanInspectSourceYToSourceX));
-            this.Disposables.Add(this.InspectSourceYToSourceXCommand.Subscribe(_ => this.ExecuteInspectSourceYToSourceXCommand()));
-
-            this.InspectSourceXToSourceYCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanInspectSourceXToSourceY));
-            this.Disposables.Add(this.InspectSourceXToSourceYCommand.Subscribe(_ => this.ExecuteInspectSourceXToSourceYCommand()));
-
-            this.SwitchAxisCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.Disposables.Add(this.SwitchAxisCommand.Subscribe(_ => this.ExecuteSwitchAxisCommand()));
+            this.SwitchAxisCommand = ReactiveCommandCreator.Create(this.ExecuteSwitchAxisCommand);
 
             this.Disposables.Add(this.WhenAnyValue(x => x.Matrix.SelectedCell)
                 .Subscribe(_ => this.ComputeEditInspectCanExecute()));

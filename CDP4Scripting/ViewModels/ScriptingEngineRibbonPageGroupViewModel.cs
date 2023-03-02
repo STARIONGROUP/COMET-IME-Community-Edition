@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptingEngineRibbonPageGroupViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +31,7 @@ namespace CDP4Scripting.ViewModels
     using System.ComponentModel.Composition;
     using System.IO;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Composition;
@@ -40,7 +41,6 @@ namespace CDP4Scripting.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-
     using Events;
 
     using Helpers;
@@ -90,25 +90,9 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public ScriptingEngineRibbonPageGroupViewModel(IPanelNavigationService panelNavigationService, IOpenSaveFileDialogService fileDialogService, IScriptingProxy scriptingProxy)
         {
-            
-            if (panelNavigationService == null)
-            {
-                throw new ArgumentNullException(nameof(panelNavigationService));
-            }
-
-            if (fileDialogService == null)
-            {
-                throw new ArgumentNullException(nameof(fileDialogService));
-            }
-
-            if (scriptingProxy == null)
-            {
-                throw new ArgumentNullException(nameof(scriptingProxy));
-            }
-
-            this.PanelNavigationService = panelNavigationService;
-            this.fileDialogService = fileDialogService;
-            this.scriptingProxy = scriptingProxy;
+            this.PanelNavigationService = panelNavigationService ?? throw new ArgumentNullException(nameof(panelNavigationService));
+            this.fileDialogService = fileDialogService ?? throw new ArgumentNullException(nameof(fileDialogService));
+            this.scriptingProxy = scriptingProxy ?? throw new ArgumentNullException(nameof(scriptingProxy));
 
             CDPMessageBus.Current.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel.ToString().Contains("ScriptPanelViewModel") && x.PanelStatus == PanelStatus.Closed)
@@ -124,22 +108,15 @@ namespace CDP4Scripting.ViewModels
             this.CollectionScriptPanelViewModels = new ObservableCollection<IScriptPanelViewModel>();
             CDPMessageBus.Current.Listen<ScriptPanelEvent>().Subscribe(this.ScriptPanelEventHandler);
 
-            object NoOp(object param) => param;
+            this.NewPythonScriptCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateNewScript("python", ScriptingLaguageKindSupported.Python));
 
-            this.NewPythonScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.NewPythonScriptCommand.Subscribe(_ => this.ExecuteCreateNewScript("python", ScriptingLaguageKindSupported.Python));
+            this.NewLuaScriptCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateNewScript("lua", ScriptingLaguageKindSupported.Lua));
 
-            this.NewLuaScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.NewLuaScriptCommand.Subscribe(_ => this.ExecuteCreateNewScript("lua", ScriptingLaguageKindSupported.Lua));
+            this.NewTextScriptCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateNewScript("text", ScriptingLaguageKindSupported.Text));
 
-            this.NewTextScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.NewTextScriptCommand.Subscribe(_ => this.ExecuteCreateNewScript("text", ScriptingLaguageKindSupported.Text));
+            this.OpenScriptCommand = ReactiveCommandCreator.Create(this.OpenScriptFile);
 
-            this.OpenScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.OpenScriptCommand.Subscribe(_ => this.OpenScriptFile());
-
-            this.SaveAllCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.SaveAllCommand.Subscribe(_ => this.SaveAllScripts());
+            this.SaveAllCommand = ReactiveCommandCreator.Create(this.SaveAllScripts);
         }
 
         /// <summary>
@@ -159,27 +136,27 @@ namespace CDP4Scripting.ViewModels
         /// <summary>
         /// Creates a new python tab.
         /// </summary>
-        public ReactiveCommand<object, object> NewPythonScriptCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> NewPythonScriptCommand { get; private set; }
 
         /// <summary>
         /// Creates a new Lua tab.
         /// </summary>
-        public ReactiveCommand<object, object> NewLuaScriptCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> NewLuaScriptCommand { get; private set; }
 
         /// <summary>
         /// Creates a new text tab.
         /// </summary>
-        public ReactiveCommand<object, object> NewTextScriptCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> NewTextScriptCommand { get; private set; }
 
         /// <summary>
         /// Shows a dialog window to select a python file and import it into the texteditor
         /// </summary>
-        public ReactiveCommand<object, object> OpenScriptCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenScriptCommand { get; private set; }
 
         /// <summary>
         /// Saves all the scripts currently open.
         /// </summary>
-        public ReactiveCommand<object, object> SaveAllCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveAllCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the list of the paths that correspond to the files open in the scripting engine.

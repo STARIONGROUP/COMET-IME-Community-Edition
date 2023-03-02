@@ -35,7 +35,6 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
-
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
       <ExcludeAssets>runtime</ExcludeAssets>

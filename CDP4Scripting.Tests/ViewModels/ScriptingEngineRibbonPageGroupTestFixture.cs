@@ -1,8 +1,27 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ScriptingEngineRibbonPageGroupTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2017 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Scripting.Tests.ViewModels
 {
@@ -80,21 +99,21 @@ namespace CDP4Scripting.Tests.ViewModels
         [Test]
         public async Task VerifyThatNewScriptCommandsWork()
         {
-            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.NewLuaScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.NewLuaScriptCommand.Execute());
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Once);
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 1);
             var scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(0);
             Assert.AreEqual(scriptViewModel.Caption, "lua0");
             Assert.AreEqual(scriptViewModel.FileExtension, "*.lua");
 
-            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.NewPythonScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.NewPythonScriptCommand.Execute());
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 2);
             scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(1);
             Assert.AreEqual(scriptViewModel.Caption, "python1");
             Assert.AreEqual(scriptViewModel.FileExtension, "*.py");
 
-            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.NewTextScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.NewTextScriptCommand.Execute());
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(3));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 3);
             scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
@@ -102,7 +121,7 @@ namespace CDP4Scripting.Tests.ViewModels
             Assert.AreEqual(scriptViewModel.FileExtension, "*.txt");
 
             this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.RemoveAt(1);
-            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.NewTextScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.NewTextScriptCommand.Execute());
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(4));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 3);
             scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
@@ -170,7 +189,7 @@ namespace CDP4Scripting.Tests.ViewModels
             this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Add(panelVM2.Object);
             var pythonFilePath = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.py");
             this.fileDialogService.Setup(x => x.GetSaveFileDialog("python", null, It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(pythonFilePath);
-            Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.SaveAllCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.SaveAllCommand.Execute());
             content = File.ReadAllText(this.filePath2);
             Assert.AreEqual("content of the testFile2.lua file", content);
             this.fileDialogService.Verify(x => x.GetSaveFileDialog("python", null, ScriptingEngineRibbonPageGroupViewModel.DialogFilters, It.IsAny<string>(), 1), Times.Once);
@@ -192,7 +211,7 @@ namespace CDP4Scripting.Tests.ViewModels
         public async Task VerifyThatOpenScriptFileWorks()
         {
             // No path returned by the fileDialogService.GetOpenFileDialog, the method should return at the first conditionnal statement 
-            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Once);
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 0);
 
@@ -200,19 +219,19 @@ namespace CDP4Scripting.Tests.ViewModels
             this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.Add("tab1", "C\\Users\\test.lua");
             string[] paths = { "C\\Users\\test.lua" };
             this.fileDialogService.Setup(x => x.GetOpenFileDialog(false, false, true, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4)).Returns(paths);
-            await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null);
+            await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute();
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(2));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 0);
 
             // The path returns a directory. An exception should be trhown and no panel should be created. 
             paths[0] = "C\\Users";
-            Assert.ThrowsAsync<NotSupportedException>(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
+            Assert.ThrowsAsync<NotSupportedException>(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(3));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 0);
 
             // The path returns a filename with an invalid extension. An exception should be trhown and no panel should be created. 
             paths[0] = "C\\Users\\test.jar";
-            Assert.ThrowsAsync<NotSupportedException>(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
+            Assert.ThrowsAsync<NotSupportedException>(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(4));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 0);
 
@@ -221,7 +240,7 @@ namespace CDP4Scripting.Tests.ViewModels
             // The dictionary should add the path of the file opened.
             await File.WriteAllTextAsync(this.filePathOpenTest, "content of the lua file");
             paths[0] = this.filePathOpenTest;
-            Assert.DoesNotThrowAsync( async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync( async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(5));
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Once);
             var viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(0);
@@ -240,7 +259,7 @@ namespace CDP4Scripting.Tests.ViewModels
             this.filePathOpenTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.py");
             await File.WriteAllTextAsync(this.filePathOpenTest, "content of the python file");
             paths[0] = this.filePathOpenTest;
-            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(6));
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
             viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(1);
@@ -256,7 +275,7 @@ namespace CDP4Scripting.Tests.ViewModels
             this.filePathOpenTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.txt");
             await File.WriteAllTextAsync(this.filePathOpenTest, "content of the text file");
             paths[0] = this.filePathOpenTest;
-            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(7));
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(3));
             viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
@@ -274,7 +293,7 @@ namespace CDP4Scripting.Tests.ViewModels
             await File.WriteAllTextAsync(filePathOpenTest3, "content of the python file 2");
             paths = new[] {this.filePathOpenTest, filePathOpenTest2, filePathOpenTest3};
             this.fileDialogService.Setup(x => x.GetOpenFileDialog(false, false, true, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4)).Returns(paths);
-            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(8));
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(5));
             viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(3);

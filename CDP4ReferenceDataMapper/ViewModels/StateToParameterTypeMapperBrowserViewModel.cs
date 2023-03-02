@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="StateToParameterTypeMapperBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -296,27 +296,27 @@ namespace CDP4ReferenceDataMapper.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to start the mapping - populate the row-view-models
         /// </summary>
-        public ReactiveCommand<object, object> StartMappingCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> StartMappingCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to clear the mapping settings
         /// </summary>
-        public ReactiveCommand<object, object> ClearSettingsCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> ClearSettingsCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to remove the <see cref="SelectedSourceParameterType"/> from  the mapping settings <see cref="SourceParameterTypes"/>
         /// </summary>
-        public ReactiveCommand<object, object> RemoveSelectedSourceParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> RemoveSelectedSourceParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to execute when the selected item from <see cref="SourceParameterTypes"/> was changed
         /// </summary>
-        public ReactiveCommand<object, object> SelectedMappingParameterChangedCommand { get; protected set; }
+        public ReactiveCommand<object, Unit> SelectedMappingParameterChangedCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to execute when changed values need to be saved
         /// </summary>
-        public ReactiveCommand<Unit, object> SaveValuesCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> SaveValuesCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -330,8 +330,6 @@ namespace CDP4ReferenceDataMapper.ViewModels
         {
             base.InitializeCommands();
 
-            object NoOp(object param) => param;
-
             var canExecuteStartMappingCommand = this.WhenAnyValue(
                 vm => vm.SelectedElementDefinitionCategory,
                 vm => vm.SelectedActualFiniteStateList,
@@ -340,23 +338,19 @@ namespace CDP4ReferenceDataMapper.ViewModels
                 (a, b, c, d) =>
                     a != null && b != null && c != null && d != null);
 
-            this.StartMappingCommand = ReactiveCommand.Create<object, object>(NoOp, canExecuteStartMappingCommand);
-            this.StartMappingCommand.Subscribe(_ => this.ExecuteStartMappingCommand());
+            this.StartMappingCommand = ReactiveCommandCreator.Create(this.ExecuteStartMappingCommand, canExecuteStartMappingCommand);
 
-            this.ClearSettingsCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.ClearSettingsCommand.Subscribe(_ => this.ExecuteClearSettingsCommand());
+            this.ClearSettingsCommand = ReactiveCommandCreator.Create(this.ExecuteClearSettingsCommand);
 
             var canExecuteRemoveSelectedSourceParameterTypeCommand =
                 this.WhenAnyValue(vm => vm.SelectedSourceParameterType)
                     .Select(x => x != null);
 
-            this.RemoveSelectedSourceParameterTypeCommand = ReactiveCommand.Create<object, object>(NoOp, canExecuteRemoveSelectedSourceParameterTypeCommand);
-            this.RemoveSelectedSourceParameterTypeCommand.Subscribe(_ => this.ExecuteRemoveSelectedSourceParameterCommand());
+            this.RemoveSelectedSourceParameterTypeCommand = ReactiveCommandCreator.Create(this.ExecuteRemoveSelectedSourceParameterCommand, canExecuteRemoveSelectedSourceParameterTypeCommand);
 
-            this.SelectedMappingParameterChangedCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.SelectedMappingParameterChangedCommand.Subscribe(this.ExecuteSelectedMappingParameterChangedCommand);
+            this.SelectedMappingParameterChangedCommand = ReactiveCommandCreator.Create<object>(this.ExecuteSelectedMappingParameterChangedCommand);
 
-            this.SaveValuesCommand = ReactiveCommand.Create<Unit, object>(_ => this.ExecuteSaveValuesCommand().ToObservable());
+            this.SaveValuesCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteSaveValuesCommand);
         }
 
         /// <summary>

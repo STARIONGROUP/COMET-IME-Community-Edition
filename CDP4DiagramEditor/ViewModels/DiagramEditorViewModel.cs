@@ -1,27 +1,27 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramEditorViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor.ViewModels
 {
@@ -229,17 +229,17 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets the save command
         /// </summary>
-        public ReactiveCommand<Unit, object> SaveDiagramCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveDiagramCommand { get; private set; }
 
         /// <summary>
         /// Gets the diagram generator command
         /// </summary>
-        public ReactiveCommand<object, object> GenerateDiagramCommandShallow { get; private set; }
+        public ReactiveCommand<Unit, Unit> GenerateDiagramCommandShallow { get; private set; }
 
         /// <summary>
         /// Gets the diagram generator command
         /// </summary>
-        public ReactiveCommand<object, object> GenerateDiagramCommandDeep { get; private set; }
+        public ReactiveCommand<Unit, Unit> GenerateDiagramCommandDeep { get; private set; }
 
         /// <summary>
         /// Gets or sets the RelationshipRules
@@ -262,17 +262,17 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets or sets the Create Port Command
         /// </summary>
-        public ReactiveCommand<object, object> CreatePortCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreatePortCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the Create RelationShip Command
         /// </summary>
-        public ReactiveCommand<object, object> CreateInterfaceCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateInterfaceCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the Create BinaryRelationShip Command
         /// </summary>
-        public ReactiveCommand<object, object> CreateBinaryRelationshipCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateBinaryRelationshipCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -306,28 +306,26 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         protected override void InitializeCommands()
         {
-            object NoOp(object param) => param;
-
             base.InitializeCommands();
 
             var canExecute = this.WhenAnyValue(x => x.CanCreateDiagram, x => x.IsDirty, (x, y) => x && y);
-            this.SaveDiagramCommand = ReactiveCommand.Create<Unit, object>(x => this.ExecuteSaveDiagramCommand(), canExecute, RxApp.MainThreadScheduler);
+
+            this.SaveDiagramCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteSaveDiagramCommand, canExecute);
             this.SaveDiagramCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message));
 
-            this.GenerateDiagramCommandShallow = ReactiveCommand.Create<object, object>(NoOp,
+            this.GenerateDiagramCommandShallow = ReactiveCommandCreator.Create(
+                () => this.ExecuteGenerateDiagramCommand(false),
                 this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
-            this.GenerateDiagramCommandShallow.Subscribe(x => this.ExecuteGenerateDiagramCommand(false));
 
-            this.GenerateDiagramCommandDeep = ReactiveCommand.Create<object, object>(NoOp,
+            this.GenerateDiagramCommandDeep = ReactiveCommandCreator.Create(
+                () => this.ExecuteGenerateDiagramCommand(true),
                 this.WhenAnyValue(x => x.SelectedItems).Select(s => s != null && s.OfType<DiagramContentItem>().Any()));
-            this.GenerateDiagramCommandDeep.Subscribe(x => this.ExecuteGenerateDiagramCommand(true));
 
-            this.CreatePortCommand = ReactiveCommand.Create<object, object>(NoOp,
+            this.CreatePortCommand = ReactiveCommandCreator.Create(
+                this.CreatePortCommandExecute,
                 this.WhenAnyValue(x => x.SelectedItem).Select(s => (s as DiagramContentItem)?.Content is PortContainerDiagramContentItem));
-            this.CreatePortCommand.Subscribe(_ => this.CreatePortCommandExecute());
 
-            this.CreateInterfaceCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.CreateInterfaceCommand.Subscribe(_ => this.CreateInterfaceCommandExecute());
+            this.CreateInterfaceCommand = ReactiveCommandCreator.Create(this.CreateInterfaceCommandExecute);
         }
 
         /// <summary>

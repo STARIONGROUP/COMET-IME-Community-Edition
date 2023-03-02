@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="LogInfoPanelViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +30,7 @@ namespace CDP4LogInfo.ViewModels
     using System.ComponentModel;
     using System.Globalization;
     using System.IO;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Windows;
     using System.Windows.Data;
@@ -136,18 +137,13 @@ namespace CDP4LogInfo.ViewModels
             this.WhenAnyValue(vm => vm.SelectedLogLevel)
                 .Subscribe(logLevel => CDP4SimpleConfigurator.ChangeTargetRule(this.logTarget, this.SelectedLogLevel));
 
-            object NoOp(object param) => param;
-
             var canClear = this.LogEventInfo.CountChanged.Select(count => count > 0);
-            this.ClearCommand = ReactiveCommand.Create<object,object>(NoOp, canClear);
-            this.ClearCommand.Subscribe(_ => this.ExecuteClearLog());
+            this.ClearCommand = ReactiveCommandCreator.Create(this.ExecuteClearLog, canClear);
 
             var canExport = this.LogEventInfo.CountChanged.Select(count => count > 0);
-            this.ExportCommand = ReactiveCommand.Create<object, object>(NoOp, canExport);
-            this.ExportCommand.Subscribe(_ => this.ExecuteExportCommand());
+            this.ExportCommand = ReactiveCommandCreator.Create(this.ExecuteExportCommand, canExport);
 
-            this.ShowDetailsDialogCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.ShowDetailsDialogCommand.Subscribe(_ => this.ExecuteShowDetailsDialogCommand());
+            this.ShowDetailsDialogCommand = ReactiveCommandCreator.Create(this.ExecuteShowDetailsDialogCommand);
 
             Observable.Merge(
                 this.WhenAnyValue(vm => vm.IsFatalLogelSelected),
@@ -354,17 +350,17 @@ namespace CDP4LogInfo.ViewModels
         /// <summary>
         /// Gets the Clear command
         /// </summary>
-        public ReactiveCommand<object, object> ClearCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ClearCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to Export the log
         /// </summary>
-        public ReactiveCommand<object, object> ExportCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExportCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to show the details of the selected Log item
         /// </summary>
-        public ReactiveCommand<object, object> ShowDetailsDialogCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ShowDetailsDialogCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening

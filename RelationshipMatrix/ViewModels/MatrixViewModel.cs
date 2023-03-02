@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MatrixViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -182,49 +182,39 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.session = session;
             this.iteration = iteration;
 
-            object NoOp(object param) => param;
+            this.CreateSourceYToSourceXLink = ReactiveCommandCreator.Create(
+                () => this.CreateRelationship(RelationshipDirectionKind.RowThingToColumnThing),
+                this.WhenAnyValue(x => x.CanCreateSourceYToSourceX));
 
-            this.CreateSourceYToSourceXLink = ReactiveCommand.Create<Unit, object>(
-                x => this.CreateRelationship(RelationshipDirectionKind.RowThingToColumnThing).ToObservable(),
-                this.WhenAnyValue(x => x.CanCreateSourceYToSourceX),
-                RxApp.MainThreadScheduler);
+            this.CreateSourceXToSourceYLink = ReactiveCommandCreator.Create(
+                () => this.CreateRelationship(RelationshipDirectionKind.ColumnThingToRowThing),
+                this.WhenAnyValue(x => x.CanCreateSourceXToSourceY));
 
-            this.CreateSourceXToSourceYLink = ReactiveCommand.Create<Unit, object>(
-                x => this.CreateRelationship(RelationshipDirectionKind.ColumnThingToRowThing).ToObservable(),
-                this.WhenAnyValue(x => x.CanCreateSourceXToSourceY),
-                RxApp.MainThreadScheduler);
+            this.DeleteSourceYToSourceXLink = ReactiveCommandCreator.Create(
+                () => this.DeleteRelationship(RelationshipDirectionKind.RowThingToColumnThing),
+                this.WhenAnyValue(x => x.CanDelete));
 
-            this.DeleteSourceYToSourceXLink = ReactiveCommand.Create<Unit, object>(
-                x => this.DeleteRelationship(RelationshipDirectionKind.RowThingToColumnThing).ToObservable(),
-                this.WhenAnyValue(x => x.CanDelete),
-                RxApp.MainThreadScheduler);
+            this.DeleteSourceXToSourceYLink = ReactiveCommandCreator.Create(
+                () => this.DeleteRelationship(RelationshipDirectionKind.ColumnThingToRowThing),
+                this.WhenAnyValue(x => x.CanDelete));
 
-            this.DeleteSourceXToSourceYLink = ReactiveCommand.Create<Unit, object>(
-                x => this.DeleteRelationship(RelationshipDirectionKind.ColumnThingToRowThing).ToObservable(),
-                this.WhenAnyValue(x => x.CanDelete),
-                RxApp.MainThreadScheduler);
-
-            this.DeleteAllRelationships = ReactiveCommand.Create<Unit, object>(
-                x => this.DeleteRelationship(RelationshipDirectionKind.BiDirectional).ToObservable(),
-                this.WhenAnyValue(x => x.CanDelete),
-                RxApp.MainThreadScheduler);
+            this.DeleteAllRelationships = ReactiveCommandCreator.Create(
+                () => this.DeleteRelationship(RelationshipDirectionKind.BiDirectional),
+                this.WhenAnyValue(x => x.CanDelete));
 
             this.ProcessCellCommand =
-                ReactiveCommand.CreateFromTask<List<object>>(this.ProcessCellCommandExecute,null
-                    ,RxApp.MainThreadScheduler);
+                ReactiveCommandCreator.CreateAsyncTask<List<object>>(this.ProcessCellCommandExecute,null);
 
             this.ProcessAltCellCommand =
-                ReactiveCommand.CreateFromTask<List<object>>(this.ProcessAltCellCommandExecute,null,
-                    RxApp.MainThreadScheduler);
+                ReactiveCommandCreator.CreateAsyncTask<List<object>>(this.ProcessAltCellCommandExecute,null);
 
-            this.ProcessAltControlCellCommand = ReactiveCommand.CreateFromTask<List<object>>(
-                this.ProcessAltControlCellCommandExecute,null, RxApp.MainThreadScheduler);
+            this.ProcessAltControlCellCommand = ReactiveCommandCreator.CreateAsyncTask<List<object>>(
+                this.ProcessAltControlCellCommandExecute,null);
 
-            this.ToggleColumnHighlightCommand = ReactiveCommand.CreateFromTask<GridColumn>(
-                this.ToggleColumnHighlightCommandExecute,null, RxApp.MainThreadScheduler);
+            this.ToggleColumnHighlightCommand = ReactiveCommandCreator.CreateAsyncTask<GridColumn>(
+                this.ToggleColumnHighlightCommandExecute,null);
 
-            this.MouseDownCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.MouseDownCommand.Subscribe(x => this.MouseDownCommandExecute((MatrixAddress)x));
+            this.MouseDownCommand = ReactiveCommandCreator.Create<MatrixAddress>(this.MouseDownCommandExecute);
 
             this.SubscribeCommandExceptions();
 
@@ -308,27 +298,27 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets the command to create a <see cref="BinaryRelationship" /> from sourceY to sourceX
         /// </summary>
-        public ReactiveCommand<Unit, object> CreateSourceYToSourceXLink { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSourceYToSourceXLink { get; private set; }
 
         /// <summary>
         /// Gets the command to create a <see cref="BinaryRelationship" /> from sourceX to sourceY
         /// </summary>
-        public ReactiveCommand<Unit, object> CreateSourceXToSourceYLink { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSourceXToSourceYLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete a <see cref="BinaryRelationship" /> from sourceY to sourceX
         /// </summary>
-        public ReactiveCommand<Unit, object> DeleteSourceYToSourceXLink { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteSourceYToSourceXLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete a <see cref="BinaryRelationship" /> from sourceX to sourceY
         /// </summary>
-        public ReactiveCommand<Unit, object> DeleteSourceXToSourceYLink { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteSourceXToSourceYLink { get; private set; }
 
         /// <summary>
         /// Gets the command to delete all <see cref="BinaryRelationship" /> currently displayed
         /// </summary>
-        public ReactiveCommand<Unit, object> DeleteAllRelationships { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteAllRelationships { get; private set; }
 
         /// <summary>
         /// Gets the command to process cell double click.
@@ -348,7 +338,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets the command to process the mousedown click.
         /// </summary>
-        public ReactiveCommand<object, object> MouseDownCommand { get; private set; }
+        public ReactiveCommand<MatrixAddress, Unit> MouseDownCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to process column highlight toggle.

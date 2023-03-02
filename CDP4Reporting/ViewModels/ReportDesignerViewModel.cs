@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReportDesignerViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -262,12 +262,12 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Open code file inside the editor
         /// </summary>
-        public ReactiveCommand<object, object> ImportScriptCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> ImportScriptCommand { get; set; }
 
         /// <summary>
         /// Saves code that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<object, object> ExportScriptCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> ExportScriptCommand { get; set; }
 
         /// <summary>
         /// Build code that has been typed in the editor
@@ -277,27 +277,27 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Create a new Report 
         /// </summary>
-        public ReactiveCommand<object, object> NewReportCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> NewReportCommand { get; set; }
 
         /// <summary>
         /// Open rep4 zip archive which consists in datasource code file and report designer file
         /// </summary>
-        public ReactiveCommand<object, object> OpenReportCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> OpenReportCommand { get; set; }
 
         /// <summary>
         /// Save editor code and report designer to rep4 zip archive
         /// </summary>
-        public ReactiveCommand<object, object> SaveReportCommand { get; set; }
+        public ReactiveCommand<bool, Unit> SaveReportCommand { get; set; }
 
         /// <summary>
         /// Save editor code and report designer to rep4 zip archive and force the SaveFile dialog to be shown
         /// </summary>
-        public ReactiveCommand<object, object> SaveReportAsCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> SaveReportAsCommand { get; set; }
 
         /// <summary>
         /// Fires when the DataSource text was changed
         /// </summary>
-        public ReactiveCommand<object, object> DataSourceTextChangedCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> DataSourceTextChangedCommand { get; set; }
 
         /// <summary>
         /// Rebuild the DataSource
@@ -312,17 +312,17 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Submit data from a previewed report
         /// </summary>
-        public ReactiveCommand<Unit, object> SubmitParameterValuesCommand { get; set; }
+        public ReactiveCommand<object, Unit> SubmitParameterValuesCommand { get; set; }
 
         /// <summary>
         /// Fires when the DataSource text needs to be cleared
         /// </summary>
-        public ReactiveCommand<object, object> ClearOutputCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> ClearOutputCommand { get; set; }
 
         /// <summary>
         /// Fires when the Active Document changes in the Report Designer
         /// </summary>
-        public ReactiveCommand<DependencyPropertyChangedEventArgs, object> ActiveDocumentChangedCommand { get; set; }
+        public ReactiveCommand<DependencyPropertyChangedEventArgs, Unit> ActiveDocumentChangedCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -351,48 +351,38 @@ namespace CDP4Reporting.ViewModels
 
             this.openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 
-            object NoOp(object param) => param;
+            this.ExportScriptCommand = ReactiveCommandCreator.Create(this.ExportScript);
 
-            this.ExportScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.ExportScriptCommand .Subscribe(_ => this.ExportScript());
+            this.ImportScriptCommand = ReactiveCommandCreator.Create(this.ImportScript);
 
-            this.ImportScriptCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.ImportScriptCommand.Subscribe(_ => this.ImportScript());
-
-            this.CompileScriptCommand = ReactiveCommand.CreateFromTask(async _ =>
+            this.CompileScriptCommand = ReactiveCommandCreator.Create(async () =>
             {
                 var source = this.Document.Text;
                 await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
             });
 
-            this.NewReportCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.NewReportCommand.Subscribe(_ => this.CreateNewReport());
+            this.NewReportCommand = ReactiveCommandCreator.Create(this.CreateNewReport);
 
-            this.OpenReportCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.OpenReportCommand.Subscribe(_ => this.OpenReportProject());
+            this.OpenReportCommand = ReactiveCommandCreator.Create(this.OpenReportProject);
 
-            this.SaveReportCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.SaveReportCommand.Subscribe(_ => this.SaveReportProject());
+            this.SaveReportCommand = ReactiveCommandCreator.Create<bool>(this.SaveReportProject);
 
-            this.SaveReportAsCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.SaveReportAsCommand.Subscribe(_ => this.SaveReportProject(true));
+            this.SaveReportAsCommand = ReactiveCommandCreator.Create(() => this.SaveReportProject(true));
 
-            this.DataSourceTextChangedCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoCompileScript());
+            this.DataSourceTextChangedCommand = ReactiveCommandCreator.Create(this.CheckAutoCompileScript);
 
-            this.RebuildDatasourceCommand = ReactiveCommand.CreateFromTask(async _ => await this.ExecuteRebuildDatasourceCommand());
-            this.RebuildDatasourceAndRefreshPreviewCommand = ReactiveCommand.CreateFromTask(async _ => await this.ExecuteRebuildDatasourceAndRefreshPreviewCommand());
+            this.RebuildDatasourceCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteRebuildDatasourceCommand);
 
-            this.SubmitParameterValuesCommand = ReactiveCommand.Create<Unit, object>(
+            this.RebuildDatasourceAndRefreshPreviewCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteRebuildDatasourceAndRefreshPreviewCommand);
+
+            this.SubmitParameterValuesCommand = ReactiveCommandCreator.Create<object>(
                 x => this.SubmitParameterValues().ToObservable(),
-                this.WhenAnyValue(x => x.CanSubmitParameterValues),
-                RxApp.MainThreadScheduler);
+                this.WhenAnyValue(x => x.CanSubmitParameterValues));
 
-            this.ClearOutputCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.ClearOutputCommand.Subscribe(_ => { this.Output = string.Empty; });
+            this.ClearOutputCommand = ReactiveCommandCreator.Create(() => { this.Output = string.Empty; });
 
-            this.ActiveDocumentChangedCommand = ReactiveCommand.Create<DependencyPropertyChangedEventArgs, object>(x =>
-                this.SetReportDesigner(((DependencyPropertyChangedEventArgs) x).NewValue));
+            this.ActiveDocumentChangedCommand = ReactiveCommandCreator.CreateAsyncTask<DependencyPropertyChangedEventArgs>(x =>
+                this.SetReportDesigner(x.NewValue));
 
             this.WhenAnyValue(x => x.CurrentReport).Subscribe(x =>
             {

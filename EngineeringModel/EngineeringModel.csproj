@@ -15,7 +15,8 @@
     <FileVersion>9.2.0.0</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
-	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>  </PropertyGroup>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>  
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
     <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4EngineeringModel\</OutputPath>

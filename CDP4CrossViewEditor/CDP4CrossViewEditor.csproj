@@ -13,7 +13,6 @@
     <FileVersion>9.2.0.5</FileVersion>
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-	<EnableDefaultPageItems>false</EnableDefaultPageItems>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -40,15 +39,6 @@
     <Compile Remove="Converters\**" />
     <EmbeddedResource Remove="Converters\**" />
     <None Remove="Converters\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Views\UserControls\ElementSelectorSource.xaml.cs" />
-    <Compile Remove="Views\UserControls\ElementSelectorTarget.xaml.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="Views\UserControls\ElementSelectorSource.xaml" />
-    <None Remove="Views\UserControls\ElementSelectorTarget.xaml" />
-    <None Remove="Views\UserControls\ParameterThingSelector.xaml" />
   </ItemGroup>
   <ItemGroup>
 		<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
@@ -95,58 +85,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="sysglobl">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\CrossViewDialog.xaml.cs">
-      <DependentUpon>CrossViewDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UserControls\ElementThingSelector - Copy.xaml.cs">
-      <DependentUpon>ElementThingSelector.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UserControls\ElementThingSelector.xaml.cs">
-      <DependentUpon>ElementThingSelector.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UserControls\ThingSelectorControl.xaml.cs">
-      <DependentUpon>ThingSelectorControl.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
@@ -160,68 +98,5 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\RibbonXml\CrossViewEditorRibbon.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\CrossViewDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\UserControls\ParameterThingSelector.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\UserControls\ElementThingSelector.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\UserControls\ThingSelectorControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Core">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Data">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Drawing">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.IO.Compression.FileSystem">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Numerics">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml.Linq">
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
 </Project>

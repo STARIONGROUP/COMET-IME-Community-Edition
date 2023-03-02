@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptPanelViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -209,18 +209,13 @@ namespace CDP4Scripting.ViewModels
 
             this.ScriptVariables = new List<KeyValuePair<string, dynamic>>();
 
-            object NoOp(object param) => param;
+            this.SaveScriptCommand = ReactiveCommandCreator.Create(this.SaveScript, this.WhenAnyValue(x => x.IsDirty));
 
-            this.SaveScriptCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.IsDirty));
-            this.SaveScriptCommand.Subscribe(_ => this.SaveScript());
+            this.ExecuteScriptCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteScript, this.WhenAnyValue(x => x.CanExecuteScript));
 
-            this.ExecuteScriptCommand = ReactiveCommand.Create<Unit, object>( _ => this.ExecuteScript().ToObservable(), this.WhenAnyValue(x => x.CanExecuteScript), RxApp.MainThreadScheduler);
+            this.StopScriptCommand = ReactiveCommandCreator.Create(this.StopScript, this.WhenAnyValue(x => x.IsScriptExecuted));
 
-            this.StopScriptCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.IsScriptExecuted));
-            this.StopScriptCommand.Subscribe(_ => this.StopScript());
-
-            this.ClearOutputCommand = ReactiveCommand.Create<object, object>(NoOp, this.WhenAnyValue(x => x.CanClearOutput));
-            this.ClearOutputCommand.Subscribe(_ => this.ClearOutput());
+            this.ClearOutputCommand = ReactiveCommandCreator.Create(this.ClearOutput, this.WhenAnyValue(x => x.CanClearOutput));
 
             this.WhenAnyValue(vm => vm.OpenSessions.Count)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -439,22 +434,22 @@ namespace CDP4Scripting.ViewModels
         /// <summary>
         /// Saves the data that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<object, object> SaveScriptCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveScriptCommand { get; private set; }
 
         /// <summary>
         /// Gets the code from the texteditor, execute it and show the result
         /// </summary>
-        public ReactiveCommand<Unit, object> ExecuteScriptCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExecuteScriptCommand { get; private set; }
 
         /// <summary>
         /// Stops the script executed.
         /// </summary>
-        public ReactiveCommand<object, object> StopScriptCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> StopScriptCommand { get; private set; }
 
         /// <summary>
         /// Clears the content of the output.
         /// </summary>
-        public ReactiveCommand<object, object> ClearOutputCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ClearOutputCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening

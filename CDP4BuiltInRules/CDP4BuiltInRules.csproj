@@ -13,8 +13,7 @@
     <FileVersion>9.2.0.5</FileVersion>
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-	<EnableDefaultPageItems>false</EnableDefaultPageItems>
-    <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>  
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -71,7 +70,7 @@
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
- <PackageReference Include="Splat" Version="14.4.1">
+	 <PackageReference Include="Splat" Version="14.4.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
@@ -81,143 +80,10 @@
 	<Reference Include="System.Web" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\BuiltInRuleDialog.xaml.cs">
-      <DependentUpon>BuiltInRuleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ErrorBrowser.xaml.cs">
-      <DependentUpon>ErrorBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\BuiltInRulesBrowser.xaml.cs">
-      <DependentUpon>BuiltInRulesBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\BuiltInRulesRibbonPage.xaml.cs">
-      <DependentUpon>BuiltInRulesRibbonPage.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ErrorBrowserRibbon.xaml.cs">
-      <DependentUpon>ErrorBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\BuiltInRuleDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ErrorBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\BuiltInRulesBrowser.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\BuiltInRulesRibbonPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ErrorBrowserRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\BuiltInRuleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\BuiltInRuleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\BuiltInRulesBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\BuiltInRulesBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\BuiltInRulesRibbonPage.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\BuiltInRulesRibbonPage.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ErrorBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ErrorBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ErrorBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ErrorBrowserRibbon.g.i.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Core">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Data">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Drawing">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.IO.Compression.FileSystem">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Numerics">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml.Linq">
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
 </Project>

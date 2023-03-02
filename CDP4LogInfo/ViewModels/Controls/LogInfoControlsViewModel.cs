@@ -1,14 +1,35 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="LogInfoControlsViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4LogInfo.ViewModels
 {
     using System;
+    using System.Reactive;
     using System.Reactive.Linq;
     using CDP4Composition;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
     using CDP4Dal;
@@ -31,12 +52,9 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public LogInfoControlsViewModel(IDialogNavigationService dialogNavigationService)
         {
-            object NoOp(object param) => param;
-
             this.LogInfoPanel = new LogInfoPanelViewModel(dialogNavigationService);
 
-            this.OpenClosePanelCommand = ReactiveCommand.Create<object, object>(NoOp);
-            this.OpenClosePanelCommand.Subscribe(_ => this.ExecuteOpenClosePanel());
+            this.OpenClosePanelCommand = ReactiveCommandCreator.Create(this.ExecuteOpenClosePanel);
             
             CDPMessageBus.Current.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel == (IPanelViewModel)this.LogInfoPanel && x.PanelStatus == PanelStatus.Closed)
@@ -61,7 +79,7 @@ namespace CDP4LogInfo.ViewModels
         /// <summary>
         /// Gets the open or close Log Panel
         /// </summary>
-        public ReactiveCommand<object, object> OpenClosePanelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenClosePanelCommand { get; private set; }
 
         /// <summary>
         /// Executes the Open or Close panel command

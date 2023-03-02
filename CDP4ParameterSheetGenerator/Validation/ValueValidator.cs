@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ValueValidator.cs" company="RHEA S.A.">
-//   Copyright (c) 2015 RHEA S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,11 +31,13 @@ namespace CDP4ParameterSheetGenerator.Validation
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Validation;
+
     using CDP4ParameterSheetGenerator.Generator;
     using NLog;
 
     /// <summary>
-    /// The compound result of <see cref="Parameter"/> value validation that carries the <see cref="ValidationResultKind"/> 
+    /// The compound result of <see cref="Parameter"/> value validation that carries the <see cref="CDP4Common.Validation.ValidationResultKind"/> 
     /// and an optional message.
     /// </summary>
     public struct ValidationResult
@@ -84,28 +105,28 @@ namespace CDP4ParameterSheetGenerator.Validation
             {
                 case ClassKind.BooleanParameterType:
                     var booleanParameter = (BooleanParameterType)parameterType;
-                    return booleanParameter.Validate(value);
+                    return Validate(booleanParameter, value);
                 case ClassKind.DateParameterType:
                     var dateParameterType = (DateParameterType)parameterType;                   
-                    return dateParameterType.Validate(value);
+                    return Validate(dateParameterType, value);
                 case ClassKind.DateTimeParameterType:
                     var dateTimeParameterType = (DateTimeParameterType)parameterType;
-                    return dateTimeParameterType.Validate(value);
+                    return Validate(dateTimeParameterType, value);
                 case ClassKind.EnumerationParameterType:
                     var enumerationParameterType = (EnumerationParameterType)parameterType;
-                    return enumerationParameterType.Validate(value);
+                    return Validate(enumerationParameterType, value);
                 case ClassKind.QuantityKind:
                 case ClassKind.SimpleQuantityKind:
                 case ClassKind.DerivedQuantityKind:
                 case ClassKind.SpecializedQuantityKind:                
                     var quantityKind = (QuantityKind)parameterType;
-                    return quantityKind.Validate(measurementScale, value);
+                    return Validate(quantityKind, measurementScale, value);
                 case ClassKind.TextParameterType:
                     var textParameterType = (TextParameterType)parameterType;
-                    return textParameterType.Validate(value);
+                    return Validate(textParameterType, value);
                 case ClassKind.TimeOfDayParameterType:
                     var timeOfDayParameterType = (TimeOfDayParameterType)parameterType;
-                    return timeOfDayParameterType.Validate(value);
+                    return Validate(timeOfDayParameterType, value);
                 default:
                     throw new NotSupportedException(string.Format("The Validate method is not suported for parameterType: {0}", parameterType));
             }
@@ -318,7 +339,7 @@ namespace CDP4ParameterSheetGenerator.Validation
                 return result;
             }
 
-            result = scale.Validate(value);
+            result = Validate(scale, value);
 
             return result;
         }
