@@ -151,19 +151,6 @@
                                Hint="{Binding SelectedThingClassKindString,
                                               Converter={dx:FormatStringConverter FormatString={}Refresh {0}}}" />
 
-                <dxb:BarButtonItem Command="{Binding ExportCommand}"
-                               Glyph="{dx:DXImage Image=Export_16x16.png}"
-                               Hint="{Binding SelectedThingClassKindString,
-                                              Converter={dx:FormatStringConverter FormatString={}Export {0}}}" />
-
-                <dxb:BarSplitButtonItem />
-
-                <dxb:BarButtonItem Command="{Binding HelpCommand}"
-                               Glyph="{dx:DXImage Image=Info_16x16.png}"
-                               Hint="Show Help" />
-
-                <dxb:BarSplitButtonItem />
-
             </dxb:ToolBarControl>
 
             <views:BrowserHeader Grid.Row="1" />
