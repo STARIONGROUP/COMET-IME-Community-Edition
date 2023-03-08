@@ -735,10 +735,17 @@ namespace CDP4Reporting.ViewModels
                     Name = "__temporaryParameter__"
                 };
 
-                changes.AddItem(refreshDataSource);
-                changes.RemoveItem(refreshDataSource);
-                changes.AddItem(refreshParameter);
-                changes.RemoveItem(refreshParameter);
+                try
+                {
+                    changes.AddItem(refreshDataSource);
+                    changes.RemoveItem(refreshDataSource);
+                    changes.AddItem(refreshParameter);
+                    changes.RemoveItem(refreshParameter);
+                }
+                finally
+                {
+                    //Ignore when this happend
+                }
             });
         }
 

@@ -38,6 +38,19 @@
 		<File Id="fil_RelationshipMatrix_Vectors" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)System.Numerics.Vectors.dll" KeyPath="yes" />
 	  </Component>		
 
+	    <Component Id="comp_ClosedXml" Guid="{3172DF0B-98E0-4F2B-88AF-AF90C0D45EBD}" Location="local" Win64="$(var.Win64)">
+		    <File Id="fil_RelationshipMatrix_ClosedXml" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)ClosedXML.dll" KeyPath="yes" />
+	    </Component>		
+
+	    <Component Id="comp_ExcelNumberFormat" Guid="{CC98BD8C-65D7-42E8-ADEE-A27E1E838E30}" Location="local" Win64="$(var.Win64)">
+		    <File Id="fil_RelationshipMatrix_ExcelNumberFormat" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)ExcelNumberFormat.dll" KeyPath="yes" />
+	    </Component>		
+
+	    <Component Id="comp_OpenXml" Guid="{E30AA0D1-9521-43CF-8BE0-658330C84A8E}" Location="local" Win64="$(var.Win64)">
+		    <File Id="fil_RelationshipMatrix_OpenXml" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)DocumentFormat.OpenXml.dll" KeyPath="yes" />
+	    </Component>		
+
+
     </ComponentGroup>
 	</Fragment>
 </Wix>
