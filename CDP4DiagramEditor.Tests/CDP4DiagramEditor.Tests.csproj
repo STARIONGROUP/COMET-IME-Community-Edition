@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
-    <ProjectReference Include="..\CDP4DiagramEditor\CDP4DiagramEditor.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />

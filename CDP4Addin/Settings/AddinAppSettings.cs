@@ -26,10 +26,12 @@
 namespace CDP4AddinCE.Settings
 {
     using CDP4Composition.Services.AppSettingService;
+    using System.Runtime.InteropServices;
 
     /// <summary>
     /// An <see cref="AddinAppSettings"/> hold the settings from application <see cref="AppSettings"/>
     /// </summary>
+    [ClassInterface(ClassInterfaceType.None)]
     public class AddinAppSettings : AppSettings
     {
     }

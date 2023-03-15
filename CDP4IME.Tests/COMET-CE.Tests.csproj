@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>COMET.Tests</RootNamespace>
     <AssemblyName>COMET.Tests</AssemblyName>
-	<TargetFramework>net6.0-windows</TargetFramework>
+	<TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>COMET.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>

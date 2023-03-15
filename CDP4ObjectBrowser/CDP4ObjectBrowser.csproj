@@ -1,20 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{C6B4A2B4-5DD4-45D8-93B4-17DF82641B86}</ProjectGuid>
-    <MinIMEVersion>9.2.0</MinIMEVersion>
-    <TargetFramework>net6.0-windows</TargetFramework>
-	  <UseWPF>true</UseWPF>
-	  <UseWindowsForms>true</UseWindowsForms>
-	  <EnableDefaultPageItems>false</EnableDefaultPageItems>
-	  <EnableDefaultCompileItems>true</EnableDefaultCompileItems>
+    <MinIMEVersion>9.4.0</MinIMEVersion>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ObjectBrowser</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4ObjectBrowser</Product>
     <Description>COMET Object Browser Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.2.0.5</AssemblyVersion>
-    <FileVersion>9.2.0.5</FileVersion>
+    <AssemblyVersion>9.4.0.2</AssemblyVersion>
+    <FileVersion>9.4.0.2</FileVersion>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -38,17 +36,6 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-	  <PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
-	  <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
-  </ItemGroup>
-   
-  
-  <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -58,7 +45,103 @@
     <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="2.0.5">
+    <PackageReference Include="DevExpress.CodeParser" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Data" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.DataAccess" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Diagram.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Images" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Mvvm" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Office.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.5-pre-23050">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.5-pre-23050">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.5-pre-23050">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.5-pre-23050">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Xpo" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+	<PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.1">
@@ -102,6 +185,9 @@
     <Reference Include="System.Xaml">
       <Private>false</Private>
     </Reference>
+    <Reference Include="System.Web">
+	  <Private>false</Private>
+	</Reference>
     <Reference Include="WindowsBase">
       <Private>false</Private>
     </Reference>
@@ -746,26 +832,10 @@
     <Compile Update="Interface\ITopContainerRowViewModel.cs">
       <DependentUpon>ObjectBrowserRowViewTemplate.txt4</DependentUpon>
     </Compile>
-    <Compile Update="Views\ObjectBrowserRibbonPage.xaml.cs">
-      <DependentUpon>ObjectBrowserRibbonPage.xaml</DependentUpon>
-    </Compile>
-    <Page Include="Views\ObjectBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Update="Views\ObjectBrowser.xaml.cs">
-      <DependentUpon>ObjectBrowser.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Views\ObjectBrowserAutoGen.xaml">
-      <Generator>MSBuild:Compile</Generator>
+    <Compile Update="Views\ObjectBrowserAutoGen.xaml">
       <SubType>Designer</SubType>
       <DependentUpon>ObjectBrowserXamlGenerator.txt4</DependentUpon>
-    </Page>
-    <Page Include="Views\ObjectBrowserRibbonPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="AutoGen\ObjectBrowserRowViewTemplate.txt4" />
@@ -778,14 +848,6 @@
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ObjectBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ObjectBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ObjectBrowserRibbonPage.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ObjectBrowserRibbonPage.g.i.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Update="System">

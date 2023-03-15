@@ -57,6 +57,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
-    <ProjectReference Include="..\CDP4ObjectBrowser\CDP4ObjectBrowser.csproj" />
   </ItemGroup>
 </Project>

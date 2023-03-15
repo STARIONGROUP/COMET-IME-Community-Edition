@@ -46,6 +46,5 @@
   </ItemGroup>
 	<ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
-    <ProjectReference Include="..\CDP4PropertyGrid\CDP4PropertyGrid.csproj" />
   </ItemGroup>
 </Project>

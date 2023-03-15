@@ -3,9 +3,7 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>COMET</RootNamespace>
     <AssemblyName>COMET</AssemblyName>
-    <UseWindowsForms>true</UseWindowsForms>
-    <UseWPF>true</UseWPF>
-	<TargetFramework>net6.0-windows</TargetFramework>
+	<TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <OutputPath>bin\$(Configuration)\net48\</OutputPath>
     <AssemblyTitle>COMET</AssemblyTitle>
@@ -13,8 +11,8 @@
     <Product>COMET</Product>
     <Description>The COMET Integrated Modelling Environment</Description>
     <Copyright>Copyright © RHEA System S.A</Copyright>
-    <AssemblyVersion>9.2.0.0</AssemblyVersion>
-    <FileVersion>9.2.0.0</FileVersion>
+    <AssemblyVersion>9.4.0.2</AssemblyVersion>
+    <FileVersion>9.4.0.2</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
@@ -45,23 +43,85 @@
     <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236" />
     <PackageReference Include="CDP4RequirementsVerification-CE" Version="9.0.0-750-PR236" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
-    <PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
-    <PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
-    <PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
-    <PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" />
-    <PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
-    <PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
-    <PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
-    <PackageReference Include="MdXaml_migfree" Version="1.15.0" />
+    <PackageReference Include="DevExpress.Charts" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Charts.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.CodeParser" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Data" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.DataAccess" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Diagram.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Gauges.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Images" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Mvvm" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Office.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.PivotGrid.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Reporting.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Sparkline.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Utils" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Win" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Win.Grid" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Win.Navigation" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Win.PivotGrid" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Win.Printing" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Win.TreeList" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Win.VerticalGrid" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Charts" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.PivotGrid" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Reporting" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Xpo" Version="22.2.5-pre-23050" />
+    <PackageReference Include="ExceptionReporter" Version="4.0.2" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.1.0" />
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
+    <PackageReference Include="Markdown.Xaml" Version="1.0.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="ReactiveUI" Version="18.3.1" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Printing" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
     <None Include="NLog.dll.nlog">
@@ -72,8 +132,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="ExceptionReporter.WinForms.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
-    <ProjectReference Include="..\CDP4OfficeInfrastructure\CDP4OfficeInfrastructure.csproj" />
     <ProjectReference Include="..\CDP4ShellDialogs\CDP4ShellDialogs.csproj" />
     <ProjectReference Include="..\CDP4UpdateServerDal\CDP4UpdateServerDal.csproj" />
   </ItemGroup>
@@ -85,6 +147,33 @@
   <ItemGroup>
     <Resource Include="comet.ico" />
     <Resource Include="markdown.xaml License.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" Exclude="App.xaml" />
+    <None Remove="Views\About - Copy.xaml" />
+    <None Remove="Views\ImeRow.xaml" />
+    <None Remove="Views\PluginRow.xaml" />
+    <None Remove="Views\UpdateDownloaderInstaller.xaml" />
+    <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
+
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MsBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Views\About - Copy.xaml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PluginRow - Copy.xaml.cs">
+      <DependentUpon>PluginRow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\PluginRow.xaml.cs">
+      <DependentUpon>PluginRow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\UpdateDownloaderInstaller.xaml.cs">
+      <DependentUpon>UpdateDownloaderInstaller.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

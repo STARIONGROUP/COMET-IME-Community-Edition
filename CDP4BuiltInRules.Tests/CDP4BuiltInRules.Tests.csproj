@@ -55,7 +55,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CDP4BuiltInRules\CDP4BuiltInRules.csproj" />
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
   </ItemGroup>
 </Project>

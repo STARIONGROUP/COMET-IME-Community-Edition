@@ -124,14 +124,6 @@
     <Content Include="variables.wxi" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BasicRdl\BasicRdl.csproj">
-      <Name>BasicRdl</Name>
-      <Project>{bedcc5c5-83b2-41ed-ac9f-895757553bf2}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
     <ProjectReference Include="..\CDP4Addin\CDP4Addin.csproj">
       <Name>CDP4Addin</Name>
       <Project>{161e536a-db05-4bfd-badd-a5b9ef605da5}</Project>
@@ -140,49 +132,9 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
-    <ProjectReference Include="..\CDP4BudgetViewer\CDP4Budget.csproj">
-      <Name>CDP4Budget</Name>
-      <Project>{7d862014-4ce6-41ac-940c-49d7de4c485d}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\CDP4BuiltInRules\CDP4BuiltInRules.csproj">
-      <Name>CDP4BuiltInRules</Name>
-      <Project>{1caceea5-d398-419d-b88b-d4cc4ea67eed}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Name>CDP4Composition</Name>
       <Project>{866d3d1a-dea1-4c0d-a2ec-972cf450d0c4}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\CDP4CrossViewEditor\CDP4CrossViewEditor.csproj">
-      <Name>CDP4CrossViewEditor</Name>
-      <Project>{a9113a52-c31f-4c76-b87f-ab28e079284c}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\CDP4Dashboard\CDP4Dashboard.csproj">
-      <Name>CDP4Dashboard</Name>
-      <Project>{89e91585-c793-4d90-ab8c-fd295590665b}</Project>
-      <Private>True</Private>
-      <DoNotHarvest>True</DoNotHarvest>
-      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
-      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
-    </ProjectReference>
-    <ProjectReference Include="..\CDP4Grapher\CDP4Grapher.csproj">
-      <Name>CDP4Grapher</Name>
-      <Project>{7dedb709-7b9d-4cec-b98c-cc29874e357b}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>

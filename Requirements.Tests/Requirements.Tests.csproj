@@ -53,7 +53,6 @@
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
     <ProjectReference Include="..\CDP4OfficeInfrastructure\CDP4OfficeInfrastructure.csproj" />
-    <ProjectReference Include="..\Requirements\Requirements.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="ReqIF\testreq.reqif">

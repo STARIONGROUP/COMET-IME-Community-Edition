@@ -26,6 +26,7 @@
 namespace CDP4AddinCE
 {
     using System.ComponentModel.Composition.Hosting;
+    using System.Runtime.InteropServices;
 
     using CDP4AddinCE.Settings;
     using CDP4Composition.Composition;
@@ -33,6 +34,7 @@ namespace CDP4AddinCE
     /// <summary>
     /// Bootstrapper implementation for the Addin
     /// </summary>
+    [ClassInterface(ClassInterfaceType.None)]
     public class CDP4AddinBootstrapper : COMETBootstrapper<AddinAppSettings>
     {
         /// <summary>

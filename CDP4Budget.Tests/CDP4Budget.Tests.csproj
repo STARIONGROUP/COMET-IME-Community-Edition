@@ -44,7 +44,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CDP4BudgetViewer\CDP4Budget.csproj" />
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
   </ItemGroup>
 </Project>

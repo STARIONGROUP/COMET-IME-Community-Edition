@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>BasicRdl.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -59,7 +59,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\BasicRdl\BasicRdl.csproj" />
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
   </ItemGroup>
 </Project>

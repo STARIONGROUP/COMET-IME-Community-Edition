@@ -1,18 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	<TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4OfficeInfrastructure</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4OfficeInfrastructure</Product>
     <Description>COMET Office Infrastucture library</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.2.0.5</AssemblyVersion>
-    <FileVersion>9.2.0.5</FileVersion>
+    <AssemblyVersion>9.4.0.2</AssemblyVersion>
+    <FileVersion>9.4.0.2</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
-	<UseWPF>true</UseWPF>
-	<UseWindowsForms>true</UseWindowsForms>
-	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -35,10 +32,17 @@
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
     <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
-    <PackageReference Include="NetOfficeFw.Office" Version="1.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="ReactiveUI" Version="18.3.1" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 </Project>

@@ -37,6 +37,7 @@ namespace CDP4LogInfo.Views
     /// Interaction logic for LogInfoControls.xaml
     /// </summary>
     [Export(typeof(ExtendedRibbonPageGroup))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class LogInfoControls : ExtendedRibbonPageGroup, IView
     {
         /// <summary>
@@ -45,6 +46,7 @@ namespace CDP4LogInfo.Views
         [ImportingConstructor]
         public LogInfoControls(IDialogNavigationService dialogNavigationService)
         {
+            this.InitializeComponent();
             this.DataContext = new LogInfoControlsViewModel(dialogNavigationService);
         }
     }

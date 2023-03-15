@@ -77,9 +77,9 @@ namespace CDP4AddinCE
     /// provides the Fluent XML Ribbon and call-back implementations for the Fluent XML Ribbon controls
     /// </summary>
     [COMAddin("COMET-CE Office Add-in", "The COMET-CE Office Add-in provides COMET application integration with Microsoft Office Suite", 3)]
-    [Guid("FD48B640-1D3F-4922-854B-C69028CA469E")]
+    [Guid("0CAE241F-E861-4CBF-9636-72555CC33D8E")]
     [ProgId("CDP4CE.Addin")]
-    [RegistryLocation(RegistrySaveLocation.CurrentUser)]
+    [RegistryLocation(RegistrySaveLocation.LocalMachine)]
     public class Addin : COMAddin
     {
         /// <summary>
@@ -345,17 +345,17 @@ namespace CDP4AddinCE
         /// </summary>
         private void RedirectAssemblies()
         {
-            logger.Trace("Microsoft.Practices.ServiceLocation");
-            var serviceLocationTargetVersion = new Version("1.3.0.0");
-            this.RedirectAssembly("Microsoft.Practices.ServiceLocation", serviceLocationTargetVersion, "31bf3856ad364e35");
+            //logger.Trace("Microsoft.Practices.ServiceLocation");
+            //var serviceLocationTargetVersion = new Version("1.3.0.0");
+            //this.RedirectAssembly("Microsoft.Practices.ServiceLocation", serviceLocationTargetVersion, "31bf3856ad364e35");
 
-            logger.Trace("System.Windows.Interactivity");
-            var windowsInteractivity = new Version("4.5.0.0");
-            this.RedirectAssembly("System.Windows.Interactivity", windowsInteractivity, "31bf3856ad364e35");
+            //logger.Trace("System.Windows.Interactivity");
+            //var windowsInteractivity = new Version("4.5.0.0");
+            //this.RedirectAssembly("System.Windows.Interactivity", windowsInteractivity, "31bf3856ad364e35");
 
-            logger.Trace("System.Threading.Tasks.Extensions");
-            var threadingTasksExtensions = new Version("4.5.4.0");
-            this.RedirectAssembly("System.Threading.Tasks.Extensions", threadingTasksExtensions, "31bf3856ad364e35");
+            //logger.Trace("System.Threading.Tasks.Extensions");
+            //var threadingTasksExtensions = new Version("4.5.4.0");
+            //this.RedirectAssembly("System.Threading.Tasks.Extensions", threadingTasksExtensions, "31bf3856ad364e35");
         }
 
         /// <summary>

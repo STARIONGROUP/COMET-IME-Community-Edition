@@ -1,18 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{7D862014-4CE6-41AC-940C-49D7DE4C485D}</ProjectGuid>
-    <MinIMEVersion>9.2.0</MinIMEVersion>
-    <TargetFramework>net6.0-windows</TargetFramework>
-    <AssemblyTitle>CDP4BudgetViewer</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
-    <Product>CDP4BudgetViewer</Product>
-    <Description>COMET Budget Computation and Viewer Plugin</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.2.0.5</AssemblyVersion>
-    <FileVersion>9.2.0.5</FileVersion>
+	<ProjectGuid>{7D862014-4CE6-41AC-940C-49D7DE4C485D}</ProjectGuid>
+	<MinIMEVersion>9.4.0</MinIMEVersion>
+	<TargetFramework>net48</TargetFramework>
+	<AssemblyTitle>CDP4BudgetViewer</AssemblyTitle>
+	<Company>RHEA System S.A.</Company>
+	<Product>CDP4BudgetViewer</Product>
+	<Description>COMET Budget Computation and Viewer Plugin</Description>
+	<Copyright>Copyright © RHEA System S.A.</Copyright>
+	<AssemblyVersion>9.4.0.2</AssemblyVersion>
+	<FileVersion>9.4.0.2</FileVersion>
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <EnableDefaultPageItems>false</EnableDefaultPageItems>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -24,15 +23,6 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
-  	<ItemGroup>
-		<PackageReference Include="DevExpress.WindowsDesktop.CodeParser" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Data" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.DataDesktop" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Images" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Mvvm" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Wpf" Version="20.2.11" />
-		<PackageReference Include="DevExpress.WindowsDesktop.Wpf.Themes.Seven" Version="20.2.11" />
-	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
       <ExcludeAssets>runtime</ExcludeAssets>
@@ -40,10 +30,103 @@
     <PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="2.0.5">
+    <PackageReference Include="DevExpress.CodeParser" Version="22.2.5-pre-23050">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2">
+    <PackageReference Include="DevExpress.Data" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.DataAccess" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Diagram.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Images" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Mvvm" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Office.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.5-pre-23050">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.5-pre-23050">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.5-pre-23050">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.5-pre-23050">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Xpo" Version="22.2.5-pre-23050">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
@@ -58,14 +141,16 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
+    <!--<PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     <PackageReference Include="System.ServiceModel.Primitives" Version="4.8.1" />
     <PackageReference Include="System.ServiceModel.Http" Version="4.8.1" />
     <PackageReference Include="System.ServiceModel.Duplex" Version="4.8.1" />
     <PackageReference Include="System.ServiceModel.NetTcp" Version="4.8.1" />
     <PackageReference Include="System.ServiceModel.Security" Version="4.8.1" />
-    <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />
-    <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
+    <PackageReference Include="System.ServiceModel.Federation" Version="4.8.1" />-->
+    <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" >
+	  <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore">
@@ -86,6 +171,9 @@
     <Reference Include="System.Xaml">
       <Private>false</Private>
     </Reference>
+	<Reference Include="System.Web">
+	  <Private>false</Private>
+	</Reference>
     <Reference Include="System.Data.DataSetExtensions">
       <Private>false</Private>
     </Reference>
@@ -100,36 +188,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\BudgetRibbon.xaml.cs">
-      <DependentUpon>BudgetRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\BudgetViewer.xaml.cs">
-      <DependentUpon>BudgetViewer.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\BudgetConfig.xaml.cs">
-      <DependentUpon>BudgetConfig.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\BudgetRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\BudgetViewer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\BudgetConfig.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Reference Update="System">

@@ -44,6 +44,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
-    <ProjectReference Include="..\CDP4GraphExport\CDP4GraphExport.csproj" />
   </ItemGroup>
 </Project>
