@@ -27,7 +27,9 @@ namespace CDP4Scripting.Tests.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows.Documents;
 
     using CDP4Composition.Mvvm;
@@ -78,9 +80,9 @@ namespace CDP4Scripting.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatPythonCodeCanBeExecuted()
+        public async Task VerifyThatPythonCodeCanBeExecuted()
         {
-            this.pythonScriptPanelViewModel.ClearOutputCommand.Execute();
+            await this.pythonScriptPanelViewModel.ClearOutputCommand.Execute();
             this.pythonScriptPanelViewModel.Execute("print 'Hello, world!'");
             var outputContent = new TextRange(this.pythonScriptPanelViewModel.OutputTerminal.Document.ContentStart, this.pythonScriptPanelViewModel.OutputTerminal.Document.ContentEnd);
             Assert.AreEqual("Hello, world!\r\n\r\n", outputContent.Text);

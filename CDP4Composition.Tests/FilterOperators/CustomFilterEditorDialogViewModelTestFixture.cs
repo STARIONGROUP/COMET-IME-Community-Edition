@@ -38,6 +38,7 @@ namespace CDP4Composition.Tests.FilterOperators
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Composition;
     using CDP4Composition.FilterOperators;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
@@ -85,6 +86,7 @@ namespace CDP4Composition.Tests.FilterOperators
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            RxApp.DefaultExceptionHandler = new RxAppObservableExceptionHandler();
             this.serviceLocator = new Mock<IServiceLocator>();
 
             var treeList = new TreeListControl { View = new TreeListView() };
@@ -147,8 +149,8 @@ namespace CDP4Composition.Tests.FilterOperators
         public async Task VerifyThatQueryOperatorsCommandWorks()
         {
             var vm = new CustomFilterEditorDialogViewModel(this.dialogNavigationService.Object, this.dataViewBase);
-
-            Assert.Catch<UnhandledErrorException>(() => ((ICommand)vm.QueryOperatorsCommand).Execute(default));
+            
+            Assert.CatchAsync<NotSupportedException>(async () => await vm.QueryOperatorsCommand.Execute(default));
 
             await vm.QueryOperatorsCommand.Execute(this.filterEditorQueryOperatorsEventArgs);
 

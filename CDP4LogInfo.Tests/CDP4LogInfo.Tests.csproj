@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4LogInfo.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
@@ -40,8 +40,6 @@
     <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="Splat" Version="14.4.1" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
@@ -58,5 +56,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
+    <ProjectReference Include="..\CDP4LogInfo\CDP4LogInfo.csproj" />
   </ItemGroup>
 </Project>

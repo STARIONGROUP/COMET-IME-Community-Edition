@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+	<Reference Include="System.Net.Http" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Json\ConsolidateImeResponse.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

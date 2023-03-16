@@ -93,6 +93,8 @@ namespace CDP4Composition.Composition
             this.UpdateBootstrapperStatus("Initializing modules");
             this.InitializeModules(container);
 
+            RxApp.DefaultExceptionHandler = new RxAppObservableExceptionHandler();
+
             this.OnComposed(container);
         }
 

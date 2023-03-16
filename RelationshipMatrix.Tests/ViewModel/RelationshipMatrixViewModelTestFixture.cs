@@ -27,6 +27,9 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Composition;
@@ -55,7 +58,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         }
 
         [Test]
-        public void AssertViewModelWorks()
+        public async Task AssertViewModelWorks()
         {
             var vm = new RelationshipMatrixViewModel(
                 this.iteration,
@@ -135,7 +138,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
-            vm.SwitchAxisCommand.Execute();
+            await vm.SwitchAxisCommand.Execute();
 
             Assert.AreEqual(2, vm.Matrix.Records.Count);
             Assert.AreEqual(2, vm.Matrix.Columns.Count);

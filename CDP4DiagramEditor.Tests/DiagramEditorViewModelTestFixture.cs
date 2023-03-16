@@ -46,12 +46,15 @@ namespace CDP4DiagramEditor.Tests
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CDP4DiagramEditor.ViewModels;
+
+    using CommonServiceLocator;
 
     using DevExpress.Xpf.Diagram;
 
@@ -72,6 +75,8 @@ namespace CDP4DiagramEditor.Tests
         private Mock<IDiagramDropInfo> dropinfo;
         private Mock<IExtendedDiagramOrgChartBehavior> mockExtendedDiagramBehavior;
         private Mock<ICdp4DiagramOrgChartBehavior> mockDiagramBehavior;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IThingCreator> thingCreator;
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
         private SiteDirectory sitedir;
@@ -104,6 +109,7 @@ namespace CDP4DiagramEditor.Tests
         [SetUp]
         public void Setup()
         {
+            this.serviceLocator = new Mock<IServiceLocator>();
             this.session = new Mock<ISession>();
             this.assembler = new Assembler(this.uri);
             this.permissionService = new Mock<IPermissionService>();
@@ -113,6 +119,9 @@ namespace CDP4DiagramEditor.Tests
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
+            this.thingCreator = new Mock<IThingCreator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>()).Returns(this.thingCreator.Object);
             this.dropinfo = new Mock<IDiagramDropInfo>();
             this.cache = this.assembler.Cache;
 

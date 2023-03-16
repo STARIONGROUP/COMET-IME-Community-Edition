@@ -31,6 +31,7 @@ namespace CDP4DiagramEditor.Tests
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
@@ -143,12 +144,12 @@ namespace CDP4DiagramEditor.Tests
             var diagramrow = vm.Diagrams.Single();
             Assert.That(diagramrow.Name, Is.Not.Null.Or.Empty);
 
-            Assert.IsFalse(await vm.UpdateCommand.CanExecute);
+            Assert.That(((ICommand)vm.UpdateCommand).CanExecute(null), Is.False);
             vm.SelectedThing = diagramrow;
             vm.ComputePermission();
-            Assert.IsTrue(await vm.UpdateCommand.CanExecute);
+            Assert.That(((ICommand)vm.UpdateCommand).CanExecute(null), Is.True);
 
-            _ = vm.UpdateCommand.Execute();
+            await vm.UpdateCommand.Execute();
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<DiagramEditorViewModel>()));
         }
 

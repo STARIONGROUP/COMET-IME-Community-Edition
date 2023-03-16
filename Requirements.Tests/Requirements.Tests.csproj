@@ -2,7 +2,7 @@
   <PropertyGroup>
     <RootNamespace>CDP4Requirements.Tests</RootNamespace>
     <AssemblyName>CDP4Requirements.Tests</AssemblyName>
-	<TargetFramework>net6.0-windows</TargetFramework>
+	<TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>Requirements.Tests</AssemblyTitle>
@@ -38,21 +38,20 @@
 	<PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236" />
 	<PackageReference Include="CommonServiceLocator" Version="2.0.5" />
 	<PackageReference Include="ReactiveUI" Version="18.3.1" />
-	<PackageReference Include="System.ComponentModel.Composition" Version="6.0.0" />
 	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
 	<PackageReference Include="NLog" Version="4.7.10" />
-	<PackageReference Include="ReactiveUI" Version="18.3.1" />
 	<PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
 	<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
 	<PackageReference Include="Moq" Version="4.16.1" />
 	<PackageReference Include="NUnit" Version="3.13.3" />
-	<PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
-	<PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
-  </ItemGroup>
+    <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
+		  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
     <ProjectReference Include="..\CDP4OfficeInfrastructure\CDP4OfficeInfrastructure.csproj" />
+    <ProjectReference Include="..\Requirements\Requirements.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="ReqIF\testreq.reqif">

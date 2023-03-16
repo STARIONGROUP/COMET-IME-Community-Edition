@@ -107,8 +107,6 @@ namespace CDP4Scripting.ViewModels
         {
             try
             {
-                throw new NotImplementedException();
-
                 // Check if the script should be stopped
                 this.CancellationToken.ThrowIfCancellationRequested();
 
@@ -117,8 +115,8 @@ namespace CDP4Scripting.ViewModels
                 // Allow the user to load scripts located in pathLuaScriptsDirectory
                 var pathLuaScriptsDirectory = @"C:\Users\Mathieu\Documents\COMET scripts\?";
                 var pathLuaFiles = pathLuaScriptsDirectory + ".lua";
-                // TODO: Fix that
-                //Script.DefaultOptions.ScriptLoader = new ReplInterpreterScriptLoader();
+                
+                Script.DefaultOptions.ScriptLoader = new ReplInterpreterScriptLoader();
                 ((ScriptLoaderBase)Script.DefaultOptions.ScriptLoader).ModulePaths = new[] { pathLuaScriptsDirectory, pathLuaFiles };
 
                 // Execute the script
@@ -176,8 +174,7 @@ namespace CDP4Scripting.ViewModels
             var tempList = new List<KeyValuePair<string, dynamic>>();
             foreach (var pair in pairs)
             {
-                //TODO: Fix Thah
-                //tempList.Add(new KeyValuePair<string, dynamic>(pair.Key.ToString(), pair.Value.ToDynamic()));
+                tempList.Add(new KeyValuePair<string, dynamic>(pair.Key.ToString(), pair.Value.ToDynamic()));
             }
             this.ScriptVariables = tempList;
         }

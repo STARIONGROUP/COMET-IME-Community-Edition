@@ -34,6 +34,7 @@ namespace CDP4Scripting.Tests.ViewModels
     using System.Threading.Tasks;
 
     using CDP4Composition;
+    using CDP4Composition.Composition;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
@@ -65,6 +66,7 @@ namespace CDP4Scripting.Tests.ViewModels
         [SetUp]
         public void SetUp()
         {
+            RxApp.DefaultExceptionHandler = new RxAppObservableExceptionHandler();
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
             this.openSessions = new ReactiveList<ISession>();
@@ -238,7 +240,7 @@ namespace CDP4Scripting.Tests.ViewModels
             // The path returns a filename with a lua extension, the panel navigation service should open a panel.
             // The collection of script panels should add the new panel.
             // The dictionary should add the path of the file opened.
-            await File.WriteAllTextAsync(this.filePathOpenTest, "content of the lua file");
+            File.WriteAllText(this.filePathOpenTest, "content of the lua file");
             paths[0] = this.filePathOpenTest;
             Assert.DoesNotThrowAsync( async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(5));
@@ -257,7 +259,7 @@ namespace CDP4Scripting.Tests.ViewModels
             // The collection of script panels should add the new panels.
             // The dictionary should add the path of the file opened.
             this.filePathOpenTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.py");
-            await File.WriteAllTextAsync(this.filePathOpenTest, "content of the python file");
+            File.WriteAllText(this.filePathOpenTest, "content of the python file");
             paths[0] = this.filePathOpenTest;
             Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(6));
@@ -273,7 +275,7 @@ namespace CDP4Scripting.Tests.ViewModels
             // The collection of tab items should add the new tab item.
             // The dictionary should add the path of the file opened.
             this.filePathOpenTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.txt");
-            await File.WriteAllTextAsync(this.filePathOpenTest, "content of the text file");
+            File.WriteAllText(this.filePathOpenTest, "content of the text file");
             paths[0] = this.filePathOpenTest;
             Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(7));
@@ -288,9 +290,9 @@ namespace CDP4Scripting.Tests.ViewModels
             // The method GetOpenFileDialog returns 3 paths
             // 1 of the 3 panels is already open, therefore only 2 panels should be created
             var filePathOpenTest2 = Path.Combine(TestContext.CurrentContext.TestDirectory, "test2.txt");
-            await File.WriteAllTextAsync(filePathOpenTest2, "content of the text file 2");
+            File.WriteAllText(filePathOpenTest2, "content of the text file 2");
             var filePathOpenTest3 = Path.Combine(TestContext.CurrentContext.TestDirectory, "test2.py");
-            await File.WriteAllTextAsync(filePathOpenTest3, "content of the python file 2");
+            File.WriteAllText(filePathOpenTest3, "content of the python file 2");
             paths = new[] {this.filePathOpenTest, filePathOpenTest2, filePathOpenTest3};
             this.fileDialogService.Setup(x => x.GetOpenFileDialog(false, false, true, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4)).Returns(paths);
             Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());

@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>CDP4Grapher.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Grapher.Tests</Product>
@@ -18,7 +18,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-	  <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236" />
+	<PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236" />
     <PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236" />
     <PackageReference Include="CDP4RequirementsVerification-CE" Version="9.0.0-750-PR236" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
@@ -26,8 +26,6 @@
     <PackageReference Include="NLog" Version="4.7.10" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="ReactiveUI" Version="18.3.1" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
 	<ItemGroup>

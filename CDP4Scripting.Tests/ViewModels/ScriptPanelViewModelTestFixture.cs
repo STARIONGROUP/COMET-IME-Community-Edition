@@ -89,8 +89,8 @@ namespace CDP4Scripting.Tests.ViewModels
         public void VerifyThatCommandsWork()
         {
             Assert.DoesNotThrowAsync(async () => await this.scriptPanelViewModel.Object.ExecuteScriptCommand.Execute());
-            Assert.DoesNotThrowAsync(async () => await  this.scriptPanelViewModel.Object.StopScriptCommand.Execute());
-            Assert.DoesNotThrowAsync(async () => await  this.scriptPanelViewModel.Object.SaveScriptCommand.Execute());
+            Assert.DoesNotThrow(() => this.scriptPanelViewModel.Object.StopScriptCommand.Execute());
+            Assert.DoesNotThrow(() => this.scriptPanelViewModel.Object.SaveScriptCommand.Execute());
         }
 
         [Test]

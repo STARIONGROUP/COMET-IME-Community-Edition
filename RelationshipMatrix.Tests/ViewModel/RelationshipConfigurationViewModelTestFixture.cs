@@ -29,6 +29,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -71,25 +72,25 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         }
 
         [Test]
-        public async Task Verify_that_the_rule_inspect_command_is_active_when_rule_is_selected()
+        public void Verify_that_the_rule_inspect_command_is_active_when_rule_is_selected()
         {
-            Assert.IsFalse(await this.relationshipConfigurationViewModel.InspectRuleCommand.CanExecute);
+            Assert.That(((ICommand)this.relationshipConfigurationViewModel.InspectRuleCommand).CanExecute(null), Is.False);
 
             this.relationshipConfigurationViewModel.PossibleRules.Add(this.rule);
 
             this.relationshipConfigurationViewModel.SelectedRule = this.relationshipConfigurationViewModel.PossibleRules.First();
 
-            Assert.IsTrue(await this.relationshipConfigurationViewModel.InspectRuleCommand.CanExecute); 
+            Assert.That(((ICommand)this.relationshipConfigurationViewModel.InspectRuleCommand).CanExecute(null), Is.True);
         }
 
         [Test]
-        public void Verify_that_when_inspect_command_is_executed_navigation_service_is_invoked()
+        public async Task Verify_that_when_inspect_command_is_executed_navigation_service_is_invoked()
         {
             this.relationshipConfigurationViewModel.PossibleRules.Add(this.rule);
 
             this.relationshipConfigurationViewModel.SelectedRule = this.relationshipConfigurationViewModel.PossibleRules.First();
 
-            this.relationshipConfigurationViewModel.InspectRuleCommand.Execute();
+            await this.relationshipConfigurationViewModel.InspectRuleCommand.Execute();
 
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<Rule>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, It.IsAny<Thing>(), null));
         }
