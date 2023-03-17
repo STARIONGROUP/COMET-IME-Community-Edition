@@ -31,6 +31,7 @@ namespace CDP4Composition.Navigation
     using System.Diagnostics;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using System.Windows.Threading;
 
     using CDP4Common.CommonData;
 
@@ -43,6 +44,8 @@ namespace CDP4Composition.Navigation
     using CDP4Dal.Composition;
 
     using NLog;
+
+    using ISession = CDP4Dal.ISession;
 
     /// <summary>
     /// The panel navigation service class that provides services to open a docking panel given a <see cref="Thing"/> or a <see cref="IPanelViewModel"/>
@@ -303,6 +306,8 @@ namespace CDP4Composition.Navigation
 
             // unregister from filter string service
             this.filterStringService.UnregisterFromService(panelViewModel);
+
+            this.OptimizeMemoryUsage();
         }
 
         /// <summary>
@@ -320,6 +325,16 @@ namespace CDP4Composition.Navigation
 
             // unregister from filter string service
             this.filterStringService.UnregisterFromService(panelViewModel);
+
+            this.OptimizeMemoryUsage();
+        }
+
+        /// <summary>
+        /// Optimize the application's memory usage
+        /// </summary>
+        private void OptimizeMemoryUsage()
+        {
+            Dispatcher.CurrentDispatcher.InvokeAsync(GC.Collect, DispatcherPriority.Background);
         }
 
         /// <summary>
