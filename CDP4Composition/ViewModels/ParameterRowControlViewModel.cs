@@ -28,7 +28,10 @@ namespace CDP4Composition.ViewModels
     using System.Linq;
 
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Views;
 
     using ReactiveUI;
@@ -67,17 +70,31 @@ namespace CDP4Composition.ViewModels
         }
 
         /// <summary>
-        /// Backing field for <see cref="Value"/>
+        /// Backing field for <see cref="ActualValue"/>
         /// </summary>
-        private string value;
+        private string actualValue;
 
         /// <summary>
-        /// Gets or sets the parameter name
+        /// Gets or sets the actual value
         /// </summary>
-        public string Value
+        public string ActualValue
         {
-            get => this.value;
-            set => this.RaiseAndSetIfChanged(ref this.value, value);
+            get => this.actualValue;
+            set => this.RaiseAndSetIfChanged(ref this.actualValue, value);
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="PublishedValue"/>
+        /// </summary>
+        private string publishedValue;
+
+        /// <summary>
+        /// Gets or sets the published value
+        /// </summary>
+        public string PublishedValue
+        {
+            get => this.publishedValue;
+            set => this.RaiseAndSetIfChanged(ref this.publishedValue, value);
         }
 
         /// <summary>
@@ -161,12 +178,25 @@ namespace CDP4Composition.ViewModels
         public Option ActualOption { get; private set; }
 
         /// <summary>
+        /// Gets or sets a list of <see cref="ParameterRowControlViewModel"/>
+        /// </summary>
+        public ReactiveList<ParameterRowControlViewModel> ContainedRows { get; set; }
+
+        /// <summary>
+        /// Initializes an instance of <see cref="ParameterRowControlViewModel"/>
+        /// </summary>
+        public ParameterRowControlViewModel()
+        {
+        }
+
+        /// <summary>
         /// Initializes a new instance of <see cref="ParameterRowControlViewModel"/>
         /// </summary>
         /// <param name="parameter">The <see cref="Parameter"/> this view model represents</param>
         /// <param name="actualOption">The actual Option</param>
         public ParameterRowControlViewModel(ParameterOrOverrideBase parameter, Option actualOption)
         {
+            this.ContainedRows = new ReactiveList<ParameterRowControlViewModel>();
             this.Parameter = parameter;
             this.ActualOption = actualOption;
             this.UpdateProperties();
@@ -181,18 +211,65 @@ namespace CDP4Composition.ViewModels
 
             this.Name = this.Parameter.ParameterType.Name;
             this.ShortName = this.Parameter.ParameterType.ShortName;
-            var actualvalue = valueSet?.Published.FirstOrDefault() ?? "-";
 
             var scaleShortName = this.Parameter.Scale is null 
                     ? string.Empty 
                     : $" [{this.Parameter.Scale.ShortName}]";
 
-            this.Value = $"{actualvalue}{scaleShortName}";
+            var actualValue = this.FormatValueString(valueSet?.ActualValue);
+            var publishedValue = this.FormatValueString(valueSet?.Published);
+
+            this.ActualValue = $"{actualValue}{scaleShortName}";
+            this.PublishedValue = $"{publishedValue}{scaleShortName}";
             this.OwnerShortName = this.Parameter.Owner.ShortName;
             this.Switch = valueSet?.ValueSwitch.ToString();
             this.Description = "-";
             this.ModelCode = this.Parameter.ModelCode();
             this.RowType = this.Parameter.ClassKind.ToString();
+
+            this.UpdateContainedRows();
+        }
+
+        /// <summary>
+        /// Converts the <see cref="ValueArray{T}"/> into a string to be displayed
+        /// </summary>
+        /// <param name="valueArray"></param>
+        /// <returns>A string representing the values</returns>
+        protected string FormatValueString(ValueArray<string> valueArray)
+        {
+            if (valueArray == null) return "-";
+            var valueString = string.Empty;
+
+            if (valueArray.Count == 1)
+            {
+                valueString = valueArray.FirstOrDefault();
+            }
+            else
+            {
+                valueString = string.Format("{{{0}}}", string.Join(", ", valueArray));
+            }
+
+            return valueString;
+        }
+
+        /// <summary>
+        /// Updates the <see cref="ContainedRows"/> list 
+        /// </summary>
+        private void UpdateContainedRows()
+        {
+            if (this.Parameter.StateDependence != null)
+            {
+                var rowViewModel = new StateDependenceRowViewModel(this.Parameter.StateDependence.ActualState, this.Parameter.ValueSets);
+                var rows = rowViewModel.GenerateStateRows();
+                this.ContainedRows.AddRange(rows);
+            }
+            else if (this.Parameter.ParameterType is CompoundParameterType compoundParameterType)
+            {
+                var valueSet = this.GetValueSet();
+                var rowViewModel = new CompoundParameterTypeRowViewModel(compoundParameterType.Component.SortedItems, valueSet);
+                var rows = rowViewModel.GenerateCompoundParameterRowViewModels();
+                this.ContainedRows.AddRange(rows);
+            }
         }
 
         /// <summary>
