@@ -160,6 +160,7 @@ namespace BasicRdl.ViewModels
             this.PossibleScale.Clear();
 
             var qt = this.ParameterType as QuantityKind;
+
             if (qt == null)
             {
                 this.Scale = null;
@@ -167,9 +168,10 @@ namespace BasicRdl.ViewModels
             }
 
             this.PossibleScale.AddRange(qt.AllPossibleScale);
+            
             if (this.PossibleScale.Count > 0)
             {
-                this.Scale = qt.DefaultScale ?? this.PossibleScale.First();
+                this.Scale = this.Thing.Scale ?? qt.DefaultScale ?? this.PossibleScale.First();
             }
         }
 

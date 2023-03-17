@@ -57,13 +57,15 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<ISession> session;
         private readonly Uri uri = new Uri("http://www.rheagroup.com");
-        private ParameterTypeComponent parameterType;
+        private ParameterTypeComponent parameterTypeComponent;
         private SiteDirectory siteDir;
         private SiteReferenceDataLibrary srdl;
         private Category cat;
         private BooleanParameterType bpt;
         private CompoundParameterType cpt;
-        private MeasurementScale scale;
+        private MeasurementScale scale1;
+        private MeasurementScale scale2;
+        private MeasurementScale scale3;
         private SimpleQuantityKind qt;
         private Mock<IPermissionService> permissionService;
 
@@ -96,9 +98,17 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
             this.qt = new SimpleQuantityKind(Guid.NewGuid(), this.cache, null);
             this.srdl.ParameterType.Add(this.qt);
 
-            this.scale = new OrdinalScale(Guid.NewGuid(), this.cache, null);
-            this.srdl.Scale.Add(this.scale);
-            this.qt.PossibleScale.Add(this.scale);
+            this.scale1 = new OrdinalScale(Guid.NewGuid(), this.cache, null) {Name = "scale1"};
+            this.srdl.Scale.Add(this.scale1);
+            this.qt.PossibleScale.Add(this.scale1);
+
+            this.scale2 = new OrdinalScale(Guid.NewGuid(), this.cache, null) {Name = "scale2"};
+            this.srdl.Scale.Add(this.scale2);
+            this.qt.PossibleScale.Add(this.scale2);
+
+            this.scale3 = new OrdinalScale(Guid.NewGuid(), this.cache, null) {Name = "scale2"};
+            this.srdl.Scale.Add(this.scale3);
+            this.qt.PossibleScale.Add(this.scale3);
 
             this.cache.TryAdd(new CacheKey(this.srdl.Iid, null), new Lazy<Thing>(() => this.srdl));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
@@ -109,7 +119,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
-            this.parameterType = new ParameterTypeComponent();
+            this.parameterTypeComponent = new ParameterTypeComponent();
         }
 
         [Test]
@@ -118,12 +128,12 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext);
             var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
-            var parameterTypeComponent = new ParameterTypeComponentRowViewModel(this.parameterType, this.session.Object, viewmodel);
-            Assert.False(parameterTypeComponent.IsReadOnly);
-            Assert.Null(parameterTypeComponent.SelectedFilter);
-            Assert.Null(parameterTypeComponent.Coordinates);
-            Assert.AreEqual(parameterTypeComponent.PossibleParameterType.Count, 2);
-            Assert.AreEqual(parameterTypeComponent.PossibleScale.Count, 0);
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(this.parameterTypeComponent, this.session.Object, viewmodel);
+            Assert.That(parameterTypeComponentVm.IsReadOnly, Is.False);
+            Assert.That(parameterTypeComponentVm.SelectedFilter, Is.Null);
+            Assert.That(parameterTypeComponentVm.Coordinates, Is.Null);
+            Assert.That(parameterTypeComponentVm.PossibleParameterType.Count, Is.EqualTo(2));
+            Assert.That(parameterTypeComponentVm.PossibleScale.Count, Is.EqualTo(0));
         }
 
         [Test]
@@ -132,9 +142,9 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext);
             var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
-            var parameterTypeComponent = new ParameterTypeComponentRowViewModel(this.parameterType, this.session.Object, viewmodel);
-            parameterTypeComponent.SelectedFilter = typeof(SimpleQuantityKind).Name;
-            Assert.True(parameterTypeComponent.PossibleParameterType[0] is SimpleQuantityKind);
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(this.parameterTypeComponent, this.session.Object, viewmodel);
+            parameterTypeComponentVm.SelectedFilter = nameof(SimpleQuantityKind);
+            Assert.That(parameterTypeComponentVm.PossibleParameterType[0] is SimpleQuantityKind, Is.True);
         }
 
         [Test]
@@ -143,8 +153,8 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext);
             var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
-            var parameterTypeComponent = new ParameterTypeComponentRowViewModel(this.parameterType, this.session.Object, viewmodel);
-            Assert.True(parameterTypeComponent.PossibleParameterType.Count.Equals(2));
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(this.parameterTypeComponent, this.session.Object, viewmodel);
+            Assert.That(parameterTypeComponentVm.PossibleParameterType.Count, Is.EqualTo(2));
         }
 
         [Test]
@@ -153,13 +163,69 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext);
             var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
-            var parameterTypeComponent = new ParameterTypeComponentRowViewModel(this.parameterType, this.session.Object, viewmodel);
-            parameterTypeComponent.SelectedFilter = typeof(SimpleQuantityKind).Name;
-            Assert.True(parameterTypeComponent.PossibleParameterType[0] is SimpleQuantityKind);
-            Assert.True(parameterTypeComponent.PossibleParameterType.Count.Equals(1));
-            parameterTypeComponent.SelectedFilter = null;
-            Assert.True(parameterTypeComponent.PossibleParameterType.Count.Equals(2));
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(this.parameterTypeComponent, this.session.Object, viewmodel);
+            parameterTypeComponentVm.SelectedFilter = nameof(SimpleQuantityKind);
+            Assert.That(parameterTypeComponentVm.PossibleParameterType[0] is SimpleQuantityKind, Is.True);
+            Assert.That(parameterTypeComponentVm.PossibleParameterType.Count, Is.EqualTo(1));
+            parameterTypeComponentVm.SelectedFilter = null;
+            Assert.That(parameterTypeComponentVm.PossibleParameterType.Count, Is.EqualTo(2));
         }
 
+        [Test]
+        public void VerifyThatPossibleMeasurementScalesArePopulatedCorrectly()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext);
+            var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
+
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(this.parameterTypeComponent, this.session.Object, viewmodel);
+            parameterTypeComponentVm.ParameterType = this.qt;
+
+            Assert.That(parameterTypeComponentVm.PossibleScale.Count, Is.EqualTo(3));
+        }
+
+        [Test]
+        public void VerifyThatSelectedMeasurementScaleIsPopulatedCorrectlyWithDefaultScale()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext);
+            var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
+
+            this.parameterTypeComponent.ParameterType = this.qt;
+            this.qt.DefaultScale = this.scale2;
+
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(this.parameterTypeComponent, this.session.Object, viewmodel);
+
+            Assert.That(parameterTypeComponentVm.Scale, Is.EqualTo(this.scale2));
+        }
+
+        [Test]
+        public void VerifyThatSelectedMeasurementScaleIsPopulatedCorrectlyWithoutDefaultScale()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext);
+            var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
+
+            this.parameterTypeComponent.ParameterType = this.qt;
+
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(this.parameterTypeComponent, this.session.Object, viewmodel);
+
+            Assert.That(parameterTypeComponentVm.Scale, Is.EqualTo(this.scale1));
+        }
+
+        [Test]
+        public void VerifyThatSelectedMeasurementScaleIsPopulatedCorrectlyForExistingParameterComponentType()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext);
+            var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
+
+            this.parameterTypeComponent.ParameterType = this.qt;
+            this.parameterTypeComponent.Scale = this.scale3;
+
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(this.parameterTypeComponent, this.session.Object, viewmodel);
+
+            Assert.That(parameterTypeComponentVm.Scale, Is.EqualTo(this.scale3));
+        }
     }
 }
