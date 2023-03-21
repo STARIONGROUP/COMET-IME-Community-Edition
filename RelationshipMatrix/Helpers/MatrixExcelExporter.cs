@@ -27,6 +27,7 @@ namespace CDP4RelationshipMatrix.Helpers
 {
     using System;
     using System.Linq;
+    using System.Text;
 
     using CDP4Common.EngineeringModelData;
 
@@ -85,10 +86,8 @@ namespace CDP4RelationshipMatrix.Helpers
         {
             using (var workbook = new XLWorkbook())
             {
-                this.ConstructMetaSheet(workbook);
-
                 this.ConstructMatrixSheet(workbook);
-
+                this.ConstructMetaSheet(workbook);
                 workbook.SaveAs(path);
             }
         }
@@ -102,27 +101,43 @@ namespace CDP4RelationshipMatrix.Helpers
             var worksheetMatrix = workbook.Worksheets.Add("Matrix");
 
             var firstCell = worksheetMatrix.Cell("A1");
-            var lastCell = worksheetMatrix.Cell(this.Matrix.Records.Count + 1, this.Matrix.Columns.Count);
+            var lastCell = worksheetMatrix.Cell(this.Matrix.Records.Count + 1, this.Matrix.Columns.Count+1);
 
             // construct headers
-            for (var i = 1; i < this.Matrix.Columns.Count; i++)
+            for (var i = 1; i <= this.Matrix.Columns.Count; i++)
             {
                 worksheetMatrix.Cell(1, i).Value = this.Matrix.Columns[i - 1].Header;
             }
 
             // construct total header
-            worksheetMatrix.Cell(1, this.Matrix.Columns.Count).Value = "Traces";
+            worksheetMatrix.Cell(1, this.Matrix.Columns.Count + 1).Value = "Traces";
 
             worksheetMatrix.Row(1).Style.Alignment.TextRotation = 90;
             worksheetMatrix.Row(1).Style.Font.Bold = true;
             worksheetMatrix.Column(1).Style.Font.Bold = true;
             worksheetMatrix.Row(1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
 
-            worksheetMatrix.Column(this.Matrix.Columns.Count).Style.Font.Bold = false;
-            worksheetMatrix.Column(this.Matrix.Columns.Count).Style.Font.Italic = true;
+            worksheetMatrix.Column(this.Matrix.Columns.Count + 1).Style.Font.Bold = false;
+            worksheetMatrix.Column(this.Matrix.Columns.Count + 1).Style.Font.Italic = true;
 
-            firstCell.Value = this.SourceYConfiguration?.SelectedClassKind;
+            // construct corner cell
+            var sb = new StringBuilder();
+
+            sb.AppendLine($"                 {this.SourceXConfiguration.SelectedClassKind}");
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine($"{this.SourceYConfiguration.SelectedClassKind}");
+
+            // style corner cell
+            firstCell.Value = sb.ToString();
             firstCell.Style.Alignment.TextRotation = 0;
+            firstCell.Style.Border.DiagonalBorder = XLBorderStyleValues.Thin;
+            firstCell.Style.Border.DiagonalDown = true;
 
             // construct rows
             for (var i = 1; i <= this.Matrix.Records.Count; i++)
@@ -144,7 +159,7 @@ namespace CDP4RelationshipMatrix.Helpers
                     worksheetMatrix.Cell(i + 1, j + 1).Value = trace ? "X" : string.Empty;
                 }
 
-                worksheetMatrix.Cell(i + 1, this.Matrix.Records[i - 1].Count).Value = traceCount;
+                worksheetMatrix.Cell(i + 1, this.Matrix.Records[i - 1].Count + 1).Value = traceCount;
             }
 
             var matrixTable = worksheetMatrix.Range(firstCell, lastCell).CreateTable("Matrix");
@@ -159,8 +174,8 @@ namespace CDP4RelationshipMatrix.Helpers
                 matrixTableField.TotalsRowFunction = XLTotalsRowFunction.Count;
             }
 
-            matrixTable.Field(this.SourceYConfiguration.SelectedClassKind.ToString()).TotalsRowLabel = "Traces";
-            matrixTable.Field(this.SourceYConfiguration.SelectedClassKind.ToString()).TotalsRowFunction = XLTotalsRowFunction.None;
+            matrixTable.Fields.First().TotalsRowLabel = "Traces";
+            matrixTable.Fields.First().TotalsRowFunction = XLTotalsRowFunction.None;
 
             matrixTable.Rows().Last().Style.Font.Italic = true;
             matrixTable.Rows().Last().Style.Font.Bold = false;
@@ -169,14 +184,29 @@ namespace CDP4RelationshipMatrix.Helpers
 
             // color in trace summaries
             matrixTable.Rows().Last().AddConditionalFormat().WhenEquals("Traces").Fill.SetBackgroundColor(XLColor.NoColor);
-            matrixTable.Rows().Last().AddConditionalFormat().WhenEquals(0).Fill.SetBackgroundColor(XLColor.MistyRose);
-            matrixTable.Rows().Last().AddConditionalFormat().WhenGreaterThan(0).Fill.SetBackgroundColor(XLColor.Celadon);
 
-            matrixTable.Columns().Last().AddConditionalFormat().WhenEquals("Traces").Fill.SetBackgroundColor(XLColor.NoColor);
-            matrixTable.Columns().Last().AddConditionalFormat().WhenEquals(0).Fill.SetBackgroundColor(XLColor.MistyRose);
-            matrixTable.Columns().Last().AddConditionalFormat().WhenGreaterThan(0).Fill.SetBackgroundColor(XLColor.Celadon);
+            var lastRowFirstTraceCell = worksheetMatrix.Cell(matrixTable.Rows().Last().RowNumber(), 2);
+            var lastRowLastTraceCell = worksheetMatrix.Cell(matrixTable.Rows().Last().RowNumber(), this.Matrix.Columns.Count);
+            var rowTraceRange = worksheetMatrix.Range(lastRowFirstTraceCell, lastRowLastTraceCell);
 
+            rowTraceRange.AddConditionalFormat().WhenEquals(0).Fill.SetBackgroundColor(XLColor.MistyRose);
+            rowTraceRange.AddConditionalFormat().WhenGreaterThan(0).Fill.SetBackgroundColor(XLColor.Celadon);
+
+            var lastColumnFirstTraceCell = worksheetMatrix.Cell(2, this.Matrix.Columns.Count + 1);
+            var lastColumnLastTraceCell = worksheetMatrix.Cell(matrixTable.Rows().Last().RowNumber() - 1, this.Matrix.Columns.Count + 1);
+            var columnTraceRange = worksheetMatrix.Range(lastColumnFirstTraceCell, lastColumnLastTraceCell);
+
+            columnTraceRange.AddConditionalFormat().WhenEquals(0).Fill.SetBackgroundColor(XLColor.MistyRose);
+            columnTraceRange.AddConditionalFormat().WhenGreaterThan(0).Fill.SetBackgroundColor(XLColor.Celadon);
+
+            // remove last cell totals
+            worksheetMatrix.Cell(matrixTable.Rows().Last().RowNumber(), this.Matrix.Columns.Count + 1).FormulaA1 = string.Empty;
+
+            // adjust width
             worksheetMatrix.Columns().AdjustToContents();
+
+            // set tab color
+            worksheetMatrix.SetTabColor(XLColor.DarkSeaGreen);
         }
 
         /// <summary>
