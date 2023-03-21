@@ -31,6 +31,7 @@ namespace CDP4IME
     using System.Reflection;
     using System.Text;
     using System.Windows;
+    using System.Windows.Controls;
 
     using CDP4Composition;
     using CDP4Composition.ErrorReporting.Views;
@@ -64,8 +65,11 @@ namespace CDP4IME
         protected override void OnStartup(StartupEventArgs e)
         {
             // Set the Theme of the application
-            ThemeManager.ApplicationThemeName = Theme.SevenName;
+            ApplicationThemeHelper.ApplicationThemeName = Theme.SevenName;
             AppliedTheme.ThemeName = Theme.SevenName;
+            ToolTipService.BetweenShowDelayProperty.OverrideMetadata(typeof(Control), new FrameworkPropertyMetadata());  
+            ToolTipService.InitialShowDelayProperty.OverrideMetadata(typeof(Control), new FrameworkPropertyMetadata(750));  
+           
             RxApp.MainThreadScheduler = DispatcherScheduler.Current;
             base.OnStartup(e);
 

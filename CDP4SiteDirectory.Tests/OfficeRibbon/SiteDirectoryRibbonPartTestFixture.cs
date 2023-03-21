@@ -92,7 +92,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
 
             this.session.Setup(x => x.PermissionService).Returns(this.permittingPermissionService.Object);
 
-            this.amountOfRibbonControls = 9;
+            this.amountOfRibbonControls = 10;
             this.order = 1;
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);

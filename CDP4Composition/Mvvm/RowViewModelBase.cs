@@ -111,6 +111,11 @@ namespace CDP4Composition.Mvvm
         private ThingStatus thingStatus;
 
         /// <summary>
+        /// Backing field for <see cref="Details"/>
+        /// </summary>
+        private string details;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RowViewModelBase{T}"/> class.
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> represented by the row</param>
@@ -272,6 +277,15 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// Gets or sets the details
+        /// </summary>
+        public string Details
+        {
+            get { return this.details; }
+            protected set { this.RaiseAndSetIfChanged(ref this.details, value); }
+        }
+
+        /// <summary>
         /// Indicates if edit functions in context menu are active
         /// </summary>
         public virtual bool CanEditThing { get; } = true;
@@ -428,6 +442,9 @@ namespace CDP4Composition.Mvvm
                     this.HasError = !string.IsNullOrEmpty(this.ErrorMsg);
                 }
             };
+
+            this.Disposables.Add(
+                this.WhenAnyValue(x => x.Tooltip).Subscribe(_ => this.UpdateDetails()));
         }
 
         /// <summary>
@@ -619,6 +636,14 @@ namespace CDP4Composition.Mvvm
         protected virtual void UpdateTooltip()
         {
             this.Tooltip = this.Thing?.Tooltip();
+        }
+
+        /// <summary>
+        /// Update this <see cref="Details"/>
+        /// </summary>
+        protected virtual void UpdateDetails()
+        {
+            this.Details = this.Thing?.Tooltip();
         }
 
         /// <summary>
