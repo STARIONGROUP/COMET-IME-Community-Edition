@@ -47,7 +47,10 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
+    using CDP4RelationshipMatrix.Helpers;
     using CDP4RelationshipMatrix.Settings;
+
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -169,6 +172,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         private bool rebuildSuppressed;
 
         /// <summary>
+        /// The <see cref="IOpenSaveFileDialogService"/>
+        /// </summary>
+        private IOpenSaveFileDialogService fileDialogService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel" /> class
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration" /></param>
@@ -187,6 +195,8 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.ShowDirectionality = true;
             this.ShowRelatedOnly = false;
             this.IsBusy = false;
+
+            this.fileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 
             this.ToolTip =
                 $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
@@ -367,6 +377,11 @@ namespace CDP4RelationshipMatrix.ViewModels
             get { return this.canInspectSourceX; }
             private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceX, value); }
         }
+
+        /// <summary>
+        /// Gets the command to export the matrix to excel
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> ExportToExcelCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to edit the current row thing
@@ -617,6 +632,8 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.ManageSavedConfigurations = ReactiveCommandCreator.Create(this.ExecuteManageSavedConfigurations);
 
+            this.ExportToExcelCommand = ReactiveCommandCreator.Create(this.ExecuteExportToExcelCommand);
+
             this.SaveCurrentConfiguration = ReactiveCommandCreator.Create(this.ExecuteSaveCurrentConfiguration);
 
             this.EditSourceYCommand = ReactiveCommandCreator.Create(this.ExecuteEditSourceYCommand, this.WhenAnyValue(x => x.CanEditSourceY));
@@ -822,6 +839,25 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Executes the export to excel
+        /// </summary>
+        private void ExecuteExportToExcelCommand()
+        {
+            // get save dialog
+            var path = this.fileDialogService.GetSaveFileDialog("RelationshipMatrix", ".xlsx", "Excel files (.xlsx)|*.xlsx", null, 1);
+
+            if (path == null)
+            {
+                return;
+            }
+
+            // initiate exporter
+            var exporter = new MatrixExcelExporter(this.SourceXConfiguration, this.SourceYConfiguration, this.RelationshipConfiguration, this.Matrix, this.Thing);
+
+            exporter.Export(path);
         }
 
         /// <summary>

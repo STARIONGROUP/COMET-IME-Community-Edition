@@ -628,6 +628,31 @@
                                     </dxlc:LayoutControl>
                                 </dxn:NavBarGroup.Content>
                             </dxn:NavBarGroup>
+                            <dxn:NavBarGroup DisplaySource="Content" Header="Matrix">
+                                <dxn:NavBarGroup.Content>
+                                    <dxlc:LayoutControl>
+                                        <dxlc:LayoutGroup Orientation="Vertical">
+                                            <dxlc:LayoutGroup View="GroupBox"
+                                                              GroupBoxDisplayMode="Light"
+                                                              HorizontalAlignment="Stretch"
+                                                                  
+                                                              IsCollapsible="False"
+                                                              Orientation="Horizontal"
+                                                              Header="Export">
+                                                <dxlc:LayoutItem>
+                                                    <dx:SimpleButton Width="30" Height="30"
+                                                                     HorizontalAlignment="Left"
+                                                                     Margin="5,0"
+                                                                     Command="{Binding ExportToExcelCommand}"
+                                                                     ToolTip="Export Matrix to Excel"
+                                                                     Glyph="{dx:DXImage Image=Action_Export_ToExcel.png}" />
+                                                </dxlc:LayoutItem>
+                                            </dxlc:LayoutGroup>
+
+                                        </dxlc:LayoutGroup>
+                                    </dxlc:LayoutControl>
+                                </dxn:NavBarGroup.Content>
+                            </dxn:NavBarGroup>
                         </dxn:NavBarControl.Groups>
                     </dxn:NavBarControl>
                 </dxlc:LayoutItem>

@@ -45,8 +45,9 @@
     <PackageReference Include="CDP4JsonSerializer-CE" Version="10.0.0-rc4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
+    <PackageReference Include="ClosedXML" Version="0.96.0" />
     <PackageReference Include="DevExpress.CodeParser" Version="22.2.5-pre-23050">
-      <ExcludeAssets>runtime</ExcludeAssets>
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.Data" Version="22.2.5-pre-23050">
       <ExcludeAssets>runtime</ExcludeAssets>
