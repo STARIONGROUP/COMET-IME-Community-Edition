@@ -26,6 +26,7 @@
 namespace CDP4RelationshipMatrix.Helpers
 {
     using System;
+    using System.IO;
     using System.Linq;
     using System.Text;
 
@@ -46,11 +47,11 @@ namespace CDP4RelationshipMatrix.Helpers
         /// </summary>
         public MatrixExcelExporter(SourceConfigurationViewModel sourceXConfiguration, SourceConfigurationViewModel sourceYConfiguration, RelationshipConfigurationViewModel relationshipConfiguration, MatrixViewModel matrix, Iteration iteration)
         {
-            this.SourceXConfiguration = sourceXConfiguration;
-            this.SourceYConfiguration = sourceYConfiguration;
-            this.RelationshipConfiguration = relationshipConfiguration;
-            this.Matrix = matrix;
-            this.Iteration = iteration;
+            this.SourceXConfiguration = sourceXConfiguration ?? throw new ArgumentNullException(nameof(sourceXConfiguration));
+            this.SourceYConfiguration = sourceYConfiguration ?? throw new ArgumentNullException(nameof(sourceYConfiguration));
+            this.RelationshipConfiguration = relationshipConfiguration ?? throw new ArgumentNullException(nameof(relationshipConfiguration));
+            this.Matrix = matrix ?? throw new ArgumentNullException(nameof(matrix));
+            this.Iteration = iteration ?? throw new ArgumentNullException(nameof(iteration));
         }
 
         /// <summary>
@@ -84,6 +85,11 @@ namespace CDP4RelationshipMatrix.Helpers
         /// <param name="path">The path to save the file to.</param>
         public void Export(string path)
         {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentNullException(nameof(path));
+            }
+
             using (var workbook = new XLWorkbook())
             {
                 this.ConstructMatrixSheet(workbook);
@@ -93,7 +99,7 @@ namespace CDP4RelationshipMatrix.Helpers
         }
 
         /// <summary>
-        /// Constructes the matrix sheet
+        /// Constructs the matrix sheet
         /// </summary>
         /// <param name="workbook">The workbook</param>
         private void ConstructMatrixSheet(XLWorkbook workbook)

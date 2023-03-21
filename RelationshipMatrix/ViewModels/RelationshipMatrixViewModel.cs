@@ -50,6 +50,8 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4RelationshipMatrix.Helpers;
     using CDP4RelationshipMatrix.Settings;
 
+    using NLog;
+
     using CommonServiceLocator;
 
     using ReactiveUI;
@@ -175,6 +177,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// The <see cref="IOpenSaveFileDialogService"/>
         /// </summary>
         private IOpenSaveFileDialogService fileDialogService;
+
+        /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel" /> class
@@ -854,10 +861,23 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return;
             }
 
-            // initiate exporter
-            var exporter = new MatrixExcelExporter(this.SourceXConfiguration, this.SourceYConfiguration, this.RelationshipConfiguration, this.Matrix, this.Thing);
+            this.IsBusy = true;
 
-            exporter.Export(path);
+            try
+            {
+                // initiate exporter
+                var exporter = new MatrixExcelExporter(this.SourceXConfiguration, this.SourceYConfiguration, this.RelationshipConfiguration, this.Matrix, this.Thing);
+
+                exporter.Export(path);
+            }
+            catch (Exception ex)
+            {
+                logger.Error($"Exporting Relationship Matrix to Excel failed. Error: {ex.Message}.");
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
         }
 
         /// <summary>
