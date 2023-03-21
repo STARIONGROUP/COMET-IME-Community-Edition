@@ -1,21 +1,44 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterComponentValueRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels.Dialogs
 {
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
+
     using CDP4Dal;
+
     using ReactiveUI;
 
     /// <summary>
@@ -51,6 +74,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             : base(parameterBase, session, actualOption, actualState, containerRow, valueIndex, isDialogReadOnly)
         {
             var compoundParameterType = this.Thing.ParameterType as CompoundParameterType;
+
             if (compoundParameterType == null)
             {
                 throw new InvalidOperationException("This row shall only be used for CompoundParameterType.");
@@ -73,66 +97,61 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
 
             this.Name = compoundParameterType.Component[valueIndex].ShortName;
             this.Option = this.ActualOption;
-            this.State = (this.ActualState != null) ? this.ActualState.Name : string.Empty;
+            this.State = this.ActualState != null ? this.ActualState.Name : string.Empty;
 
-            this.WhenAnyValue(rowViewModel => rowViewModel.Switch).Skip(1).Subscribe(switchKind =>
-            {
-                var valueBaseRow = this.ContainerViewModel as ParameterValueBaseRowViewModel;
-                if (valueBaseRow != null)
+            this.WhenAnyValue(rowViewModel => rowViewModel.Switch).Skip(1).Subscribe(
+                switchKind =>
                 {
-                    foreach (ParameterComponentValueRowViewModel row in valueBaseRow.ContainedRows)
+                    var valueBaseRow = this.ContainerViewModel as ParameterValueBaseRowViewModel;
+
+                    if (valueBaseRow != null)
                     {
-                        row.Switch = switchKind;
+                        foreach (ParameterComponentValueRowViewModel row in valueBaseRow.ContainedRows)
+                        {
+                            row.Switch = switchKind;
+                        }
+
+                        return;
                     }
 
-                    return;
-                }
+                    var parameterBaseRow = this.ContainerViewModel as ParameterOrOverrideBaseRowViewModel;
 
-                var parameterBaseRow = this.ContainerViewModel as ParameterOrOverrideBaseRowViewModel;
-                if (parameterBaseRow != null)
-                {
-                    foreach (ParameterComponentValueRowViewModel row in parameterBaseRow.ContainedRows)
+                    if (parameterBaseRow != null)
                     {
-                        row.Switch = switchKind;
+                        foreach (ParameterComponentValueRowViewModel row in parameterBaseRow.ContainedRows)
+                        {
+                            row.Switch = switchKind;
+                        }
+
+                        return;
                     }
 
-                    return;
-                }
+                    var subscriptionRow = this.ContainerViewModel as ParameterSubscriptionRowViewModel;
 
-                var subscriptionRow = this.ContainerViewModel as ParameterSubscriptionRowViewModel;
-                if (subscriptionRow != null)
-                {
-                    foreach (ParameterComponentValueRowViewModel row in subscriptionRow.ContainedRows)
+                    if (subscriptionRow != null)
                     {
-                        row.Switch = switchKind;
+                        foreach (ParameterComponentValueRowViewModel row in subscriptionRow.ContainedRows)
+                        {
+                            row.Switch = switchKind;
+                        }
                     }
-                }
-            });
+                });
         }
 
         /// <summary>
         /// The row type for this <see cref="ParameterComponentValueRowViewModel"/>
         /// </summary>
-        public override string RowType
-        {
-            get { return "Parameter Type Component"; }
-        }
+        public override string RowType => "Parameter Type Component";
 
         /// <summary>
         /// Gets a value indicating whether the values are read only
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Gets a value indicating whether the reference values are read only
         /// </summary>
-        public bool IsReferenceReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReferenceReadOnly => false;
 
         /// <summary>
         /// Setting values for this <see cref="ParameterComponentValueRowViewModel"/>
@@ -141,7 +160,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         {
             base.UpdateValues();
             var compoundParameterType = (CompoundParameterType)this.Thing.ParameterType;
-            this.Scale = compoundParameterType.Component[ValueIndex].Scale;
+            this.Scale = compoundParameterType.Component[this.ValueIndex].Scale;
             this.ScaleShortName = this.Scale == null ? "-" : this.Scale.ShortName;
         }
 
@@ -186,15 +205,16 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                     var propertyCode = this.RowCode + ManualPropertyName;
 
                     var rule = this.DialogViewModel.ValidationErrors.SingleOrDefault(x => x.PropertyName == propertyCode);
+
                     if (rule != null)
                     {
                         this.DialogViewModel.ValidationErrors.Remove(rule);
                     }
 
-                    var validationMsg = ParameterValueValidator.Validate(this.Manual, parameterType, scale);
+                    var validationMsg = ParameterValueValidator.Validate(this.Manual, parameterType, scale, this.LoggerFactory);
+
                     if (!string.IsNullOrWhiteSpace(validationMsg))
                     {
-
                         var validationRule = new ValidationService.ValidationRule
                         {
                             ErrorText = validationMsg,
@@ -213,15 +233,16 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                     var propertyCode = this.RowCode + ReferencePropertyName;
 
                     var rule = this.DialogViewModel.ValidationErrors.SingleOrDefault(x => x.PropertyName == propertyCode);
+
                     if (rule != null)
                     {
                         this.DialogViewModel.ValidationErrors.Remove(rule);
                     }
 
-                    var validationMsg = ParameterValueValidator.Validate(this.Reference, parameterType, scale);
+                    var validationMsg = ParameterValueValidator.Validate(this.Reference, parameterType, scale, this.LoggerFactory);
+
                     if (!string.IsNullOrWhiteSpace(validationMsg))
                     {
-
                         var validationRule = new ValidationService.ValidationRule
                         {
                             ErrorText = validationMsg,

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -45,6 +45,10 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
+    using CommonServiceLocator;
+
+    using Microsoft.Extensions.Logging;
 
     using ReactiveUI;
 
@@ -93,6 +97,27 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="DisplayCategory"/>
         /// </summary>
         private string displayCategory;
+
+        /// <summary>
+        /// Backing field for <see cref="LoggerFactory"/> 
+        /// </summary>
+        private ILoggerFactory loggerFactory;
+
+        /// <summary>
+        /// The INJECTED <see cref="ILoggerFactory"/> 
+        /// </summary>
+        protected ILoggerFactory LoggerFactory
+        {
+            get
+            {
+                if (this.loggerFactory == null)
+                {
+                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
+                }
+
+                return this.loggerFactory;
+            }
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}"/> class. 
@@ -302,7 +327,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             if (columnName == "Manual" || columnName == "Reference")
             {
-                return ParameterValueValidator.Validate(newValue, this.ParameterType, this.Thing.Scale);
+                return ParameterValueValidator.Validate(newValue, this.ParameterType, this.Thing.Scale, this.LoggerFactory);
             }
 
             return null;

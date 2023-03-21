@@ -38,10 +38,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236" />
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="9.0.0-750-PR236" />
+    <PackageReference Include="CDP4Common-CE" Version="10.0.0-rc4" />
+    <PackageReference Include="CDP4Dal-CE" Version="10.0.0-rc4" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="10.0.0-rc4" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="3.0.0-rc4" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="DevExpress.Charts" Version="22.2.5-pre-23050" />
     <PackageReference Include="DevExpress.Charts.Core" Version="22.2.5-pre-23050" />
@@ -96,12 +96,11 @@
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
     <PackageReference Include="Markdown.Xaml" Version="1.0.0" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="4.7.10" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.9" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLog" Version="5.1.2" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.2.2" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>

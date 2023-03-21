@@ -27,6 +27,7 @@ namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -152,6 +153,11 @@ namespace CDP4EngineeringModel.ViewModels
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
+        /// Gets or sets the CreateMultiRelationshipCommand Command
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CreateMultiRelationshipCommand { get; set; }
+
+        /// <summary>
         /// Updates all the Binary relationships
         /// </summary>
         private void UpdateBinaryRelationships()
@@ -161,8 +167,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             var newRelationship = updatedRelationship.Except(currentRelationship).ToList();
             var oldRelationship = currentRelationship.Except(updatedRelationship).ToList();
-
-
+            
             foreach (var relationship in oldRelationship)
             {
                 this.RemoveBinaryRelationshipRowViewModel((BinaryRelationship)relationship);
@@ -308,6 +313,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.PopulateContextMenu();
             
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Binary Relationship", "", this.CreateCommand, MenuItemKind.Create, ClassKind.BinaryRelationship));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Multi Relationship", "", this.CreateMultiRelationshipCommand, MenuItemKind.Create, ClassKind.MultiRelationship));
         }
 
         /// <summary>
@@ -319,6 +325,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.InitializeCommands();
 
             this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<BinaryRelationship>(this.Thing), this.WhenAnyValue(x => x.CanCreateRelationship));
+            this.CreateMultiRelationshipCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<MultiRelationship>(this.Thing), this.WhenAnyValue(x => x.CanCreateRelationship));
         }
     }
 }

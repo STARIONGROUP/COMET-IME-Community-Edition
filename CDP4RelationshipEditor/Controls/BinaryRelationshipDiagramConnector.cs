@@ -32,7 +32,7 @@ namespace CDP4RelationshipEditor.Controls
         {
             if (this.Thing is BinaryRelationship relationship)
             {
-                this.Content = string.Join(", ", relationship.AppliedBinaryRelationshipRules.Select(b => b.Name)).PadLeft(1).PadRight(1);
+                this.Content = string.Join(", ", relationship.QueryAppliedBinaryRelationshipRules().Select(b => b.Name)).PadLeft(1).PadRight(1);
             }
         }
     }

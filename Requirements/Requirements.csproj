@@ -42,16 +42,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
+    <PackageReference Include="CDP4Common-CE" Version="10.0.0-rc4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236">
+    <PackageReference Include="CDP4Dal-CE" Version="10.0.0-rc4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="10.0.0-rc4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="9.0.0-750-PR236">
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="3.0.0-rc4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
@@ -187,10 +187,13 @@
 	<PackageReference Include="NetOfficeFw.Excel" Version="1.9.1">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="Newtonsoft.Json" Version="13.0.1">
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.3">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="NLog" Version="4.7.10">
+	<PackageReference Include="NLog" Version="5.1.2">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="NLog.Extensions.Logging" Version="5.2.2">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReactiveUI.WPF" Version="18.3.1">

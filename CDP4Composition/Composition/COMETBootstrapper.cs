@@ -26,8 +26,10 @@
 namespace CDP4Composition.Composition
 {
     using System;
+    using System.Collections.Concurrent;
     using System.ComponentModel.Composition;
     using System.ComponentModel.Composition.Hosting;
+    using System.ComponentModel.Composition.Primitives;
     using System.Diagnostics;
     using System.IO;
     using System.Reactive.Concurrency;
@@ -40,7 +42,10 @@ namespace CDP4Composition.Composition
 
     using CommonServiceLocator;
 
+    using Microsoft.Extensions.Logging;
+
     using NLog;
+    using NLog.Extensions.Logging;
 
     using ReactiveUI;
 
@@ -88,7 +93,12 @@ namespace CDP4Composition.Composition
             this.ResetStatusProgress();
             this.ShowStatusMessage("Initializing COMET IME Plugins...");
 
-            container.ComposeParts();
+            var batch = new CompositionBatch();
+            var loggerFactory = new LoggerFactory();
+            loggerFactory.AddProvider(new NLogLoggerProvider());
+            batch.AddExportedValue<ILoggerFactory>(loggerFactory);
+            batch.AddExportedValue(container);
+            container.Compose(batch);
 
             this.UpdateBootstrapperStatus("Initializing modules");
             this.InitializeModules(container);

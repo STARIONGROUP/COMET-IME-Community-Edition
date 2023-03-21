@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProcessedValueSetGenerator.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -41,6 +41,10 @@ namespace CDP4Reporting.Utilities
     using CDP4Reporting.DataCollection;
     using CDP4Reporting.SubmittableParameterValues;
 
+    using CommonServiceLocator;
+
+    using Microsoft.Extensions.Logging;
+
     /// <summary>
     /// Helper class to create <see cref="ProcessedValueSet"/>s using data from an <see cref="IIterationDependentDataCollector"/>.
     /// </summary>
@@ -50,6 +54,27 @@ namespace CDP4Reporting.Utilities
         ///Gets or sets the <see cref="IIterationDependentDataCollector"/> to be used.
         /// </summary>
         public IIterationDependentDataCollector IterationDependentDataCollector { get; private set; }
+
+        /// <summary>
+        /// Backing field for <see cref="LoggerFactory"/> 
+        /// </summary>
+        private ILoggerFactory loggerFactory;
+
+        /// <summary>
+        /// The INJECTED <see cref="ILoggerFactory"/> 
+        /// </summary>
+        protected ILoggerFactory LoggerFactory
+        {
+            get
+            {
+                if (this.loggerFactory == null)
+                {
+                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
+                }
+
+                return this.loggerFactory;
+            }
+        }
 
         /// <summary>
         /// Instantiates an instance of <see cref="ProcessedValueSetGenerator"/>
@@ -215,7 +240,7 @@ namespace CDP4Reporting.Utilities
 
                 computedValue = computedValue?.ToValueSetObject(parameterType).ToValueSetString(parameterType) ?? parameterValueSet.Computed[componentIndex];
 
-                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
+                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider, this.LoggerFactory);
 
                 if (validManualValue.ResultKind > validationResult)
                 {
@@ -285,7 +310,7 @@ namespace CDP4Reporting.Utilities
             {
                 computedValue = computedValue.ToValueSetObject(parameterType).ToValueSetString(parameterType);
 
-                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
+                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider, this.LoggerFactory);
 
                 if (validManualValue.ResultKind > validationResult)
                 {

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -46,8 +46,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
 
     using CDP4EngineeringModel.ViewModels;
+
+    using CommonServiceLocator;
     
     using Moq;
     
@@ -65,6 +68,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
+        private Mock<IServiceLocator> serviceLocator;
         private Parameter parameter;
         private Iteration iteration;
         private EngineeringModel model;
@@ -101,6 +105,9 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.permissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             var testDomain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
             var subscription = new ParameterSubscription(Guid.NewGuid(), this.cache, this.uri);

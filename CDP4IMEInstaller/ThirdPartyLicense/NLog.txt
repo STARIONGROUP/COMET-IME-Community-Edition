@@ -1,5 +1,5 @@
 ﻿name: NLog
-version: 4.7.10
+version: 5.2.2
 project url: http://nlog-project.org/
 license url: https://raw.githubusercontent.com/NLog/NLog/master/LICENSE.txt
 

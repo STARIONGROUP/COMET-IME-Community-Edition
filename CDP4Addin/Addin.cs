@@ -62,7 +62,6 @@ namespace CDP4AddinCE
     using NetOffice.OfficeApi;
     using NetOffice.Tools;
     using NetOffice.Tools.Native;
-    using NetOffice.OfficeApi.Tools.Contribution;
 
     using NLog;
 
@@ -345,6 +344,14 @@ namespace CDP4AddinCE
         /// </summary>
         private void RedirectAssemblies()
         {
+            logger.Trace("Microsoft.Extensions.Logging.Abstractions");
+            var loggingAbstractionsTargetVersion = new Version("7.0.0.0");
+            this.RedirectAssembly("Microsoft.Extensions.Logging.Abstractions", loggingAbstractionsTargetVersion, "adb9793829ddae60");
+
+            logger.Trace("Microsoft.Extensions.Logging");
+            var loggingTargetVersion = new Version("7.0.0.0");
+            this.RedirectAssembly("Microsoft.Extensions.Logging", loggingTargetVersion, "adb9793829ddae60");
+
             //logger.Trace("Microsoft.Practices.ServiceLocation");
             //var serviceLocationTargetVersion = new Version("1.3.0.0");
             //this.RedirectAssembly("Microsoft.Practices.ServiceLocation", serviceLocationTargetVersion, "31bf3856ad364e35");

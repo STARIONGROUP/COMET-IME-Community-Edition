@@ -30,15 +30,16 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236" />
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236" />
+    <PackageReference Include="CDP4Common-CE" Version="10.0.0-rc4" />
+    <PackageReference Include="CDP4Dal-CE" Version="10.0.0-rc4" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="10.0.0-rc4" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="DotLiquid" Version="2.2.508" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="4.7.10" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLog" Version="5.1.2" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.2.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />

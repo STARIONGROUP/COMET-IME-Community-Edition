@@ -18,12 +18,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-	<PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236" />
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="9.0.0-750-PR236" />
+	<PackageReference Include="CDP4Common-CE" Version="10.0.0-rc4" />
+    <PackageReference Include="CDP4Dal-CE" Version="10.0.0-rc4" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="3.0.0-rc4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="NLog" Version="4.7.10" />
+    <PackageReference Include="NLog" Version="5.1.2" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.2.2" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="ReactiveUI" Version="18.3.1" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />

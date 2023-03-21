@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationalExpressionDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -36,14 +36,18 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Dal;
-    using CDP4Dal.Operations;
-  
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
+    using CDP4Dal;
+    using CDP4Dal.Operations;
+
+    using CommonServiceLocator;
+
     using DynamicData;
+
+    using Microsoft.Extensions.Logging;
 
     using ReactiveUI;
 
@@ -53,6 +57,27 @@ namespace CDP4Requirements.ViewModels
     [ThingDialogViewModelExport(ClassKind.RelationalExpression)]
     public class RelationalExpressionDialogViewModel : CDP4CommonView.RelationalExpressionDialogViewModel, IThingDialogViewModel
     {
+        /// <summary>
+        /// Backing field for <see cref="LoggerFactory"/> 
+        /// </summary>
+        private ILoggerFactory loggerFactory;
+
+        /// <summary>
+        /// The INJECTED <see cref="ILoggerFactory"/> 
+        /// </summary>
+        protected ILoggerFactory LoggerFactory
+        {
+            get
+            {
+                if (this.loggerFactory == null)
+                {
+                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
+                }
+
+                return this.loggerFactory;
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationalExpressionDialogViewModel"/> class.
         /// </summary>
@@ -91,27 +116,25 @@ namespace CDP4Requirements.ViewModels
         /// <param name="chainOfContainers">
         /// The optional chain of containers that contains the <paramref name="container"/> argument
         /// </param>
-        public RelationalExpressionDialogViewModel(RelationalExpression relationalExpression, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null) 
+        public RelationalExpressionDialogViewModel(RelationalExpression relationalExpression, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(relationalExpression, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
             this.WhenAnyValue(vm => vm.SelectedScale).Subscribe(_ => this.UpdateOkCanExecute());
             this.Value.ItemChanged.WhenAnyPropertyChanged().Subscribe(_ => this.UpdateOkCanExecute());
 
-            this.WhenAnyValue(vm => vm.SelectedParameterType).Subscribe(_ =>
-            {
-                this.PopulatePossibleScale();
-                this.PopulateValue();
-                this.UpdateOkCanExecute();
-            });
+            this.WhenAnyValue(vm => vm.SelectedParameterType).Subscribe(
+                _ =>
+                {
+                    this.PopulatePossibleScale();
+                    this.PopulateValue();
+                    this.UpdateOkCanExecute();
+                });
         }
 
         /// <summary>
         /// Gets a value indicating whether the ParameterType property is ReadOnly.
         /// </summary>
-        public bool IsParameterTypeReadOnly
-        {
-            get { return this.IsReadOnly || this.dialogKind == ThingDialogKind.Update;  }
-        }
+        public bool IsParameterTypeReadOnly => this.IsReadOnly || this.dialogKind == ThingDialogKind.Update;
 
         /// <summary>
         /// Populates the <see cref="PossibleParameterType"/> property
@@ -129,6 +152,7 @@ namespace CDP4Requirements.ViewModels
             {
                 var model = this.ChainOfContainer.First().TopContainer as EngineeringModel;
                 var containerRdl = model.EngineeringModelSetup.RequiredRdl.Single();
+
                 if (containerRdl != null)
                 {
                     var allTypes = new List<ParameterType>(containerRdl.ParameterType);
@@ -151,6 +175,7 @@ namespace CDP4Requirements.ViewModels
             base.PopulatePossibleScale();
 
             var quantityKind = this.SelectedParameterType as QuantityKind;
+
             if (quantityKind == null)
             {
                 return;
@@ -179,9 +204,10 @@ namespace CDP4Requirements.ViewModels
             }
 
             this.Value.Clear();
+
             for (var i = 0; i < this.SelectedParameterType.NumberOfValues; i++)
             {
-                var thingValue = (this.Thing.Value.Count() > i) ? this.Thing.Value[i] : string.Empty;
+                var thingValue = this.Thing.Value.Count() > i ? this.Thing.Value[i] : string.Empty;
                 this.Value.Add(new RelationalExpressionValueRowViewModel(this.SelectedParameterType) { Index = i, Value = thingValue });
             }
         }
@@ -221,7 +247,7 @@ namespace CDP4Requirements.ViewModels
                         throw new Cdp4ModelValidationException($"{currentCultureString} is not a valid value for a {this.SelectedParameterType.ClassKind}.");
                     }
 
-                    var validationResult = ParameterValueValidator.Validate(dateTimeObject, this.SelectedParameterType, this.SelectedScale);
+                    var validationResult = ParameterValueValidator.Validate(dateTimeObject, this.SelectedParameterType, this.SelectedScale, this.LoggerFactory);
 
                     if (validationResult != null)
                     {

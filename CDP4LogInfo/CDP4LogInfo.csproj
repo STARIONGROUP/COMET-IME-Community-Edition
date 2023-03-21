@@ -36,19 +36,21 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0-750-PR236">
+    <PackageReference Include="CDP4Common-CE" Version="10.0.0-rc4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0-750-PR236">
+    <PackageReference Include="CDP4Dal-CE" Version="10.0.0-rc4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0-750-PR236">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="10.0.0-rc4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CsvHelper" Version="27.1.1" />
+	<PackageReference Include="CsvHelper" Version="30.0.1">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
     <PackageReference Include="DevExpress.CodeParser" Version="22.2.5-pre-23050">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -148,23 +150,20 @@
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="4.7.10">
+    <PackageReference Include="NLog" Version="5.1.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="ReactiveUI.WPF" Version="18.3.1">
+	<PackageReference Include="NLog.Extensions.Logging" Version="5.2.2">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="ReactiveUI.WPF" Version="18.3.1">
 	  <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Splat" Version="14.4.1">
       <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0">
-	    <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4">
-	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>

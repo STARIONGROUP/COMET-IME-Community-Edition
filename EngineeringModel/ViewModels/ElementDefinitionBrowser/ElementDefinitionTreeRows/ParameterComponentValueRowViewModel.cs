@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterComponentValueRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -74,6 +74,7 @@ namespace CDP4EngineeringModel.ViewModels
             : base(parameterBase, session, actualOption, actualState, containerRow, valueIndex, isReadOnly)
         {
             var compoundParameterType = this.Thing.ParameterType as CompoundParameterType;
+
             if (compoundParameterType == null)
             {
                 throw new InvalidOperationException("This row shall only be used for CompoundParameterType.");
@@ -111,13 +112,12 @@ namespace CDP4EngineeringModel.ViewModels
             else
             {
                 var parameterTypComponentObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterTypeComponent));
-                this.Disposables.Add( 
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterTypComponentObserver, new ObjectChangedMessageBusEventHandlerSubscription(component, discriminator, action)));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterTypComponentObserver, new ObjectChangedMessageBusEventHandlerSubscription(component, discriminator, action)));
             }
 
             this.Name = component.ShortName;
             this.Option = this.ActualOption;
-            this.State = (this.ActualState != null) ? this.ActualState.Name : string.Empty;
+            this.State = this.ActualState != null ? this.ActualState.Name : string.Empty;
 
             this.PropertyChanged += (sender, args) =>
             {
@@ -159,26 +159,17 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// The row type for this <see cref="ParameterComponentValueRowViewModel"/>
         /// </summary>
-        public override string RowType
-        {
-            get { return "Parameter Type Component"; }
-        }
+        public override string RowType => "Parameter Type Component";
 
         /// <summary>
         /// Gets a value indicating whether the values are read only
         /// </summary>
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
         /// <summary>
         /// Gets a value indicating whether the reference values are read only
         /// </summary>
-        public bool IsReferenceReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReferenceReadOnly => false;
 
         /// <summary>
         /// Setting values for this <see cref="ParameterComponentValueRowViewModel"/>
@@ -212,7 +203,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var parameterType = this.ParameterType;
                 var scale = this.Scale;
 
-                return ParameterValueValidator.Validate(newValue, parameterType, scale);
+                return ParameterValueValidator.Validate(newValue, parameterType, scale, this.LoggerFactory);
             }
 
             return null;
