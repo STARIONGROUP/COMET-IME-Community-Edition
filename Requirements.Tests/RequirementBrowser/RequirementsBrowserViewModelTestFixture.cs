@@ -30,6 +30,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Windows;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
@@ -40,15 +41,17 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CDP4Requirements.ViewModels;
-
+    
     using CDP4RequirementsVerification;
+
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -75,9 +78,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private Assembler assembler;
         private Mock<ISession> session;
         private Participant participant;
+        private Mock<IServiceLocator> serviceLocator;
         private Mock<IThingDialogNavigationService> dialogNavigation;
         private Mock<IPanelNavigationService> panelNavigation;
         private Mock<IPermissionService> permissionService;
+        private Mock<IMessageBoxService> messageBoxService;
         private Person person;
         private Option option;
 
@@ -94,6 +99,12 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.messageBoxService = new Mock<IMessageBoxService>();
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
 
             this.session = new Mock<ISession>();
 
@@ -241,6 +252,29 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             vm.ExecuteVerifyRequirements(this.iteration.DefaultOption);
             Assert.AreEqual(RequirementStateOfCompliance.Unknown, reqSpecRow.RequirementStateOfCompliance);
+        }
+
+        [Test]
+        public void VerifyThatNoTopElementSetResultsInMessageBox()
+        {
+            this.iteration.TopElement = null;
+
+            var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            var reqSpecRow = vm.ReqSpecificationRows.Single();
+
+            Assert.IsTrue(vm.CanVerifyRequirements);
+            vm.ExecuteVerifyRequirements(this.iteration.DefaultOption);
+            
+            Assert.AreEqual(RequirementStateOfCompliance.Unknown, reqSpecRow.RequirementStateOfCompliance);
+            
+            this.messageBoxService.Verify(
+                x => x.Show(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<MessageBoxButton>(),
+                    MessageBoxImage.Warning
+                    )
+                );
         }
     }
 }
