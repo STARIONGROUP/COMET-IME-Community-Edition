@@ -64,7 +64,8 @@ namespace CDP4Composition.Tests.Mvvm
         private Person person;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IPanelNavigationService> navigation;
-        private Mock<IThingDialogNavigationService> dialogNavigation;
+        private Mock<IThingDialogNavigationService> thingDialogNavigationService;
+        private Mock<IDialogNavigationService> DialogNavigationService;
         private Mock<IPermissionService> permmissionService; 
         private Mock<ISession> session;
 
@@ -83,11 +84,12 @@ namespace CDP4Composition.Tests.Mvvm
 
             this.serviceLocator = new Mock<IServiceLocator>();
             this.navigation = new Mock<IPanelNavigationService>();
-            this.dialogNavigation = new Mock<IThingDialogNavigationService>();
+            this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
+            this.DialogNavigationService = new Mock<IDialogNavigationService>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(this.navigation.Object);
-            this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.dialogNavigation.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.thingDialogNavigationService.Object);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.permmissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permmissionService.Object);
@@ -97,12 +99,12 @@ namespace CDP4Composition.Tests.Mvvm
         [Test]
         public void AssertThatSelectingARowCallsCDPMessageBus()
         {
-            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
 
             var selectedThingChangedRaised = false;
             CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
 
-            browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.dialogNavigation.Object);
+            browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.thingDialogNavigationService.Object);
 
             Assert.IsTrue(selectedThingChangedRaised);
         }
@@ -110,46 +112,83 @@ namespace CDP4Composition.Tests.Mvvm
         [Test]
         public async Task AssertThatCreateCommandWorks()
         {
-            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
             await browser.CreateCommand.Execute();
 
-            this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
+            this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<Thing>(), null));
         }
 
         [Test]
         public void AssertThatDeleteCommandWorks()
         {
-            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new BrowserDeleteCommandTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, this.DialogNavigationService.Object, null);
+
+            var rowViewModelBase = new Mock<IRowViewModelBase<Thing>>();
+            rowViewModelBase.SetupGet(x => x.ContainedRows).Returns( new CDP4Composition.Mvvm.Types.DisposableReactiveList<IRowViewModelBase<Thing>>());
+            rowViewModelBase.SetupGet(x => x.Thing).Returns(this.siteDir);
+            browser.IsDeleteCommandOverrideAllowed = true;
+            browser.SelectedThing = rowViewModelBase.Object;
+            
             Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+            this.DialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()),Times.Once);
+        }
+
+
+        [Test]
+        public void AssertThatDeleteCommandNotWorks()
+        {
+            var browser = new BrowserDeleteCommandTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, this.DialogNavigationService.Object, null);
+            var rowViewModelBase = new Mock<IRowViewModelBase<Thing>>();
+            rowViewModelBase.SetupGet(x => x.ContainedRows).Returns(new CDP4Composition.Mvvm.Types.DisposableReactiveList<IRowViewModelBase<Thing>>());
+            rowViewModelBase.SetupGet(x => x.Thing).Returns(this.siteDir);
+            browser.IsDeleteCommandOverrideAllowed = false;
+            browser.SelectedThing = rowViewModelBase.Object;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+            this.DialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Never);
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandCallsBaseMethod()
+        {
+            var browser = new BrowserDeleteCommandTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, this.DialogNavigationService.Object, null);
+            var rowViewModelBase = new Mock<IRowViewModelBase<Thing>>();
+            rowViewModelBase.SetupGet(x => x.ContainedRows).Returns(new CDP4Composition.Mvvm.Types.DisposableReactiveList<IRowViewModelBase<Thing>>());
+            rowViewModelBase.SetupGet(x => x.Thing).Returns(this.siteDir);
+            
+            browser.SelectedThing = rowViewModelBase.Object;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+            this.DialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
         }
 
         [Test]
         public async Task AssertThatEditCommandWorks()
         {
-            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
             Assert.IsFalse(((ICommand)browser.UpdateCommand).CanExecute(null));
 
-            browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.dialogNavigation.Object);
+            browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.thingDialogNavigationService.Object);
             await browser.UpdateCommand.Execute();
 
-            this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Update, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
+            this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, It.IsAny<Thing>(), null));
         }
 
         [Test]
         public async Task AssertThatInspectCommandWorks()
         {
-            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
             Assert.IsFalse(((ICommand)browser.UpdateCommand).CanExecute(null));
 
-            browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.dialogNavigation.Object);
+            browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.thingDialogNavigationService.Object);
             await browser.InspectCommand.Execute();
-            this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Inspect, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
+            this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, It.IsAny<Thing>(), null));
         }
 
         [Test]
         public void AssertThatRefreshCommandWorks()
         {
-            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
             Assert.DoesNotThrowAsync(async () => await browser.RefreshCommand.Execute());
             this.session.Verify(session => session.Refresh());
         }
@@ -157,14 +196,14 @@ namespace CDP4Composition.Tests.Mvvm
         [Test]
         public void AssertThatExportCommandWorks()
         {
-            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
             Assert.DoesNotThrow(() => browser.ExportCommand.Execute());
         }
 
         [Test]
         public void AssertThatHelpCommandWorks()
         {
-            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
             Assert.DoesNotThrow(() => browser.HelpCommand.Execute());
         }
 
@@ -172,9 +211,9 @@ namespace CDP4Composition.Tests.Mvvm
         public async Task VerifyThatDeprecateCommandWorks()
         {
             this.permmissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
-            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
             Assert.IsFalse(((ICommand)browser.DeprecateCommand).CanExecute(null));
-            browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.dialogNavigation.Object);
+            browser.SelectedThing = new RowTestClass(this.person, this.session.Object, this.thingDialogNavigationService.Object);
             
             browser.ComputePermission();
 
@@ -188,17 +227,38 @@ namespace CDP4Composition.Tests.Mvvm
         public void VerifyDomainSwitchEventIsCaught()
         {
             var iteration = new Iteration(Guid.NewGuid(), null, null);
-            var browser = new IterationBrowserTestClass(iteration, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var browser = new IterationBrowserTestClass(iteration, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
            
 
             var option = new Option(Guid.NewGuid(), null, null);
             iteration.Option.Add(option);
 
-            var optionbrowser = new OptionBrowserTestClass(option, this.session.Object, this.dialogNavigation.Object, this.navigation.Object, null, null);
+            var optionbrowser = new OptionBrowserTestClass(option, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
 
             CDPMessageBus.Current.SendMessage(new DomainChangedEvent(iteration, new DomainOfExpertise { Name = "changed", ShortName = "ch" }));
             Assert.AreEqual("changed [ch]", browser.DomainOfExpertise);
             Assert.AreEqual("changed [ch]", optionbrowser.DomainOfExpertise);
+        }
+    }
+
+
+    internal class BrowserDeleteCommandTestClass : BrowserViewModelBase<SiteDirectory>
+    {
+        internal BrowserDeleteCommandTestClass(SiteDirectory siteDir, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        : base(siteDir, session, dialogNav, panelNav, dialogNavigationService, pluginSettingsService)
+        {
+
+        }
+
+        public bool? IsDeleteCommandOverrideAllowed { get; set; }
+
+        protected override bool IsDeleteCommandAllowed()
+        {
+            if (!this.IsDeleteCommandOverrideAllowed.HasValue)
+            {
+                return base.IsDeleteCommandAllowed();
+            }
+            return this.IsDeleteCommandOverrideAllowed.Value;
         }
     }
 

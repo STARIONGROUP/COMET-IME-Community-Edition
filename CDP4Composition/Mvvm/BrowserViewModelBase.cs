@@ -569,7 +569,7 @@ namespace CDP4Composition.Mvvm
         /// </param>
         protected virtual async void ExecuteDeleteCommand(Thing thing)
         {
-            if (thing == null)
+            if (thing == null | !IsDeleteCommandAllowed())
             {
                 return;
             }
@@ -603,6 +603,16 @@ namespace CDP4Composition.Mvvm
                 this.IsBusy = false;
             }
         }
+
+        /// <summary>
+        /// Check if the Delete Command asociated to this ViewModel is allowed.
+        /// </summary>
+        /// <returns>True if the Delete Command is allowed, false otherwise</returns>
+        protected virtual bool IsDeleteCommandAllowed()
+        {
+            return true;
+        }
+
 
         /// <summary>
         /// Execute the <see cref="DeprecateCommand"/>

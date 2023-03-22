@@ -17,7 +17,7 @@
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
@@ -31,26 +31,28 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
     using System.Linq;
     using System.Reactive.Linq;
     using System.Reflection;
+    using System.Windows;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-
+    using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
-    
-    using Moq;
-    
+
+    using CommonServiceLocator;
+
+    using Moq;    
     using NUnit.Framework;
 
     /// <summary>
@@ -62,10 +64,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         private PropertyInfo rev;
 
         private Mock<ISession> session;
+        private Mock<IServiceLocator> serviceLocator;
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IMessageBoxService> messageBoxService;
         private Mock<IParameterActualFiniteStateListApplicationBatchService> parameterActualFiniteStateListApplicationBatchService;
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
@@ -79,6 +83,21 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         private Iteration iteration;
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private ElementDefinition elementDefinition1;
+        private ElementDefinition elementDefinition2;
+        private ElementDefinition elementDefinition3;
+        private Parameter parameterA;
+        private Parameter parameterB;
+        private Parameter parameterC;
+        private Parameter parameterD;
+        private PossibleFiniteState possibleStateA;
+        private PossibleFiniteState possibleStateB;
+        private PossibleFiniteState possibleStateC;
+        private PossibleFiniteState possibleStateD;
+        private PossibleFiniteStateList possibleFiniteStateList1;
+        private PossibleFiniteStateList possibleFiniteStateList2;
+        private ActualFiniteStateList actualFiniteStateList;
+
 
         [SetUp]
         public void Setup()
@@ -86,6 +105,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.rev = typeof (Thing).GetProperty("RevisionNumber");
 
             this.session = new Mock<ISession>();
+            this.serviceLocator = new Mock<IServiceLocator>();
             this.assembler = new Assembler(this.uri);
             this.permissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
@@ -93,6 +113,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+            this.messageBoxService = new Mock<IMessageBoxService>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>())
+                .Returns(this.messageBoxService.Object);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
@@ -333,6 +358,207 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Exactly(1));
 
             this.parameterActualFiniteStateListApplicationBatchService.Verify(x => x.Update(this.session.Object, this.iteration, It.IsAny<ActualFiniteStateList>(), false, It.IsAny<IEnumerable<Category>>(), It.IsAny<IEnumerable<DomainOfExpertise>>(), It.IsAny<IEnumerable<ParameterType>>()), Times.Exactly(1));
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandWorks()
+        {            
+            var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
+            var rowViewModelBase = new Mock<IRowViewModelBase<Thing>>();
+            rowViewModelBase.SetupGet(x => x.ContainedRows).Returns(new CDP4Composition.Mvvm.Types.DisposableReactiveList<IRowViewModelBase<Thing>>());
+            rowViewModelBase.SetupGet(x => x.Thing).Returns(this.sitedir);
+            browser.IsDeleteCommandOverrideAllowed = true;
+            browser.SelectedThing = rowViewModelBase.Object;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
+        }
+
+        private void InitializeStateListsImportandData()
+        {
+            this.possibleStateA = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri);
+            this.possibleStateB = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri);
+            this.possibleStateC = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri);
+            this.possibleStateD = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri);
+
+            this.possibleFiniteStateList1 = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
+            this.possibleFiniteStateList1.PossibleState.Add(this.possibleStateA);
+            this.possibleFiniteStateList1.PossibleState.Add(this.possibleStateB);
+            this.possibleFiniteStateList1.DefaultState = this.possibleStateA;
+
+            this.possibleFiniteStateList2 = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
+            this.possibleFiniteStateList2.PossibleState.Add(this.possibleStateC);
+            this.possibleFiniteStateList2.PossibleState.Add(this.possibleStateD);
+            this.possibleFiniteStateList2.DefaultState = this.possibleStateC;
+
+            this.actualFiniteStateList = new ActualFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
+            this.actualFiniteStateList.PossibleFiniteStateList.Add(this.possibleFiniteStateList1);
+            this.actualFiniteStateList.ActualState.Add(new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri)
+            {
+                PossibleState = new List<PossibleFiniteState> { this.possibleStateA },
+
+                Kind = ActualFiniteStateKind.MANDATORY
+            });
+
+            this.actualFiniteStateList.ActualState.Add(new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri)
+            {
+                PossibleState = new List<PossibleFiniteState> { this.possibleStateB },
+                Kind = ActualFiniteStateKind.MANDATORY
+            });
+
+            this.parameterA = new Parameter(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, StateDependence = this.actualFiniteStateList };
+            this.parameterB = new Parameter(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, StateDependence = this.actualFiniteStateList };
+            this.parameterC = new Parameter(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.parameterD = new Parameter(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+
+            this.elementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.elementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.elementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+
+            this.elementDefinition1.Parameter.Add(this.parameterA);
+            this.elementDefinition1.Parameter.Add(this.parameterB);
+
+            this.elementDefinition2.Parameter.Add(this.parameterA);
+            this.elementDefinition2.Parameter.Add(this.parameterC);
+
+            this.elementDefinition3.Parameter.Add(this.parameterC);
+            this.elementDefinition3.Parameter.Add(this.parameterD);
+
+            this.iteration.Element.Add(this.elementDefinition1);
+            this.iteration.Element.Add(this.elementDefinition2);
+            this.iteration.Element.Add(this.elementDefinition3);
+
+            this.iteration.ActualFiniteStateList.Add(this.actualFiniteStateList);
+            this.iteration.PossibleFiniteStateList.Add(this.possibleFiniteStateList1);
+            this.iteration.PossibleFiniteStateList.Add(this.possibleFiniteStateList2);
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandChecksForActualFiniteStateListDependencies()
+        {
+            InitializeStateListsImportandData();
+            var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
+            var rowViewModelBase = new ActualFiniteStateListRowViewModel(this.actualFiniteStateList, this.session.Object, browser);
+
+            browser.IsDeleteCommandOverrideAllowed = false;
+            browser.SelectedThing = rowViewModelBase;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+            this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandChecksForPossibleFiniteStateList1Dependencies()
+        {
+            InitializeStateListsImportandData();
+            //Try to delete a list that have dependencies
+            var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
+            var rowViewModelBase = new PossibleFiniteStateListRowViewModel(this.possibleFiniteStateList1,this.session.Object,browser);
+
+            browser.IsDeleteCommandOverrideAllowed = false;
+            browser.SelectedThing = rowViewModelBase;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+            this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandChecksForPossibleFiniteStateList2Dependencies()
+        {
+            InitializeStateListsImportandData();
+            //Try to delete a list that don't have dependencies
+            var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
+            var rowViewModelBase = new PossibleFiniteStateListRowViewModel(this.possibleFiniteStateList2, this.session.Object, browser);
+
+            browser.IsDeleteCommandOverrideAllowed = false;
+            browser.SelectedThing = rowViewModelBase;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+            this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Never);
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandChecksForPossibleFiniteStateDependencies()
+        {
+            InitializeStateListsImportandData();
+            var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
+            var rowViewModelBase = new PossibleFiniteStateRowViewModel(this.possibleStateA, this.session.Object, browser);
+
+            browser.IsDeleteCommandOverrideAllowed = false;
+            browser.SelectedThing = rowViewModelBase;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+            this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandShowDialogTextIsCorrect1()
+        {
+            InitializeStateListsImportandData();
+            var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
+            var rowViewModelBase = new ActualFiniteStateListRowViewModel(this.actualFiniteStateList, this.session.Object, browser);
+
+            browser.IsDeleteCommandOverrideAllowed = false;
+            browser.SelectedThing = rowViewModelBase;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+
+            var textToContain = "3 parameter(s) will be affected by this deletion";
+            this.messageBoxService.Verify(x => x.Show(It.Is<string>(s => s.Contains(textToContain)), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandShowDialogTextIsCorrect2()
+        {
+            InitializeStateListsImportandData();
+            //Try to delete a list that have dependencies
+            var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
+            var rowViewModelBase = new PossibleFiniteStateListRowViewModel(this.possibleFiniteStateList1, this.session.Object, browser);
+
+            browser.IsDeleteCommandOverrideAllowed = false;
+            browser.SelectedThing = rowViewModelBase;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+
+            var textToContain = "3 parameter(s) will be affected by this deletion";
+            this.messageBoxService.Verify(x => x.Show(It.Is<string>(s=>s.Contains(textToContain)), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
+        }
+
+        [Test]
+        public void AssertThatDeleteCommandShowDialogTextIsCorrect3()
+        {
+            InitializeStateListsImportandData();
+            var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
+            var rowViewModelBase = new PossibleFiniteStateRowViewModel(this.possibleStateA, this.session.Object, browser);
+
+            browser.IsDeleteCommandOverrideAllowed = false;
+            browser.SelectedThing = rowViewModelBase;
+
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
+
+            var textToContain = "3 parameter(s) will be affected by this deletion";
+            this.messageBoxService.Verify(x => x.Show(It.Is<string>(s => s.Contains(textToContain)), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
+        }
+
+        internal class FiniteStateBrowserDeleteCommandTestClass : FiniteStateBrowserViewModel
+        {
+            internal FiniteStateBrowserDeleteCommandTestClass(Iteration iteration, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService)
+            : base(iteration, session, dialogNav, panelNav, dialogNavigationService, pluginSettingsService, parameterActualFiniteStateListApplicationBatchService)
+            {
+
+            }
+
+            public bool? IsDeleteCommandOverrideAllowed { get; set; }
+
+            protected override bool IsDeleteCommandAllowed()
+            {
+                if (this.IsDeleteCommandOverrideAllowed.HasValue && !this.IsDeleteCommandOverrideAllowed.Value)
+                {
+                    return base.IsDeleteCommandAllowed();
+                }
+
+                return this.IsDeleteCommandOverrideAllowed.Value;
+            }
         }
     }
 }

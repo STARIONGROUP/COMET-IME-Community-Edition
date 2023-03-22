@@ -17,7 +17,7 @@
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
@@ -26,6 +26,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -44,7 +45,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;    
     using CDP4Composition.PluginSettingService;
-
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -53,6 +54,8 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4EngineeringModel.ViewModels.Dialogs;
     using CDP4EngineeringModel.Views;
 
+    using CommonServiceLocator;
+
     using ReactiveUI;
 
     /// <summary>
@@ -60,6 +63,11 @@ namespace CDP4EngineeringModel.ViewModels
     /// </summary>
     public class FiniteStateBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
     {
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> used to show user messages.
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+
         /// <summary>
         /// The Panel Caption
         /// </summary>
@@ -162,6 +170,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
+
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -619,6 +628,64 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.IsBusy = false;
             }
+        }
+
+        /// <summary>
+        /// Check if the Delete Command asociated to this ViewModel is allowed.
+        /// </summary>
+        /// <returns>True if the Delete Command is allowed, false otherwise</returns>
+        protected override bool IsDeleteCommandAllowed()
+        {
+            var iterationElements = this.Thing.Element;
+            var ParametersWithStateDependencies = 0;
+            var FirstPhrase = "";
+
+            switch (this.SelectedThing.Thing)
+            {
+                case ActualFiniteStateList actualFiniteStateList:
+  
+                    ParametersWithStateDependencies = iterationElements.SelectMany(elem => elem.Parameter.Where(param => param.StateDependence == actualFiniteStateList)).Count();
+                    FirstPhrase = $"Deleting an {nameof(ActualFiniteStateList)} will delete ALL parameter values that may be dependent on this.";
+                    break;
+
+                case PossibleFiniteStateList possibleFiniteStateList:
+                    ParametersWithStateDependencies = iterationElements.SelectMany(elem => 
+                                                      elem.Parameter.Where(param => 
+                                                      param.StateDependence != null).SelectMany(param => 
+                                                      param.StateDependence.PossibleFiniteStateList.Where(finiteStateList => 
+                                                      finiteStateList == possibleFiniteStateList))).Count();
+
+                    FirstPhrase = $"Deleting a {nameof(PossibleFiniteStateList)} List will delete ALL parameter values that may be dependent on this through {nameof(ActualFiniteStateList)} that use it.";
+                    break;
+
+                case PossibleFiniteState possibleFiniteState:
+                    ParametersWithStateDependencies = iterationElements.SelectMany(elem =>
+                                  elem.Parameter.Where(param =>
+                                  param.StateDependence != null).SelectMany(param =>
+                                  param.StateDependence.PossibleFiniteStateList.SelectMany(finiteStateList =>
+                                  finiteStateList.PossibleState.Where(finiteState => 
+                                  finiteState == possibleFiniteState)))).Count();
+
+                    FirstPhrase = $"Deleting a {nameof(PossibleFiniteState)} will delete ALL parameter values that may be dependent on this through {nameof(ActualFiniteState)} that use it.";
+                    break;
+            }
+
+            
+            if(ParametersWithStateDependencies > 0)
+            {
+                var message = FirstPhrase +
+                "\r\n\r\nCare should be taken not to delete states and their dependent parameter values in the product tree inadvertently." +
+                "\r\n\r\nAre you sure you want to delete these?" +
+                $"\r\n\r\n{ParametersWithStateDependencies} parameter(s) will be affected by this deletion";
+
+                if (this.messageBoxService.Show(message, "Deleting Finite State", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                {
+                    return true;
+                }
+                return false;
+            }
+
+            return true;
         }
     }
 }
