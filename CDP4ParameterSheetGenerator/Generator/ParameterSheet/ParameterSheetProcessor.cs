@@ -45,10 +45,6 @@ namespace CDP4ParameterSheetGenerator.Generator
 
     using CDP4ParameterSheetGenerator.ParameterSheet;
 
-    using CommonServiceLocator;
-
-    using Microsoft.Extensions.Logging;
-
     using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Enums;
 
@@ -93,27 +89,6 @@ namespace CDP4ParameterSheetGenerator.Generator
         /// A string that holds an error message that occurred while processing the sheet.
         /// </summary>
         private string errorMessage;
-
-        /// <summary>
-        /// Backing field for <see cref="LoggerFactory"/> 
-        /// </summary>
-        private ILoggerFactory loggerFactory;
-
-        /// <summary>
-        /// The INJECTED <see cref="ILoggerFactory"/> 
-        /// </summary>
-        protected ILoggerFactory LoggerFactory
-        {
-            get
-            {
-                if (this.loggerFactory == null)
-                {
-                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
-                }
-
-                return this.loggerFactory;
-            }
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterSheetProcessor"/> class. 
@@ -563,28 +538,28 @@ namespace CDP4ParameterSheetGenerator.Generator
                     ParameterSheetUtilities.ConvertObjectToString(ref actualValue);
                 }
 
-                validManualValue = parameterType.Validate(manualValue, measurementScale, provider, this.LoggerFactory);
+                validManualValue = parameterType.Validate(manualValue, measurementScale, provider);
 
                 if (validManualValue.ResultKind > validationResult)
                 {
                     validationResult = validManualValue.ResultKind;
                 }
 
-                validComputedValue = parameterType.Validate(computedValue, measurementScale, provider, this.LoggerFactory);
+                validComputedValue = parameterType.Validate(computedValue, measurementScale, provider);
 
                 if (validComputedValue.ResultKind > validationResult)
                 {
                     validationResult = validComputedValue.ResultKind;
                 }
 
-                validReferenceValue = parameterType.Validate(referenceValue, measurementScale, provider, this.LoggerFactory);
+                validReferenceValue = parameterType.Validate(referenceValue, measurementScale, provider);
 
                 if (validReferenceValue.ResultKind > validationResult)
                 {
                     validationResult = validReferenceValue.ResultKind;
                 }
 
-                validActualValue = parameterType.Validate(actualValue, measurementScale, provider, this.LoggerFactory);
+                validActualValue = parameterType.Validate(actualValue, measurementScale, provider);
 
                 if (validActualValue.ResultKind > validationResult)
                 {
@@ -718,28 +693,28 @@ namespace CDP4ParameterSheetGenerator.Generator
                     ParameterSheetUtilities.ConvertDoubleToDateTimeObject(ref actualValue, parameterType);
                 }
 
-                validManualValue = parameterType.Validate(manualValue, measurementScale, provider, this.LoggerFactory);
+                validManualValue = parameterType.Validate(manualValue, measurementScale, provider);
 
                 if (validManualValue.ResultKind > validationResult)
                 {
                     validationResult = validManualValue.ResultKind;
                 }
 
-                validComputedValue = parameterType.Validate(computedValue, measurementScale, provider, this.LoggerFactory);
+                validComputedValue = parameterType.Validate(computedValue, measurementScale, provider);
 
                 if (validComputedValue.ResultKind > validationResult)
                 {
                     validationResult = validComputedValue.ResultKind;
                 }
 
-                validReferenceValue = parameterType.Validate(referenceValue, measurementScale, provider, this.LoggerFactory);
+                validReferenceValue = parameterType.Validate(referenceValue, measurementScale, provider);
 
                 if (validReferenceValue.ResultKind > validationResult)
                 {
                     validationResult = validReferenceValue.ResultKind;
                 }
 
-                validActualValue = parameterType.Validate(actualValue, measurementScale, provider, this.LoggerFactory);
+                validActualValue = parameterType.Validate(actualValue, measurementScale, provider);
 
                 if (validActualValue.ResultKind > validationResult)
                 {
@@ -842,7 +817,7 @@ namespace CDP4ParameterSheetGenerator.Generator
                     ParameterSheetUtilities.ConvertDoubleToDateTimeObject(ref manualValue, parameterType);
                 }
 
-                validManualValue = parameterType.Validate(manualValue, measurementScale, provider, this.LoggerFactory);
+                validManualValue = parameterType.Validate(manualValue, measurementScale, provider);
 
                 if (validManualValue.ResultKind > validationResult)
                 {

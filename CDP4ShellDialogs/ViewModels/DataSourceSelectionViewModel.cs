@@ -48,8 +48,6 @@ namespace CDP4ShellDialogs.ViewModels
 
     using CommonServiceLocator;
 
-    using Microsoft.Extensions.Logging;
-
     /// <summary>
     /// The purpose of the <see cref="DataSourceSelectionViewModel"/> is to allow a user to select an <see cref="IDal"/> implementation
     /// and provide Credentials to login to a data source.
@@ -410,8 +408,7 @@ namespace CDP4ShellDialogs.ViewModels
 
                 var credentials = new Credentials(this.UserName, this.Password, providedUri, proxySettings);
                 var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
-                var logger = ServiceLocator.Current.GetInstance<ILoggerFactory>();
-                var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType(), logger);
+                var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
 
                 this.IsBusy = true;
 
@@ -553,7 +550,6 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         private void ResetProperties()
         {
-            var testLoggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
             this.ShowBrowseButton = false;
             this.ErrorMessage = string.Empty;

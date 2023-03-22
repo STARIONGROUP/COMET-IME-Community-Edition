@@ -28,9 +28,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="10.0.0-rc4" />
-    <PackageReference Include="CDP4Dal-CE" Version="10.0.0-rc4" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="10.0.0-rc4" />
+    <PackageReference Include="CDP4Common-CE" Version="10.0.0-rc6" />
+    <PackageReference Include="CDP4Dal-CE" Version="10.0.0-rc6" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="10.0.0-rc6" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

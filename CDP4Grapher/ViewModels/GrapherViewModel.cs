@@ -49,8 +49,6 @@ namespace CDP4Grapher.ViewModels
 
     using DevExpress.Mvvm.Native;
 
-    using Microsoft.Extensions.Logging;
-
     using ReactiveUI;
 
     /// <summary>
@@ -169,27 +167,6 @@ namespace CDP4Grapher.ViewModels
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
-        /// Backing field for <see cref="LoggerFactory"/> 
-        /// </summary>
-        private ILoggerFactory loggerFactory;
-
-        /// <summary>
-        /// The INJECTED <see cref="ILoggerFactory"/> 
-        /// </summary>
-        protected ILoggerFactory LoggerFactory
-        {
-            get
-            {
-                if (this.loggerFactory == null)
-                {
-                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
-                }
-
-                return this.loggerFactory;
-            }
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="GrapherViewModel"/> class
         /// </summary>
         /// <param name="option">The <see cref="Option"/> of which this browser is of</param>
@@ -275,7 +252,7 @@ namespace CDP4Grapher.ViewModels
         {
             var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Thing.Container);
 
-            var elements = new NestedElementTreeGenerator(this.LoggerFactory).Generate(this.option, currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
+            var elements = new NestedElementTreeGenerator().Generate(this.option, currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
             this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e)));
         }
 
@@ -287,7 +264,7 @@ namespace CDP4Grapher.ViewModels
         {
             var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Thing.Container);
 
-            var newTree = new NestedElementTreeGenerator(this.LoggerFactory).GenerateNestedElements(this.option, currentDomainOfExpertise, graphElement.Thing.ElementUsage.Last().ElementDefinition)
+            var newTree = new NestedElementTreeGenerator().GenerateNestedElements(this.option, currentDomainOfExpertise, graphElement.Thing.ElementUsage.Last().ElementDefinition)
                 .OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
             
             this.GraphElements.Clear();

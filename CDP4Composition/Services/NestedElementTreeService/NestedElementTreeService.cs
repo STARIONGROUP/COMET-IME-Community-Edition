@@ -32,8 +32,6 @@ namespace CDP4Composition.Services.NestedElementTreeService
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
 
-    using Microsoft.Extensions.Logging;
-
     /// <summary>
     /// Class service <see cref="NestedElementTreeService"/> used as a wrapper for the NestedElementTreeGenerator.
     /// </summary>
@@ -50,10 +48,9 @@ namespace CDP4Composition.Services.NestedElementTreeService
         /// <summary>
         /// Creates a new instance of <see cref="NestedElementTreeService"/>
         /// </summary>
-        /// <param name="loggerFactory">The INJECTED <see cref="ILoggerFactory"/> </param>
-        public NestedElementTreeService(ILoggerFactory loggerFactory)
+        public NestedElementTreeService()
         {
-            this.nestedElementTreeGenerator = new NestedElementTreeGenerator(loggerFactory);
+            this.nestedElementTreeGenerator = new NestedElementTreeGenerator();
         }
 
         /// <summary>

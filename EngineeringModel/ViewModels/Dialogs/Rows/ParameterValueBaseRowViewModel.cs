@@ -42,8 +42,6 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
 
     using CommonServiceLocator;
 
-    using Microsoft.Extensions.Logging;
-
     using ReactiveUI;
 
     /// <summary>
@@ -104,27 +102,6 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// The <see cref="IDialogViewModelBase{ParameterBase}"/> context
         /// </summary>
         protected readonly IDialogViewModelBase<ParameterBase> DialogViewModel;
-
-        /// <summary>
-        /// Backing field for <see cref="LoggerFactory"/> 
-        /// </summary>
-        private ILoggerFactory loggerFactory;
-
-        /// <summary>
-        /// The INJECTED <see cref="ILoggerFactory"/> 
-        /// </summary>
-        protected ILoggerFactory LoggerFactory
-        {
-            get
-            {
-                if (this.loggerFactory == null)
-                {
-                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
-                }
-
-                return this.loggerFactory;
-            }
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterValueBaseRowViewModel"/> class
@@ -379,7 +356,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                         this.DialogViewModel.ValidationErrors.Remove(rule);
                     }
 
-                    var validationMsg = ParameterValueValidator.Validate(this.Manual, this.ParameterType, this.Scale, this.LoggerFactory);
+                    var validationMsg = ParameterValueValidator.Validate(this.Manual, this.ParameterType, this.Scale);
 
                     if (!string.IsNullOrWhiteSpace(validationMsg))
                     {
@@ -407,7 +384,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                         this.DialogViewModel.ValidationErrors.Remove(rule);
                     }
 
-                    var validationMsg = ParameterValueValidator.Validate(this.Reference, this.ParameterType, this.Scale, this.LoggerFactory);
+                    var validationMsg = ParameterValueValidator.Validate(this.Reference, this.ParameterType, this.Scale);
 
                     if (!string.IsNullOrWhiteSpace(validationMsg))
                     {

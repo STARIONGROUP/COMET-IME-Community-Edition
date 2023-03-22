@@ -211,7 +211,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                         this.DialogViewModel.ValidationErrors.Remove(rule);
                     }
 
-                    var validationMsg = ParameterValueValidator.Validate(this.Manual, parameterType, scale, this.LoggerFactory);
+                    var validationMsg = ParameterValueValidator.Validate(this.Manual, parameterType, scale);
 
                     if (!string.IsNullOrWhiteSpace(validationMsg))
                     {
@@ -239,7 +239,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                         this.DialogViewModel.ValidationErrors.Remove(rule);
                     }
 
-                    var validationMsg = ParameterValueValidator.Validate(this.Reference, parameterType, scale, this.LoggerFactory);
+                    var validationMsg = ParameterValueValidator.Validate(this.Reference, parameterType, scale);
 
                     if (!string.IsNullOrWhiteSpace(validationMsg))
                     {

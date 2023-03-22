@@ -38,8 +38,6 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
 
     using CommonServiceLocator;
 
-    using Microsoft.Extensions.Logging;
-
     /// <summary>
     /// The purpose of the <see cref="OptionSheetRowAssembler"/> is to assemble a list of <see cref="IExcelRow{Thing}"/>s
     /// that are to be written to a workbook. The <see cref="IExcelRow{Thing}"/>s represent the <see cref="ElementDefinition"/>s,  <see cref="ElementUsage"/>s
@@ -67,27 +65,6 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         /// The <see cref="DomainOfExpertise"/> for which the owned <see cref="Parameter"/> and <see cref="ParameterSubscription"/> are assembled.
         /// </summary>
         private readonly DomainOfExpertise owner;
-
-        /// <summary>
-        /// Backing field for <see cref="LoggerFactory"/> 
-        /// </summary>
-        private ILoggerFactory loggerFactory;
-
-        /// <summary>
-        /// The INJECTED <see cref="ILoggerFactory"/> 
-        /// </summary>
-        protected ILoggerFactory LoggerFactory
-        {
-            get
-            {
-                if (this.loggerFactory == null)
-                {
-                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
-                }
-
-                return this.loggerFactory;
-            }
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OptionSheetRowAssembler"/> class.
@@ -144,7 +121,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             }
             else
             {
-                var nestedElementTreeGenerator = new NestedElementTreeGenerator(this.LoggerFactory);
+                var nestedElementTreeGenerator = new NestedElementTreeGenerator();
                 nestedElements = nestedElementTreeGenerator.Generate(this.option, this.owner, false);
             }
 

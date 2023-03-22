@@ -47,8 +47,6 @@ namespace CDP4Requirements.ViewModels
 
     using DynamicData;
 
-    using Microsoft.Extensions.Logging;
-
     using ReactiveUI;
 
     /// <summary>
@@ -57,27 +55,6 @@ namespace CDP4Requirements.ViewModels
     [ThingDialogViewModelExport(ClassKind.RelationalExpression)]
     public class RelationalExpressionDialogViewModel : CDP4CommonView.RelationalExpressionDialogViewModel, IThingDialogViewModel
     {
-        /// <summary>
-        /// Backing field for <see cref="LoggerFactory"/> 
-        /// </summary>
-        private ILoggerFactory loggerFactory;
-
-        /// <summary>
-        /// The INJECTED <see cref="ILoggerFactory"/> 
-        /// </summary>
-        protected ILoggerFactory LoggerFactory
-        {
-            get
-            {
-                if (this.loggerFactory == null)
-                {
-                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
-                }
-
-                return this.loggerFactory;
-            }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationalExpressionDialogViewModel"/> class.
         /// </summary>
@@ -247,7 +224,7 @@ namespace CDP4Requirements.ViewModels
                         throw new Cdp4ModelValidationException($"{currentCultureString} is not a valid value for a {this.SelectedParameterType.ClassKind}.");
                     }
 
-                    var validationResult = ParameterValueValidator.Validate(dateTimeObject, this.SelectedParameterType, this.SelectedScale, this.LoggerFactory);
+                    var validationResult = ParameterValueValidator.Validate(dateTimeObject, this.SelectedParameterType, this.SelectedScale);
 
                     if (validationResult != null)
                     {

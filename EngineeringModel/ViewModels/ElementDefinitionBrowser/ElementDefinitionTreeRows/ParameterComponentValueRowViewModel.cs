@@ -203,7 +203,7 @@ namespace CDP4EngineeringModel.ViewModels
                 var parameterType = this.ParameterType;
                 var scale = this.Scale;
 
-                return ParameterValueValidator.Validate(newValue, parameterType, scale, this.LoggerFactory);
+                return ParameterValueValidator.Validate(newValue, parameterType, scale);
             }
 
             return null;

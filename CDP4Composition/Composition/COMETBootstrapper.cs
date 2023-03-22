@@ -42,8 +42,6 @@ namespace CDP4Composition.Composition
 
     using CommonServiceLocator;
 
-    using Microsoft.Extensions.Logging;
-
     using NLog;
     using NLog.Extensions.Logging;
 
@@ -93,12 +91,7 @@ namespace CDP4Composition.Composition
             this.ResetStatusProgress();
             this.ShowStatusMessage("Initializing COMET IME Plugins...");
 
-            var batch = new CompositionBatch();
-            var loggerFactory = new LoggerFactory();
-            loggerFactory.AddProvider(new NLogLoggerProvider());
-            batch.AddExportedValue<ILoggerFactory>(loggerFactory);
-            batch.AddExportedValue(container);
-            container.Compose(batch);
+            container.ComposeParts();
 
             this.UpdateBootstrapperStatus("Initializing modules");
             this.InitializeModules(container);

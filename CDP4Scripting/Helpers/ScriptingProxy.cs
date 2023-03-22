@@ -51,8 +51,6 @@ namespace CDP4Scripting.Helpers
 
     using IronPython.Modules;
 
-    using Microsoft.Extensions.Logging;
-
     /// <summary>
     /// The purpose of the <see cref="ScriptingProxy"/> class is to provide access to an <see cref="EngineeringModel"/>
     /// </summary>
@@ -60,8 +58,6 @@ namespace CDP4Scripting.Helpers
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ScriptingProxy : IScriptingProxy
     {
-        private readonly ILoggerFactory loggerfactory;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptingProxy"/> class.
         /// </summary>
@@ -70,13 +66,12 @@ namespace CDP4Scripting.Helpers
         /// <param name="dialogNavigationService">The (MEF injected) instance of <see cref="IDialogNavigationService"/>.</param>
         /// <param name="loggerfactory">The (MEF injected) instance of <see cref="ILoggerFactory"/>.</param>
         [ImportingConstructor]
-        public ScriptingProxy(IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, ILoggerFactory loggerfactory)
+        public ScriptingProxy(IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
         {
-            this.loggerfactory = loggerfactory;
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.PanelNavigationService = panelNavigationService;
             this.DialogNavigationService = dialogNavigationService;
-            this.NestedElementTreeGenerator = new NestedElementTreeGenerator(loggerfactory);
+            this.NestedElementTreeGenerator = new NestedElementTreeGenerator();
             this.InitCommandCompletionData();
         }
 

@@ -48,8 +48,6 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CommonServiceLocator;
 
-    using Microsoft.Extensions.Logging;
-
     using ReactiveUI;
 
     /// <summary>
@@ -97,27 +95,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for <see cref="DisplayCategory"/>
         /// </summary>
         private string displayCategory;
-
-        /// <summary>
-        /// Backing field for <see cref="LoggerFactory"/> 
-        /// </summary>
-        private ILoggerFactory loggerFactory;
-
-        /// <summary>
-        /// The INJECTED <see cref="ILoggerFactory"/> 
-        /// </summary>
-        protected ILoggerFactory LoggerFactory
-        {
-            get
-            {
-                if (this.loggerFactory == null)
-                {
-                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
-                }
-
-                return this.loggerFactory;
-            }
-        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterBaseRowViewModel{T}"/> class. 
@@ -327,7 +304,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             if (columnName == "Manual" || columnName == "Reference")
             {
-                return ParameterValueValidator.Validate(newValue, this.ParameterType, this.Thing.Scale, this.LoggerFactory);
+                return ParameterValueValidator.Validate(newValue, this.Thing.ParameterType, this.Thing.Scale);
             }
 
             return null;

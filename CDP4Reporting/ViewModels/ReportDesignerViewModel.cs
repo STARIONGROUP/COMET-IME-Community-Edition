@@ -81,7 +81,6 @@ namespace CDP4Reporting.ViewModels
     using ReactiveUI;
 
     using File = System.IO.File;
-    using Microsoft.Extensions.Logging;
 
     /// <summary>
     /// The view-model for the Report Designer that lets users to create reports based on template source files.
@@ -258,27 +257,6 @@ namespace CDP4Reporting.ViewModels
         {
             get => this.isAutoCompileEnabled;
             set => this.RaiseAndSetIfChanged(ref this.isAutoCompileEnabled, value);
-        }
-
-        /// <summary>
-        /// Backing field for <see cref="LoggerFactory"/> 
-        /// </summary>
-        private ILoggerFactory loggerFactory;
-
-        /// <summary>
-        /// The INJECTED <see cref="ILoggerFactory"/> 
-        /// </summary>
-        protected ILoggerFactory LoggerFactory
-        {
-            get
-            {
-                if (this.loggerFactory == null)
-                {
-                    this.loggerFactory = ServiceLocator.Current.GetInstance<ILoggerFactory>();
-                }
-
-                return this.loggerFactory;
-            }
         }
 
         /// <summary>
@@ -1293,7 +1271,7 @@ namespace CDP4Reporting.ViewModels
             
             foreach (Option option in optionDependentDataCollector.Iteration.Option)
             {
-                var nestedElementTree = new NestedElementTreeGenerator(this.LoggerFactory);
+                var nestedElementTree = new NestedElementTreeGenerator();
 
                 var allNestedParameters = nestedElementTree.GetNestedParameters(option).ToList();
 

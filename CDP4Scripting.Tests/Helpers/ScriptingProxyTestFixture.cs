@@ -48,8 +48,6 @@ namespace CDP4Scripting.Tests.Helpers
 
     using Interfaces;
 
-    using Microsoft.Extensions.Logging;
-
     using Moq;
 
     using NUnit.Framework;
@@ -71,7 +69,6 @@ namespace CDP4Scripting.Tests.Helpers
         private Mock<IScriptPanelViewModel> scriptViewModel;
         private ScriptingProxy scriptingProxy;
         private Mock<ISession> session;
-        private Mock<ILoggerFactory> loggerFactory;
 
         private OutputTerminal outputTerminal;
 
@@ -111,7 +108,6 @@ namespace CDP4Scripting.Tests.Helpers
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
-            this.loggerFactory = new Mock<ILoggerFactory>();
 
             this.assembler = new Assembler(this.uri);
             this.session = new Mock<ISession>();
@@ -123,7 +119,7 @@ namespace CDP4Scripting.Tests.Helpers
             this.scriptViewModel.SetupGet(x => x.OutputTerminal).Returns(() => this.outputTerminal);
             this.scriptViewModel.SetupProperty(x => x.SelectedSession, session.Object);
             
-            this.scriptingProxy = new ScriptingProxy(this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.loggerFactory.Object);
+            this.scriptingProxy = new ScriptingProxy(this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
             this.scriptingProxy.ScriptingPanelViewModel = this.scriptViewModel.Object;
 
             // Creation of the elements that can be searched using a script
