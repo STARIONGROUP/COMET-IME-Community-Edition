@@ -321,8 +321,7 @@ namespace CDP4AddinCE
         /// <param name="exception">The exception that occurred.</param>
         protected override void OnError(ErrorMethodKind methodKind, Exception exception)
         {
-            //TODO: Fix This
-            //this.Utils.Dialog.ShowError(exception, "Unexpected state in COMET-CE.Addin " + methodKind.ToString());
+            HandleException(exception);
         }
 
         /// <summary>
@@ -616,8 +615,7 @@ namespace CDP4AddinCE
             catch (Exception ex)
             {
                 logger.Fatal(ex, "Bootstrapper exception: ");
-                //TODO: Fix This
-                //this.Utils.Dialog.ShowError(ex, "Unexpected state in COMET-CE.Addin");
+                HandleException(ex);
             }
         }
 
