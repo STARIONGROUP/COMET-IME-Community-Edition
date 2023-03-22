@@ -111,7 +111,11 @@ namespace CDP4SiteDirectory.ViewModels
         public bool PwdEditIsChecked
         {
             get { return this.pwdEditIsChecked; }
-            set { this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value); }
+            set
+            {
+                this.RaiseAndSetIfChanged(ref this.pwdEditIsChecked, value);
+                this.RaisePropertyChanged(nameof(this.ShoudDisplayPasswordNotSetWarning));
+            }
         }
 
         /// <summary>
@@ -135,6 +139,14 @@ namespace CDP4SiteDirectory.ViewModels
         public ReactiveCommand<Unit, Unit> SetDefaultEmailAddressCommand { get; private set; } 
 
         /// <summary>
+        /// Returns true if new <see cref="Person"/> nas no passwords set
+        /// </summary>
+        public bool ShoudDisplayPasswordNotSetWarning
+        {
+            get { return this.dialogKind == ThingDialogKind.Create && !this.PwdEditIsChecked; }
+        }
+
+        /// <summary>
         /// Gets the error message for the property with the given name.
         /// </summary>
         /// <returns>
@@ -148,7 +160,7 @@ namespace CDP4SiteDirectory.ViewModels
                 if ((columnName == "Password" || columnName == "PasswordConfirmation") && !this.PwdEditIsChecked)
                 {
                     var validationErrorToRemove =
-                        this.ValidationErrors.SingleOrDefault(
+                        this.ValidationErrors.FirstOrDefault(
                             x => x.PropertyName == "Password" || x.PropertyName == "PasswordConfirmation");
                     if (validationErrorToRemove != null)
                     {
