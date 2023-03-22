@@ -36,6 +36,8 @@
                                   Text="{Binding Path=ScaleValueDefinition, Mode=TwoWay, ValidatesOnDataErrors=True,UpdateSourceTrigger=PropertyChanged}"/>
                 </dxlc:LayoutItem>
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:AliasLayoutGroup />
             <items:DefinitionLayoutGroup />

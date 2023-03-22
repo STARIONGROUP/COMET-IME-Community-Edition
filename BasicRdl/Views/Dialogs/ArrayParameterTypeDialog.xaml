@@ -159,7 +159,8 @@
                 </dxlc:LayoutItem>
 
                 <items:IsDeprecatedLayoutItem />
-
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:CategoryLayoutGroup />
             <items:AliasLayoutGroup />

@@ -109,7 +109,8 @@
                     </Grid>
                 </dxlc:LayoutItem>
                 <items:IsDeprecatedLayoutItem />
-
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:AliasLayoutGroup />
             <items:DefinitionLayoutGroup />

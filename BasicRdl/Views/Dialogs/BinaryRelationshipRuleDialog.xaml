@@ -161,7 +161,8 @@
                 <items:IsDeprecatedLayoutItem />
 
                 <items:ShortNameContainerLayoutItem />
-
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
 
             <items:AliasLayoutGroup />

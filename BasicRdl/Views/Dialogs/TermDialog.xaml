@@ -29,6 +29,8 @@
                 <items:ShortNameLayoutItem />
                 <items:NameLayoutItem />
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
             
             <items:AliasLayoutGroup />

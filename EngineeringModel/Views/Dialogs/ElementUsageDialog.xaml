@@ -106,7 +106,8 @@
                         </dxg:GridControl.Columns>
                     </dxg:GridControl>
                 </lc:LayoutItem>
-
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </lc:LayoutGroup>
             <items:ExcludeOptionsLayoutGroup />
             <items:CategoryLayoutGroup />

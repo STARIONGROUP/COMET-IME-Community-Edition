@@ -39,6 +39,8 @@
                                    IsReadOnly="{Binding IsReadOnly}"/>
                 </dxlc:LayoutItem>
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <items:ValueDefinitionLayoutGroup/>
             <items:MappingToReferenceScaleLayoutGroup/>

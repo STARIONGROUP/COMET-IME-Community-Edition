@@ -40,6 +40,8 @@
                 <items:IsMinimumInclusiveLayoutItem/>
                 <items:IsMaximumInclusiveLayoutItem />
                 <items:IsDeprecatedLayoutItem />
+                <items:AliasDisplayLayoutItem />
+                <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
             <dxlc:LayoutGroup Name="Logarithm" Header="Logarithm" Orientation="Vertical">
                 <dxlc:LayoutItem Label="Logarithm base:">
