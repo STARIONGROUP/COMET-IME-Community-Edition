@@ -48,6 +48,7 @@
     <PackageReference Include="CDP4JsonSerializer-CE" Version="10.0.0-rc6">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
+    <PackageReference Include="CDP4Reporting-CE" Version="2.0.0-rc6" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportDesignerViewModelTextFixture.cs" company="RHEA System S.A.">//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ReportDesignerViewModelTextFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -69,6 +69,9 @@ namespace CDP4Reporting.Tests.ViewModels
 
     using ReactiveUI;
 
+    using CDP4Reporting.ReportScript;
+    using CDP4Reporting.Utilities;
+
     /// <summary>
     /// Suite of tests for the <see cref="ReportDesignerViewModel"/> class
     /// </summary>
@@ -131,7 +134,7 @@ namespace CDP4Reporting.Tests.ViewModels
                     paramsList[1].AddLookupValue(""1"", ""one"");
                     paramsList.Add(new ReportingParameter(""param3"", typeof(string), ""DefaultValue""));
                     paramsList[2].Visible = false;
-                    paramsList.Add(new ReportingParameter(""param3"", typeof(string), null));
+                    paramsList.Add(new ReportingParameter(""param4"", typeof(string), null));
                     paramsList[3].Visible = false;
 
                     return paramsList;
@@ -179,7 +182,7 @@ namespace CDP4Reporting.Tests.ViewModels
         private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<IOpenSaveFileDialogService> openSaveFileDialogService;
         private Mock<ISubmittableParameterValuesCollector> submittableParameterValuesCollector;
-        private Mock<IDynamicTableChecker> dynamicTableChecker;
+        private Mock<IDynamicTableChecker<XtraReport>> dynamicTableChecker;
         private Mock<IPermissionService> permissionService;
         private Mock<IMessageBoxService> messageBoxService;
 
@@ -225,7 +228,7 @@ namespace CDP4Reporting.Tests.ViewModels
             this.openSaveFileDialogService = new Mock<IOpenSaveFileDialogService>();
             this.submittableParameterValuesCollector = new Mock<ISubmittableParameterValuesCollector>();
             this.permissionService = new Mock<IPermissionService>();
-            this.dynamicTableChecker = new Mock<IDynamicTableChecker>();
+            this.dynamicTableChecker = new Mock<IDynamicTableChecker<XtraReport>>();
             this.messageBoxService = new Mock<IMessageBoxService>();
 
             this.serviceLocator = new Mock<IServiceLocator>();
@@ -233,7 +236,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.openSaveFileDialogService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<ISubmittableParameterValuesCollector>()).Returns(this.submittableParameterValuesCollector.Object);
-            this.serviceLocator.Setup(x => x.GetInstance<IDynamicTableChecker>()).Returns(this.dynamicTableChecker.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IDynamicTableChecker<XtraReport>>()).Returns(this.dynamicTableChecker.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
 
             this.assembler = new Assembler(this.uri);
@@ -749,7 +752,17 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public void VerifyThatCompileScriptCommandWorks()
         {
-            Assert.DoesNotThrowAsync(async () => await  this.reportDesignerViewModel.CompileScriptCommand.Execute());
+            // initialize ReportScriptHandler
+            var report = new XtraReport();
+            
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+                , x =>
+                {
+                    this.reportDesignerViewModel.Errors = x;
+                }, 
+                x => { });
+
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.CompileScriptCommand.Execute());
         }
 
         [Test]
@@ -761,9 +774,19 @@ namespace CDP4Reporting.Tests.ViewModels
             };
 
             this.reportDesignerViewModel.Document = textDocument;
+
+            // initialize ReportScriptHandler
+            var report = new XtraReport();
+            
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+                , x =>
+                {
+                    this.reportDesignerViewModel.Errors = x;
+                }, 
+                x => { });
+            
             await this.reportDesignerViewModel.CompileScriptCommand.Execute();
 
-            Assert.AreEqual(0, this.reportDesignerViewModel.CompileResult.Errors.Count);
             Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Errors);
         }
 
@@ -776,9 +799,22 @@ namespace CDP4Reporting.Tests.ViewModels
             };
 
             this.reportDesignerViewModel.Document = textDocument;
+            
+            // initialize ReportScriptHandler
+            var report = new XtraReport();
+            
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+                , x =>
+            {
+                this.reportDesignerViewModel.Errors = x;
+            }, 
+            x => { });
+            
             await this.reportDesignerViewModel.CompileScriptCommand.Execute();
 
-            Assert.AreNotEqual(0, this.reportDesignerViewModel.CompileResult.Errors.Count);
+            // CompileScriptCommand is not awaitable due to timed threads
+            Thread.Sleep(5000);
+
             Assert.AreNotEqual(string.Empty, this.reportDesignerViewModel.Errors);
         }
 
@@ -986,6 +1022,19 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public void VerifyThatRebuildDataSourceCommandWorksWithNoDataSource()
         {
+            // initialize ReportScriptHandler
+            var report = new XtraReport();
+
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+                , x =>
+                {
+                    this.reportDesignerViewModel.Errors = x;
+                },
+                x =>
+                {
+                    this.reportDesignerViewModel.Output = x;
+                });
+
             Assert.DoesNotThrowAsync(async () => await  this.reportDesignerViewModel.RebuildDatasourceCommand.Execute());
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("Nothing to compile"));

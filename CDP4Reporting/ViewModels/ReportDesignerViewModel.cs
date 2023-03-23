@@ -26,7 +26,6 @@
 namespace CDP4Reporting.ViewModels
 {
     using System;
-    using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.Data;
     using System.Diagnostics.CodeAnalysis;
@@ -59,17 +58,12 @@ namespace CDP4Reporting.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
-    using CDP4Reporting.DataCollection;
-    using CDP4Reporting.DynamicTableChecker;
-    using CDP4Reporting.Events;
-    using CDP4Reporting.Parameters;
     using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.Utilities;
 
     using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Printing;
     using DevExpress.Xpf.Reports.UserDesigner;
-    using DevExpress.XtraReports.Parameters;
     using DevExpress.XtraReports.UI;
 
     using ICSharpCode.AvalonEdit.Document;
@@ -80,7 +74,13 @@ namespace CDP4Reporting.ViewModels
 
     using ReactiveUI;
 
+    using CDP4Reporting.DataCollection;
+    using CDP4Reporting.DynamicTableChecker;
+    using CDP4Reporting.Events;
+    using CDP4Reporting.ReportScript;
+
     using File = System.IO.File;
+    using Parameter = DevExpress.XtraReports.Parameters.Parameter;
 
     /// <summary>
     /// The view-model for the Report Designer that lets users to create reports based on template source files.
@@ -108,9 +108,9 @@ namespace CDP4Reporting.ViewModels
         private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
-        /// The <see cref="IDynamicTableChecker"/> used to check datatables in the report.
+        /// The <see cref="IDynamicTableChecker{T}"/> used to check datatables in the report.
         /// </summary>
-        private readonly IDynamicTableChecker dynamicTableChecker = ServiceLocator.Current.GetInstance<IDynamicTableChecker>();
+        private readonly IDynamicTableChecker<XtraReport> dynamicTableChecker = ServiceLocator.Current.GetInstance<IDynamicTableChecker<XtraReport>>();
 
         /// <summary>
         /// The <see cref="IOpenSaveFileDialogService"/> that is used to navigate to the File Open/Save dialog
@@ -126,11 +126,6 @@ namespace CDP4Reporting.ViewModels
         /// The currently active <see cref="XtraReport"/> in the Report Designer
         /// </summary>
         private XtraReport currentReport = GetNewXtraReport();
-
-        /// <summary>
-        /// Backing field for <see cref="CurrentDataCollector"/>
-        /// </summary>
-        private IDataCollector currentDataCollector;
 
         /// <summary>
         /// The currently active <see cref="TextDocument"/> in the Avalon Editor
@@ -173,6 +168,11 @@ namespace CDP4Reporting.ViewModels
         private string output;
 
         /// <summary>
+        /// Gets or sets the <see cref="ReportScriptHandler"/>
+        /// </summary>
+        public ReportScriptHandler<XtraReport, Parameter> ReportScriptHandler { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the browser is dirty
         /// </summary>
         public override bool IsDirty
@@ -197,15 +197,6 @@ namespace CDP4Reporting.ViewModels
         {
             get => this.currentReport;
             set => this.RaiseAndSetIfChanged(ref this.currentReport, value);
-        }
-
-        /// <summary>
-        /// Gets or sets the current report DataSource
-        /// </summary>
-        public IDataCollector CurrentDataCollector
-        {
-            get => this.currentDataCollector;
-            set => this.RaiseAndSetIfChanged(ref this.currentDataCollector, value);
         }
 
         /// <summary>
@@ -244,11 +235,6 @@ namespace CDP4Reporting.ViewModels
             get => this.canSubmitParameterValues;
             set => this.RaiseAndSetIfChanged(ref this.canSubmitParameterValues, value);
         }
-
-        /// <summary>
-        /// Gets or sets build output result
-        /// </summary>
-        public CompilerResults CompileResult { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether automatically build is checked
@@ -341,8 +327,14 @@ namespace CDP4Reporting.ViewModels
         public ReportDesignerViewModel(Iteration thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
+            ReportingSettings.OptionSelector = (options, option) =>
+            {
+                var thingSelectorDialogService = ServiceLocator.Current.GetInstance<IThingSelectorDialogService>();
+                return thingSelectorDialogService.SelectThing(options, new string[] { "ShortName", "Name" });
+            };
+
             this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
-            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.Document = new TextDocument();
             this.Errors = string.Empty;
@@ -358,7 +350,7 @@ namespace CDP4Reporting.ViewModels
             this.CompileScriptCommand = ReactiveCommandCreator.Create(async () =>
             {
                 var source = this.Document.Text;
-                await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+                await this.compilationConcurrentActionRunner.RunAction(() => this.ReportScriptHandler.CompileAssembly(source));
             });
 
             this.NewReportCommand = ReactiveCommandCreator.Create(this.CreateNewReport);
@@ -392,7 +384,7 @@ namespace CDP4Reporting.ViewModels
 
             this.Changing
                 .Where(x => x.PropertyName == nameof(this.CurrentReport))
-                .Subscribe(x => 
+                .Subscribe(x =>
                 {
                     if (this.CurrentReport != null)
                     {
@@ -405,7 +397,7 @@ namespace CDP4Reporting.ViewModels
                 CDPMessageBus.Current.Listen<ReportOutputEvent>()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => this.AddOutput(x.Output))
-                );
+            );
 
             this.InitializeDataSetExtensionsUsage();
         }
@@ -414,7 +406,7 @@ namespace CDP4Reporting.ViewModels
         /// Method that is here that does nothing, but makes sure that System.Data.DataSetExtensions.dll is
         /// available in the report script
         /// </summary>
-        [SuppressMessage("Minor Code Smell", "S1481:Unused local variables should be removed", 
+        [SuppressMessage("Minor Code Smell", "S1481:Unused local variables should be removed",
             Justification = "Method that is here that does nothing, but makes sure that System.Data.DataSetExtensions.dll is available in the report script.")]
         private void InitializeDataSetExtensionsUsage()
         {
@@ -429,7 +421,7 @@ namespace CDP4Reporting.ViewModels
         /// <returns>The <see cref="Task"/></returns>
         private async Task SetReportDesigner(object newValue)
         {
-            await Task.Run(() => this.currentReportDesignerDocument = (ReportDesignerDocument) newValue);
+            await Task.Run(() => this.currentReportDesignerDocument = (ReportDesignerDocument)newValue);
         }
 
         /// <summary>
@@ -483,7 +475,7 @@ namespace CDP4Reporting.ViewModels
 
             var text = this.Document.Text;
 
-            this.compilationConcurrentActionRunner.DelayRunAction(() => this.CompileAssembly(text), 2500);
+            this.compilationConcurrentActionRunner.DelayRunAction(() => this.ReportScriptHandler.CompileAssembly(text), 2500);
         }
 
         /// <summary>
@@ -500,6 +492,8 @@ namespace CDP4Reporting.ViewModels
             this.lastSavedDataSourceText = "";
 
             this.CurrentReport = GetNewXtraReport();
+            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(this.CurrentReport), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
+
             this.CurrentReportProjectFilePath = string.Empty;
         }
 
@@ -511,9 +505,9 @@ namespace CDP4Reporting.ViewModels
         {
             var newReport = new XtraReport
             {
-                ReportUnit = ReportUnit.Pixels, 
-                SnapGridSize = 6F, 
-                SnapGridStepCount = 5, 
+                ReportUnit = ReportUnit.Pixels,
+                SnapGridSize = 6F,
+                SnapGridStepCount = 5,
                 SnappingMode = SnappingMode.SnapToGridAndSnapLines
             };
 
@@ -541,7 +535,9 @@ namespace CDP4Reporting.ViewModels
 
             var report = new XtraReport();
 
-            using (var reportZipArchive = this.GetReportZipArchive(reportProjectFilePath))
+            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
+
+            using (var reportZipArchive = this.ReportScriptHandler.GetReportZipArchive(reportProjectFilePath))
             {
                 report.LoadLayoutFromXml(reportZipArchive.ReportDefinition);
 
@@ -555,14 +551,15 @@ namespace CDP4Reporting.ViewModels
                         this.Document = new TextDocument(datasource);
                     }
 
-                    this.CompileAssembly(this.Document.Text);
+                    this.ReportScriptHandler.CompileAssembly(this.Document.Text);
                 }
             }
 
             this.CurrentReport = report;
             this.CurrentReportProjectFilePath = reportProjectFilePath;
 
-            this.RebuildDataSource();
+            this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session);
+            this.TriggerRefreshUI();
 
             this.lastSavedDataSourceText = this.Document.Text;
             this.currentReportDesignerDocument?.SetValue(ReportDesignerDocument.HasChangesProperty, false);
@@ -660,11 +657,12 @@ namespace CDP4Reporting.ViewModels
             try
             {
                 var source = this.Document.Text;
-                await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+                await this.compilationConcurrentActionRunner.RunAction(() => this.ReportScriptHandler.CompileAssembly(source));
 
-                if (!this.CompileResult?.Errors.HasErrors ?? false)
+                if (!this.ReportScriptHandler.CompileResults?.Errors.HasErrors ?? false)
                 {
-                    this.RebuildDataSource();
+                    this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session);
+                    this.TriggerRefreshUI();
                 }
             }
             finally
@@ -672,7 +670,7 @@ namespace CDP4Reporting.ViewModels
                 this.IsBusy = false;
             }
         }
-        
+
         /// <summary>
         /// Executes the <see cref="RebuildDatasourceAndRefreshPreviewCommand"/>
         /// </summary>
@@ -684,16 +682,26 @@ namespace CDP4Reporting.ViewModels
             try
             {
                 var source = this.Document.Text;
-                await this.compilationConcurrentActionRunner.RunAction(() => this.CompileAssembly(source));
+                await this.compilationConcurrentActionRunner.RunAction(() => this.ReportScriptHandler.CompileAssembly(source));
 
-                if (this.CompileResult?.Errors.HasErrors ?? false)
+                if (this.ReportScriptHandler.CompileResults?.Errors.HasErrors ?? false)
                 {
-                    this.messageBoxService.Show(this.CompileResult?.Errors.ToString(), "Compilation error", MessageBoxButton.OK, MessageBoxImage.Stop);
+                    this.messageBoxService.Show(this.ReportScriptHandler.CompileResults?.Errors.ToString(), "Compilation error", MessageBoxButton.OK, MessageBoxImage.Stop);
                 }
 
-                this.RebuildDataSource(true);
+                if (this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session, true))
+                {
+                    this.messageBoxService.Show(
+                        "Report parameters were added to, or removed from the report definition. Reload the preview tab to reflect these changes in the parameters panel.",
+                        "Reload preview tab",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Information);
+                }
+
+                this.TriggerRefreshUI();
+
                 var presenter = this.currentReportDesignerDocument?.Preview as DocumentPreviewControl;
-                presenter?.ParametersModel.SubmitParameters();  
+                presenter?.ParametersModel.SubmitParameters();
             }
             finally
             {
@@ -702,72 +710,11 @@ namespace CDP4Reporting.ViewModels
         }
 
         /// <summary>
-        /// Rebuild the report's datasource
-        /// </summary>
-        /// <param name="notifyParameterChange">Indicates if message should be shown when parameter values have been added, or removed.</param>
-        private void RebuildDataSource(bool notifyParameterChange = false)
-        {
-            const string dataSourceName = "ReportDataSource";
-
-            var reportDataSource = 
-                this.CurrentReport.ComponentStorage.OfType<ObjectDataSource>()
-                    .FirstOrDefault(x => x.Name.Equals(dataSourceName));
-            
-            object dataSource;
-
-            try
-            {
-                dataSource = this.GetDataSource();
-            }
-            catch (Exception ex)
-            {
-                this.Errors = $"{ex.Message}\n{ex.StackTrace}";
-                return;
-            }
-
-            var parameters = this.GetParameters(dataSource);
-            var filterString = string.Empty;
-
-            if (parameters?.Any() ?? false)
-            {
-                filterString = this.GetFilterString(parameters);
-            }
-
-            this.currentReport.FilterString = filterString;
-            this.CheckParameters(parameters, notifyParameterChange);
-
-            if (reportDataSource == null)
-            {
-                // Create new datasource
-                reportDataSource = new ObjectDataSource
-                {
-                    DataSource = dataSource,
-                    Name = dataSourceName
-                };
-
-                this.CurrentReport.ComponentStorage.Add(reportDataSource);
-                this.CurrentReport.DataSource = reportDataSource;
-
-                // Add dynamic parameter to report definition
-                this.currentReportDesignerDocument?.MakeChanges(
-                    changes => { changes.AddItem(reportDataSource); });
-            }
-            else
-            {
-                // Use existing datasource
-                reportDataSource.DataSource = dataSource;
-                reportDataSource.RebuildResultSchema();
-
-                this.TriggerRefreshReportingDesigner();
-            }
-        }
-
-        /// <summary>
         /// Triggers the UI of the Reporting Designer to refresh itself.
         /// Currently implemented using a call to MakeChanges that adds a temporary datasource and removes it immediately.
         /// </summary>
         [ExcludeFromCodeCoverage]
-        private void TriggerRefreshReportingDesigner()
+        private void TriggerRefreshUI()
         {
             this.currentReportDesignerDocument?.MakeChanges(changes =>
             {
@@ -777,311 +724,16 @@ namespace CDP4Reporting.ViewModels
                     Name = "__temporaryDataSource__"
                 };
 
+                var refreshParameter = new Parameter
+                {
+                    Name = "__temporaryParameter__"
+                };
+
                 changes.AddItem(refreshDataSource);
                 changes.RemoveItem(refreshDataSource);
+                changes.AddItem(refreshParameter);
+                changes.RemoveItem(refreshParameter);
             });
-        }
-
-        /// <summary>
-        /// Get the data representation for the report
-        /// </summary>
-        /// <returns>The datasource as an <see cref="object"/></returns>
-        private object GetDataSource()
-        {
-            if (this.CompileResult == null)
-            {
-                this.AddOutput("Build data source code first.");
-                return null;
-            }
-
-            AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolver;
-
-            try
-            {
-                var editorFullClassName =
-                    this.CompileResult
-                        .CompiledAssembly
-                        .GetTypes()
-                        .FirstOrDefault(t => t.GetInterfaces()
-                            .Any(i => i == typeof(IDataCollector))
-                        )?.FullName;
-
-                if (editorFullClassName == null)
-                {
-                    this.AddOutput($"No class that implements from {nameof(IDataCollector)} was found.");
-                    return null;
-                }
-
-                var instObj = this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) as IDataCollector;
-
-                if (instObj == null)
-                {
-                    this.AddOutput("DataCollector class not found.");
-                    return null;
-                }
-
-                if (instObj is IIterationDependentDataCollector iterationDependentDataCollector)
-                {
-                    iterationDependentDataCollector.Initialize(this.Thing, this.Session);
-                }
-
-                this.CurrentDataCollector = instObj;
-
-                return instObj.CreateDataObject();
-            }
-            catch (Exception ex)
-            {
-                this.Errors = $"{ex.Message}\n{ex.StackTrace}";
-                throw;
-            }
-            finally
-            {
-                AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
-            }
-        }
-
-        /// <summary>
-        /// Check if the compiled assembly built from the code editor contains a class that implements the <see cref="IReportingParameters"/> interface
-        /// If true, then create report parameters using that class.
-        /// </summary>
-        /// <param name="parameters">
-        /// The <see cref="IEnumerable{IReportingParameter}"/> that contains the report's parameters
-        /// </param>
-        /// <param name="notifyParameterChange">Indicates if message should be shown when parameter values have been added, or removed.</param>
-        private void CheckParameters(IEnumerable<IReportingParameter> parameters, bool notifyParameterChange)
-        {
-            var reportingParameters = parameters.ToList();
-
-            var currentParameters = new List<DevExpress.XtraReports.Parameters.Parameter>();
-            var previouslySetValues = new Dictionary<string, object>();
-
-            //Find existing dynamic parameters
-            foreach (var reportParameter in this.CurrentReport.Parameters)
-            {
-                if (reportParameter.Name.StartsWith(ReportingParameter.NamePrefix))
-                {
-                    previouslySetValues.Add(reportParameter.Name, reportParameter.Value);
-                    currentParameters.Add(reportParameter);
-                }
-            }
-
-            if (notifyParameterChange)
-            {
-                var nonChangedParameters = 
-                    currentParameters.Select(x => x.Name)
-                        .Intersect<string>(reportingParameters.Select(x => x.ParameterName))
-                        .ToList();
-
-                if (!nonChangedParameters.Count.Equals(currentParameters.Count) || !nonChangedParameters.Count.Equals(reportingParameters.Count))
-                {
-                    this.messageBoxService.Show(
-                        "Report parameters were added to, or removed from the report definition. Reload the preview tab to reflect these changes in the parameters panel.", 
-                        "Reload preview tab", 
-                        MessageBoxButton.OK, 
-                        MessageBoxImage.Information);
-                }
-            }
-
-            // Remove old dynamic parameters
-            if (currentParameters.Any())
-            {
-                foreach (var reportParameter in currentParameters)
-                {
-                    this.currentReportDesignerDocument?.MakeChanges(
-                        changes => { changes.RemoveItem(reportParameter); });
-                }
-            }
-
-            var presenter = (notifyParameterChange ? this.currentReportDesignerDocument?.Preview : null) as DocumentPreviewControl;
-
-            // Create new dynamic parameters
-            foreach (var reportingParameter in reportingParameters)
-            {
-                var previouslySetValue =
-                    reportingParameter.Visible && previouslySetValues.ContainsKey(reportingParameter.ParameterName)
-                        ? previouslySetValues[reportingParameter.ParameterName]
-                        : null;
-
-                this.CreateDynamicParameter(reportingParameter, previouslySetValue);
-
-                if (notifyParameterChange)
-                {
-                    var existingInvisibleParameter = 
-                        presenter?.ParametersModel.Parameters.SingleOrDefault(x => !x.Visible && x.Name == reportingParameter.ParameterName);
-
-                    if (existingInvisibleParameter != null)
-                    {
-                        existingInvisibleParameter.Value = reportingParameter.DefaultValue;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Create a dynamic parameter, set its default value based on previously set values and add it to the current Report
-        /// </summary>
-        /// <param name="reportingParameter">The <see cref="IReportingParameter"/></param>
-        /// <param name="previouslySetValue">The previously set value in the report designer.</param>
-        private void CreateDynamicParameter(IReportingParameter reportingParameter, object previouslySetValue)
-        {
-            var newReportParameter = new DevExpress.XtraReports.Parameters.Parameter
-            {
-                Name = reportingParameter.ParameterName,
-                Description = reportingParameter.Name,
-                Type = reportingParameter.Type,
-                Visible = true
-            };
-
-            if (reportingParameter.LookUpValues.Any())
-            {
-                var staticListLookupSettings = new StaticListLookUpSettings();
-                newReportParameter.LookUpSettings = staticListLookupSettings;
-
-                newReportParameter.MultiValue = reportingParameter.IsMultiValue;
-
-                foreach (var keyValuePair in reportingParameter.LookUpValues)
-                {
-                    staticListLookupSettings.LookUpValues.Add(new LookUpValue(keyValuePair.Key, keyValuePair.Value));
-                }
-            }
-
-            // Restore default values
-            if (previouslySetValue != null && !reportingParameter.ForceDefaultValue)
-            {
-                newReportParameter.Value = previouslySetValue;
-            }
-            else if (reportingParameter.DefaultValue != null)
-            {
-                newReportParameter.Value = reportingParameter.DefaultValue;
-            }
-
-            newReportParameter.Visible = reportingParameter.Visible;
-
-            // Add dynamic parameter to report definition
-            this.currentReportDesignerDocument?.MakeChanges(
-                changes => { changes.AddItem(newReportParameter); });
-        }
-
-        /// <summary>
-        /// Check if the compiled assembly built from the code editor contains a class that implements the <see cref="IReportingParameters"/> interface
-        /// If true, then execute the class' <see cref="IReportingParameters.CreateParameters"/> method.
-        /// </summary>
-        /// <param name="dataSource">The datasource, which could be used to create parameters</param>
-        /// <returns>The <see cref="IEnumerable{IReportingParameter}"/></returns>
-        private IReadOnlyList<IReportingParameter> GetParameters(object dataSource)
-        {
-            var result = new List<IReportingParameter>();
-
-            if (this.CompileResult == null)
-            {
-                this.AddOutput("Compile data source code first.");
-                return result;
-            }
-
-            AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolver;
-
-            try
-            {
-                var editorFullClassName =
-                    this.CompileResult
-                        .CompiledAssembly
-                        .GetTypes()
-                        .FirstOrDefault(t => t.GetInterfaces()
-                            .Any(i => i == typeof(IReportingParameters))
-                        )?.FullName;
-
-                if (editorFullClassName == null)
-                {
-                    return result;
-                }
-
-                if (!(this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
-                {
-                    this.AddOutput("Report parameter class not found.");
-                    return result;
-                }
-
-                result = instObj.CreateParameters(dataSource, this.CurrentDataCollector)?.ToList();
-            }
-            catch (Exception ex)
-            {
-                this.AddOutput(ex.ToString());
-            }
-            finally
-            {
-                AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// Check if the compiled assembly built from the code editor contains a class that implements the <see cref="IReportingParameters"/> interface
-        /// If true, then execute the class' <see cref="IReportingParameters.CreateFilterString"/> method.
-        /// </summary>
-        /// <param name="parameters">The <see cref="IEnumerable{IReportingParameter}"/>, which could be used to create a filter string</param>
-        /// <returns>The create Filter string in <see cref="IReportingParameters.CreateFilterString"/></returns>.
-        private string GetFilterString(IEnumerable<IReportingParameter> parameters)
-        {
-            if (this.CompileResult == null)
-            {
-                this.AddOutput("Compile data source code first.");
-                return null;
-            }
-
-            AppDomain.CurrentDomain.AssemblyResolve += this.AssemblyResolver;
-
-            try
-            {
-                var editorFullClassName =
-                    this.CompileResult
-                        .CompiledAssembly
-                        .GetTypes()
-                        .FirstOrDefault(t => t.GetInterfaces()
-                            .Any(i => i == typeof(IReportingParameters))
-                        )?.FullName;
-
-                if (editorFullClassName == null)
-                {
-                    return null;
-                }
-
-                if (!(this.CompileResult.CompiledAssembly.CreateInstance(editorFullClassName) is IReportingParameters instObj))
-                {
-                    this.AddOutput("Report parameter class not found.");
-                    return null;
-                }
-
-                return instObj.CreateFilterString(parameters);
-            }
-            catch (Exception ex)
-            {
-                this.AddOutput(ex.ToString());
-            }
-            finally
-            {
-                AppDomain.CurrentDomain.AssemblyResolve -= this.AssemblyResolver;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Needed for using the CDP4Reporting assembly
-        /// </summary>
-        /// <param name="sender">The sender <see cref="object"/></param>
-        /// <param name="args">The <see cref="ResolveEventArgs"/></param>
-        /// <returns></returns>
-        private Assembly AssemblyResolver(object sender, ResolveEventArgs args)
-        {
-            var assembly = AppDomain.CurrentDomain.GetAssemblies().SingleOrDefault(x => x.FullName == args.Name);
-
-            if (assembly != null)
-            {
-                return assembly;
-            }
-
-            return null;
         }
 
         /// <summary>
@@ -1091,92 +743,6 @@ namespace CDP4Reporting.ViewModels
         private void AddOutput(string text)
         {
             this.Output += $"{DateTime.Now:HH:mm:ss} {text}{Environment.NewLine}";
-        }
-
-        /// <summary>
-        /// Get report zip archive components
-        /// </summary>
-        /// <param name="rep4File">archive zip file</param>
-        /// <returns>The <see cref="ReportZipArchive"/></returns>
-        private ReportZipArchive GetReportZipArchive(string rep4File)
-        {
-            using (var zipFile = ZipFile.OpenRead(rep4File))
-            {
-                var repxStream = new MemoryStream();
-                var dataSourceStream = new MemoryStream();
-
-                zipFile.Entries.FirstOrDefault(x => x.Name.EndsWith(".repx"))?.Open().CopyTo(repxStream);
-                repxStream.Position = 0;
-                zipFile.Entries.FirstOrDefault(x => x.Name.EndsWith(".cs"))?.Open().CopyTo(dataSourceStream);
-                dataSourceStream.Position = 0;
-
-                return new ReportZipArchive
-                {
-                    ReportDefinition = repxStream,
-                    DataSourceCode = dataSourceStream
-                };
-            }
-        }
-
-        /// <summary>
-        /// Execute compilation of the code in the Code Editor
-        /// </summary>
-        private void CompileAssembly(string source)
-        {
-            try
-            {
-                this.Errors = string.Empty;
-
-                if (string.IsNullOrEmpty(source))
-                {
-                    this.AddOutput("Nothing to compile.");
-                    return;
-                }
-
-                var compiler = new Microsoft.CSharp.CSharpCodeProvider();
-
-                var parameters = new CompilerParameters
-                {
-                    GenerateInMemory = true,
-                    GenerateExecutable = false
-                };
-
-                var currentAssemblies =
-                    AppDomain.CurrentDomain.GetAssemblies()
-                        .Where(x => !x.IsDynamic)
-                        .Select(x => x.Location)
-                        .ToArray();
-
-                parameters.ReferencedAssemblies.AddRange(currentAssemblies);
-
-                this.CompileResult = compiler.CompileAssemblyFromSource(parameters, source);
-
-                if (this.CompileResult.Errors.Count == 0)
-                {
-                    this.AddOutput("File succesfully compiled.");
-                    this.Errors = string.Empty;
-                    return;
-                }
-
-                var sbErrors = new StringBuilder($"{DateTime.Now:HH:mm:ss} Compilation Errors:");
-
-                foreach (var error in this.CompileResult.Errors)
-                {
-                    sbErrors.AppendLine(error.ToString());
-                }
-
-                this.Errors = sbErrors.ToString();
-            }
-            catch (Exception ex)
-            {
-                var exception = ex;
-
-                while (exception != null)
-                {
-                    this.AddOutput($"{ex.Message}\\n{ex.StackTrace}\\n");
-                    exception = exception.InnerException;
-                }
-            }
         }
 
         /// <summary>
@@ -1192,7 +758,7 @@ namespace CDP4Reporting.ViewModels
         {
             var report = sender as XtraReport;
 
-            this.dynamicTableChecker.Check(report, this.currentDataCollector);
+            this.dynamicTableChecker.Check(report, this.ReportScriptHandler.CurrentDataCollector);
         }
 
         /// <summary>
@@ -1219,7 +785,7 @@ namespace CDP4Reporting.ViewModels
         /// <returns>An awaitable <see cref="Task"/></returns>
         private async Task SubmitParameterValues()
         {
-            if (!(this.CurrentDataCollector is IOptionDependentDataCollector optionDependentDataCollector))
+            if (!(this.ReportScriptHandler.CurrentDataCollector is IOptionDependentDataCollector optionDependentDataCollector))
             {
                 return;
             }
@@ -1258,9 +824,9 @@ namespace CDP4Reporting.ViewModels
             errorTexts = new List<string>();
             var processedValueSets = new Dictionary<Guid, ProcessedValueSet>();
 
-            if (!(this.CurrentDataCollector is IOptionDependentDataCollector optionDependentDataCollector))
+            if (!(this.ReportScriptHandler.CurrentDataCollector is IOptionDependentDataCollector optionDependentDataCollector))
             {
-                errorTexts.Add( $"CurrentDataCollector should be of type {nameof(IOptionDependentDataCollector)}");
+                errorTexts.Add($"CurrentDataCollector should be of type {nameof(IOptionDependentDataCollector)}");
                 return processedValueSets;
             }
 
@@ -1268,7 +834,7 @@ namespace CDP4Reporting.ViewModels
             {
                 return processedValueSets;
             }
-            
+
             foreach (Option option in optionDependentDataCollector.Iteration.Option)
             {
                 var nestedElementTree = new NestedElementTreeGenerator();
@@ -1333,7 +899,7 @@ namespace CDP4Reporting.ViewModels
 
                 if ((dialogResult?.Result.HasValue ?? false) && dialogResult.Result.Value)
                 {
-                    var submitConfirmationDialogResult = (SubmitConfirmationDialogResult) dialogResult;
+                    var submitConfirmationDialogResult = (SubmitConfirmationDialogResult)dialogResult;
 
                     var context = TransactionContextResolver.ResolveContext(iteration);
                     var transaction = new ThingTransaction(context);
