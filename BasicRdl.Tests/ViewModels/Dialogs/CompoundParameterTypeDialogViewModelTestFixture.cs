@@ -167,5 +167,26 @@ namespace BasicRdl.Tests.ViewModels
         {
             Assert.DoesNotThrow(() => new CompoundParameterTypeDialogViewModel());
         }
+
+        [Test]
+        public void VerifyThatParameterTypeComponentHasValidShortName()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext);
+            var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
+
+            var parameterTypeComponent = new ParameterTypeComponent(Guid.NewGuid(), this.cache, null) { ShortName = "Acc", ParameterType = this.bpt, Scale = this.scale };
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(parameterTypeComponent, this.session.Object, viewmodel);
+            viewmodel.Component.Add(parameterTypeComponentVm);
+            viewmodel.UpdateOkCanExecuteStatus();
+
+            Assert.IsTrue(viewmodel.OkCanExecute);
+
+            parameterTypeComponentVm.ShortName = "";
+            var newValue = parameterTypeComponentVm["ShortName"]; //Normally gets called from the UI
+            viewmodel.UpdateOkCanExecuteStatus();
+
+            Assert.IsFalse(viewmodel.OkCanExecute);
+        }
     }
 }

@@ -2,7 +2,7 @@
 // <copyright file="ParameterTypeComponentRowViewModelTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 // 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Jaime Bernar
 // 
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -226,6 +226,23 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
             var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(this.parameterTypeComponent, this.session.Object, viewmodel);
 
             Assert.That(parameterTypeComponentVm.Scale, Is.EqualTo(this.scale3));
+        }
+
+        [Test]
+        public void VerifyThatShortNameIsValidValue()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext);
+            var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
+            var parameterTypeComponent = new ParameterTypeComponent() { ShortName = "Acc" };
+            var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(parameterTypeComponent, this.session.Object, viewmodel);
+
+            var newValue = parameterTypeComponentVm["ShortName"]; //Normally gets called from the UI
+            Assert.IsFalse(parameterTypeComponentVm.HasError);
+
+            parameterTypeComponentVm.ShortName = string.Empty;
+            newValue = parameterTypeComponentVm["ShortName"]; //Normally gets called from the UI
+            Assert.IsTrue(parameterTypeComponentVm.HasError);
         }
     }
 }
