@@ -504,5 +504,37 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             Assert.AreEqual(dropInfo.Object.Effects, DragDropEffects.None);
         }
+
+        [Test]
+        public void VerifyThatIncludedObjectsAreInDetailsPanel()
+        {
+            this.elementDefinition.ContainedElement.Add(this.elementUsage1);
+            this.elementDefinitionForUsage1.ParameterGroup.Add(this.parameterGroup1ForUsage1);
+            // ***************************************
+
+            option1.Name = "Option1";
+            option2.Name = "Option2";
+
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            Assert.IsTrue(elementUsageRow.Details.Contains(option1.Name));
+            Assert.IsTrue(elementUsageRow.Details.Contains(option2.Name));
+        }
+
+        [Test]
+        public void VerifyThatExcludedObjectsAreInDetailsPanel()
+        {
+            this.elementDefinition.ContainedElement.Add(this.elementUsage1);
+            this.elementDefinitionForUsage1.ParameterGroup.Add(this.parameterGroup1ForUsage1);
+            // ***************************************
+
+            option1.Name = "Option1";
+            option2.Name = "Option2";
+            this.elementUsage1.ExcludeOption.Add(option1);
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);           
+
+            Assert.IsTrue(elementUsageRow.ExcludedOptions.Count() > 0);
+            Assert.IsTrue(elementUsageRow.Details.Contains(option1.Name));
+            Assert.IsTrue(elementUsageRow.Details.Contains(option2.Name));
+        }
     }
 }
