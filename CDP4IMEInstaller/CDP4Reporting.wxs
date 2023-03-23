@@ -6,7 +6,7 @@
   <Fragment>
     <ComponentGroup Id="CDP4REPORTING_CG" Directory="REPORTING">
 
-      <Component Id="comp_CDP4Reporting_plugin" Guid="{2468B91C-D476-4A2F-BCB3-DF416CB1CD66}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_CDP4Reporting_plugin" Guid="{B020E124-E9AE-4EEC-B37B-50A06CD4337D}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_CDP4Reporting_plugin"  Vital="yes" Source="$(var.CDP4Reporting.TargetPath)" KeyPath="yes"></File>
       </Component>
 
@@ -18,8 +18,8 @@
 		    <File Id="fil_avalonedit_CDP4Reporting" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)ICSharpCode.AvalonEdit.dll" KeyPath="yes" />
 	    </Component>
 
-	    <Component Id="comp_CDP4Reporting" Guid="{8E62D565-3002-46D0-8306-981FB2BE5D86}" Location="local" Win64="$(var.Win64)">
-		    <File Id="fil_CDP4Reporting" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)CDP4Reporting.dll" KeyPath="yes" />
+	    <Component Id="comp_CDP4Reporting_sdk" Guid="{6F5ED405-6B7B-4169-ADFD-0983A9D2D599}" Location="local" Win64="$(var.Win64)">
+		    <File Id="fil_CDP4Reporting_sdk" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)CDP4Reporting.dll" KeyPath="yes" />
 	    </Component>
 
     </ComponentGroup>

@@ -758,7 +758,10 @@ namespace CDP4Reporting.ViewModels
         {
             var report = sender as XtraReport;
 
-            this.dynamicTableChecker.Check(report, this.ReportScriptHandler.CurrentDataCollector);
+            if (this.ReportScriptHandler != null)
+            {
+                this.dynamicTableChecker.Check(report, this.ReportScriptHandler.CurrentDataCollector);
+            }
         }
 
         /// <summary>

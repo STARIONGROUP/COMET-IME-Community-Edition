@@ -44,7 +44,7 @@ namespace CDP4IMEInstaller.Tests
     public class CDP4IMEInstallerTestFixture
     {
         private KnownAssembliesClassDrop knownAssembliesClassDrop;
-        private string devExpressVersion = "v20.2";
+        private string devExpressVersion = "v22.2";
         private string currentConfiguration;
 
         [SetUp]

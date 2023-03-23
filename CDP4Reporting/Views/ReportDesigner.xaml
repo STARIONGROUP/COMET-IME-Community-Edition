@@ -179,12 +179,12 @@
                                     </dxb:InsertAction.Element>
                                 </dxb:InsertAction>
                                 <dxb:UpdateAction ElementName="{x:Static dxrud:DefaultBarItemNames.DesignerHomePage}" PropertyName="Caption" Value="File" />
-                                    <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.PreviewPage}">
+                                <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.PreviewPage}" Index="2">
                                     <dxb:InsertAction.Element>
                                         <dxr:RibbonPageGroup Caption="Submit" Name="SubmitGroup" />
                                     </dxb:InsertAction.Element>
                                 </dxb:InsertAction>
-                                <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.PreviewPage}">
+                                <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.PreviewPage}" Index="3">
                                     <dxb:InsertAction.Element>
                                         <dxr:RibbonPageGroup Caption="Rebuild" Name="RebuildGroup" />
                                     </dxb:InsertAction.Element>
