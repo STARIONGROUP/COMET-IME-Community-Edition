@@ -54,6 +54,7 @@ namespace CDP4Composition.Tests.Mvvm
     using NUnit.Framework;
     
     using System;
+    using System.Linq;
 
     using ReactiveUI;
 

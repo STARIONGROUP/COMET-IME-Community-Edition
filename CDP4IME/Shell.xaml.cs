@@ -2,7 +2,7 @@
 // <copyright file="Shell.xaml.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Jaime Bernar
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -34,9 +34,7 @@ namespace COMET
     using CDP4Composition.Ribbon;
 
     using CDP4Dal;
-
     using DevExpress.Xpf.Ribbon;
-
     using Hardcodet.Wpf.TaskbarNotification;
 
     using ReactiveUI;
@@ -69,6 +67,14 @@ namespace COMET
             this.subscription = CDPMessageBus.Current.Listen<TaskbarNotificationEvent>()
                                 .ObserveOn(RxApp.MainThreadScheduler)
                                 .Subscribe(this.ShowTaskBarNotification);
+
+            this.Ribbon.MouseUp += (sender, e) => 
+            {
+                if (e.OriginalSource is RibbonApplicationButtonControl)
+                {
+                    viewModel.OpenAboutCommand.Execute().GetAwaiter().Wait();
+                }
+            };
         }
 
         /// <summary>
