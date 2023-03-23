@@ -2,7 +2,7 @@
 // <copyright file="BrowserViewModelBaseTestFixture.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Jaime Bernar
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -68,6 +68,7 @@ namespace CDP4Composition.Tests.Mvvm
         private Mock<IDialogNavigationService> DialogNavigationService;
         private Mock<IPermissionService> permmissionService; 
         private Mock<ISession> session;
+        private Mock<IRowViewModelBase<Thing>> rowViewModel;
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
@@ -94,6 +95,8 @@ namespace CDP4Composition.Tests.Mvvm
             this.permmissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permmissionService.Object);
             this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
+
+            this.rowViewModel = new Mock<IRowViewModelBase<Thing>>();
         }
 
         [Test]
@@ -239,8 +242,31 @@ namespace CDP4Composition.Tests.Mvvm
             Assert.AreEqual("changed [ch]", browser.DomainOfExpertise);
             Assert.AreEqual("changed [ch]", optionbrowser.DomainOfExpertise);
         }
-    }
 
+        [Test]
+        public void VerifyThatTheContextMenuIsCorrectlyPopulated()
+        {
+            this.permmissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
+            var browser = new BrowserTestClass(this.siteDir, this.session.Object, this.thingDialogNavigationService.Object, this.navigation.Object, null, null);
+            var rowTestClass = new RowTestClass(this.person, this.session.Object, this.thingDialogNavigationService.Object);
+            browser.SelectedThing = rowTestClass;
+                       
+            browser.PopulateContextMenu();
+            var contextMenu = browser.ContextMenu;
+            Assert.IsFalse(contextMenu.Any(x => x.Header == "Expand Rows"));
+
+            browser.SelectedThing.ContainedRows.Add(rowViewModel.Object);
+            
+            browser.PopulateContextMenu();
+            Assert.IsTrue(contextMenu.Any(x => x.Header == "Expand Rows"));
+
+            browser.SelectedThing.IsExpanded = true;
+            rowViewModel.SetupGet(x=>x.IsExpanded).Returns(true);
+            rowViewModel.SetupGet(x => x.ContainedRows).Returns(new CDP4Composition.Mvvm.Types.DisposableReactiveList<IRowViewModelBase<Thing>>());
+            browser.PopulateContextMenu();
+            Assert.IsFalse(contextMenu.Any(x => x.Header == "Expand Rows"));
+        }
+    }
 
     internal class BrowserDeleteCommandTestClass : BrowserViewModelBase<SiteDirectory>
     {

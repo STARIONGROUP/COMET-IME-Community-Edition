@@ -2,7 +2,7 @@
 // <copyright file="BrowserViewModelBase.cs" company="RHEA System S.A.">
 //    Copyright (c) 2015-2022 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Jaime Bernar
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -951,8 +951,12 @@ namespace CDP4Composition.Mvvm
                 this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
                     new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
                     new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
-            }
 
+                if (this.selectedThing.IsExpanded && !this.selectedThing.AllChildRowsExpanded())
+                {
+                    this.ContextMenu.Add(new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+                }
+            }
         }
 
         /// <summary>
