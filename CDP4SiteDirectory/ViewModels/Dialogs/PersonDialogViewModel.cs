@@ -52,6 +52,16 @@ namespace CDP4SiteDirectory.ViewModels
         private string shortName;
         
         /// <summary>
+        /// The backing field for <see cref="GivenName"/>
+        /// </summary>
+        private string givenName;
+
+        /// <summary>
+        /// The backing field for <see cref="Surname"/>
+        /// </summary>
+        private string surname;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="PersonDialogViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -141,6 +151,26 @@ namespace CDP4SiteDirectory.ViewModels
         {
             get { return this.shortName; }
             set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the ShortName
+        /// </summary>
+        [ValidationOverride(true, "PersonGivenName")]
+        public override string GivenName
+        {
+            get { return this.givenName; }
+            set { this.RaiseAndSetIfChanged(ref this.givenName, value); }
+        }
+        
+        /// <summary>
+        /// Gets or sets the ShortName
+        /// </summary>
+        [ValidationOverride(true, "PersonSurname")]
+        public override string Surname
+        {
+            get { return this.surname; }
+            set { this.RaiseAndSetIfChanged(ref this.surname, value); }
         }
 
         /// <summary>

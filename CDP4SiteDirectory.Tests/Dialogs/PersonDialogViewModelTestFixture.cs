@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PersonDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Tests.Dialogs
 {
@@ -15,15 +34,19 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+
     using CDP4SiteDirectory.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -65,6 +88,78 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
+        public void VerifyThatValidationWorksOnShortName()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext, this.clone);
+
+            var vm = new PersonDialogViewModel(this.person.Clone(false), transaction, this.session.Object, true,
+                ThingDialogKind.Update, null, this.clone);
+
+            vm.ShortName = "a";
+            vm.GivenName = "b";
+            vm.Surname = "c";
+
+            Assert.That(vm["ShortName"], Is.Null.Or.Empty);
+            Assert.That(vm.ValidationErrors.Count, Is.EqualTo(0));
+            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+
+            vm.ShortName = string.Empty;
+            Assert.That(vm["ShortName"], Is.Not.Null.Or.Empty);
+
+            Assert.That(vm.ValidationErrors.Count, Is.EqualTo(1));
+            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+        }
+
+        [Test]
+        public void VerifyThatValidationWorksOnGivenName()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext, this.clone);
+
+            var vm = new PersonDialogViewModel(this.person.Clone(false), transaction, this.session.Object, true,
+                ThingDialogKind.Update, null, this.clone);
+
+            vm.ShortName = "a";
+            vm.GivenName = "b";
+            vm.Surname = "c";
+
+            Assert.That(vm["GivenName"], Is.Null.Or.Empty);
+            Assert.That(vm.ValidationErrors.Count, Is.EqualTo(0));
+            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+
+            vm.GivenName = string.Empty;
+            Assert.That(vm["GivenName"], Is.Not.Null.Or.Empty);
+
+            Assert.That(vm.ValidationErrors.Count, Is.EqualTo(1));
+            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+        }
+
+        [Test]
+        public void VerifyThatValidationWorksOnSurame()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext, this.clone);
+
+            var vm = new PersonDialogViewModel(this.person.Clone(false), transaction, this.session.Object, true,
+                ThingDialogKind.Update, null, this.clone);
+
+            vm.ShortName = "a";
+            vm.GivenName = "b";
+            vm.Surname = "c";
+
+            Assert.That(vm["Surname"], Is.Null.Or.Empty);
+            Assert.That(vm.ValidationErrors.Count, Is.EqualTo(0));
+            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.True);
+
+            vm.Surname = string.Empty;
+            Assert.That(vm["Surname"], Is.Not.Null.Or.Empty);
+
+            Assert.That(vm.ValidationErrors.Count, Is.EqualTo(1));
+            Assert.That(((ICommand)vm.OkCommand).CanExecute(null), Is.False);
+        }
+        
+        [Test]
         public void VerifyThatValidationWorksOnPassword()
         {
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
@@ -77,7 +172,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 
             // assert 2 errors messages are added when password update is activated
             vm.PwdEditIsChecked = true;
-            
+
             Assert.That(vm["Password"], Is.Not.Null.Or.Empty);
             Assert.That(vm["PasswordConfirmation"], Is.Not.Null.Or.Empty);
 
@@ -89,7 +184,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 
             Assert.That(vm["Password"], Is.Null.Or.Empty);
             Assert.That(vm["PasswordConfirmation"], Is.Null.Or.Empty);
-            
+
             Assert.AreEqual(0, vm.ValidationErrors.Count);
 
             Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
@@ -115,6 +210,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         {
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext, this.clone);
+
             var vm = new PersonDialogViewModel(this.person.Clone(false), transaction, this.session.Object, true,
                 ThingDialogKind.Update, null, this.clone);
 
@@ -186,7 +282,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 
             Assert.IsTrue(vm.ShoudDisplayPasswordNotSetWarning);
         }
-        
+
         [Test]
         public void VerifyThatPasswordWarningIsNotDisplayedWhenCreatingUserWithPassword()
         {
