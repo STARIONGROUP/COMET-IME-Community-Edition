@@ -10,8 +10,8 @@
     <Product>CDP4Reporting</Product>
     <Description>COMET Reporting Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.4.0.2</AssemblyVersion>
-    <FileVersion>9.4.0.2</FileVersion>
+    <AssemblyVersion>9.4.1.0</AssemblyVersion>
+    <FileVersion>9.4.1.0</FileVersion>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -45,7 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
-    <PackageReference Include="CDP4Reporting-CE" Version="1.0.0" />
+    <PackageReference Include="CDP4Reporting-CE" Version="1.0.1" />
     <PackageReference Include="CDP4Common-CE" Version="9.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
