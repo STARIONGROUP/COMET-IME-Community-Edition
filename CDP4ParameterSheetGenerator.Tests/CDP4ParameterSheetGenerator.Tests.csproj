@@ -9,8 +9,6 @@
     <Copyright>Copyright © RHEA System S.A.</Copyright>
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <EnableDefaultPageItems>false</EnableDefaultPageItems>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

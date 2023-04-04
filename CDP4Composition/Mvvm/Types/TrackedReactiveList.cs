@@ -23,31 +23,32 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Mvvm;
-
-using System;
-using System.ComponentModel;
-
-using DynamicData;
-
-/// <summary>
-/// Wrapper class for the legacy <see cref="ReactiveList{T}"/> class
-/// </summary>
-/// <typeparam name="T">The <see cref="System.Type"/></typeparam>
-public class TrackedReactiveList<T> : ReactiveList<T> where T : INotifyPropertyChanged
+namespace CDP4Composition.Mvvm
 {
-    private IObservable<IChangeSet<T>> itemChanged;
+    using System;
+    using System.ComponentModel;
 
-    public IObservable<IChangeSet<T>> ItemChanged
+    using DynamicData;
+
+    /// <summary>
+    /// Wrapper class for the legacy <see cref="ReactiveList{T}"/> class
+    /// </summary>
+    /// <typeparam name="T">The <see cref="System.Type"/></typeparam>
+    public class TrackedReactiveList<T> : ReactiveList<T> where T : INotifyPropertyChanged
     {
-        get
-        {
-            if (this.itemChanged == null)
-            {
-                this.itemChanged = this.SourceList.Connect();
-            }
+        private IObservable<IChangeSet<T>> itemChanged;
 
-            return this.itemChanged;
+        public IObservable<IChangeSet<T>> ItemChanged
+        {
+            get
+            {
+                if (this.itemChanged == null)
+                {
+                    this.itemChanged = this.SourceList.Connect();
+                }
+
+                return this.itemChanged;
+            }
         }
     }
 }

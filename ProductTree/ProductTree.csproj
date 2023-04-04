@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{2FFF0B74-7E29-41A2-A1FF-5004CE27D22A}</ProjectGuid>
-    <MinIMEVersion>9.4.0</MinIMEVersion>
+    <MinIMEVersion>10.0.0</MinIMEVersion>
     <RootNamespace>CDP4ProductTree</RootNamespace>
     <AssemblyName>CDP4ProductTree</AssemblyName>
     <TargetFramework>net48</TargetFramework>
@@ -11,8 +11,8 @@
     <Product>ProductTree</Product>
     <Description>COMET Product Tree Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.4.0.2</AssemblyVersion>
-    <FileVersion>9.4.0.2</FileVersion>
+    <AssemblyVersion>10.0.0.1</AssemblyVersion>
+    <FileVersion>10.0.0.1</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>

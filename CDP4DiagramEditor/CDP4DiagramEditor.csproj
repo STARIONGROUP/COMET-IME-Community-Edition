@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{F541DA64-5C66-45FE-822C-CF93964A3F52}</ProjectGuid>
-    <MinIMEVersion>9.4.0</MinIMEVersion>
+    <MinIMEVersion>10.0.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4DiagramEditor</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>CDP4DiagramEditor</Product>
     <Description>COMET Diagram Editor plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>0.23.0.2</AssemblyVersion>
-    <FileVersion>0.23.0.2</FileVersion>
+    <AssemblyVersion>0.24.0.1</AssemblyVersion>
+    <FileVersion>0.24.0.1</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>

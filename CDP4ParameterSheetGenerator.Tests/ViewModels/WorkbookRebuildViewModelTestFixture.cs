@@ -28,6 +28,8 @@ namespace CDP4ParameterSheetGenerator.Tests.ViewModels
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -146,15 +148,15 @@ namespace CDP4ParameterSheetGenerator.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatCancelCommandReturnsDialogResult()
+        public async Task VerifyThatCancelCommandReturnsDialogResult()
         {
             var viewModel = new WorkbookRebuildViewModel(this.processedValueSets, ValueSetKind.All);
-            viewModel.CancelCommand.Execute(null);
+            await viewModel.CancelCommand.Execute();
 
             var negativeDialogResult = viewModel.DialogResult;
             Assert.IsFalse(negativeDialogResult.Result.Value);
 
-            viewModel.OkCommand.Execute(null);
+            await viewModel.OkCommand.Execute();
             var positiviveDialogResult = (WorkbookRebuildDialogResult)viewModel.DialogResult;
 
             Assert.IsTrue(positiviveDialogResult.Result.Value);

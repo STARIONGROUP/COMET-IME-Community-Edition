@@ -23,43 +23,44 @@
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
-namespace CDP4DiagramEditor.Views;
-
-using System.ComponentModel.Composition;
-using System.Windows.Controls;
-
-using CDP4Composition;
-
-/// <summary>
-/// Interaction logic for CDP4DiagramEditor.xaml
-/// </summary>
-[Export(typeof(IPanelView))]
-public partial class DiagramEditor : UserControl, IPanelView
+namespace CDP4DiagramEditor.Views
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="DiagramEditor"/> class
-    /// </summary>
-    /// <remarks>
-    /// Called by MEF
-    /// </remarks>
-    public DiagramEditor()
-    {
-    }
+    using System.ComponentModel.Composition;
+    using System.Windows.Controls;
+
+    using CDP4Composition;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DiagramEditor"/> class.
+    /// Interaction logic for CDP4DiagramEditor.xaml
     /// </summary>
-    /// <param name="initializeComponent">
-    /// a value indicating whether the contained Components shall be loaded
-    /// </param>
-    /// <remarks>
-    /// This constructor is called by the navigation service
-    /// </remarks>
-    public DiagramEditor(bool initializeComponent)
+    [Export(typeof(IPanelView))]
+    public partial class DiagramEditor : UserControl, IPanelView
     {
-        if (initializeComponent)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagramEditor"/> class
+        /// </summary>
+        /// <remarks>
+        /// Called by MEF
+        /// </remarks>
+        public DiagramEditor()
         {
-            this.InitializeComponent();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DiagramEditor"/> class.
+        /// </summary>
+        /// <param name="initializeComponent">
+        /// a value indicating whether the contained Components shall be loaded
+        /// </param>
+        /// <remarks>
+        /// This constructor is called by the navigation service
+        /// </remarks>
+        public DiagramEditor(bool initializeComponent)
+        {
+            if (initializeComponent)
+            {
+                this.InitializeComponent();
+            }
         }
     }
 }
