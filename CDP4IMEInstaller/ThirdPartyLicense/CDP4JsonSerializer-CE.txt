@@ -1,5 +1,5 @@
 ﻿name: CDP4JsonSerializer-CE
-version: 8.1.0
+version: 10.0.0
 project url: https://github.com/RHEAGROUP/COMET-SDK-Community-Edition
 license url: https://licenses.nuget.org/LGPL-3.0-only
 

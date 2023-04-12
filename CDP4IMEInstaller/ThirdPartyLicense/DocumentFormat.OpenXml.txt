@@ -1,11 +1,13 @@
-﻿name: ExceptionReporter coding ideas
-version: 4.0.2
-project url: https://github.com/PandaWood/ExceptionReporter.NET
-license url: https://github.com/PandaWood/ExceptionReporter.NET/blob/master/LICENSE.txt
+﻿name: Open-XML-SDK
+version: 2.16.0 
+project url: https://github.com/dotnet/Open-XML-SDK
+license url: https://github.com/dotnet/Open-XML-SDK/blob/main/LICENSE
 
-MIT License
+The MIT License (MIT)
 
-Copyright (c) 2008-2018 Peter van der Woude, Simon Cropp
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
