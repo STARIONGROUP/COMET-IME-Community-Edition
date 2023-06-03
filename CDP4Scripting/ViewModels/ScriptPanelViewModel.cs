@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptPanelViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
@@ -43,9 +43,10 @@ namespace CDP4Scripting.ViewModels
 
     using CDP4Dal;
 
-    using Events;
-
-    using Helpers;
+    using CDP4Scripting.Events;
+    using CDP4Scripting.Helpers;
+    using CDP4Scripting.Interfaces;
+    using CDP4Scripting.Views;
 
     using ICSharpCode.AvalonEdit;
     using ICSharpCode.AvalonEdit.CodeCompletion;
@@ -53,15 +54,11 @@ namespace CDP4Scripting.ViewModels
     using ICSharpCode.AvalonEdit.Highlighting.Xshd;
     using ICSharpCode.AvalonEdit.Search;
 
-    using Interfaces;
-
     using Microsoft.Scripting;
 
     using NLog;
 
     using ReactiveUI;
-
-    using Views;
 
     /// <summary>
     /// The view-model for the <see cref="ScriptPanel"/> view
@@ -187,6 +184,14 @@ namespace CDP4Scripting.ViewModels
         protected Microsoft.Scripting.Hosting.ScriptEngine Engine { get; set; }
 
         /// <summary>
+        /// Gets or sets the ScriptRuntime engine.
+        /// </summary>
+        /// <remarks>
+        /// Currently the ScriptRuntime is only used to execute Python scripts.
+        /// </remarks>
+        protected Microsoft.Scripting.Hosting.ScriptRuntime Runtime { get; set; }
+
+        /// <summary>
         /// The constructor of the <see cref="ScriptPanelViewModel"/> class.
         /// </summary>
         /// <param name="panelTitle">The title of the panel associated to this view model.</param> 
@@ -268,6 +273,9 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public SearchPanel SearchPanel { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the CompletionWindow
+        /// </summary>
         public CompletionWindow CompletionWindow { get; private set; }
 
         /// <summary>
@@ -648,7 +656,6 @@ namespace CDP4Scripting.ViewModels
             {
                 await Task.Run(() =>
                 {
-                    // Check if the script should be stopped
                     this.CancellationToken.ThrowIfCancellationRequested();
                     this.scriptThread = Thread.CurrentThread;
                     this.Execute(script);
@@ -660,7 +667,7 @@ namespace CDP4Scripting.ViewModels
             }
             catch (Exception ex)
             {
-                this.OutputTerminal.AppendText(string.Format("\nAn error occured during the execution of the script !\nError: {0}\n", ex.Message));
+                this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {ex.Message}\n");
             }
             finally
             {
@@ -678,13 +685,6 @@ namespace CDP4Scripting.ViewModels
         {
             // Asks for a cancellation of the token
             this.cancellationTokenSource.Cancel();
-
-            // If the thread that executes the script is still alive, abort it using a KeyboardInterruptException
-            // The KeyboardInterruptException will be interpreted as a user choice
-            if (this.scriptThread.IsAlive)
-            {
-                this.scriptThread.Abort(new KeyboardInterruptException(""));
-            }
         }
 
         /// <summary>
@@ -738,9 +738,10 @@ namespace CDP4Scripting.ViewModels
                         data.Add(completionData);
                     }
 
-                    CompletionWindow.Show();
-                    CompletionWindow.Closed += delegate {
-                        CompletionWindow = null;
+                    this.CompletionWindow.Show();
+                    this.CompletionWindow.Closed += delegate 
+                    {
+                        this.CompletionWindow = null;
                     };
                 }
                 else
@@ -788,9 +789,10 @@ namespace CDP4Scripting.ViewModels
                         data.Add(new EditorCompletionData(string.Format("{0}()", method.Name), ""));
                     }
 
-                    CompletionWindow.Show();
-                    CompletionWindow.Closed += delegate {
-                        CompletionWindow = null;
+                    this.CompletionWindow.Show();
+                    this.CompletionWindow.Closed += delegate
+                    {
+                        this.CompletionWindow = null;
                     };
                 }
             }
@@ -807,11 +809,11 @@ namespace CDP4Scripting.ViewModels
         /// <param name="e">The event</param>
         public void TextAreaTextEntering(object sender, TextCompositionEventArgs e)
         {
-            if (e.Text.Length > 0 && CompletionWindow != null)
+            if (e.Text.Length > 0 && this.CompletionWindow != null)
             {
                 if (!char.IsLetterOrDigit(e.Text[0]))
                 {
-                    CompletionWindow.CompletionList.RequestInsertion(e);
+                    this.CompletionWindow.CompletionList.RequestInsertion(e);
                 }
             }
         }

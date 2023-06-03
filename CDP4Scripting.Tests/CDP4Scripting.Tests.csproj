@@ -26,31 +26,31 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
-    <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0" />
-    <PackageReference Include="CommonServiceLocator" Version="1.3" />
-    <PackageReference Include="DynamicLanguageRuntime" Version="1.3.0" />
-    <PackageReference Include="IronPython" Version="2.7.11" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
-    <PackageReference Include="Moq" Version="4.16.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="NUnit" Version="3.13.2" />
-    <PackageReference Include="reactiveui" Version="6.4.0" />
-    <PackageReference Include="reactiveui-core" Version="6.4.0" />
-    <PackageReference Include="Rx-Core" Version="2.2.5" />
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
-    <PackageReference Include="Rx-Linq" Version="2.2.5" />
-    <PackageReference Include="Rx-Main" Version="2.2.5" />
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
-    <PackageReference Include="Rx-XAML" Version="2.2.5" />
-    <PackageReference Include="Splat" Version="1.6.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+      <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+      <PackageReference Include="Moq" Version="4.16.1" />
+      <PackageReference Include="NUnit" Version="3.13.2" />
+      <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
+      <PackageReference Include="DynamicLanguageRuntime" Version="1.3.3" />
+      <PackageReference Include="IronPython" Version="3.4.0" />
+      <PackageReference Include="Castle.Core" Version="4.4.0" />
+      <PackageReference Include="CDP4Common-CE" Version="9.0.0" />
+      <PackageReference Include="CDP4Dal-CE" Version="9.0.0" />
+      <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0" />
+      <PackageReference Include="CommonServiceLocator" Version="1.3" />      
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+      <PackageReference Include="NLog" Version="4.7.10" />
+      <PackageReference Include="reactiveui" Version="6.4.0" />
+      <PackageReference Include="reactiveui-core" Version="6.4.0" />
+      <PackageReference Include="Rx-Core" Version="2.2.5" />
+      <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
+      <PackageReference Include="Rx-Linq" Version="2.2.5" />
+      <PackageReference Include="Rx-Main" Version="2.2.5" />
+      <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
+      <PackageReference Include="Rx-XAML" Version="2.2.5" />
+      <PackageReference Include="Splat" Version="1.6.0" />
+      <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0" />
+      <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />
+      <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -68,7 +68,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
-    <ProjectReference Include="..\CDP4Scripting\CDP4Scripting.csproj" />
+      <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
+      <ProjectReference Include="..\CDP4Scripting\CDP4Scripting.csproj" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptingEngineRibbonPageGroupViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
@@ -40,11 +40,9 @@ namespace CDP4Scripting.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using Events;
-
-    using Helpers;
-
-    using Interfaces;
+    using CDP4Scripting.Events;
+    using CDP4Scripting.Helpers;
+    using CDP4Scripting.Interfaces;
 
     using ReactiveUI;
 
@@ -77,7 +75,7 @@ namespace CDP4Scripting.ViewModels
         /// <summary>
         /// The file filters to use when a dialog is opened.
         /// </summary>
-        public const string DialogFilters = "Lua Files (*.lua)|*.lua|Python Files (*.py)|*.py|Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+        public const string DialogFilters = "Python Files (*.py)|*.py|Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
 
         /// <summary>
         /// Backing field for <see cref="HasSession"/>
@@ -127,9 +125,6 @@ namespace CDP4Scripting.ViewModels
             this.NewPythonScriptCommand = ReactiveCommand.Create();
             this.NewPythonScriptCommand.Subscribe(_ => this.ExecuteCreateNewScript("python", ScriptingLaguageKindSupported.Python));
 
-            this.NewLuaScriptCommand = ReactiveCommand.Create();
-            this.NewLuaScriptCommand.Subscribe(_ => this.ExecuteCreateNewScript("lua", ScriptingLaguageKindSupported.Lua));
-
             this.NewTextScriptCommand = ReactiveCommand.Create();
             this.NewTextScriptCommand.Subscribe(_ => this.ExecuteCreateNewScript("text", ScriptingLaguageKindSupported.Text));
 
@@ -158,11 +153,6 @@ namespace CDP4Scripting.ViewModels
         /// Creates a new python tab.
         /// </summary>
         public ReactiveCommand<object> NewPythonScriptCommand { get; private set; }
-
-        /// <summary>
-        /// Creates a new Lua tab.
-        /// </summary>
-        public ReactiveCommand<object> NewLuaScriptCommand { get; private set; }
 
         /// <summary>
         /// Creates a new text tab.
@@ -229,8 +219,6 @@ namespace CDP4Scripting.ViewModels
                 case ScriptingLaguageKindSupported.Python:
                     scriptPanelViewModel = new PythonScriptPanelViewModel(panelTitle, this.scriptingProxy, this.OpenSessions);
                     break;
-                case ScriptingLaguageKindSupported.Lua:
-                    scriptPanelViewModel = new LuaScriptPanelViewModel(panelTitle, this.scriptingProxy, this.OpenSessions);
                     break;
                 case ScriptingLaguageKindSupported.Text:
                     scriptPanelViewModel = new TextScriptPanelViewModel(panelTitle, this.scriptingProxy, this.OpenSessions);
@@ -272,11 +260,6 @@ namespace CDP4Scripting.ViewModels
                 IScriptPanelViewModel scriptPanelViewModel;
                 switch (fileExtension)
                 {
-                    case ".lua":
-                        {
-                            scriptPanelViewModel = this.CreateNewScript(fileName, ScriptingLaguageKindSupported.Lua);
-                            break;
-                        }
                     case ".py":
                         {
                             scriptPanelViewModel = this.CreateNewScript(fileName, ScriptingLaguageKindSupported.Python);

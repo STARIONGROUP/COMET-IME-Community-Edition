@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptingEngineTabViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
 //            Nathanael Smiechowski, Kamil Wojnowski
@@ -31,14 +31,13 @@ namespace CDP4Scripting.Tests.ViewModels
     using System.Windows.Documents;
 
     using CDP4Dal;
-    
+
+    using CDP4Scripting.Interfaces;
     using CDP4Scripting.Helpers;
     using CDP4Scripting.ViewModels;
     
     using ICSharpCode.AvalonEdit;
-    
-    using Interfaces;
-    
+
     using Moq;
     
     using NUnit.Framework;
@@ -77,9 +76,9 @@ namespace CDP4Scripting.Tests.ViewModels
             this.scriptPanelViewModel.Object.LoadHighlightingSheet(resourcePath);
             Assert.AreEqual(null, this.scriptPanelViewModel.Object.AvalonEditor.SyntaxHighlighting);
 
-            resourcePath = "CDP4Scripting.Resources.SyntaxHighlightingSheets.Lua.xshd";
+            resourcePath = "CDP4Scripting.Resources.SyntaxHighlightingSheets.Python.xshd";
             this.scriptPanelViewModel.Object.LoadHighlightingSheet(resourcePath);
-            Assert.AreEqual("Lua", this.scriptPanelViewModel.Object.AvalonEditor.SyntaxHighlighting.Name);
+            Assert.AreEqual("Python", this.scriptPanelViewModel.Object.AvalonEditor.SyntaxHighlighting.Name);
         }
 
         [Test]
