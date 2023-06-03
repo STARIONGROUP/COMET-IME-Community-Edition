@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PythonScriptPanelViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
+//            Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -33,10 +33,9 @@ namespace CDP4Scripting.Tests.ViewModels
 
     using CDP4Dal;
 
+    using CDP4Scripting.Interfaces;
     using CDP4Scripting.ViewModels;
-    
-    using Interfaces;
-    
+
     using IronPython.Hosting;
     
     using Microsoft.Scripting;
@@ -66,6 +65,7 @@ namespace CDP4Scripting.Tests.ViewModels
             this.scriptingProxy = new Mock<IScriptingProxy>();
             this.openSessions = new ReactiveList<ISession>();
             this.pythonScriptPanelViewModel = new PythonScriptPanelViewModel("python script", this.scriptingProxy.Object, this.openSessions);
+            
             this.pythonEngine = Python.CreateEngine();
             this.scope = this.pythonEngine.CreateScope();
         }
@@ -80,11 +80,12 @@ namespace CDP4Scripting.Tests.ViewModels
         public void VerifyThatPythonCodeCanBeExecuted()
         {
             this.pythonScriptPanelViewModel.ClearOutputCommand.Execute(null);
-            this.pythonScriptPanelViewModel.Execute("print 'Hello, world!'");
+            this.pythonScriptPanelViewModel.Execute("print(\"Hello, world!\")");
             var outputContent = new TextRange(this.pythonScriptPanelViewModel.OutputTerminal.Document.ContentStart, this.pythonScriptPanelViewModel.OutputTerminal.Document.ContentEnd);
-            Assert.AreEqual("Hello, world!\r\n\r\n", outputContent.Text);
 
-            var command = String.Format("{0}.Help()", ScriptPanelViewModel.Command);
+            Assert.That(outputContent.Text, Is.EqualTo("Hello, world!\r\n"));
+
+            var command = $"{ScriptPanelViewModel.Command}.Help()";
             Assert.DoesNotThrow(() => this.pythonScriptPanelViewModel.Execute(command));
             this.scriptingProxy.Verify(x => x.Help(), Times.Once);
         }
@@ -96,15 +97,15 @@ namespace CDP4Scripting.Tests.ViewModels
             this.scope = this.pythonEngine.CreateScope();
 
             //warning: if you tab or add space to the python code (to put it in line with C# code).The test will fail (unexpected indent)
-            string printHello = @"
+            var printHello = @"
 def PrintHello(name):
   msg = 'Hello ' + name
   return msg
 ";
             var source = this.pythonEngine.CreateScriptSourceFromString(printHello, SourceCodeKind.Statements);
-            source.Execute(scope);
+            source.Execute(this.scope);
 
-            var fPrintHello = scope.GetVariable<Func<string, string>>("PrintHello");
+            var fPrintHello = this.scope.GetVariable<Func<string, string>>("PrintHello");
             var result = fPrintHello("Leiden");
             Assert.IsTrue(result == "Hello Leiden");
         }
@@ -115,17 +116,21 @@ def PrintHello(name):
             this.pythonScriptPanelViewModel.Execute("a=2");
             this.pythonScriptPanelViewModel.Execute("b=\"hello world\"");
 
-            Assert.AreEqual(2, this.pythonScriptPanelViewModel.ScriptVariables.Count);
-            var pair = this.pythonScriptPanelViewModel.ScriptVariables.ElementAt(0);
+            Assert.That(this.pythonScriptPanelViewModel.ScriptVariables.Count, Is.EqualTo(4));
+
+            var pair = this.pythonScriptPanelViewModel.ScriptVariables.ElementAt(2);
             var key = pair.Key;
             var value = pair.Value;
-            Assert.AreEqual("a", key);
-            Assert.AreEqual(2, value);
-            pair = this.pythonScriptPanelViewModel.ScriptVariables.ElementAt(1);
+
+            Assert.That(key, Is.EqualTo("a"));
+            Assert.That(value, Is.EqualTo(2));
+
+            pair = this.pythonScriptPanelViewModel.ScriptVariables.ElementAt(3);
             key = pair.Key;
             value = pair.Value;
-            Assert.AreEqual("b", key);
-            Assert.AreEqual("hello world", value);
+
+            Assert.That(key, Is.EqualTo("b"));
+            Assert.That(value, Is.EqualTo("hello world"));
 
             this.pythonScriptPanelViewModel.ClearScopeVariables();
             Assert.AreEqual(0, this.pythonScriptPanelViewModel.ScriptVariables.Count);

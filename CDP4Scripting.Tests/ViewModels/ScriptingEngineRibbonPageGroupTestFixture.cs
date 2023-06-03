@@ -1,8 +1,28 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptingEngineRibbonPageGroupTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2017 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
+//            Nathanael Smiechowski
+//
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Scripting.Tests.ViewModels
 {
@@ -11,16 +31,23 @@ namespace CDP4Scripting.Tests.ViewModels
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
+
     using CDP4Dal;
+    
+    using CDP4Scripting.Events;
+    using CDP4Scripting.Interfaces;
     using CDP4Scripting.ViewModels;
-    using Events;
+
     using ICSharpCode.AvalonEdit;
-    using Interfaces;
+    
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     /// <summary>
@@ -35,9 +62,9 @@ namespace CDP4Scripting.Tests.ViewModels
         private Mock<IScriptingProxy> scriptingProxy;
         private Mock<ScriptPanelViewModel> scriptPanelViewModel;
         private ReactiveList<ISession> openSessions;
-        private string filePathOpenTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.lua");
-        private readonly string filePathSaveTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.lua");
-        private readonly string filePath2 = Path.Combine(TestContext.CurrentContext.TestDirectory, "testFile2.lua");
+        private string filePathOpenTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.py");
+        private readonly string filePathSaveTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.py");
+        private readonly string filePath2 = Path.Combine(TestContext.CurrentContext.TestDirectory, "testFile2.py");
 
         [SetUp]
         public void SetUp()
@@ -50,7 +77,7 @@ namespace CDP4Scripting.Tests.ViewModels
 
             var avalonEditor = new TextEditor();
             avalonEditor.Text = "Content of the editor";
-            this.scriptPanelViewModel = new Mock<ScriptPanelViewModel>("header", this.scriptingProxy.Object, "*.lua", openSessions);
+            this.scriptPanelViewModel = new Mock<ScriptPanelViewModel>("header", this.scriptingProxy.Object, "*.py", openSessions);
             this.scriptPanelViewModel.SetupProperty(x => x.AvalonEditor, avalonEditor);
 
             this.fileDialogService = new Mock<IOpenSaveFileDialogService>();
@@ -76,33 +103,26 @@ namespace CDP4Scripting.Tests.ViewModels
         [Test]
         public void VerifyThatNewScriptCommandsWork()
         {
-            Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.NewLuaScriptCommand.Execute(null));
-            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Once);
+            Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.NewPythonScriptCommand.Execute(null));
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 1);
             var scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(0);
-            Assert.AreEqual(scriptViewModel.Caption, "lua0");
-            Assert.AreEqual(scriptViewModel.FileExtension, "*.lua");
-
-            Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.NewPythonScriptCommand.Execute(null));
-            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
-            Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 2);
-            scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(1);
-            Assert.AreEqual(scriptViewModel.Caption, "python1");
+            Assert.AreEqual(scriptViewModel.Caption, "python0");
             Assert.AreEqual(scriptViewModel.FileExtension, "*.py");
 
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.NewTextScriptCommand.Execute(null));
-            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(3));
-            Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 3);
-            scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
-            Assert.AreEqual(scriptViewModel.Caption, "text2");
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
+            Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 2);
+            scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(1);
+            Assert.AreEqual(scriptViewModel.Caption, "text1");
             Assert.AreEqual(scriptViewModel.FileExtension, "*.txt");
 
             this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.RemoveAt(1);
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.NewTextScriptCommand.Execute(null));
-            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(4));
-            Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 3);
-            scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
-            Assert.AreEqual(scriptViewModel.Caption, "text3");
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(3));
+            Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 2);
+            scriptViewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(1);
+            Assert.AreEqual(scriptViewModel.Caption, "text1");
             Assert.AreEqual(scriptViewModel.FileExtension, "*.txt");
         }
 
@@ -123,13 +143,13 @@ namespace CDP4Scripting.Tests.ViewModels
             Assert.DoesNotThrow(() => CDPMessageBus.Current.SendMessage(scriptSaved));
             this.fileDialogService.Verify(x => x.GetSaveFileDialog(It.IsAny<string>(), null, ScriptingEngineRibbonPageGroupViewModel.DialogFilters, It.IsAny<string>(), 1), Times.Once);
             Assert.IsTrue(File.Exists(this.filePathSaveTest));
-            Assert.IsTrue(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test.lua"));
+            Assert.IsTrue(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test.py"));
             string result;
-            this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.TryGetValue("test.lua", out result);
+            this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.TryGetValue("test.py", out result);
             Assert.AreEqual(this.filePathSaveTest, result);
 
             // The path of the file associated to the script panel is already stored in the dictionnary, the file should be overwritten
-            panelVM.SetupProperty(x => x.Caption, "test.lua*");
+            panelVM.SetupProperty(x => x.Caption, "test.py*");
             editor.Text = "new content";
             Assert.DoesNotThrow(() => CDPMessageBus.Current.SendMessage(scriptSaved));
             var content = File.ReadAllText(this.filePathSaveTest);
@@ -137,14 +157,14 @@ namespace CDP4Scripting.Tests.ViewModels
 
             // The file has been deleted, the dictionary should be updated with the new value of the path.
             File.Delete(this.filePathSaveTest);
-            this.fileDialogService.Setup(x => x.GetSaveFileDialog("test.lua", null, It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.filePath2);
+            this.fileDialogService.Setup(x => x.GetSaveFileDialog("test.py", null, It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.filePath2);
             Assert.DoesNotThrow(() => CDPMessageBus.Current.SendMessage(scriptSaved));
-            this.fileDialogService.Verify(x => x.GetSaveFileDialog("test.lua", null, ScriptingEngineRibbonPageGroupViewModel.DialogFilters, It.IsAny<string>(), 1), Times.Once);
+            this.fileDialogService.Verify(x => x.GetSaveFileDialog("test.py", null, ScriptingEngineRibbonPageGroupViewModel.DialogFilters, It.IsAny<string>(), 1), Times.Once);
             Assert.IsTrue(File.Exists(this.filePath2));
-            this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.TryGetValue("testFile2.lua", out result);
+            this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.TryGetValue("testFile2.py", out result);
             Assert.AreEqual(this.filePath2, result);
             Assert.IsFalse(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsValue(this.filePathSaveTest));
-            Assert.IsFalse(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test.lua"));
+            Assert.IsFalse(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test.py"));
 
             // The fileDialogService.GetSaveFileDialog should be called once and returns "" that leads to an exception.
             panelVM.SetupProperty(x => x.Caption, "new header");
@@ -156,8 +176,8 @@ namespace CDP4Scripting.Tests.ViewModels
             // The first one has been saved previously, the content of the file associated should be overwritten
             // The second one has never been saved, a new file should be created
             // A couple should be added to the dictionary to store the path of the second file.
-            panelVM.SetupProperty(x => x.Caption, "testFile2.lua*");
-            editor.Text = "content of the testFile2.lua file";
+            panelVM.SetupProperty(x => x.Caption, "testFile2.py*");
+            editor.Text = "content of the testFile2.py file";
             var panelVM2 = new Mock<IScriptPanelViewModel>();
             panelVM2.SetupProperty(x => x.Caption, "python*");
             panelVM2.SetupProperty(x => x.AvalonEditor, editor);
@@ -168,7 +188,7 @@ namespace CDP4Scripting.Tests.ViewModels
             this.fileDialogService.Setup(x => x.GetSaveFileDialog("python", null, It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(pythonFilePath);
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.SaveAllCommand.Execute(null));
             content = File.ReadAllText(this.filePath2);
-            Assert.AreEqual("content of the testFile2.lua file", content);
+            Assert.AreEqual("content of the testFile2.py file", content);
             this.fileDialogService.Verify(x => x.GetSaveFileDialog("python", null, ScriptingEngineRibbonPageGroupViewModel.DialogFilters, It.IsAny<string>(), 1), Times.Once);
             Assert.IsTrue(File.Exists(pythonFilePath));
             this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.TryGetValue("test.py", out result);
@@ -178,10 +198,9 @@ namespace CDP4Scripting.Tests.ViewModels
         [Test]
         public void VerifyFindFilterIndexWorks()
         {
-            Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.FindFilterIndex("*.lua"), 1);
-            Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.FindFilterIndex("*.py"), 2);
-            Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.FindFilterIndex("*.txt"), 3);
-            Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.FindFilterIndex("*.jar"), 1);
+            Assert.That(this.scriptingEngineRibbonPageGroupViewModel.FindFilterIndex("*.py"), Is.EqualTo(1));
+            Assert.That(this.scriptingEngineRibbonPageGroupViewModel.FindFilterIndex("*.txt"), Is.EqualTo(2));
+            Assert.That(this.scriptingEngineRibbonPageGroupViewModel.FindFilterIndex("*.jar"), Is.EqualTo(1));
         }
 
         [Test]
@@ -193,8 +212,8 @@ namespace CDP4Scripting.Tests.ViewModels
             Assert.AreEqual(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Count, 0);
 
             // The file is already opened in the scripting engine, the method should return without open a new panel
-            this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.Add("tab1", "C\\Users\\test.lua");
-            string[] paths = { "C\\Users\\test.lua" };
+            this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.Add("tab1", "C\\Users\\test.py");
+            string[] paths = { "C\\Users\\test.py" };
             this.fileDialogService.Setup(x => x.GetOpenFileDialog(false, false, true, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4)).Returns(paths);
             this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null);
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(2));
@@ -215,20 +234,20 @@ namespace CDP4Scripting.Tests.ViewModels
             // The path returns a filename with a lua extension, the panel navigation service should open a panel.
             // The collection of script panels should add the new panel.
             // The dictionary should add the path of the file opened.
-            File.WriteAllText(this.filePathOpenTest, "content of the lua file");
+            File.WriteAllText(this.filePathOpenTest, "content of the python file");
             paths[0] = this.filePathOpenTest;
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(5));
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Once);
             var viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(0);
-            Assert.AreEqual("content of the lua file", viewModel.AvalonEditor.Text);
-            Assert.AreEqual("test.lua", viewModel.Caption);
-            Assert.IsTrue(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test.lua"));
+            Assert.AreEqual("content of the python file", viewModel.AvalonEditor.Text);
+            Assert.AreEqual("test.py", viewModel.Caption);
+            Assert.IsTrue(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test.py"));
             string result;
-            this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.TryGetValue("test.lua", out result);
+            this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.TryGetValue("test.py", out result);
             Assert.AreEqual(this.filePathOpenTest, result);
 
-            this.scriptPanelViewModel.SetupProperty(x => x.Caption, "test.lua");
+            this.scriptPanelViewModel.SetupProperty(x => x.Caption, "test.py");
 
             // The path returns a filename with a python extension.
             // The collection of script panels should add the new panels.
@@ -238,8 +257,8 @@ namespace CDP4Scripting.Tests.ViewModels
             paths[0] = this.filePathOpenTest;
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(6));
-            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
-            viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(1);
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
+            viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(0);
             Assert.AreEqual("content of the python file", viewModel.AvalonEditor.Text);
             Assert.AreEqual("test.py", viewModel.Caption);
             Assert.IsTrue(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test.py"));
@@ -254,8 +273,8 @@ namespace CDP4Scripting.Tests.ViewModels
             paths[0] = this.filePathOpenTest;
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(7));
-            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(3));
-            viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
+            viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(1);
             Assert.AreEqual("content of the text file", viewModel.AvalonEditor.Text);
             Assert.AreEqual("test.txt", viewModel.Caption);
             Assert.IsTrue(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test.txt"));
@@ -272,14 +291,14 @@ namespace CDP4Scripting.Tests.ViewModels
             this.fileDialogService.Setup(x => x.GetOpenFileDialog(false, false, true, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4)).Returns(paths);
             Assert.DoesNotThrow(() => this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute(null));
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(8));
-            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(5));
-            viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(3);
+            this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(4));
+            viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(2);
             Assert.AreEqual("test2.txt", viewModel.Caption);
             Assert.AreEqual("content of the text file 2", viewModel.AvalonEditor.Text);
             Assert.IsTrue(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test2.txt"));
             this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.TryGetValue("test2.txt", out result);
             Assert.AreEqual(filePathOpenTest2, result);
-            viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(4);
+            viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(3);
             Assert.AreEqual("test2.py", viewModel.Caption);
             Assert.AreEqual("content of the python file 2", viewModel.AvalonEditor.Text);
             Assert.IsTrue(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("test2.py"));
@@ -292,17 +311,17 @@ namespace CDP4Scripting.Tests.ViewModels
         {
             var avalonEditor = new TextEditor();
 
-            var panel1 = new Mock<ScriptPanelViewModel>("panel 1", this.scriptingProxy.Object, "*.lua", this.openSessions, true);
+            var panel1 = new Mock<ScriptPanelViewModel>("panel 1", this.scriptingProxy.Object, "*.py", this.openSessions, true);
             panel1.As<IPanelViewModel>();
             panel1.As<IScriptPanelViewModel>().SetupProperty(x => x.Caption, "panel 1");
             panel1.SetupProperty(x => x.AvalonEditor, avalonEditor);
 
-            var panel2 = new Mock<ScriptPanelViewModel>("panel 2", this.scriptingProxy.Object, "*.lua", this.openSessions, true);
+            var panel2 = new Mock<ScriptPanelViewModel>("panel 2", this.scriptingProxy.Object, "*.py", this.openSessions, true);
             panel2.As<IPanelViewModel>();
             panel2.As<IScriptPanelViewModel>().SetupProperty(x => x.Caption, "panel 2");
             panel2.SetupProperty(x => x.AvalonEditor, avalonEditor);
             
-            var panel3 = new Mock<ScriptPanelViewModel>("panel 3", this.scriptingProxy.Object, "*.lua", this.openSessions, true);
+            var panel3 = new Mock<ScriptPanelViewModel>("panel 3", this.scriptingProxy.Object, "*.py", this.openSessions, true);
             panel3.As<IPanelViewModel>();
             panel3.As<IScriptPanelViewModel>().SetupProperty(x => x.Caption, "panel 3");
             panel3.SetupProperty(x => x.AvalonEditor, avalonEditor);

@@ -22,11 +22,6 @@
                                 LargeGlyph="{dx:DXImage Image=Example_32x32.png}"
                                 RibbonStyle="Large">
             <dxb:PopupMenu>
-                <dxb:BarButtonItem Name="NewLuaTab"
-                                   Content="Lua"
-                                   Glyph="{dx:DXImage Image=AddItem_16x16.png}"
-                                   Command="{Binding NewLuaScriptCommand}"
-                                   RibbonStyle="Large" />
 
                 <dxb:BarButtonItem Name="CreateNewPythonTab"
                                    Content="Python"

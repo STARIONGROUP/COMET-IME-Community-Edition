@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TextScriptPanelViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
@@ -27,18 +27,16 @@ namespace CDP4Scripting.ViewModels
 {
     using CDP4Dal;
 
-    using Interfaces;
+    using CDP4Scripting.Interfaces;
+    using CDP4Scripting.Views;
 
     using ReactiveUI;
-
-    using Views;
 
     /// <summary>
     /// The view-model for the <see cref="ScriptPanel"/> for the text files.
     /// </summary>
     public class TextScriptPanelViewModel : ScriptPanelViewModel
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TextScriptPanelViewModel"/> class.
         /// </summary>
