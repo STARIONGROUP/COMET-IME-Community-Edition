@@ -1,12 +1,12 @@
-<img src="https://github.com/RHEAGROUP/COMET-IME-Community-Edition/raw/development/COMET-Community-Edition.png" width="250">
+<img src="https://github.com/RHEAGROUP/COMET-IME-Community-Edition/raw/development/COMET-Community-Edition.jpg" width="250">
 
-The COMET Integrated Modelling Environment (IME) Community Editition (CE) is the RHEA Group open source Concurrent Design desktop application and Microsoft Excel integration compliant with ECSS-E-TM-10-25 Annex A and Annex C. COMET IME makes use of a plugin framework, the end-user functionality is implemented in COMET IME plugins that are loaded at run-time. This makes it straightforward to package, distribute and update the environment.
+The CDP4-COMET Integrated Modelling Environment (IME) Community Editition (CE) is the RHEA Group open source Concurrent Design desktop application and Microsoft Excel integration compliant with ECSS-E-TM-10-25 Annex A and Annex C. CDP4-COMET IME makes use of a plugin framework, the end-user functionality is implemented in CDP4-COMET IME plugins that are loaded at run-time. This makes it straightforward to package, distribute and update the environment.
 
-The user manual for the COMET IME is available [online](http://cdp4docs.rheagroup.com/)
+The user manual for the CDP4-COMET IME is available [online](http://cdp4docs.rheagroup.com/)
 
 ## Build status
 
-AppVeyor is used to build and test the C# COMET-IME
+AppVeyor is used to build and test the C# CDP4-COMET-IME
 
 Branch | Build Status
 ------- | :------------
@@ -35,17 +35,17 @@ The Concurrent Design method is an approach to design activities in which all de
 
 The Concurrent Design method brings many advantages to the early design phase by providing a structure for this otherwise chaotic phase. Many design concepts have been implemented in the Concurrent Design method to help a team of stakeholders perform their task. The design work is done in collocated sessions with all stakeholders involved and present, creating an integrated design and enabling good communication and exchange of information between team members.
 
-To read more about Concurrent Design and how to use the COMET Desktop application to perform concurrent design please read our documentation at http://cdp4docs.rheagroup.com/
+To read more about Concurrent Design and how to use the CDP4-COMET Desktop application to perform concurrent design please read our documentation at http://cdp4docs.rheagroup.com/
 
-## COMET-SDK
+## CDP4-COMET-SDK
 
-The COMET-IME Community Edition make use of the [COMET-SDK](http://sdk.cdp4.org/).
+The CDP4-COMET-IME Community Edition make use of the [CDP4-COMET-SDK](http://sdk.cdp4.org/).
 
 # License
 
-The COMET-IME Community Edition is provided to the community under the GNU Affero General Public License. The COMET Community Edition relies on open source and proprietary licensed components. Some of these components have a license that is not compatible with the GPL or AGPL. For these components Additional permission under GNU GPL version 3 section 7 are granted. See the license files for the details. The license can be found [here](LICENSE).
+The CDP4-COMET-IME Community Edition is provided to the community under the GNU Affero General Public License. The CDP4-COMET Community Edition relies on open source and proprietary licensed components. Some of these components have a license that is not compatible with the GPL or AGPL. For these components Additional permission under GNU GPL version 3 section 7 are granted. See the license files for the details. The license can be found [here](LICENSE).
 
-The [RHEA Group](https://www.rheagroup.com) also provides the [COMET Web Services Enterprise Edition](https://github.com/RHEAGROUP/CDP4-WebServices-Community-Edition/wiki/CDP4-Web-Services-Enterprise-Edition) which comes with commercial support and more features. [Contact](https://www.rheagroup.com/contact) us for more details.
+The [RHEA Group](https://www.rheagroup.com) also provides the [CDP4-COMET Web Services Enterprise Edition](https://github.com/RHEAGROUP/CDP4-WebServices-Community-Edition/wiki/CDP4-Web-Services-Enterprise-Edition) which comes with commercial support and more features. [Contact](https://www.rheagroup.com/contact) us for more details.
 
 # Contributions
 
