@@ -77,6 +77,8 @@ namespace CDP4Reporting.ViewModels
     using CDP4Reporting.Events;
     using CDP4Reporting.ReportScript;
 
+    using DevExpress.Data.Helpers;
+
     using File = System.IO.File;
     using Parameter = DevExpress.XtraReports.Parameters.Parameter;
 
@@ -707,7 +709,28 @@ namespace CDP4Reporting.ViewModels
                 this.TriggerRefreshUI();
 
                 var presenter = this.currentReportDesignerDocument?.Preview as DocumentPreviewControl;
-                presenter?.ParametersModel.SubmitParameters();
+
+                try
+                {
+                    foreach (var parameter in this.currentReport.Parameters)
+                    {
+                        if (parameter.Name.StartsWith("dyn_"))
+                        {
+                            var visibleParameter = presenter?.ParameterPanelViewModel.Parameters.SingleOrDefault(x => x.Name == parameter.Name);
+
+                            if (visibleParameter != null)
+                            {
+                                visibleParameter.Value = parameter.Value;
+                            }
+                        }
+                    }
+                }
+                finally
+                {
+                    //ignore this error...
+                }
+
+                presenter?.ParameterPanelViewModel.SubmitParameters();
             }
             finally
             {

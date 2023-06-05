@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{DA9183AB-D060-488F-89E9-DEC1F0177B1E}</ProjectGuid>
-    <MinIMEVersion>9.4.0</MinIMEVersion>
+    <MinIMEVersion>9.4.2</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>CDP4Scripting</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Scripting</Product>
     <Description>COMET Scripting Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.4.0.2</AssemblyVersion>
-    <FileVersion>9.4.0.2</FileVersion>
+    <AssemblyVersion>9.4.2.0</AssemblyVersion>
+    <FileVersion>9.4.2.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
