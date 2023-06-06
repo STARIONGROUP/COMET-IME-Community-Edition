@@ -34,14 +34,13 @@ namespace CDP4Scripting.Tests.ViewModels
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
-    
+
+    using CDP4Scripting.Interfaces;
     using CDP4Scripting.Helpers;
     using CDP4Scripting.ViewModels;
     
     using ICSharpCode.AvalonEdit;
-    
-    using Interfaces;
-    
+
     using Moq;
     
     using NUnit.Framework;
@@ -80,9 +79,9 @@ namespace CDP4Scripting.Tests.ViewModels
             this.scriptPanelViewModel.Object.LoadHighlightingSheet(resourcePath);
             Assert.AreEqual(null, this.scriptPanelViewModel.Object.AvalonEditor.SyntaxHighlighting);
 
-            resourcePath = "CDP4Scripting.Resources.SyntaxHighlightingSheets.Lua.xshd";
+            resourcePath = "CDP4Scripting.Resources.SyntaxHighlightingSheets.Python.xshd";
             this.scriptPanelViewModel.Object.LoadHighlightingSheet(resourcePath);
-            Assert.AreEqual("Lua", this.scriptPanelViewModel.Object.AvalonEditor.SyntaxHighlighting.Name);
+            Assert.AreEqual("Python", this.scriptPanelViewModel.Object.AvalonEditor.SyntaxHighlighting.Name);
         }
 
         [Test]

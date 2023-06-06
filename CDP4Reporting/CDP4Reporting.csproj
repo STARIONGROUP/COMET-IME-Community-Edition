@@ -38,7 +38,15 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
+    <Compile Remove="ViewModels\MassBudgetDataSource.cs" />
+    <Compile Remove="Views\CDP4Report.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Views\ReportDesigner.xaml" />
+    <None Remove="Views\ReportingRibbonPageCategory.xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="CDP4Common-CE" Version="10.0.0-rc6">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>

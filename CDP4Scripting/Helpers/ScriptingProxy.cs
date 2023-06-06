@@ -106,8 +106,6 @@ namespace CDP4Scripting.Helpers
         [Documentation("NestedElementTreeGenerator", "Allows the usage of the methods of this class.")]
         public NestedElementTreeGenerator NestedElementTreeGenerator { get; private set; }
 
-        #region CDP4Commands
-
         /// <summary>
         /// A command to clear the output.
         /// </summary>
@@ -162,7 +160,7 @@ namespace CDP4Scripting.Helpers
             sb.AppendLine("COMET Commands \n");
 
             sb.AppendLine(string.Format("COMET contains a list of commands you can perform from the script. You can use a command as follows : " +
-                                        "{0}.CommandName(parameters) \n", ScriptPanelViewModel.Command));
+                              "{0}.CommandName(parameters) \n", ScriptPanelViewModel.Command));
 
             sb.AppendLine("List of the commands available \n");
 
@@ -185,7 +183,7 @@ namespace CDP4Scripting.Helpers
 
                     if (cmdAttr?.Name != null && cmdAttr.Description != null)
                     {
-                        sb.AppendLine(string.Format("{0} : {1}", cmdAttr.Name, cmdAttr.Description));
+                        sb.AppendLine($"{cmdAttr.Name} : {cmdAttr.Description}");
                     }
                 }
             }
@@ -205,7 +203,7 @@ namespace CDP4Scripting.Helpers
 
                     if (cmdAttr?.Name != null && cmdAttr.Description != null)
                     {
-                        sb.AppendLine(string.Format("{0} : {1}", cmdAttr.Name, cmdAttr.Description));
+                        sb.AppendLine($"{cmdAttr.Name} : {cmdAttr.Description}");
                     }
                 }
             }
@@ -215,17 +213,13 @@ namespace CDP4Scripting.Helpers
                 new Action(() => this.ScriptingPanelViewModel.OutputTerminal.AppendText(sb.ToString())));
         }
 
-        #endregion
-
-        #region DataCommands
-
         /// <summary>
         /// Clears the variables of the scope of the script.
         /// </summary>
         [Documentation("ClearVariables()", "Clears the variables of the scope of the script.")]
         public void ClearVariables()
         {
-            if (this.ScriptingPanelViewModel.GetType() == typeof(PythonScriptPanelViewModel) || this.ScriptingPanelViewModel.GetType() == typeof(LuaScriptPanelViewModel))
+            if (this.ScriptingPanelViewModel.GetType() == typeof(PythonScriptPanelViewModel))
             {
                 this.ScriptingPanelViewModel.ClearScopeVariables();
             }
@@ -286,8 +280,7 @@ namespace CDP4Scripting.Helpers
             {
                 Application.Current.Dispatcher.Invoke(
                     DispatcherPriority.Input,
-                    new Action(() => this.ScriptingPanelViewModel.OutputTerminal.AppendText(string.Format("\nAn error occured during the execution of the script !\nError: {0}\n", ex.Message))));
-
+                    new Action(() => this.ScriptingPanelViewModel.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {ex.Message}\n")));
                 return null;
             }
         }
@@ -486,9 +479,8 @@ namespace CDP4Scripting.Helpers
 
             Application.Current.Dispatcher.Invoke(
                 DispatcherPriority.Input,
-                new Action(() =>
-                    this.ScriptingPanelViewModel.OutputTerminal.AppendText(string.Format("Engineering model {0} not found.\n", engineeringModelShortName))));
-
+                new Action(() => 
+                    this.ScriptingPanelViewModel.OutputTerminal.AppendText($"Engineering model {engineeringModelShortName} not found.\n")));
             return null;
         }
 
@@ -524,9 +516,8 @@ namespace CDP4Scripting.Helpers
 
             Application.Current.Dispatcher.Invoke(
                 DispatcherPriority.Input,
-                new Action(() =>
-                    this.ScriptingPanelViewModel.OutputTerminal.AppendText(string.Format("Iteration {0} not found for the engineering model {1}\n", iterationNumber, engineeringModelShortName))));
-
+                new Action(() => 
+                    this.ScriptingPanelViewModel.OutputTerminal.AppendText($"Iteration {iterationNumber} not found for the engineering model {engineeringModelShortName}\n")));
             return null;
         }
 
@@ -568,9 +559,7 @@ namespace CDP4Scripting.Helpers
             Application.Current.Dispatcher.Invoke(
                 DispatcherPriority.Input,
                 new Action(() =>
-                    this.ScriptingPanelViewModel.OutputTerminal.AppendText(string.Format("Element definition {0} for the iteration {1} of the engineering model {2} was not found.",
-                        elementDefinitionName, iterationNumber, engineeringModelShortName))));
-
+                    this.ScriptingPanelViewModel.OutputTerminal.AppendText($"Element definition {elementDefinitionName} for the iteration {iterationNumber} of the engineering model {engineeringModelShortName} was not found.")));
             return null;
         }
 
@@ -618,9 +607,7 @@ namespace CDP4Scripting.Helpers
                 DispatcherPriority.Input,
                 new Action(() =>
                     this.ScriptingPanelViewModel.OutputTerminal.AppendText(
-                        string.Format("Parameter {0} of the element definition {1} for the iteration {2} of the engineering model {3} was not found.",
-                            parameterName, elementDefinitionName, iterationNumber, engineeringModelShortName))));
-
+                        $"Parameter {parameterName} of the element definition {elementDefinitionName} for the iteration {iterationNumber} of the engineering model {engineeringModelShortName} was not found.")));
             return null;
         }
 
@@ -694,9 +681,7 @@ namespace CDP4Scripting.Helpers
                 DispatcherPriority.Input,
                 new Action(() =>
                     this.ScriptingPanelViewModel.OutputTerminal.AppendText(
-                        string.Format("Value of type {0} for Parameter {1} of the element definition {2} for the iteration {3} of the engineering model {4} was not found.",
-                            parameterSwitch, parameterName, elementDefinitionName, iterationNumber, engineeringModelShortName))));
-
+                        $"Value of type {parameterSwitch} for Parameter {parameterName} of the element definition {elementDefinitionName} for the iteration {iterationNumber} of the engineering model {engineeringModelShortName} was not found.")));
             return null;
         }
 
@@ -720,8 +705,6 @@ namespace CDP4Scripting.Helpers
 
             return this.ScriptingPanelViewModel.SelectedSession.Assembler.RetrieveSiteDirectory();
         }
-
-        #endregion
 
         /// <summary>
         /// Initializes the list of the command completion data from the methods and properties decorated with an attribute.

@@ -41,11 +41,10 @@ namespace CDP4Scripting.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    using Events;
 
-    using Helpers;
-
-    using Interfaces;
+    using CDP4Scripting.Events;
+    using CDP4Scripting.Helpers;
+    using CDP4Scripting.Interfaces;
 
     using ReactiveUI;
 
@@ -78,7 +77,7 @@ namespace CDP4Scripting.ViewModels
         /// <summary>
         /// The file filters to use when a dialog is opened.
         /// </summary>
-        public const string DialogFilters = "Lua Files (*.lua)|*.lua|Python Files (*.py)|*.py|Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+        public const string DialogFilters = "Python Files (*.py)|*.py|Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
 
         /// <summary>
         /// Backing field for <see cref="HasSession"/>
@@ -110,8 +109,6 @@ namespace CDP4Scripting.ViewModels
 
             this.NewPythonScriptCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateNewScript("python", ScriptingLaguageKindSupported.Python));
 
-            this.NewLuaScriptCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateNewScript("lua", ScriptingLaguageKindSupported.Lua));
-
             this.NewTextScriptCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateNewScript("text", ScriptingLaguageKindSupported.Text));
 
             this.OpenScriptCommand = ReactiveCommandCreator.Create(this.OpenScriptFile);
@@ -137,11 +134,6 @@ namespace CDP4Scripting.ViewModels
         /// Creates a new python tab.
         /// </summary>
         public ReactiveCommand<Unit, Unit> NewPythonScriptCommand { get; private set; }
-
-        /// <summary>
-        /// Creates a new Lua tab.
-        /// </summary>
-        public ReactiveCommand<Unit, Unit> NewLuaScriptCommand { get; private set; }
 
         /// <summary>
         /// Creates a new text tab.
@@ -208,8 +200,6 @@ namespace CDP4Scripting.ViewModels
                 case ScriptingLaguageKindSupported.Python:
                     scriptPanelViewModel = new PythonScriptPanelViewModel(panelTitle, this.scriptingProxy, this.OpenSessions);
                     break;
-                case ScriptingLaguageKindSupported.Lua:
-                    scriptPanelViewModel = new LuaScriptPanelViewModel(panelTitle, this.scriptingProxy, this.OpenSessions);
                     break;
                 case ScriptingLaguageKindSupported.Text:
                     scriptPanelViewModel = new TextScriptPanelViewModel(panelTitle, this.scriptingProxy, this.OpenSessions);
@@ -251,11 +241,6 @@ namespace CDP4Scripting.ViewModels
                 IScriptPanelViewModel scriptPanelViewModel;
                 switch (fileExtension)
                 {
-                    case ".lua":
-                        {
-                            scriptPanelViewModel = this.CreateNewScript(fileName, ScriptingLaguageKindSupported.Lua);
-                            break;
-                        }
                     case ".py":
                         {
                             scriptPanelViewModel = this.CreateNewScript(fileName, ScriptingLaguageKindSupported.Python);

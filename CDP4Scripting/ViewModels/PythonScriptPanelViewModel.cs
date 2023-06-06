@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PythonScriptPanelViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
@@ -28,6 +28,7 @@ namespace CDP4Scripting.ViewModels
     using System;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Windows;
     using System.Windows.Threading;
@@ -36,17 +37,15 @@ namespace CDP4Scripting.ViewModels
 
     using CDP4Dal;
 
-    using Events;
-
-    using Interfaces;
+    using CDP4Scripting.Events;
+    using CDP4Scripting.Interfaces;
+    using CDP4Scripting.Views;
 
     using IronPython.Hosting;
 
     using Microsoft.Scripting;
 
     using ReactiveUI;
-
-    using Views;
 
     /// <summary>
     /// The view-model for the <see cref="ScriptPanel"/> view
@@ -73,9 +72,16 @@ namespace CDP4Scripting.ViewModels
         {
             this.LoadHighlightingSheet(PythonHighlighting);
 
-            this.Engine = Python.CreateEngine();
-            this.Engine.Runtime.LoadAssembly(typeof(string).Assembly);
-            this.Engine.Runtime.LoadAssembly(typeof(Uri).Assembly);
+            this.Runtime = IronPython.Hosting.Python.CreateRuntime();
+            this.Runtime.LoadAssembly(typeof(string).Assembly);
+            this.Runtime.LoadAssembly(typeof(Uri).Assembly);
+
+            var streamWriter = new EventingMemoryStream();
+            streamWriter.OnNewText += this.StreamWriter_OnNewText;
+
+            this.Runtime.IO.SetOutput(streamWriter, Encoding.ASCII);
+
+            this.Engine = Python.GetEngine(this.Runtime);
 
             var searchPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var paths = this.Engine.GetSearchPaths();
@@ -101,21 +107,13 @@ namespace CDP4Scripting.ViewModels
         {
             try
             {
-                // Check if the script should be stopped
                 this.CancellationToken.ThrowIfCancellationRequested();
 
                 this.ScriptingProxy.ScriptingPanelViewModel = this;
 
-                var sourceCode = this.Engine.CreateScriptSourceFromString(script, SourceCodeKind.AutoDetect);
+                var source = this.Engine.CreateScriptSourceFromString(script, SourceCodeKind.AutoDetect);
 
-                using (var memoryStream = new MemoryStream())
-                {
-                    var streamWriter = new EventRaisingStreamWriter(memoryStream);
-
-                    streamWriter.StringWritten += OnMemoryStreamChanged;
-                    this.Engine.Runtime.IO.SetOutput(memoryStream, streamWriter);
-                    sourceCode.Execute(this.Scope);
-                }
+                source.Execute(this.Scope);
             }
             catch (ThreadAbortException tae)
             {
@@ -124,7 +122,7 @@ namespace CDP4Scripting.ViewModels
                 {
                     Application.Current.Dispatcher.Invoke(
                         DispatcherPriority.Input,
-                        new Action(() =>this.OutputTerminal.AppendText(string.Format("\nAn error occured during the execution of the script !\nError: {0}\n", tae.Message))));
+                        new Action(() =>this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {tae.Message}\n")));
                 }
 
                 // The abortion of the thread is cancelled to avoid the loss of data, the cancelletation token is checked and will throw an exception to cancel the task properly if necessary
@@ -132,17 +130,15 @@ namespace CDP4Scripting.ViewModels
                 this.Engine.Runtime.Shutdown();
                 this.CancellationToken.ThrowIfCancellationRequested();
             }
-            // If CancellationRequested
             catch (OperationCanceledException)
             {
                 throw new OperationCanceledException(this.CancellationToken);
             }
-            // Other kinds of exceptions
             catch (Exception ex)
             {
                 Application.Current.Dispatcher.Invoke(
                     DispatcherPriority.Input,
-                    new Action(() =>this.OutputTerminal.AppendText(string.Format("\nAn error occured during the execution of the script !\nError: {0}\n", ex.Message))));
+                    new Action(() =>this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {ex.Message}\n")));
             }
             finally
             {
@@ -151,26 +147,32 @@ namespace CDP4Scripting.ViewModels
         }
 
         /// <summary>
-        /// Event handler called every time the <see cref="EventRaisingStreamWriter"/> writes in the <see cref="MemoryStream"/>.
-        /// This event handler is called each time the Python script uses the output.
+        /// Event handler used to update the output window
         /// </summary>
-        /// <param name="sender">The sender.</param>
-        /// <param name="e">The arguments.</param>
-        public void OnMemoryStreamChanged(object sender, StreamEventArgs<string> e)
+        /// <param name="sender">
+        /// the sender of the event
+        /// </param>
+        /// <param name="e">
+        /// the string that is used to update the output window content with
+        /// </param>
+        private void StreamWriter_OnNewText(object sender, string e)
         {
             try
             {
-                // Check if the script should be stopped
                 if (this.CancellationToken.IsCancellationRequested)
                 {
-                    this.Engine.Runtime.Shutdown();
+                    Application.Current.Dispatcher.Invoke(
+                        DispatcherPriority.Input,
+                        new Action(() => this.OutputTerminal.AppendText("Script Execution Cancelled")));
+
                     throw new OperationCanceledException(this.CancellationToken);
                 }
-
-                // Update the content of the output 
-                Application.Current.Dispatcher.Invoke(
-                    DispatcherPriority.Input,
-                    new Action (() => this.OutputTerminal.AppendText(e.Value)));
+                else
+                {
+                    Application.Current.Dispatcher.Invoke(
+                        DispatcherPriority.Input,
+                        new Action(() => this.OutputTerminal.AppendText(e)));
+                }
             }
             catch (ThreadAbortException tae)
             {
@@ -179,7 +181,7 @@ namespace CDP4Scripting.ViewModels
                 {
                     Application.Current.Dispatcher.Invoke(
                         DispatcherPriority.Input,
-                        new Action(() => this.OutputTerminal.AppendText(string.Format("\nAn error occured during the execution of the script !\nError: {0}\n", tae.Message))));
+                        new Action(() => this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {tae.Message}\n")));
                 }
 
                 // The abortion of the thread is cancelled to avoid the loss of data, the cancelletation token is checked and will throw an exception to cancel the task properly if necessary
@@ -187,17 +189,15 @@ namespace CDP4Scripting.ViewModels
                 this.Engine.Runtime.Shutdown();
                 this.CancellationToken.ThrowIfCancellationRequested();
             }
-            // If CancellationRequested
             catch (OperationCanceledException)
             {
                 throw new OperationCanceledException(this.CancellationToken);
             }
-            // Other kinds of exceptions
             catch (Exception ex)
             {
                 Application.Current.Dispatcher.Invoke(
                     DispatcherPriority.Input,
-                    new Action(() => this.OutputTerminal.AppendText(string.Format("\nAn error occured during the execution of the script !\nError: {0}\n", ex.Message))));
+                    new Action(() => this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {ex.Message}\n")));
             }
         }
 

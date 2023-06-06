@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CDP4ScriptingModuleTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
@@ -26,7 +26,9 @@
 namespace CDP4Scripting.Tests
 {
     using CDP4Composition.Navigation;
+
     using Moq;
+
     using NUnit.Framework;
 
     /// <summary>

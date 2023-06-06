@@ -35,7 +35,7 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="AvalonEdit" Version="6.1.2.30" />
+    <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
     <PackageReference Include="CDP4Common-CE" Version="10.0.0-rc6">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -144,9 +144,8 @@
     <PackageReference Include="DevExpress.Xpo" Version="22.2.5-pre-23050">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DynamicLanguageRuntime" Version="1.3.0" />
-    <PackageReference Include="IronPython" Version="2.7.11" />
-    <PackageReference Include="MoonSharp" Version="2.0.0.0" />
+    <PackageReference Include="DynamicLanguageRuntime" Version="1.3.3" />
+    <PackageReference Include="IronPython" Version="3.4.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -218,7 +217,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\SyntaxHighlightingSheets\Python.xshd" />
-    <EmbeddedResource Include="Resources\SyntaxHighlightingSheets\Lua.xshd" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Images\CollapseChevronUp_16x.png" />
