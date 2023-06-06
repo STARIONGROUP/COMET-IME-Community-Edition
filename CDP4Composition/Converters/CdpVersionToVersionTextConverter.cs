@@ -84,7 +84,7 @@ namespace CDP4Composition
 
             var comparision = propertyVersion.CompareTo(dalVersion);
 
-            return comparision <= 0 ? "" : $"Property needs at least COMET model version {versionAttribute.Version}";
+            return comparision <= 0 ? "" : $"Property needs at least CDP4-COMET model version {versionAttribute.Version}";
         }
 
         /// <summary>Not supported</summary>

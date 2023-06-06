@@ -71,7 +71,7 @@ namespace CDP4ObjectBrowser.Tests
         {
             var viewModel = new ObjectBrowserViewModel(this.session.Object, this.thingDialogNavigationService.Object, this.pluginSettingsService.Object);
 
-            Assert.AreEqual("COMET Object Browser", viewModel.Caption);
+            Assert.AreEqual("CDP4-COMET Object Browser", viewModel.Caption);
             Assert.AreEqual("John Doe", viewModel.Person);            
             Assert.AreEqual("http://www.rheagroup.com/\nJohn Doe", viewModel.ToolTip);
             Assert.IsNotEmpty(viewModel.Sessions);

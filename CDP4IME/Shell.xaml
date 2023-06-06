@@ -68,7 +68,7 @@
                            Grid.Row="0"
                            ApplicationButtonLargeIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo_48x48.png"
                            ApplicationButtonSmallIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo_48x48.png"
-                           ApplicationButtonText="CDP4 COMET-CE"
+                           ApplicationButtonText="CDP4-COMET-CE"
                            PageCategoryAlignment="Right"
                            RibbonStyle="Office2007"
                            Padding="0">
@@ -304,7 +304,7 @@
                         <dxb:BarButtonItem Name="AboutButton"
                                            Command="{Binding OpenAboutCommand}"
                                            Content="About"
-                                           Description="About COMET"
+                                           Description="About CDP4-COMET"
                                            Glyph="{dxc:DXImage Image=Info_16x16.png}"
                                            Hint="About COMET"
                                            LargeGlyph="{dxc:DXImage Image=Info_32x32.png}"

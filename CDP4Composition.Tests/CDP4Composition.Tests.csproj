@@ -5,7 +5,7 @@
     <AssemblyTitle>CDP4Composition.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Composition.Tests</Product>
-    <Description>COMET Composition and Infrastructure library unit tests</Description>
+    <Description>CDP4-COMET Composition and Infrastructure library unit tests</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>

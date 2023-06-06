@@ -54,7 +54,7 @@ namespace CDP4IME
         /// <param name="container">The <see cref="AggregateCatalog"/></param>
         protected override void OnComposed(CompositionContainer container)
         {
-            this.UpdateBootstrapperStatus("Starting COMET IME");
+            this.UpdateBootstrapperStatus("Starting CDP4-COMET IME");
             Application.Current.MainWindow = container.GetExportedValue<Shell>();
         }
 

@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{05B9FB71-DFFD-40BC-BF35-F05A1F3CF217}</ProjectGuid>
-    <MinIMEVersion>9.4.2</MinIMEVersion>
+    <MinIMEVersion>9.5.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ParameterSheetGenerator</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4ParameterSheetGenerator</Product>
-    <Description>COMET Excel Addin Parameter Sheet Generator</Description>
+    <Description>CDP4-COMET Excel Addin Parameter Sheet Generator</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.4.2.0</AssemblyVersion>
-    <FileVersion>9.4.2.0</FileVersion>
+    <AssemblyVersion>9.5.0.0</AssemblyVersion>
+    <FileVersion>9.5.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

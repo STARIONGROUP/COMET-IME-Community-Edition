@@ -140,9 +140,9 @@ namespace CDP4Composition.PluginSettingService
         {
             if (!Directory.Exists(this.ApplicationConfigurationDirectory))
             {
-                this.logger.Debug("The COMET settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
+                this.logger.Debug("The CDP4-COMET settings folder {0} does not yet exist", this.ApplicationConfigurationDirectory);
                 Directory.CreateDirectory(this.ApplicationConfigurationDirectory);
-                this.logger.Debug("The COMET settings folder {0} has been created", this.ApplicationConfigurationDirectory);
+                this.logger.Debug("The CDP4-COMET settings folder {0} has been created", this.ApplicationConfigurationDirectory);
             }
         }
 
