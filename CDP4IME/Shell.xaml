@@ -68,7 +68,7 @@
                            Grid.Row="0"
                            ApplicationButtonLargeIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo_48x48.png"
                            ApplicationButtonSmallIcon="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo_48x48.png"
-                           ApplicationButtonText="COMET-CE"
+                           ApplicationButtonText="CDP4 COMET-CE"
                            PageCategoryAlignment="Right"
                            RibbonStyle="Office2007"
                            Padding="0">

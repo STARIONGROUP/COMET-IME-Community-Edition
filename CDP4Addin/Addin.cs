@@ -75,7 +75,7 @@ namespace CDP4AddinCE
     /// The <see cref="Addin"/> provides CDP4 integration with the Office Suite. It self-registers in the registry and
     /// provides the Fluent XML Ribbon and call-back implementations for the Fluent XML Ribbon controls
     /// </summary>
-    [COMAddin("COMET-CE Office Add-in", "The COMET-CE Office Add-in provides COMET application integration with Microsoft Office Suite", 3)]
+    [COMAddin("CDP4 COMET-CE Office Add-in", "The CDP4 COMET-CE Office Add-in provides CDP4 COMET application integration with Microsoft Office Suite", 3)]
     [Guid("FD48B640-1D3F-4922-854B-C69028CA469E")]
     [ProgId("CDP4CE.Addin")]
     [RegistryLocation(RegistrySaveLocation.CurrentUser)]

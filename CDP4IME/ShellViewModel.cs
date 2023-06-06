@@ -217,7 +217,7 @@ namespace CDP4IME
 
             this.OnClosingCommand = ReactiveCommand.CreateAsyncTask(async x => this.OnClosing(x as CancelEventArgs), RxApp.MainThreadScheduler);
 
-            logger.Info("Welcome in the COMET Application");
+            logger.Info("Welcome in the CDP4 COMET Application");
         }
         
         /// <summary>
