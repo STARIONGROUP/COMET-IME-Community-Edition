@@ -6,17 +6,17 @@
   <Fragment>
     <DirectoryRef Id="ApplicationProgramsFolder" >
       <Component Id="ShortcutCDP4CE" Guid="{E241E4F4-CFD0-4EAA-A838-6150670FF906}">
-        <Shortcut Id="ShortcutCDP4CE" Name="COMET-CE" Description="COMET Community Edition" Target="[#fil_CDP4IME]" WorkingDirectory="BIN"/>                
-        <RegistryValue Root="HKCU" Key="Software\RHEA\COMET-CE" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+        <Shortcut Id="ShortcutCDP4CE" Name="CDP4-COMET-CE" Description="CDP4-COMET Community Edition" Target="[#fil_CDP4IME]" WorkingDirectory="BIN"/>                
+        <RegistryValue Root="HKCU" Key="Software\RHEA\CDP4-COMET-CE" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
         <RemoveFile Id="RemoveOldStartMenuShortcut" On="install" Name="CDP4-CE.lnk"/>
       </Component>
     </DirectoryRef>
     <DirectoryRef Id="DesktopFolder" >
       <Component Id="DesktopShortcutCDP4CE" Guid="{ADB4F330-23C8-4572-96E8-E9EDA2D332D3}">
-        <RegistryKey Root="HKCU" Key="Software\RHEA\COMET-CE" Action="createAndRemoveOnUninstall">
+        <RegistryKey Root="HKCU" Key="Software\RHEA\CDP4-COMET-CE" Action="createAndRemoveOnUninstall">
           <RegistryValue Name="installed" Value="1" Type="integer" KeyPath="yes"/>
         </RegistryKey>
-        <Shortcut Id="DesktopShortcutCDP4CE" Directory="DesktopFolder" Name="COMET-CE" Target="[#fil_CDP4IME]"/>
+        <Shortcut Id="DesktopShortcutCDP4CE" Directory="DesktopFolder" Name="CDP4-COMET-CE" Target="[#fil_CDP4IME]"/>
         <RemoveFile Id="RemoveOldDesktopShortcut" On="install" Name="CDP4-CE.lnk"/>
       </Component>
     </DirectoryRef>

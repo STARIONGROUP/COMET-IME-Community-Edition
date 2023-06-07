@@ -192,7 +192,7 @@ namespace CDP4Scripting.Tests.Helpers
 
             var content = new TextRange(this.scriptViewModel.Object.OutputTerminal.Document.ContentStart, this.scriptViewModel.Object.OutputTerminal.Document.ContentEnd);
             Assert.That(content.Text.Length, Is.GreaterThan(50));
-            Assert.IsTrue(content.Text.Contains("COMET Commands"));
+            Assert.IsTrue(content.Text.Contains("CDP4-COMET Commands"));
             Assert.IsTrue(content.Text.Contains("List of the commands available"));
             Assert.IsTrue(content.Text.Contains("OpenDialog(string dialogName)"));
             Assert.IsTrue(content.Text.Contains("Opens a dialog using its name."));

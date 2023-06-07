@@ -5,10 +5,10 @@
     <AssemblyTitle>CDP4Composition</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Composition</Product>
-    <Description>COMET Composition and Infrastructure library</Description>
+    <Description>CDP4-COMET Composition and Infrastructure library</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.4.0.2</AssemblyVersion>
-    <FileVersion>9.4.0.2</FileVersion>
+    <AssemblyVersion>9.5.0.0</AssemblyVersion>
+    <FileVersion>9.5.0.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>

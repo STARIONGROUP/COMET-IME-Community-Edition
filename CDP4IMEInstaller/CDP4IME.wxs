@@ -11,7 +11,7 @@
         <File Id="fil_CDP4IME" Vital="yes" Source="$(var.CDP4IME-CE.TargetPath)" KeyPath="yes" />
         <File Id="fil_license" Vital="yes" Source="$(var.CDP4IME-CE.ProjectDir)license.rtf" />
         <File Id="fil_NLog.dll.nlog" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)NLog.dll.nlog" />
-        <File Id="fil_app.config" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)COMET.exe.config" />
+        <File Id="fil_app.config" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir)CDP4-COMET.exe.config" />
       </Component>
 
       <!-- CDP4-SDK dependencies -->

@@ -3,17 +3,17 @@
     <ProjectGuid>{E8A6C54E-80C1-42E3-A2C2-D698B97BE7C2}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>CDP4IME</RootNamespace>
-    <AssemblyName>COMET</AssemblyName>
+    <AssemblyName>CDP4-COMET</AssemblyName>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <OutputPath>bin\$(Configuration)\net48\</OutputPath>
     <AssemblyTitle>CDP4IME</AssemblyTitle>
     <Company>RHEA System S.A</Company>
     <Product>CDP4IME</Product>
-    <Description>The COMET Integrated Modelling Environment</Description>
+    <Description>The CDP4-COMET Integrated Modelling Environment</Description>
     <Copyright>Copyright © RHEA System S.A</Copyright>
-    <AssemblyVersion>9.4.1.0</AssemblyVersion>
-    <FileVersion>9.4.1.0</FileVersion>
+    <AssemblyVersion>9.5.0.0</AssemblyVersion>
+    <FileVersion>9.5.0.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>

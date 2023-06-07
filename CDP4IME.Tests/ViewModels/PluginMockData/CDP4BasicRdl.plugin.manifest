@@ -1,7 +1,7 @@
 {
   "ProjectGuid": "bedcc5c5-83b2-41ed-ac9f-895757553bf2",
   "Name": "CDP4BasicRdl",
-  "Description": "COMET test plugin",
+  "Description": "CDP4-COMET test plugin",
   "Version": "5.5.5.5",
   "CompatibleIMEVersion": null,
   "TargetFramework": "net48",

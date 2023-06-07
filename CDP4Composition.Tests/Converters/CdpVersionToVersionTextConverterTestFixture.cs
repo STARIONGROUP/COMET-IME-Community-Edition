@@ -87,7 +87,7 @@ namespace CDP4Composition.Tests.Converters
 
             var visibility = (string) result;
 
-            Assert.AreEqual($"Property needs at least COMET model version 1.2.0", visibility);
+            Assert.AreEqual($"Property needs at least CDP4-COMET model version 1.2.0", visibility);
 
             testViewModel = new TestViewModel(this.sessionOneTwoZero.Object);
 

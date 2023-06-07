@@ -75,7 +75,7 @@ namespace CDP4AddinCE
     /// The <see cref="Addin"/> provides CDP4 integration with the Office Suite. It self-registers in the registry and
     /// provides the Fluent XML Ribbon and call-back implementations for the Fluent XML Ribbon controls
     /// </summary>
-    [COMAddin("COMET-CE Office Add-in", "The COMET-CE Office Add-in provides COMET application integration with Microsoft Office Suite", 3)]
+    [COMAddin("CDP4-COMET-CE Office Add-in", "The CDP4-COMET-CE Office Add-in provides CDP4-COMET application integration with Microsoft Office Suite", 3)]
     [Guid("FD48B640-1D3F-4922-854B-C69028CA469E")]
     [ProgId("CDP4CE.Addin")]
     [RegistryLocation(RegistrySaveLocation.CurrentUser)]
@@ -126,7 +126,7 @@ namespace CDP4AddinCE
         /// </remarks>
         public Addin()
         {
-            logger.Debug("starting COMET-CE addin");
+            logger.Debug("starting CDP4-COMET-CE addin");
 
             this.PreloadAssemblies();
             this.RedirectAssemblies();
@@ -136,7 +136,7 @@ namespace CDP4AddinCE
             // Set the Theme of the application
             ThemeManager.ApplicationThemeName = Theme.SevenName;
 
-            logger.Debug("COMET-CE addin started");
+            logger.Debug("CDP4-COMET-CE addin started");
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace CDP4AddinCE
         [RegisterErrorHandler]
         public static void RegisterErrorHandler(RegisterErrorMethodKind methodKind, Exception exception)
         {
-            MessageBox.Show($"An register error occurend in {methodKind.ToString()}", "COMET-CE.Addin");
+            MessageBox.Show($"An register error occurend in {methodKind.ToString()}", "CDP4-COMET-CE.Addin");
         }
 
         /// <summary>
@@ -321,7 +321,7 @@ namespace CDP4AddinCE
         /// <param name="exception">The exception that occurred.</param>
         protected override void OnError(ErrorMethodKind methodKind, Exception exception)
         {
-            this.Utils.Dialog.ShowError(exception, "Unexpected state in COMET-CE.Addin " + methodKind.ToString());
+            this.Utils.Dialog.ShowError(exception, "Unexpected state in CDP4-COMET-CE.Addin " + methodKind.ToString());
         }
 
         /// <summary>
@@ -626,7 +626,7 @@ namespace CDP4AddinCE
             catch (Exception ex)
             {
                 logger.Fatal(ex, "Bootstrapper exception: ");
-                this.Utils.Dialog.ShowError(ex, "Unexpected state in COMET-CE.Addin");
+                this.Utils.Dialog.ShowError(ex, "Unexpected state in CDP4-COMET-CE.Addin");
             }
         }
 

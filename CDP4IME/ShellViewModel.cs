@@ -149,7 +149,7 @@ namespace CDP4IME
 
             this.dialogNavigationService = dialogNavigationService;
             this.DockViewModel = dockViewModel;
-            this.Title = "COMET IME - Community Edition";
+            this.Title = "CDP4-COMET IME - Community Edition";
 
             this.logTarget = new MemoryEventTarget();
             this.logTarget.EventReceived += this.LogEventReceived;
@@ -217,7 +217,7 @@ namespace CDP4IME
 
             this.OnClosingCommand = ReactiveCommand.CreateAsyncTask(async x => this.OnClosing(x as CancelEventArgs), RxApp.MainThreadScheduler);
 
-            logger.Info("Welcome in the COMET Application");
+            logger.Info("Welcome in the CDP4-COMET Application");
         }
         
         /// <summary>
