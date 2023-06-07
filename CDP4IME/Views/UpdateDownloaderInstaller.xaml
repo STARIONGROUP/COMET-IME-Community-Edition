@@ -9,7 +9,7 @@
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
         mc:Ignorable="d"
-        Title="CDP4-Update" Height="600" Width="600" ResizeMode="NoResize" BorderThickness="0" Background="White">
+        Title="CDP4-COMET-Update" Height="600" Width="600" ResizeMode="NoResize" BorderThickness="0" Background="White">
     <Window.Resources>
         <dxmvvm:BooleanNegationConverter x:Key="BooleanNegationConverter"></dxmvvm:BooleanNegationConverter>
         <converters:BooleanToGridUnitConverter x:Key="BooleanToGridUnitConverter"></converters:BooleanToGridUnitConverter>
@@ -50,7 +50,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F6B944" FontSize="18" Text="CDP4-IME is up to date!" Visibility="{Binding AvailableIme.Count, Converter={StaticResource IntegerToVisibilityConverter}, ConverterParameter=Invert}"/>
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="#F6B944" FontSize="18" Text="CDP4-COMET IME is up to date!" Visibility="{Binding AvailableIme.Count, Converter={StaticResource IntegerToVisibilityConverter}, ConverterParameter=Invert}"/>
         </Grid>
 
         <Grid Margin="10,0,10,10" Grid.Row="2">
