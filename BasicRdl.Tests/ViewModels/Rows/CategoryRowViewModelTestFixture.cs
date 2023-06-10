@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CategoryRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -130,7 +130,6 @@ namespace BasicRdl.Tests.ViewModels
         {
             var name = "name";
             var shortname = "shortname";
-            var containerRdl = "containerrdl";
 
             var category = new Category(Guid.NewGuid(), null, null) { ShortName = shortname, Name = name };
             var container = new SiteReferenceDataLibrary(Guid.NewGuid(), null, null) { ShortName = "containerrdl"}; 

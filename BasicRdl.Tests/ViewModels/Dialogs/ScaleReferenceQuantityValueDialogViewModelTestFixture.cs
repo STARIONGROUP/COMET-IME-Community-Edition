@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScaleReferenceQuantityValueDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -29,7 +29,6 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
-    using System.Threading.Tasks;
 
     using BasicRdl.ViewModels.Dialogs;
 
@@ -114,7 +113,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatOkCommandWorks()
+        public void VerifyThatOkCommandWorks()
         {
             this.viewmodel.OkCommand.Execute(null);
 
@@ -124,7 +123,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatExceptionAreCaught()
+        public void VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 

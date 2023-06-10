@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ConstantRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -110,13 +110,11 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-            this.Value = this.Thing.Value.Count() == 1 ? this.Thing.Value.First() : "[...]";
+            this.Value = this.Thing.Value.Count == 1 ? this.Thing.Value.First() : "[...]";
             this.ClassKind = this.Thing.ClassKind.ToString();
-            var quantityKind = this.Thing.ParameterType as QuantityKind;
-            this.SelectedScale = quantityKind != null ? this.Thing.Scale : null;
+            this.SelectedScale = this.Thing.ParameterType is QuantityKind quantityKind ? this.Thing.Scale : null;
 
-            var container = this.Thing.Container as ReferenceDataLibrary;  
-            this.ContainerRdl = container == null ? string.Empty : container.ShortName;
+            this.ContainerRdl = !(this.Thing.Container is ReferenceDataLibrary container) ? string.Empty : container.ShortName;
         }
 
         /// <summary>
@@ -162,11 +160,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
-            var category = dropInfo.Payload as Category;
-            if (category != null)
+            if (dropInfo.Payload is Category category)
             {
                 await this.Drop(category);
-                return;
             }
         }
 

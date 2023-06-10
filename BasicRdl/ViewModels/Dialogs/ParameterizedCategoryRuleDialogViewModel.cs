@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterizedCategoryRuleDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
@@ -137,12 +137,7 @@ namespace BasicRdl.ViewModels
         {
             base.PopulatePossibleCategory();
 
-            var containerRdl = this.Container as ReferenceDataLibrary;
-
-            if (containerRdl == null)
-            {
-            }
-            else
+            if (this.Container is ReferenceDataLibrary containerRdl)
             {
                 var rdls = containerRdl.AggregatedReferenceDataLibrary;
 

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EnumerationParameterTypeDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -26,7 +26,6 @@
 namespace BasicRdl.Tests.ViewModels
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
@@ -64,7 +63,6 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IThingDialogNavigationService> navigation;
         private Mock<IPermissionService> permissionService;
-        private ConcurrentDictionary<Guid, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()

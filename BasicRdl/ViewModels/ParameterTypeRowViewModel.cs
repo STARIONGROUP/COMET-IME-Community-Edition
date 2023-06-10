@@ -282,7 +282,6 @@ namespace BasicRdl.ViewModels
             if (dropInfo.Payload is Category category)
             {
                 await this.Drop(category);
-                return;
             }
         }
 

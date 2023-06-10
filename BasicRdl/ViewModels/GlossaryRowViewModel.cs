@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GlossaryRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -180,7 +180,6 @@ namespace BasicRdl.ViewModels
 
                 transaction.CreateOrUpdate(currentGlossary);
                 await this.DalWrite(transaction);
-                return;
             }
             else if (dropInfo.Effects == DragDropEffects.Copy)
             {

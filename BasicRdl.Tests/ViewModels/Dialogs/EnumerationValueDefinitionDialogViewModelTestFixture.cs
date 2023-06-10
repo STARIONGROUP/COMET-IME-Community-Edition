@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EnumerationValueDefinitionDialogViewModleTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -51,7 +51,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
     internal class EnumerationValueDefinitionDialogViewModleTestFixture
     {
         private Uri uri = new Uri("http://test.com");
-        private DerivedUnit derivedUnit;
+        private DerivedUnit derivedUnit = null;
         private SiteDirectory siteDir;
         private SiteReferenceDataLibrary siteRdl;
         private Mock<ISession> session;

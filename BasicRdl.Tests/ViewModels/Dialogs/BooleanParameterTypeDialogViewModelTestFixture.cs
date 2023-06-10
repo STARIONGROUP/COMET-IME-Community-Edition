@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BooleanParameterTypeDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
@@ -29,7 +29,6 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
-    using System.Threading.Tasks;
     
     using BasicRdl.ViewModels;
    
@@ -115,25 +114,26 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatOkCommandWorks()
+        public void VerifyThatOkCommandWorks()
         {
             this.viewmodel.OkCommand.Execute(null);
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
-            Assert.IsNull(this.viewmodel.WriteException);
-            Assert.IsTrue(this.viewmodel.DialogResult.Value);
+
+            Assert.That(this.viewmodel.WriteException, Is.Null);
+            Assert.That(this.viewmodel.DialogResult.Value, Is.True);
         }
 
         [Test]
-        public async Task VerifyThatExceptionAreCaught()
+        public void VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
             this.viewmodel.OkCommand.Execute(null);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
-            Assert.IsNotNull(this.viewmodel.WriteException);
-            Assert.AreEqual("test", this.viewmodel.WriteException.Message);
+            Assert.That(this.viewmodel.WriteException, Is.Not.Null);
+            Assert.That(this.viewmodel.WriteException.Message, Is.EqualTo("test"));
         }
 
         [Test]
