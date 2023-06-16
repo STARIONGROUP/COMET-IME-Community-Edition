@@ -62,7 +62,7 @@
                                    VerticalAlignment="Center"
                                    HorizontalAlignment="Center"
                                    Visibility="{Binding GrapherPlaceholderVisibility}">
-                            The current Iteration for this option does not contain a Top Element
+                            The Graph cannot be rendered as the Iteration does not contain a Top Element
                         </TextBlock>
                     </Grid>
                 </dxdo:LayoutPanel>
