@@ -104,12 +104,12 @@ namespace CDP4Grapher.ViewModels
         /// <summary>
         /// Backing field for the <see cref="GrapherVisibility"/> property
         /// </summary>
-        private Visibility grapherVisibility;
+        private Visibility grapherVisibility = Visibility.Visible;
 
         /// <summary>
         /// Backing field for the <see cref="GrapherPlaceholderVisibility"/> property
         /// </summary>
-        private Visibility grapherPlaceholderVisibility;
+        private Visibility grapherPlaceholderVisibility = Visibility.Collapsed;
 
         /// <summary>
         /// Gets or sets the attached behavior

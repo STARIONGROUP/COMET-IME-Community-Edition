@@ -29,6 +29,7 @@ namespace CDP4Grapher.Tests.ViewModels
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Threading;
+    using System.Windows;
 
     using CDP4Common.EngineeringModelData;
     
@@ -153,6 +154,19 @@ namespace CDP4Grapher.Tests.ViewModels
             vm.SetsSelectedElementAndSelectedElementPath(vm.GraphElements.FirstOrDefault());
             Assert.IsNotNull(vm.SelectedElementModelCode);
             Assert.IsNotNull(vm.SelectedElement);
+        }
+
+        [Test]
+        public void VerifyGrapherWithNoTopElement()
+        {
+            this.Iteration.TopElement = null;
+            var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm.GrapherVisibility, Is.EqualTo(Visibility.Collapsed));
+                Assert.That(vm.GrapherPlaceholderVisibility, Is.EqualTo(Visibility.Visible));
+            });
         }
     }
 }
