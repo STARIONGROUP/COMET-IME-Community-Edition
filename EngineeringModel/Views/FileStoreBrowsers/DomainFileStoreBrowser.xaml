@@ -146,11 +146,11 @@
                     </dxg:TreeListView>
                 </dxg:TreeListControl.View>
                 <dxg:TreeListControl.Columns>
-                    <dxg:TreeListColumn FieldName="Name" />
+                    <dxg:TreeListColumn FieldName="Name"/>
                     <dxg:TreeListColumn FieldName="OwnerName" Header="Owner" />
                     <dxg:TreeListColumn FieldName="Locker" Header="Locked by" />
                     <dxg:TreeListColumn FieldName="CreatorValue" Header="Creator" />
-                    <dxg:TreeListColumn FieldName="CreatedOn" Header="Created on" />
+                    <dxg:TreeListColumn FieldName="CreationDate" Header="Created on" />
                 </dxg:TreeListControl.Columns>
 
                 <dxg:TreeListControl.InputBindings>
