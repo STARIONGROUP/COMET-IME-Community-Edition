@@ -119,7 +119,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             this.file.FileRevision.Add(this.fileRevision1);
 
             var viewModel = new FileRowViewModel(this.file, this.session.Object, domainFileStoreRowViewModel, this.fileStoreFileAndFolderHandler.Object);
-            Assert.AreEqual(this.fileRevision1.CreatedOn.ToString(CultureInfo.InvariantCulture), viewModel.CreatedOn);
+            Assert.AreEqual(this.fileRevision1.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), viewModel.CreationDate);
             Assert.AreEqual(this.fileRevision1.Name, viewModel.Name);
             Assert.AreEqual(this.fileRevision1.Creator.Person.Name, viewModel.CreatorValue);
             Assert.IsFalse(viewModel.IsLocked);
@@ -139,7 +139,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             this.revisionNumberPropertyInfo.SetValue(this.file, 11);
             CDPMessageBus.Current.SendObjectChangeEvent(this.file, EventKind.Updated);
 
-            Assert.AreEqual(this.fileRevision2.CreatedOn.ToString(CultureInfo.InvariantCulture), viewModel.CreatedOn);
+            Assert.AreEqual(this.fileRevision2.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), viewModel.CreationDate);
             Assert.AreEqual(this.fileRevision2.Name, viewModel.Name);
             Assert.AreEqual(this.fileRevision2.Creator.Person.Name, viewModel.CreatorValue);
             this.fileStoreFileAndFolderHandler.Verify(x => x.UpdateFileRowPosition(this.file, It.IsAny<FileRevision>()), Times.Once);
