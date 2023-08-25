@@ -327,7 +327,8 @@ namespace CDP4Reporting.ViewModels
         public ReportDesignerViewModel(Iteration thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            DevExpress.Utils.DeserializationSettings.RegisterTrustedClass(typeof(DataSet));  
+            var dataSetAssembly = typeof(DataSet).Assembly;
+            DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(dataSetAssembly); 
 
             ReportingSettings.OptionSelector = (options, option) =>
             {
