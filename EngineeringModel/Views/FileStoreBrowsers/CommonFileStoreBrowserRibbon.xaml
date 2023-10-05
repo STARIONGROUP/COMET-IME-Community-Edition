@@ -26,8 +26,7 @@
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=Project_32x32.png}"
-                            Hint="Open a Common File Store Browser for an Iteration of a Model"
-                            IsVisible="False">
+                            Hint="Open a Common File Store Browser for an Iteration of a Model">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>
