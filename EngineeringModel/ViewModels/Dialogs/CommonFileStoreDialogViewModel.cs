@@ -32,6 +32,7 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
@@ -119,7 +120,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreatedOn = this.Thing.CreatedOn.Equals(DateTime.MinValue) ? DateTime.UtcNow : this.Thing.CreatedOn;
 
-            var iteration = ((EngineeringModel)this.Container).Iteration.FirstOrDefault();
+            var iteration = ((EngineeringModel)this.Container).Iteration.LastOrDefault();
 
             this.SelectedOwner = this.SelectedOwner ?? this.Session.QuerySelectedDomainOfExpertise(iteration);
             this.Name = this.Name ?? this.SelectedOwner.Name;

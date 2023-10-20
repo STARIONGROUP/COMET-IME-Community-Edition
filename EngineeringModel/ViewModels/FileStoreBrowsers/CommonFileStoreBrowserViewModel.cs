@@ -291,36 +291,6 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Update the <see cref="CommonFileStore"/>
         /// </summary>
-        //private void UpdateFileStoreRows()
-        //{
-        //    var updatedStore = ((EngineeringModel)this.Thing.Container).CommonFileStore.FirstOrDefault();
-        //    if (updatedStore == null)
-        //    {
-        //        if (this.commonFileStoreRow != null)
-        //        {
-        //            this.ContainedRows.RemoveAndDispose(this.commonFileStoreRow);
-        //            this.commonFileStoreRow = null;
-        //        }
-
-        //        return;
-        //    }
-
-        //    if (this.commonFileStoreRow == null)
-        //    {
-        //        this.commonFileStoreRow = new CommonFileStoreRowViewModel(updatedStore, this.Session, this);
-        //        this.ContainedRows.Add(this.commonFileStoreRow);
-        //    }
-        //    else if (this.commonFileStoreRow.Thing != updatedStore)
-        //    {
-        //        this.commonFileStoreRow.Dispose();
-        //        this.commonFileStoreRow = new CommonFileStoreRowViewModel(updatedStore, this.Session, this);
-        //        this.ContainedRows.Add(this.commonFileStoreRow);
-        //    }
-        //}
-
-        /// <summary>
-        /// Update the <see cref="CommonFileStore"/>
-        /// </summary>
         private void UpdateFileStoreRows()
         {
             var commonFileStore = ((EngineeringModel)this.Thing.Container).CommonFileStore;

@@ -124,7 +124,16 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreatedOn = this.Thing.CreatedOn.Equals(DateTime.MinValue) ? DateTime.UtcNow : this.Thing.CreatedOn;
 
-            var iteration = this.Container.GetContainerOfType<Iteration>();
+            Iteration iteration = null;
+
+            if (this.Container is DomainFileStore domainFileStore)
+            {
+                iteration = (Iteration)domainFileStore.Container;
+            }
+            else if (this.Container is CommonFileStore commonFileStore)
+            {
+                iteration = ((EngineeringModel)commonFileStore.Container).Iteration.LastOrDefault();
+            }
 
             if (this.SelectedCreator == null)
             {

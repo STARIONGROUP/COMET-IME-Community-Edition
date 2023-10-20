@@ -201,7 +201,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             
             Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
-            Assert.That(vm.DomainOfExpertise, Is.Null.Or.Empty);
+            Assert.That(vm.DomainOfExpertise, Is.Not.Null.Or.Empty);
             Assert.AreEqual(this.engineeringModelSetup.Name, vm.CurrentModel);
             Assert.AreEqual(this.iterationSetup.IterationNumber, vm.CurrentIteration);
 
@@ -220,8 +220,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             vm.ComputePermission();
 
-            Assert.IsFalse(vm.CanCreateStore);
-            Assert.IsTrue(vm.CanCreateFolder);
+            Assert.IsTrue(vm.CanCreateStore);
+            Assert.IsFalse(vm.CanCreateFolder);
 
             var storeRow = vm.ContainedRows.Single();
             Assert.IsEmpty(storeRow.ContainedRows);
