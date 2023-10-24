@@ -143,14 +143,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
         public void VerifyThatRibbonViewModelCanBeConstructed()
         {
             var viewmodel = new CommonFileStoreBrowserRibbonViewModel();
-            Assert.IsFalse(viewmodel.HasModels);
+            Assert.IsFalse(viewmodel.HasSessions);
         }
 
         [Test]
         public void VerifyThatInstantiatePanelViewModelReturnsExpectedViewModel()
         {
             var viewmodel = CommonFileStoreBrowserRibbonViewModel.InstantiatePanelViewModel(
-                this.iteration,
+                this.model,
                 this.session.Object,
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,

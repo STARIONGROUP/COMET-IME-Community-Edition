@@ -33,7 +33,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    
+    using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     
@@ -150,6 +151,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.model.Iteration.Add(this.iteration);
 
+            var lazyModel = new Lazy<Thing>(() => this.model);
+            this.assembler.Cache.GetOrAdd(new CacheKey(this.model.Iid, null), lazyModel);
+
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -196,15 +200,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatBrowserWorksWithNoStore()
         {
-            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
             Assert.IsEmpty(vm.ContainedRows);
             
             Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
-            Assert.That(vm.DomainOfExpertise, Is.Not.Null.Or.Empty);
+            Assert.That(vm.DomainOfExpertise, Is.Null.Or.Empty);
             Assert.AreEqual(this.engineeringModelSetup.Name, vm.CurrentModel);
-            Assert.AreEqual(this.iterationSetup.IterationNumber, vm.CurrentIteration);
 
             Assert.IsTrue(vm.CanCreateStore);
             Assert.IsFalse(vm.CanCreateFolder);
@@ -213,11 +216,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatRowsAreCreatedAndAddedCorrectly()
         {
-            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             this.model.CommonFileStore.Add(this.store);
-            this.rev.SetValue(this.iteration, 2);
+            this.rev.SetValue(this.model.EngineeringModelSetup, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
 
             vm.ComputePermission();
 
@@ -282,12 +285,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatCreateStoreCommandWorks()
         {
-            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
             this.model.CommonFileStore.Add(this.store);
-            this.rev.SetValue(this.iteration, 2);
+            this.rev.SetValue(this.model.EngineeringModelSetup, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
             vm.ComputePermission();
 
             //No row selected
@@ -304,7 +307,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                     It.IsAny<EngineeringModel>(),
                     null), Times.Once());
 
-            //DomainFileStore row selected
+            //CommonFileStore row selected
             vm.SelectedThing = vm.ContainedRows.First();
 
             vm.CreateStoreCommand.Execute(null);
@@ -324,16 +327,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatCreateFileCommandWorks()
         {
-            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
             this.store.Folder.Add(this.folder1);
             this.store.Folder.Add(this.folder2);
             this.folder2.ContainingFolder = this.folder1;
 
             this.model.CommonFileStore.Add(this.store);
-            this.rev.SetValue(this.iteration, 2);
+            this.rev.SetValue(this.model.EngineeringModelSetup, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
             vm.ComputePermission();
 
             //DomainFileStore row selected
@@ -349,7 +352,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                         true,
                         ThingDialogKind.Create,
                         this.thingDialogNavigationService.Object,
-                        It.IsAny<DomainFileStore>(),
+                        It.IsAny<CommonFileStore>(),
                         null), Times.Once());
 
             //Main folder row selected
@@ -365,7 +368,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                     true,
                     ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object,
-                    It.IsAny<DomainFileStore>(),
+                    It.IsAny<CommonFileStore>(),
                     null), Times.Exactly(2));
 
             //Sub folder row selected
@@ -381,7 +384,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                     true,
                     ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object,
-                    It.IsAny<DomainFileStore>(),
+                    It.IsAny<CommonFileStore>(),
                     null), Times.Exactly(3));
         }
     }
