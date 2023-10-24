@@ -106,9 +106,13 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulatePossibleOwner();
 
-            var engineeringModel = (EngineeringModel)this.Container;
-            var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
-            this.PossibleOwner.AddRange(domains);
+            var engineeringModel = (EngineeringModel)(this.Container ?? this.Thing.Container);
+
+            if (engineeringModel != null)
+            {
+                var domains = engineeringModel?.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
+                this.PossibleOwner.AddRange(domains);
+            }
         }
 
         /// <summary>
@@ -120,10 +124,15 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreatedOn = this.Thing.CreatedOn.Equals(DateTime.MinValue) ? DateTime.UtcNow : this.Thing.CreatedOn;
 
-            var iteration = ((EngineeringModel)this.Container).Iteration.LastOrDefault();
+            var engineeringModel = (EngineeringModel)(this.Container ?? this.Thing.Container);
 
-            this.SelectedOwner = this.SelectedOwner ?? this.Session.QuerySelectedDomainOfExpertise(iteration);
-            this.Name = this.Name ?? this.SelectedOwner.Name;
+            if (engineeringModel != null)
+            {
+                var iteration = engineeringModel.Iteration.LastOrDefault();
+
+                this.SelectedOwner = this.SelectedOwner ?? this.Session.QuerySelectedDomainOfExpertise(iteration);
+                this.Name = this.Name ?? this.SelectedOwner.Name;
+            }
         }
 
         /// <summary>

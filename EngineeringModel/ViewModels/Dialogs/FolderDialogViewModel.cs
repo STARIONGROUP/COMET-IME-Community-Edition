@@ -106,8 +106,12 @@ namespace CDP4EngineeringModel.ViewModels
             base.PopulatePossibleOwner();
 
             var engineeringModel = this.Container.GetContainerOfType<EngineeringModel>();
-            var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
-            this.PossibleOwner.AddRange(domains);
+            var domains = engineeringModel?.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
+
+            if (domains != null)
+            {
+                this.PossibleOwner.AddRange(domains);
+            }
         }
 
         /// <summary>
