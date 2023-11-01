@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommonFileStoreDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
 //            Nathanael Smiechowski, Kamil Wojnowski, Jaime Bernar
@@ -32,7 +32,6 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
