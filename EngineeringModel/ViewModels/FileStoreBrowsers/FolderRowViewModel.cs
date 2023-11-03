@@ -1,20 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FolderRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -27,6 +27,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -117,7 +118,7 @@ namespace CDP4EngineeringModel.ViewModels
 
                 if (dropInfo.Payload is File file && (file.CurrentContainingFolder != this.Thing) && file.Container.Iid.Equals(this.Thing.Container.Iid))
                 {
-                    dropInfo.Effects = DragDropEffects.Copy;
+                    dropInfo.Effects = DragDropEffects.Move;
                     return;
                 }
 
@@ -146,9 +147,17 @@ namespace CDP4EngineeringModel.ViewModels
                     this.IsBusy = true;
 
                     var iteration = this.Thing.GetContainerOfType<Iteration>();
-                    this.Session.OpenIterations.TryGetValue(iteration, out var tuple);
 
-                    await file.MoveFile(this.Thing, tuple?.Item2, this.Session);
+                    if (iteration == null)
+                    {
+                        var participant = this.Session.OpenIterations.FirstOrDefault().Value.Item2;
+                        await file.MoveFile(this.Thing, participant, this.Session);
+                    }
+                    else
+                    {
+                        this.Session.OpenIterations.TryGetValue(iteration, out var tuple);
+                        await file.MoveFile(this.Thing, tuple?.Item2, this.Session);
+                    }
                 }
                 catch (Exception e)
                 {

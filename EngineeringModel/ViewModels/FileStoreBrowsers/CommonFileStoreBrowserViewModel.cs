@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommonFileStoreBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -28,6 +28,8 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
     using System.Windows.Controls;
 
     using CDP4Common.CommonData;
@@ -35,6 +37,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -51,7 +54,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// The view-model for the <see cref="CommonFileStoreBrowserViewModel"/> view
     /// </summary>
-    public class CommonFileStoreBrowserViewModel : BrowserViewModelBase<EngineeringModel>, IPanelViewModel
+    public class CommonFileStoreBrowserViewModel : BrowserViewModelBase<EngineeringModel>, IPanelViewModel, IDropTarget
     {
         /// <summary>
         /// The Panel Caption
@@ -391,24 +394,63 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Executes the upload file command
+        /// Updates the current drag state.
         /// </summary>
-        private void ExecuteUploadFile()
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
         {
-            var result = this.fileDialogService.GetSaveFileDialog(string.Empty, string.Empty, string.Empty, string.Empty, 1);
-            
-            if (string.IsNullOrEmpty(result))
+            try
             {
-                return;
-            }
+                logger.Trace("drag over {0}", dropInfo.TargetItem);
 
-            //// TODO on Task T1250: Replace the following 3 lines with an actual call to the server to upload the file 
-            //var uploadedFile = new File();
-            //var participant = new Participant { Person = new Person() };
-            //var fileRevision = new FileRevision { Creator = participant };
-            //uploadedFile.FileRevision.Add(fileRevision);
-            //var uploadedRow = new FileRowViewModel(uploadedFile, this.Session, this.commonFileStoreRow);
-            //this.ContainedRows.Add(uploadedRow);
+                if (dropInfo.TargetItem is IDropTarget droptarget)
+                {
+                    droptarget.DragOver(dropInfo);
+                    return;
+                }
+
+                dropInfo.Effects = DragDropEffects.None;
+            }
+            catch (Exception ex)
+            {
+                dropInfo.Effects = DragDropEffects.None;
+                logger.Error(ex, "drag-over caused an error");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            if (dropInfo.TargetItem is IDropTarget droptarget)
+            {
+                try
+                {
+                    this.IsBusy = true;
+
+                    await droptarget.Drop(dropInfo);
+                }
+                catch (Exception ex)
+                {
+                    this.Feedback = ex.Message;
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            }
         }
     }
 }
