@@ -120,12 +120,15 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationsetup };
             this.model.Iteration.Add(this.iteration);
 
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
         }
@@ -140,14 +143,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
         public void VerifyThatRibbonViewModelCanBeConstructed()
         {
             var viewmodel = new CommonFileStoreBrowserRibbonViewModel();
-            Assert.IsFalse(viewmodel.HasModels);
+            Assert.IsFalse(viewmodel.HasSessions);
         }
 
         [Test]
         public void VerifyThatInstantiatePanelViewModelReturnsExpectedViewModel()
         {
             var viewmodel = CommonFileStoreBrowserRibbonViewModel.InstantiatePanelViewModel(
-                this.iteration,
+                this.model,
                 this.session.Object,
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,

@@ -7,6 +7,8 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -16,7 +18,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// The view-model for the <see cref="CommonFileStoreBrowserRibbonViewModel"/> view
     /// </summary>
-    public class CommonFileStoreBrowserRibbonViewModel : RibbonButtonIterationDependentViewModel
+    public class CommonFileStoreBrowserRibbonViewModel : RibbonButtonEngineeringModelDependentViewModel
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CommonFileStoreBrowserRibbonViewModel"/> class.
@@ -28,7 +30,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Returns an instance of the <see cref="CommonFileStoreBrowser"/> class
         /// </summary>
-        /// <param name="iteration">
+        /// <param name="engineeringModel">
         /// The iteration.
         /// </param>
         /// <param name="session">
@@ -49,9 +51,9 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>
         /// An instance of <see cref="CommonFileStoreBrowserViewModel"/>
         /// </returns>
-        public static CommonFileStoreBrowserViewModel InstantiatePanelViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        public static CommonFileStoreBrowserViewModel InstantiatePanelViewModel(EngineeringModel engineeringModel, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
         {
-            return new CommonFileStoreBrowserViewModel(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
+            return new CommonFileStoreBrowserViewModel(engineeringModel, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService);
         }
     }
 }
