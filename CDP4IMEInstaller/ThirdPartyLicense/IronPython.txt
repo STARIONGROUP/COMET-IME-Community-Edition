@@ -1,5 +1,5 @@
 ﻿name: IronPython
-version: 2.7.11
+version: 3.4.0
 project url: http://ironpython.net/
 license url: https://raw.githubusercontent.com/IronLanguages/ironpython2/master/LICENSE
 

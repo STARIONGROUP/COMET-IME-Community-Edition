@@ -1,5 +1,5 @@
 ﻿name: AvalonEdit
-version: 6.1.2.30
+version: 6.3.0.90
 project url: http://avalonedit.net/
 license url: https://opensource.org/licenses/MIT
 

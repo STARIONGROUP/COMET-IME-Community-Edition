@@ -263,7 +263,7 @@ namespace CDP4Composition.Modularity
         /// <returns>the Path the AppData folder</returns>
         public static string GetAppDataPath()
         {
-            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "RHEA", "COMET");
+            var appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "RHEA", "CDP4-COMET");
 
             if (!Directory.Exists(appDataPath))
             {

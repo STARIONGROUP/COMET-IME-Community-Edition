@@ -6,7 +6,7 @@
     <AssemblyTitle>CDP4Scripting</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Scripting</Product>
-    <Description>COMET Scripting Plugin</Description>
+    <Description>CDP4-COMET Scripting Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
     <AssemblyVersion>10.0.0.1</AssemblyVersion>
     <FileVersion>10.0.0.1</FileVersion>
@@ -163,6 +163,9 @@
     </PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="5.0.0">
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>

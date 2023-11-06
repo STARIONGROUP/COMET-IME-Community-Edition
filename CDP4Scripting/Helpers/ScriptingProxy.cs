@@ -157,7 +157,7 @@ namespace CDP4Scripting.Helpers
             }
 
             var sb = new StringBuilder();
-            sb.AppendLine("COMET Commands \n");
+            sb.AppendLine("CDP4-COMET Commands \n");
 
             sb.AppendLine(string.Format("COMET contains a list of commands you can perform from the script. You can use a command as follows : " +
                               "{0}.CommandName(parameters) \n", ScriptPanelViewModel.Command));

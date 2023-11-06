@@ -81,3 +81,4 @@ CDP4.v12.suo
 /CDP4Addin/Properties/launchSettings.json
 *.xaml.orig
 /UpgradeLog.htm
+/release-with-signtool.bat

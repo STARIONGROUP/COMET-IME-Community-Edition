@@ -4,7 +4,7 @@
     <AssemblyTitle>CDP4Scripting.Tests</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Scripting.Tests</Product>
-    <Description>COMET Scripting Plugin Unit tests</Description>
+    <Description>CDP4-COMET Scripting Plugin Unit tests</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

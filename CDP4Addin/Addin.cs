@@ -126,7 +126,7 @@ namespace CDP4AddinCE
         /// </remarks>
         public Addin()
         {
-            logger.Debug("starting COMET-CE addin");
+            logger.Debug("starting CDP4-COMET-CE addin");
 
             this.PreloadAssemblies();
             this.RedirectAssemblies();
@@ -136,7 +136,7 @@ namespace CDP4AddinCE
             // Set the Theme of the application
             ThemeManager.ApplicationThemeName = Theme.SevenName;
 
-            logger.Debug("COMET-CE addin started");
+            logger.Debug("CDP4-COMET-CE addin started");
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace CDP4AddinCE
         [RegisterErrorHandler]
         public static void RegisterErrorHandler(RegisterErrorMethodKind methodKind, Exception exception)
         {
-            MessageBox.Show($"An register error occurend in {methodKind.ToString()}", "COMET-CE.Addin");
+            MessageBox.Show($"An register error occurend in {methodKind.ToString()}", "CDP4-COMET-CE.Addin");
         }
 
         /// <summary>

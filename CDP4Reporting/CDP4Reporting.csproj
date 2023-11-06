@@ -8,7 +8,7 @@
     <AssemblyTitle>CDP4Reporting</AssemblyTitle>
     <Company>RHEA System S.A.</Company>
     <Product>CDP4Reporting</Product>
-    <Description>COMET Reporting Plugin</Description>
+    <Description>CDP4-COMET Reporting Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
     <AssemblyVersion>10.0.0.1</AssemblyVersion>
     <FileVersion>10.0.0.1</FileVersion>

@@ -9,7 +9,7 @@
 	<AssemblyTitle>CDP4EngineeringModel</AssemblyTitle>
 	<Company>RHEA System S.A.</Company>
 	<Product>CDP4EngineeringModel</Product>
-	<Description>COMET Engineering Model Plugin</Description>
+	<Description>CDP4-COMET Engineering Model Plugin</Description>
 	<Copyright>Copyright © RHEA System S.A.</Copyright>
 	<AssemblyVersion>10.0.0.1</AssemblyVersion>
 	<FileVersion>10.0.0.1</FileVersion>

@@ -4,16 +4,16 @@
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET-IME Community Edition.
+//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -74,22 +74,22 @@ namespace CDP4Composition.Composition
             var container = new CompositionContainer(catalog);
 
             var sw = Stopwatch.StartNew();
-            this.UpdateBootstrapperStatus("Loading COMET Catalogs");
-            this.ShowStatusMessage("Loading COMET IME Components...");
+            this.UpdateBootstrapperStatus("Loading CDP4-COMET Catalogs");
+            this.ShowStatusMessage("Loading CDP4-COMET IME Components...");
 
             this.AddExecutingAssemblyCatalog(catalog);
             this.AddCustomCatalogs(catalog);
 
-            this.UpdateBootstrapperStatus($"COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
+            this.UpdateBootstrapperStatus($"CDP4-COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
 
             this.ConfigureServiceLocator(container);
-            this.ShowStatusMessage("Loading COMET IME Plugins...");
+            this.ShowStatusMessage("Loading CDP4-COMET IME Plugins...");
 
             this.AddPluginCatalogs(catalog);
 
             this.UpdateBootstrapperStatus("Composing parts");
             this.ResetStatusProgress();
-            this.ShowStatusMessage("Initializing COMET IME Plugins...");
+            this.ShowStatusMessage("Initializing CDP4-COMET IME Plugins...");
 
             container.ComposeParts();
 
@@ -135,8 +135,8 @@ namespace CDP4Composition.Composition
         /// <param name="catalog">The <see cref="AggregateCatalog"/></param>
         private void AddPluginCatalogs(AggregateCatalog catalog)
         {
-            this.UpdateBootstrapperStatus("Loading COMET Plugins");
-
+            this.UpdateBootstrapperStatus("Loading CDP4-COMET Plugins");
+            
             var pluginLoader = new PluginLoader<T>();
             this.ResetStatusProgress();
             var counter = 1;
@@ -159,8 +159,8 @@ namespace CDP4Composition.Composition
                 }
             }
 
-            this.UpdateBootstrapperStatus($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
-            this.ShowStatusMessage($"{pluginLoader.DirectoryCatalogues.Count} COMET Plugins Loaded");
+            this.UpdateBootstrapperStatus($"{pluginLoader.DirectoryCatalogues.Count} CDP4-COMET Plugins Loaded");
+            this.ShowStatusMessage($"{pluginLoader.DirectoryCatalogues.Count} CDP4-COMET Plugins Loaded");
         }
 
         /// <summary>

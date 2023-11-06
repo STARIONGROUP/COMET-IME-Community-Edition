@@ -46,7 +46,7 @@ namespace CDP4Requirements.ReqIFDal
         private IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
-        /// Indicates that COMET model failures that resulted in a <see cref="Cdp4ModelValidationException"/>s were ignored by the user.
+        /// Indicates that CDP4-COMET model failures that resulted in a <see cref="Cdp4ModelValidationException"/>s were ignored by the user.
         /// </summary>
         private bool cdp4ModelValidationFailuresIgnored;
 
@@ -76,8 +76,8 @@ namespace CDP4Requirements.ReqIFDal
             if (!this.cdp4ModelValidationFailuresIgnored)
             {
                 if (this.messageBoxService.Show(
-                    $"COMET Model validation failure found:\n{message}) \n\nNot all data can be added to the ReqIf.\n\nSkip data that results in COMET Model validation failures?",
-                    $"COMET Model validation failure ",
+                    $"CDP4-COMET Model validation failure found:\n{message}) \n\nNot all data can be added to the ReqIf.\n\nSkip data that results in CDP4-COMET Model validation failures?",
+                    $"CDP4-COMET Model validation failure ",
                     MessageBoxButton.YesNo,
                     MessageBoxImage.Exclamation) == MessageBoxResult.Yes)
                 {
@@ -102,8 +102,8 @@ namespace CDP4Requirements.ReqIFDal
                 var missingParameterizedCategoryRules = string.Join("\n\n", this.cdp4ModelValidationFailures.Distinct());
 
                 this.messageBoxService.Show(
-                    $"The following COMET Model validation failures were ignored: \n\n {missingParameterizedCategoryRules}", 
-                    "COMET Model validation failures",
+                    $"The following CDP4-COMET Model validation failures were ignored: \n\n {missingParameterizedCategoryRules}", 
+                    "CDP4-COMET Model validation failures",
                     MessageBoxButton.OK,
                     MessageBoxImage.Exclamation);
             }

@@ -152,7 +152,7 @@ namespace COMET
 
             this.dialogNavigationService = dialogNavigationService;
             this.DockViewModel = dockViewModel;
-            this.Title = "COMET IME - Community Edition";
+            this.Title = "CDP4-COMET IME - Community Edition";
 
             this.logTarget = new MemoryEventTarget();
             this.logTarget.EventReceived += this.LogEventReceived;
@@ -211,7 +211,7 @@ namespace COMET
 
             this.OnClosingCommand = ReactiveCommandCreator.Create<CancelEventArgs>(this.OnClosing, null);
 
-            logger.Info("Welcome in the COMET Application");
+            logger.Info("Welcome in the CDP4-COMET Application");
         }
         
         /// <summary>

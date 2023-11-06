@@ -11,7 +11,7 @@
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              SizeToContent="WidthAndHeight"
              Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
-             Title="About COMET">
+             Title="About CDP4-COMET">
     <dx:DXWindow.Resources>
         <views:TextDataProvider x:Key="TextData" Uri="license.rtf"/>
     </dx:DXWindow.Resources>
