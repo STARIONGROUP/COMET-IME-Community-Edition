@@ -117,25 +117,26 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatOkCommandWorks()
+        public void VerifyThatOkCommandWorks()
         {
             await this.viewmodel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
-            Assert.IsNull(this.viewmodel.WriteException);
-            Assert.IsTrue(this.viewmodel.DialogResult.Value);
+
+            Assert.That(this.viewmodel.WriteException, Is.Null);
+            Assert.That(this.viewmodel.DialogResult.Value, Is.True);
         }
 
         [Test]
-        public async Task VerifyThatExceptionAreCaught()
+        public void VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
             ((ICommand)this.viewmodel.OkCommand).Execute(default);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
-            Assert.IsNotNull(this.viewmodel.WriteException);
-            Assert.AreEqual("test", this.viewmodel.WriteException.Message);
+            Assert.That(this.viewmodel.WriteException, Is.Not.Null);
+            Assert.That(this.viewmodel.WriteException.Message, Is.EqualTo("test"));
         }
 
         [Test]

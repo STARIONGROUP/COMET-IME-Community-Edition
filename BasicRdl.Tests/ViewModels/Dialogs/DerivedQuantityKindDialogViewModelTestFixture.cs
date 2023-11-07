@@ -124,7 +124,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatOkCommandWorks()
+        public void VerifyThatOkCommandWorks()
         {
             await this.viewmodel.OkCommand.Execute();
 
@@ -134,7 +134,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatExceptionAreCaught()
+        public void VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 

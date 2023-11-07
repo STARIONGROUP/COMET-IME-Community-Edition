@@ -26,7 +26,6 @@
 namespace BasicRdl.Tests.ViewModels
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
@@ -67,7 +66,6 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IThingDialogNavigationService> navigation;
         private Mock<IPermissionService> permissionService;
-        private ConcurrentDictionary<Guid, Lazy<Thing>> cache;
 
         [SetUp]
         public void Setup()

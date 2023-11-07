@@ -282,7 +282,7 @@ namespace BasicRdl.ViewModels
         /// </remarks>
         private string ComputeComponentCoordinates(int n)
         {
-            var rank = this.currentDimension.Count();
+            var rank = this.currentDimension.Count;
             var indexList = new int[rank];
 
             for (var i = 0; i < rank; i++)
@@ -301,7 +301,7 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private void ComputeComponentCoordinateDenominator()
         {
-            var rank = this.currentDimension.Count();
+            var rank = this.currentDimension.Count;
             this.indexDenominator = new int[rank];
             var reversedDimension = this.currentDimension.ToList();
             reversedDimension.Reverse();

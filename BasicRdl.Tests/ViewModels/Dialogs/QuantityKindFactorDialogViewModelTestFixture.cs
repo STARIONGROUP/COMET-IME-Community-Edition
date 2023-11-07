@@ -92,8 +92,7 @@ namespace BasicRdl.Tests.ViewModels
             this.siteDir.SiteReferenceDataLibrary.Add(rdl);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             var chainOfContainers = new[] { rdl };
-
-
+            
             this.cache.TryAdd(new CacheKey(testDerivedQuantityKind.Iid, null), new Lazy<Thing>(() => testDerivedQuantityKind));
             var clone = testDerivedQuantityKind.Clone(false);
 
@@ -117,7 +116,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatOkCommandWorks()
+        public void VerifyThatOkCommandWorks()
         {
             await this.viewmodel.OkCommand.Execute();
 
@@ -127,7 +126,7 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatExceptionAreCaught()
+        public void VerifyThatExceptionAreCaught()
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 

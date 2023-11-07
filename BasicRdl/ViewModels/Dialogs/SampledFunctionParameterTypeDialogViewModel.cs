@@ -102,10 +102,7 @@ namespace BasicRdl.ViewModels
                 var containerThing = container as ReferenceDataLibrary;
                 if (containerThing == null)
                 {
-                    var errorMessage =
-                        string.Format(
-                            "The sampled function parameter is of type {0}, it shall be of type ReferenceDataLibrary",
-                            container.GetType());
+                    var errorMessage = $"The sampled function parameter is of type {container.GetType()}, it shall be of type ReferenceDataLibrary";
                     throw new ArgumentException(errorMessage);
                 }
             }
@@ -311,7 +308,7 @@ namespace BasicRdl.ViewModels
                 {
                     interpolation = this.Thing.InterpolationPeriod[rowIndex];
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     logger.Warn($"Interpolation period at index {rowIndex} value array is incorrect.");
                 }

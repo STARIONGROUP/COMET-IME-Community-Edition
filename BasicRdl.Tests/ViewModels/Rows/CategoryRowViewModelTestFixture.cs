@@ -130,7 +130,6 @@ namespace BasicRdl.Tests.ViewModels
         {
             var name = "name";
             var shortname = "shortname";
-            var containerRdl = "containerrdl";
 
             var category = new Category(Guid.NewGuid(), null, null) { ShortName = shortname, Name = name };
             var container = new SiteReferenceDataLibrary(Guid.NewGuid(), null, null) { ShortName = "containerrdl"}; 

@@ -51,7 +51,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
     internal class EnumerationValueDefinitionDialogViewModleTestFixture
     {
         private Uri uri = new Uri("http://test.com");
-        private DerivedUnit derivedUnit;
+        private DerivedUnit derivedUnit = null;
         private SiteDirectory siteDir;
         private SiteReferenceDataLibrary siteRdl;
         private Mock<ISession> session;

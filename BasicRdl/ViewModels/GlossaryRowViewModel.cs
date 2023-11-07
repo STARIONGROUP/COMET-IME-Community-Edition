@@ -180,7 +180,6 @@ namespace BasicRdl.ViewModels
 
                 transaction.CreateOrUpdate(currentGlossary);
                 await this.DalWrite(transaction);
-                return;
             }
             else if (dropInfo.Effects == DragDropEffects.Copy)
             {
