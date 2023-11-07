@@ -315,7 +315,7 @@ namespace CDP4Composition.Mvvm
             {
                 // Clear all property values that maybe have been set
                 // when the class was instantiated
-                this.RevisionNumber = 0;
+                this.revisionNumber = 0; //Don't set the reactive property this.RevisionNumber here. Otherwise NotifyChange might execute unwanted code.
                 this.Thing = null;
 
                 if (this.Disposables != null)
