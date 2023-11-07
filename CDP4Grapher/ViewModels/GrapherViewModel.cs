@@ -28,6 +28,7 @@ namespace CDP4Grapher.ViewModels
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Windows;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
@@ -102,6 +103,16 @@ namespace CDP4Grapher.ViewModels
         private string selectedElementModelCode;
 
         /// <summary>
+        /// Backing field for the <see cref="GrapherVisibility"/> property
+        /// </summary>
+        private Visibility grapherVisibility = Visibility.Visible;
+
+        /// <summary>
+        /// Backing field for the <see cref="GrapherPlaceholderVisibility"/> property
+        /// </summary>
+        private Visibility grapherPlaceholderVisibility = Visibility.Collapsed;
+
+        /// <summary>
         /// Gets or sets the attached behavior
         /// </summary>
         public IGrapherOrgChartBehavior Behavior { get; set; }
@@ -165,6 +176,24 @@ namespace CDP4Grapher.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
+        
+        /// <summary>
+        /// Gets or sets the visibility of the grapher
+        /// </summary>
+        public Visibility GrapherVisibility
+        {
+            get => this.grapherVisibility;
+            set => this.RaiseAndSetIfChanged(ref this.grapherVisibility, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the visibility of the grapher's placeholder
+        /// </summary>
+        public Visibility GrapherPlaceholderVisibility
+        {
+            get => this.grapherPlaceholderVisibility;
+            set => this.RaiseAndSetIfChanged(ref this.grapherPlaceholderVisibility, value);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GrapherViewModel"/> class
@@ -250,10 +279,21 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void PopulateElementUsages()
         {
-            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Thing.Container);
+            var iteration = (Iteration)this.Thing.Container;
+            var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
 
-            var elements = new NestedElementTreeGenerator().Generate(this.option, currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
-            this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e)));
+            if (iteration.TopElement != null)
+            {
+                var elements = new NestedElementTreeGenerator().Generate(this.option, currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
+                this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e)));
+                this.GrapherVisibility = Visibility.Visible;
+                this.GrapherPlaceholderVisibility = Visibility.Collapsed;
+            }
+            else
+            {
+                this.GrapherVisibility = Visibility.Collapsed;
+                this.GrapherPlaceholderVisibility = Visibility.Visible;
+            }
         }
 
         /// <summary>

@@ -36,7 +36,7 @@
 
                         <TextBlock Grid.Row="1" Margin="5,10,5,10" TextAlignment="Center" Foreground="Black" FontSize="18" VerticalAlignment="Center" Background="AliceBlue" Text="{Binding SelectedElementModelCode}" HorizontalAlignment="Stretch"></TextBlock>
 
-                        <views1:GrapherDiagramControl Grid.Row="2" x:Name="diagramControl">
+                        <views1:GrapherDiagramControl Grid.Row="2" x:Name="diagramControl" Visibility="{Binding GrapherVisibility}">
                             <dxmvvm:Interaction.Behaviors>
                                 <behaviors:GrapherOrgChartBehavior 
                                     ParentMember="ParentId" 
@@ -56,6 +56,14 @@
                                 </behaviors:GrapherOrgChartBehavior>
                             </dxmvvm:Interaction.Behaviors>
                         </views1:GrapherDiagramControl>
+
+                        <TextBlock Grid.Row="2"
+                                   TextAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   Visibility="{Binding GrapherPlaceholderVisibility}">
+                            The Graph cannot be rendered as the Iteration does not contain a Top Element
+                        </TextBlock>
                     </Grid>
                 </dxdo:LayoutPanel>
             </dxdo:LayoutGroup>
