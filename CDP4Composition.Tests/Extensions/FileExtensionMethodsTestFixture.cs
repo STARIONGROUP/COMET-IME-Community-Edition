@@ -135,7 +135,8 @@ namespace CDP4Composition.Tests.Extensions
                 nameof(CDP4Common.EngineeringModelData.FileRevision.Iid),
                 nameof(CDP4Common.EngineeringModelData.FileRevision.ModifiedOn),
                 nameof(CDP4Common.EngineeringModelData.FileRevision.ThingPreference),
-                nameof(CDP4Common.EngineeringModelData.FileRevision.RevisionNumber)
+                nameof(CDP4Common.EngineeringModelData.FileRevision.RevisionNumber),
+                nameof(CDP4Common.EngineeringModelData.FileRevision.Actor)
             };
 
             CollectionAssert.AreEquivalent(realFileRevisionProperties, expectedFileRevisionProperties, 

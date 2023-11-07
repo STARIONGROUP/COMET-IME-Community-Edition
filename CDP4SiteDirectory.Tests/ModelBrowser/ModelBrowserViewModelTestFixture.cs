@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET-IME Community Edition.
+//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -30,20 +30,26 @@ namespace CDP4SiteDirectory.Tests
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4SiteDirectory.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -54,7 +60,7 @@ namespace CDP4SiteDirectory.Tests
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private SiteDirectory siteDirectory;
-        private Uri uri;        
+        private Uri uri;
         private Person person;
         private PropertyInfo revPropertyInfo;
         private Assembler assembler;
@@ -62,20 +68,19 @@ namespace CDP4SiteDirectory.Tests
         [SetUp]
         public void SetUp()
         {
-            this.revPropertyInfo = typeof (SiteDirectory).GetProperty("RevisionNumber");
+            this.revPropertyInfo = typeof(SiteDirectory).GetProperty("RevisionNumber");
             this.uri = new Uri("http://www.rheagroup.com");
             this.assembler = new Assembler(this.uri);
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
-            
-            
-            this.navigationService = new Mock<IPanelNavigationService>();            
+
+            this.navigationService = new Mock<IPanelNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
-            
+
             this.session = new Mock<ISession>();
-            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(siteDirectory);
+            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
@@ -92,7 +97,7 @@ namespace CDP4SiteDirectory.Tests
         public void VerifyThatPropertiesAreSet()
         {
             var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
-            
+
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
         }
@@ -104,7 +109,7 @@ namespace CDP4SiteDirectory.Tests
 
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             this.siteDirectory.Model.Add(model);
-            revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
@@ -128,7 +133,7 @@ namespace CDP4SiteDirectory.Tests
             model.IterationSetup.Add(iteration);
 
             this.siteDirectory.Model.Add(model);
-            revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
@@ -160,7 +165,7 @@ namespace CDP4SiteDirectory.Tests
             model.Participant.Add(participant);
 
             this.siteDirectory.Model.Add(model);
-            revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
@@ -196,7 +201,7 @@ namespace CDP4SiteDirectory.Tests
             model.IterationSetup.Add(new IterationSetup());
 
             this.siteDirectory.Model.Add(model);
-            revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
@@ -214,7 +219,7 @@ namespace CDP4SiteDirectory.Tests
             model.IterationSetup.Clear();
             model.ActiveDomain.Clear();
 
-            var modelRevisionProperty = typeof (EngineeringModelSetup).GetProperty("RevisionNumber");
+            var modelRevisionProperty = typeof(EngineeringModelSetup).GetProperty("RevisionNumber");
             modelRevisionProperty.SetValue(model, 5);
 
             CDPMessageBus.Current.SendObjectChangeEvent(model, EventKind.Updated);
@@ -223,7 +228,7 @@ namespace CDP4SiteDirectory.Tests
             Assert.AreEqual(0, domainFolderRow.ContainedRows.Count);
 
             this.siteDirectory.Model.Clear();
-            revPropertyInfo.SetValue(this.siteDirectory, 52);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 52);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
             Assert.AreEqual(0, viewmodel.ModelSetup.Count);
@@ -248,7 +253,7 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
-            
+
             Assert.AreEqual(50, viewmodel.RevisionNumber);
             viewmodel.Dispose();
 
@@ -274,7 +279,6 @@ namespace CDP4SiteDirectory.Tests
             var participant1 = new Participant(Guid.NewGuid(), null, this.uri);
             participant1.Person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "Alabla1", Surname = "Alabla1" };
 
-
             model.Participant.Add(participant);
             model.Participant.Add(participant1);
             model.IterationSetup.Add(new IterationSetup());
@@ -283,7 +287,7 @@ namespace CDP4SiteDirectory.Tests
             model.ActiveDomain.Add(domain);
 
             this.siteDirectory.Model.Add(model);
-            revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
@@ -303,6 +307,7 @@ namespace CDP4SiteDirectory.Tests
 
             var participantFolderRow =
                 modelRow.ContainedRows.OfType<FolderRowViewModel>().Single(x => x.Name == "Participants");
+
             var iterationFolderRow = modelRow.ContainedRows.OfType<FolderRowViewModel>().Single(x => x.Name == "Iterations");
 
             viewmodel.SelectedThing = participantFolderRow;
@@ -351,7 +356,7 @@ namespace CDP4SiteDirectory.Tests
             model.ActiveDomain.Add(domain);
 
             this.siteDirectory.Model.Add(model);
-            revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
@@ -371,6 +376,7 @@ namespace CDP4SiteDirectory.Tests
 
             var participantFolderRow =
                 modelRow.ContainedRows.OfType<FolderRowViewModel>().Single(x => x.Name == "Participants");
+
             var iterationFolderRow = modelRow.ContainedRows.OfType<FolderRowViewModel>().Single(x => x.Name == "Iterations");
 
             viewmodel.SelectedThing = participantFolderRow;
@@ -391,6 +397,7 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.PopulateContextMenu();
 
             Assert.AreEqual(3, viewmodel.ContextMenu.Count);
+
             foreach (var conMenu in viewmodel.ContextMenu)
             {
                 Assert.AreNotEqual("Delete this Participant", conMenu.Header);
@@ -423,7 +430,7 @@ namespace CDP4SiteDirectory.Tests
             model.ActiveDomain.Add(domain);
 
             this.siteDirectory.Model.Add(model);
-            revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
@@ -460,7 +467,7 @@ namespace CDP4SiteDirectory.Tests
             model.ActiveDomain.Add(domain);
 
             this.siteDirectory.Model.Add(model);
-            revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
@@ -502,7 +509,7 @@ namespace CDP4SiteDirectory.Tests
             model.ActiveDomain.Add(domain);
 
             this.siteDirectory.Model.Add(model);
-            revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
             CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
@@ -515,6 +522,27 @@ namespace CDP4SiteDirectory.Tests
 
             await viewmodel.CreateCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<EngineeringModelSetup>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<SiteDirectory>(), null));
+        }
+
+        [Test]
+        public async Task VerifyThatCreateModelSetupCommandWorksAsExpectedWhenCanCreateOverrideIsUsed()
+        {
+            this.assembler.Cache.TryAdd(new CacheKey(this.siteDirectory.Iid, null),
+                new Lazy<Thing>(() => this.siteDirectory));
+
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(false);
+
+            this.permissionService.Setup(x => x.CanCreateOverride(It.IsAny<ClassKind>(), It.IsAny<ClassKind>())).Returns(true);
+
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), this.thingDialogNavigationService.Object, this.navigationService.Object, null, null);
+
+            Assert.IsTrue(((ICommand)viewmodel.CreateCommand).CanExecute(null));
+
+            this.permissionService.Setup(x => x.CanCreateOverride(It.IsAny<ClassKind>(), It.IsAny<ClassKind>())).Returns(false);
+
+            viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), this.thingDialogNavigationService.Object, this.navigationService.Object, null, null);
+
+            Assert.IsFalse(((ICommand)viewmodel.CreateCommand).CanExecute(null));
         }
     }
 }

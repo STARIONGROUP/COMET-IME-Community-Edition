@@ -167,7 +167,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             dropinfo.Setup(x => x.Payload).Returns(this.file);
 
             row.DragOver(dropinfo.Object);
-            dropinfo.VerifySet(x => x.Effects = DragDropEffects.Copy);
+            dropinfo.VerifySet(x => x.Effects = DragDropEffects.Move);
 
             this.fileRevision1.ContainingFolder = this.folder1;
 
@@ -183,7 +183,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var dropTarget = new Mock<IDropTarget>();
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(this.file);
-            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
+            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
             dropinfo.Setup(x => x.TargetItem).Returns(dropTarget.Object);
 
             await row.Drop(dropinfo.Object);

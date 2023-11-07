@@ -4,7 +4,7 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="10.0.0-rc6" />
+    <PackageReference Include="CDP4Common-CE" Version="24.1.1" />
     <PackageReference Include="DotLiquid" Version="2.2.508" />
   </ItemGroup>
   

@@ -14,7 +14,7 @@
 
       {%- for wxsObject in KnownAssemblies.WxsObjects -%}
       <Component Id="{{wxsObject.ComponentId}}" Guid="{{specialChar1}}{{wxsObject.Guid}}{{specialChar2}}" Win64="$(var.Win64)">
-        <File Id="{{wxsObject.FileId}}" Vital="yes" Source="$(var.CDP4IME-CE.TargetDir){{wxsObject.AssemblyName}}" KeyPath="yes" Assembly=".net"></File>
+        <File Id="{{wxsObject.FileId}}" Vital="yes" Source="$(var.COMET-CE.TargetDir){{wxsObject.AssemblyName}}" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       {%- endfor -%}
