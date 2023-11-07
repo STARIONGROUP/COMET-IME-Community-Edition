@@ -329,6 +329,8 @@ namespace CDP4Reporting.ViewModels
         public ReportDesignerViewModel(Iteration thing, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
+            DevExpress.Utils.DeserializationSettings.RegisterTrustedClass(typeof(DataSet));  
+
             ReportingSettings.OptionSelector = (options, option) =>
             {
                 var thingSelectorDialogService = ServiceLocator.Current.GetInstance<IThingSelectorDialogService>();
@@ -719,7 +721,7 @@ namespace CDP4Reporting.ViewModels
                         }
                     }
                 }
-                finally
+                catch
                 {
                     //ignore this error...
                 }
@@ -752,10 +754,39 @@ namespace CDP4Reporting.ViewModels
                     Name = "__temporaryParameter__"
                 };
 
-                changes.AddItem(refreshDataSource);
-                changes.RemoveItem(refreshDataSource);
-                changes.AddItem(refreshParameter);
-                changes.RemoveItem(refreshParameter);
+                var triedAddDataSource = false;
+                var triedAddParameter = false;
+
+                try
+                {
+                    changes.AddItem(refreshDataSource);
+                    triedAddDataSource = true;
+                    changes.RemoveItem(refreshDataSource);
+                    changes.AddItem(refreshParameter);
+                    triedAddParameter = true;
+                    changes.RemoveItem(refreshParameter);
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    try
+                    {
+                        if (triedAddDataSource)
+                        {
+                            changes.RemoveItem(refreshDataSource);
+                        }
+
+                        if (triedAddParameter)
+                        {
+                            changes.RemoveItem(refreshParameter);
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
             });
         }
 
