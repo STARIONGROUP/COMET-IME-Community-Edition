@@ -509,8 +509,7 @@ namespace CDP4Composition.Mvvm
             get { return this.tooltip; }
             protected set { this.RaiseAndSetIfChanged(ref this.tooltip, value); }
         }
-
-
+        
         /// <summary>
         /// Execute the generic <see cref="CreateCommand"/>
         /// </summary>

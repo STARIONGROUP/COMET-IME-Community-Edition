@@ -129,7 +129,10 @@ namespace CDP4EngineeringModel.ViewModels
                     vm => vm.IsLocked).Subscribe(
                 x =>
                 {
-                    this.SelectedLockedBy = x ? this.currentPerson : null;
+                    if (!this.IsLockedByAnotherPerson())
+                    {
+                        this.SelectedLockedBy = x ? this.currentPerson : null;
+                    }
                 });
 
             this.WhenAnyValue(
@@ -255,7 +258,11 @@ namespace CDP4EngineeringModel.ViewModels
 
             var iteration = this.Container.GetContainerOfType<Iteration>();
 
-            if (iteration != null)
+            if (iteration == null)
+            {
+                this.currentPerson = this.Session.OpenIterations.FirstOrDefault().Value.Item2.Person;
+            }
+            else
             {
                 if (this.Session.OpenIterations.TryGetValue(iteration, out var tuple))
                 {
@@ -298,7 +305,7 @@ namespace CDP4EngineeringModel.ViewModels
                 return true;
             }
 
-            return this.SelectedLockedBy != this.currentPerson;
+            return this.SelectedLockedBy != null && this.SelectedLockedBy != this.currentPerson;
         }
 
         /// <summary>

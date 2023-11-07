@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommonFileStoreBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-IME Community Edition. 
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -29,6 +29,8 @@ namespace CDP4EngineeringModel.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows;
     using System.Windows.Controls;
 
     using CDP4Common.CommonData;
@@ -36,6 +38,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -52,17 +55,12 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// The view-model for the <see cref="CommonFileStoreBrowserViewModel"/> view
     /// </summary>
-    public class CommonFileStoreBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
+    public class CommonFileStoreBrowserViewModel : BrowserViewModelBase<EngineeringModel>, IPanelViewModel, IDropTarget
     {
         /// <summary>
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Common File Store";
-
-        /// <summary>
-        /// the <see cref="CommonFileStoreRowViewModel"/>
-        /// </summary>
-        private CommonFileStoreRowViewModel commonFileStoreRow;
 
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -97,7 +95,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="CommonFileStoreBrowserViewModel"/> class.
         /// </summary>
-        /// <param name="iteration">
+        /// <param name="engineeringModel">
         /// The iteration.
         /// </param>
         /// <param name="session">
@@ -115,11 +113,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public CommonFileStoreBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
+        public CommonFileStoreBrowserViewModel(EngineeringModel engineeringModel, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+            : base(engineeringModel, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
-            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+            this.Caption = $"{PanelCaption}, {this.Thing.EngineeringModelSetup.Name}";
+            this.ToolTip = $"{this.Thing.EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
             this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
             this.AddSubscriptions();
             this.UpdateProperties();
@@ -133,36 +131,24 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup
-        {
-            get { return (EngineeringModelSetup)this.Thing.IterationSetup.Container; }
-        }
+        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.EngineeringModelSetup;
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel; 
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value); 
         }
-
-        /// <summary>
-        /// Gets the current iteration caption to be displayed in the browser
-        /// </summary>
-        public int CurrentIteration
-        {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
-        }
-
+        
         /// <summary>
         /// Gets a value indicating whether the <see cref="CreateFolderCommand"/> can be executed
         /// </summary>
         public bool CanCreateFolder
         {
-            get { return this.canCreateFolder; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateFolder, value); }
+            get => this.canCreateFolder; 
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateFolder, value); 
         }
 
         /// <summary>
@@ -170,8 +156,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanUploadFile
         {
-            get { return this.canUploadFile; }
-            private set { this.RaiseAndSetIfChanged(ref this.canUploadFile, value); }
+            get => this.canUploadFile; 
+            private set => this.RaiseAndSetIfChanged(ref this.canUploadFile, value); 
         }
 
         /// <summary>
@@ -189,8 +175,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreateStore
         {
-            get { return this.canCreateStore; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateStore, value); }
+            get => this.canCreateStore; 
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateStore, value); 
         }
 
         /// <summary>
@@ -210,15 +196,17 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateFolderCommand = ReactiveCommandCreator.Create(
-                () => this.ExecuteCreateCommand<Folder>(this.commonFileStoreRow.Thing), 
-                this.WhenAnyValue(x => x.CanCreateFolder));
-
             this.CreateStoreCommand = ReactiveCommandCreator.Create(
                 () => this.ExecuteCreateCommand<CommonFileStore>(this.Thing.TopContainer), 
                 this.WhenAnyValue(x => x.CanCreateStore));
 
-            this.UploadFileCommand = ReactiveCommandCreator.Create(this.ExecuteUploadFile);
+            this.CreateFolderCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateCommandForFolder(this.SelectedThing.Thing), 
+                this.WhenAnyValue(x => x.CanCreateFolder));
+
+            this.UploadFileCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing),
+            this.WhenAnyValue(x => x.CanUploadFile));
         }
 
         /// <summary>
@@ -237,10 +225,12 @@ namespace CDP4EngineeringModel.ViewModels
         public override void ComputePermission()
         {
             base.ComputePermission();
-            this.CanCreateFolder = this.commonFileStoreRow != null &&
-                                   this.PermissionService.CanWrite(ClassKind.Folder, this.commonFileStoreRow.Thing);
 
-            this.CanCreateStore = this.commonFileStoreRow == null;
+            var isContainer = this.SelectedThing?.Thing is CommonFileStore || this.SelectedThing?.Thing is Folder;
+
+            this.CanCreateStore = this.PermissionService.CanWrite(ClassKind.CommonFileStore, this.Thing);
+            this.CanCreateFolder = isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
+            this.CanUploadFile = isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
         }
 
         /// <summary>
@@ -250,8 +240,8 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulateContextMenu();
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Common File Store", "", this.CreateStoreCommand, MenuItemKind.Create, ClassKind.CommonFileStore));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Upload a File to the File Store", "", this.UploadFileCommand, MenuItemKind.Create, ClassKind.File));
         }
 
@@ -264,6 +254,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var row in this.ContainedRows)
             {
                 row.Dispose();
@@ -275,28 +266,43 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void UpdateFileStoreRows()
         {
-            var updatedStore = ((EngineeringModel)this.Thing.Container).CommonFileStore.FirstOrDefault();
-            if (updatedStore == null)
-            {
-                if (this.commonFileStoreRow != null)
-                {
-                    this.ContainedRows.RemoveAndDispose(this.commonFileStoreRow);
-                    this.commonFileStoreRow = null;
-                }
+            var commonFileStore = this.Thing.CommonFileStore;
 
-                return;
+            var currentDomainFileStores = this.ContainedRows.Select(x => x.Thing).OfType<CommonFileStore>().ToList();
+            var newDomainFileStores = commonFileStore.Except(currentDomainFileStores);
+            var oldDomainFileStores = currentDomainFileStores.Except(commonFileStore);
+
+            foreach (var domainFileStore in oldDomainFileStores)
+            {
+                this.RemoveDomainFileStoreRow(domainFileStore);
             }
 
-            if (this.commonFileStoreRow == null)
+            foreach (var domainFileStore in newDomainFileStores)
             {
-                this.commonFileStoreRow = new CommonFileStoreRowViewModel(updatedStore, this.Session, this);
-                this.ContainedRows.Add(this.commonFileStoreRow);
+                this.AddDomainFileStoreRow(domainFileStore);
             }
-            else if (this.commonFileStoreRow.Thing != updatedStore)
+        }
+
+        /// <summary>
+        /// Add the row of the associated <see cref="CommonFileStore"/>
+        /// </summary>
+        /// <param name="commonFileStore">The <see cref="CommonFileStore"/> to add</param>
+        private void AddDomainFileStoreRow(CommonFileStore commonFileStore)
+        {
+            this.ContainedRows.Add(new CommonFileStoreRowViewModel(commonFileStore, this.Session, this));
+        }
+
+        /// <summary>
+        /// Remove the row of the associated <see cref="CommonFileStore"/>
+        /// </summary>
+        /// <param name="commonFileStore">The <see cref="CommonFileStore"/> to remove</param>
+        private void RemoveDomainFileStoreRow(CommonFileStore commonFileStore)
+        {
+            var row = this.ContainedRows.SingleOrDefault(x => x.Thing == commonFileStore);
+
+            if (row != null)
             {
-                this.commonFileStoreRow.Dispose();
-                this.commonFileStoreRow = new CommonFileStoreRowViewModel(updatedStore, this.Session, this);
-                this.ContainedRows.Add(this.commonFileStoreRow);
+                this.ContainedRows.RemoveAndDispose(row);
             }
         }
 
@@ -305,29 +311,33 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
-            this.Disposables.Add(engineeringModelSetupSubscription);
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties()));
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
-            this.Disposables.Add(domainOfExpertiseSubscription);
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties()));
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
-            this.Disposables.Add(iterationSetupSubscription);
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.EngineeringModelSetup)
+                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties()));
 
-            var modelSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
-            this.Disposables.Add(modelSubscription);
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
+                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties()));
+
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Folder))
+                .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
+                .Subscribe(_ => this.ComputePermission()));
+
+            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(File))
+                .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
+                .Subscribe(_ => this.ComputePermission()));
         }
 
         /// <summary>
@@ -336,29 +346,115 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateProperties()
         {
             this.CurrentModel = this.CurrentEngineeringModelSetup.Name;
-            this.CurrentIteration = this.Thing.IterationSetup.IterationNumber;
-
             this.UpdateFileStoreRows();
         }
 
         /// <summary>
-        /// Executes the upload file command
+        /// Execute the generic <see cref="CreateCommand"/> for a <see cref="Folder"/>
         /// </summary>
-        private void ExecuteUploadFile()
+        /// <param name="container">
+        /// The container of the <see cref="Folder"/> that is to be created
+        /// </param>
+        protected void ExecuteCreateCommandForFolder(Thing container = null)
         {
-            var result = this.fileDialogService.GetSaveFileDialog(string.Empty, string.Empty, string.Empty, string.Empty, 1);
-            if (string.IsNullOrEmpty(result))
+            var thing = new Folder();
+
+            if (container is Folder folder)
             {
+                thing.ContainingFolder = folder;
+
+                var realContainer = folder.GetContainerOfType(typeof(CommonFileStore));
+
+                this.ExecuteCreateCommand(thing, realContainer);
                 return;
             }
 
-            //// TODO on Task T1250: Replace the following 3 lines with an actual call to the server to upload the file 
-            //var uploadedFile = new File();
-            //var participant = new Participant { Person = new Person() };
-            //var fileRevision = new FileRevision { Creator = participant };
-            //uploadedFile.FileRevision.Add(fileRevision);
-            //var uploadedRow = new FileRowViewModel(uploadedFile, this.Session, this.commonFileStoreRow);
-            //this.ContainedRows.Add(uploadedRow);
+            this.ExecuteCreateCommand(thing, container);
+        }
+
+        /// <summary>
+        /// Execute the generic <see cref="CreateCommand"/> for a <see cref="File"/>
+        /// </summary>
+        /// <param name="container">
+        /// The container of the <see cref="File"/> that is to be created
+        /// </param>
+        protected void ExecuteCreateCommandForFile(Thing container = null)
+        {
+            var file = new File
+            {
+                Container = this.Thing
+            };
+
+            if (container is Folder fileFolder)
+            {
+                var realContainer = fileFolder.GetContainerOfType(typeof(CommonFileStore));
+                file.CurrentContainingFolder = fileFolder;
+
+                this.ExecuteCreateCommand(file, realContainer);
+                return;
+            }
+
+            this.ExecuteCreateCommand(file, container);
+        }
+
+        /// <summary>
+        /// Updates the current drag state.
+        /// </summary>
+        /// <param name="dropInfo">
+        ///  Information about the drag operation.
+        /// </param>
+        /// <remarks>
+        /// To allow a drop at the current drag position, the <see cref="DropInfo.Effects"/> property on 
+        /// <paramref name="dropInfo"/> should be set to a value other than <see cref="DragDropEffects.None"/>
+        /// and <see cref="DropInfo.Payload"/> should be set to a non-null value.
+        /// </remarks>
+        public void DragOver(IDropInfo dropInfo)
+        {
+            try
+            {
+                logger.Trace("drag over {0}", dropInfo.TargetItem);
+
+                if (dropInfo.TargetItem is IDropTarget droptarget)
+                {
+                    droptarget.DragOver(dropInfo);
+                    return;
+                }
+
+                dropInfo.Effects = DragDropEffects.None;
+            }
+            catch (Exception ex)
+            {
+                dropInfo.Effects = DragDropEffects.None;
+                logger.Error(ex, "drag-over caused an error");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Performs the drop operation
+        /// </summary>
+        /// <param name="dropInfo">
+        /// Information about the drop operation.
+        /// </param>
+        public async Task Drop(IDropInfo dropInfo)
+        {
+            if (dropInfo.TargetItem is IDropTarget droptarget)
+            {
+                try
+                {
+                    this.IsBusy = true;
+
+                    await droptarget.Drop(dropInfo);
+                }
+                catch (Exception ex)
+                {
+                    this.Feedback = ex.Message;
+                }
+                finally
+                {
+                    this.IsBusy = false;
+                }
+            }
         }
     }
 }

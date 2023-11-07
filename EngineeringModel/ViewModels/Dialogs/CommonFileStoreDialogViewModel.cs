@@ -1,9 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FolderDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CommonFileStoreDialogViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2023 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//            Nathanael Smiechowski, Kamil Wojnowski, Jaime Bernar
 //
 //    This file is part of CDP4-IME Community Edition. 
 //    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
@@ -43,31 +43,31 @@ namespace CDP4EngineeringModel.ViewModels
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="FolderDialogViewModel"/> is to allow a <see cref="Folder"/> to
+    /// The purpose of the <see cref="CommonFileStoreDialogViewModel"/> is to allow a <see cref="CommonFileStore"/> to
     /// be created or updated.
     /// </summary>
     /// <remarks>
-    /// The creation of an <see cref="Folder"/> will result in an <see cref="Folder"/> being created by
+    /// The creation of an <see cref="CommonFileStore"/> will result in an <see cref="CommonFileStore"/> being created by
     /// the connected data-source
     /// </remarks>
-    [ThingDialogViewModelExport(ClassKind.Folder)]
-    public class FolderDialogViewModel : CDP4CommonView.FolderDialogViewModel, IThingDialogViewModel
+    [ThingDialogViewModelExport(ClassKind.CommonFileStore)]
+    public class CommonFileStoreDialogViewModel : CDP4CommonView.CommonFileStoreDialogViewModel, IThingDialogViewModel
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="FolderDialogViewModel"/> class.
+        /// Initializes a new instance of the <see cref="CommonFileStoreDialogViewModel"/> class.
         /// </summary>
         /// <remarks>
         /// The default constructor is required by MEF
         /// </remarks>
-        public FolderDialogViewModel()
+        public CommonFileStoreDialogViewModel()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="FolderDialogViewModel"/> class.
+        /// Initializes a new instance of the <see cref="CommonFileStoreDialogViewModel"/> class.
         /// </summary>
-        /// <param name="folder">
-        /// The <see cref="Folder"/> that is the subject of the current view-model. This is the object
+        /// <param name="fileStore">
+        /// The <see cref="CommonFileStore"/> that is the subject of the current view-model. This is the object
         /// that will be either created, or edited.
         /// </param>
         /// <param name=""></param>
@@ -78,10 +78,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// The <see cref="ISession"/> in which the current <see cref="Thing"/> is to be added or updated
         /// </param>
         /// <param name="isRoot">
-        /// Assert if this <see cref="FolderDialogViewModel"/> is the root of all <see cref="IThingDialogViewModel"/>
+        /// Assert if this <see cref="CommonFileStoreDialogViewModel"/> is the root of all <see cref="IThingDialogViewModel"/>
         /// </param>
         /// <param name="dialogKind">
-        /// The kind of operation this <see cref="FolderDialogViewModel"/> performs
+        /// The kind of operation this <see cref="CommonFileStoreDialogViewModel"/> performs
         /// </param>
         /// <param name="thingDialogNavigationService">
         /// The <see cref="IThingDialogNavigationService"/>
@@ -92,9 +92,9 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="chainOfContainers">
         /// The optional chain of containers that contains the <paramref name="container"/> argument
         /// </param>
-        public FolderDialogViewModel(Folder folder, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, 
+        public CommonFileStoreDialogViewModel(CommonFileStore fileStore, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, 
             IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
-            : base(folder, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
+            : base(fileStore, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
         }
 
@@ -105,11 +105,11 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulatePossibleOwner();
 
-            var engineeringModel = this.Container.GetContainerOfType<EngineeringModel>();
-            var domains = engineeringModel?.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
+            var engineeringModel = (EngineeringModel)(this.Container ?? this.Thing.Container);
 
-            if (domains != null)
+            if (engineeringModel != null)
             {
+                var domains = engineeringModel?.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
                 this.PossibleOwner.AddRange(domains);
             }
         }
@@ -121,36 +121,17 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.UpdateProperties();
 
-            if (this.Container is Folder folder && this.Thing.ContainingFolder == null)
-            {
-                this.Thing.ContainingFolder = folder;
-            }
-
             this.CreatedOn = this.Thing.CreatedOn.Equals(DateTime.MinValue) ? DateTime.UtcNow : this.Thing.CreatedOn;
 
-            Iteration iteration = null;
+            var engineeringModel = (EngineeringModel)(this.Container ?? this.Thing.Container);
 
-            if (this.Container is DomainFileStore domainFileStore)
+            if (engineeringModel != null)
             {
-                iteration = (Iteration)domainFileStore.Container;
-            }
-            else if (this.Container is CommonFileStore commonFileStore)
-            {
-                iteration = ((EngineeringModel)commonFileStore.Container).Iteration.LastOrDefault();
-            }
+                var iteration = engineeringModel.Iteration.LastOrDefault();
 
-            if (this.SelectedCreator == null)
-            {
-                if (iteration != null)
-                {
-                    this.Session.OpenIterations.TryGetValue(iteration, out var tuple);
-                    this.SelectedCreator = tuple?.Item2;
-                }
+                this.SelectedOwner = this.SelectedOwner ?? this.Session.QuerySelectedDomainOfExpertise(iteration);
+                this.Name = this.Name ?? this.SelectedOwner.Name;
             }
-
-            this.SelectedOwner = 
-                this.SelectedOwner ?? 
-                (iteration == null ? null : this.Session.QuerySelectedDomainOfExpertise(iteration));
         }
 
         /// <summary>

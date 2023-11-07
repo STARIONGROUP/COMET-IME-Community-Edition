@@ -28,17 +28,21 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    
+    using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     
     using CDP4EngineeringModel.ViewModels;
@@ -149,6 +153,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.model.Iteration.Add(this.iteration);
 
+            var lazyModel = new Lazy<Thing>(() => this.model);
+            this.assembler.Cache.GetOrAdd(new CacheKey(this.model.Iid, null), lazyModel);
+
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -195,7 +202,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatBrowserWorksWithNoStore()
         {
-            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
             Assert.IsEmpty(vm.ContainedRows);
             
@@ -203,7 +210,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
             Assert.That(vm.DomainOfExpertise, Is.Null.Or.Empty);
             Assert.AreEqual(this.engineeringModelSetup.Name, vm.CurrentModel);
-            Assert.AreEqual(this.iterationSetup.IterationNumber, vm.CurrentIteration);
 
             Assert.IsTrue(vm.CanCreateStore);
             Assert.IsFalse(vm.CanCreateFolder);
@@ -212,16 +218,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatRowsAreCreatedAndAddedCorrectly()
         {
-            var vm = new CommonFileStoreBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             this.model.CommonFileStore.Add(this.store);
-            this.rev.SetValue(this.iteration, 2);
+            this.rev.SetValue(this.model.EngineeringModelSetup, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            CDPMessageBus.Current.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
 
             vm.ComputePermission();
 
-            Assert.IsFalse(vm.CanCreateStore);
-            Assert.IsTrue(vm.CanCreateFolder);
+            Assert.IsTrue(vm.CanCreateStore);
+            Assert.IsFalse(vm.CanCreateFolder);
 
             var storeRow = vm.ContainedRows.Single();
             Assert.IsEmpty(storeRow.ContainedRows);
@@ -276,6 +282,112 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             CDPMessageBus.Current.SendObjectChangeEvent(folder3, EventKind.Updated);
 
             Assert.AreEqual(2, folder2Row.ContainedRows.Count);
+        }
+
+        [Test]
+        public async Task VerifyThatCreateStoreCommandWorks()
+        {
+            var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+
+            this.model.CommonFileStore.Add(this.store);
+            this.rev.SetValue(this.model.EngineeringModelSetup, 2);
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
+            vm.ComputePermission();
+
+            //No row selected
+            await vm.CreateStoreCommand.Execute();
+
+            this.thingDialogNavigationService.Verify(
+                x => x.Navigate(
+                    It.IsAny<CommonFileStore>(),
+                    It.IsAny<IThingTransaction>(),
+                    It.IsAny<ISession>(),
+                    true,
+                    ThingDialogKind.Create,
+                    this.thingDialogNavigationService.Object,
+                    It.IsAny<EngineeringModel>(),
+                    null), Times.Once());
+
+            //CommonFileStore row selected
+            vm.SelectedThing = vm.ContainedRows.First();
+
+            await vm.CreateStoreCommand.Execute();
+
+            this.thingDialogNavigationService.Verify(
+                x => x.Navigate(
+                    It.IsAny<CommonFileStore>(),
+                    It.IsAny<IThingTransaction>(),
+                    It.IsAny<ISession>(),
+                    true,
+                    ThingDialogKind.Create,
+                    this.thingDialogNavigationService.Object,
+                    It.IsAny<EngineeringModel>(),
+                    null), Times.Exactly(2));
+        }
+
+        [Test]
+        public async Task VerifyThatCreateFileCommandWorks()
+        {
+            var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+
+            this.store.Folder.Add(this.folder1);
+            this.store.Folder.Add(this.folder2);
+            this.folder2.ContainingFolder = this.folder1;
+
+            this.model.CommonFileStore.Add(this.store);
+            this.rev.SetValue(this.model.EngineeringModelSetup, 2);
+
+            CDPMessageBus.Current.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
+            vm.ComputePermission();
+
+            //DomainFileStore row selected
+            vm.SelectedThing = vm.ContainedRows.First();
+
+            await vm.UploadFileCommand.Execute();
+
+            this.thingDialogNavigationService.Verify(
+                x => x.Navigate(
+                        It.IsAny<File>(),
+                        It.IsAny<IThingTransaction>(),
+                        It.IsAny<ISession>(),
+                        true,
+                        ThingDialogKind.Create,
+                        this.thingDialogNavigationService.Object,
+                        It.IsAny<CommonFileStore>(),
+                        null), Times.Once());
+
+            //Main folder row selected
+            vm.SelectedThing = vm.ContainedRows.First().ContainedRows.First();
+
+            await vm.UploadFileCommand.Execute();
+
+            this.thingDialogNavigationService.Verify(
+                x => x.Navigate(
+                    It.IsAny<File>(),
+                    It.IsAny<IThingTransaction>(),
+                    It.IsAny<ISession>(),
+                    true,
+                    ThingDialogKind.Create,
+                    this.thingDialogNavigationService.Object,
+                    It.IsAny<CommonFileStore>(),
+                    null), Times.Exactly(2));
+
+            //Sub folder row selected
+            vm.SelectedThing = vm.ContainedRows.First().ContainedRows.First().ContainedRows.First();
+
+            await vm.UploadFileCommand.Execute();
+
+            this.thingDialogNavigationService.Verify(
+                x => x.Navigate(
+                    It.IsAny<File>(),
+                    It.IsAny<IThingTransaction>(),
+                    It.IsAny<ISession>(),
+                    true,
+                    ThingDialogKind.Create,
+                    this.thingDialogNavigationService.Object,
+                    It.IsAny<CommonFileStore>(),
+                    null), Times.Exactly(3));
         }
     }
 }

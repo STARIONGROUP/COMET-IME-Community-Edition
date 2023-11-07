@@ -26,14 +26,14 @@
                             RibbonStyle="Large"
                             IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=Project_32x32.png}"
-                            Hint="Open a Common File Store Browser for an Iteration of a Model"
-                            IsVisible="False">
+                            Hint="Open a Common File Store Browser for a Model"
+                            IsVisible="True">
         <dxb:BarSplitButtonItem.PopupControl>
             <dxr:GalleryDropDownPopupMenu>
                 <dxr:GalleryDropDownPopupMenu.Gallery>
                     <dxb:Gallery ColCount="1"
-                                 GroupTemplate="{StaticResource groupTemplate}"
-                                 GroupsSource="{Binding OpenModels}"
+                                 GroupTemplate="{StaticResource sessionGroupTemplate}"
+                                 GroupsSource="{Binding EngineeringModels}"
                                  IsGroupCaptionVisible="True"
                                  ItemCheckMode="Multiple" />
                 </dxr:GalleryDropDownPopupMenu.Gallery>

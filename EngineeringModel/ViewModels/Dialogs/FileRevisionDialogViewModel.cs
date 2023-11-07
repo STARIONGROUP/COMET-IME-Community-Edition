@@ -390,7 +390,21 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 var iteration = this.Container.GetContainerOfType<Iteration>();
 
-                if (iteration != null)
+                if (iteration == null)
+                {
+                    var engineeringModel = this.Container.GetContainerOfType<EngineeringModel>();
+
+                    if (engineeringModel != null)
+                    {
+                        var dictionary = this.Session.OpenIterations.FirstOrDefault(x => x.Key.Container == engineeringModel);
+
+                        if (dictionary.Key != null)
+                        {
+                            this.SelectedCreator = dictionary.Value.Item2;
+                        }
+                    }
+                }
+                else
                 {
                     this.Session.OpenIterations.TryGetValue(iteration, out var tuple);
                     this.SelectedCreator = tuple?.Item2;
