@@ -119,8 +119,7 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyThatOkCommandWorks()
         {
-            await this.viewmodel.OkCommand.Execute();
-
+            ((ICommand)this.viewmodel.OkCommand).Execute(default);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
             Assert.That(this.viewmodel.WriteException, Is.Null);
