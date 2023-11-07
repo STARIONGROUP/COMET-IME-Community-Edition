@@ -32,8 +32,8 @@
     <PackageReference Include="CDP4Dal-CE" Version="10.0.0-rc6" />
     <PackageReference Include="CDP4JsonSerializer-CE" Version="10.0.0-rc6" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
-    <PackageReference Include="DevExpress.Reporting.Core" Version="22.2.5-pre-23050" />
-    <PackageReference Include="DevExpress.Wpf.Reporting" Version="22.2.5-pre-23050" />
+    <PackageReference Include="DevExpress.Reporting.Core" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Wpf.Reporting" Version="22.2.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.1.2" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.2" />
