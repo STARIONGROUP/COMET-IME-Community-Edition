@@ -27,6 +27,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Globalization;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -41,12 +42,19 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Events;
 
     using CDP4EngineeringModel.ViewModels.FileStoreBrowsers;
+    
+    using ReactiveUI;
 
     /// <summary>
     /// The <see cref="DomainFileStore"/> row-view-model
     /// </summary>
     public class DomainFileStoreRowViewModel : CDP4CommonView.DomainFileStoreRowViewModel, IFileStoreRow<DomainFileStore>, IDropTarget
     {
+        /// <summary>
+        /// Backing field for the <see cref="CreationDate"/> property
+        /// </summary>
+        private string creationDate;
+
         /// <summary>
         /// The <see cref="IFileStoreFileAndFolderHandler"/>
         /// </summary>
@@ -63,6 +71,15 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.fileStoreFileAndFolderHandler = new FileStoreFileAndFolderHandler<DomainFileStore>(this);
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Gets or sets the date of creation of the <see cref="Folder"/>
+        /// </summary>
+        public string CreationDate
+        {
+            get => this.creationDate;
+            private set => this.RaiseAndSetIfChanged(ref this.creationDate, value);
         }
 
         /// <summary>
@@ -84,6 +101,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateProperties()
         {
             this.fileStoreFileAndFolderHandler.UpdateFileRows();
+            this.CreationDate = this.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture);
             this.UpdateThingStatus();
         }
 

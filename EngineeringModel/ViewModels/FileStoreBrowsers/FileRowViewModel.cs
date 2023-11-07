@@ -61,9 +61,9 @@ namespace CDP4EngineeringModel.ViewModels
         private string name;
 
         /// <summary>
-        /// Backing field for <see cref="CreatedOn"/>
+        /// Backing field for the <see cref="CreationDate"/> property
         /// </summary>
-        private string createdOn;
+        private string creationDate;
 
         /// <summary>
         /// Backing field for <see cref="CreatorValue"/>
@@ -114,12 +114,12 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets the date the current <see cref="FileRevision"/> was created
+        /// Gets or sets the date of creation of the <see cref="Folder"/>
         /// </summary>
-        public string CreatedOn
+        public string CreationDate
         {
-            get => this.createdOn;
-            private set => this.RaiseAndSetIfChanged(ref this.createdOn, value);
+            get => this.creationDate;
+            private set => this.RaiseAndSetIfChanged(ref this.creationDate, value);
         }
 
         /// <summary>
@@ -226,7 +226,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void UpdateFileRevisionProperties()
         {
             this.Name = this.fileRevision.Name;
-            this.CreatedOn = this.fileRevision.CreatedOn.ToString(CultureInfo.InvariantCulture);
+            this.CreationDate = this.fileRevision.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture);
             this.CreatorValue = this.fileRevision.Creator.Person.Name;
         }
     }
