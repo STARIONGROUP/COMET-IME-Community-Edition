@@ -6,10 +6,10 @@ ECHO.
 
 IF %1.==. GOTO VersionError
 set version=%1
-set installers86path=.\CDP4IMEInstaller\bin\Release\COMET-CE.x86.msi
-set filename86=COMET-CE.x86_%version%.msi
-set installers64path=.\CDP4IMEInstaller\bin\x64\Release\COMET-CE.x64.msi
-set filename64=COMET-CE.x64_%version%.msi
+set installers86path=.\CDP4IMEInstaller\bin\Release\CDP4-COMET-CE.x86.msi
+set filename86=CDP4-COMET-CE.x86_%version%.msi
+set installers64path=.\CDP4IMEInstaller\bin\x64\Release\CDP4-COMET-CE.x64.msi
+set filename64=CDP4-COMET-CE.x64_%version%.msi
 
 set releasefolder=.\Release
 

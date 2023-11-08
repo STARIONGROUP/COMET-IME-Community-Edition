@@ -2,11 +2,11 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <RootNamespace>COMET</RootNamespace>
-    <AssemblyName>COMET</AssemblyName>
-	<TargetFramework>net48</TargetFramework>
+    <AssemblyName>CDP4-COMET</AssemblyName>
+	  <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <OutputPath>bin\$(Configuration)\net48\</OutputPath>
-    <AssemblyTitle>COMET</AssemblyTitle>
+    <AssemblyTitle>CDP4-COMET</AssemblyTitle>
     <Company>RHEA System S.A</Company>
     <Product>CDP4-COMET</Product>
     <Description>The CDP4-COMET Integrated Modelling Environment</Description>
