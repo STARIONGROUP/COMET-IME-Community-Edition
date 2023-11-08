@@ -14,6 +14,55 @@
         <File Id="fil_Manifest_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)CDP4ServicesDal.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="comp_MessagePackSerializer_CDP4ServicesDal" Guid="{FBF4A8D4-E31A-448F-A66D-9D60FD485ADA}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_MessagePackSerializer_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)CDP4MessagePackSerializer.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_MessagePack_Annotations_CDP4ServicesDal" Guid="{20C10576-3226-46A5-986B-A319FA229CD8}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_MessagePack_Annotations_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)MessagePack.Annotations.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_MessagePack_CDP4ServicesDal" Guid="{4E16AC44-B97A-4A86-8AE3-58A54EB27B86}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_MessagePack_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)MessagePack.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_StringTools_CDP4ServicesDal" Guid="{62D576BC-D8E0-4887-A923-BF55EB7AC5B7}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_StringTools_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.NET.StringTools.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Immutable_CDP4ServicesDal" Guid="{417F785C-F9EE-428E-B784-DF45E510E17A}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Immutable_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Collections.Immutable.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Pipelines_CDP4ServicesDal" Guid="{0447E257-943F-4A1F-BB4D-7FC3AE24E5C4}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Pipelines_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.IO.Pipelines.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_CDP4ServicesDal_Buffers" Guid="{6B9D9C1A-AEFC-49B2-9E88-9991FC23B06F}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4ServicesDal_Buffers" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Buffers.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_CDP4ServicesDal_Memory" Guid="{29F51A8A-AEEE-4447-9C3D-C4E343465AAE}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4ServicesDal_Memory" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Memory.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_CDP4ServicesDal_Vectors" Guid="{35C8FBF8-8265-4934-BB5A-AC2AB9DFD553}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4ServicesDal_Vectors" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Numerics.Vectors.dll" KeyPath="yes" />
+      </Component>		
+      
+      <Component Id="comp_CDP4ServicesDal_AsyncInterfaces" Guid="{8C9B74D4-6BC3-4EA5-8D48-BB166B6F993B}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4ServicesDal_AsyncInterfaces" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
+      </Component>		
+
+      <Component Id="comp_CDP4ServicesDal_CompilerServices" Guid="{D1E56633-30BC-4FCC-A30C-0B1177DE931A}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4ServicesDal_CompilerServices" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
+      </Component>		
+
+      <Component Id="comp_CDP4ServicesDal_ValueTuple" Guid="{1533BEC9-2199-45BB-9331-52B43ABDEFCE}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_CDP4ServicesDal_ValueTuple" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.ValueTuple.dll" KeyPath="yes" />
+      </Component>		
+
+      
     </ComponentGroup>
   </Fragment>
 </Wix>
