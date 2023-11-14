@@ -16,8 +16,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="24.1.1" />
-    <PackageReference Include="CDP4Dal-CE" Version="24.2.0-rc2" />
+    <PackageReference Include="CDP4Common-CE" Version="24.2.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="24.2.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.2.3" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.2" />

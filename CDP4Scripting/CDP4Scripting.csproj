@@ -36,13 +36,13 @@
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
-    <PackageReference Include="CDP4Common-CE" Version="24.1.1">
+    <PackageReference Include="CDP4Common-CE" Version="24.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="24.2.0-rc2">
+    <PackageReference Include="CDP4Dal-CE" Version="24.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.1.1">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
