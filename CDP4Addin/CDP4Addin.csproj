@@ -10,8 +10,8 @@
     <Product>CDP4AddinCE</Product>
     <Description>CDP4-COMET-CE Office Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>10.0.0.2</AssemblyVersion>
-    <FileVersion>10.0.0.2</FileVersion>
+    <AssemblyVersion>10.0.0.3</AssemblyVersion>
+    <FileVersion>10.0.0.3</FileVersion>
     <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -98,6 +98,16 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Update="TaskPaneWpfHostControl.cs" />
     <Compile Update="TaskPaneWpfHostControl.Designer.cs">
       <DependentUpon>TaskPaneWpfHostControl.cs</DependentUpon>
@@ -114,6 +124,10 @@
     <ProjectReference Include="..\CDP4ShellDialogs\CDP4ShellDialogs.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="TaskPaneWpfHostControl.resx">
       <DependentUpon>TaskPaneWpfHostControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -125,5 +139,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="OfficeRibbon\FluentRibbonManager.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
 </Project>

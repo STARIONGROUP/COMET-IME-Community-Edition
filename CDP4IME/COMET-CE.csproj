@@ -11,10 +11,12 @@
     <Product>CDP4-COMET</Product>
     <Description>The CDP4-COMET Integrated Modelling Environment</Description>
     <Copyright>Copyright © RHEA System S.A</Copyright>
-    <AssemblyVersion>10.0.0.2</AssemblyVersion>
-    <FileVersion>10.0.0.2</FileVersion>
+    <AssemblyVersion>10.0.0.3</AssemblyVersion>
+    <FileVersion>10.0.0.3</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -146,33 +148,6 @@
   <ItemGroup>
     <Resource Include="comet.ico" />
     <Resource Include="markdown.xaml License.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="**\*.xaml" SubType="Designer" Generator="MSBuild:Compile" Exclude="App.xaml" />
-    <None Remove="Views\About - Copy.xaml" />
-    <None Remove="Views\ImeRow.xaml" />
-    <None Remove="Views\PluginRow.xaml" />
-    <None Remove="Views\UpdateDownloaderInstaller.xaml" />
-    <Compile Update="**\*.xaml.cs" SubType="Designer" DependentUpon="%(Filename)" />
-
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MsBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\About - Copy.xaml.cs">
-      <DependentUpon>%(Filename)</DependentUpon>
-    </Compile>
-    <Compile Update="Views\PluginRow - Copy.xaml.cs">
-      <DependentUpon>PluginRow.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\PluginRow.xaml.cs">
-      <DependentUpon>PluginRow.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UpdateDownloaderInstaller.xaml.cs">
-      <DependentUpon>UpdateDownloaderInstaller.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

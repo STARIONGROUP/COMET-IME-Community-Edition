@@ -38,31 +38,6 @@
         <File Id="fil_Pipelines_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.IO.Pipelines.dll" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_CDP4ServicesDal_Buffers" Guid="{6B9D9C1A-AEFC-49B2-9E88-9991FC23B06F}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_CDP4ServicesDal_Buffers" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Buffers.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_CDP4ServicesDal_Memory" Guid="{29F51A8A-AEEE-4447-9C3D-C4E343465AAE}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_CDP4ServicesDal_Memory" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Memory.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_CDP4ServicesDal_Vectors" Guid="{35C8FBF8-8265-4934-BB5A-AC2AB9DFD553}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_CDP4ServicesDal_Vectors" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Numerics.Vectors.dll" KeyPath="yes" />
-      </Component>		
-      
-      <Component Id="comp_CDP4ServicesDal_AsyncInterfaces" Guid="{8C9B74D4-6BC3-4EA5-8D48-BB166B6F993B}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_CDP4ServicesDal_AsyncInterfaces" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes" />
-      </Component>		
-
-      <Component Id="comp_CDP4ServicesDal_CompilerServices" Guid="{D1E56633-30BC-4FCC-A30C-0B1177DE931A}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_CDP4ServicesDal_CompilerServices" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes" />
-      </Component>		
-
-      <Component Id="comp_CDP4ServicesDal_ValueTuple" Guid="{1533BEC9-2199-45BB-9331-52B43ABDEFCE}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_CDP4ServicesDal_ValueTuple" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.ValueTuple.dll" KeyPath="yes" />
-      </Component>		
-
-      
     </ComponentGroup>
   </Fragment>
 </Wix>

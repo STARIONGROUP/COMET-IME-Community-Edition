@@ -70,6 +70,7 @@ namespace CDP4AddinCE
     using ExceptionReporting;
 
     using MessageBox = System.Windows.Forms.MessageBox;
+    using NetOffice.ExcelApi;
 
     /// <summary>
     /// The <see cref="Addin"/> provides CDP4 integration with the Office Suite. It self-registers in the registry and
@@ -336,6 +337,7 @@ namespace CDP4AddinCE
             Assembly.Load("Markdown.Xaml");
             Assembly.Load("System.Net.Http.Formatting");
             Assembly.Load("System.Threading.Tasks.Extensions");
+            Assembly.Load("System.Runtime.CompilerServices.Unsafe");
         }
 
         /// <summary>
@@ -343,6 +345,21 @@ namespace CDP4AddinCE
         /// </summary>
         private void RedirectAssemblies()
         {
+            logger.Trace("System.Buffers");
+            var systemBuffers = new Version("4.0.3.0");
+            this.RedirectAssembly("System.Buffers", systemBuffers, "cc7b13ffcd2ddd51");
+
+            logger.Trace("System.memory");
+            var systemMemory = new Version("4.0.1.2");
+            this.RedirectAssembly("System.Memory", systemMemory, "cc7b13ffcd2ddd51");
+
+            logger.Trace("Microsoft.Bcl.AsyncInterfaces");
+            var asyncInterfaces = new Version("6.0.0.0");
+            this.RedirectAssembly("Microsoft.Bcl.AsyncInterfaces", asyncInterfaces, "cc7b13ffcd2ddd51");
+
+            logger.Trace("System.Runtime.CompilerServices.Unsafe");
+            var compilerServices = new Version("6.0.0.0");
+            this.RedirectAssembly("System.Runtime.CompilerServices.Unsafe", compilerServices, "b03f5f7f11d50a3a");
         }
 
         /// <summary>

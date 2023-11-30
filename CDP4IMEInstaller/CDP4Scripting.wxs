@@ -26,19 +26,6 @@
       <Component Id="comp_MicrosoftScriptingMetadata" Guid="{F8FEBC24-58F4-406F-B1E8-2DA0A0D9EF5A}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_MicrosoftScriptingMetadata"  Vital="yes" Source="$(var.CDP4Scripting.TargetDir)Microsoft.Scripting.Metadata.dll" KeyPath="yes"></File>
       </Component>
-
-      <Component Id="comp_CDP4Scripting_Buffers" Guid="{7296652D-730B-4E29-B528-ACB2531125C4}" Location="local" Win64="$(var.Win64)">
-	      <File Id="fil_CDP4Scripting_Buffers" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)System.Buffers.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_CDP4Scripting_Memory" Guid="{672F5AD2-94D4-4F02-99C7-635B40FAFC21}" Location="local" Win64="$(var.Win64)">
-	      <File Id="fil_CDP4Scripting_Memory" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)System.Memory.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="comp_CDP4Scripting_Vectors" Guid="{15728422-F992-40B4-830F-AF84A04EFC7F}" Location="local" Win64="$(var.Win64)">
-	      <File Id="fil_CDP4Scripting_Vectors" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)System.Numerics.Vectors.dll" KeyPath="yes" />
-      </Component>		
-
       <!-- Iron Python -->
       <Component Id="comp_IronPython" Guid="{3E0A049E-C4E4-4D07-BCEA-A504D8744861}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_IronPython" Vital="yes" Source="$(var.CDP4Scripting.TargetDir)IronPython.dll" KeyPath="yes" />

@@ -2,6 +2,7 @@
 
 ECHO.
 ECHO This release script requires powershell to be runnable from cmd.
+ECHO Be sure to have the Visual Studio MSBUILD\Bin folder in your local environment PATH settings, as this is the only correct way to build new SDK style projects using legacy WIX (3.1)
 ECHO.
 
 IF %1.==. GOTO VersionError
@@ -68,7 +69,7 @@ set platform=x64
 
 call MSBuild.exe CDP4-CE.sln -target:Clean -p:Configuration=Release;Platform=x64
 call MSBuild.exe .\CDP4PluginPackager\CDP4PluginPackager.csproj -p:Configuration=Release;Platform=x86
-call MSBuild.exe CDP4-CE.sln -restore /property:Configuration=Release;Platform=x64
+call MSBuild.exe CDP4-CE.sln -restore -p:Configuration=Release;Platform=x64
 
 ECHO Error Level %errorlevel%
 
@@ -106,6 +107,10 @@ EXIT /B 0
 
 ECHO.
 ECHO Release %version% %platform% Failed
+ECHO.
+ECHO Possible causes: 
+ECHO - This release script requires powershell to be runnable from cmd.
+ECHO - Be sure to have the Visual Studio MSBUILD\Bin folder in your local environment PATH settings, as this is the only correct way to build SDK style projects using legacy WIX (3.1)
 ECHO.
 
 EXIT /B 1

@@ -131,7 +131,11 @@
 	  <Component Id="_CF15179B2D4B" Guid="{9EC4A891-FF0D-47CD-9E61-CF15179B2D4B}" Location="local" Win64="$(var.Win64)">
 		<File Id="_9EC4A891"  Vital="yes" Source="$(var.COMET-CE.TargetDir)System.Net.Http.Formatting.dll" KeyPath="yes"></File>
 	  </Component>
-	  
-	</ComponentGroup>
+
+    <Component Id="_CF15179B2D4C" Guid="{9EC4A892-FF0D-47CD-9E61-CF15179B2D4C}" Location="local" Win64="$(var.Win64)">
+      <File Id="_9EC4A892"  Vital="yes" Source="$(var.COMET-CE.TargetDir)CDP4-COMET.exe.config" KeyPath="yes"></File>
+    </Component>
+
+    </ComponentGroup>
   </Fragment>
 </Wix>
