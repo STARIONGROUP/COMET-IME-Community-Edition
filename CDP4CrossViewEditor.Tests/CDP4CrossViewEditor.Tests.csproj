@@ -36,14 +36,14 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="24.2.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="24.2.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.2.0" />
+    <PackageReference Include="CDP4Common-CE" Version="24.4.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="24.4.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.4.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
     <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NLog" Version="5.2.3" />
+    <PackageReference Include="NLog" Version="5.2.7" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.2" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
     <PackageReference Include="Splat" Version="14.4.1" />

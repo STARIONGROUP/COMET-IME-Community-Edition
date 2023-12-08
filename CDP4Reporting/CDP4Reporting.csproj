@@ -47,16 +47,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit" Version="6.3.0.90" />
-    <PackageReference Include="CDP4Common-CE" Version="24.2.0">
+    <PackageReference Include="CDP4Common-CE" Version="24.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="24.2.0">
+    <PackageReference Include="CDP4Dal-CE" Version="24.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.2.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Reporting-CE" Version="24.2.0" />
+    <PackageReference Include="CDP4Reporting-CE" Version="24.4.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -186,7 +186,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="5.2.3">
+    <PackageReference Include="NLog" Version="5.2.7">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.2">

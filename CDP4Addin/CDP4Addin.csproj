@@ -33,9 +33,9 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="24.2.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="24.2.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.2.0" />
+    <PackageReference Include="CDP4Common-CE" Version="24.4.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="24.4.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.4.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="DevExpress.CodeParser" Version="22.2.6" />
     <PackageReference Include="DevExpress.Data" Version="22.2.6" />
@@ -74,7 +74,7 @@
     <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
     <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NLog" Version="5.2.3" />
+    <PackageReference Include="NLog" Version="5.2.7" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.2.2" />
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
