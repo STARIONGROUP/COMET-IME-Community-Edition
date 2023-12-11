@@ -28,9 +28,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.0" />
-    <PackageReference Include="CDP4Common-CE" Version="24.4.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="24.4.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.4.0" />
+    <PackageReference Include="CDP4Common-CE" Version="24.5.0-rc8" />
+    <PackageReference Include="CDP4Dal-CE" Version="24.5.0-rc8" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.5.0-rc8" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />

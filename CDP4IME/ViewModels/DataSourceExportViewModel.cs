@@ -32,6 +32,8 @@ namespace COMET.ViewModels
     using System.Reactive;
     using System.Windows;
 
+    using CDP4Common.Exceptions;
+
     using CDP4Composition.Exceptions;
     using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
@@ -360,12 +362,23 @@ namespace COMET.ViewModels
                     operationContainers.Add(operationContainer);
                 }
 
-                var result = await dalInstance.Write(operationContainers);
+                try
+                {
+                    var result = await dalInstance.Write(operationContainers);
+                    this.DialogResult = new BaseDialogResult(true);
+                }
+                catch (ModelWarningException e)
+                {
+                    this.messageBoxService.Show(e.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+
                 this.DialogResult = new BaseDialogResult(true);
             }
             catch (Exception ex)
             {
                 this.ErrorMessage = ex.Message;
+                this.messageBoxService.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.DialogResult = new BaseDialogResult(false);
             }
             finally
             {
