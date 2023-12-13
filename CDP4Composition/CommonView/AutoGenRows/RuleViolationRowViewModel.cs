@@ -82,7 +82,7 @@ namespace CDP4CommonView
             base.InitializeSubscriptions();
 
             this.name = this.WhenAnyValue(x => x.Description)
-                            .ToProperty(this, x => x.Name);
+                            .ToProperty(this, x => x.Name, scheduler: RxApp.MainThreadScheduler);
 
             this.Disposables.Add(this.name);
         }

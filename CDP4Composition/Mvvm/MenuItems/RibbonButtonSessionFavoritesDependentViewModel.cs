@@ -64,7 +64,7 @@ namespace CDP4Composition.Mvvm
             this.InstantiatePanelViewModelFunction = instantiatePanelViewModel;
 
             this.OpenSessions = new ReactiveList<RibbonMenuItemViewModelBase>();
-            this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
+            this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
 
             this.OpenSingleBrowserCommand = ReactiveCommandCreator.Create(this.ExecuteOpenSingleBrowser);
 

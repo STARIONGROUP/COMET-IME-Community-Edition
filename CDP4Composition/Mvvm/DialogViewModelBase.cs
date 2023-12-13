@@ -186,7 +186,7 @@ namespace CDP4Composition.Mvvm
             this.InitializeCommands();
             this.UpdateProperties();
 
-            this.WhenAnyValue(x => x.WriteException).Select(x => x != null).ToProperty(this, x => x.HasException, out this.hasException);
+            this.WhenAnyValue(x => x.WriteException).Select(x => x != null).ToProperty(this, x => x.HasException, out this.hasException, scheduler: RxApp.MainThreadScheduler);
 
             switch (this.dialogKind)
             {

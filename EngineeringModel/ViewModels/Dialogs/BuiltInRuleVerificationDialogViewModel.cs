@@ -114,7 +114,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.WhenAnyValue(vm => vm.SelectedBuiltInRuleMetaData)
                     .Select(metaData => metaData != this.empytBuiltInRule || this.IsReadOnly)
-                    .ToProperty(this, vm => vm.IsNameReadOnly, out this.isNameReadOnly);
+                    .ToProperty(this, vm => vm.IsNameReadOnly, out this.isNameReadOnly, scheduler: RxApp.MainThreadScheduler);
 
             this.WhenAnyValue(vm => vm.SelectedBuiltInRuleMetaData).Subscribe(_ => this.UpdateName());
         }

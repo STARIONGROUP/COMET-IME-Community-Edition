@@ -146,7 +146,7 @@ namespace COMET
             }
 
             this.OpenSessions = new ReactiveList<ISession>();
-            this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
+            this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
@@ -191,7 +191,7 @@ namespace COMET
 
             this.WhenAnyValue(x => x.SelectedSession)
                 .Select(x => (x != null))
-                .ToProperty(this, x => x.IsSessionSelected, out this.isSessionSelected);
+                .ToProperty(this, x => x.IsSessionSelected, out this.isSessionSelected, scheduler: RxApp.MainThreadScheduler);
 
             this.SelectedSession = null;
 

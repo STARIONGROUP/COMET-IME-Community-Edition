@@ -113,11 +113,11 @@ namespace COMET.ViewModels
             this.Reload = ReactiveCommandCreator.Create(this.ExecuteReload);
             this.HideAll = ReactiveCommandCreator.Create(this.ExecuteHideAll);
             
-            this.WhenAnyValue(x => x.LastUpdateDateTime).Select(x => x.ToString(CultureInfo.InvariantCulture)).ToProperty(this, x => x.LastUpdateDateTimeHint, out this.lastUpdateDateTimeHint);
+            this.WhenAnyValue(x => x.LastUpdateDateTime).Select(x => x.ToString(CultureInfo.InvariantCulture)).ToProperty(this, x => x.LastUpdateDateTimeHint, out this.lastUpdateDateTimeHint, scheduler: RxApp.MainThreadScheduler);
 
             this.WhenAnyValue(x => x.ErrorMsg)
                 .Select(x => x != null)
-                .ToProperty(this, x => x.HasError, out this.hasError);
+                .ToProperty(this, x => x.HasError, out this.hasError, scheduler: RxApp.MainThreadScheduler);
 
             this.WhenAnyValue(
                     x => x.IsAutoRefreshEnabled, 

@@ -70,7 +70,7 @@ namespace CDP4Composition.Navigation
                 Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), CdpLogoAnimationPath);
 
             // error message handling
-            this.WhenAnyValue(x => x.ErrorMessage).Select(x => !string.IsNullOrWhiteSpace(x)).ToProperty(this, x => x.HasError, out this.hasError);
+            this.WhenAnyValue(x => x.ErrorMessage).Select(x => !string.IsNullOrWhiteSpace(x)).ToProperty(this, x => x.HasError, out this.hasError, scheduler: RxApp.MainThreadScheduler);
         }
 
         /// <summary>

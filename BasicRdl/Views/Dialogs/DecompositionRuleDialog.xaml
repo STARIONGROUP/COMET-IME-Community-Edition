@@ -54,6 +54,8 @@
                                   />
                     </lc:LayoutItem>
                 </lc:LayoutGroup>
+                <TextBlock Text ="{Binding Test}"></TextBlock>
+
                 <lc:LayoutItem Label="Containing Category: "
                                ToolTip="Select the Category for the Element-Definitions to which this rule applies">
                     <Grid>
