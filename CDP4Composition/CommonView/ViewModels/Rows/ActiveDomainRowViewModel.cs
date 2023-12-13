@@ -64,7 +64,7 @@ namespace CDP4Composition.CommonView.ViewModels
             this.IsVisible = isVisible;
             this.Name = domainOfExpertise.Name;
             this.IsDeprecated = domainOfExpertise.IsDeprecated;
-            this.IsEnabled = false;
+            this.IsEnabled = true;
         }
 
         /// <summary>
