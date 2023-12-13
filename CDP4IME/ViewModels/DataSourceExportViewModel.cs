@@ -86,6 +86,11 @@ namespace COMET.ViewModels
         private string path;
 
         /// <summary>
+        /// Backing field for the <see cref="ExportPublications"/> property
+        /// </summary>
+        private bool exportPublications = true;
+
+        /// <summary>
         /// Backing field for the <see cref="Versions"/> property.
         /// </summary>
         private Dictionary<string, Version> versions;
@@ -284,6 +289,15 @@ namespace COMET.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets a value indicating that <see cref="CDP4Common.EngineeringModelData.Publication"/>s should be exported if present
+        /// </summary>
+        public bool ExportPublications
+        {
+            get => this.exportPublications;
+            set => this.RaiseAndSetIfChanged(ref this.exportPublications, value);
+        }
+
+        /// <summary>
         /// Gets the Ok Command
         /// </summary>
         public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
@@ -357,6 +371,12 @@ namespace COMET.ViewModels
                     var transactionContext = TransactionContextResolver.ResolveContext(iteration);
                     var operationContainer = new OperationContainer(transactionContext.ContextRoute());
                     var dto = iteration.ToDto();
+
+                    if (!this.ExportPublications)
+                    {
+                        iteration.Publication.Clear();
+                    }
+
                     var operation = new Operation(null, dto, OperationKind.Create);
                     operationContainer.AddOperation(operation);
                     operationContainers.Add(operationContainer);
