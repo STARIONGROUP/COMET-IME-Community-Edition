@@ -105,7 +105,7 @@ namespace CDP4SiteDirectory.ViewModels
                     domains.Aggregate(
                         string.Empty,
                         (current, domainOfExpertise) => string.Format("{0} {1}", current, domainOfExpertise.ShortName)).Trim())
-                .ToProperty(this, row => row.DomainShortnames, out this.domainShortnames);
+                .ToProperty(this, row => row.DomainShortnames, out this.domainShortnames, scheduler: RxApp.MainThreadScheduler);
             this.domainShortnames.ThrownExceptions.Subscribe(e => Logger.Error(e));
 
             var canEmail = this.WhenAnyValue(vm => vm.EmailAddress).Select(x => !string.IsNullOrEmpty(x));

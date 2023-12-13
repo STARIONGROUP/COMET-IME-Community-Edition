@@ -99,7 +99,7 @@ namespace CDP4Scripting.ViewModels
                 .Subscribe(this.HandleClosedPanel);
 
             this.OpenSessions = new ReactiveList<ISession>();
-            this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
+            this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.initialDialogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "file.txt");

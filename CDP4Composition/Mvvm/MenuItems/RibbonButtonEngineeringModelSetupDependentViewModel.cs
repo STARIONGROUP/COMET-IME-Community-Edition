@@ -69,7 +69,7 @@ namespace CDP4Composition.Mvvm
 
             this.EngineeringModelSetups = new ReactiveList<SessionEngineeringModelSetupMenuGroupViewModel>();
             this.Sessions = new List<ISession>();
-            this.EngineeringModelSetups.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSessions, out this.hasSessions);
+            this.EngineeringModelSetups.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSessions, out this.hasSessions, scheduler: RxApp.MainThreadScheduler);
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 

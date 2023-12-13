@@ -75,12 +75,12 @@ namespace CDP4SiteDirectory.ViewModels
             this.WhenAnyValue(row => row.Domains)
                 .Select(domains => domains.Aggregate(string.Empty,
                     (current, domainOfExpertise) => string.Format("{0} {1}", current, domainOfExpertise.ShortName)))
-                .ToProperty(this, row => row.DomainShortnames, out this.domainShortnames);
+                .ToProperty(this, row => row.DomainShortnames, out this.domainShortnames, scheduler: RxApp.MainThreadScheduler);
 
             this.WhenAnyValue(row => row.EngineeringModelSetup)
                 .Where(x => x != null)
                 .Select(modelSetup => modelSetup.Name)
-                .ToProperty(this, row => row.ModelName, out this.modelName);
+                .ToProperty(this, row => row.ModelName, out this.modelName, scheduler: RxApp.MainThreadScheduler);
 
             if (this.ContainerViewModel is PersonRowViewModel deprecatable)
             {

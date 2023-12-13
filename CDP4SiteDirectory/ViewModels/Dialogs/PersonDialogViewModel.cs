@@ -108,11 +108,11 @@ namespace CDP4SiteDirectory.ViewModels
 
             this.isSelectedRoleDeprecated =
                 this.WhenAny(x => x.SelectedRole, selectedRole => selectedRole.Value?.IsDeprecated == true)
-                    .ToProperty(this, x => x.IsSelectedRoleDeprecated, out this.isSelectedRoleDeprecated);
+                    .ToProperty(this, x => x.IsSelectedRoleDeprecated, out this.isSelectedRoleDeprecated, scheduler: RxApp.MainThreadScheduler);
 
             this.shoudDisplayPasswordNotSetWarning =
                 this.WhenAny(x => x.PwdEditIsChecked, x => !x.Value && this.dialogKind == ThingDialogKind.Create)
-                    .ToProperty(this, x => x.ShoudDisplayPasswordNotSetWarning, out this.shoudDisplayPasswordNotSetWarning);
+                    .ToProperty(this, x => x.ShoudDisplayPasswordNotSetWarning, out this.shoudDisplayPasswordNotSetWarning, scheduler: RxApp.MainThreadScheduler);
         }
 
         /// <summary>

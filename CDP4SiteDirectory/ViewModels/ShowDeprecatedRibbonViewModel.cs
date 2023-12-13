@@ -74,7 +74,7 @@ namespace CDP4SiteDirectory.ViewModels
             this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
             
             this.openSessions = new ReactiveList<ISession>();
-            this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
+            this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
 
             CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 

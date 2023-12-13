@@ -106,7 +106,10 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets a value indicating whether the Rdl has been selected
         /// </summary>
-        public bool HasLibrary => this.hasLibrary.Value;
+        public bool HasLibrary
+        {
+            get { return this.hasLibrary.Value; }
+        }
 
         /// <summary>
         /// Gets or sets the MaxContainedString
@@ -159,16 +162,19 @@ namespace BasicRdl.ViewModels
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
+
             this.WhenAnyValue(x => x.Container)
                 .Select(x => x != null)
-                .ToProperty(this, x => x.HasLibrary, out this.hasLibrary);
+                .ToProperty(this, x => x.HasLibrary, out this.hasLibrary, scheduler: RxApp.MainThreadScheduler);
 
-            this.WhenAnyValue(x => x.Container).Subscribe(_ =>
+            this.WhenAnyValue(x => x.Container)
+                .Subscribe(_ =>
             {
                 this.PopulateContainedCategory();
                 this.PopulatePossibleContainingCategory();
                 this.UpdateOkCanExecute();
             });
+
             this.WhenAnyValue(x => x.ContainedCategory).Subscribe(_ => this.UpdateOkCanExecute());
             this.WhenAnyValue(x => x.SelectedContainingCategory).Subscribe(_ => this.UpdateOkCanExecute());
             this.WhenAnyValue(vm => vm.MaxContainedString).Subscribe(_ => { this.UpdateMaxContained(); this.UpdateOkCanExecute(); });
