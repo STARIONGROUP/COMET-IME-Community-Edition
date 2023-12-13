@@ -42,6 +42,9 @@
                                                  Mode=TwoWay,
                                                  UpdateSourceTrigger=PropertyChanged}" />
                 </dxlc:LayoutItem>
+                <dxlc:LayoutItem AddColonToLabel="True" Label="Export Publications">
+                    <dxe:CheckEdit IsChecked="{Binding Path= ExportPublications, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </dxlc:LayoutItem>
                 <dxlc:LayoutItem AddColonToLabel="True" Label="Model version">
                     <dxe:ComboBoxEdit DisplayMember="Key"
                                       ItemsSource="{Binding Path=Versions,
