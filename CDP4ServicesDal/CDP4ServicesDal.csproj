@@ -37,16 +37,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="24.4.0">
+    <PackageReference Include="CDP4Common-CE" Version="24.5.0-rc8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="24.4.0">
+    <PackageReference Include="CDP4Dal-CE" Version="24.5.0-rc8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.4.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.5.0-rc8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4ServicesDal-CE" Version="24.4.0" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="24.5.0-rc8" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
