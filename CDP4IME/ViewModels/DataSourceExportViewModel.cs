@@ -382,16 +382,7 @@ namespace COMET.ViewModels
                     operationContainers.Add(operationContainer);
                 }
 
-                try
-                {
-                    var result = await dalInstance.Write(operationContainers);
-                    this.DialogResult = new BaseDialogResult(true);
-                }
-                catch (ModelWarningException e)
-                {
-                    this.messageBoxService.Show(e.Message, "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-
+                var result = await dalInstance.Write(operationContainers);
                 this.DialogResult = new BaseDialogResult(true);
             }
             catch (Exception ex)

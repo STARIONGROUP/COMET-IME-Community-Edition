@@ -11,8 +11,8 @@
 	<Product>CDP4EngineeringModel</Product>
 	<Description>CDP4-COMET Engineering Model Plugin</Description>
 	<Copyright>Copyright © RHEA System S.A.</Copyright>
-	<AssemblyVersion>10.0.0.4</AssemblyVersion>
-	<FileVersion>10.0.0.4</FileVersion>
+	<AssemblyVersion>10.0.0.5</AssemblyVersion>
+	<FileVersion>10.0.0.5</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -39,13 +39,13 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="24.5.0-rc8">
+    <PackageReference Include="CDP4Common-CE" Version="24.5.0-rc9">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="24.5.0-rc8">
+    <PackageReference Include="CDP4Dal-CE" Version="24.5.0-rc9">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.5.0-rc8">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.5.0-rc9">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">

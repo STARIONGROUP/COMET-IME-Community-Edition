@@ -7,8 +7,8 @@
 	<Product>CDP4Composition</Product>
 	<Description>CDP4-COMET Composition and Infrastructure library</Description>
 	<Copyright>Copyright © RHEA System S.A.</Copyright>
-	<AssemblyVersion>10.0.0.4</AssemblyVersion>
-	<FileVersion>10.0.0.4</FileVersion>
+	<AssemblyVersion>10.0.0.5</AssemblyVersion>
+	<FileVersion>10.0.0.5</FileVersion>
 	<OutputPath>bin\$(Configuration)\</OutputPath>
 	<LangVersion>latest</LangVersion>
 	<UseWPF>true</UseWPF>
@@ -29,10 +29,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="24.5.0-rc8" />
-    <PackageReference Include="CDP4Dal-CE" Version="24.5.0-rc8" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.5.0-rc8" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="24.5.0-rc8" />
+    <PackageReference Include="CDP4Common-CE" Version="24.5.0-rc9" />
+    <PackageReference Include="CDP4Dal-CE" Version="24.5.0-rc9" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.5.0-rc9" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="24.5.0-rc9" />
     <PackageReference Include="CsvHelper" Version="30.0.1" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="DevExpress.CodeParser" Version="22.2.6" />
