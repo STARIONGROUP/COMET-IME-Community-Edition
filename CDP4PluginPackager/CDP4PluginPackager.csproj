@@ -21,7 +21,7 @@
 	</PropertyGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" />
 	<ItemGroup>
-		<PackageReference Include="CDP4Common-CE" Version="24.5.0-rc9" />
+		<PackageReference Include="CDP4Common-CE" Version="24.5.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	<ItemGroup>

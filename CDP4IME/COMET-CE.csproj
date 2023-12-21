@@ -40,10 +40,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="24.5.0-rc9" />
-    <PackageReference Include="CDP4Dal-CE" Version="24.5.0-rc9" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.5.0-rc9" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="24.5.0-rc9" />
+    <PackageReference Include="CDP4Common-CE" Version="24.5.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="24.5.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="24.5.0" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="24.5.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="DevExpress.Charts" Version="22.2.6" />
     <PackageReference Include="DevExpress.Charts.Core" Version="22.2.6" />
