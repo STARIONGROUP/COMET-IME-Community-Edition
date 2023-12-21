@@ -220,7 +220,7 @@ namespace CDP4Requirements.ViewModels
 
             if (string.IsNullOrWhiteSpace(this.Path))
             {
-                this.canExecuteImport = false;
+                this.CanExecuteImport = false;
                 return;
             }
 

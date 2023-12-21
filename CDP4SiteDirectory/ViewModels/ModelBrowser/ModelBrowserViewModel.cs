@@ -283,7 +283,7 @@ namespace CDP4SiteDirectory.ViewModels
                                                && modelSetup.StudyPhase != StudyPhaseKind.PREPARATION_PHASE
                                                && this.PermissionService.CanWrite(ClassKind.IterationSetup, modelSetup);
 
-                this.canCreateParticipant = modelSetup != null &&
+                this.CanCreateParticipant = modelSetup != null &&
                                             this.PermissionService.CanWrite(ClassKind.Participant, modelSetup);
             }
             else
@@ -294,7 +294,7 @@ namespace CDP4SiteDirectory.ViewModels
                                                && modelSetup.StudyPhase != StudyPhaseKind.PREPARATION_PHASE
                                                && this.PermissionService.CanWrite(ClassKind.IterationSetup, modelSetup);
 
-                this.canCreateParticipant = modelSetup != null &&
+                this.CanCreateParticipant = modelSetup != null &&
                                             this.PermissionService.CanWrite(ClassKind.Participant, modelSetup);
             }
         }

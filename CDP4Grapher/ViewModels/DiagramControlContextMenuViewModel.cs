@@ -314,9 +314,9 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void ExecuteExportGraphAsPdf()
         {
-            this.canExportDiagram = false;
+            this.CanExportDiagram = false;
             this.Behavior.ExportGraph(DiagramExportFormat.PDF);
-            this.canExportDiagram = true;
+            this.CanExportDiagram = true;
         }
 
         /// <summary>
@@ -324,9 +324,9 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void ExecuteExportGraphAsPng()
         {
-            this.canExportDiagram = false;
+            this.CanExportDiagram = false;
             this.Behavior.ExportGraph(DiagramExportFormat.JPEG);
-            this.canExportDiagram = true;
+            this.CanExportDiagram = true;
         }
 
         /// <summary>
