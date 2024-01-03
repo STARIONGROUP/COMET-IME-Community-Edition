@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RibbonButtonEngineeringModelDependentViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
@@ -161,24 +161,28 @@ namespace CDP4Composition.Mvvm
         /// <param name="session">the session that has been removed</param>
         protected virtual void SessionRemoveGroup(ISession session)
         {
-            var sessionEngineeringModelSetupMenuGroupViewModel = this.EngineeringModels.SingleOrDefault(x => x.Session == session);
+            var sessionEngineeringModelSetupMenuGroupViewModels = 
+                this.EngineeringModels.Where(x => x.Session == session).ToArray();
 
-            if (sessionEngineeringModelSetupMenuGroupViewModel == null)
+            if (!sessionEngineeringModelSetupMenuGroupViewModels.Any())
             {
                 return;
             }
 
-            foreach (var menuItemToRemove in sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.ToList())
+            foreach (var sessionEngineeringModelSetupMenuGroupViewModel in sessionEngineeringModelSetupMenuGroupViewModels)
             {
-                sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.Remove(menuItemToRemove);
-
-                // removes the group if there are no more of its iterations opened
-                if (sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.Count == 0)
+                foreach (var menuItemToRemove in sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.ToList())
                 {
-                    this.EngineeringModels.Remove(sessionEngineeringModelSetupMenuGroupViewModel);
-                }
+                    sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.Remove(menuItemToRemove);
 
-                ((ICommand)menuItemToRemove.ClosePanelsCommand).Execute(default);
+                    // removes the group if there are no more of its iterations opened
+                    if (sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.Count == 0)
+                    {
+                        this.EngineeringModels.Remove(sessionEngineeringModelSetupMenuGroupViewModel);
+                    }
+
+                    ((ICommand)menuItemToRemove.ClosePanelsCommand).Execute(default);
+                }
             }
         }
 
