@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -46,7 +46,6 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.Services;
 
     using CDP4EngineeringModel.ViewModels;
 
@@ -59,6 +58,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using ParameterComponentValueRowViewModel = CDP4EngineeringModel.ViewModels.Dialogs.ParameterComponentValueRowViewModel;
     using ParameterOptionRowViewModel = CDP4EngineeringModel.ViewModels.Dialogs.ParameterOptionRowViewModel;
     using ParameterStateRowViewModel = CDP4EngineeringModel.ViewModels.Dialogs.ParameterStateRowViewModel;
+    using System.Security.Cryptography;
 
     [TestFixture]
     internal class ParameterDialogViewModelTestFixture
@@ -310,7 +310,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
-        public void VerifyThatMakingOptionOrStateDependentSetToFalse()
+        public void VerifyThatMakingOwnerOrOptionDependentOrStateDependentSetsIsValueSetEdittableToFalse()
         {
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
     ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
@@ -320,13 +320,23 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             vm.IsOptionDependent = true;
             Assert.IsFalse(vm.IsValueSetEditable);
 
+            //reset
+            vm.IsOptionDependent = false;
+            Assert.IsTrue(vm.IsValueSetEditable);
+
             vm.SelectedStateDependence = vm.PossibleStateDependence.First();
             Assert.IsFalse(vm.IsValueSetEditable);
+            
+            //reset
+            vm.SelectedStateDependence = null;
+            Assert.IsTrue(vm.IsValueSetEditable);
 
-            vm.IsOptionDependent = false;
+            var originalOwner = vm.SelectedOwner;
+            vm.SelectedOwner = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
             Assert.IsFalse(vm.IsValueSetEditable);
 
-            vm.SelectedStateDependence = null;
+            //reset
+            vm.SelectedOwner = originalOwner;
             Assert.IsTrue(vm.IsValueSetEditable);
         }
 

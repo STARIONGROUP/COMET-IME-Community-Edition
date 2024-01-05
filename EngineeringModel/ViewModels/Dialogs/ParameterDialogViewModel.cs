@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -139,8 +139,13 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.WhenAnyValue(vm => vm.SelectedOwner).Subscribe(_ => this.UpdateOkCanExecute());
             this.WhenAnyValue(vm => vm.SelectedScale).Subscribe(_ => this.UpdateOkCanExecute());
-            this.WhenAnyValue(vm => vm.IsOptionDependent).Subscribe(_ => this.IsValueSetEditable = this.IsOptionDependent == this.Thing.IsOptionDependent && this.SelectedStateDependence == this.Thing.StateDependence);
-            this.WhenAnyValue(vm => vm.SelectedStateDependence).Subscribe(_ => this.IsValueSetEditable = this.IsOptionDependent == this.Thing.IsOptionDependent && this.SelectedStateDependence == this.Thing.StateDependence);
+
+            this.WhenAnyValue(
+                vm => vm.IsOptionDependent,
+                vm => vm.SelectedStateDependence,
+                vm => vm.SelectedOwner)
+                .Subscribe(_ => this.UpdateIsValueSetEditable());
+
             this.WhenAnyValue(vm => vm.SelectedScale).Where(x => x != null).Subscribe(_ => this.CheckValueValidation());
             this.WhenAnyValue(vm => vm.SelectedGroupSelection).Subscribe(x => this.SelectedGroup = x != null ? x.Thing : null);
             this.WhenAnyValue(vm => vm.DisplayedValueSet).Where(x => x != null).Subscribe(_ => this.LoadValueSetGrid());
@@ -346,6 +351,16 @@ namespace CDP4EngineeringModel.ViewModels
             base.UpdateOkCanExecute();
 
             this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null && this.IsSelectedScaleValid();
+        }
+
+        /// <summary>
+        /// Updates the value of <see cref="IsValueSetEditable"/> 
+        /// </summary>
+        private void UpdateIsValueSetEditable()
+        {
+            this.IsValueSetEditable = this.IsOptionDependent == this.Thing.IsOptionDependent
+                                      && this.SelectedStateDependence == this.Thing.StateDependence
+                                      && this.SelectedOwner == this.Thing.Owner;
         }
 
         /// <summary>
