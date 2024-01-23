@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceExportViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -32,7 +32,7 @@ namespace COMET.ViewModels
     using System.Reactive;
     using System.Windows;
 
-    using CDP4Common.Exceptions;
+    using CDP4Common.MetaInfo;
 
     using CDP4Composition.Exceptions;
     using CDP4Composition.Extensions;
@@ -151,13 +151,18 @@ namespace COMET.ViewModels
             this.OpenSessions = new ReactiveList<ISession>(sessions);
             this.DialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
 
-            this.availableVersions = new Dictionary<string, Version>
-            {
-                { "ECSS-E-TM-10-25 (Version 2.4.1)", new Version("1.0.0") },
-                { "COMET 1.1.0", new Version("1.1.0") },
-                { "COMET 1.2.0", new Version("1.2.0") },
-                { "COMET 1.3.0", new Version("1.3.0") }
-            };
+            var versions = new MetaDataProvider().QuerySupportedModelVersions();
+
+            this.availableVersions = versions
+                .Select(
+                    x =>
+                        new KeyValuePair<string, Version>(
+                            (x.Major == 1 && x.Minor == 0 
+                                ? "ECSS-E-TM-10-25 (Version 2.4.1)" 
+                                : $"CDP4-COMET {x.ToString(3)}"),
+                            x))
+                .OrderBy(x => x.Value)
+                .ToDictionary(x => x.Key, x=> x.Value);
 
             this.IsBusy = false;
 
