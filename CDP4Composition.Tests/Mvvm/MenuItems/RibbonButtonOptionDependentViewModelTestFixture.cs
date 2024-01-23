@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RibbonButtonOptionDependentViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -44,7 +44,7 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
     using Moq;
 
     using NUnit.Framework;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -57,6 +57,7 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
         /// The view-model that is being tested.
         /// </summary>
         private TestClass viewModel;
+
         private EngineeringModel engineeringModel;
         private Uri uri;
         private Mock<ISession> session;
@@ -66,6 +67,8 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
         private Mock<IThingDialogNavigationService> dialogNavigation;
 
         private Assembler assembler;
+
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
@@ -81,12 +84,14 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.dialogNavigation.Object);
 
             this.uri = new Uri("http://www.rheagroup.com");
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
-            this.viewModel = new TestClass();
+            this.viewModel = new TestClass(this.messageBus);
 
             var engineeringModelSeup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -100,12 +105,12 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
 
             var session = new Mock<ISession>();
             var openSessionEvent = new SessionEvent(session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.Contains(session.Object, this.viewModel.Sessions);
 
             var closeSessionEvent = new SessionEvent(session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsEmpty(this.viewModel.Sessions);
         }
@@ -120,8 +125,8 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
             var option_1_1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "option1_1" };
             iteration_1.Option.Add(option_1_1);
 
-            Assert.Throws<InvalidOperationException>(() => CDPMessageBus.Current.SendObjectChangeEvent(iteration_1, EventKind.Added));
-            Assert.Throws<InvalidOperationException>(() => CDPMessageBus.Current.SendObjectChangeEvent(option_1_1, EventKind.Added));
+            Assert.Throws<InvalidOperationException>(() => this.messageBus.SendObjectChangeEvent(iteration_1, EventKind.Added));
+            Assert.Throws<InvalidOperationException>(() => this.messageBus.SendObjectChangeEvent(option_1_1, EventKind.Added));
         }
 
         [Test]
@@ -137,8 +142,8 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
             iteration_1.Option.Add(option_1_1);
 
             this.viewModel.Sessions.Add(this.session.Object);
-            
-            CDPMessageBus.Current.SendObjectChangeEvent(iteration_1, EventKind.Added);
+
+            this.messageBus.SendObjectChangeEvent(iteration_1, EventKind.Added);
 
             Assert.AreEqual(1, this.viewModel.OpenIterations.Count);
 
@@ -149,41 +154,39 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
             var option_2_1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "option2_1" };
             iteration_2.Option.Add(option_2_1);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(iteration_2, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(iteration_2, EventKind.Added);
             Assert.AreEqual(2, this.viewModel.OpenIterations.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(iteration_1, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(iteration_1, EventKind.Removed);
             Assert.AreEqual(1, this.viewModel.OpenIterations.Count);
 
             var iterationMenuViewModel = this.viewModel.OpenIterations.Single();
 
             Assert.AreEqual(1, iterationMenuViewModel.SelectedOptions.Count);
 
-            var option_2_2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "option2_2", RevisionNumber = 1};
+            var option_2_2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "option2_2", RevisionNumber = 1 };
             iteration_2.Option.Add(option_2_2);
-            CDPMessageBus.Current.SendObjectChangeEvent(option_2_2, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(option_2_2, EventKind.Added);
 
             Assert.AreEqual(2, iterationMenuViewModel.SelectedOptions.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(option_2_1, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(option_2_1, EventKind.Removed);
             Assert.AreEqual(1, iterationMenuViewModel.SelectedOptions.Count);
 
             var new_name = "option2_2_NEW";
             option_2_2.Name = new_name;
             option_2_2.RevisionNumber = 2;
-            CDPMessageBus.Current.SendObjectChangeEvent(option_2_2, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(option_2_2, EventKind.Updated);
             Assert.AreEqual(iterationMenuViewModel.SelectedOptions.Single().MenuItemContent, new_name);
 
             Assert.AreEqual(1, this.viewModel.OpenIterations.Count);
-            CDPMessageBus.Current.SendObjectChangeEvent(option_2_2, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(option_2_2, EventKind.Removed);
             Assert.AreEqual(0, this.viewModel.OpenIterations.Count);
-
-            
         }
 
-        private class TestClass : RibbonButtonOptionDependentViewModel            
+        private class TestClass : RibbonButtonOptionDependentViewModel
         {
-            public TestClass() : base(null)
+            public TestClass(ICDPMessageBus messageBus) : base(null, messageBus)
             {
             }
         }

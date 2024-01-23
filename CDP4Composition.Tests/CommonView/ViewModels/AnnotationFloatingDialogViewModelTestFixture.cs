@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AnnotationFloatingDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -31,20 +31,24 @@ namespace CDP4CommonView.Tests.ViewModels
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reflection;
-    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4CommonView.ViewModels;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using Moq;
+
     using NUnit.Framework;
 
     using ReactiveUI;
@@ -70,32 +74,33 @@ namespace CDP4CommonView.Tests.ViewModels
         private DomainOfExpertise domain;
 
         private PropertyInfo rev = typeof(Thing).GetProperty("RevisionNumber");
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) {Surname = "surname", GivenName = "given", ShortName = "short"};
+            this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { Surname = "surname", GivenName = "given", ShortName = "short" };
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { IterationNumber = 1 };
-            this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) {Person = this.person};
+            this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = this.person };
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
-            this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) {EngineeringModelSetup = this.modelsetup};
-            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri) {IterationSetup = this.iterationsetup};
+            this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) { EngineeringModelSetup = this.modelsetup };
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri) { IterationSetup = this.iterationsetup };
             this.ed = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.rid = new ReviewItemDiscrepancy(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.reference = new ModellingThingReference(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.reference.ReferencedThing = this.ed;
             this.rid.PrimaryAnnotatedThing = this.reference;
-
 
             this.sitedir.Person.Add(this.person);
             this.sitedir.Domain.Add(this.domain);
@@ -108,10 +113,10 @@ namespace CDP4CommonView.Tests.ViewModels
             this.rid.RelatedThing.Add(this.reference);
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
-            this.session.Setup(x => x.OpenIterations).
-                Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> {{this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant)}});
+            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.assembler.Cache.TryAdd(new CacheKey(this.model.Iid, null), new Lazy<Thing>(() => this.model));
             this.assembler.Cache.TryAdd(new CacheKey(this.rid.Iid, null), new Lazy<Thing>(() => this.rid));
@@ -120,7 +125,7 @@ namespace CDP4CommonView.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -172,7 +177,7 @@ namespace CDP4CommonView.Tests.ViewModels
             this.rid.Discussion.Clear();
             this.rev.SetValue(this.rid, 10);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.rid, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.rid, EventKind.Updated);
             Assert.AreEqual(0, vm.DiscussionRows.Count);
         }
     }

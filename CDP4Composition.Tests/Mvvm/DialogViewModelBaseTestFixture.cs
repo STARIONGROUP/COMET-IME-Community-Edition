@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DialogViewModelBaseTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -26,15 +26,15 @@
 namespace CDP4Composition.Tests.Mvvm
 {
     using System;
-    using System.Windows;
-    using System.Threading;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive.Concurrency;
     using System.Reactive;
-    using System.Threading.Tasks;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using System.Windows;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
@@ -112,6 +112,7 @@ namespace CDP4Composition.Tests.Mvvm
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(this.dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(new CDPMessageBus());
             this.dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 
@@ -123,7 +124,8 @@ namespace CDP4Composition.Tests.Mvvm
             Assert.AreEqual("http://www.rheagroup.com:80/SiteDirectory/609d5d8f-f209-4905-967e-796970fefd84/person/f1cbaf64-afa6-4467-97e5-5d98803f2848", testdialog.ThingUri);
         }
 
-        [Test, Apartment(ApartmentState.STA)]
+        [Test]
+        [Apartment(ApartmentState.STA)]
         public async Task VerifThatCopyUriCommandWorks()
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, this.clone);
@@ -139,7 +141,8 @@ namespace CDP4Composition.Tests.Mvvm
             Assert.AreEqual("N/A", testdialog.ThingUri);
         }
 
-        [Test, Apartment(ApartmentState.STA)]
+        [Test]
+        [Apartment(ApartmentState.STA)]
         public async Task VerifThatJsonExportCommandsWork()
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, this.clone);
@@ -179,7 +182,7 @@ namespace CDP4Composition.Tests.Mvvm
             var fileRevision = new FileRevision(Guid.NewGuid(), null, null);
             var file = new File(Guid.NewGuid(), null, null);
 
-            fakeTransaction.Setup(x => x.AddedThing).Returns(new List<Thing> {file});
+            fakeTransaction.Setup(x => x.AddedThing).Returns(new List<Thing> { file });
             fakeTransaction.Setup(x => x.UpdatedThing).Returns(new Dictionary<Thing, Thing>());
 
             fakeTransaction.Setup(x => x.GetFiles()).Returns(new List<string> { "c:\\filelocation\file.txt" }.ToArray());
@@ -341,8 +344,8 @@ namespace CDP4Composition.Tests.Mvvm
 
         public string Name
         {
-            get { return this.name; }
-            set { this.RaiseAndSetIfChanged(ref this.name, value); }
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         public ReactiveCommand<Unit, Unit> CreateCommand { get; private set; }

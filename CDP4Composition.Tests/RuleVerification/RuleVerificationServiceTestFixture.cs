@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationServiceTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,12 +36,17 @@ namespace CDP4Composition.Tests.RuleVerification
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     /// <summary>
@@ -46,13 +70,15 @@ namespace CDP4Composition.Tests.RuleVerification
         private Category equipmentCategory;
         private Category batteryCategory;
         private Category lithiumBatteryCategory;
-            
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
             this.session = new Mock<ISession>();
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://www.rheagroup.com");
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
@@ -73,6 +99,8 @@ namespace CDP4Composition.Tests.RuleVerification
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
             this.engineeringModel.Iteration.Add(this.iteration);
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         /// <summary>
@@ -137,7 +165,7 @@ namespace CDP4Composition.Tests.RuleVerification
         public void VerifyThatArgumentNotNullExceptionIsThrownWhenRuleVerificationListIsNull()
         {
             var service = new RuleVerificationService(this.builtInRules);
-            
+
             Assert.ThrowsAsync<ArgumentNullException>(() => service.Execute(this.session.Object, null));
         }
 
@@ -152,15 +180,16 @@ namespace CDP4Composition.Tests.RuleVerification
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
             var builtInRuleVerification = new BuiltInRuleVerification(Guid.NewGuid(), this.cache, this.uri)
-                                              {
-                                                  Name = this.builtInRuleName,
-                                                  IsActive = true
-                                              };
+            {
+                Name = this.builtInRuleName,
+                IsActive = true
+            };
+
             ruleVerificationList.RuleVerification.Add(builtInRuleVerification);
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(builtInRuleVerification)
+            var listener = this.messageBus.Listen<ObjectChangedEvent>(builtInRuleVerification)
                 .Subscribe(
-                x => { messageReceivedCounter++; });
+                    x => { messageReceivedCounter++; });
 
             service.Execute(this.session.Object, ruleVerificationList);
 
@@ -180,23 +209,21 @@ namespace CDP4Composition.Tests.RuleVerification
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
             var binaryRelationshipRule = new BinaryRelationshipRule(Guid.NewGuid(), this.cache, this.uri);
+
             var userRuleVerification = new UserRuleVerification(Guid.NewGuid(), this.cache, this.uri)
-                                           {
-                                               IsActive = true,
-                                               Rule = binaryRelationshipRule
-                                           };
+            {
+                IsActive = true,
+                Rule = binaryRelationshipRule
+            };
 
             this.session.Setup(s => s.Write(It.IsAny<OperationContainer>()))
-                        .Callback(() =>
-                        {
-                            CDPMessageBus.Current.SendObjectChangeEvent(userRuleVerification, EventKind.Updated);
-                        });
+                .Callback(() => { this.messageBus.SendObjectChangeEvent(userRuleVerification, EventKind.Updated); });
 
             ruleVerificationList.RuleVerification.Add(userRuleVerification);
 
-            var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(userRuleVerification)                
+            var listener = this.messageBus.Listen<ObjectChangedEvent>(userRuleVerification)
                 .Subscribe(
-                x => { messageReceivedCounter++; });
+                    x => { messageReceivedCounter++; });
 
             await service.Execute(this.session.Object, ruleVerificationList);
 

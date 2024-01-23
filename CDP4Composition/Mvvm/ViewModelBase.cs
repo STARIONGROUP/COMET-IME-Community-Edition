@@ -27,6 +27,7 @@ namespace CDP4Composition.Mvvm
 {
     using System;
     using System.Collections.Generic;
+    using System.Reactive.Linq;
 
     using CDP4Common;
 
@@ -160,7 +161,7 @@ namespace CDP4Composition.Mvvm
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+                var thingSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
@@ -169,7 +170,7 @@ namespace CDP4Composition.Mvvm
             }
             else
             {
-                var thingObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(T));
+                var thingObserver = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(T));
 
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(
                     thingObserver, 
