@@ -26,9 +26,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="25.0.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="25.0.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="25.0.0" />
+    <PackageReference Include="CDP4Common-CE" Version="25.1.0-rc1" />
+    <PackageReference Include="CDP4Dal-CE" Version="25.1.0-rc1" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="25.1.0-rc1" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
     <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
