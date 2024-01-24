@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypesBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-// 
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -102,11 +102,20 @@ namespace BasicRdl.ViewModels
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
         /// <param name="favoritesService">The <see cref="IFavoritesService"/>.</param>
-        public ParameterTypesBrowserViewModel(ISession session, SiteDirectory siteDir,
-            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
-            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService,
+        public ParameterTypesBrowserViewModel(
+            ISession session,
+            SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService,
+            IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService,
+            IPluginSettingsService pluginSettingsService,
             IFavoritesService favoritesService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+            : base(
+                siteDir,
+                session,
+                thingDialogNavigationService,
+                panelNavigationService,
+                dialogNavigationService,
                 pluginSettingsService)
         {
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
@@ -114,8 +123,7 @@ namespace BasicRdl.ViewModels
 
             this.favoritesService = favoritesService;
 
-            this.RefreshFavorites(
-                this.favoritesService.GetFavoriteItemsCollectionByType(this.Session, typeof(ParameterType)));
+            this.RefreshFavorites(this.favoritesService.GetFavoriteItemsCollectionByType(this.Session, typeof(ParameterType)));
 
             this.AddSubscriptions();
         }
@@ -227,34 +235,41 @@ namespace BasicRdl.ViewModels
             this.Disposables.Add(favoritesToggleListener);
 
             var addListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
-                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterType))
+                    .Where(
+                        objectChange => objectChange.EventKind == EventKind.Added &&
+                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ParameterType)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.AddParameterTypeRowViewModel);
+
             this.Disposables.Add(addListener);
 
             var removeListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
-                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterType))
+                    .Where(
+                        objectChange => objectChange.EventKind == EventKind.Removed &&
+                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ParameterType)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RemoveParameterTypeRowViewModel);
+
             this.Disposables.Add(removeListener);
 
             var rdlUpdateListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
-                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
+                    .Where(
+                        objectChange => objectChange.EventKind == EventKind.Updated &&
+                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);
+
             this.Disposables.Add(rdlUpdateListener);
 
             var favoritesListener =
                 this.favoritesService.SubscribeToChanges(this.Session, typeof(ParameterType), this.RefreshFavorites);
+
             this.Disposables.Add(favoritesListener);
         }
 
@@ -316,35 +331,109 @@ namespace BasicRdl.ViewModels
 
             if (this.SelectedThing is ParameterTypeRowViewModel selectedParameterTypeRow)
             {
-                this.ContextMenu.Add(new ContextMenuItemViewModel(
-                    !selectedParameterTypeRow.IsFavorite ? "Add to Favorites" : "Remove from Favorites", "",
-                    this.ToggleFavoriteCommand, MenuItemKind.Favorite));
+                this.ContextMenu.Add(
+                    new ContextMenuItemViewModel(
+                        !selectedParameterTypeRow.IsFavorite ? "Add to Favorites" : "Remove from Favorites",
+                        "",
+                        this.ToggleFavoriteCommand,
+                        MenuItemKind.Favorite));
             }
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Array Parameter Type", "",
-                this.CreateArrayParameterType, MenuItemKind.Create, ClassKind.ArrayParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Boolean Parameter Type", "",
-                this.CreateBooleanParameterType, MenuItemKind.Create, ClassKind.BooleanParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Compound Parameter Type", "",
-                this.CreateCompoundParameterType, MenuItemKind.Create, ClassKind.CompoundParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Date Parameter Type", "",
-                this.CreateDateParameterType, MenuItemKind.Create, ClassKind.DateParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Date Time Parameter Type", "",
-                this.CreateDateTimeParameterType, MenuItemKind.Create, ClassKind.DateTimeParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Derived Quantity Kind", "",
-                this.CreateDerivedQuantityKind, MenuItemKind.Create, ClassKind.DerivedQuantityKind));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Enumeration Parameter Type", "",
-                this.CreateEnumerationParameterType, MenuItemKind.Create, ClassKind.EnumerationParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Sampled Function Parameter Type", "",
-                this.CreateSampledFunctionParameterType, MenuItemKind.Create, ClassKind.SampledFunctionParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Simple Quantity Kind", "",
-                this.CreateSimpleQuantityKind, MenuItemKind.Create, ClassKind.SimpleQuantityKind));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Specialized Quantity Kind", "",
-                this.CreateSpecializedQuantityKind, MenuItemKind.Create, ClassKind.SpecializedQuantityKind));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Text Parameter Type", "",
-                this.CreateTextParameterType, MenuItemKind.Create, ClassKind.TextParameterType));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Time of Day Parameter Type", "",
-                this.CreateTimeOfDayParameterType, MenuItemKind.Create, ClassKind.TimeOfDayParameterType));
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create an Array Parameter Type",
+                    "",
+                    this.CreateArrayParameterType,
+                    MenuItemKind.Create,
+                    ClassKind.ArrayParameterType));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Boolean Parameter Type",
+                    "",
+                    this.CreateBooleanParameterType,
+                    MenuItemKind.Create,
+                    ClassKind.BooleanParameterType));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Compound Parameter Type",
+                    "",
+                    this.CreateCompoundParameterType,
+                    MenuItemKind.Create,
+                    ClassKind.CompoundParameterType));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Date Parameter Type",
+                    "",
+                    this.CreateDateParameterType,
+                    MenuItemKind.Create,
+                    ClassKind.DateParameterType));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Date Time Parameter Type",
+                    "",
+                    this.CreateDateTimeParameterType,
+                    MenuItemKind.Create,
+                    ClassKind.DateTimeParameterType));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Derived Quantity Kind",
+                    "",
+                    this.CreateDerivedQuantityKind,
+                    MenuItemKind.Create,
+                    ClassKind.DerivedQuantityKind));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create an Enumeration Parameter Type",
+                    "",
+                    this.CreateEnumerationParameterType,
+                    MenuItemKind.Create,
+                    ClassKind.EnumerationParameterType));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Sampled Function Parameter Type",
+                    "",
+                    this.CreateSampledFunctionParameterType,
+                    MenuItemKind.Create,
+                    ClassKind.SampledFunctionParameterType));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Simple Quantity Kind",
+                    "",
+                    this.CreateSimpleQuantityKind,
+                    MenuItemKind.Create,
+                    ClassKind.SimpleQuantityKind));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Specialized Quantity Kind",
+                    "",
+                    this.CreateSpecializedQuantityKind,
+                    MenuItemKind.Create,
+                    ClassKind.SpecializedQuantityKind));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Text Parameter Type",
+                    "",
+                    this.CreateTextParameterType,
+                    MenuItemKind.Create,
+                    ClassKind.TextParameterType));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Time of Day Parameter Type",
+                    "",
+                    this.CreateTimeOfDayParameterType,
+                    MenuItemKind.Create,
+                    ClassKind.TimeOfDayParameterType));
         }
 
         /// <summary>
@@ -370,8 +459,7 @@ namespace BasicRdl.ViewModels
             // update row status
             foreach (var parameterTypeRowViewModel in this.ParameterTypes)
             {
-                parameterTypeRowViewModel.SetFavoriteStatus(
-                    this.FavoriteParameterTypeIids.Contains(parameterTypeRowViewModel.Thing.Iid));
+                parameterTypeRowViewModel.SetFavoriteStatus(this.FavoriteParameterTypeIids.Contains(parameterTypeRowViewModel.Thing.Iid));
             }
         }
 
@@ -427,6 +515,7 @@ namespace BasicRdl.ViewModels
         private void RemoveParameterTypeRowViewModel(ParameterType parameterType)
         {
             var row = this.ParameterTypes.SingleOrDefault(rowViewModel => rowViewModel.Thing == parameterType);
+
             if (row != null)
             {
                 this.ParameterTypes.RemoveAndDispose(row);
@@ -463,8 +552,9 @@ namespace BasicRdl.ViewModels
             base.Initialize();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
-                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
+                         .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var parameterType in referenceDataLibrary.ParameterType)
                 {
@@ -482,6 +572,7 @@ namespace BasicRdl.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var type in this.ParameterTypes)
             {
                 type.Dispose();
@@ -503,6 +594,7 @@ namespace BasicRdl.ViewModels
         {
             logger.Trace("drag over {0}", dropInfo.TargetItem);
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget == null)
             {
                 dropInfo.Effects = DragDropEffects.None;
@@ -521,6 +613,7 @@ namespace BasicRdl.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget == null)
             {
                 return;

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MeasurementScaleRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-// 
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -50,19 +50,23 @@ namespace BasicRdl.Tests.ViewModels
     {
         private Mock<ISession> session;
         private Uri uri;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
             this.uri = new Uri("http://test.com");
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -120,7 +124,7 @@ namespace BasicRdl.Tests.ViewModels
             Assert.AreEqual(ratioscale.ShortName, measurementScaleRowViewModel.ShortName);
             Assert.AreEqual(ratioscale.Name, measurementScaleRowViewModel.Name);
             Assert.AreEqual(simpleUnit.ShortName, measurementScaleRowViewModel.MeasurementUnit);
-            Assert.AreEqual(rdlshortnamename, measurementScaleRowViewModel.ContainerRdl);            
+            Assert.AreEqual(rdlshortnamename, measurementScaleRowViewModel.ContainerRdl);
         }
 
         [Test]
@@ -146,6 +150,7 @@ namespace BasicRdl.Tests.ViewModels
                 Name = "ratio scale name",
                 ShortName = "ratioscaleshortname"
             };
+
             ratioscale.Unit = simpleUnit;
 
             rdl.Scale.Add(ratioscale);
@@ -156,15 +161,16 @@ namespace BasicRdl.Tests.ViewModels
             var updatedName = "updated scale name";
             ratioscale.ShortName = updatedShortName;
             ratioscale.Name = updatedName;
+
             // workaround to modify a read-only field
             var type = ratioscale.GetType();
             type.GetProperty("RevisionNumber").SetValue(ratioscale, 50);
-            CDPMessageBus.Current.SendObjectChangeEvent(ratioscale, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(ratioscale, EventKind.Updated);
 
             Assert.AreEqual(ratioscale.ShortName, measurementScaleRowViewModel.ShortName);
             Assert.AreEqual(ratioscale.Name, measurementScaleRowViewModel.Name);
             Assert.AreEqual(simpleUnit.ShortName, measurementScaleRowViewModel.MeasurementUnit);
-            Assert.AreEqual(rdlshortnamename, measurementScaleRowViewModel.ContainerRdl);            
+            Assert.AreEqual(rdlshortnamename, measurementScaleRowViewModel.ContainerRdl);
         }
 
         [Test]
@@ -188,7 +194,7 @@ namespace BasicRdl.Tests.ViewModels
             var ratioscale = new RatioScale(Guid.NewGuid(), null, this.uri)
             {
                 Name = "ratio scale name",
-                ShortName = "ratioscaleshortname"                
+                ShortName = "ratioscaleshortname"
             };
 
             ratioscale.Unit = simpleUnit;
@@ -201,12 +207,12 @@ namespace BasicRdl.Tests.ViewModels
             simpleUnit.ShortName = updatedShortName;
             simpleUnit.Name = updatedName;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(simpleUnit, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(simpleUnit, EventKind.Updated);
 
             Assert.AreEqual(ratioscale.ShortName, measurementScaleRowViewModel.ShortName);
             Assert.AreEqual(ratioscale.Name, measurementScaleRowViewModel.Name);
             Assert.AreEqual(simpleUnit.ShortName, measurementScaleRowViewModel.MeasurementUnit);
-            Assert.AreEqual(rdlshortnamename, measurementScaleRowViewModel.ContainerRdl);            
+            Assert.AreEqual(rdlshortnamename, measurementScaleRowViewModel.ContainerRdl);
         }
     }
 }

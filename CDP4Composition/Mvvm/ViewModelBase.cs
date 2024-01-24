@@ -148,7 +148,7 @@ namespace CDP4Composition.Mvvm
             this.Disposables = new List<IDisposable>();
             this.Thing = thing;
             this.Session = session;
-
+            this.CDPMessageBus = session.CDPMessageBus;
             this.RevisionNumber = thing.RevisionNumber;
             this.IDalUri = thing.IDalUri;
 

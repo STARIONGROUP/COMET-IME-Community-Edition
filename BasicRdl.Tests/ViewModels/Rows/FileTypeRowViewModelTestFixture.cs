@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FileTypeRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-// 
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -57,20 +57,23 @@ namespace BasicRdl.Tests.ViewModels.Rows
         private PropertyInfo revInfo = typeof(Thing).GetProperty("RevisionNumber");
         private SiteReferenceDataLibrary siteReferenceDataLibrary;
         private FileType fileType;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
-            this.uri = new Uri("http://www.rheagroup.com");            
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+            this.uri = new Uri("http://www.rheagroup.com");
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri)
-                                                {
-                                                    ShortName = "rdl",
-                                                    Name = "reference data library"
-                                                };
+            {
+                ShortName = "rdl",
+                Name = "reference data library"
+            };
 
             this.fileType = new FileType(Guid.NewGuid(), this.cache, this.uri) { ShortName = "cdp" };
             this.siteReferenceDataLibrary.FileType.Add(this.fileType);
@@ -79,7 +82,7 @@ namespace BasicRdl.Tests.ViewModels.Rows
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -97,7 +100,7 @@ namespace BasicRdl.Tests.ViewModels.Rows
             this.fileType.ShortName = "cdp4";
 
             this.revInfo.SetValue(this.fileType, 10);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.fileType, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.fileType, EventKind.Updated);
 
             Assert.AreEqual("cdp4", row.ShortName);
         }

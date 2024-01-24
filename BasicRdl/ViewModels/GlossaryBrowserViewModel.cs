@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GlossaryBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-// 
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -87,10 +87,19 @@ namespace BasicRdl.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public GlossaryBrowserViewModel(ISession session, SiteDirectory siteDir,
-            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
-            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+        public GlossaryBrowserViewModel(
+            ISession session,
+            SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService,
+            IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService,
+            IPluginSettingsService pluginSettingsService)
+            : base(
+                siteDir,
+                session,
+                thingDialogNavigationService,
+                panelNavigationService,
+                dialogNavigationService,
                 pluginSettingsService)
         {
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
@@ -143,30 +152,36 @@ namespace BasicRdl.ViewModels
         private void AddSubscriptions()
         {
             var addListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Glossary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
-                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Glossary))
+                    .Where(
+                        objectChange => objectChange.EventKind == EventKind.Added &&
+                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Glossary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.AddGlossaryRowViewModel);
+
             this.Disposables.Add(addListener);
 
             var removeListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Glossary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
-                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Glossary))
+                    .Where(
+                        objectChange => objectChange.EventKind == EventKind.Removed &&
+                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Glossary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RemoveGlossaryRowViewModel);
+
             this.Disposables.Add(removeListener);
 
             var rdlUpdateListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
-                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
+                    .Where(
+                        objectChange => objectChange.EventKind == EventKind.Updated &&
+                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);
+
             this.Disposables.Add(rdlUpdateListener);
         }
 
@@ -192,6 +207,7 @@ namespace BasicRdl.ViewModels
         private void RemoveGlossaryRowViewModel(Glossary glossary)
         {
             var row = this.Glossaries.SingleOrDefault(x => x.Thing == glossary);
+
             if (row != null)
             {
                 this.Glossaries.RemoveAndDispose(row);
@@ -229,8 +245,9 @@ namespace BasicRdl.ViewModels
             this.Glossaries = new DisposableReactiveList<GlossaryRowViewModel>();
 
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
-                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
+                         .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var glossary in referenceDataLibrary.Glossary)
                 {
@@ -246,9 +263,12 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateTermCommand = ReactiveCommandCreator.Create(() =>
-                this.ExecuteCreateCommand<Term>(this.SelectedThing.Thing as Glossary ??
-                                                this.SelectedThing.Thing.GetContainerOfType<Glossary>()), this.WhenAnyValue(x => x.CanCreateTerm));
+            this.CreateTermCommand = ReactiveCommandCreator.Create(
+                () =>
+                    this.ExecuteCreateCommand<Term>(
+                        this.SelectedThing.Thing as Glossary ??
+                        this.SelectedThing.Thing.GetContainerOfType<Glossary>()),
+                this.WhenAnyValue(x => x.CanCreateTerm));
 
             this.CreateGlossaryCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Glossary>(), this.WhenAnyValue(x => x.CanCreateGlossary));
         }
@@ -260,6 +280,7 @@ namespace BasicRdl.ViewModels
         {
             var dialogViewModel =
                 new HtmlExportGlossarySelectionDialogViewModel(this.Glossaries.Select(grvm => grvm.Thing).ToList());
+
             this.DialogNavigationService.NavigateModal(dialogViewModel);
         }
 
@@ -276,7 +297,8 @@ namespace BasicRdl.ViewModels
                 return;
             }
 
-            this.CanCreateTerm = this.PermissionService.CanWrite(ClassKind.Term,
+            this.CanCreateTerm = this.PermissionService.CanWrite(
+                ClassKind.Term,
                 this.SelectedThing.Thing as Glossary ?? this.SelectedThing.Thing.GetContainerOfType<Glossary>());
         }
 
@@ -287,16 +309,26 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Glossary", "", this.CreateGlossaryCommand,
-                MenuItemKind.Create, ClassKind.Glossary));
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Glossary",
+                    "",
+                    this.CreateGlossaryCommand,
+                    MenuItemKind.Create,
+                    ClassKind.Glossary));
 
             if (this.SelectedThing == null)
             {
                 return;
             }
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Term", "", this.CreateTermCommand,
-                MenuItemKind.Create, ClassKind.Term));
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Term",
+                    "",
+                    this.CreateTermCommand,
+                    MenuItemKind.Create,
+                    ClassKind.Term));
         }
 
         /// <summary>
@@ -308,6 +340,7 @@ namespace BasicRdl.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var glossary in this.Glossaries)
             {
                 glossary.Dispose();
@@ -329,6 +362,7 @@ namespace BasicRdl.ViewModels
         {
             logger.Trace("drag over {0}", dropInfo.TargetItem);
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget != null)
             {
                 droptarget.DragOver(dropInfo);
@@ -344,6 +378,7 @@ namespace BasicRdl.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget != null)
             {
                 try

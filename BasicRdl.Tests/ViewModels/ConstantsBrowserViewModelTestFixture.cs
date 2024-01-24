@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ConstantsBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-// 
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -64,12 +64,14 @@ namespace BasicRDL.Tests.ViewModels
         private List<ReferenceDataLibrary> openRdlList;
         private Person person;
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.dialogNavigation = new Mock<IThingDialogNavigationService>();
             this.navigation = new Mock<IPanelNavigationService>();
@@ -79,7 +81,7 @@ namespace BasicRDL.Tests.ViewModels
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
             this.uri = new Uri("http://www.rheagroup.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
@@ -87,6 +89,7 @@ namespace BasicRDL.Tests.ViewModels
             this.openRdlList = new List<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.browser = new ConstantsBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigation.Object, this.navigation.Object, null, null);
         }
@@ -94,7 +97,7 @@ namespace BasicRDL.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -122,10 +125,10 @@ namespace BasicRDL.Tests.ViewModels
                                    Scale = ratioScale
                                };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(constant, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(constant, EventKind.Added);
             Assert.AreEqual(1, this.browser.Constants.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(constant, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(constant, EventKind.Removed);
             Assert.AreEqual(0, this.browser.Constants.Count);
         }
 
@@ -147,7 +150,7 @@ namespace BasicRDL.Tests.ViewModels
                 Scale = ratioScale
             };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(constant, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(constant, EventKind.Added);
             Assert.AreEqual(1, this.browser.Constants.Count);
         }
 
@@ -187,14 +190,14 @@ namespace BasicRDL.Tests.ViewModels
             var cat = new Constant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new Constant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(cat, EventKind.Added);
-            CDPMessageBus.Current.SendObjectChangeEvent(cat2, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(cat, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(cat2, EventKind.Added);
 
             var rev = typeof(Thing).GetProperty("RevisionNumber");
             rev.SetValue(sRdl, 3);
             sRdl.ShortName = "test";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(sRdl, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.Constants.All(x => x.ContainerRdl == "test"));
         }
     }
