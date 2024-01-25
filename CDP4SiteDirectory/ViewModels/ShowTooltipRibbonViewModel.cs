@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShowTooltipRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -26,7 +26,6 @@
 namespace CDP4SiteDirectory.ViewModels
 {
     using System;
-    using System.Windows;
     using System.Windows.Controls;
 
     using CDP4Composition.Events;
@@ -40,6 +39,11 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class ShowTooltipRibbonViewModel : ReactiveObject
     {
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
         /// <summary>
         /// The backing field for <see cref="ShowTooltip"/> property.
         /// </summary>
@@ -48,8 +52,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ShowTooltipRibbonViewModel"/> class
         /// </summary>
-        public ShowTooltipRibbonViewModel()
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public ShowTooltipRibbonViewModel(ICDPMessageBus messageBus)
         {
+            this.messageBus = messageBus;
             this.RefreshTooltipEvent();
 
             this.WhenAnyValue(vm => vm.ShowTooltip)
@@ -61,8 +69,8 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public bool ShowTooltip
         {
-            get { return this.showTooltip; }
-            set { this.RaiseAndSetIfChanged(ref this.showTooltip, value); }
+            get => this.showTooltip;
+            set => this.RaiseAndSetIfChanged(ref this.showTooltip, value);
         }
 
         /// <summary>
@@ -70,7 +78,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private void RefreshTooltipEvent()
         {
-            CDPMessageBus.Current.SendMessage(new ToggleTooltipEvent(this.ShowTooltip));
+            this.messageBus.SendMessage(new ToggleTooltipEvent(this.ShowTooltip));
         }
     }
 }

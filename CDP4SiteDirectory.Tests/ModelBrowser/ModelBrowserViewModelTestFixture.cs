@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -64,13 +64,15 @@ namespace CDP4SiteDirectory.Tests
         private Person person;
         private PropertyInfo revPropertyInfo;
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
             this.revPropertyInfo = typeof(SiteDirectory).GetProperty("RevisionNumber");
             this.uri = new Uri("http://www.rheagroup.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
@@ -85,12 +87,13 @@ namespace CDP4SiteDirectory.Tests
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -111,10 +114,10 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             var selectedThingChangedRaised = false;
-            CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
+            this.messageBus.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
 
             viewmodel.SelectedThing = viewmodel.ModelSetup.First();
             Assert.IsTrue(selectedThingChangedRaised);
@@ -135,14 +138,14 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             var modelrow = viewmodel.ModelSetup.First();
             Assert.AreEqual("Phase: Preparation Phase, Kind: Study Model", modelrow.Description);
             var iterationFolderRow = modelrow.ContainedRows[1];
 
             var selectedThingChangedRaised = false;
-            CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
+            this.messageBus.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
 
             viewmodel.SelectedThing = iterationFolderRow.ContainedRows.First();
             Assert.IsTrue(selectedThingChangedRaised);
@@ -167,13 +170,13 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             var modelrow = viewmodel.ModelSetup.First();
             var participantFolderRow = modelrow.ContainedRows.First();
 
             var selectedThingChangedRaised = false;
-            CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
+            this.messageBus.Listen<SelectedThingChangedEvent>().Subscribe(_ => selectedThingChangedRaised = true);
 
             viewmodel.SelectedThing = participantFolderRow.ContainedRows.First();
             var participantRow = participantFolderRow.ContainedRows.First() as ModelParticipantRowViewModel;
@@ -203,7 +206,7 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             var modelrow = viewmodel.ModelSetup.First();
             var participantFolderRow = modelrow.ContainedRows.First();
@@ -222,7 +225,7 @@ namespace CDP4SiteDirectory.Tests
             var modelRevisionProperty = typeof(EngineeringModelSetup).GetProperty("RevisionNumber");
             modelRevisionProperty.SetValue(model, 5);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(model, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(model, EventKind.Updated);
             Assert.AreEqual(0, participantFolderRow.ContainedRows.Count);
             Assert.AreEqual(0, iterationFolderRow.ContainedRows.Count);
             Assert.AreEqual(0, domainFolderRow.ContainedRows.Count);
@@ -230,7 +233,7 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Clear();
             this.revPropertyInfo.SetValue(this.siteDirectory, 52);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
             Assert.AreEqual(0, viewmodel.ModelSetup.Count);
         }
 
@@ -252,14 +255,14 @@ namespace CDP4SiteDirectory.Tests
 
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             Assert.AreEqual(50, viewmodel.RevisionNumber);
             viewmodel.Dispose();
 
             Assert.AreEqual(0, viewmodel.RevisionNumber);
             this.revPropertyInfo.SetValue(this.siteDirectory, 100);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             Assert.AreEqual(0, viewmodel.RevisionNumber);
         }
@@ -289,7 +292,7 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             viewmodel.ComputePermission();
             Assert.IsFalse(viewmodel.CanCreateParticipant);
@@ -358,7 +361,7 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             viewmodel.ComputePermission();
             Assert.IsFalse(viewmodel.CanCreateParticipant);
@@ -432,7 +435,7 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             var modelRow = viewmodel.ModelSetup.Single();
             viewmodel.SelectedThing = modelRow;
@@ -469,7 +472,7 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             var modelRow = viewmodel.ModelSetup.Single();
             var iterationFolderRow = modelRow.ContainedRows.OfType<FolderRowViewModel>().Single(x => x.Name == "Iterations");
@@ -511,7 +514,7 @@ namespace CDP4SiteDirectory.Tests
             this.siteDirectory.Model.Add(model);
             this.revPropertyInfo.SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             var modelRow = viewmodel.ModelSetup.Single();
             viewmodel.SelectedThing = modelRow;

@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelSetupSelectionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Tests.Dialogs
 {
@@ -17,10 +36,15 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Dal;
+
     using CDP4SiteDirectory.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     /// <summary>
@@ -32,7 +56,8 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Uri uri;
         private Mock<ISession> session;
-            
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public async Task SetUp()
         {
@@ -40,7 +65,9 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.uri = new Uri("http://www.rheagroup.com");
-            var assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+
+            var assembler = new Assembler(this.uri, this.messageBus);
 
             var siteDirectoryDto = new CDP4Common.DTO.SiteDirectory(Guid.NewGuid(), 0);
             var dtos = new List<CDP4Common.DTO.Thing>();
@@ -55,7 +82,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -97,7 +124,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
 
             var vm = new EngineeringModelSetupSelectionDialogViewModel(availableSessions);
 
-            Assert.Contains(engineeringModelSetup, vm.PossibleEngineeringModelSetups);            
+            Assert.Contains(engineeringModelSetup, vm.PossibleEngineeringModelSetups);
         }
 
         [Test]

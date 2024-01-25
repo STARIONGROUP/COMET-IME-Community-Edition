@@ -46,6 +46,11 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class ShowDeprecatedBrowserRibbonViewModel : ReactiveObject, IDeprecatableToggleViewModel
     {
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
         /// <summary>
         /// The (injected) <see cref="IFilterStringService"/>
         /// </summary>
@@ -69,14 +74,18 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ShowDeprecatedBrowserRibbonViewModel"/> class
         /// </summary>
-        public ShowDeprecatedBrowserRibbonViewModel()
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public ShowDeprecatedBrowserRibbonViewModel(ICDPMessageBus messageBus)
         {
+            this.messageBus = messageBus;
             this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
-            
+
             this.openSessions = new ReactiveList<ISession>();
             this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.WhenAnyValue(vm => vm.ShowDeprecatedThings)
                 .Subscribe(_ => this.RefreshAndSendShowDeprecatedThingsEvent());
@@ -85,18 +94,15 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets a value indicating whether there are open <see cref="ISession"/>s
         /// </summary>
-        public bool HasSession
-        {
-            get { return this.hasSession.Value; }
-        }
+        public bool HasSession => this.hasSession.Value;
 
         /// <summary>
         /// Gets or sets a value indicating whether to display deprecated items.
         /// </summary>
         public bool ShowDeprecatedThings
         {
-            get { return this.showDeprecatedThings; }
-            set { this.RaiseAndSetIfChanged(ref this.showDeprecatedThings, value); }
+            get => this.showDeprecatedThings;
+            set => this.RaiseAndSetIfChanged(ref this.showDeprecatedThings, value);
         }
 
         /// <summary>
@@ -114,13 +120,14 @@ namespace CDP4SiteDirectory.ViewModels
                     this.openSessions.Add(sessionChange.Session);
                     break;
                 case SessionStatus.Closed:
+                {
+                    var sessionToRemove = this.openSessions.SingleOrDefault(x => x == sessionChange.Session);
+
+                    if (sessionToRemove != null)
                     {
-                        var sessionToRemove = this.openSessions.SingleOrDefault(x => x == sessionChange.Session);
-                        if (sessionToRemove != null)
-                        {
-                            this.openSessions.Remove(sessionToRemove);
-                        }
+                        this.openSessions.Remove(sessionToRemove);
                     }
+                }
 
                     break;
             }
@@ -135,7 +142,7 @@ namespace CDP4SiteDirectory.ViewModels
             this.filterStringService.ShowDeprecatedThings = this.ShowDeprecatedThings;
             this.filterStringService.RefreshDeprecatableFilterAll();
 
-            CDPMessageBus.Current.SendMessage(new ToggleDeprecatedThingEvent(this.ShowDeprecatedThings));
+            this.messageBus.SendMessage(new ToggleDeprecatedThingEvent(this.ShowDeprecatedThings));
         }
     }
 }
