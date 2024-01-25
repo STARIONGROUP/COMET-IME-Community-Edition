@@ -1,15 +1,33 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RequirementVerificationViewModels.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="RequirementVerificationViewModelsTestFixture.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests.ViewModels.Rows
 {
     using System;
     using System.Reactive.Concurrency;
     using System.Reflection;
-    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -48,11 +66,13 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         private Mock<IPermissionService> permissionService;
         private Assembler assembler;
         private DomainOfExpertise domain;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
@@ -61,6 +81,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test" };
 
@@ -76,7 +97,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [TestCase(typeof(OrExpression))]
@@ -101,15 +122,15 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
 
             Assert.IsNotNull(row);
 
-            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Calculating), thing);
+            this.messageBus.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Calculating), thing);
             Assert.AreEqual(RequirementStateOfCompliance.Calculating, row.RequirementStateOfCompliance);
 
-            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), thing);
+            this.messageBus.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), thing);
             Assert.AreEqual(RequirementStateOfCompliance.Pass, row.RequirementStateOfCompliance);
 
             if (thingType == typeof(RelationalExpression) && row is IHaveContainerViewModel)
             {
-                CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Unknown), typeof(ParameterOrOverrideBase));
+                this.messageBus.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Unknown), typeof(ParameterOrOverrideBase));
                 Assert.AreEqual(RequirementStateOfCompliance.Unknown, row.RequirementStateOfCompliance);
                 Assert.AreEqual(RequirementStateOfCompliance.Unknown, this.parametricConstraintRowViewModel.RequirementStateOfCompliance);
             }
@@ -118,10 +139,10 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         [Test]
         public void VerifyThatRequirementVerificationStateOfComplianceIsSetForParametricConstraintRowViewModel()
         {
-            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Calculating), this.parametricConstraint);
+            this.messageBus.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Calculating), this.parametricConstraint);
             Assert.AreEqual(RequirementStateOfCompliance.Calculating, this.parametricConstraintRowViewModel.RequirementStateOfCompliance);
 
-            CDPMessageBus.Current.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), this.parametricConstraint);
+            this.messageBus.SendMessage(new RequirementStateOfComplianceChangedEvent(RequirementStateOfCompliance.Pass), this.parametricConstraint);
             Assert.AreEqual(RequirementStateOfCompliance.Pass, this.parametricConstraintRowViewModel.RequirementStateOfCompliance);
         }
     }

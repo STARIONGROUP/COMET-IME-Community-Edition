@@ -35,13 +35,13 @@ namespace CDP4Requirements.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
 
-    using CommonServiceLocator;
-    
-    using ReactiveUI;
-    
     using CDP4Dal;
     using CDP4Dal.Events;
-    
+
+    using CommonServiceLocator;
+
+    using ReactiveUI;
+
     /// <summary>
     /// The view-model for the ribbon
     /// </summary>
@@ -58,6 +58,11 @@ namespace CDP4Requirements.ViewModels
         private readonly IOpenSaveFileDialogService openSaveFileDialogService;
 
         /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus CDPMessageBus;
+
+        /// <summary>
         /// Backing field for <see cref="CanExport"/>
         /// </summary>
         private bool canExport;
@@ -69,18 +74,15 @@ namespace CDP4Requirements.ViewModels
         {
             this.dialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             this.openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
+            this.CDPMessageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
 
             this.Sessions = new ReactiveList<ISession>();
             this.Iterations = new ReactiveList<Iteration>();
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration)).Subscribe(this.IterationEventHandler);
+            this.CDPMessageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Iteration)).Subscribe(this.IterationEventHandler);
 
-            this.Iterations.CountChanged.Subscribe(
-                x =>
-                    {
-                        this.CanExport = x > 0;
-                    });
+            this.Iterations.CountChanged.Subscribe(x => { this.CanExport = x > 0; });
 
             var isExportEnabled = this.WhenAnyValue(x => x.CanExport);
 
@@ -107,8 +109,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public bool CanExport
         {
-            get { return this.canExport; }
-            set { this.RaiseAndSetIfChanged(ref this.canExport, value); }
+            get => this.canExport;
+            set => this.RaiseAndSetIfChanged(ref this.canExport, value);
         }
 
         /// <summary>

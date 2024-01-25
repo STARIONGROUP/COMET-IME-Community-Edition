@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsSpecificationEditorViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -62,12 +62,12 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="CurrentIteration"/>
         /// </summary>
         private int currentIteration;
-        
+
         /// <summary>
         /// Backing field for <see cref="DomainOfExpertise"/>
         /// </summary>
         private string domainOfExpertise;
-        
+
         /// <summary>
         /// The <see cref="EngineeringModelSetup"/> that is referenced by the <see cref="EngineeringModel"/> that contains the current <see cref="Option"/>
         /// </summary>
@@ -87,7 +87,7 @@ namespace CDP4Requirements.ViewModels
         /// The <see cref="IComparer{T}"/>
         /// </summary>
         protected static readonly IComparer<IRowViewModelBase<Thing>> ContainedRowsComparer = new RequirementSpecificationContentComparer();
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementsSpecificationEditorViewModel"/> class
         /// </summary>
@@ -107,7 +107,7 @@ namespace CDP4Requirements.ViewModels
 
             var iteration = (Iteration)thing.Container;
             this.iterationSetup = iteration.IterationSetup;
-            
+
             this.ContainedRows = new DisposableReactiveList<IRowViewModelBase<Thing>>();
 
             this.AddRequirementsSpecificationRow(thing);
@@ -117,14 +117,14 @@ namespace CDP4Requirements.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -132,17 +132,17 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
-        
+
         /// <summary>
         /// Gets the <see cref="DomainOfExpertise"/> of the active user
         /// </summary>
         public string DomainOfExpertise
         {
-            get { return this.domainOfExpertise; }
-            private set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
+            get => this.domainOfExpertise;
+            private set => this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value);
         }
 
         /// <summary>
@@ -160,41 +160,46 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.modelSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var engineeringModelSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.modelSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var domainOfExpertiseSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var iterationSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.iterationSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(iterationSetupSubscription);
-            
-            var requirementsGroupAddSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsGroup))
+
+            var requirementsGroupAddSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(RequirementsGroup))
                 .Where(objectChangedEvent => objectChangedEvent.EventKind == EventKind.Added && objectChangedEvent.ChangedThing.Cache == this.Session.Assembler.Cache && objectChangedEvent.ChangedThing.GetContainerOfType(typeof(RequirementsSpecification)) == this.Thing)
                 .Select(objectChangedEvent => objectChangedEvent.ChangedThing)
                 .OfType<RequirementsGroup>()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.AddRequirementsGroupRow);
+
             this.Disposables.Add(requirementsGroupAddSubscription);
 
-            var requirementsGroupRemoveSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(RequirementsGroup))
+            var requirementsGroupRemoveSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(RequirementsGroup))
                 .Where(objectChangedEvent => objectChangedEvent.EventKind == EventKind.Removed && objectChangedEvent.ChangedThing.Cache == this.Session.Assembler.Cache && objectChangedEvent.ChangedThing.GetContainerOfType(typeof(RequirementsSpecification)) == this.Thing)
                 .Select(objectChangedEvent => objectChangedEvent.ChangedThing)
                 .OfType<RequirementsGroup>()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.RemoveRequirementsGroupRow);
+
             this.Disposables.Add(requirementsGroupRemoveSubscription);
         }
-        
+
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -209,7 +214,7 @@ namespace CDP4Requirements.ViewModels
             this.UpdateRequirementRows();
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -235,7 +240,7 @@ namespace CDP4Requirements.ViewModels
             var row = new CDP4Requirements.ViewModels.RequirementsSpecificationEditor.RequirementsSpecificationRowViewModel(requirementsSpecification, this.Session, this);
             this.ContainedRows.SortedInsert(row, ContainedRowsComparer);
         }
-        
+
         /// <summary>
         /// Update the properties of this view-model
         /// </summary>
@@ -313,6 +318,7 @@ namespace CDP4Requirements.ViewModels
         private void RemoveRequirementsGroupRow(RequirementsGroup requirementsGroup)
         {
             var row = this.ContainedRows.SingleOrDefault(x => x.Thing == requirementsGroup);
+
             if (row != null)
             {
                 this.ContainedRows.RemoveAndDispose(row);
@@ -340,6 +346,7 @@ namespace CDP4Requirements.ViewModels
         private void RemoveRequirementRow(Requirement requirement)
         {
             var row = this.ContainedRows.SingleOrDefault(x => x.Thing == requirement);
+
             if (row != null)
             {
                 this.ContainedRows.RemoveAndDispose(row);

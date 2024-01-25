@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementGroupRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests.RequirementBrowser
 {
@@ -10,19 +29,25 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.DragDrop;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
+    using CDP4Requirements.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
-    using RequirementsGroupRowViewModel = CDP4Requirements.ViewModels.RequirementsGroupRowViewModel;
-    using RequirementsSpecificationRowViewModel = CDP4Requirements.ViewModels.RequirementsSpecificationRowViewModel;
 
     [TestFixture]
     internal class RequirementGroupRowViewModelTestFixture
@@ -44,11 +69,13 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private List<Category> categories;
 
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -56,12 +83,13 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "model" };
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "rs1", ShortName = "1"};
+            this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "rs1", ShortName = "1" };
 
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test" };
             this.reqSpec.Owner = this.domain;
@@ -71,11 +99,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.model.EngineeringModelSetup = this.modelSetup;
             this.model.Iteration.Add(this.iteration);
 
-            this.categories = new List<Category>(){new Category { Name = "category1"}, new Category { Name = "category2" } };
+            this.categories = new List<Category>() { new Category { Name = "category1" }, new Category { Name = "category2" } };
 
             this.grp1 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.grp11 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.grp2 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "requirement group 2", ShortName = "rg2", Category = this.categories};
+            this.grp2 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "requirement group 2", ShortName = "rg2", Category = this.categories };
 
             this.reqSpec.Group.Add(this.grp1);
             this.reqSpec.Group.Add(this.grp2);
@@ -89,14 +117,14 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
             var row = new RequirementsGroupRowViewModel(this.grp2, this.session.Object, this.requirementSpecificationRow, this.requirementSpecificationRow);
-        
+
             Assert.AreEqual("requirement group 2", row.Name);
             Assert.AreEqual("rg2", row.ShortName);
             Assert.AreEqual("category1, category2", row.Categories);
@@ -115,10 +143,9 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.reqSpec.IsDeprecated = true;
             revision.SetValue(this.reqSpec, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.reqSpec, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.reqSpec, EventKind.Updated);
 
             Assert.IsTrue(row.IsDeprecated);
-
         }
 
         [Test]

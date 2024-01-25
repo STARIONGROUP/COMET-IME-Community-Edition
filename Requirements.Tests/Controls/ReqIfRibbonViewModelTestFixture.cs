@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReqIfRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ReqIfRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -42,9 +42,9 @@ namespace CDP4Requirements.Tests.Controls
     using CDP4Dal.Events;
 
     using CDP4Requirements.ViewModels;
-    
+
     using CommonServiceLocator;
-    
+
     using Moq;
 
     using Newtonsoft.Json;
@@ -77,10 +77,12 @@ namespace CDP4Requirements.Tests.Controls
         private EngineeringModel engineeringModel;
         private SiteReferenceDataLibrary srdl;
         private ModelReferenceDataLibrary mrdl;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.fileDialogService = new Mock<IOpenSaveFileDialogService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -94,7 +96,7 @@ namespace CDP4Requirements.Tests.Controls
             this.pluginSettingService = new Mock<IPluginSettingsService>();
 
             this.pluginSettingService.Setup(
-                x => 
+                x =>
                     x.Read<RequirementsModuleSettings>(
                         It.IsAny<bool>(), It.IsAny<JsonConverter[]>())).Returns(
                 new RequirementsModuleSettings());
@@ -113,11 +115,14 @@ namespace CDP4Requirements.Tests.Controls
             this.serviceLocator.Setup(x => x.GetInstance<IPluginSettingsService>())
                 .Returns(this.pluginSettingService.Object);
 
-            this.assembler = new Assembler(this.uri);
+            this.serviceLocator.Setup(x => x.GetInstance<ICDPMessageBus>())
+                .Returns(this.messageBus);
 
-            this.person = new Person {GivenName = "John", Surname = "Doe"};
-            this.domainOfExpertise = new DomainOfExpertise{ShortName = "SYS", Name = "System"};
-            this.participant = new Participant {Person = this.person, SelectedDomain = this.domainOfExpertise};
+            this.assembler = new Assembler(this.uri, this.messageBus);
+
+            this.person = new Person { GivenName = "John", Surname = "Doe" };
+            this.domainOfExpertise = new DomainOfExpertise { ShortName = "SYS", Name = "System" };
+            this.participant = new Participant { Person = this.person, SelectedDomain = this.domainOfExpertise };
 
             this.session = new Mock<ISession>();
 
@@ -125,11 +130,12 @@ namespace CDP4Requirements.Tests.Controls
 
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             var iterationSetup = new IterationSetup() { IterationNumber = 42 };
 
-            this.engineeringModelSetup =   new EngineeringModelSetup() { Name = "42" };
-            this.engineeringModel = new EngineeringModel() {EngineeringModelSetup = this.engineeringModelSetup};
+            this.engineeringModelSetup = new EngineeringModelSetup() { Name = "42" };
+            this.engineeringModel = new EngineeringModel() { EngineeringModelSetup = this.engineeringModelSetup };
             this.engineeringModelSetup.Participant.Add(this.participant);
 
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -142,11 +148,11 @@ namespace CDP4Requirements.Tests.Controls
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { RequiredRdl = this.srdl };
             this.engineeringModelSetup.RequiredRdl.Add(this.mrdl);
         }
-        
+
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -154,12 +160,12 @@ namespace CDP4Requirements.Tests.Controls
         {
             var vm = new ReqIfRibbonViewModel();
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
 
             Assert.AreEqual(1, vm.Sessions.Count);
 
             sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
 
             Assert.AreEqual(0, vm.Sessions.Count);
         }
@@ -168,7 +174,7 @@ namespace CDP4Requirements.Tests.Controls
         public void VerifyThatIterationEventAreCaughtFailed()
         {
             var vm = new ReqIfRibbonViewModel();
-            Assert.Throws<InvalidOperationException>(() => CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added));
+            Assert.Throws<InvalidOperationException>(() => this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Added));
         }
 
         [Test]
@@ -176,16 +182,16 @@ namespace CDP4Requirements.Tests.Controls
         {
             var vm = new ReqIfRibbonViewModel();
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
 
             Assert.IsFalse(((ICommand)vm.ExportCommand).CanExecute(null));
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Added);
 
             Assert.IsTrue(((ICommand)vm.ExportCommand).CanExecute(null));
             Assert.AreEqual(1, vm.Iterations.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Removed);
 
             Assert.AreEqual(0, vm.Iterations.Count);
         }
@@ -199,7 +205,7 @@ namespace CDP4Requirements.Tests.Controls
             await vm.ExportCommand.Execute();
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<ReqIfExportDialogViewModel>()), Times.Once);
         }
-        
+
         [Test]
         public void VerifyImportCommand()
         {

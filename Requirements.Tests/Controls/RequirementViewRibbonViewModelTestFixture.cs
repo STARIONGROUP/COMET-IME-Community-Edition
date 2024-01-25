@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementViewRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -57,6 +57,7 @@ namespace CDP4Requirements.Tests.Controls
     {
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
+        private CDPMessageBus messageBus;
         private EngineeringModel model;
         private EngineeringModelSetup modelSetup;
         private Iteration iteration;
@@ -80,7 +81,8 @@ namespace CDP4Requirements.Tests.Controls
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.permissionService = new Mock<IPermissionService>();
             this.model = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "model" };
@@ -133,31 +135,32 @@ namespace CDP4Requirements.Tests.Controls
             openIterationResult.Add(this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant));
             this.session.Setup(x => x.OpenIterations).Returns(openIterationResult);
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public async Task VerifyThatIterationEventAreCaught()
         {
-            var viewmodel = new RequirementRibbonViewModel();
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            var viewmodel = new RequirementRibbonViewModel(this.messageBus);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Added);
             Assert.AreEqual(1, viewmodel.OpenModels.Count);
 
             await viewmodel.OpenModels.Single().SelectedIterations.Single().ShowPanelCommand.Execute();
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Removed);
 
-             this.navigationService.Verify(x => x.CloseInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
+            this.navigationService.Verify(x => x.CloseInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
             Assert.AreEqual(0, viewmodel.OpenModels.Count);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
             Assert.AreEqual(0, viewmodel.Sessions.Count);
         }
     }

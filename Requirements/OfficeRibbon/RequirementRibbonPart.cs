@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementRibbonPart.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -19,17 +38,23 @@ namespace CDP4Requirements
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using CDP4OfficeInfrastructure;
+
     using CDP4Requirements.Generator;
+    using CDP4Requirements.ViewModels;
+
     using NLog;
+
     using ReactiveUI;
-    using ViewModels;
 
     /// <summary>
     /// The purpose of the <see cref="RequirementRibbonPart"/> class is to describe and provide a part of the Fluent Ribbon
@@ -78,8 +103,11 @@ namespace CDP4Requirements
         /// <param name="officeApplicationWrapper">
         /// The instance of <see cref="IOfficeApplicationWrapper"/> that provides access to the loaded Office application.
         /// </param>
-        public RequirementRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public RequirementRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper, ICDPMessageBus messageBus)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, messageBus)
         {
             this.ExcelQuery = new ExcelQuery();
             this.officeApplicationWrapper = officeApplicationWrapper;
@@ -87,8 +115,9 @@ namespace CDP4Requirements
             this.openRequirementBrowser = new List<RequirementsBrowserViewModel>();
             this.Iterations = new List<Iteration>();
 
-            CDP4Dal.CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
-            CDP4Dal.CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
+            messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+
+            messageBus.Listen<ObjectChangedEvent>(typeof(Iteration))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.IterationChangeEventHandler);
         }
@@ -101,7 +130,7 @@ namespace CDP4Requirements
         /// <summary>
         /// Gets a List of <see cref="Iteration"/> that are opened
         /// </summary>
-        public List<Iteration> Iterations { get; private set; } 
+        public List<Iteration> Iterations { get; private set; }
 
         /// <summary>
         /// Invokes the action as a result of a ribbon control being clicked, selected, etc.
@@ -206,7 +235,7 @@ namespace CDP4Requirements
                 menuxml = sb.ToString();
             }
 
-            this.UpdateControlIdentifier(menuxml);      
+            this.UpdateControlIdentifier(menuxml);
             return menuxml;
         }
 
@@ -225,6 +254,7 @@ namespace CDP4Requirements
         public override Image GetImage(string ribbonControlId, string ribbonControlTag = "")
         {
             var converter = new ThingToIconUriConverter();
+
             if (ribbonControlId.Contains("ShowRequirements"))
             {
                 return converter.GetImage(ClassKind.RequirementsSpecification, false);
@@ -319,7 +349,7 @@ namespace CDP4Requirements
             {
                 return;
             }
-            
+
             if (iterationEvent.EventKind == EventKind.Added)
             {
                 this.Iterations.Add(iterationEvent.ChangedThing as Iteration);
@@ -328,6 +358,7 @@ namespace CDP4Requirements
             {
                 var iteration = iterationEvent.ChangedThing as Iteration;
                 var browser = this.openRequirementBrowser.SingleOrDefault(x => x.Thing.Container == iteration);
+
                 if (browser != null)
                 {
                     this.PanelNavigationService.CloseInAddIn(browser);
@@ -362,6 +393,7 @@ namespace CDP4Requirements
             var iterationUniqueId = Guid.Parse(iterationId);
 
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == iterationUniqueId);
+
             if (iteration == null)
             {
                 return;
@@ -369,6 +401,7 @@ namespace CDP4Requirements
 
             // close the brower if it exists
             var browser = this.openRequirementBrowser.SingleOrDefault(x => x.Thing == iteration);
+
             if (browser != null)
             {
                 this.PanelNavigationService.CloseInAddIn(browser);
@@ -393,6 +426,7 @@ namespace CDP4Requirements
             var iterationUniqueId = Guid.Parse(iterationId);
 
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == iterationUniqueId);
+
             if (iteration == null)
             {
                 Logger.Debug($"The Iteration with Iid {iterationUniqueId} could not be found in the open iteratinos, the Requiremens Sheet could not be generated");
@@ -400,6 +434,7 @@ namespace CDP4Requirements
             }
 
             var application = this.officeApplicationWrapper.Excel;
+
             if (application != null && application.ActiveWorkbook != null)
             {
                 var generator = new RequirementSheetGenerator();
