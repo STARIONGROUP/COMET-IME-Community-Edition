@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -37,20 +37,20 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Permission;
-    using CDP4Dal.Operations;
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -80,10 +80,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private ElementUsage usage;
         private ElementUsage usageClone;
         private ElementDefinition definition1Clone;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -135,13 +137,14 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -166,7 +169,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.usageClone = this.usage.Clone(false);
             var vm = new ElementUsageDialogViewModel(this.usageClone, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.definition1Clone);
 
-            Assert.That(vm.AppliedCategories.Any(x => x.Category == productCategory), Is.True); 
+            Assert.That(vm.AppliedCategories.Any(x => x.Category == productCategory), Is.True);
         }
 
         [Test]

@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FiniteStateBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
@@ -26,7 +26,6 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -37,15 +36,16 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;    
+    using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -171,22 +171,18 @@ namespace CDP4EngineeringModel.ViewModels
             this.UpdateProperties();
         }
 
-
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup
-        {
-            get { return this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>(); }
-        }
+        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -194,8 +190,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -208,8 +204,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanExecuteCreatePossibleFiniteStateListCommand
         {
-            get { return this.canExecuteCreatePossibleFiniteStateListCommand; }
-            set { this.RaiseAndSetIfChanged(ref this.canExecuteCreatePossibleFiniteStateListCommand, value); }
+            get => this.canExecuteCreatePossibleFiniteStateListCommand;
+            set => this.RaiseAndSetIfChanged(ref this.canExecuteCreatePossibleFiniteStateListCommand, value);
         }
 
         /// <summary>
@@ -217,8 +213,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanExecuteCreateActualFiniteStateListCommand
         {
-            get { return this.canExecuteCreateActualFiniteStateListCommand; }
-            set { this.RaiseAndSetIfChanged(ref this.canExecuteCreateActualFiniteStateListCommand, value); }
+            get => this.canExecuteCreateActualFiniteStateListCommand;
+            set => this.RaiseAndSetIfChanged(ref this.canExecuteCreateActualFiniteStateListCommand, value);
         }
 
         /// <summary>
@@ -226,8 +222,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanSetAsDefault
         {
-            get { return this.canSetAsDefault; }
-            private set { this.RaiseAndSetIfChanged(ref this.canSetAsDefault, value); }
+            get => this.canSetAsDefault;
+            private set => this.RaiseAndSetIfChanged(ref this.canSetAsDefault, value);
         }
 
         /// <summary>
@@ -235,8 +231,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreatePossibleState
         {
-            get { return this.canCreatePossibleState; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreatePossibleState, value); }
+            get => this.canCreatePossibleState;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreatePossibleState, value);
         }
 
         /// <summary>
@@ -244,8 +240,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanUpdateBatchParameters
         {
-            get { return this.canUpdateBatchParameters; }
-            private set { this.RaiseAndSetIfChanged(ref this.canUpdateBatchParameters, value); }
+            get => this.canUpdateBatchParameters;
+            private set => this.RaiseAndSetIfChanged(ref this.canUpdateBatchParameters, value);
         }
 
         /// <summary>
@@ -300,7 +296,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.CreatePossibleFiniteStateListCommand =
                 ReactiveCommandCreator.Create(
-                    ()=> this.ExecuteCreateCommand<PossibleFiniteStateList>(this.Thing),
+                    () => this.ExecuteCreateCommand<PossibleFiniteStateList>(this.Thing),
                     this.WhenAnyValue(x => x.CanExecuteCreatePossibleFiniteStateListCommand));
 
             this.CreateActualFiniteStateListCommand =
@@ -310,9 +306,9 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.SetDefaultStateCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteSetDefaultCommand, this.WhenAnyValue(x => x.CanSetAsDefault));
 
-            this.CreatePossibleStateCommand = 
+            this.CreatePossibleStateCommand =
                 ReactiveCommandCreator.Create(
-                    () => this.ExecuteCreateCommand<PossibleFiniteState>(this.SelectedThing.Thing.GetContainerOfType<PossibleFiniteStateList>()), 
+                    () => this.ExecuteCreateCommand<PossibleFiniteState>(this.SelectedThing.Thing.GetContainerOfType<PossibleFiniteStateList>()),
                     this.WhenAnyValue(x => x.CanCreatePossibleState));
 
             this.BatchUpdateParameterCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteBatchUpdateParameterCommand, this.WhenAnyValue(x => x.CanUpdateBatchParameters));
@@ -341,6 +337,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.CanExecuteCreateActualFiniteStateListCommand = this.PermissionService.CanWrite(ClassKind.ActualFiniteStateList, this.Thing);
 
             var possibleStateRow = this.SelectedThing as PossibleFiniteStateRowViewModel;
+
             if (possibleStateRow != null)
             {
                 var possibleList = possibleStateRow.Thing.Container;
@@ -349,6 +346,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var possibleListRow = this.SelectedThing as PossibleFiniteStateListRowViewModel;
+
             if (possibleListRow != null)
             {
                 var possibleList = possibleListRow.Thing;
@@ -356,6 +354,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var actualFiniteStateListRowViewModel = this.SelectedThing as ActualFiniteStateListRowViewModel;
+
             if (actualFiniteStateListRowViewModel != null)
             {
                 this.CanUpdateBatchParameters = this.PermissionService.CanWrite(ClassKind.Parameter, this.Thing);
@@ -385,6 +384,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var possibleStateRow = this.SelectedThing as PossibleFiniteStateRowViewModel;
+
             if (possibleStateRow != null)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Possible Finite State", "", this.CreatePossibleStateCommand, MenuItemKind.Create, ClassKind.PossibleFiniteState));
@@ -393,12 +393,14 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var possibleListRow = this.SelectedThing as PossibleFiniteStateListRowViewModel;
+
             if (possibleListRow != null)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Possible Finite State", "", this.CreatePossibleStateCommand, MenuItemKind.Create, ClassKind.PossibleFiniteState));
             }
 
             var actualFiniteStateListRowViewModel = this.SelectedThing as ActualFiniteStateListRowViewModel;
+
             if (actualFiniteStateListRowViewModel != null)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Apply Actual Finite State List to multiple Parameters", "", this.BatchUpdateParameterCommand, MenuItemKind.Edit, ClassKind.NotThing));
@@ -414,12 +416,13 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var folderRowViewModel in this.FiniteStateList)
             {
                 folderRowViewModel.Dispose();
             }
         }
-        
+
         /// <summary>
         /// Update the <see cref="PossibleFiniteStateList"/>
         /// </summary>
@@ -440,6 +443,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var statelist in oldPossibleStateList)
             {
                 var row = this.possibleFiniteStateListFolder.ContainedRows.SingleOrDefault(x => x.Thing == statelist);
+
                 if (row != null)
                 {
                     this.possibleFiniteStateListFolder.ContainedRows.RemoveAndDispose(row);
@@ -467,6 +471,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var statelist in oldActualStateList)
             {
                 var row = this.actualFiniteStateListFolder.ContainedRows.SingleOrDefault(x => x.Thing == statelist);
+
                 if (row != null)
                 {
                     this.actualFiniteStateListFolder.ContainedRows.RemoveAndDispose(row);
@@ -480,6 +485,7 @@ namespace CDP4EngineeringModel.ViewModels
         private async Task ExecuteSetDefaultCommand()
         {
             var possibleStateRow = this.SelectedThing as PossibleFiniteStateRowViewModel;
+
             if (possibleStateRow == null)
             {
                 return;
@@ -512,7 +518,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var model = (EngineeringModel)this.Thing.Container;
-            
+
             var requiredRls = model.RequiredRdls;
             var allowedCategories = requiredRls.SelectMany(rdl => rdl.DefinedCategory).Where(c => c.PermissibleClass.Contains(ClassKind.ElementDefinition));
             var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
@@ -546,22 +552,25 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var engineeringModelSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var domainOfExpertiseSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var iterationSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(iterationSetupSubscription);
         }
 
@@ -592,6 +601,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             logger.Trace("drag over {0}", dropInfo.TargetItem);
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget == null)
             {
                 dropInfo.Effects = DragDropEffects.None;
@@ -610,6 +620,7 @@ namespace CDP4EngineeringModel.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget == null)
             {
                 return;
@@ -643,45 +654,54 @@ namespace CDP4EngineeringModel.ViewModels
             switch (this.SelectedThing.Thing)
             {
                 case ActualFiniteStateList actualFiniteStateList:
-  
+
                     ParametersWithStateDependencies = iterationElements.SelectMany(elem => elem.Parameter.Where(param => param.StateDependence == actualFiniteStateList)).Count();
                     FirstPhrase = $"Deleting an {nameof(ActualFiniteStateList)} will delete ALL parameter values that may be dependent on this.";
                     break;
 
                 case PossibleFiniteStateList possibleFiniteStateList:
-                    ParametersWithStateDependencies = iterationElements.SelectMany(elem => 
-                                                      elem.Parameter.Where(param => 
-                                                      param.StateDependence != null).SelectMany(param => 
-                                                      param.StateDependence.PossibleFiniteStateList.Where(finiteStateList => 
-                                                      finiteStateList == possibleFiniteStateList))).Count();
+                    ParametersWithStateDependencies = iterationElements.SelectMany(
+                        elem =>
+                            elem.Parameter.Where(
+                                param =>
+                                    param.StateDependence != null).SelectMany(
+                                param =>
+                                    param.StateDependence.PossibleFiniteStateList.Where(
+                                        finiteStateList =>
+                                            finiteStateList == possibleFiniteStateList))).Count();
 
                     FirstPhrase = $"Deleting a {nameof(PossibleFiniteStateList)} List will delete ALL parameter values that may be dependent on this through {nameof(ActualFiniteStateList)} that use it.";
                     break;
 
                 case PossibleFiniteState possibleFiniteState:
-                    ParametersWithStateDependencies = iterationElements.SelectMany(elem =>
-                                  elem.Parameter.Where(param =>
-                                  param.StateDependence != null).SelectMany(param =>
-                                  param.StateDependence.PossibleFiniteStateList.SelectMany(finiteStateList =>
-                                  finiteStateList.PossibleState.Where(finiteState => 
-                                  finiteState == possibleFiniteState)))).Count();
+                    ParametersWithStateDependencies = iterationElements.SelectMany(
+                        elem =>
+                            elem.Parameter.Where(
+                                param =>
+                                    param.StateDependence != null).SelectMany(
+                                param =>
+                                    param.StateDependence.PossibleFiniteStateList.SelectMany(
+                                        finiteStateList =>
+                                            finiteStateList.PossibleState.Where(
+                                                finiteState =>
+                                                    finiteState == possibleFiniteState)))).Count();
 
                     FirstPhrase = $"Deleting a {nameof(PossibleFiniteState)} will delete ALL parameter values that may be dependent on this through {nameof(ActualFiniteState)} that use it.";
                     break;
             }
 
-            
-            if(ParametersWithStateDependencies > 0)
+            if (ParametersWithStateDependencies > 0)
             {
                 var message = FirstPhrase +
-                "\r\n\r\nCare should be taken not to delete states and their dependent parameter values in the product tree inadvertently." +
-                "\r\n\r\nAre you sure you want to delete these?" +
-                $"\r\n\r\n{ParametersWithStateDependencies} parameter(s) will be affected by this deletion";
+                              "\r\n\r\nCare should be taken not to delete states and their dependent parameter values in the product tree inadvertently." +
+                              "\r\n\r\nAre you sure you want to delete these?" +
+                              $"\r\n\r\n{ParametersWithStateDependencies} parameter(s) will be affected by this deletion";
 
                 if (this.messageBoxService.Show(message, "Deleting Finite State", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                 {
                     return true;
                 }
+
                 return false;
             }
 

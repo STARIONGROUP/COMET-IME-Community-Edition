@@ -1,21 +1,45 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
+    using System;
     using System.Linq;
+    using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+
     using CDP4CommonView;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
-    using System.Reactive.Linq;
-    using System;
 
     /// <summary>
     /// A row representing a <see cref="RuleVerification"/>
@@ -45,8 +69,8 @@ namespace CDP4EngineeringModel.ViewModels
             base.InitializeSubscriptions();
 
             //A subscription is made here in addition to the one made in the base class in order to be notified of non-persistent changes which will not result in an updated revision number
-            var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber == RevisionNumber)
+            var thingSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber == this.RevisionNumber)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.ObjectChangeEventHandler);
 
@@ -68,7 +92,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void UpdateProperties()
         {
-             this.ComputeRuleViolation();
+            this.ComputeRuleViolation();
         }
 
         /// <summary>
@@ -91,6 +115,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var violation in oldRuleViolations)
             {
                 var row = this.ContainedRows.SingleOrDefault(x => x.Thing == violation);
+
                 if (row != null)
                 {
                     this.ContainedRows.RemoveAndDispose(row);

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterValueBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -33,15 +33,13 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.ViewModels;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
-
-    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -134,8 +132,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string ModelCode
         {
-            get { return this.modelCode; }
-            protected set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+            get => this.modelCode;
+            protected set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
         }
 
         /// <summary>
@@ -152,14 +150,15 @@ namespace CDP4EngineeringModel.ViewModels
             else if (this.Thing is ParameterOverride)
             {
                 valueSet = this.GetParameterOverrideValueSet();
-            } else if (this.Thing is ParameterSubscription)
+            }
+            else if (this.Thing is ParameterSubscription)
             {
                 valueSet = this.GetParameterSubscriptionValueSet();
             }
-            
+
             if (valueSet == null)
             {
-                logger.Error("No Value set was found for the option: {0}, state: {1}", (this.ActualOption == null) ? "null" : this.ActualOption.Name, (this.ActualState == null) ? "null" : this.ActualState.Name);
+                logger.Error("No Value set was found for the option: {0}, state: {1}", this.ActualOption == null ? "null" : this.ActualOption.Name, this.ActualState == null ? "null" : this.ActualState.Name);
                 return;
             }
 
@@ -177,10 +176,10 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool IsPublishable
         {
-            get { return this.isPublishable; }
-            private set { this.RaiseAndSetIfChanged(ref this.isPublishable, value); }
+            get => this.isPublishable;
+            private set => this.RaiseAndSetIfChanged(ref this.isPublishable, value);
         }
-        
+
         /// <summary>
         /// Gets the <see cref="ClassKind"/> of the <see cref="ParameterType"/> represented by this <see cref="IValueSetRow"/>
         /// </summary>
@@ -194,18 +193,21 @@ namespace CDP4EngineeringModel.ViewModels
             get
             {
                 var enumPt = this.Thing.ParameterType as EnumerationParameterType;
+
                 if (enumPt != null)
                 {
                     return enumPt.AllowMultiSelect;
                 }
 
                 var cpt = this.Thing.ParameterType as CompoundParameterType;
+
                 if (cpt == null)
                 {
                     return false;
                 }
 
                 enumPt = cpt.Component[this.ValueIndex].ParameterType as EnumerationParameterType;
+
                 if (enumPt == null)
                 {
                     return false;
@@ -223,12 +225,14 @@ namespace CDP4EngineeringModel.ViewModels
             get
             {
                 var enumValues = new ReactiveList<EnumerationValueDefinition>();
+
                 if (this.Thing == null)
                 {
                     return enumValues;
                 }
 
                 var enumPt = this.Thing.ParameterType as EnumerationParameterType;
+
                 if (enumPt != null)
                 {
                     enumValues.AddRange(enumPt.ValueDefinition);
@@ -236,9 +240,11 @@ namespace CDP4EngineeringModel.ViewModels
                 }
 
                 var cpt = this.Thing.ParameterType as CompoundParameterType;
+
                 if (cpt != null)
                 {
                     enumPt = cpt.Component[this.ValueIndex].ParameterType as EnumerationParameterType;
+
                     if (enumPt != null)
                     {
                         enumValues.AddRange(enumPt.ValueDefinition);
@@ -254,8 +260,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string Formula
         {
-            get { return this.formula; }
-            set { this.RaiseAndSetIfChanged(ref this.formula, value); }
+            get => this.formula;
+            set => this.RaiseAndSetIfChanged(ref this.formula, value);
         }
 
         /// <summary>
@@ -285,9 +291,11 @@ namespace CDP4EngineeringModel.ViewModels
         public override void CreateCloneAndWrite(object newValue, string fieldName)
         {
             Thing clone;
+
             if (this.Thing.ClassKind == ClassKind.Parameter || this.Thing.ClassKind == ClassKind.ParameterOverride)
             {
-                var valueset = (this.Thing.ClassKind == ClassKind.Parameter) ? (ParameterValueSetBase)this.GetParameterValueSet() : this.GetParameterOverrideValueSet();
+                var valueset = this.Thing.ClassKind == ClassKind.Parameter ? (ParameterValueSetBase)this.GetParameterValueSet() : this.GetParameterOverrideValueSet();
+
                 if (valueset == null)
                 {
                     return;
@@ -296,10 +304,11 @@ namespace CDP4EngineeringModel.ViewModels
                 clone = valueset.Clone(false);
                 this.UpdateValueSet((ParameterValueSetBase)clone);
             }
-            else 
+            else
             {
                 // subscription
                 var valueset = this.GetParameterSubscriptionValueSet();
+
                 if (valueset == null)
                 {
                     return;
@@ -388,6 +397,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void SetParameterSubscriptionValues()
         {
             var parameterSubscription = this.Thing as ParameterSubscription;
+
             if (parameterSubscription == null)
             {
                 return;
@@ -399,9 +409,10 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var valueSet = this.GetParameterSubscriptionValueSet();
+
             if (valueSet == null)
             {
-                logger.Error("No Value set was found for the option: {0}, state: {1}", (this.ActualOption == null)? "null" : this.ActualOption.Name, (this.ActualState == null)? "null" : this.ActualState.Name);
+                logger.Error("No Value set was found for the option: {0}, state: {1}", this.ActualOption == null ? "null" : this.ActualOption.Name, this.ActualState == null ? "null" : this.ActualState.Name);
                 return;
             }
 
@@ -426,6 +437,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             ParameterValueSetBase valueSet;
+
             if (this.Thing is Parameter)
             {
                 valueSet = this.GetParameterValueSet();
@@ -437,7 +449,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (valueSet == null)
             {
-                logger.Error("No Value set was found for the option: {0}, state: {1}", (this.ActualOption == null) ? "null" : this.ActualOption.Name, (this.ActualState == null) ? "null" : this.ActualState.Name);
+                logger.Error("No Value set was found for the option: {0}, state: {1}", this.ActualOption == null ? "null" : this.ActualOption.Name, this.ActualState == null ? "null" : this.ActualState.Name);
                 return;
             }
 
@@ -484,6 +496,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             var parameterOverride = (ParameterOverride)this.Thing;
             ParameterOverrideValueSet valueSet = null;
+
             if (this.ActualOption == null && this.ActualState == null)
             {
                 return parameterOverride.ValueSet.FirstOrDefault();
@@ -514,6 +527,7 @@ namespace CDP4EngineeringModel.ViewModels
         private ParameterValueSet GetParameterValueSet()
         {
             var parameter = (Parameter)this.Thing;
+
             if (this.ActualOption == null && this.ActualState == null)
             {
                 return parameter.ValueSet.FirstOrDefault();
@@ -541,6 +555,7 @@ namespace CDP4EngineeringModel.ViewModels
             var parameterSubscription = (ParameterSubscription)this.Thing;
 
             ParameterSubscriptionValueSet valueSet;
+
             if (this.ActualOption == null && this.ActualState == null)
             {
                 valueSet = parameterSubscription.ValueSet.FirstOrDefault();
@@ -577,7 +592,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(thing)
+                var listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(thing)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
@@ -586,9 +601,8 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var parameterValueSetBaseObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase));
-                this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterValueSetBaseObserver, new ObjectChangedMessageBusEventHandlerSubscription(thing, discriminator, action)));
+                var parameterValueSetBaseObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterValueSetBaseObserver, new ObjectChangedMessageBusEventHandlerSubscription(thing, discriminator, action)));
             }
 
             this.isValueSetListenerInitialized = true;
@@ -610,14 +624,14 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(thing)
+                var listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(thing)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
 
                 this.Disposables.Add(listener);
 
-                var subscribedListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(thing.SubscribedValueSet)
+                var subscribedListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(thing.SubscribedValueSet)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
@@ -626,13 +640,11 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var parameterSubscriptionValueSetObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterSubscriptionValueSet));
-                this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterSubscriptionValueSetObserver, new ObjectChangedMessageBusEventHandlerSubscription(thing, discriminator, action)));
+                var parameterSubscriptionValueSetObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterSubscriptionValueSet));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterSubscriptionValueSetObserver, new ObjectChangedMessageBusEventHandlerSubscription(thing, discriminator, action)));
 
-                var parameterValueSetObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase));
-                this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterValueSetObserver, new ObjectChangedMessageBusEventHandlerSubscription(thing.SubscribedValueSet, discriminator, action)));
+                var parameterValueSetObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterValueSetObserver, new ObjectChangedMessageBusEventHandlerSubscription(thing.SubscribedValueSet, discriminator, action)));
             }
 
             this.isValueSetListenerInitialized = true;
@@ -695,16 +707,17 @@ namespace CDP4EngineeringModel.ViewModels
             IDisposable listener = null;
 
             Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
-            Action<ObjectChangedEvent> action = x => 
-                {
-                    this.OwnerName = ((DomainOfExpertise)x.ChangedThing).Name;
-                    this.OwnerShortName = ((DomainOfExpertise)x.ChangedThing).ShortName;
-                };
 
+            Action<ObjectChangedEvent> action = x =>
+            {
+                this.OwnerName = ((DomainOfExpertise)x.ChangedThing).Name;
+                this.OwnerShortName = ((DomainOfExpertise)x.ChangedThing).ShortName;
+            };
 
             if (subscription != null)
             {
-                var parameterOrOverride = (ParameterOrOverrideBase) subscription.Container;
+                var parameterOrOverride = (ParameterOrOverrideBase)subscription.Container;
+
                 if (parameterOrOverride.Owner != null)
                 {
                     this.OwnerName = "[" + parameterOrOverride.Owner.Name + "]";
@@ -713,15 +726,16 @@ namespace CDP4EngineeringModel.ViewModels
 
                 if (this.AllowMessageBusSubscriptions)
                 {
-                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride.Owner)
+                    listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(parameterOrOverride.Owner)
                         .Where(discriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(action);
                 }
                 else
                 {
-                    var ownerObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise));
-                    listener = 
+                    var ownerObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise));
+
+                    listener =
                         this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOrOverride.Owner, discriminator, action));
                 }
             }
@@ -734,15 +748,16 @@ namespace CDP4EngineeringModel.ViewModels
 
                     if (this.AllowMessageBusSubscriptions)
                     {
-                        listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Owner)
+                        listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Owner)
                             .Where(discriminator)
                             .ObserveOn(RxApp.MainThreadScheduler)
                             .Subscribe(action);
                     }
                     else
                     {
-                        var ownerObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise));
-                        listener = 
+                        var ownerObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise));
+
+                        listener =
                             this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.Owner, discriminator, action));
                     }
                 }

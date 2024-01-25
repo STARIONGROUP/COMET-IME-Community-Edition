@@ -87,8 +87,8 @@ namespace CDP4Requirements
             this.openRequirementBrowser = new List<RequirementsBrowserViewModel>();
             this.Iterations = new List<Iteration>();
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
+            CDP4Dal.CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            CDP4Dal.CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.IterationChangeEventHandler);
         }

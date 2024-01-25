@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="FolderRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -54,7 +54,7 @@ namespace CDP4EngineeringModel.ViewModels
         private readonly IFileStoreFileAndFolderHandler parentFileStoreFileAndFolderHandler;
 
         /// <summary>
-        /// The (injected) <see cref="DevExpress.Mvvm.IMessageBoxService"/>
+        /// The (injected) <see cref="IMessageBoxService"/>
         /// </summary>
         private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
@@ -69,6 +69,9 @@ namespace CDP4EngineeringModel.ViewModels
         /// </param>
         /// <param name="containerViewModel">
         /// The <see cref="IViewModelBase{Thing}"/> that is the container of this <see cref="FolderRowViewModel"/>
+        /// </param>
+        /// <param name="parentFileStoreFileAndFolderHandler">
+        /// The <see cref="IFileStoreFileAndFolderHandler"/>
         /// </param>
         public FolderRowViewModel(Folder folder, ISession session, IViewModelBase<Thing> containerViewModel, IFileStoreFileAndFolderHandler parentFileStoreFileAndFolderHandler)
             : base(folder, session, containerViewModel)

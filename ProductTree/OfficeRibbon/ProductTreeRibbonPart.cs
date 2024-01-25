@@ -90,13 +90,13 @@ namespace CDP4ProductTree
             this.openProductTree = new List<ProductTreeViewModel>();
             this.Iterations = new List<Iteration>();
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            CDP4Dal.CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
+            CDP4Dal.CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.IterationChangeEventHandler);
 
-            CDPMessageBus.Current.Listen<HidePanelEvent>()
+            CDP4Dal.CDPMessageBus.Current.Listen<HidePanelEvent>()
                 .Subscribe(this.CloseHiddenPanel);
         }
 

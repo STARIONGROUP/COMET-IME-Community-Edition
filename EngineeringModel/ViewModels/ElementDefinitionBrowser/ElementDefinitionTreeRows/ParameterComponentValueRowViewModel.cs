@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterComponentValueRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -102,7 +102,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var subscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(component)
+                var subscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(component)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
@@ -111,7 +111,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var parameterTypComponentObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterTypeComponent));
+                var parameterTypComponentObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterTypeComponent));
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterTypComponentObserver, new ObjectChangedMessageBusEventHandlerSubscription(component, discriminator, action)));
             }
 

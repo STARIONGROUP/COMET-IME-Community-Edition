@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DomainFileStoreBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -413,33 +413,33 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+            this.Disposables.Add(this.CDPMessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                 .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+            this.Disposables.Add(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                 .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+            this.Disposables.Add(this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
                 .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
+            this.Disposables.Add(this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Container)
                 .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties()));
 
             this.Disposables.Add(
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Folder))
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Folder))
                     .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
                     .Subscribe(_ => this.ComputePermission()));
 
             this.Disposables.Add(
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(File))
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(File))
                     .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
                     .Subscribe(_ => this.ComputePermission()));
         }

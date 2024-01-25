@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -35,7 +35,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
@@ -44,16 +44,16 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
 
     using CDP4EngineeringModel.Views;
 
     using CommonServiceLocator;
-    
+
     using NLog;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -126,7 +126,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
-            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.ActiveParticipant = participant;
             this.UpdateRuleVericationLists();
@@ -138,18 +138,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup
-        {
-            get { return this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>(); }
-        }
+        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -157,8 +154,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -166,8 +163,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreateRuleVerificationList
         {
-            get { return this.canCreateRuleVerificationList; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateRuleVerificationList, value); }
+            get => this.canCreateRuleVerificationList;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateRuleVerificationList, value);
         }
 
         /// <summary>
@@ -175,8 +172,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreateRuleVerification
         {
-            get { return this.canCreateRuleVerification; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateRuleVerification, value); }
+            get => this.canCreateRuleVerification;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateRuleVerification, value);
         }
 
         /// <summary>
@@ -184,8 +181,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanVerifyVerificationList
         {
-            get { return this.canVerifyVerificationList; }
-            private set { this.RaiseAndSetIfChanged(ref this.canVerifyVerificationList, value); }
+            get => this.canVerifyVerificationList;
+            private set => this.RaiseAndSetIfChanged(ref this.canVerifyVerificationList, value);
         }
 
         /// <summary>
@@ -237,6 +234,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var ruleVerificationList in this.RuleVerificationListRowViewModels)
             {
                 ruleVerificationList.Dispose();
@@ -267,15 +265,15 @@ namespace CDP4EngineeringModel.ViewModels
                 this.WhenAnyValue(x => x.CanCreateRuleVerificationList));
 
             this.CreateUserRuleVerification = ReactiveCommandCreator.Create(
-                () => this.ExecuteCreateCommand<UserRuleVerification>(this.SelectedThing.Thing), 
+                () => this.ExecuteCreateCommand<UserRuleVerification>(this.SelectedThing.Thing),
                 this.WhenAnyValue(x => x.CanCreateRuleVerification));
 
             this.CreateBuiltInRuleVerification = ReactiveCommandCreator.Create(
-                () => this.ExecuteCreateCommand<BuiltInRuleVerification>(this.SelectedThing.Thing), 
+                () => this.ExecuteCreateCommand<BuiltInRuleVerification>(this.SelectedThing.Thing),
                 this.WhenAnyValue(x => x.CanCreateRuleVerification));
 
             this.VerifyRuleVerificationList = ReactiveCommandCreator.CreateAsyncTask(
-                this.ExecuteVerifyRuleVerificationList, 
+                this.ExecuteVerifyRuleVerificationList,
                 this.WhenAnyValue(x => x.CanVerifyVerificationList));
         }
 
@@ -307,6 +305,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var ruleVerificationList = this.SelectedThing as RuleVerificationListRowViewModel;
+
             if (ruleVerificationList != null)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Rule Verification List", "", this.CreateCommand, MenuItemKind.Create, ClassKind.RuleVerificationList));
@@ -324,11 +323,12 @@ namespace CDP4EngineeringModel.ViewModels
         private async Task ExecuteVerifyRuleVerificationList()
         {
             var ruleVerificationList = this.SelectedThing as RuleVerificationListRowViewModel;
+
             if (ruleVerificationList != null)
             {
                 var ruleVerificationService = ServiceLocator.Current.GetInstance<IRuleVerificationService>();
                 await ruleVerificationService.Execute(this.Session, ruleVerificationList.Thing);
-            }            
+            }
         }
 
         /// <summary>
@@ -345,6 +345,7 @@ namespace CDP4EngineeringModel.ViewModels
             foreach (var ruleVerificationList in oldVerificationLists)
             {
                 var row = this.RuleVerificationListRowViewModels.SingleOrDefault(x => x.Thing == ruleVerificationList);
+
                 if (row != null)
                 {
                     this.RuleVerificationListRowViewModels.RemoveAndDispose(row);
@@ -363,22 +364,25 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var engineeringModelSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var domainOfExpertiseSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var iterationSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(iterationSetupSubscription);
         }
 
@@ -409,7 +413,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             logger.Trace("drag over {0}", dropInfo.TargetItem);
 
-            Tuple<DomainOfExpertise, Participant> tuple;            
+            Tuple<DomainOfExpertise, Participant> tuple;
             this.Session.OpenIterations.TryGetValue(this.Thing, out tuple);
 
             if (tuple.Item1 == null)
@@ -419,6 +423,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget != null)
             {
                 droptarget.DragOver(dropInfo);
@@ -443,6 +448,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget != null)
             {
                 try

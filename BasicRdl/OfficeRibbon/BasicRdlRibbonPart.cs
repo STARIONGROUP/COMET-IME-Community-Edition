@@ -98,7 +98,7 @@ namespace BasicRdl
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
         public BasicRdlRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IFavoritesService favoritesService, ICDPMessageBus messageBus)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, messageBus)
         {
             messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
             this.FavoritesService = favoritesService;

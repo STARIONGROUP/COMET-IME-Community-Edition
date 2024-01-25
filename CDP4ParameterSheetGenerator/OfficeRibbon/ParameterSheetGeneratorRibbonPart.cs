@@ -76,9 +76,9 @@ namespace CDP4ParameterSheetGenerator
             this.officeApplicationWrapper = officeApplicationWrapper;
             this.Iterations = new List<Iteration>();
             
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            CDP4Dal.CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
+            CDP4Dal.CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.IterationChangeEventHandler);
         }
