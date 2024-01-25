@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -82,13 +82,15 @@ namespace ProductTree.Tests.ProductTreeRows
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
         private readonly string nestedElementPath = "PATH";
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.permissionService = new Mock<IPermissionService>();
             this.session = new Mock<ISession>();
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" , ShortName = "dom"};
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain", ShortName = "dom" };
 
             this.serviceLocator = new Mock<IServiceLocator>();
             this.thingCreator = new Mock<IThingCreator>();
@@ -112,11 +114,11 @@ namespace ProductTree.Tests.ProductTreeRows
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
             this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
             this.category = new Category(Guid.NewGuid(), this.cache, this.uri);
-            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) {Owner = this.domain};
+            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
             this.elementDef.Category.Add(this.category);
 
             this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
-            this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain};
+            this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain };
 
             this.siteDir.Person.Add(this.person);
             this.siteDir.Model.Add(this.modelSetup);
@@ -138,12 +140,13 @@ namespace ProductTree.Tests.ProductTreeRows
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -152,7 +155,7 @@ namespace ProductTree.Tests.ProductTreeRows
             var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
 
             Assert.AreEqual("domain", vm.OwnerName);
-            Assert.AreEqual("dom", vm.OwnerShortName );
+            Assert.AreEqual("dom", vm.OwnerShortName);
 
             Assert.AreEqual(1, vm.ContainedRows.Count);
 
@@ -172,7 +175,8 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreEqual(this.nestedElementPath, vm.GetPath());
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatUsagesAreAddedOrRemoved(IViewModelBase<Thing> container, string scenario)
         {
             var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, container);
@@ -180,28 +184,27 @@ namespace ProductTree.Tests.ProductTreeRows
             var usage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
             usage.ElementDefinition = this.elementDef2;
 
-            var revisionProperty = typeof (ElementDefinition).GetProperty("RevisionNumber");
+            var revisionProperty = typeof(ElementDefinition).GetProperty("RevisionNumber");
             revisionProperty.SetValue(this.elementDef, 50);
             this.elementDef.ContainedElement.Add(usage);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.Count);
             Assert.IsTrue(vm.ContainedRows.Any(x => x.Thing == usage));
 
             this.elementDef.ContainedElement.Remove(usage);
             revisionProperty.SetValue(this.elementDef, 100);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
             Assert.AreEqual(1, vm.ContainedRows.Count);
             Assert.IsFalse(vm.ContainedRows.Any(x => x.Thing == usage));
         }
 
-
-
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatGroupAreAddedCorrectly(IViewModelBase<Thing> container, string scenario)
         {
-            var revisionProperty = typeof (ElementDefinition).GetProperty("RevisionNumber");
+            var revisionProperty = typeof(ElementDefinition).GetProperty("RevisionNumber");
 
             var group1 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri);
             var group11 = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { ContainingGroup = group1 };
@@ -221,7 +224,7 @@ namespace ProductTree.Tests.ProductTreeRows
             group11.ContainingGroup = null;
             revisionProperty.SetValue(group11, 10);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(group11, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(group11, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreEqual(0, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
 
@@ -229,7 +232,7 @@ namespace ProductTree.Tests.ProductTreeRows
             group11.ContainingGroup = group1;
             revisionProperty.SetValue(group11, 20);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(group11, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(group11, EventKind.Updated);
             Assert.AreEqual(1, vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreSame(group11, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Single().Thing);
 
@@ -240,8 +243,8 @@ namespace ProductTree.Tests.ProductTreeRows
             revisionProperty.SetValue(group11, 30);
             revisionProperty.SetValue(this.elementDef, 30);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
-            CDPMessageBus.Current.SendObjectChangeEvent(group11, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(group11, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreEqual(0, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
 
@@ -252,7 +255,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementDef.ParameterGroup.Remove(group11);
             revisionProperty.SetValue(this.elementDef, 40);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreEqual(0, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreEqual(0, group2row.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
@@ -269,10 +272,10 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementDef.ParameterGroup.Add(group1);
             this.elementDef.ParameterGroup.Add(group11);
 
-            var type1 = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) {Name = "type1"};
-            var parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) {ParameterType = type1, Owner = this.domain};
+            var type1 = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "type1" };
+            var parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type1, Owner = this.domain };
             var valueset = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
-            valueset.Published = new ValueArray<string>(new List<string>{"1"});
+            valueset.Published = new ValueArray<string>(new List<string> { "1" });
             valueset.Manual = new ValueArray<string>(new List<string> { "1" });
             valueset.ValueSwitch = ParameterSwitchKind.MANUAL;
             parameter1.ValueSet.Add(valueset);
@@ -285,7 +288,8 @@ namespace ProductTree.Tests.ProductTreeRows
             Assert.AreSame(parameter1, param1row.Thing);
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatOptionDependencyIsHandled(IViewModelBase<Thing> container, string scenario)
         {
             var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, container);
@@ -296,13 +300,13 @@ namespace ProductTree.Tests.ProductTreeRows
 
             this.elementUsage.ExcludeOption.Add(this.option);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementUsage, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementUsage, EventKind.Updated);
             Assert.IsFalse(vm.ContainedRows.Select(x => x.Thing).Contains(this.elementUsage));
 
             revisionProperty.SetValue(this.elementUsage, 30);
             this.elementUsage.ExcludeOption.Clear();
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementUsage, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementUsage, EventKind.Updated);
             Assert.IsTrue(vm.ContainedRows.Select(x => x.Thing).Contains(this.elementUsage));
         }
 
@@ -367,6 +371,11 @@ namespace ProductTree.Tests.ProductTreeRows
         /// The <see cref="Thing"/>
         /// </summary>
         public Thing Thing { get; }
+
+        /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        public ICDPMessageBus CDPMessageBus { get; }
 
         /// <summary>
         /// Disposes the instance

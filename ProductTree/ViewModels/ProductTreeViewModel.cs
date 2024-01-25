@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -36,11 +36,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    
-    using CDP4Dal;
-    using CDP4Dal.Events;
-    using CDP4Dal.Operations;
-    
+
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.MessageBus;
@@ -49,7 +45,11 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+
+    using CDP4Dal;
+    using CDP4Dal.Events;
+    using CDP4Dal.Operations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -91,7 +91,7 @@ namespace CDP4ProductTree.ViewModels
         /// The container <see cref="iterationSetup"/> that is referenced by the container <see cref="Iteration"/> of the current <see cref="Option"/>.
         /// </summary>
         private readonly IterationSetup iterationSetup;
-        
+
         /// <summary>
         /// Backing field for <see cref="CanCreateSubscription"/>
         /// </summary>
@@ -145,11 +145,11 @@ namespace CDP4ProductTree.ViewModels
 
             this.ActiveParticipant = this.modelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
 
-            var iterationSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(iteration)
+            var iterationSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(iteration)
                 .Where(
                     objectChange =>
-                        (objectChange.EventKind == EventKind.Updated) &&
-                        (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                        objectChange.EventKind == EventKind.Updated &&
+                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                 .Select(x => x.ChangedThing as Iteration)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.SetTopElement);
@@ -157,8 +157,8 @@ namespace CDP4ProductTree.ViewModels
             this.Disposables.Add(iterationSubscription);
 
             this.ExecuteLongRunningDispatcherAction(
-                () => 
-                { 
+                () =>
+                {
                     this.AddSubscriptions();
                     this.SetTopElement(iteration);
                     this.UpdateProperties();
@@ -173,8 +173,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -182,8 +182,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -191,8 +191,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public string CurrentOption
         {
-            get { return this.currentOption; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentOption, value); }
+            get => this.currentOption;
+            private set => this.RaiseAndSetIfChanged(ref this.currentOption, value);
         }
 
         /// <summary>
@@ -200,8 +200,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public bool CanCreateSubscription
         {
-            get { return this.canCreateSubscription; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateSubscription, value); }
+            get => this.canCreateSubscription;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateSubscription, value);
         }
 
         /// <summary>
@@ -209,8 +209,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public bool CanDeleteSubscription
         {
-            get { return this.canDeleteSubscription; }
-            private set { this.RaiseAndSetIfChanged(ref this.canDeleteSubscription, value); }
+            get => this.canDeleteSubscription;
+            private set => this.RaiseAndSetIfChanged(ref this.canDeleteSubscription, value);
         }
 
         /// <summary>
@@ -218,8 +218,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public bool IsDisplayShortNamesOn
         {
-            get { return this.isDisplayShortNamesOn; }
-            private set { this.RaiseAndSetIfChanged(ref this.isDisplayShortNamesOn, value); }
+            get => this.isDisplayShortNamesOn;
+            private set => this.RaiseAndSetIfChanged(ref this.isDisplayShortNamesOn, value);
         }
 
         /// <summary>
@@ -227,8 +227,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public bool CanCreateParameterGroup
         {
-            get { return this.canCreateParameterGroup; }
-            set { this.RaiseAndSetIfChanged(ref this.canCreateParameterGroup, value); }
+            get => this.canCreateParameterGroup;
+            set => this.RaiseAndSetIfChanged(ref this.canCreateParameterGroup, value);
         }
 
         /// <summary>
@@ -266,8 +266,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public bool CanCreateOverride
         {
-            get { return this.canCreateOverride; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateOverride, value); }
+            get => this.canCreateOverride;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateOverride, value);
         }
 
         /// <summary>
@@ -310,6 +310,7 @@ namespace CDP4ProductTree.ViewModels
             {
                 logger.Trace("drag over {0}", dropInfo.TargetItem);
                 var droptarget = dropInfo.TargetItem as IDropTarget;
+
                 if (droptarget != null)
                 {
                     droptarget.DragOver(dropInfo);
@@ -335,6 +336,7 @@ namespace CDP4ProductTree.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget != null)
             {
                 try
@@ -368,7 +370,7 @@ namespace CDP4ProductTree.ViewModels
             this.DeleteSubscriptionCommand = ReactiveCommandCreator.Create(
                 () => this.ExecuteDeleteCommand(
                     ((ParameterOrOverrideBase)this.SelectedThing.Thing).ParameterSubscription
-                    .Single(s => (tuple != null) && s.Owner.Equals(tuple.Item1))), 
+                    .Single(s => tuple != null && s.Owner.Equals(tuple.Item1))),
                 this.WhenAnyValue(x => x.CanDeleteSubscription));
 
             this.CreateParameterGroup = ReactiveCommandCreator.Create(
@@ -414,6 +416,7 @@ namespace CDP4ProductTree.ViewModels
             this.CanCreateParameterGroup = this.PermissionService.CanWrite(ClassKind.ParameterGroup, this.Thing);
 
             var parameterOrOverrideRow = this.SelectedThing as ParameterOrOverrideBaseRowViewModel;
+
             if (parameterOrOverrideRow == null)
             {
                 return;
@@ -426,13 +429,14 @@ namespace CDP4ProductTree.ViewModels
                 var activeDomain = tuple.Item1;
 
                 this.CanCreateSubscription = parameterOrOverrideRow.Thing.ParameterSubscription.All(ps => ps.Owner != activeDomain)
-                                             && (parameterOrOverrideRow.Thing.Owner != activeDomain)
+                                             && parameterOrOverrideRow.Thing.Owner != activeDomain
                                              && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, parameterOrOverrideRow.Thing);
+
                 this.CanDeleteSubscription = parameterOrOverrideRow.Thing.ParameterSubscription.Any(ps => ps.Owner == activeDomain)
                                              && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, parameterOrOverrideRow.Thing);
 
                 this.CanCreateOverride = parameterOrOverrideRow.Thing is Parameter
-                                         && ((parameterOrOverrideRow.Thing.Owner == activeDomain) || ((Parameter)parameterOrOverrideRow.Thing).AllowDifferentOwnerOfOverride)
+                                         && (parameterOrOverrideRow.Thing.Owner == activeDomain || ((Parameter)parameterOrOverrideRow.Thing).AllowDifferentOwnerOfOverride)
                                          && !this.TopElement.Contains(parameterOrOverrideRow.ContainerViewModel)
                                          && this.PermissionService.CanWrite(ClassKind.ParameterOverride, this.SelectedThing.ContainerViewModel.Thing);
             }
@@ -500,6 +504,7 @@ namespace CDP4ProductTree.ViewModels
         {
             base.Dispose(disposing);
             var topElement = this.TopElement.SingleOrDefault();
+
             if (topElement == null)
             {
                 return;
@@ -515,22 +520,25 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.modelSetup)
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var engineeringModelSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.modelSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var domainOfExpertiseSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationSetup)
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var iterationSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.iterationSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(iterationSetupSubscription);
         }
 
@@ -548,11 +556,11 @@ namespace CDP4ProductTree.ViewModels
             var existingTopElement = this.TopElement.SingleOrDefault();
             var topElement = iteration.TopElement;
 
-            if ((topElement == null) && (existingTopElement != null))
+            if (topElement == null && existingTopElement != null)
             {
                 this.TopElement.ClearAndDispose();
             }
-            else if ((topElement != null) && ((existingTopElement == null) || (existingTopElement.Thing != topElement)))
+            else if (topElement != null && (existingTopElement == null || existingTopElement.Thing != topElement))
             {
                 if (existingTopElement != null)
                 {
@@ -620,6 +628,7 @@ namespace CDP4ProductTree.ViewModels
             }
 
             var parameterOrOverrideRow = this.SelectedThing as ParameterOrOverrideBaseRowViewModel;
+
             if (parameterOrOverrideRow == null)
             {
                 return;
@@ -657,12 +666,14 @@ namespace CDP4ProductTree.ViewModels
             }
 
             var elementUsage = this.SelectedThing.ContainerViewModel.Thing as ElementUsage;
+
             if (elementUsage == null)
             {
                 return;
             }
 
             var parameter = this.SelectedThing.Thing as Parameter;
+
             if (parameter == null)
             {
                 return;

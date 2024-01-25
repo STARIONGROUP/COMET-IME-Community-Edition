@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeModule.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -33,7 +33,7 @@ namespace CDP4ProductTree
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
-
+    using CDP4Dal;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="ProductTreeModule"/> Component
@@ -56,14 +56,23 @@ namespace CDP4ProductTree
         /// <param name="thingDialogNavigationService">
         /// The (MEF injected) instance of <see cref="IThingDialogNavigationService"/>
         /// </param>
+        /// <param name="messageBus">
+        /// The (MEF injected) instance of <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public ProductTreeModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService)
+        public ProductTreeModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, ICDPMessageBus messageBus)
         {
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
             this.DialogNavigationService = dialogNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
+            this.CDPMessageBus = messageBus;
         }
+
+        /// <summary>
+        /// Gets the <see cref="ICDPMessageBus"/>
+        /// </summary>
+        public ICDPMessageBus CDPMessageBus { get; }
 
         /// <summary>
         /// Gets the <see cref="IFluentRibbonManager"/> that is used by the <see cref="ProductTreeModule"/> to register Office Fluent Ribbon XML
@@ -84,7 +93,7 @@ namespace CDP4ProductTree
         /// Gets the <see cref="IThingDialogNavigationService"/> that handles navigation to dialogs
         /// </summary>
         internal IThingDialogNavigationService ThingDialogNavigationService { get; private set; }
-        
+
         /// <summary>
         /// Gets the <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </summary>
@@ -103,7 +112,7 @@ namespace CDP4ProductTree
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new ProductTreeRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService);
+            var rdlRibbonPart = new ProductTreeRibbonPart(10, this.PanelNavigationService, this.DialogNavigationService, this.ThingDialogNavigationService, this.PluginSettingsService, this.CDPMessageBus);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }

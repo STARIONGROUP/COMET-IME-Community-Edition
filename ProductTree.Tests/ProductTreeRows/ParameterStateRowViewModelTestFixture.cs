@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterStateRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -37,13 +37,13 @@ namespace ProductTree.Tests.ProductTreeRows
     using CDP4Composition.Services.NestedElementTreeService;
 
     using CDP4Dal;
-    
+
     using CDP4ProductTree.ViewModels;
 
     using CommonServiceLocator;
 
     using Moq;
-    
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -71,6 +71,7 @@ namespace ProductTree.Tests.ProductTreeRows
         private DomainOfExpertise domain;
         private ParameterRowViewModel parameterRowViewModel;
         private readonly string nestedParameterPath = "PATH";
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
@@ -78,6 +79,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
+            this.messageBus = new CDPMessageBus();
             this.nestedElementTreeService = new Mock<INestedElementTreeService>();
             this.nestedElementTreeService.Setup(x => x.GetNestedParameterPath(It.IsAny<ParameterBase>(), It.IsAny<Option>(), It.IsAny<ActualFiniteState>())).Returns(this.nestedParameterPath);
 
@@ -117,6 +119,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementdef1.Parameter.Add(this.parameter1);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.parameter1.Iid, null), new Lazy<Thing>(() => this.parameter1));
         }
@@ -124,14 +127,14 @@ namespace ProductTree.Tests.ProductTreeRows
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
             this.parameterRowViewModel = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
-            var row = new ParameterStateRowViewModel(this.parameter1, this.state1 , this.session.Object, this.parameterRowViewModel);
+            var row = new ParameterStateRowViewModel(this.parameter1, this.state1, this.session.Object, this.parameterRowViewModel);
 
             Assert.AreEqual(row.ActualState, this.state1);
             Assert.AreEqual(row.IsDefault, row.ActualState.IsDefault);

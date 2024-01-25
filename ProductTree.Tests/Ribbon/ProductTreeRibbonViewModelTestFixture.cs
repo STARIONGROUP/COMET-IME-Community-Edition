@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -52,7 +52,8 @@ namespace ProductTree.Tests.Ribbon
 
     using ReactiveUI;
 
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     internal class ProductTreeRibbonViewModelTestFixture
     {
         private Mock<IPermissionService> permissionService;
@@ -62,7 +63,7 @@ namespace ProductTree.Tests.Ribbon
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<ISession> session;
-        private Mock<ISession> session2; 
+        private Mock<ISession> session2;
         private Assembler assembler;
         private Assembler assembler2;
         private readonly Uri uri = new Uri("http://test.com");
@@ -78,12 +79,14 @@ namespace ProductTree.Tests.Ribbon
         private Participant participant;
         private Option option;
         private DomainOfExpertise domainOfExpertise;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.permissionService = new Mock<IPermissionService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -91,10 +94,10 @@ namespace ProductTree.Tests.Ribbon
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.session2 = new Mock<ISession>();
-            this.assembler2 = new Assembler(this.uri2);
+            this.assembler2 = new Assembler(this.uri2, this.messageBus);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IPermissionService>()).Returns(this.permissionService.Object);
@@ -133,6 +136,8 @@ namespace ProductTree.Tests.Ribbon
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session2.Setup(x => x.Assembler).Returns(this.assembler2);
+            this.session2.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
@@ -140,74 +145,75 @@ namespace ProductTree.Tests.Ribbon
             openIterations.Add(this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domainOfExpertise, this.participant));
 
             this.session.Setup(x => x.OpenIterations).Returns(openIterations);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatSessionEventAreCaught()
         {
-            var vm = new ProductTreeRibbonViewModel();
+            var vm = new ProductTreeRibbonViewModel(this.messageBus);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
             Assert.AreEqual(1, vm.Sessions.Count);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
             Assert.AreEqual(0, vm.Sessions.Count);
         }
 
         [Test]
         public void VerifyThatOptionEventAreProcessed()
         {
-            var vm = new ProductTreeRibbonViewModel();
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            var vm = new ProductTreeRibbonViewModel(this.messageBus);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Added);
             Assert.AreEqual(1, vm.OpenIterations.Count);
             Assert.AreEqual(1, vm.OpenIterations.First().SelectedOptions.Count);
 
             var option2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            option.Container = this.iteration;
+            this.option.Container = this.iteration;
             this.iteration.Option.Add(option2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(option2, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(option2, EventKind.Added);
             Assert.AreEqual(1, vm.OpenIterations.Count);
             Assert.AreEqual(2, vm.OpenIterations.First().SelectedOptions.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.option, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(this.option, EventKind.Removed);
             Assert.AreEqual(1, vm.OpenIterations.Count);
             Assert.AreEqual(1, vm.OpenIterations.First().SelectedOptions.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(option2, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(option2, EventKind.Removed);
             Assert.AreEqual(0, vm.OpenIterations.Count);
         }
 
         [Test]
         public void VerifyThatIterationRemovedEventAreProcessed()
         {
-            var vm = new ProductTreeRibbonViewModel();
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            CDPMessageBus.Current.SendObjectChangeEvent(this.option, EventKind.Added);
+            var vm = new ProductTreeRibbonViewModel(this.messageBus);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendObjectChangeEvent(this.option, EventKind.Added);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Removed);
             Assert.AreEqual(0, vm.OpenIterations.Count);
         }
 
         [Test]
         public void VerifyThatThereIsAMenuItemForEachSessionAndOptionCombination()
         {
-            var vm = new ProductTreeRibbonViewModel();
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
-            var anotherPerson  = new Person(Guid.NewGuid(), this.assembler2.Cache, this.uri2);
+            var vm = new ProductTreeRibbonViewModel(this.messageBus);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            var anotherPerson = new Person(Guid.NewGuid(), this.assembler2.Cache, this.uri2);
 
             this.session2.Setup(x => x.ActivePerson).Returns(anotherPerson);
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session2.Object, SessionStatus.Open));
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration2, EventKind.Added);
+            this.messageBus.SendMessage(new SessionEvent(this.session2.Object, SessionStatus.Open));
+            this.messageBus.SendObjectChangeEvent(this.iteration2, EventKind.Added);
 
             Assert.AreEqual(2, vm.OpenIterations.Count);
             Assert.AreEqual(1, vm.OpenIterations.First().SelectedOptions.Count);
@@ -217,7 +223,7 @@ namespace ProductTree.Tests.Ribbon
         [Test]
         public void Verify_That_RibbonViewModel_Can_Be_Constructed()
         {
-            Assert.DoesNotThrow(() => new ProductTreeRibbonViewModel());
+            Assert.DoesNotThrow(() => new ProductTreeRibbonViewModel(this.messageBus));
         }
 
         [Test]

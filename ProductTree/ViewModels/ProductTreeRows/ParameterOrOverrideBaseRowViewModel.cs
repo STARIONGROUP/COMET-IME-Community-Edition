@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -189,9 +189,10 @@ namespace CDP4ProductTree.ViewModels
         private void UpdateCategories()
         {
             var builder = new CategoryStringBuilder()
-                                .AddCategories("PT", this.Thing.ParameterType.Category);
+                .AddCategories("PT", this.Thing.ParameterType.Category);
 
             var elementBase = this.ContainerViewModel.FindThingFromContainerViewModelHierarchy<ElementBase>();
+
             if (elementBase != null)
             {
                 if (elementBase is ElementUsage elementUsage)
@@ -272,14 +273,14 @@ namespace CDP4ProductTree.ViewModels
 
             if (this.AllowMessageBusSubscriptions)
             {
-                parameterTypeListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
+                parameterTypeListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
             }
             else
             {
-                var elementUsageObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType));
+                var elementUsageObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterType));
 
                 parameterTypeListener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>()
                     .RegisterEventHandler(elementUsageObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ParameterType, discriminator, action));
@@ -337,7 +338,7 @@ namespace CDP4ProductTree.ViewModels
                 this.StateDependence = this.Thing.StateDependence;
             }
 
-            if ((this.MeasurementScale == null) || (this.MeasurementScale != this.Thing.Scale))
+            if (this.MeasurementScale == null || this.MeasurementScale != this.Thing.Scale)
             {
                 this.measurementScaleListener?.Dispose();
 
@@ -346,13 +347,15 @@ namespace CDP4ProductTree.ViewModels
 
                 if (this.AllowMessageBusSubscriptions)
                 {
-                    this.measurementScaleListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Scale)
+                    this.measurementScaleListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Scale)
                         .Where(discriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(action);                }
+                        .Subscribe(action);
+                }
                 else
                 {
-                    var measurementScaleObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(MeasurementScale));
+                    var measurementScaleObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(MeasurementScale));
+
                     this.measurementScaleListener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>()
                         .RegisterEventHandler(measurementScaleObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.Scale, discriminator, action));
                 }
@@ -433,20 +436,21 @@ namespace CDP4ProductTree.ViewModels
             foreach (Thing parameterValueSet in addedValueSet)
             {
                 IDisposable listener;
-                
-                Func<ObjectChangedEvent, bool> discriminator = objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber);
+
+                Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
                 Action<ObjectChangedEvent> action = x => this.PopulateValueSetProperty();
 
                 if (this.AllowMessageBusSubscriptions)
                 {
-                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterValueSet)
+                    listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(parameterValueSet)
                         .Where(discriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(action);
                 }
                 else
                 {
-                    var parameterValueSetObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase));
+                    var parameterValueSetObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase));
+
                     listener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>()
                         .RegisterEventHandler(parameterValueSetObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterValueSet, discriminator, action));
                 }
@@ -500,7 +504,7 @@ namespace CDP4ProductTree.ViewModels
             var valueSet = this.GetValueSet(actualOption: actualOption);
             this.IsPublishable = this.CheckValuesPublishabledStatus(valueSet);
 
-            if ((valueSet == null) && !this.IsOptionDependent)
+            if (valueSet == null && !this.IsOptionDependent)
             {
                 logger.Warn("The value set of Parameter or override {0} is null for a option and state independent. it should not happen.", this.Thing.Iid);
 
@@ -638,20 +642,21 @@ namespace CDP4ProductTree.ViewModels
             foreach (var state in this.Thing.StateDependence.ActualState)
             {
                 IDisposable listener;
-                
+
                 Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
                 Action<ObjectChangedEvent> action = x => this.UpdateActualStateRow(actualOption, state);
 
                 if (this.AllowMessageBusSubscriptions)
                 {
-                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(state)
+                    listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(state)
                         .Where(discriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(action);
                 }
                 else
                 {
-                    var stateObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ActualFiniteState));
+                    var stateObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ActualFiniteState));
+
                     listener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>()
                         .RegisterEventHandler(stateObserver, new ObjectChangedMessageBusEventHandlerSubscription(state, discriminator, action));
                 }

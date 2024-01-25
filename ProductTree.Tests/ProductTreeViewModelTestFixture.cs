@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -87,11 +87,13 @@ namespace ProductTree.Tests
         private DomainOfExpertise domain;
         private Assembler assembler;
         private readonly string nestedParameterPath = "PATH";
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
 
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -106,7 +108,7 @@ namespace ProductTree.Tests
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
@@ -164,12 +166,14 @@ namespace ProductTree.Tests
                 {
                     { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
                 });
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -201,7 +205,7 @@ namespace ProductTree.Tests
             revisionNumber.SetValue(this.option, 50);
             this.option.Name = "blablabla";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.option, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.option, EventKind.Updated);
             Assert.AreEqual("blablabla", vm.CurrentOption);
         }
 
@@ -218,7 +222,7 @@ namespace ProductTree.Tests
             var iterationNumber = typeof(IterationSetup).GetProperty("IterationNumber");
             iterationNumber.SetValue(this.iterationSetup, 1);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iterationSetup, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iterationSetup, EventKind.Updated);
             Assert.AreEqual(1, vm.CurrentIteration);
         }
 
@@ -233,7 +237,7 @@ namespace ProductTree.Tests
             this.domain.Name = "System";
             this.domain.ShortName = "SYS";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.domain, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.domain, EventKind.Updated);
             Assert.AreEqual("System [SYS]", vm.DomainOfExpertise);
         }
 
@@ -247,7 +251,7 @@ namespace ProductTree.Tests
 
             this.person.GivenName = "Jane";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.person, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.person, EventKind.Updated);
             Assert.AreEqual("Jane Doe", vm.Person);
         }
 
@@ -260,7 +264,7 @@ namespace ProductTree.Tests
             revisionNumber.SetValue(this.iteration, 50);
             this.iteration.TopElement = null;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(0, vm.TopElement.Count);
         }
 
@@ -275,7 +279,7 @@ namespace ProductTree.Tests
             var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iteration.TopElement = elementdef;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreSame(elementdef, vm.TopElement.Single().Thing);
         }
 
@@ -305,7 +309,7 @@ namespace ProductTree.Tests
             elementdef.Parameter.Add(parameter);
             this.iteration.TopElement = elementdef;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreSame(elementdef, vm.TopElement.Single().Thing);
             Assert.AreEqual(1, vm.TopElement.Single().ContainedRows.Count);
             var paramRow = vm.TopElement.Single().ContainedRows.First() as ParameterOrOverrideBaseRowViewModel;
@@ -355,7 +359,7 @@ namespace ProductTree.Tests
             elementdef.Parameter.Add(parameter);
             this.iteration.TopElement = elementdef;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreSame(elementdef, vm.TopElement.Single().Thing);
             Assert.AreEqual(1, vm.TopElement.Single().ContainedRows.Count);
             var paramRow = vm.TopElement.Single().ContainedRows.First() as ParameterOrOverrideBaseRowViewModel;
@@ -415,7 +419,7 @@ namespace ProductTree.Tests
 
             this.domain = null;
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
-            
+
             vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
