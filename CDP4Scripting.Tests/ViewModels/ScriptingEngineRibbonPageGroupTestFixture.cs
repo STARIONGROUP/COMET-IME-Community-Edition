@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptingEngineRibbonPageGroupTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -40,13 +40,13 @@ namespace CDP4Scripting.Tests.ViewModels
     using CDP4Composition.Navigation.Events;
 
     using CDP4Dal;
-    
+
     using CDP4Scripting.Events;
     using CDP4Scripting.Interfaces;
     using CDP4Scripting.ViewModels;
 
     using ICSharpCode.AvalonEdit;
-    
+
     using Moq;
 
     using NUnit.Framework;
@@ -56,7 +56,8 @@ namespace CDP4Scripting.Tests.ViewModels
     /// <summary>
     /// Suite of tests for the <see cref="ScriptingEngineRibbonPageGroup"/>
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class ScriptingEngineRibbonPageGroupTestFixture
     {
         private ScriptingEngineRibbonPageGroupViewModel scriptingEngineRibbonPageGroupViewModel;
@@ -68,6 +69,7 @@ namespace CDP4Scripting.Tests.ViewModels
         private string filePathOpenTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.py");
         private readonly string filePathSaveTest = Path.Combine(TestContext.CurrentContext.TestDirectory, "test.py");
         private readonly string filePath2 = Path.Combine(TestContext.CurrentContext.TestDirectory, "testFile2.py");
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
@@ -75,19 +77,21 @@ namespace CDP4Scripting.Tests.ViewModels
             RxApp.DefaultExceptionHandler = new RxAppObservableExceptionHandler();
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
+
             this.openSessions = new ReactiveList<ISession>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.scriptingProxy = new Mock<IScriptingProxy>();
 
             var avalonEditor = new TextEditor();
             avalonEditor.Text = "Content of the editor";
-            this.scriptPanelViewModel = new Mock<ScriptPanelViewModel>("header", this.scriptingProxy.Object, "*.py", openSessions);
+            this.scriptPanelViewModel = new Mock<ScriptPanelViewModel>("header", this.scriptingProxy.Object, "*.py", this.openSessions);
             this.scriptPanelViewModel.SetupProperty(x => x.AvalonEditor, avalonEditor);
 
             this.fileDialogService = new Mock<IOpenSaveFileDialogService>();
             this.fileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4)).Returns((string[])null);
 
-            this.scriptingEngineRibbonPageGroupViewModel = new ScriptingEngineRibbonPageGroupViewModel(this.panelNavigationService.Object, this.fileDialogService.Object, this.scriptingProxy.Object);
+            this.scriptingEngineRibbonPageGroupViewModel = new ScriptingEngineRibbonPageGroupViewModel(this.panelNavigationService.Object, this.fileDialogService.Object, this.scriptingProxy.Object, this.messageBus);
         }
 
         [TearDown]
@@ -99,9 +103,9 @@ namespace CDP4Scripting.Tests.ViewModels
         [Test]
         public void VerifyThatNullParametersThrowException()
         {
-            Assert.Throws<ArgumentNullException>(() => new ScriptingEngineRibbonPageGroupViewModel(null, this.fileDialogService.Object, this.scriptingProxy.Object));
-            Assert.Throws<ArgumentNullException>(() => new ScriptingEngineRibbonPageGroupViewModel(this.panelNavigationService.Object, null, this.scriptingProxy.Object));
-            Assert.Throws<ArgumentNullException>(() => new ScriptingEngineRibbonPageGroupViewModel(this.panelNavigationService.Object, this.fileDialogService.Object, null));
+            Assert.Throws<ArgumentNullException>(() => new ScriptingEngineRibbonPageGroupViewModel(null, this.fileDialogService.Object, this.scriptingProxy.Object, this.messageBus));
+            Assert.Throws<ArgumentNullException>(() => new ScriptingEngineRibbonPageGroupViewModel(this.panelNavigationService.Object, null, this.scriptingProxy.Object, this.messageBus));
+            Assert.Throws<ArgumentNullException>(() => new ScriptingEngineRibbonPageGroupViewModel(this.panelNavigationService.Object, this.fileDialogService.Object, null, this.messageBus));
         }
 
         [Test]
@@ -247,7 +251,7 @@ namespace CDP4Scripting.Tests.ViewModels
             // The dictionary should add the path of the file opened.
             File.WriteAllText(this.filePathOpenTest, "content of the python file");
             paths[0] = this.filePathOpenTest;
-            Assert.DoesNotThrowAsync( async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
+            Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(5));
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Once);
             var viewModel = this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.ElementAt(0);
@@ -298,7 +302,7 @@ namespace CDP4Scripting.Tests.ViewModels
             File.WriteAllText(filePathOpenTest2, "content of the text file 2");
             var filePathOpenTest3 = Path.Combine(TestContext.CurrentContext.TestDirectory, "test2.py");
             File.WriteAllText(filePathOpenTest3, "content of the python file 2");
-            paths = new[] {this.filePathOpenTest, filePathOpenTest2, filePathOpenTest3};
+            paths = new[] { this.filePathOpenTest, filePathOpenTest2, filePathOpenTest3 };
             this.fileDialogService.Setup(x => x.GetOpenFileDialog(false, false, true, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4)).Returns(paths);
             Assert.DoesNotThrowAsync(async () => await this.scriptingEngineRibbonPageGroupViewModel.OpenScriptCommand.Execute());
             this.fileDialogService.Verify(x => x.GetOpenFileDialog(It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 4), Times.Exactly(8));
@@ -322,17 +326,17 @@ namespace CDP4Scripting.Tests.ViewModels
         {
             var avalonEditor = new TextEditor();
 
-            var panel1 = new Mock<ScriptPanelViewModel>("panel 1", this.scriptingProxy.Object, "*.py", this.openSessions, true);
+            var panel1 = new Mock<ScriptPanelViewModel>("panel 1", this.scriptingProxy.Object, this.messageBus, "*.py", this.openSessions, true);
             panel1.As<IPanelViewModel>();
             panel1.As<IScriptPanelViewModel>().SetupProperty(x => x.Caption, "panel 1");
             panel1.SetupProperty(x => x.AvalonEditor, avalonEditor);
 
-            var panel2 = new Mock<ScriptPanelViewModel>("panel 2", this.scriptingProxy.Object, "*.py", this.openSessions, true);
+            var panel2 = new Mock<ScriptPanelViewModel>("panel 2", this.scriptingProxy.Object, this.messageBus, "*.py", this.openSessions, true);
             panel2.As<IPanelViewModel>();
             panel2.As<IScriptPanelViewModel>().SetupProperty(x => x.Caption, "panel 2");
             panel2.SetupProperty(x => x.AvalonEditor, avalonEditor);
-            
-            var panel3 = new Mock<ScriptPanelViewModel>("panel 3", this.scriptingProxy.Object, "*.py", this.openSessions, true);
+
+            var panel3 = new Mock<ScriptPanelViewModel>("panel 3", this.scriptingProxy.Object, this.messageBus, "*.py", this.openSessions, true);
             panel3.As<IPanelViewModel>();
             panel3.As<IScriptPanelViewModel>().SetupProperty(x => x.Caption, "panel 3");
             panel3.SetupProperty(x => x.AvalonEditor, avalonEditor);

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptingEngineRibbonPageGroupViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -51,7 +51,8 @@ namespace CDP4Scripting.ViewModels
     /// <summary>
     /// The view-model of the <see cref="ScriptingEngineRibbonPageGroup"/>
     /// </summary>
-    [Export(typeof(ScriptingEngineRibbonPageGroupViewModel)), PartCreationPolicy(CreationPolicy.Shared)] 
+    [Export(typeof(ScriptingEngineRibbonPageGroupViewModel))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class ScriptingEngineRibbonPageGroupViewModel : ReactiveObject
     {
         /// <summary>
@@ -84,28 +85,46 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         private ObservableAsPropertyHelper<bool> hasSession;
 
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly CDPMessageBus messageBus;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptingEngineRibbonPageGroupViewModel"/> class
         /// </summary>
-        public ScriptingEngineRibbonPageGroupViewModel(IPanelNavigationService panelNavigationService, IOpenSaveFileDialogService fileDialogService, IScriptingProxy scriptingProxy)
+        /// <param name="panelNavigationService">
+        /// The <see cref="IPanelNavigationService"/>
+        /// </param>
+        /// <param name="fileDialogService">
+        /// The <see cref="IOpenSaveFileDialogService"/>
+        /// </param>
+        /// <param name="scriptingProxy">
+        /// The <see cref="IScriptingProxy"/>
+        /// </param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public ScriptingEngineRibbonPageGroupViewModel(IPanelNavigationService panelNavigationService, IOpenSaveFileDialogService fileDialogService, IScriptingProxy scriptingProxy, ICDPMessageBus messageBus)
         {
             this.PanelNavigationService = panelNavigationService ?? throw new ArgumentNullException(nameof(panelNavigationService));
             this.fileDialogService = fileDialogService ?? throw new ArgumentNullException(nameof(fileDialogService));
             this.scriptingProxy = scriptingProxy ?? throw new ArgumentNullException(nameof(scriptingProxy));
+            this.messageBus = new CDPMessageBus();
 
-            this.messageBus.Listen<NavigationPanelEvent>()
+            messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel.ToString().Contains("ScriptPanelViewModel") && x.PanelStatus == PanelStatus.Closed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.HandleClosedPanel);
 
             this.OpenSessions = new ReactiveList<ISession>();
             this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
-            this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.initialDialogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "file.txt");
             this.PathScriptingFiles = new Dictionary<string, string>();
             this.CollectionScriptPanelViewModels = new ObservableCollection<IScriptPanelViewModel>();
-            this.messageBus.Listen<ScriptPanelEvent>().Subscribe(this.ScriptPanelEventHandler);
+            messageBus.Listen<ScriptPanelEvent>().Subscribe(this.ScriptPanelEventHandler);
 
             this.NewPythonScriptCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateNewScript("python", ScriptingLaguageKindSupported.Python));
 
@@ -126,8 +145,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public ObservableCollection<IScriptPanelViewModel> CollectionScriptPanelViewModels
         {
-            get { return this.collectionScriptPanelViewModels; }
-            set { this.RaiseAndSetIfChanged(ref this.collectionScriptPanelViewModels, value); }
+            get => this.collectionScriptPanelViewModels;
+            set => this.RaiseAndSetIfChanged(ref this.collectionScriptPanelViewModels, value);
         }
 
         /// <summary>
@@ -164,10 +183,7 @@ namespace CDP4Scripting.ViewModels
         /// <summary>
         /// Gets a value indicating whether there are open sessions
         /// </summary>
-        public bool HasSession
-        {
-            get { return this.hasSession.Value; }
-        }
+        public bool HasSession => this.hasSession.Value;
 
         /// <summary>
         /// Calls the <see cref="CreateNewScript"/> method and pass as title agrument, the language used and the number of <see cref="IScriptPanelViewModel"/> open.
@@ -177,7 +193,8 @@ namespace CDP4Scripting.ViewModels
         private void ExecuteCreateNewScript(string panelTitle, ScriptingLaguageKindSupported scriptingLanguage)
         {
             var panelCounter = this.CollectionScriptPanelViewModels.Count - 1;
-            bool captionExists = true;
+            var captionExists = true;
+
             while (captionExists)
             {
                 panelCounter++;
@@ -195,14 +212,15 @@ namespace CDP4Scripting.ViewModels
         private IScriptPanelViewModel CreateNewScript(string panelTitle, ScriptingLaguageKindSupported scriptingLanguage)
         {
             IScriptPanelViewModel scriptPanelViewModel;
+
             switch (scriptingLanguage)
             {
                 case ScriptingLaguageKindSupported.Python:
-                    scriptPanelViewModel = new PythonScriptPanelViewModel(panelTitle, this.scriptingProxy, this.OpenSessions);
+                    scriptPanelViewModel = new PythonScriptPanelViewModel(panelTitle, this.scriptingProxy, this.messageBus, this.OpenSessions);
                     break;
                     break;
                 case ScriptingLaguageKindSupported.Text:
-                    scriptPanelViewModel = new TextScriptPanelViewModel(panelTitle, this.scriptingProxy, this.OpenSessions);
+                    scriptPanelViewModel = new TextScriptPanelViewModel(panelTitle, this.scriptingProxy, this.messageBus, this.OpenSessions);
                     break;
                 default:
                     throw new NotSupportedException(string.Format("The {0} is not supported", scriptingLanguage));
@@ -220,6 +238,7 @@ namespace CDP4Scripting.ViewModels
         {
             // Open the dialog to open a file
             var filePaths = this.fileDialogService.GetOpenFileDialog(false, false, true, DialogFilters, "*.*", this.initialDialogPath, 4);
+
             if (filePaths == null || !filePaths.Any())
             {
                 return;
@@ -239,22 +258,23 @@ namespace CDP4Scripting.ViewModels
 
                 // Check if the extension is supported and create the panel associated
                 IScriptPanelViewModel scriptPanelViewModel;
+
                 switch (fileExtension)
                 {
                     case ".py":
-                        {
-                            scriptPanelViewModel = this.CreateNewScript(fileName, ScriptingLaguageKindSupported.Python);
-                            break;
-                        }
+                    {
+                        scriptPanelViewModel = this.CreateNewScript(fileName, ScriptingLaguageKindSupported.Python);
+                        break;
+                    }
                     case ".txt":
-                        {
-                            scriptPanelViewModel = this.CreateNewScript(fileName, ScriptingLaguageKindSupported.Text);
-                            break;
-                        }
+                    {
+                        scriptPanelViewModel = this.CreateNewScript(fileName, ScriptingLaguageKindSupported.Text);
+                        break;
+                    }
                     default:
-                        {
-                            throw new NotSupportedException(string.Format("The filextension ({0}) is not supported", fileExtension));
-                        }
+                    {
+                        throw new NotSupportedException(string.Format("The filextension ({0}) is not supported", fileExtension));
+                    }
                 }
 
                 scriptPanelViewModel.AvalonEditor.Text = File.ReadAllText(filePath);
@@ -273,6 +293,7 @@ namespace CDP4Scripting.ViewModels
             var contentScript = scriptPanelViewModel.AvalonEditor.Text;
 
             string header;
+
             // Check if the content of the Panel is dirty or not to not include the * in the name of the file saved 
             if (scriptPanelViewModel.Caption.EndsWith("*"))
             {
@@ -284,6 +305,7 @@ namespace CDP4Scripting.ViewModels
             }
 
             string filePath;
+
             if (this.PathScriptingFiles.TryGetValue(header, out filePath) && File.Exists(filePath))
             {
                 File.WriteAllText(filePath, contentScript);
@@ -299,8 +321,8 @@ namespace CDP4Scripting.ViewModels
 
             if (string.IsNullOrEmpty(filePath) || string.IsNullOrEmpty(fileName))
             {
-                throw new ArgumentNullException(String.Format("An error occured with the path or the name of the file, the script has not been saved. " +
-                             "Please verify that the path '{0}' amd the name '{1}' are not empty.", filePath, fileName));
+                throw new ArgumentNullException(string.Format("An error occured with the path or the name of the file, the script has not been saved. " +
+                                                              "Please verify that the path '{0}' amd the name '{1}' are not empty.", filePath, fileName));
             }
 
             File.WriteAllText(filePath, contentScript);
@@ -321,7 +343,7 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         private void SaveAllScripts()
         {
-            foreach (var scriptPanelViewModel in CollectionScriptPanelViewModels)
+            foreach (var scriptPanelViewModel in this.CollectionScriptPanelViewModels)
             {
                 this.SaveScript(scriptPanelViewModel);
             }
@@ -352,8 +374,9 @@ namespace CDP4Scripting.ViewModels
         /// <param name="navigationPanelEvent"> The payload of the event that is being handled.</param>
         private void HandleClosedPanel(NavigationPanelEvent navigationPanelEvent)
         {
-            var scriptPanelViewModel = (IScriptPanelViewModel) navigationPanelEvent.ViewModel;
+            var scriptPanelViewModel = (IScriptPanelViewModel)navigationPanelEvent.ViewModel;
             var header = scriptPanelViewModel.Caption;
+
             if (this.PathScriptingFiles.ContainsKey(header))
             {
                 this.PathScriptingFiles.Remove(header);
@@ -384,7 +407,8 @@ namespace CDP4Scripting.ViewModels
             var filterIndex = 1;
             extension = string.Concat("(", extension, ")");
             var filters = DialogFilters.Split('|');
-            for (int i = 0; i < filters.Length; i++)
+
+            for (var i = 0; i < filters.Length; i++)
             {
                 if (filters[i].Contains(extension))
                 {
