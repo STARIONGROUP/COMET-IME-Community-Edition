@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShellViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -82,7 +82,7 @@ namespace COMET
         /// Backing field for <see cref="HasOpenIterations"/>
         /// </summary>
         private bool hasOpenIterations;
-        
+
         /// <summary>
         /// The CDP4 custom Log Target
         /// </summary>
@@ -128,17 +128,25 @@ namespace COMET
         /// </summary>
         private IDisposable subscription;
 
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ShellViewModel"/> class.
         /// </summary>
         /// <param name="dialogNavigationService">
         /// The <see cref="IDialogNavigationService"/> that is used to show modal dialogs to the user
         /// </param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         /// <param name="dockViewModel">
         /// The <see cref="DockLayoutViewModel" for the panel dock/>
         /// </param>
         [ImportingConstructor]
-        public ShellViewModel(IDialogNavigationService dialogNavigationService, DockLayoutViewModel dockViewModel)
+        public ShellViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, DockLayoutViewModel dockViewModel)
         {
             if (dialogNavigationService == null)
             {
@@ -148,6 +156,7 @@ namespace COMET
             this.OpenSessions = new ReactiveList<ISession>();
             this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
 
+            this.messageBus = messageBus;
             this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.dialogNavigationService = dialogNavigationService;
@@ -190,7 +199,7 @@ namespace COMET
             this.OpenDomainSwitchDialogCommand = ReactiveCommandCreator.Create(this.ExecuteOpenDomainSwitchDialogCommand, this.WhenAnyValue(x => x.HasOpenIterations));
 
             this.WhenAnyValue(x => x.SelectedSession)
-                .Select(x => (x != null))
+                .Select(x => x != null)
                 .ToProperty(this, x => x.IsSessionSelected, out this.isSessionSelected, scheduler: RxApp.MainThreadScheduler);
 
             this.SelectedSession = null;
@@ -201,11 +210,12 @@ namespace COMET
 
             this.subscription = this.messageBus.Listen<IsBusyEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x =>
-                {
-                    this.IsBusy = x.IsBusy;
-                    this.LoadingMessage = x.Message;
-                });
+                .Subscribe(
+                    x =>
+                    {
+                        this.IsBusy = x.IsBusy;
+                        this.LoadingMessage = x.Message;
+                    });
 
             this.CheckForUpdateCommand = ReactiveCommandCreator.Create(this.ExecuteCheckForUpdateCommand);
 
@@ -213,7 +223,7 @@ namespace COMET
 
             logger.Info("Welcome in the CDP4-COMET Application");
         }
-        
+
         /// <summary>
         /// Executes the <see cref="CheckForUpdateCommand"/>
         /// </summary>
@@ -227,8 +237,8 @@ namespace COMET
         /// </summary>
         public LogEventInfo LogEventInfo
         {
-            get { return this.logEventInfo; }
-            set { this.RaiseAndSetIfChanged(ref this.logEventInfo, value); }
+            get => this.logEventInfo;
+            set => this.RaiseAndSetIfChanged(ref this.logEventInfo, value);
         }
 
         /// <summary>
@@ -250,7 +260,7 @@ namespace COMET
         /// Gets the <see cref="ReactiveCommand"/> to open the web-proxy configuration
         /// </summary>
         public ReactiveCommand<Unit, Unit> OpenProxyConfigurationCommand { get; private set; }
-        
+
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to manage the configured uris
         /// </summary>
@@ -295,7 +305,7 @@ namespace COMET
         /// Gets the <see cref="ReactiveCommand"/> to verify last versions on the update server
         /// </summary>
         public ReactiveCommand<Unit, Unit> CheckForUpdateCommand { get; private set; }
-        
+
         /// <summary>
         /// Gets the <see cref="SessionViewModel"/>s that represent the currently loaded <see cref="Session"/>s
         /// </summary>
@@ -306,8 +316,8 @@ namespace COMET
         /// </summary>
         public SessionViewModel SelectedSession
         {
-            get { return this.selectedSession; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSession, value); }
+            get => this.selectedSession;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSession, value);
         }
 
         /// <summary>
@@ -315,8 +325,8 @@ namespace COMET
         /// </summary>
         public bool IsBusy
         {
-            get { return this.isBusy; }
-            set { this.RaiseAndSetIfChanged(ref this.isBusy, value); }
+            get => this.isBusy;
+            set => this.RaiseAndSetIfChanged(ref this.isBusy, value);
         }
 
         /// <summary>
@@ -324,33 +334,27 @@ namespace COMET
         /// </summary>
         public string LoadingMessage
         {
-            get { return this.loadingMessage; }
-            set { this.RaiseAndSetIfChanged(ref this.loadingMessage, value); }
+            get => this.loadingMessage;
+            set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
         }
 
         /// <summary>
         /// Gets a value indicating whether a session is selected or not
         /// </summary>
-        public bool IsSessionSelected
-        {
-            get { return this.isSessionSelected.Value; }
-        }
+        public bool IsSessionSelected => this.isSessionSelected.Value;
 
         /// <summary>
         /// Gets a value indicating whether there are open sessions
         /// </summary>
-        public bool HasSession
-        {
-            get { return this.hasSession.Value; }
-        }
+        public bool HasSession => this.hasSession.Value;
 
         /// <summary>
         /// Gets a value indicating whether there are open <see cref="ModelReferenceDataLibrary"/> in any <see cref="ISession"/>
         /// </summary>
         public bool HasOpenIterations
         {
-            get { return this.hasOpenIterations; }
-            private set { this.RaiseAndSetIfChanged(ref this.hasOpenIterations, value); }
+            get => this.hasOpenIterations;
+            private set => this.RaiseAndSetIfChanged(ref this.hasOpenIterations, value);
         }
 
         /// <summary>
@@ -358,15 +362,9 @@ namespace COMET
         /// </summary>
         public bool HasSessions
         {
-            get
-            {
-                return this.hasSessions;
-            }
+            get => this.hasSessions;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.hasSessions, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.hasSessions, value);
         }
 
         /// <summary>
@@ -374,15 +372,9 @@ namespace COMET
         /// </summary>
         public string Title
         {
-            get
-            {
-                return this.title;
-            }
+            get => this.title;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.title, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.title, value);
         }
 
         /// <summary>
@@ -404,7 +396,7 @@ namespace COMET
         private async Task ExecuteOpenDataSourceRequest()
         {
             var openSessions = this.Sessions.Select(x => x.Session).ToList();
-            var dataSelection = new DataSourceSelectionViewModel(this.dialogNavigationService, openSessions);
+            var dataSelection = new DataSourceSelectionViewModel(this.dialogNavigationService, this.messageBus, openSessions);
             var result = this.dialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
@@ -426,7 +418,7 @@ namespace COMET
         /// </summary>
         private void ExecuteSaveSessionCommand()
         {
-            var sessionExport = new DataSourceExportViewModel(this.Sessions.Select(x => x.Session), new OpenSaveFileDialogService());
+            var sessionExport = new DataSourceExportViewModel(this.Sessions.Select(x => x.Session), new OpenSaveFileDialogService(), this.messageBus);
             this.dialogNavigationService.NavigateModal(sessionExport);
         }
 

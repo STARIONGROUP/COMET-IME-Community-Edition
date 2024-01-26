@@ -27,16 +27,12 @@ namespace CDP4ShellDialogs.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Reactive;
     using System.Reactive.Concurrency;
-    using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
 
-    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common.Types;
 
     using CDP4Composition.Services;
 
@@ -70,12 +66,14 @@ namespace CDP4ShellDialogs.Tests
         private Assembler assembler;
 
         private Credentials credentials;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://www.rheagroup.com");
             this.credentials = new Credentials("John", "Doe", this.uri);
             this.session = new Mock<ISession>();
@@ -110,20 +108,21 @@ namespace CDP4ShellDialogs.Tests
 
             this.model.IterationSetup.Add(this.iteration);
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.session.Setup(x => x.DataSourceUri).Returns("session1");
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             this.session.Setup(x => x.Credentials).Returns(this.credentials);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
         }
-        
+
         [Test]
         public async Task VerifyThatIterationRowViewModelIsCreated()
         {

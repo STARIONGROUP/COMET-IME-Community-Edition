@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Addin.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -54,10 +54,13 @@ namespace CDP4AddinCE
 
     using CDP4OfficeInfrastructure;
 
-    using DevExpress.Xpf.Core;
-
     using CommonServiceLocator;
 
+    using DevExpress.Xpf.Core;
+
+    using ExceptionReporting;
+
+    using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Tools;
     using NetOffice.OfficeApi;
     using NetOffice.Tools;
@@ -67,10 +70,7 @@ namespace CDP4AddinCE
 
     using ReactiveUI;
 
-    using ExceptionReporting;
-
     using MessageBox = System.Windows.Forms.MessageBox;
-    using NetOffice.ExcelApi;
 
     /// <summary>
     /// The <see cref="Addin"/> provides CDP4 integration with the Office Suite. It self-registers in the registry and
@@ -112,6 +112,11 @@ namespace CDP4AddinCE
         /// </summary>
         private IOfficeApplicationWrapper officeApplicationWrapper;
 
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private ICDPMessageBus messageBus;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Addin"/> class.
         /// </summary>
@@ -128,6 +133,8 @@ namespace CDP4AddinCE
         public Addin()
         {
             logger.Debug("starting CDP4-COMET-CE addin");
+
+            this.messageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
 
             this.PreloadAssemblies();
             this.RedirectAssemblies();
@@ -646,11 +653,12 @@ namespace CDP4AddinCE
         {
             logger.Error(ex);
 
-            var thread = new Thread(() =>
-            {
-                var exceptionReporter = new ExceptionReporter();
-                exceptionReporter.Show(ex);
-            });
+            var thread = new Thread(
+                () =>
+                {
+                    var exceptionReporter = new ExceptionReporter();
+                    exceptionReporter.Show(ex);
+                });
 
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -711,7 +719,7 @@ namespace CDP4AddinCE
         /// <param name="workbook">
         /// The workbook that was activated
         /// </param>
-        private void OnWorkbookActivateEvent(NetOffice.ExcelApi.Workbook workbook)
+        private void OnWorkbookActivateEvent(Workbook workbook)
         {
             logger.Debug("Workbook {0} activated", workbook.Name);
 
@@ -727,7 +735,7 @@ namespace CDP4AddinCE
         /// <param name="workbook">
         /// The workbook that was deactivated
         /// </param>
-        private void OnWorkbookDeactivateEvent(NetOffice.ExcelApi.Workbook workbook)
+        private void OnWorkbookDeactivateEvent(Workbook workbook)
         {
             logger.Debug("Workbook {0} deactivated", workbook.Name);
 
@@ -750,7 +758,7 @@ namespace CDP4AddinCE
 
             this.FluentRibbonManager.IsActive = true;
             var appSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<AddinAppSettings>>();
-            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService);
+            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService, this.messageBus);
             this.FluentRibbonManager.RegisterRibbonPart(ribbonpart);
             this.fluentRibbonXml = this.FluentRibbonManager.GetFluentXml();
 

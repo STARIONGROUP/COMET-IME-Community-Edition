@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SessionViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -97,6 +97,7 @@ namespace COMET.ViewModels
         /// Backing field for the <see cref="LastUpdateDateTime"/> property.
         /// </summary>
         private DateTime lastUpdateDateTime;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionViewModel"/> class.
         /// </summary>
@@ -112,7 +113,7 @@ namespace COMET.ViewModels
             this.Refresh = ReactiveCommandCreator.Create(this.ExecuteRefresh);
             this.Reload = ReactiveCommandCreator.Create(this.ExecuteReload);
             this.HideAll = ReactiveCommandCreator.Create(this.ExecuteHideAll);
-            
+
             this.WhenAnyValue(x => x.LastUpdateDateTime).Select(x => x.ToString(CultureInfo.InvariantCulture)).ToProperty(this, x => x.LastUpdateDateTimeHint, out this.lastUpdateDateTimeHint, scheduler: RxApp.MainThreadScheduler);
 
             this.WhenAnyValue(x => x.ErrorMsg)
@@ -120,7 +121,7 @@ namespace COMET.ViewModels
                 .ToProperty(this, x => x.HasError, out this.hasError, scheduler: RxApp.MainThreadScheduler);
 
             this.WhenAnyValue(
-                    x => x.IsAutoRefreshEnabled, 
+                    x => x.IsAutoRefreshEnabled,
                     x => x.AutoRefreshInterval)
                 .Subscribe(_ => this.SetTimer());
         }
@@ -138,7 +139,7 @@ namespace COMET.ViewModels
         /// <summary>
         /// Gets the Hide All <see cref="ICommand"/> that closes all the panels associated to this <see cref="Session"/>
         /// </summary>
-        public ReactiveCommand<Unit, Unit> HideAll { get; private set; } 
+        public ReactiveCommand<Unit, Unit> HideAll { get; private set; }
 
         /// <summary>
         /// Gets the Refresh <see cref="ICommand"/> that refreshes the encapsulated <see cref="Session"/>
@@ -155,28 +156,16 @@ namespace COMET.ViewModels
         /// a reload loads all the data from the data-source
         /// </remarks>
         public ReactiveCommand<Unit, Unit> Reload { get; private set; }
-        
+
         /// <summary>
         /// Gets the <see cref="Uri"/> of the current <see cref="Session"/>
         /// </summary>
-        public string DataSourceUri
-        {
-            get
-            {
-                return this.Session.DataSourceUri;
-            }
-        }
+        public string DataSourceUri => this.Session.DataSourceUri;
 
         /// <summary>
         /// Gets the name of the current <see cref="ISession"/>
         /// </summary>
-        public string SessionName
-        {
-            get
-            {
-                return this.Session.Name;
-            }
-        }
+        public string SessionName => this.Session.Name;
 
         /// <summary>
         /// Gets or sets a value indicating whether the <see cref="Session"/> object has it's
@@ -184,15 +173,9 @@ namespace COMET.ViewModels
         /// </summary>
         public bool IsAutoRefreshEnabled
         {
-            get
-            {
-                return this.isAutoRefreshEnabled;
-            }
+            get => this.isAutoRefreshEnabled;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isAutoRefreshEnabled, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isAutoRefreshEnabled, value);
         }
 
         /// <summary>
@@ -200,15 +183,9 @@ namespace COMET.ViewModels
         /// </summary>
         public uint AutoRefreshInterval
         {
-            get
-            {
-                return this.autoRefreshInterval;
-            }
+            get => this.autoRefreshInterval;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.autoRefreshInterval, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.autoRefreshInterval, value);
         }
 
         /// <summary>
@@ -216,15 +193,9 @@ namespace COMET.ViewModels
         /// </summary>
         public uint AutoRefreshSecondsLeft
         {
-            get
-            {
-                return this.autoRefreshSecondsLeft;
-            }
+            get => this.autoRefreshSecondsLeft;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.autoRefreshSecondsLeft, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.autoRefreshSecondsLeft, value);
         }
 
         /// <summary>
@@ -232,15 +203,9 @@ namespace COMET.ViewModels
         /// </summary>
         public bool IsClosed
         {
-            get
-            {
-                return this.isClosed;
-            }
+            get => this.isClosed;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isClosed, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isClosed, value);
         }
 
         /// <summary>
@@ -248,40 +213,28 @@ namespace COMET.ViewModels
         /// </summary>
         public DateTime LastUpdateDateTime
         {
-            get
-            {
-                return this.lastUpdateDateTime;
-            }
+            get => this.lastUpdateDateTime;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.lastUpdateDateTime, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.lastUpdateDateTime, value);
         }
 
         /// <summary>
         /// Gets the hint displayed on the data-source Refresh button
         /// </summary>
-        public string LastUpdateDateTimeHint
-        {
-            get { return "Last Updated at " + this.lastUpdateDateTimeHint.Value; }
-        }
+        public string LastUpdateDateTimeHint => "Last Updated at " + this.lastUpdateDateTimeHint.Value;
 
         /// <summary>
         /// Gets a value indicating whether an Error was produced
         /// </summary>
-        public bool HasError
-        {
-            get { return this.hasError.Value; }
-        }
+        public bool HasError => this.hasError.Value;
 
         /// <summary>
         /// Gets or sets the error message 
         /// </summary>
         public string ErrorMsg
         {
-            get { return this.errorMsg; }
-            set { this.RaiseAndSetIfChanged(ref this.errorMsg, value); }
+            get => this.errorMsg;
+            set => this.RaiseAndSetIfChanged(ref this.errorMsg, value);
         }
 
         /// <summary>
@@ -317,7 +270,7 @@ namespace COMET.ViewModels
         {
             try
             {
-                this.messageBus.SendMessage(new IsBusyEvent(true, "Reloading..."));
+                this.Session.CDPMessageBus.SendMessage(new IsBusyEvent(true, "Reloading..."));
                 this.errorMsg = null;
                 await this.Session.Reload();
                 this.LastUpdateDateTime = DateTime.Now;
@@ -328,10 +281,10 @@ namespace COMET.ViewModels
             }
             finally
             {
-                this.messageBus.SendMessage(new IsBusyEvent(false));
+                this.Session.CDPMessageBus.SendMessage(new IsBusyEvent(false));
             }
         }
-        
+
         /// <summary>
         /// Sets the timer according to the appropriate setting
         /// </summary>
@@ -346,7 +299,7 @@ namespace COMET.ViewModels
                 }
 
                 this.AutoRefreshSecondsLeft = this.AutoRefreshInterval;
-                
+
                 this.timer = new DispatcherTimer();
                 this.timer.Interval = TimeSpan.FromSeconds(1);
                 this.timer.Tick += this.OntTimerElapsed;

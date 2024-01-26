@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ModelSelectionSessionTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,18 +28,23 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
     using System;
     using System.Globalization;
     using System.Linq;
+
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
+
     using CDP4ShellDialogs.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
     public class ModelSelectionSessionTestFixture
     {
         private Mock<ISession> session;
-        private Mock<IPermissionService> permissionService; 
+        private Mock<IPermissionService> permissionService;
 
         private SiteDirectory siteDirectory;
         private EngineeringModelSetup model1;
@@ -31,11 +55,13 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
         private Person person;
         private DomainOfExpertise domain;
         private string frozenOnDate;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
-            this.session = new Mock<ISession>(){Name = "http://www.rheagroup.com/"};
+            this.messageBus = new CDPMessageBus();
+            this.session = new Mock<ISession>() { Name = "http://www.rheagroup.com/" };
             this.permissionService = new Mock<IPermissionService>();
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com")) { Name = "TestSiteDir" };
@@ -47,11 +73,12 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
             this.iteration21.FrozenOn = DateTime.Parse(this.frozenOnDate);
 
             this.iteration22 = new IterationSetup(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com"));
-            
+
             this.person = new Person(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com")) { GivenName = "testPerson" };
             this.domain = new DomainOfExpertise(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com")) { Name = "domaintest" };
 
             this.person.DefaultDomain = this.domain;
+
             this.model1.Participant.Add(new Participant(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com"))
             {
                 Person = this.person,
@@ -64,6 +91,7 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
             this.siteDirectory.Model.Add(this.model1);
             this.siteDirectory.Model.Add(this.model2);
             this.siteDirectory.Person.Add(this.person);
+
             this.model2.Participant.Add(new Participant(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com"))
             {
                 Person = this.person,
@@ -71,6 +99,7 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
             });
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]

@@ -130,6 +130,11 @@ namespace COMET.ViewModels
         /// </summary>
         private readonly Dictionary<string, Version> availableVersions;
 
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceExportViewModel"/> class.
         /// </summary>
@@ -139,12 +144,17 @@ namespace COMET.ViewModels
         /// <param name="openSaveFileDialogService">
         /// The file Dialog Service.
         /// </param>
-        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService, ICDPMessageBus messageBus)
         {
             if (openSaveFileDialogService == null)
             {
                 throw new ArgumentNullException(nameof(openSaveFileDialogService), "The openSaveFileDialogService may not be null.");
             }
+
+            this.messageBus = messageBus;
 
             this.openSaveFileDialogService = openSaveFileDialogService;
             this.AvailableDals = new List<IDalMetaData>();
@@ -157,17 +167,16 @@ namespace COMET.ViewModels
                 .Select(
                     x =>
                         new KeyValuePair<string, Version>(
-                            (x.Major == 1 && x.Minor == 0 
-                                ? "ECSS-E-TM-10-25 (Version 2.4.1)" 
-                                : $"CDP4-COMET {x.ToString(3)}"),
+                            x.Major == 1 && x.Minor == 0
+                                ? "ECSS-E-TM-10-25 (Version 2.4.1)"
+                                : $"CDP4-COMET {x.ToString(3)}",
                             x))
                 .OrderBy(x => x.Value)
-                .ToDictionary(x => x.Key, x=> x.Value);
+                .ToDictionary(x => x.Key, x => x.Value);
 
             this.IsBusy = false;
 
-            this.WhenAnyValue(
-                vm => vm.SelectedSession).Subscribe(
+            this.WhenAnyValue(vm => vm.SelectedSession).Subscribe(
                 x =>
                 {
                     if (x == null)
@@ -176,7 +185,7 @@ namespace COMET.ViewModels
                     }
                     else
                     {
-                        this.Versions = 
+                        this.Versions =
                             this.availableVersions
                                 .Where(y => y.Value <= x.DalVersion)
                                 .ToDictionary(k => k.Key, v => v.Value);
@@ -195,11 +204,11 @@ namespace COMET.ViewModels
                 vm => vm.SelectedSession,
                 vm => vm.Path,
                 vm => vm.SelectedVersion,
-                (passwordRetype, password, selecteddal, selectedsession, path, selectedVersion) 
-                    => selecteddal != null && 
-                       selectedsession != null && 
-                       !string.IsNullOrEmpty(path) && 
-                       !string.IsNullOrEmpty(password) && 
+                (passwordRetype, password, selecteddal, selectedsession, path, selectedVersion)
+                    => selecteddal != null &&
+                       selectedsession != null &&
+                       !string.IsNullOrEmpty(path) &&
+                       !string.IsNullOrEmpty(password) &&
                        password == passwordRetype &&
                        selectedVersion.Key != default);
 
@@ -358,7 +367,7 @@ namespace COMET.ViewModels
                 var dal = this.dals.Single(x => x.Metadata == this.SelectedDal);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType(), this.SelectedVersion.Value);
 
-                var fileExportSession = dalInstance.CreateSession(creds);
+                var fileExportSession = dalInstance.CreateSession(creds, this.messageBus);
 
                 // create write
                 var operationContainers = new List<OperationContainer>();
