@@ -1,19 +1,19 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -28,7 +28,6 @@ namespace CDP4DiagramEditor.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
@@ -86,7 +85,7 @@ namespace CDP4DiagramEditor.ViewModels
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
-            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.UpdateDiagrams();
 
@@ -156,15 +155,15 @@ namespace CDP4DiagramEditor.ViewModels
                 (selection, canWrite) => selection != null && canWrite);
 
             this.CreateCommand = ReactiveCommandCreator.Create(
-                () => this.ExecuteCreateCommand<DiagramCanvas>(this.Thing), 
+                () => this.ExecuteCreateCommand<DiagramCanvas>(this.Thing),
                 this.WhenAnyValue(vm => vm.CanCreateDiagram));
 
             this.DeleteCommand = ReactiveCommandCreator.Create(
-                () => this.ExecuteDeleteCommand(this.SelectedThing.Thing), 
+                () => this.ExecuteDeleteCommand(this.SelectedThing.Thing),
                 canDelete);
-            
+
             this.UpdateCommand = ReactiveCommandCreator.Create(
-                this.ExecuteUpdateCommand, 
+                this.ExecuteUpdateCommand,
                 canDelete);
 
             this.InspectCommand = ReactiveCommandCreator.Create(
@@ -254,21 +253,21 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = this.messageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+            var engineeringModelSetupSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = this.messageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+            var domainOfExpertiseSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = this.messageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+            var iterationSetupSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
@@ -309,7 +308,7 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             var thing = this.SelectedThing.Thing;
-            var vm = new DiagramEditorViewModel((DiagramCanvas) thing, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+            var vm = new DiagramEditorViewModel((DiagramCanvas)thing, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
             this.PanelNavigationService.OpenInDock(vm);
         }
     }

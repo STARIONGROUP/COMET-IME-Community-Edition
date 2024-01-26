@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramEditorViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -64,7 +64,8 @@ namespace CDP4DiagramEditor.Tests
 
     using Point = System.Windows.Point;
 
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class DiagramEditorViewModelTestFixture
     {
         private Mock<ISession> session;
@@ -106,12 +107,15 @@ namespace CDP4DiagramEditor.Tests
         private RequirementsSpecification spec3;
         private BinaryRelationship link1;
 
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.permissionService = new Mock<IPermissionService>();
             this.mockExtendedDiagramBehavior = new Mock<IExtendedDiagramOrgChartBehavior>();
             this.mockDiagramBehavior = new Mock<ICdp4DiagramOrgChartBehavior>(MockBehavior.Strict);
@@ -181,7 +185,6 @@ namespace CDP4DiagramEditor.Tests
             this.iteration.RequirementsSpecification.Add(this.spec3);
             this.iteration.Relationship.Add(this.link1);
 
-
             var tuple = new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant);
 
             var openedIterations = new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
@@ -201,7 +204,9 @@ namespace CDP4DiagramEditor.Tests
                 Target = this.diagramObject2,
                 DepictedThing = this.link1
             };
+
             this.elementDefinition = new ElementDefinition() { Name = "WhyNot", ShortName = "WhyNot" };
+
             this.bound1 = new Bounds(Guid.NewGuid(), this.cache, this.uri)
             {
                 X = 1,
@@ -224,15 +229,16 @@ namespace CDP4DiagramEditor.Tests
             this.diagram.DiagramElement.Add(this.diagramObject1);
             this.diagram.DiagramElement.Add(this.diagramObject2);
             this.diagram.DiagramElement.Add(this.connector);
-            
+
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(openedIterations);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.mockExtendedDiagramBehavior.Setup(x => x.GetDiagramPositionFromMousePosition(It.IsAny<Point>())).Returns(new Point());
             this.mockDiagramBehavior.Setup(x => x.GetDiagramPositionFromMousePosition(It.IsAny<Point>())).Returns(new Point());
-            this.mockDiagramBehavior.Setup(x => x.ItemPositions).Returns(new Dictionary<object, Point>() );
+            this.mockDiagramBehavior.Setup(x => x.ItemPositions).Returns(new Dictionary<object, Point>());
             this.mockDiagramBehavior.Setup(x => x.ApplyChildLayout(It.IsAny<DiagramItem>()));
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
@@ -251,6 +257,7 @@ namespace CDP4DiagramEditor.Tests
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             viewModel.UpdateProperties();
             viewModel.ComputeDiagramConnector();
 
@@ -270,6 +277,7 @@ namespace CDP4DiagramEditor.Tests
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             this.dropinfo.Setup(x => x.Payload).Returns(this.domain);
             viewModel.DragOver(this.dropinfo.Object);
             this.dropinfo.VerifySet(x => x.Effects = It.IsAny<DragDropEffects>(), Times.Once);
@@ -282,10 +290,12 @@ namespace CDP4DiagramEditor.Tests
         public async Task VerifyThatDropWorks()
         {
             this.diagram.DiagramElement.Clear();
+
             var viewModel = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             viewModel.UpdateProperties();
             Assert.IsEmpty(viewModel.ThingDiagramItems);
             var drop = new Mock<IDiagramDropInfo>();
@@ -303,6 +313,7 @@ namespace CDP4DiagramEditor.Tests
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             viewModel.UpdateProperties();
             var itemNumber = viewModel.ThingDiagramItems.Count;
             viewModel.RemoveDiagramThingItem(viewModel.ThingDiagramItems.FirstOrDefault());
@@ -314,6 +325,7 @@ namespace CDP4DiagramEditor.Tests
         public async Task VerifyThatSaveCommandWorks()
         {
             this.diagram.DiagramElement.Clear();
+
             var viewModel = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
             {
                 Behavior = this.mockDiagramBehavior.Object
@@ -335,7 +347,7 @@ namespace CDP4DiagramEditor.Tests
             this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => op.Operations.Count() == 5)));
             viewModel.Dispose();
         }
-        
+
         [Test]
         public void VerifyThatGenerateRelationShallowWorks()
         {
@@ -358,6 +370,7 @@ namespace CDP4DiagramEditor.Tests
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             viewModel.UpdateProperties();
             Assert.AreEqual(1, viewModel.ThingDiagramItems.Count);
 
@@ -383,17 +396,18 @@ namespace CDP4DiagramEditor.Tests
             relationship0.Source = this.diagramObject1.DepictedThing;
             relationship0.Target = this.diagramObject2.DepictedThing;
             this.iteration.Relationship.Add(relationship0);
-            
+
             var relationship1 = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri);
             relationship1.Category.Add(this.relationshipCat);
             relationship1.Source = this.diagramObject2.DepictedThing;
             relationship1.Target = this.diagramObject3.DepictedThing;
             this.iteration.Relationship.Add(relationship1);
-            
+
             var viewModel = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             viewModel.UpdateProperties();
             Assert.AreEqual(1, viewModel.ThingDiagramItems.Count);
 
@@ -432,6 +446,7 @@ namespace CDP4DiagramEditor.Tests
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             viewModel.UpdateProperties();
             await viewModel.SaveDiagramCommand.Execute();
             Assert.IsFalse(viewModel.IsDirty);
@@ -452,6 +467,7 @@ namespace CDP4DiagramEditor.Tests
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             Assert.IsTrue(this.diagram.DiagramElement.Any());
             viewModel.UpdateProperties();
             Assert.IsTrue(viewModel.ThingDiagramItems.Any());
@@ -472,6 +488,7 @@ namespace CDP4DiagramEditor.Tests
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             viewModel.UpdateProperties();
             viewModel.ComputeDiagramConnector();
             Assert.IsNotEmpty(viewModel.DiagramConnectorCollection);
@@ -493,6 +510,7 @@ namespace CDP4DiagramEditor.Tests
             {
                 Behavior = this.mockDiagramBehavior.Object
             };
+
             viewModel.UpdateProperties();
             viewModel.ComputeDiagramConnector();
             Assert.IsEmpty(viewModel.DiagramConnectorCollection);
