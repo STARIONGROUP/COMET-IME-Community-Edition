@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipMatrixViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -50,9 +50,9 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4RelationshipMatrix.Helpers;
     using CDP4RelationshipMatrix.Settings;
 
-    using NLog;
-
     using CommonServiceLocator;
+
+    using NLog;
 
     using ReactiveUI;
 
@@ -206,7 +206,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.fileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 
             this.ToolTip =
-                $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+                $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.settings = this.PluginSettingsService.Read<RelationshipMatrixPluginSettings>();
 
@@ -233,7 +233,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.Disposables.Add(this.RelationshipConfiguration);
             this.Disposables.Add(this.Matrix);
 
-            var model = (EngineeringModel) this.Thing.TopContainer;
+            var model = (EngineeringModel)this.Thing.TopContainer;
 
             this.modelSetup = model.EngineeringModelSetup;
             this.iterationSetup = this.Thing.IterationSetup;
@@ -249,8 +249,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -258,8 +258,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -267,8 +267,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public SourceConfigurationViewModel SourceYConfiguration
         {
-            get { return this.sourceYConfiguration; }
-            private set { this.RaiseAndSetIfChanged(ref this.sourceYConfiguration, value); }
+            get => this.sourceYConfiguration;
+            private set => this.RaiseAndSetIfChanged(ref this.sourceYConfiguration, value);
         }
 
         /// <summary>
@@ -276,8 +276,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public SourceConfigurationViewModel SourceXConfiguration
         {
-            get { return this.sourceXConfiguration; }
-            private set { this.RaiseAndSetIfChanged(ref this.sourceXConfiguration, value); }
+            get => this.sourceXConfiguration;
+            private set => this.RaiseAndSetIfChanged(ref this.sourceXConfiguration, value);
         }
 
         /// <summary>
@@ -285,8 +285,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public SavedConfiguration SelectedSavedConfiguration
         {
-            get { return this.selectedSavedConfiguration; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSavedConfiguration, value); }
+            get => this.selectedSavedConfiguration;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSavedConfiguration, value);
         }
 
         /// <summary>
@@ -294,8 +294,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public ReactiveList<SavedConfiguration> SavedConfigurations
         {
-            get { return this.savedConfigurations; }
-            set { this.RaiseAndSetIfChanged(ref this.savedConfigurations, value); }
+            get => this.savedConfigurations;
+            set => this.RaiseAndSetIfChanged(ref this.savedConfigurations, value);
         }
 
         /// <summary>
@@ -304,8 +304,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public RelationshipConfigurationViewModel RelationshipConfiguration
         {
-            get { return this.relationshipConfiguration; }
-            set { this.RaiseAndSetIfChanged(ref this.relationshipConfiguration, value); }
+            get => this.relationshipConfiguration;
+            set => this.RaiseAndSetIfChanged(ref this.relationshipConfiguration, value);
         }
 
         /// <summary>
@@ -318,8 +318,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool CanEditSourceY
         {
-            get { return this.canEditSourceY; }
-            private set { this.RaiseAndSetIfChanged(ref this.canEditSourceY, value); }
+            get => this.canEditSourceY;
+            private set => this.RaiseAndSetIfChanged(ref this.canEditSourceY, value);
         }
 
         /// <summary>
@@ -327,8 +327,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool CanEditSourceX
         {
-            get { return this.canEditSourceX; }
-            private set { this.RaiseAndSetIfChanged(ref this.canEditSourceX, value); }
+            get => this.canEditSourceX;
+            private set => this.RaiseAndSetIfChanged(ref this.canEditSourceX, value);
         }
 
         /// <summary>
@@ -336,8 +336,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool CanEditSourceYToSourceX
         {
-            get { return this.canEditSourceYToSourceX; }
-            private set { this.RaiseAndSetIfChanged(ref this.canEditSourceYToSourceX, value); }
+            get => this.canEditSourceYToSourceX;
+            private set => this.RaiseAndSetIfChanged(ref this.canEditSourceYToSourceX, value);
         }
 
         /// <summary>
@@ -345,8 +345,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool CanEditSourceXToSourceY
         {
-            get { return this.canEditSourceXToSourceY; }
-            private set { this.RaiseAndSetIfChanged(ref this.canEditSourceXToSourceY, value); }
+            get => this.canEditSourceXToSourceY;
+            private set => this.RaiseAndSetIfChanged(ref this.canEditSourceXToSourceY, value);
         }
 
         /// <summary>
@@ -354,8 +354,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool CanInspectSourceYToSourceX
         {
-            get { return this.canInspectSourceYToSourceX; }
-            private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceYToSourceX, value); }
+            get => this.canInspectSourceYToSourceX;
+            private set => this.RaiseAndSetIfChanged(ref this.canInspectSourceYToSourceX, value);
         }
 
         /// <summary>
@@ -363,8 +363,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool CanInspectSourceXToSourceY
         {
-            get { return this.canInspectSourceXToSourceY; }
-            private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceXToSourceY, value); }
+            get => this.canInspectSourceXToSourceY;
+            private set => this.RaiseAndSetIfChanged(ref this.canInspectSourceXToSourceY, value);
         }
 
         /// <summary>
@@ -372,8 +372,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool CanInspectSourceY
         {
-            get { return this.canInspectSourceY; }
-            private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceY, value); }
+            get => this.canInspectSourceY;
+            private set => this.RaiseAndSetIfChanged(ref this.canInspectSourceY, value);
         }
 
         /// <summary>
@@ -381,8 +381,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool CanInspectSourceX
         {
-            get { return this.canInspectSourceX; }
-            private set { this.RaiseAndSetIfChanged(ref this.canInspectSourceX, value); }
+            get => this.canInspectSourceX;
+            private set => this.RaiseAndSetIfChanged(ref this.canInspectSourceX, value);
         }
 
         /// <summary>
@@ -450,8 +450,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool ShowDirectionality
         {
-            get { return this.showDirectionality; }
-            set { this.RaiseAndSetIfChanged(ref this.showDirectionality, value); }
+            get => this.showDirectionality;
+            set => this.RaiseAndSetIfChanged(ref this.showDirectionality, value);
         }
 
         /// <summary>
@@ -459,8 +459,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool ShowRelatedOnly
         {
-            get { return this.showRelatedOnly; }
-            set { this.RaiseAndSetIfChanged(ref this.showRelatedOnly, value); }
+            get => this.showRelatedOnly;
+            set => this.RaiseAndSetIfChanged(ref this.showRelatedOnly, value);
         }
 
         /// <summary>
@@ -569,7 +569,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = this.messageBus.Listen<ObjectChangedEvent>(this.modelSetup)
+            var engineeringModelSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.modelSetup)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
                                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber &&
                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -578,7 +578,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = this.messageBus
+            var domainOfExpertiseSubscription = this.CDPMessageBus
                 .Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
                                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber &&
@@ -588,7 +588,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = this.messageBus.Listen<ObjectChangedEvent>(this.iterationSetup)
+            var iterationSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.iterationSetup)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
                                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber &&
                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -598,7 +598,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.Disposables.Add(iterationSetupSubscription);
 
             // restricted to defined thing for now
-            var thingsSubscription = this.messageBus.Listen<ObjectChangedEvent>(typeof(DefinedThing))
+            var thingsSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DefinedThing))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.CheckRebuildMatrix);
 
@@ -610,7 +610,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.WhenAny(x => x.SelectedSavedConfiguration, vm => vm.Value != null)
                 .Subscribe(_ => this.LoadSavedConfiguration());
 
-            var ruleSubscription = this.messageBus
+            var ruleSubscription = this.CDPMessageBus
                 .Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
                 .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -618,7 +618,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(ruleSubscription);
 
-            var relationshipSubscription = this.messageBus
+            var relationshipSubscription = this.CDPMessageBus
                 .Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
                 .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -627,7 +627,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.Disposables.Add(relationshipSubscription);
 
             var deprecateSubscription =
-                this.messageBus.Listen<ToggleDeprecatedThingEvent>()
+                this.CDPMessageBus.Listen<ToggleDeprecatedThingEvent>()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x =>
                     {
@@ -766,12 +766,12 @@ namespace CDP4RelationshipMatrix.ViewModels
             {
                 this.BuildRelationshipMatrix();
             }
-            else if (this.IsClassKindValidForRebuild(thing.ClassKind,
-                         this.SourceYConfiguration.SelectedClassKind.Value) &&
-                     this.SourceYConfiguration.SelectedCategories.Count > 0 ||
-                     this.IsClassKindValidForRebuild(thing.ClassKind,
-                         this.SourceXConfiguration.SelectedClassKind.Value) &&
-                     this.SourceXConfiguration.SelectedCategories.Count > 0)
+            else if ((this.IsClassKindValidForRebuild(thing.ClassKind,
+                          this.SourceYConfiguration.SelectedClassKind.Value) &&
+                      this.SourceYConfiguration.SelectedCategories.Count > 0) ||
+                     (this.IsClassKindValidForRebuild(thing.ClassKind,
+                          this.SourceXConfiguration.SelectedClassKind.Value) &&
+                      this.SourceXConfiguration.SelectedCategories.Count > 0))
             {
                 if (thing is ICategorizableThing categorizable && (
                         IsCategoryApplicableToConfiguration(categorizable, this.SourceYConfiguration) ||
@@ -791,8 +791,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         private bool IsClassKindValidForRebuild(ClassKind thingClassKind, ClassKind expectedClassKind)
         {
             // class kind should match, or in case of ElementUsage, ElementDefinition should be taken into account.
-            return thingClassKind == expectedClassKind || expectedClassKind == ClassKind.ElementUsage &&
-                   thingClassKind == ClassKind.ElementDefinition;
+            return thingClassKind == expectedClassKind || (expectedClassKind == ClassKind.ElementUsage &&
+                                                           thingClassKind == ClassKind.ElementDefinition);
         }
 
         /// <summary>
@@ -1054,6 +1054,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             var relationShip = cell.Relationships.FirstOrDefault(x => x.Source == cell.SourceY && x.Target == cell.SourceX);
+
             if (relationShip != null)
             {
                 this.ExecuteInspectCommand(relationShip);
@@ -1071,6 +1072,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             var relationShip = cell.Relationships.FirstOrDefault(x => x.Source == cell.SourceX && x.Target == cell.SourceY);
+
             if (relationShip != null)
             {
                 this.ExecuteInspectCommand(relationShip);
@@ -1088,6 +1090,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             var relationShip = cell.Relationships.FirstOrDefault(x => x.Source == cell.SourceY && x.Target == cell.SourceX);
+
             if (relationShip != null)
             {
                 this.ExecuteUpdateCommand(relationShip);
@@ -1105,6 +1108,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             }
 
             var relationShip = cell.Relationships.FirstOrDefault(x => x.Source == cell.SourceX && x.Target == cell.SourceY);
+
             if (relationShip != null)
             {
                 this.ExecuteUpdateCommand(relationShip);
