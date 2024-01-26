@@ -27,10 +27,14 @@ namespace CDP4Grapher.Views
 {
     using System.ComponentModel.Composition;
 
-    using CDP4Composition.Ribbon;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Ribbon;
 
-    using ViewModels;
+    using CDP4Dal;
+
+    using CDP4Grapher.ViewModels;
+
+    using CommonServiceLocator;
 
     /// <summary>
     /// Interaction logic for GrapherRibbon.xaml
@@ -45,7 +49,8 @@ namespace CDP4Grapher.Views
         public GrapherRibbon()
         {
             this.InitializeComponent();
-            this.DataContext = new GrapherRibbonViewModel();
+            var messageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
+            this.DataContext = new GrapherRibbonViewModel(messageBus);
         }
     }
 }

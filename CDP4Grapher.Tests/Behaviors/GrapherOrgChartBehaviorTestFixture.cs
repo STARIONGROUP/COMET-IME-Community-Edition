@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherOrgChartBehaviorTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -37,17 +37,19 @@ namespace CDP4Grapher.Tests.Behaviors
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
 
+    using CDP4Dal;
+
     using CDP4Grapher.Behaviors;
     using CDP4Grapher.Tests.Data;
     using CDP4Grapher.Utilities;
     using CDP4Grapher.ViewModels;
     using CDP4Grapher.Views;
 
+    using CommonServiceLocator;
+
     using DevExpress.Diagram.Core;
     using DevExpress.Diagram.Core.Layout;
     using DevExpress.Xpf.Diagram;
-
-    using CommonServiceLocator;
 
     using Moq;
 
@@ -55,9 +57,8 @@ namespace CDP4Grapher.Tests.Behaviors
 
     using ReactiveUI;
 
-    using LayoutDirection = DevExpress.Diagram.Core.Layout.LayoutDirection;
-
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class GrapherOrgChartBehaviorTestFixture : GrapherBaseTestData
     {
         private GrapherOrgChartBehavior behavior;
@@ -66,26 +67,28 @@ namespace CDP4Grapher.Tests.Behaviors
         private Mock<IGrapherViewModel> grapherViewModel;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IHaveContextMenu> contextMenu;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public override void Setup()
         {
             base.Setup();
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            
+            this.messageBus = new CDPMessageBus();
+
             this.elementViewModels = new List<GraphElementViewModel>()
             {
                 new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
                 {
                     RootElement = this.ElementDefinition1,
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage1 }
-                }),
+                }, this.messageBus),
 
                 new GraphElementViewModel(new NestedElement(Guid.NewGuid(), this.Assembler.Cache, this.Uri)
                 {
                     RootElement = this.ElementDefinition1,
                     ElementUsage = new OrderedItemList<ElementUsage>(this.Option) { this.ElementUsage1, this.ElementUsage2 }
-                })
+                }, this.messageBus)
             };
 
             this.contextMenu = new Mock<IHaveContextMenu>();
@@ -117,7 +120,7 @@ namespace CDP4Grapher.Tests.Behaviors
             Assert.IsTrue(this.behavior.CurrentLayout != default);
             Assert.AreSame(this.behavior.AssociatedObject, diagramControl);
         }
-        
+
         [Test]
         public void VerifyExport()
         {

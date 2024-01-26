@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,8 @@ namespace CDP4Grapher.Tests.ViewModels
     /// <summary>
     /// Suite of tests for the <see cref="GrapherRibbonViewModel"/> class.
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class GrapherRibbonViewModelTestFixture
     {
         private Option option;
@@ -77,10 +78,13 @@ namespace CDP4Grapher.Tests.ViewModels
         private EngineeringModel engineeringModel;
         private IterationSetup iterationSetup;
         private Iteration iteration;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
+
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
 
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri)
@@ -120,9 +124,12 @@ namespace CDP4Grapher.Tests.ViewModels
 
             this.iteration.Option.Add(this.option);
             this.engineeringModel.Iteration.Add(this.iteration);
+
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
             this.thingNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -141,11 +148,11 @@ namespace CDP4Grapher.Tests.ViewModels
             this.elementUsage2 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, ElementDefinition = this.elementDefinition2 };
             this.elementUsage3 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, ElementDefinition = this.elementDefinition3 };
         }
-        
+
         [Test]
         public void Verify_That_RibbonViewModel_Can_Be_Constructed()
         {
-            var vm = new GrapherRibbonViewModel();
+            var vm = new GrapherRibbonViewModel(this.messageBus);
             Assert.IsNotNull(vm);
         }
 
@@ -153,12 +160,13 @@ namespace CDP4Grapher.Tests.ViewModels
         public void Verify_That_InstantiatePanelViewModel_Returns_Expected_ViewModel()
         {
             var viewModel = GrapherRibbonViewModel.InstantiatePanelViewModel(
-                this.option, 
-                this.session.Object, 
-                this.thingNavigationService.Object, 
-                this.panelNavigationService.Object, 
-                this.dialogNavigationService.Object, 
+                this.option,
+                this.session.Object,
+                this.thingNavigationService.Object,
+                this.panelNavigationService.Object,
+                this.dialogNavigationService.Object,
                 this.pluginSettingService.Object);
+
             Assert.IsInstanceOf<GrapherViewModel>(viewModel);
         }
     }
