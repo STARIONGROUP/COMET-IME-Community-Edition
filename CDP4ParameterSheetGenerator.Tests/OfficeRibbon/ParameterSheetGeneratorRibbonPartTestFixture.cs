@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSheetGeneratorRibbonPartTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,29 +31,35 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
     using System.Reactive.Concurrency;
     using System.Threading;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-    using CDP4OfficeInfrastructure;
-    using CommonServiceLocator;
-    using Moq;
-    using NetOffice.ExcelApi;
-    using NUnit.Framework;
-    using ReactiveUI;
 
-    using Application = System.Windows.Application;
+    using CDP4OfficeInfrastructure;
+
+    using CommonServiceLocator;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="ParameterSheetGeneratorRibbonPart"/>
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class ParameterSheetGeneratorRibbonPartTestFixture
     {
         private Uri uri;
@@ -56,26 +81,28 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPermissionService> permittingPermissionService;
         private Mock<IPluginSettingsService> pluginSettingsService;
-        
-        private Mock<IOfficeApplicationWrapper> officeApplicationWrapper;        
+
+        private Mock<IOfficeApplicationWrapper> officeApplicationWrapper;
         private Mock<IExcelQuery> excelQuery;
 
         private Mock<ISession> session;
 
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://www.rheageoup.com");
             this.SetupRecognizePackUir();
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.session = new Mock<ISession>();
-            
+
             var dtos = new List<CDP4Common.DTO.Thing>();
 
             var siteDirectory = new CDP4Common.DTO.SiteDirectory(Guid.NewGuid(), 0);
@@ -109,9 +136,10 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             this.amountOfRibbonControls = 10;
             this.order = 1;
 
-            this.ribbonPart = new ParameterSheetGeneratorRibbonPart(this.order, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingsService.Object, this.officeApplicationWrapper.Object);
+            this.ribbonPart = new ParameterSheetGeneratorRibbonPart(this.order, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingsService.Object, this.officeApplicationWrapper.Object, this.messageBus);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>())
                 .Returns(this.thingDialogNavigationService.Object);
         }
@@ -137,7 +165,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine(ex);
+                Console.WriteLine(ex);
             }
         }
 
@@ -251,9 +279,9 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             this.ribbonPart.ExcelQuery = this.excelQuery.Object;
 
             var iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
-                                     {
-                                         IterationNumber = 1
-                                     };
+            {
+                IterationNumber = 1
+            };
 
             var iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
             iteration.IterationSetup = iterationSetup;
