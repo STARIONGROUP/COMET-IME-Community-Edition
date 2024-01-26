@@ -25,16 +25,14 @@
 
 namespace CDP4EngineeringModel.Views
 {
-    using CDP4Composition.Ribbon;
-    using CDP4Composition.Mvvm;
-
-    using CDP4EngineeringModel.ViewModels;
-
     using System.ComponentModel.Composition;
+
+    using CDP4Composition.Mvvm;
+    using CDP4Composition.Ribbon;
 
     using CDP4Dal;
 
-    using ReactiveUI;
+    using CDP4EngineeringModel.ViewModels;
 
     /// <summary>
     /// Interaction logic for PublicationBrowserRibbon.xaml
@@ -43,11 +41,16 @@ namespace CDP4EngineeringModel.Views
     [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class PublicationBrowserRibbon : ExtendedRibbonPageGroup, IView
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="PublicationBrowserRibbon"/> class
+        /// </summary>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public PublicationBrowserRibbon()
+        public PublicationBrowserRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new PublicationBrowserRibbonViewModel(messageBus);
         }
     }

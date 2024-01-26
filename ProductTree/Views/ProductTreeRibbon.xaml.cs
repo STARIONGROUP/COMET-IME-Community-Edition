@@ -43,11 +43,13 @@ namespace CDP4ProductTree.Views
         /// <summary>
         /// Initializes a new instance of the <see cref="ProductTreeRibbon"/> class
         /// </summary>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public ProductTreeRibbon()
+        public ProductTreeRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new ProductTreeRibbonViewModel(messageBus);
         }
     }

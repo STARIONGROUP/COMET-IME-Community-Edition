@@ -41,11 +41,16 @@ namespace CDP4EngineeringModel.Views
     [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class ElementDefinitionRibbon : ExtendedRibbonPageGroup, IView
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="ElementDefinitionRibbon"/> class
+        /// </summary>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public ElementDefinitionRibbon()
+        public ElementDefinitionRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new ElementDefinitionRibbonViewModel(messageBus);
         }
     }

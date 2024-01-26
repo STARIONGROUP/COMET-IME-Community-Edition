@@ -147,7 +147,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary name="messageBus">
         /// The <see cref="ICDPMessageBus"/>
         /// </summary>
-        private readonly CDPMessageBus messageBus;
+        private readonly ICDPMessageBus messageBus;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceSelectionViewModel"/> class.
@@ -161,7 +161,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// </param>
         public DataSourceSelectionViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, IEnumerable<ISession> openSessions = null)
         {
-            this.messageBus = new CDPMessageBus();
+            this.messageBus = messageBus;
 
             // reset the loading indicator
             this.IsBusy = false;

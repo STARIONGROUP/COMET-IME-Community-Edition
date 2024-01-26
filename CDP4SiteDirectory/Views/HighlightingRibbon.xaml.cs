@@ -43,10 +43,13 @@ namespace CDP4SiteDirectory.Views
         /// <summary>
         /// Initializes a new instance of the <see cref="HighlightingRibbon"/> class
         /// </summary>
-        public HighlightingRibbon()
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        [ImportingConstructor]
+        public HighlightingRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new HighlightingRibbonViewModel(messageBus);
         }
     }

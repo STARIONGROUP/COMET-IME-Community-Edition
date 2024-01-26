@@ -43,10 +43,13 @@ namespace CDP4SiteDirectory.Views
         /// <summary>
         /// Initializes a new instance of the <see cref="RoleBrowserRibbon" /> class.
         /// </summary>
-        public RoleBrowserRibbon()
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        [ImportingConstructor]
+        public RoleBrowserRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new RoleBrowserRibbonViewModel(messageBus);
         }
     }

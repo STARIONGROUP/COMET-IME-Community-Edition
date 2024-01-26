@@ -88,7 +88,7 @@ namespace CDP4Scripting.ViewModels
         /// <summary name="messageBus">
         /// The <see cref="ICDPMessageBus"/>
         /// </summary>
-        private readonly CDPMessageBus messageBus;
+        private readonly ICDPMessageBus messageBus;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScriptingEngineRibbonPageGroupViewModel"/> class
@@ -110,7 +110,7 @@ namespace CDP4Scripting.ViewModels
             this.PanelNavigationService = panelNavigationService ?? throw new ArgumentNullException(nameof(panelNavigationService));
             this.fileDialogService = fileDialogService ?? throw new ArgumentNullException(nameof(fileDialogService));
             this.scriptingProxy = scriptingProxy ?? throw new ArgumentNullException(nameof(scriptingProxy));
-            this.messageBus = new CDPMessageBus();
+            this.messageBus = messageBus;
 
             messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel.ToString().Contains("ScriptPanelViewModel") && x.PanelStatus == PanelStatus.Closed)

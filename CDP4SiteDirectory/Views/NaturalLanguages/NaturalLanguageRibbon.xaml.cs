@@ -40,10 +40,16 @@ namespace CDP4SiteDirectory.Views
     [Export(typeof(ExtendedRibbonPageGroup))]
     public partial class NaturalLanguageRibbon : IView
     {
-        public NaturalLanguageRibbon()
+        /// <summary>
+        /// Creates a new instance of the <see cref="NaturalLanguageRibbon"/> class
+        /// </summary>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        [ImportingConstructor]
+        public NaturalLanguageRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new NaturalLanguageRibbonViewModel(messageBus);
         }
     }

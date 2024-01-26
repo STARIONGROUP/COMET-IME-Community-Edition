@@ -52,6 +52,7 @@ namespace CDP4SiteDirectory.Views
         /// <param name="messageBus">
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
+        [ImportingConstructor]
         public ShowTooltipRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();

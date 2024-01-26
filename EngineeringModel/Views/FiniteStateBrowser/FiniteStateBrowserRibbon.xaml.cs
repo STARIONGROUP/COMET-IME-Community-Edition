@@ -41,11 +41,16 @@ namespace CDP4EngineeringModel.Views
     [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class FiniteStateBrowserRibbon : ExtendedRibbonPageGroup, IView
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="FiniteStateBrowserRibbon"/> class
+        /// </summary>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public FiniteStateBrowserRibbon()
+        public FiniteStateBrowserRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new FiniteStateBrowserRibbonViewModel(messageBus);
         }
     }

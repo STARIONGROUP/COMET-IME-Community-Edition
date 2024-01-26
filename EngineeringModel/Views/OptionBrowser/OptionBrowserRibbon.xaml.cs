@@ -41,11 +41,16 @@ namespace CDP4EngineeringModel.Views
     [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class OptionBrowserRibbon : ExtendedRibbonPageGroup, IView
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="OptionBrowserRibbon"/> class
+        /// </summary>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public OptionBrowserRibbon()
+        public OptionBrowserRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new OptionBrowserRibbonViewModel(messageBus);
         }
     }

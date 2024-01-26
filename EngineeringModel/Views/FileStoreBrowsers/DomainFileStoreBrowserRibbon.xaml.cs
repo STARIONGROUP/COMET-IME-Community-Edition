@@ -44,11 +44,13 @@ namespace CDP4EngineeringModel.Views
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainFileStoreBrowserRibbon"/> class.
         /// </summary>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public DomainFileStoreBrowserRibbon()
+        public DomainFileStoreBrowserRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new DomainFileStoreBrowserRibbonViewModel(messageBus);
         }
     }

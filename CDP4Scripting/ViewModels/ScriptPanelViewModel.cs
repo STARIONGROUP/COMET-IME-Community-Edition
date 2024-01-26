@@ -177,7 +177,7 @@ namespace CDP4Scripting.ViewModels
         /// <summary>
         /// The <see cref="ICDPMessageBus"/>
         /// </summary>
-        private readonly CDPMessageBus messageBus;
+        private readonly ICDPMessageBus messageBus;
 
         /// <summary>
         /// Gets or sets the script engine.
@@ -210,7 +210,7 @@ namespace CDP4Scripting.ViewModels
             this.ScriptingProxy = scriptingProxy;
             this.OpenSessions = openSessions;
             this.FileExtension = fileExtension;
-            this.messageBus = new CDPMessageBus();
+            this.messageBus = messageBus;
 
             this.InitAvalonEditor();
 

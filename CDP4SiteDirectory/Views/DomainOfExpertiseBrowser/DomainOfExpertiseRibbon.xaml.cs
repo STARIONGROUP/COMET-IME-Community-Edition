@@ -38,15 +38,19 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for DomainOfExpertiseRibbon.xaml
     /// </summary>
     [Export(typeof(ExtendedRibbonPageGroup))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class DomainOfExpertiseRibbon : IView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DomainOfExpertiseRibbon" /> class.
         /// </summary>
-        public DomainOfExpertiseRibbon()
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        [ImportingConstructor]
+        public DomainOfExpertiseRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new DomainOfExpertiseRibbonViewModel(messageBus);
         }
     }
