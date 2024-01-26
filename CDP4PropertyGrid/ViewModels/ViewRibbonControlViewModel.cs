@@ -56,7 +56,7 @@ namespace CDP4PropertyGrid.ViewModels
         {
             this.OpenClosePanelCommand = ReactiveCommandCreator.Create(this.ExecuteOpenClosePanel);
 
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            this.messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel.GetType() == typeof(PropertyGridViewModel) && x.PanelStatus == PanelStatus.Closed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.HandleClosedPanel());

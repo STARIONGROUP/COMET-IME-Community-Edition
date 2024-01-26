@@ -136,7 +136,7 @@ namespace CDP4BuiltInRules.Tests.ViewModels
 
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]

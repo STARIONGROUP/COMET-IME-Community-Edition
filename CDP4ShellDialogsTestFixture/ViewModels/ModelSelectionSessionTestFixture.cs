@@ -76,7 +76,7 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]

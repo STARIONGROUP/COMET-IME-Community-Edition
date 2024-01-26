@@ -139,7 +139,7 @@ namespace CDP4Budget.Tests.ViewModel
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]

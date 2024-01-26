@@ -399,7 +399,7 @@ namespace CDP4Reporting.ViewModels
                 });
 
             this.Disposables.Add(
-                CDPMessageBus.Current.Listen<ReportOutputEvent>()
+                this.messageBus.Listen<ReportOutputEvent>()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => this.AddOutput(x.Output))
             );

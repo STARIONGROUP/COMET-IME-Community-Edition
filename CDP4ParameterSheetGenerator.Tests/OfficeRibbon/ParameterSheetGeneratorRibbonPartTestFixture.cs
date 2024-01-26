@@ -119,7 +119,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         /// <summary>
@@ -156,7 +156,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
             Assert.IsNull(this.ribbonPart.Session);
         }
 
@@ -164,7 +164,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
         public void VerifyThatIfFluentRibbonIsNullTheSessionEventHasNoEffect()
         {
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
             Assert.IsNull(this.ribbonPart.Session);
         }
 
@@ -176,12 +176,12 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.AreEqual(this.session.Object, this.ribbonPart.Session);
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsNull(this.ribbonPart.Session);
         }
@@ -203,7 +203,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("unknownRibbonControlId"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             this.ribbonPart.ExcelQuery = this.excelQuery.Object;
 
@@ -217,7 +217,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("unknownRibbonControlId"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled("Rebuild"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("SynchronizeAll"));
@@ -246,7 +246,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("unknownRibbonControlId"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             this.ribbonPart.ExcelQuery = this.excelQuery.Object;
 
@@ -258,7 +258,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             var iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
             iteration.IterationSetup = iterationSetup;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(iteration, EventKind.Added);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled("Rebuild"));
 
@@ -275,7 +275,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("Rebuild"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             this.ribbonPart.ExcelQuery = this.excelQuery.Object;
 
@@ -287,14 +287,14 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             var iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
             iteration.IterationSetup = iterationSetup;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(iteration, EventKind.Added);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled("Rebuild"));
 
             Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled("Rebuild"));
 

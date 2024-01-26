@@ -106,7 +106,7 @@ namespace CDP4ObjectBrowser
             this.constantFolder = new CDP4Composition.FolderRowViewModel("Constant", "Constant", this.Session, this);
             this.ContainedRows.Add(this.constantFolder);
 
-            var rdlListener = CDPMessageBus.Current.Listen<SessionEvent>()
+            var rdlListener = this.messageBus.Listen<SessionEvent>()
                 .Where(objectChange => objectChange.Status == SessionStatus.RdlOpened || objectChange.Status == SessionStatus.RdlClosed)
                 .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(rdlListener);

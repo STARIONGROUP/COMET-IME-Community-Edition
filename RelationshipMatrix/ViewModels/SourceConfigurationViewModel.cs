@@ -189,7 +189,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.WhenAnyValue(x => x.SelectedCategories).Subscribe(x => this.IsSourceXSelected = x.Any());
             this.WhenAnyValue(x => x.SelectedCategories).Subscribe(x => this.IsSourceYSelected = x.Any());
 
-            var categorySubscription = CDPMessageBus.Current
+            var categorySubscription = this.messageBus
                 .Listen<ObjectChangedEvent>(typeof(Category))
                 .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)

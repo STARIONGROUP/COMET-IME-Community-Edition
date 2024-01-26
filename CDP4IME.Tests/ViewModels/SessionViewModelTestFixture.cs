@@ -98,7 +98,7 @@ namespace COMET.Tests.ViewModels
             this.dalOutputs.Add(sitedirectory);
             this.dalOutputs.Add(person);
             this.tokenSource = new CancellationTokenSource();
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(SiteDirectory)).Subscribe(x => this.OnEvent(x.ChangedThing));
+            this.messageBus.Listen<ObjectChangedEvent>(typeof(SiteDirectory)).Subscribe(x => this.OnEvent(x.ChangedThing));
 
             this.mockedDal = new Mock<IDal>();
             this.mockedDal.Setup(x => x.Close());
@@ -116,7 +116,7 @@ namespace COMET.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
             this.cache.Clear();
         }
 

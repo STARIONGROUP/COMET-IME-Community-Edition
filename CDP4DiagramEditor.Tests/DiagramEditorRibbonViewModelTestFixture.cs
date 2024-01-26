@@ -115,7 +115,7 @@ namespace CDP4DiagramEditor.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -133,10 +133,10 @@ namespace CDP4DiagramEditor.Tests
         public void VerifyThatSessionEventsAreCaught()
         {
             var vm = new DiagramEditorRibbonViewModel();
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
             Assert.AreEqual(1, vm.Sessions.Count);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
             Assert.AreEqual(0, vm.Sessions.Count);
         }
 

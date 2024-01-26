@@ -93,19 +93,19 @@ namespace CDP4Scripting.ViewModels
             this.fileDialogService = fileDialogService ?? throw new ArgumentNullException(nameof(fileDialogService));
             this.scriptingProxy = scriptingProxy ?? throw new ArgumentNullException(nameof(scriptingProxy));
 
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            this.messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel.ToString().Contains("ScriptPanelViewModel") && x.PanelStatus == PanelStatus.Closed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.HandleClosedPanel);
 
             this.OpenSessions = new ReactiveList<ISession>();
             this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.initialDialogPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "file.txt");
             this.PathScriptingFiles = new Dictionary<string, string>();
             this.CollectionScriptPanelViewModels = new ObservableCollection<IScriptPanelViewModel>();
-            CDPMessageBus.Current.Listen<ScriptPanelEvent>().Subscribe(this.ScriptPanelEventHandler);
+            this.messageBus.Listen<ScriptPanelEvent>().Subscribe(this.ScriptPanelEventHandler);
 
             this.NewPythonScriptCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateNewScript("python", ScriptingLaguageKindSupported.Python));
 

@@ -136,7 +136,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             Assert.AreEqual(1, vm.Matrix.Records.Count);
             Assert.AreEqual(3, vm.Matrix.Columns.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
             await vm.SwitchAxisCommand.Execute();
 

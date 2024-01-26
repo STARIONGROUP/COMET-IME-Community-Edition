@@ -73,19 +73,19 @@ namespace CDP4RelationshipMatrix.Tests.Ribbon
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatIterationArePopulated()
         {
             var viewmodel = new RelationshipMatrixRibbonViewModel();
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Added);
 
             Assert.AreEqual(1, viewmodel.OpenModels.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Removed);
             Assert.AreEqual(0, viewmodel.OpenModels.Count);
         }
 

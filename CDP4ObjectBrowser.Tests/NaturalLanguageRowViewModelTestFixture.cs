@@ -51,7 +51,7 @@ namespace CDP4ObjectBrowser.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace CDP4ObjectBrowser.Tests
             var type = this.naturalLanguage.GetType();
             type.GetProperty("RevisionNumber").SetValue(this.naturalLanguage, 50);
             var objectChangedEvent = new ObjectChangedEvent(this.naturalLanguage, EventKind.Updated);
-            CDPMessageBus.Current.SendMessage(objectChangedEvent, this.naturalLanguage, null);
+            this.messageBus.SendMessage(objectChangedEvent, this.naturalLanguage, null);
 
             Assert.AreEqual(this.name, this.viewModel.Name);
         }

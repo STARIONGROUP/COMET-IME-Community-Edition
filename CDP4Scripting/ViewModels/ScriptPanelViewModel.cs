@@ -692,7 +692,7 @@ namespace CDP4Scripting.ViewModels
         private void SaveScript()
         {
             var scriptSaved = new ScriptPanelEvent(this, ScriptPanelStatus.Saved);
-            CDPMessageBus.Current.SendMessage(scriptSaved);
+            this.messageBus.SendMessage(scriptSaved);
         }
 
         /// <summary>

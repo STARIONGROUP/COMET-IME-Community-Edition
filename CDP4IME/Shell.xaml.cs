@@ -64,7 +64,7 @@ namespace COMET
 
             ribbonContentBuilder.BuildAndAppendToRibbon(this.Ribbon);
 
-            this.subscription = CDPMessageBus.Current.Listen<TaskbarNotificationEvent>()
+            this.subscription = this.messageBus.Listen<TaskbarNotificationEvent>()
                                 .ObserveOn(RxApp.MainThreadScheduler)
                                 .Subscribe(this.ShowTaskBarNotification);
 

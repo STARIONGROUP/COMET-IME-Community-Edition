@@ -98,7 +98,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         private void Initialize()
         {
-            this.selectedThingChangedSubscription = CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(this.HandleSelectedThingChanged);
+            this.selectedThingChangedSubscription = this.messageBus.Listen<SelectedThingChangedEvent>().Subscribe(this.HandleSelectedThingChanged);
         }
 
         /// <summary>

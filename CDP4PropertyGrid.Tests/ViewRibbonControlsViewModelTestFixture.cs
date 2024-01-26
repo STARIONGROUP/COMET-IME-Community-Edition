@@ -40,7 +40,7 @@ namespace CDP4PropertyGrid.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace CDP4PropertyGrid.Tests
 
             // Verify PanelEVentClosed
             vm.IsChecked = true;
-            CDPMessageBus.Current.SendMessage(new NavigationPanelEvent(new PropertyGridViewModel(false), this.panelView.Object, PanelStatus.Closed));
+            this.messageBus.SendMessage(new NavigationPanelEvent(new PropertyGridViewModel(false), this.panelView.Object, PanelStatus.Closed));
             Assert.IsFalse(vm.IsChecked);
         }
     }

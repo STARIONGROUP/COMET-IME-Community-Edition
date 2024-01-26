@@ -93,7 +93,7 @@ namespace CDP4BuiltInRules.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -159,7 +159,7 @@ namespace CDP4BuiltInRules.Tests
             var testThing = new Lazy<Thing>(() => pocoConstant);
             testThing.Value.Cache.TryAdd(new CacheKey(testThing.Value.Iid, null), testThing);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.EndUpdate));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.EndUpdate));
             Assert.IsNotEmpty(this.browser.Errors);
         }
 
@@ -185,7 +185,7 @@ namespace CDP4BuiltInRules.Tests
 
             this.browser.SelectedThing = this.browser.Errors.First();
 
-            var highlightSubscription = CDPMessageBus.Current.Listen<HighlightEvent>(this.browser.SelectedThing.Thing)
+            var highlightSubscription = this.messageBus.Listen<HighlightEvent>(this.browser.SelectedThing.Thing)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
 

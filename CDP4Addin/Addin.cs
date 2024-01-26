@@ -421,17 +421,17 @@ namespace CDP4AddinCE
         /// </summary>
         private void SetupEventListeners()
         {
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            this.messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.PanelStatus == PanelStatus.Open)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.HandleOpenPanel);
 
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            this.messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.PanelStatus == PanelStatus.Closed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.HandleClosePanel);
 
-            CDPMessageBus.Current.Listen<SessionEvent>()
+            this.messageBus.Listen<SessionEvent>()
                 .Where(x => x.Status == SessionStatus.Closed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.HandleCloseSession);
@@ -512,7 +512,7 @@ namespace CDP4AddinCE
 
             var identifier = this.customTaskPanes.SingleOrDefault(x => x.Value.CustomTaskPane == customTaskPaneInst).Key;
             var hidePanelEvent = new HidePanelEvent(identifier);
-            CDPMessageBus.Current.SendMessage(hidePanelEvent);
+            this.messageBus.SendMessage(hidePanelEvent);
         }
 
         /// <summary>

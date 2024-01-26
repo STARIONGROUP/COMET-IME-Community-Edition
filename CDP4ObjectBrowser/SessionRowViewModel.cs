@@ -64,7 +64,7 @@ namespace CDP4ObjectBrowser
         public SessionRowViewModel(SiteDirectory siteDirectory, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(siteDirectory, session, containerViewModel)
         {
-            var engineeringModelAdded = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
+            var engineeringModelAdded = this.messageBus.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
                 .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .Select(objectChange => objectChange.ChangedThing as EngineeringModel)
                 .SubscribeOn(RxApp.MainThreadScheduler)
@@ -72,7 +72,7 @@ namespace CDP4ObjectBrowser
 
             this.Disposables.Add(engineeringModelAdded);
 
-            var engineeringModelRemoved = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
+            var engineeringModelRemoved = this.messageBus.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
                 .Where(objectChange => objectChange.EventKind == EventKind.Removed)
                 .Select(objectChange => objectChange.ChangedThing as EngineeringModel)
                 .SubscribeOn(RxApp.MainThreadScheduler)

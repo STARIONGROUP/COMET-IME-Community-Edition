@@ -270,7 +270,7 @@ namespace COMET.Tests
         [Test]
         public void VerifyThatOpenModelSelectionOpensDialog()
         {
-            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
 
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<ModelOpeningDialogViewModel>())).Returns(null as IDialogResult);
 
@@ -280,11 +280,11 @@ namespace COMET.Tests
         [Test]
         public void VerifyThatSessionArePopulated()
         {
-            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
 
             Assert.AreEqual(1, this.viewModel.OpenSessions.Count);
 
-            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Closed));
+            this.messageBus.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Closed));
             Assert.AreEqual(0, this.viewModel.OpenSessions.Count);
         }
         

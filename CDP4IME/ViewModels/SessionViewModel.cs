@@ -317,7 +317,7 @@ namespace COMET.ViewModels
         {
             try
             {
-                CDPMessageBus.Current.SendMessage(new IsBusyEvent(true, "Reloading..."));
+                this.messageBus.SendMessage(new IsBusyEvent(true, "Reloading..."));
                 this.errorMsg = null;
                 await this.Session.Reload();
                 this.LastUpdateDateTime = DateTime.Now;
@@ -328,7 +328,7 @@ namespace COMET.ViewModels
             }
             finally
             {
-                CDPMessageBus.Current.SendMessage(new IsBusyEvent(false));
+                this.messageBus.SendMessage(new IsBusyEvent(false));
             }
         }
         

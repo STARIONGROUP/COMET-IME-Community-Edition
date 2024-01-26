@@ -81,7 +81,7 @@ namespace CDP4Reporting.Tests.Behaviour
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
     }
 }

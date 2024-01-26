@@ -84,7 +84,7 @@ namespace CDP4PropertyGrid.Tests
 
             var expectedPerson = new Person();
 
-            CDPMessageBus.Current.SendMessage(new SelectedThingChangedEvent(expectedPerson, this.session.Object));
+            this.messageBus.SendMessage(new SelectedThingChangedEvent(expectedPerson, this.session.Object));
 
             Assert.That(vm.Thing, Is.EqualTo(expectedPerson));
         }

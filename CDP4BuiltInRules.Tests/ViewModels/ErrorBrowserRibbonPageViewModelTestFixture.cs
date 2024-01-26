@@ -104,7 +104,7 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -112,10 +112,10 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         {
             var viewmodel = new ErrorBrowserRibbonViewModel();
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
             Assert.AreEqual(1, viewmodel.OpenSessions.Count);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
             Assert.AreEqual(0, viewmodel.OpenSessions.Count);
         }
 
@@ -124,7 +124,7 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         {
             var vm = new ErrorBrowserRibbonViewModel();
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
             await vm.OpenSingleBrowserCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));

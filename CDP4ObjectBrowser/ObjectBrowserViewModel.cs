@@ -79,7 +79,7 @@ namespace CDP4ObjectBrowser
             this.Person = (activePerson == null) ? string.Empty : this.session.ActivePerson.Name;
             if (activePerson != null)
             {
-                var personSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(activePerson)
+                var personSubscription = this.messageBus.Listen<ObjectChangedEvent>(activePerson)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(

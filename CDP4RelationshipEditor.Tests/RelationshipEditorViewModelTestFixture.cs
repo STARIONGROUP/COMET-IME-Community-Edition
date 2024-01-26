@@ -100,7 +100,7 @@ namespace CDP4RelationshipEditor.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -122,16 +122,16 @@ namespace CDP4RelationshipEditor.Tests
             var newBinaryRule = new BinaryRelationshipRule(Guid.NewGuid(), this.cache, this.uri);
             var newMultiRule = new MultiRelationshipRule(Guid.NewGuid(), this.cache, this.uri);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(newBinaryRule, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(newBinaryRule, EventKind.Added);
             Assert.AreEqual(1, viewmodel.RelationshipRules.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(newMultiRule, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(newMultiRule, EventKind.Added);
             Assert.AreEqual(2, viewmodel.RelationshipRules.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(newBinaryRule, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(newBinaryRule, EventKind.Removed);
             Assert.AreEqual(1, viewmodel.RelationshipRules.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(newMultiRule, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(newMultiRule, EventKind.Removed);
             Assert.AreEqual(0, viewmodel.RelationshipRules.Count);
         }
 

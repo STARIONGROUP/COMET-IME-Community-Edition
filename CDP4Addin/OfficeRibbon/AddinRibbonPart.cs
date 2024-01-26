@@ -88,7 +88,7 @@ namespace CDP4AddinCE
         public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IAppSettingsService<AddinAppSettings> appSettingService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            CDP4Dal.CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            CDP4Dal.this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
             this.appSettingService = appSettingService;
         }
 

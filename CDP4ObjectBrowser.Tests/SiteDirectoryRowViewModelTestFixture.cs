@@ -45,7 +45,7 @@ namespace CDP4ObjectBrowser.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace CDP4ObjectBrowser.Tests
             var type = this.siteDirectory.GetType();
             type.GetProperty("RevisionNumber").SetValue(this.siteDirectory, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
 
             Assert.AreEqual(this.siteDirectory.Name, this.viewModel.Name);
             Assert.AreEqual(this.siteDirectory.ShortName, this.viewModel.ShortName);

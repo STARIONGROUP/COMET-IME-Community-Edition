@@ -154,7 +154,7 @@ namespace CDP4RelationshipEditor.ViewModels
         private void AddSubscriptions()
         {
             var addBinaryListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
+                this.messageBus.Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
                     .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Rule)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -163,7 +163,7 @@ namespace CDP4RelationshipEditor.ViewModels
             this.Disposables.Add(addBinaryListener);
 
             var removeBinaryListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
+                this.messageBus.Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
                     .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Rule)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -172,7 +172,7 @@ namespace CDP4RelationshipEditor.ViewModels
             this.Disposables.Add(removeBinaryListener);
 
             var addMultiListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(MultiRelationshipRule))
+                this.messageBus.Listen<ObjectChangedEvent>(typeof(MultiRelationshipRule))
                     .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Rule)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -181,7 +181,7 @@ namespace CDP4RelationshipEditor.ViewModels
             this.Disposables.Add(addMultiListener);
 
             var removeMultiListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(MultiRelationshipRule))
+                this.messageBus.Listen<ObjectChangedEvent>(typeof(MultiRelationshipRule))
                     .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as Rule)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -681,7 +681,7 @@ namespace CDP4RelationshipEditor.ViewModels
                 return;
             }
 
-            CDPMessageBus.Current.SendMessage(new SelectedThingChangedEvent(thing, this.Session));
+            this.messageBus.SendMessage(new SelectedThingChangedEvent(thing, this.Session));
         }
 
         /// <summary>

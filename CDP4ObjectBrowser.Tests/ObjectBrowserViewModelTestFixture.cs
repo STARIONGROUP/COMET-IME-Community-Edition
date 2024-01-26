@@ -63,7 +63,7 @@ namespace CDP4ObjectBrowser.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace CDP4ObjectBrowser.Tests
             var viewModel = new ObjectBrowserViewModel(this.session.Object, this.thingDialogNavigationService.Object, this.pluginSettingsService.Object);
 
             this.person.GivenName = "Jane";            
-            CDPMessageBus.Current.SendObjectChangeEvent(this.person, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.person, EventKind.Updated);
 
             Assert.AreEqual("Jane Doe", viewModel.Person);
         }

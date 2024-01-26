@@ -203,11 +203,11 @@ namespace CDP4BuiltInRules.ViewModels
         private void ExecuteHighlightCommand()
         {
             // clear all highlights
-            CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
+            this.messageBus.SendMessage(new CancelHighlightEvent());
 
             // highlight the selected thing
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.SelectedThing.Thing), this.SelectedThing.Thing);
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.SelectedThing.Thing), null);
+            this.messageBus.SendMessage(new HighlightEvent(this.SelectedThing.Thing), this.SelectedThing.Thing);
+            this.messageBus.SendMessage(new HighlightEvent(this.SelectedThing.Thing), null);
         }
     }
 }

@@ -111,7 +111,7 @@ namespace CDP4DiagramEditor.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -164,13 +164,13 @@ namespace CDP4DiagramEditor.Tests
             var revision = typeof(Iteration).GetProperty("RevisionNumber");
             revision.SetValue(this.iteration, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(2, viewmodel.Diagrams.Count);
 
             this.iteration.DiagramCanvas.Clear();
             revision.SetValue(this.iteration, 3);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(0, viewmodel.Diagrams.Count);
         }
 

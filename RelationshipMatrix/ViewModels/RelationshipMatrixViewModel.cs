@@ -569,7 +569,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.modelSetup)
+            var engineeringModelSetupSubscription = this.messageBus.Listen<ObjectChangedEvent>(this.modelSetup)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
                                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber &&
                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -578,7 +578,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current
+            var domainOfExpertiseSubscription = this.messageBus
                 .Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
                                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber &&
@@ -588,7 +588,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationSetup)
+            var iterationSetupSubscription = this.messageBus.Listen<ObjectChangedEvent>(this.iterationSetup)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
                                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber &&
                                        objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
@@ -598,7 +598,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.Disposables.Add(iterationSetupSubscription);
 
             // restricted to defined thing for now
-            var thingsSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DefinedThing))
+            var thingsSubscription = this.messageBus.Listen<ObjectChangedEvent>(typeof(DefinedThing))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.CheckRebuildMatrix);
 
@@ -610,7 +610,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.WhenAny(x => x.SelectedSavedConfiguration, vm => vm.Value != null)
                 .Subscribe(_ => this.LoadSavedConfiguration());
 
-            var ruleSubscription = CDPMessageBus.Current
+            var ruleSubscription = this.messageBus
                 .Listen<ObjectChangedEvent>(typeof(BinaryRelationshipRule))
                 .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -618,7 +618,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.Disposables.Add(ruleSubscription);
 
-            var relationshipSubscription = CDPMessageBus.Current
+            var relationshipSubscription = this.messageBus
                 .Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
                 .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -627,7 +627,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.Disposables.Add(relationshipSubscription);
 
             var deprecateSubscription =
-                CDPMessageBus.Current.Listen<ToggleDeprecatedThingEvent>()
+                this.messageBus.Listen<ToggleDeprecatedThingEvent>()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x =>
                     {

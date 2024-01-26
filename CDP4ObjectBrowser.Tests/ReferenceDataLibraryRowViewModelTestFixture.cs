@@ -95,7 +95,7 @@ namespace CDP4ObjectBrowser.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -117,13 +117,13 @@ namespace CDP4ObjectBrowser.Tests
             Assert.AreEqual(0, scaleFolder.ContainedRows.Count);
 
             var openRdlsessionEvent = new SessionEvent(this.session, SessionStatus.RdlOpened);
-            CDPMessageBus.Current.SendMessage(openRdlsessionEvent, null, null);
+            this.messageBus.SendMessage(openRdlsessionEvent, null, null);
 
             Assert.AreEqual(1, scaleFolder.ContainedRows.Count);
 
             this.siteRdl.Scale.Clear();
             var closeRdlsessionEvent = new SessionEvent(this.session, SessionStatus.RdlClosed);
-            CDPMessageBus.Current.SendMessage(closeRdlsessionEvent, null, null);
+            this.messageBus.SendMessage(closeRdlsessionEvent, null, null);
 
             Assert.AreEqual(0, scaleFolder.ContainedRows.Count);
         }

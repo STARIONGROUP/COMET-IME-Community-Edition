@@ -148,7 +148,7 @@ namespace COMET
             this.OpenSessions = new ReactiveList<ISession>();
             this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.dialogNavigationService = dialogNavigationService;
             this.DockViewModel = dockViewModel;
@@ -199,7 +199,7 @@ namespace COMET
 
             this.OpenAboutCommand = ReactiveCommandCreator.Create(this.ExecuteOpenAboutRequest);
 
-            this.subscription = CDPMessageBus.Current.Listen<IsBusyEvent>()
+            this.subscription = this.messageBus.Listen<IsBusyEvent>()
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x =>
                 {

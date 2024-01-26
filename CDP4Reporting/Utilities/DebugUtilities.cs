@@ -71,7 +71,7 @@ namespace CDP4Reporting.Utilities
         /// </param>
         public static void AddOutput(string output)
         {
-            CDPMessageBus.Current.SendMessage(new ReportOutputEvent(output));
+            this.messageBus.SendMessage(new ReportOutputEvent(output));
         }
     }
 }

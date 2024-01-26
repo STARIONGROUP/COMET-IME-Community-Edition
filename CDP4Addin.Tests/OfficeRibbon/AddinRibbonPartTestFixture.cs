@@ -136,7 +136,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Plugins"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Close"));
@@ -186,7 +186,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Plugins"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Close"));
@@ -197,7 +197,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
         public async Task VerifyThatOnActionSelectModelToCloseOpenDialog()
         {
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             await this.ribbonPart.OnAction("CDP4_SelectModelToClose");
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
@@ -217,7 +217,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             await this.ribbonPart.OnAction("CDP4_Close");
             this.session.Verify(x => x.Close());
@@ -234,7 +234,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
         public async Task Verify_that_when_On_Action_CDP4_SelectModelToOpen_NavigatesTo_ModelOpeningDialogViewModel()
         {
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
 

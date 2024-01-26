@@ -104,7 +104,7 @@ namespace CDP4ObjectBrowser.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace CDP4ObjectBrowser.Tests
             var vm = new ObjectBrowserRibbonPageViewModel();
             Assert.IsEmpty(vm.OpenSessions);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
 
             Assert.AreEqual(1, vm.OpenSessions.Count);
 

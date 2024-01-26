@@ -108,7 +108,7 @@ namespace CDP4ShellDialogs.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         private Uri uri;

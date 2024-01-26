@@ -497,7 +497,7 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             this.CleanupExistingFiles();
 
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         private void CleanupExistingFiles()
