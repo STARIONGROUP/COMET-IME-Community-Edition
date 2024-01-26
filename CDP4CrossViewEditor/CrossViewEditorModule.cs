@@ -32,6 +32,8 @@ namespace CDP4CrossViewEditor
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
+    using CDP4Dal;
+
     using CDP4OfficeInfrastructure;
 
     /// <summary>
@@ -59,14 +61,18 @@ namespace CDP4CrossViewEditor
         /// <param name="officeApplicationWrapper">
         /// The MEF injected instance of <see cref="IOfficeApplicationWrapper"/>
         /// </param>
+        /// <param name="messageBus">
+        /// The MEF injected instance of <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public CrossViewEditorModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IOfficeApplicationWrapper officeApplicationWrapper)
+        public CrossViewEditorModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IOfficeApplicationWrapper officeApplicationWrapper, ICDPMessageBus messageBus)
         {
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.DialogNavigationService = dialogNavigationService;
             this.OfficeApplicationWrapper = officeApplicationWrapper;
+            this.MessageBus = messageBus;
         }
 
         /// <summary>
@@ -95,6 +101,11 @@ namespace CDP4CrossViewEditor
         internal IOfficeApplicationWrapper OfficeApplicationWrapper { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ICDPMessageBus"/> used in the application
+        /// </summary>
+        public ICDPMessageBus MessageBus { get; }
+
+        /// <summary>
         /// Initialize the Module
         /// </summary>
         public void Initialize()
@@ -107,7 +118,7 @@ namespace CDP4CrossViewEditor
         /// </summary>
         private void RegisterRibbonPart()
         {
-            var ribbonPart = new CrossViewEditorRibbonPart(3000, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, null, this.OfficeApplicationWrapper);
+            var ribbonPart = new CrossViewEditorRibbonPart(3000, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, null, this.OfficeApplicationWrapper, this.MessageBus);
             this.RibbonManager.RegisterRibbonPart(ribbonPart);
         }
     }

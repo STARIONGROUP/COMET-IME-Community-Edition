@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CrossViewEditorRibbonPartTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +31,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -54,7 +55,8 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
     /// <summary>
     /// Suite of tests for the <see cref="CrossViewEditorRibbonPart"/>
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class CrossViewEditorRibbonPartTestFixture
     {
         /// <summary>
@@ -127,17 +129,24 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         /// </summary>
         private Mock<ISession> session;
 
+        /// <summary>
+        /// The <see cref="CDPMessageBus"/>
+        /// </summary>
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://www.rheageoup.com");
             this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "John", Surname = "Doe" };
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -150,7 +159,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             this.amountOfRibbonControls = 2;
             this.order = 1000;
 
-            this.ribbonPart = new CrossViewEditorRibbonPart(this.order, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingsService.Object, this.officeApplicationWrapper.Object);
+            this.ribbonPart = new CrossViewEditorRibbonPart(this.order, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingsService.Object, this.officeApplicationWrapper.Object, this.messageBus);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
@@ -161,7 +170,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -178,18 +187,18 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
             Assert.IsNull(this.ribbonPart.Session);
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
         }
 
         [Test]
         public void VerifyThatIfFluentRibbonIsNullTheSessionEventHasNoEffect()
         {
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
             Assert.IsNull(this.ribbonPart.Session);
         }
 
@@ -200,12 +209,12 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.AreEqual(this.session.Object, this.ribbonPart.Session);
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsNull(this.ribbonPart.Session);
         }
@@ -219,12 +228,12 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled(RibbonButtonId));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled(RibbonButtonId));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled(RibbonButtonId));
         }
@@ -238,13 +247,13 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled(RibbonButtonId));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.CreateIteration(), EventKind.Added);
+            this.messageBus.SendMessage(openSessionEvent);
+            this.messageBus.SendObjectChangeEvent(this.CreateIteration(), EventKind.Added);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled(RibbonButtonId));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
         }
 
         [Test]
@@ -256,14 +265,14 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled(RibbonButtonId));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.CreateIteration(), EventKind.Added);
+            this.messageBus.SendMessage(openSessionEvent);
+            this.messageBus.SendObjectChangeEvent(this.CreateIteration(), EventKind.Added);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled(RibbonButtonId));
             Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled(RibbonButtonId));
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
@@ -276,22 +285,22 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             var iteration = this.CreateIteration();
 
-            CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(iteration, EventKind.Added);
             Assert.AreEqual(1, this.ribbonPart.Iterations.Count);
 
             this.ribbonPart.GetContent(RibbonButtonId);
 
             Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
 
-            CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(iteration, EventKind.Removed);
             Assert.AreEqual(0, this.ribbonPart.Iterations.Count);
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
         }
 
         [Test]
@@ -301,7 +310,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var iteration = this.CreateIteration();
-            CDPMessageBus.Current.SendObjectChangeEvent(iteration, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(iteration, EventKind.Added);
 
             Assert.DoesNotThrowAsync(async () => await this.ribbonPart.OnAction($"Editor_{iteration.Iid}", iteration.Iid.ToString()));
 
@@ -315,7 +324,7 @@ namespace CDP4CrossViewEditor.Tests.OfficeRibbon
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             var iteration = this.CreateIteration();
 
