@@ -42,21 +42,13 @@ namespace CDP4Requirements.Views
     [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class RequirementBrowserRibbon : IView
     {
-        public RequirementBrowserRibbon()
-        {
-            this.InitializeComponent();
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementBrowserRibbon"/> class
         /// </summary>
-        /// <param name="messageBus">
-        /// The <see cref="ICDPMessageBus"/>
-        /// </param>
-        [ImportingConstructor]
-        public RequirementBrowserRibbon(ICDPMessageBus messageBus)
+        public RequirementBrowserRibbon()
         {
             this.InitializeComponent();
+            var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
             this.DataContext = new RequirementRibbonViewModel(messageBus);
         }
     }
