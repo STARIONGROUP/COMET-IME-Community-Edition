@@ -11,8 +11,8 @@
     <Product>ProductTree</Product>
     <Description>CDP4-COMET Product Tree Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>10.0.0.6</AssemblyVersion>
-    <FileVersion>10.0.0.6</FileVersion>
+    <AssemblyVersion>10.0.0.7</AssemblyVersion>
+    <FileVersion>10.0.0.7</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -134,13 +134,13 @@
     <PackageReference Include="DevExpress.Xpo" Version="22.2.6">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="CDP4Common-CE" Version="25.1.0-rc1">
+	<PackageReference Include="CDP4Common-CE" Version="25.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="25.1.0-rc1">
+    <PackageReference Include="CDP4Dal-CE" Version="25.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="25.1.0-rc1">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="25.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
