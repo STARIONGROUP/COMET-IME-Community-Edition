@@ -62,8 +62,13 @@ namespace CDP4Composition.Views
 
             var messageBus = CommonServiceLocator.ServiceLocator.Current.GetInstance<ICDPMessageBus>();
 
-            messageBus.Listen<ApplyFilterEvent>()
+            var subscription = messageBus.Listen<ApplyFilterEvent>()
                 .Subscribe(_ => this.FilterEditor.ApplyFilter());
+
+            this.Closed += (sender, e) =>
+            {
+                subscription.Dispose();
+            };
         }
 
         /// <summary>
