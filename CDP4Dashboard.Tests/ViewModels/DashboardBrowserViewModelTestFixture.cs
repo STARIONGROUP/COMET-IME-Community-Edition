@@ -1,23 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DashboardBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Smiechowski Nathanael
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software: you can redistribute it and/or modify
-//    it under the terms of the GNU Affero General Public License as
-//    published by the Free Software Foundation, either version 3 of the
-//    License, or(at your option) any later version.
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//    GNU Affero General Public License for more details
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program; If not, see http://www.gnu.org/licenses/
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -57,12 +59,11 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
 
     using ReactiveUI;
 
-    using Parameter = CDP4Common.EngineeringModelData.Parameter;
-
     /// <summary>
     /// Suite of tests for the <see cref="DashboardBrowserViewModel"/> class.
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     internal class DashboardBrowserViewModelTestFixture
     {
         private Mock<IPanelNavigationService> panelNavigationService;
@@ -87,22 +88,24 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         private Mock<IPermissionService> permissionService;
         private TextParameterType pt;
         private PropertyInfo rev = typeof(Thing).GetProperty("RevisionNumber");
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             this.cache = new List<Thing>();
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://test.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.panelNavigationService = new Mock<IPanelNavigationService>();
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.pt = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.sitedir.Person.Add(person);
+            this.sitedir.Person.Add(this.person);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "TestDoE" };
             this.sitedir.Domain.Add(this.domain);
 
@@ -158,6 +161,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
             this.assembler.Cache.TryAdd(new CacheKey(this.model.Iid, null), new Lazy<Thing>(() => this.model));
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
@@ -167,7 +171,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -296,8 +300,6 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
 
             Assert.AreEqual(774, widget2.Height);
             Assert.AreEqual(718, widget2.Width);
-
-
         }
     }
 }

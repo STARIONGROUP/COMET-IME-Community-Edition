@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReferenceSourceRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-// 
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -48,19 +48,22 @@ namespace BasicRDL.Tests.ViewModels
     {
         private Mock<ISession> session;
         private Uri uri;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             this.uri = new Uri("http://test.com");
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -68,22 +71,22 @@ namespace BasicRDL.Tests.ViewModels
         {
             var shortname = "referenceSourceshortname";
             var name = "referenceSource name";
-            var testSiteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), null, this.uri) { ShortName = "testRDL"};
+            var testSiteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), null, this.uri) { ShortName = "testRDL" };
             var organization = new Organization(Guid.NewGuid(), null, this.uri) { ShortName = "Rhea" };
             var versionDate = new DateTime(2016, 8, 6);
-            var referenceSource = new ReferenceSource(Guid.NewGuid(), null, this.uri)
-                                      {
-                                          Name = name,
-                                          ShortName = shortname,
-                                          Container = testSiteRdl,
-                                          Author = "John Doe",
-                                          Language = "EU",
-                                          PublicationYear = 2016,
-                                          Publisher = organization,
-                                          VersionIdentifier = "v1",
-                                          VersionDate = new DateTime(2016, 8, 6)
-                                      };
 
+            var referenceSource = new ReferenceSource(Guid.NewGuid(), null, this.uri)
+            {
+                Name = name,
+                ShortName = shortname,
+                Container = testSiteRdl,
+                Author = "John Doe",
+                Language = "EU",
+                PublicationYear = 2016,
+                Publisher = organization,
+                VersionIdentifier = "v1",
+                VersionDate = new DateTime(2016, 8, 6)
+            };
 
             testSiteRdl.ReferenceSource.Add(referenceSource);
             var referenceSourceRowViewModel = new ReferenceSourceRowViewModel(referenceSource, this.session.Object, null);

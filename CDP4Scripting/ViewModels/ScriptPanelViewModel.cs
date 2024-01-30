@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptPanelViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -30,7 +30,6 @@ namespace CDP4Scripting.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
-    using System.Reactive.Threading.Tasks;
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
@@ -55,8 +54,6 @@ namespace CDP4Scripting.ViewModels
     using ICSharpCode.AvalonEdit.Highlighting;
     using ICSharpCode.AvalonEdit.Highlighting.Xshd;
     using ICSharpCode.AvalonEdit.Search;
-
-    using Microsoft.Scripting;
 
     using NLog;
 
@@ -178,6 +175,11 @@ namespace CDP4Scripting.ViewModels
         private bool isSelected;
 
         /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
+        /// <summary>
         /// Gets or sets the script engine.
         /// </summary>
         /// <remarks>
@@ -196,17 +198,19 @@ namespace CDP4Scripting.ViewModels
         /// <summary>
         /// The constructor of the <see cref="ScriptPanelViewModel"/> class.
         /// </summary>
-        /// <param name="panelTitle">The title of the panel associated to this view model.</param> 
+        /// <param name="panelTitle">The title of the panel associated to this view model.</param>
         /// <param name="scriptingProxy">A <see cref="IScriptingProxy"/> object to perform the script commands associated to CDP4.</param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="fileExtension">The file extension associated to the tab item view-model.</param>
         /// <param name="openSessions">The list of the open <see cref="ISession"/>.</param>
         /// <param name="areTerminalsExistByDefault">Indicates whether the input and output terminals exist by default</param>
-        protected ScriptPanelViewModel(string panelTitle, IScriptingProxy scriptingProxy, string fileExtension, ReactiveList<ISession> openSessions, bool areTerminalsExistByDefault)
+        protected ScriptPanelViewModel(string panelTitle, IScriptingProxy scriptingProxy, ICDPMessageBus messageBus, string fileExtension, ReactiveList<ISession> openSessions, bool areTerminalsExistByDefault)
         {
             this.Caption = panelTitle;
             this.ScriptingProxy = scriptingProxy;
             this.OpenSessions = openSessions;
             this.FileExtension = fileExtension;
+            this.messageBus = messageBus;
 
             this.InitAvalonEditor();
 
@@ -235,7 +239,7 @@ namespace CDP4Scripting.ViewModels
                 .Subscribe(_ => this.ReactOnIsScriptExecutedChange());
 
             this.cancellationTokenSource = new CancellationTokenSource();
-            this.CancellationToken = cancellationTokenSource.Token;
+            this.CancellationToken = this.cancellationTokenSource.Token;
 
             if (areTerminalsExistByDefault)
             {
@@ -282,8 +286,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public IList<KeyValuePair<string, dynamic>> ScriptVariables
         {
-            get { return this.scriptVariables; } 
-            protected set { this.RaiseAndSetIfChanged(ref this.scriptVariables, value); }
+            get => this.scriptVariables;
+            protected set => this.RaiseAndSetIfChanged(ref this.scriptVariables, value);
         }
 
         /// <summary>
@@ -291,8 +295,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool IsRunButtonVisible
         {
-            get { return this.isRunButtonVisible; }
-            set { this.RaiseAndSetIfChanged(ref this.isRunButtonVisible, value); }
+            get => this.isRunButtonVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isRunButtonVisible, value);
         }
 
         /// <summary>
@@ -300,8 +304,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool IsSelectSessionVisible
         {
-            get { return this.isSelectSessionVisible; }
-            set { this.RaiseAndSetIfChanged(ref this.isSelectSessionVisible, value); }
+            get => this.isSelectSessionVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isSelectSessionVisible, value);
         }
 
         /// <summary>
@@ -309,8 +313,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool IsClearOutputButtonVisible
         {
-            get { return this.isClearOutputButtonVisible; }
-            set { this.RaiseAndSetIfChanged(ref this.isClearOutputButtonVisible, value); }
+            get => this.isClearOutputButtonVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isClearOutputButtonVisible, value);
         }
 
         /// <summary>
@@ -318,8 +322,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool IsStopScriptButtonVisible
         {
-            get { return this.isStopScriptButtonVisible; }
-            set { this.RaiseAndSetIfChanged(ref this.isStopScriptButtonVisible, value); }
+            get => this.isStopScriptButtonVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isStopScriptButtonVisible, value);
         }
 
         /// <summary>
@@ -327,8 +331,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool AreTerminalsVisible
         {
-            get { return this.areTerminalsVisible; }
-            set { this.RaiseAndSetIfChanged(ref this.areTerminalsVisible, value); }
+            get => this.areTerminalsVisible;
+            set => this.RaiseAndSetIfChanged(ref this.areTerminalsVisible, value);
         }
 
         /// <summary>
@@ -336,8 +340,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool IsScriptVariablesPanelVisible
         {
-            get { return this.isLocalVariablePanelVisible; }
-            set { this.RaiseAndSetIfChanged(ref this.isLocalVariablePanelVisible, value); }
+            get => this.isLocalVariablePanelVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isLocalVariablePanelVisible, value);
         }
 
         /// <summary>
@@ -348,25 +352,19 @@ namespace CDP4Scripting.ViewModels
         /// </remarks>
         public virtual string Caption
         {
-            get { return this.caption; }
-            set { this.RaiseAndSetIfChanged(ref this.caption, value); }
+            get => this.caption;
+            set => this.RaiseAndSetIfChanged(ref this.caption, value);
         }
 
         /// <summary>
         /// Gets the tooltip
         /// </summary>
-        public string ToolTip
-        {
-            get { return "Display a script panel"; }
-        }
+        public string ToolTip => "Display a script panel";
 
         /// <summary>
         /// Gets the data-source
         /// </summary>
-        public string DataSource
-        {
-            get { return null; }
-        }
+        public string DataSource => null;
 
         /// <summary>
         /// Gets the identifier of this panel.
@@ -385,8 +383,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool IsDirty
         {
-            get { return this.isDirty; }
-            set { this.RaiseAndSetIfChanged(ref this.isDirty, value); }
+            get => this.isDirty;
+            set => this.RaiseAndSetIfChanged(ref this.isDirty, value);
         }
 
         /// <summary>
@@ -399,8 +397,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public ISession SelectedSession
         {
-            get { return this.selectedSession; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSession, value); }
+            get => this.selectedSession;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSession, value);
         }
 
         /// <summary>
@@ -408,8 +406,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool IsComboBoxSessionsEnable
         {
-            get { return this.isComboBoxSessionsEnable; }
-            set { this.RaiseAndSetIfChanged(ref this.isComboBoxSessionsEnable, value); }
+            get => this.isComboBoxSessionsEnable;
+            set => this.RaiseAndSetIfChanged(ref this.isComboBoxSessionsEnable, value);
         }
 
         /// <summary>
@@ -417,8 +415,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool CanClearOutput
         {
-            get { return this.canClearOutput; }
-            private set { this.RaiseAndSetIfChanged(ref this.canClearOutput, value); }
+            get => this.canClearOutput;
+            private set => this.RaiseAndSetIfChanged(ref this.canClearOutput, value);
         }
 
         /// <summary>
@@ -426,8 +424,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool IsScriptExecuted
         {
-            get { return this.isScriptExecuted; }
-            private set { this.RaiseAndSetIfChanged(ref this.isScriptExecuted, value); }
+            get => this.isScriptExecuted;
+            private set => this.RaiseAndSetIfChanged(ref this.isScriptExecuted, value);
         }
 
         /// <summary>
@@ -435,8 +433,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool CanExecuteScript
         {
-            get { return this.canExecuteScript; }
-            private set { this.RaiseAndSetIfChanged(ref this.canExecuteScript, value); }
+            get => this.canExecuteScript;
+            private set => this.RaiseAndSetIfChanged(ref this.canExecuteScript, value);
         }
 
         /// <summary>
@@ -469,8 +467,8 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         public bool IsSelected
         {
-            get { return isSelected; }
-            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+            get => this.isSelected;
+            set => this.RaiseAndSetIfChanged(ref this.isSelected, value);
         }
 
         /// <summary>
@@ -612,6 +610,7 @@ namespace CDP4Scripting.ViewModels
         {
             this.OutputTerminal.ScrollToEnd();
             var outputContent = new TextRange(this.OutputTerminal.Document.ContentStart, this.OutputTerminal.Document.ContentEnd);
+
             if (outputContent.Text.Length == 0)
             {
                 this.CanClearOutput = false;
@@ -628,6 +627,7 @@ namespace CDP4Scripting.ViewModels
         public void LoadHighlightingSheet(string sheetPath)
         {
             var assembly = Assembly.GetExecutingAssembly();
+
             using (var stream = assembly.GetManifestResourceStream(sheetPath))
             {
                 if (stream == null)
@@ -692,7 +692,7 @@ namespace CDP4Scripting.ViewModels
         private void SaveScript()
         {
             var scriptSaved = new ScriptPanelEvent(this, ScriptPanelStatus.Saved);
-            CDPMessageBus.Current.SendMessage(scriptSaved);
+            this.messageBus.SendMessage(scriptSaved);
         }
 
         /// <summary>
@@ -724,6 +724,7 @@ namespace CDP4Scripting.ViewModels
                 var data = this.CompletionWindow.CompletionList.CompletionData;
 
                 var word = this.AvalonEditor.GetWordsBeforeDot();
+
                 if (word == null)
                 {
                     return;
@@ -738,10 +739,7 @@ namespace CDP4Scripting.ViewModels
                     }
 
                     this.CompletionWindow.Show();
-                    this.CompletionWindow.Closed += delegate 
-                    {
-                        this.CompletionWindow = null;
-                    };
+                    this.CompletionWindow.Closed += delegate { this.CompletionWindow = null; };
                 }
                 else
                 {
@@ -749,20 +747,22 @@ namespace CDP4Scripting.ViewModels
 
                     // Checks whether the string corresponds to a key of the script variables 
                     var scriptVariable = this.ScriptVariables.SingleOrDefault(x => x.Key == words[0]);
+
                     if (scriptVariable.Equals(default(KeyValuePair<string, dynamic>)))
                     {
                         return;
                     }
-                    
+
                     var scriptVariableType = scriptVariable.Value.GetType();
                     List<PropertyInfo> properties;
 
                     // Browse the expression entered to suggest properties of the last part (the one after the last dot) 
-                    for (int i = 0; i < words.Length - 1; i++)
+                    for (var i = 0; i < words.Length - 1; i++)
                     {
                         properties = new List<PropertyInfo>(scriptVariableType.GetProperties());
 
                         var property = properties.SingleOrDefault(x => x.Name == words[i + 1]);
+
                         if (property == null)
                         {
                             return;
@@ -773,6 +773,7 @@ namespace CDP4Scripting.ViewModels
 
                     // Iterate the properties to display as suggestions
                     properties = new List<PropertyInfo>(scriptVariableType.GetProperties());
+
                     foreach (var property in properties)
                     {
                         data.Add(new EditorCompletionData(property.Name, ""));
@@ -789,10 +790,7 @@ namespace CDP4Scripting.ViewModels
                     }
 
                     this.CompletionWindow.Show();
-                    this.CompletionWindow.Closed += delegate
-                    {
-                        this.CompletionWindow = null;
-                    };
+                    this.CompletionWindow.Closed += delegate { this.CompletionWindow = null; };
                 }
             }
             catch (Exception exception)

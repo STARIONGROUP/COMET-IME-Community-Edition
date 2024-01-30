@@ -1,25 +1,25 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AddinRibbonPartTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -77,14 +77,16 @@ namespace CDP4Addin.Tests.OfficeRibbon
         private Mock<IAppSettingsService<AddinAppSettings>> appSettingService;
         private SiteDirectory siteDirectory;
         private Mock<IAssemblyInformationService> assemblyLocationLoader;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             this.SetupRecognizePackUir();
 
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://www.rheagroup.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, new Uri("http://test.com"));
 
             this.session = new Mock<ISession>();
@@ -96,6 +98,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             var iterationDictionary = new Dictionary<CDP4Common.EngineeringModelData.Iteration, Tuple<DomainOfExpertise, Participant>>();
             this.session.Setup(x => x.OpenIterations).Returns(iterationDictionary);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.appSettingService = new Mock<IAppSettingsService<AddinAppSettings>>();
             this.appSettingService.Setup(x => x.AppSettings).Returns(new AddinAppSettings());
@@ -126,7 +129,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             this.amountOfRibbonControls = 9;
             this.order = 1;
 
-            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, this.dialogNavigationService.Object, null, this.appSettingService.Object);
+            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, this.dialogNavigationService.Object, null, this.appSettingService.Object, this.messageBus);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
@@ -136,7 +139,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         /// <summary>
@@ -176,7 +179,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Plugins"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Close"));
@@ -186,7 +189,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Plugins"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Open"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Close"));
@@ -197,7 +200,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
         public async Task VerifyThatOnActionSelectModelToCloseOpenDialog()
         {
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             await this.ribbonPart.OnAction("CDP4_SelectModelToClose");
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
@@ -217,7 +220,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             await this.ribbonPart.OnAction("CDP4_Close");
             this.session.Verify(x => x.Close());
@@ -234,7 +237,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
         public async Task Verify_that_when_On_Action_CDP4_SelectModelToOpen_NavigatesTo_ModelOpeningDialogViewModel()
         {
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
 

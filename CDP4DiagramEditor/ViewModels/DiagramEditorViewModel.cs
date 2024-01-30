@@ -1,19 +1,19 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramEditorViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -29,7 +29,6 @@ namespace CDP4DiagramEditor.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
-    using System.Reactive.Threading.Tasks;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
@@ -295,10 +294,10 @@ namespace CDP4DiagramEditor.ViewModels
             this.Disposables.Add(deleteObservable);
             this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel>();
             this.ThingDiagramItems = new DisposableReactiveList<ThingDiagramContentItem>();
-            this.SelectedItems = new ReactiveList<DiagramItem> ();
+            this.SelectedItems = new ReactiveList<DiagramItem>();
 
-            this.DiagramPortCollection = new ReactiveList<DiagramPortViewModel> ();
-            this.DiagramConnectorCollection = new ReactiveList<DiagramEdgeViewModel> ();
+            this.DiagramPortCollection = new ReactiveList<DiagramPortViewModel>();
+            this.DiagramConnectorCollection = new ReactiveList<DiagramEdgeViewModel>();
         }
 
         /// <summary>
@@ -395,7 +394,7 @@ namespace CDP4DiagramEditor.ViewModels
                 }
                 else
                 {
-                    newDiagramElement = new NamedThingDiagramContentItem(diagramThing, this);
+                    newDiagramElement = new NamedThingDiagramContentItem(diagramThing, this, this.Session.CDPMessageBus);
                 }
 
                 var bound = diagramThing.Bounds.Single();
@@ -485,7 +484,7 @@ namespace CDP4DiagramEditor.ViewModels
 
                 var position = new Point(convertedDropPosition.X, convertedDropPosition.Y);
 
-                block.Bounds.Add(new Bounds { X = (float) position.X, Y = (float) position.Y });
+                block.Bounds.Add(new Bounds { X = (float)position.X, Y = (float)position.Y });
 
                 NamedThingDiagramContentItem diagramItem = null;
 
@@ -496,11 +495,11 @@ namespace CDP4DiagramEditor.ViewModels
                 else if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> tuplePayload)
                 {
                     block.DepictedThing = tuplePayload.Item1;
-                    diagramItem = new NamedThingDiagramContentItem(block, this);
+                    diagramItem = new NamedThingDiagramContentItem(block, this, this.Session.CDPMessageBus);
                 }
                 else
                 {
-                    diagramItem = new NamedThingDiagramContentItem(block, this);
+                    diagramItem = new NamedThingDiagramContentItem(block, this, this.Session.CDPMessageBus);
                 }
 
                 diagramItem.Position = position;
@@ -546,8 +545,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             var bound = new Bounds()
             {
-                X = (float) diagramPosition.X,
-                Y = (float) diagramPosition.Y,
+                X = (float)diagramPosition.X,
+                Y = (float)diagramPosition.Y,
                 Height = Cdp4DiagramHelper.DefaultHeight,
                 Width = Cdp4DiagramHelper.DefaultWidth
             };
@@ -562,7 +561,7 @@ namespace CDP4DiagramEditor.ViewModels
             }
             else
             {
-                newDiagramElement = new NamedThingDiagramContentItem(block, this);
+                newDiagramElement = new NamedThingDiagramContentItem(block, this, this.Session.CDPMessageBus);
             }
 
             var position = new Point { X = bound.X, Y = bound.Y };
@@ -601,10 +600,10 @@ namespace CDP4DiagramEditor.ViewModels
 
                 var bound = new Bounds()
                 {
-                    X = (float) target.Position.X,
-                    Y = (float) target.Position.Y,
-                    Height = (float) target.ActualHeight,
-                    Width = (float) target.ActualWidth
+                    X = (float)target.Position.X,
+                    Y = (float)target.Position.Y,
+                    Height = (float)target.ActualHeight,
+                    Width = (float)target.ActualWidth
                 };
 
                 block.Bounds.Add(bound);
@@ -703,7 +702,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="shouldAddMissingThings">True if missing things should be added to diagram.</param>
         public void GenerateRelationshipDiagramElements(ThingDiagramContentItem item, bool extendDeep, bool shouldAddMissingThings = true)
         {
-            var iteration = (Iteration) this.Thing.Container;
+            var iteration = (Iteration)this.Thing.Container;
 
             var depictedThing = item.DiagramThing.DepictedThing;
 

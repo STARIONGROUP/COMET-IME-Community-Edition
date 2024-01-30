@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationalExpressionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests.Dialogs
 {
@@ -10,19 +29,25 @@ namespace CDP4Requirements.Tests.Dialogs
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Exceptions;
     using CDP4Common.MetaInfo;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+
     using CDP4Requirements.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -47,10 +72,12 @@ namespace CDP4Requirements.Tests.Dialogs
         private ParametricConstraint parametricConstraint;
         private ParametricConstraint clone;
         private RelationalExpression dateRelationalExpression;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
@@ -58,6 +85,7 @@ namespace CDP4Requirements.Tests.Dialogs
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
@@ -92,13 +120,12 @@ namespace CDP4Requirements.Tests.Dialogs
             this.dateRelationalExpression = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri);
             this.dateRelationalExpression.ParameterType = new DateParameterType();
             this.dateRelationalExpression.Value = new ValueArray<string>(new[] { "2019-12-31" });
-
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -108,7 +135,7 @@ namespace CDP4Requirements.Tests.Dialogs
             this.session.Setup(x => x.ActivePerson).Returns(new Person(Guid.NewGuid(), null, this.uri));
             this.mrdl.ParameterType.Add(new SimpleQuantityKind(Guid.NewGuid(), null, this.uri) { ShortName = "test" });
 
-            var vm = new RelationalExpressionDialogViewModel(this.relationalExpression, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object,this.clone);
+            var vm = new RelationalExpressionDialogViewModel(this.relationalExpression, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
 
             Assert.AreEqual(1, vm.PossibleParameterType.Count);
             Assert.AreEqual(1, vm.Value.Count);
@@ -124,11 +151,11 @@ namespace CDP4Requirements.Tests.Dialogs
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.ActivePerson).Returns(new Person(Guid.NewGuid(), null, this.uri));
 
-            var pt = new SimpleQuantityKind(Guid.NewGuid(), null, this.uri) {ShortName = "test"};
+            var pt = new SimpleQuantityKind(Guid.NewGuid(), null, this.uri) { ShortName = "test" };
 
             this.mrdl.ParameterType.Add(pt);
 
-            var scale = new RatioScale(Guid.NewGuid(), null, this.uri) {ShortName = "testms"};
+            var scale = new RatioScale(Guid.NewGuid(), null, this.uri) { ShortName = "testms" };
 
             this.mrdl.Scale.Add(scale);
             pt.PossibleScale.Add(scale);

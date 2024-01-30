@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsSpecificationEditorViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -26,18 +26,20 @@
 namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
 {
     using System;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Threading.Tasks;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive.Concurrency;
-    
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
+
+    using CDP4CommonView.EventAggregator;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -45,13 +47,11 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
     using CDP4Dal.Permission;
 
     using CDP4Requirements.ViewModels;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
-    
-    using CDP4CommonView.EventAggregator;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -77,21 +77,22 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
         private Mock<IPanelNavigationService> panelNavigation;
         private Mock<IPermissionService> permissionService;
         private Person person;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
-
 
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri) { ShortName = "test" };
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { SelectedDomain = null, Person = this.person };
@@ -100,44 +101,45 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.iterationSetup.IterationNumber = 1;
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "test" , ShortName = "TST" };
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "test", ShortName = "TST" };
 
             this.requirementsSpecification = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri)
-                                                 {
-                                                     Name = "User Requirements Document",
-                                                     ShortName = "URD",
-                                                     Owner = this.domain
-                                                 };
-            
+            {
+                Name = "User Requirements Document",
+                ShortName = "URD",
+                Owner = this.domain
+            };
+
             this.modelSetup.IterationSetup.Add(this.iterationSetup);
             this.modelSetup.Participant.Add(this.participant);
 
             this.panelNavigation = new Mock<IPanelNavigationService>();
             this.thingDialogNavigation = new Mock<IThingDialogNavigationService>();
             this.dialogNavigation = new Mock<IDialogNavigationService>();
-            
+
             this.iteration.RequirementsSpecification.Add(this.requirementsSpecification);
             this.iteration.IterationSetup = this.iterationSetup;
             this.model.EngineeringModelSetup = this.modelSetup;
             this.model.Iteration.Add(this.iteration);
-            
+
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString());
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, this.participant) } });
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
             var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null, null);
-            
+
             Assert.AreEqual("Requirements Specification Editor: URD", vm.Caption);
             Assert.AreEqual("model", vm.CurrentModel);
             Assert.AreEqual("None", vm.DomainOfExpertise);
@@ -153,7 +155,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
 
             this.requirementsSpecification.Requirement.Add(requirementB);
             this.requirementsSpecification.Requirement.Add(requirementA);
-            
+
             var vm = new RequirementsSpecificationEditorViewModel(this.requirementsSpecification, this.session.Object, null, null, null, null);
             Assert.AreEqual(3, vm.ContainedRows.Count);
 
@@ -182,7 +184,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
         {
             var requirementA = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "REQA", Owner = this.domain };
             var requirementB = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "REQB", Owner = this.domain };
-            var defA = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) {Content = "0"};
+            var defA = new Definition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Content = "0" };
 
             this.cache.TryAdd(new CacheKey(defA.Iid, this.iteration.Iid), new Lazy<Thing>(() => defA));
             this.cache.TryAdd(new CacheKey(requirementA.Iid, this.iteration.Iid), new Lazy<Thing>(() => requirementA));

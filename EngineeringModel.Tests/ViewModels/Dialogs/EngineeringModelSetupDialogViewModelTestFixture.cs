@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="EngineeringModelSetupDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -35,22 +35,22 @@ namespace CDP4EngineeringModel.Tests
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
-    using CDP4Common.MetaInfo;    
+    using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
+
     using CDP4Composition.Navigation;
 
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
-    
+
     using CDP4EngineeringModel.ViewModels;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -94,14 +94,17 @@ namespace CDP4EngineeringModel.Tests
         /// The unique ID of the source <see cref="EngineeringModelSetup"/>
         /// </summary>
         private EngineeringModelSetup sourceEngineeringModelSetup;
+
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory siteDirClone;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.uri = new Uri("http://test.com");
@@ -109,7 +112,7 @@ namespace CDP4EngineeringModel.Tests
             var sourceEngineeringModelSetupIid = Guid.NewGuid();
             this.sourceEngineeringModelSetup = new EngineeringModelSetup(sourceEngineeringModelSetupIid, this.cache, this.uri);
             this.siteDirectory.Model.Add(this.sourceEngineeringModelSetup);
-            
+
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.FromResult("some result"));
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
@@ -125,10 +128,12 @@ namespace CDP4EngineeringModel.Tests
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
 
             this.sessionThatThrowsWriteException.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.sessionThatThrowsWriteException.Setup(x => x.Dal).Returns(dal.Object);
+            this.sessionThatThrowsWriteException.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
@@ -137,7 +142,7 @@ namespace CDP4EngineeringModel.Tests
             this.siteDirectory = null;
             this.uri = null;
             this.viewModel = null;
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -195,7 +200,7 @@ namespace CDP4EngineeringModel.Tests
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
 
             this.viewModel = new EngineeringModelSetupDialogViewModel(engineeringModelSetup, transaction, this.session.Object, true, ThingDialogKind.Create, null, this.siteDirClone);
-            
+
             Assert.That(this.viewModel["Name"], Is.Not.Null.Or.Empty);
 
             Assert.IsFalse(((ICommand)this.viewModel.OkCommand).CanExecute(null));
@@ -254,9 +259,9 @@ namespace CDP4EngineeringModel.Tests
 
             var engineeringModelSetup = new EngineeringModelSetup
             {
-                ShortName = shortname, 
-                Name = name, 
-                StudyPhase = studyPhase, 
+                ShortName = shortname,
+                Name = name,
+                StudyPhase = studyPhase,
                 SourceEngineeringModelSetupIid = this.sourceEngineeringModelSetup.Iid
             };
 
@@ -297,7 +302,7 @@ namespace CDP4EngineeringModel.Tests
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
             this.viewModel = new EngineeringModelSetupDialogViewModel(engineeringModelSetup, transaction, this.session.Object, true, ThingDialogKind.Create, null, this.siteDirClone);
-            
+
             Assert.That(this.viewModel["Name"], Is.Not.Null.Or.Empty);
             Assert.IsFalse(((ICommand)this.viewModel.OkCommand).CanExecute(null));
 
@@ -336,7 +341,7 @@ namespace CDP4EngineeringModel.Tests
         public void VerifyThatActiveDomainIsCorrectlyPopulated()
         {
             var domain1 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
-            var domain2 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri); 
+            var domain2 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
             var domain3 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri);
 
             this.siteDirClone.Domain.Add(domain1);

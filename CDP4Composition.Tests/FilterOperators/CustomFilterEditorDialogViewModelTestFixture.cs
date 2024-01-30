@@ -1,19 +1,19 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CustomFilterEditorDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -33,7 +33,6 @@ namespace CDP4Composition.Tests.FilterOperators
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
-    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -47,11 +46,11 @@ namespace CDP4Composition.Tests.FilterOperators
 
     using CDP4Dal;
 
+    using CommonServiceLocator;
+
     using DevExpress.Data.Filtering;
     using DevExpress.Xpf.Core.FilteringUI;
     using DevExpress.Xpf.Grid;
-
-    using CommonServiceLocator;
 
     using Moq;
 
@@ -102,6 +101,7 @@ namespace CDP4Composition.Tests.FilterOperators
             this.serviceLocator.Setup(x => x.GetInstance<ISavedUserPreferenceService>()).Returns(this.savedUserPreferenceService.Object);
 
             this.session = new Mock<ISession>();
+            this.session.Setup(x => x.CDPMessageBus).Returns(new CDPMessageBus());
 
             this.category1 = new Category(Guid.NewGuid(), null, null)
             {
@@ -118,7 +118,7 @@ namespace CDP4Composition.Tests.FilterOperators
 
             this.parentRow.ContainedRows.Add(this.childRow);
 
-            this.filterEditorQueryOperatorsEventArgs = 
+            this.filterEditorQueryOperatorsEventArgs =
                 this.CreateInstance<FilterEditorQueryOperatorsEventArgs>(CriteriaOperator.And(), nameof(CategoryTestRowViewModel.Category));
 
             var filterEditorOperatorItem = new List<FilterEditorOperatorItem>
@@ -136,7 +136,7 @@ namespace CDP4Composition.Tests.FilterOperators
 
             var customFilterOperators = new Dictionary<DataViewBase, Dictionary<string, (CustomFilterOperatorType, IEnumerable<IRowViewModelBase<Thing>>)>>();
             var browserDictionary = new Dictionary<string, (CustomFilterOperatorType, IEnumerable<IRowViewModelBase<Thing>>)>();
-            browserDictionary.Add(nameof(CategoryTestRowViewModel.Category), (CustomFilterOperatorType.Category, new [] {this.parentRow}));
+            browserDictionary.Add(nameof(CategoryTestRowViewModel.Category), (CustomFilterOperatorType.Category, new[] { this.parentRow }));
 
             customFilterOperators.Add(this.dataViewBase, browserDictionary);
 
@@ -149,32 +149,32 @@ namespace CDP4Composition.Tests.FilterOperators
         public async Task VerifyThatQueryOperatorsCommandWorks()
         {
             var vm = new CustomFilterEditorDialogViewModel(this.dialogNavigationService.Object, this.dataViewBase);
-            
+
             Assert.CatchAsync<NotSupportedException>(async () => await vm.QueryOperatorsCommand.Execute(default));
 
             await vm.QueryOperatorsCommand.Execute(this.filterEditorQueryOperatorsEventArgs);
 
             Assert.AreEqual(2, this.filterEditorQueryOperatorsEventArgs.Operators.Count);
 
-            Assert.AreEqual(1, 
+            Assert.AreEqual(1,
                 this.filterEditorOperatorItemList.Count(
-                    x => x.CustomFunctionName== CategoryFilterOperatorHandler.IsMemberOfCategoryName));
+                    x => x.CustomFunctionName == CategoryFilterOperatorHandler.IsMemberOfCategoryName));
 
-            Assert.AreEqual(1, 
+            Assert.AreEqual(1,
                 this.filterEditorOperatorItemList.Count(
-                    x => x.CustomFunctionName== CategoryFilterOperatorHandler.HasCategoryApplied));
+                    x => x.CustomFunctionName == CategoryFilterOperatorHandler.HasCategoryApplied));
         }
 
         private T CreateInstance<T>(params object[] args)
         {
-            var type = typeof (T);
+            var type = typeof(T);
 
             var instance = type.Assembly.CreateInstance(
                 type.FullName, false,
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 null, args, null, null);
 
-            return (T) instance;
+            return (T)instance;
         }
 
         private class CategoryTestRowViewModel : RowViewModelBase<Category>

@@ -1,12 +1,30 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TeamCompositionCardViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.ViewModels
 {
-
     using System;
     using System.Linq;
     using System.Reactive;
@@ -14,7 +32,9 @@ namespace CDP4SiteDirectory.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
 
@@ -101,11 +121,12 @@ namespace CDP4SiteDirectory.ViewModels
 
             this.WhenAnyValue(row => row.Domains)
                 .Select(
-                    domains => 
-                    domains.Aggregate(
-                        string.Empty,
-                        (current, domainOfExpertise) => string.Format("{0} {1}", current, domainOfExpertise.ShortName)).Trim())
+                    domains =>
+                        domains.Aggregate(
+                            string.Empty,
+                            (current, domainOfExpertise) => string.Format("{0} {1}", current, domainOfExpertise.ShortName)).Trim())
                 .ToProperty(this, row => row.DomainShortnames, out this.domainShortnames, scheduler: RxApp.MainThreadScheduler);
+
             this.domainShortnames.ThrownExceptions.Subscribe(e => Logger.Error(e));
 
             var canEmail = this.WhenAnyValue(vm => vm.EmailAddress).Select(x => !string.IsNullOrEmpty(x));
@@ -124,15 +145,9 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public ReactiveList<DomainOfExpertise> Domains
         {
-            get
-            {
-                return this.domains;
-            }
+            get => this.domains;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.domains, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.domains, value);
         }
 
         /// <summary>
@@ -140,15 +155,9 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public string Person
         {
-            get
-            {
-                return this.person;
-            }
+            get => this.person;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.person, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.person, value);
         }
 
         /// <summary>
@@ -156,15 +165,9 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public string Organization
         {
-            get
-            {
-                return this.organization;
-            }
+            get => this.organization;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.organization, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.organization, value);
         }
 
         /// <summary>
@@ -172,15 +175,9 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public string OrganizationalUnit
         {
-            get
-            {
-                return this.organizationalUnit;
-            }
+            get => this.organizationalUnit;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.organizationalUnit, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.organizationalUnit, value);
         }
 
         /// <summary>
@@ -188,17 +185,11 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public bool IsActive
         {
-            get
-            {
-                return this.isActive;
-            }
+            get => this.isActive;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isActive, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isActive, value);
         }
-    
+
         /// <summary>
         /// Gets or sets the <see cref="EmailAddress"/> of the <see cref="Person"/> associated to the current <see cref="Participant"/>
         /// </summary>
@@ -207,15 +198,9 @@ namespace CDP4SiteDirectory.ViewModels
         /// </remarks>
         public string EmailAddress
         {
-            get
-            {
-                return this.emailAddress;
-            }
+            get => this.emailAddress;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.emailAddress, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.emailAddress, value);
         }
 
         /// <summary>
@@ -226,39 +211,24 @@ namespace CDP4SiteDirectory.ViewModels
         /// </remarks>
         public string TelephoneNumber
         {
-            get
-            {
-                return this.telephoneNumber;
-            }
+            get => this.telephoneNumber;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.telephoneNumber, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.telephoneNumber, value);
         }
 
         /// <summary>
         /// Gets the <see cref="DomainShortnames"/> of the row-view-model
         /// </summary>
-        public string DomainShortnames
-        {
-            get { return this.domainShortnames.Value; }
-        }
+        public string DomainShortnames => this.domainShortnames.Value;
 
         /// <summary>
         /// Gets or sets the name of the associated <see cref="ParticipantRole"/>
         /// </summary>
         public string ParticipantRole
         {
-            get
-            {
-                return this.participantRole;
-            }
+            get => this.participantRole;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.participantRole, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.participantRole, value);
         }
 
         /// <summary>
@@ -266,15 +236,9 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public string PersonRole
         {
-            get
-            {
-                return this.personRole;
-            }
+            get => this.personRole;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.personRole, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.personRole, value);
         }
 
         /// <summary>
@@ -308,6 +272,7 @@ namespace CDP4SiteDirectory.ViewModels
             else
             {
                 var email = this.Thing.Person.EmailAddress.FirstOrDefault();
+
                 if (email != null)
                 {
                     this.EmailAddress = email.Value;
@@ -327,6 +292,7 @@ namespace CDP4SiteDirectory.ViewModels
             else
             {
                 var number = this.Thing.Person.TelephoneNumber.FirstOrDefault();
+
                 if (number != null)
                 {
                     this.TelephoneNumber = number.Value;
@@ -348,7 +314,7 @@ namespace CDP4SiteDirectory.ViewModels
             catch (Exception ex)
             {
                 Logger.Error(ex);
-            }            
+            }
         }
 
         /// <summary>
@@ -368,37 +334,40 @@ namespace CDP4SiteDirectory.ViewModels
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
-            var personUpdateListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Person)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+
+            var personUpdateListener = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Person)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(personUpdateListener);
 
-            var personRoleUpdateListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Person.Role)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var personRoleUpdateListener = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Person.Role)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(personRoleUpdateListener);
 
-            var participantRoleUpdateListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Role)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var participantRoleUpdateListener = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Role)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(participantRoleUpdateListener);
 
-            var telephoneNumnerListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(TelephoneNumber))
+            var telephoneNumnerListener = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(TelephoneNumber))
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Container == this.Thing.Person)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(telephoneNumnerListener);
 
-            var emailAddressListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(EmailAddress))
+            var emailAddressListener = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(EmailAddress))
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Container == this.Thing.Person)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(emailAddressListener);
         }
     }

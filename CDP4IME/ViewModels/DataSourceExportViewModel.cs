@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceExportViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -32,7 +32,7 @@ namespace COMET.ViewModels
     using System.Reactive;
     using System.Windows;
 
-    using CDP4Common.Exceptions;
+    using CDP4Common.MetaInfo;
 
     using CDP4Composition.Exceptions;
     using CDP4Composition.Extensions;
@@ -130,6 +130,11 @@ namespace COMET.ViewModels
         /// </summary>
         private readonly Dictionary<string, Version> availableVersions;
 
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceExportViewModel"/> class.
         /// </summary>
@@ -139,30 +144,39 @@ namespace COMET.ViewModels
         /// <param name="openSaveFileDialogService">
         /// The file Dialog Service.
         /// </param>
-        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService, ICDPMessageBus messageBus)
         {
             if (openSaveFileDialogService == null)
             {
                 throw new ArgumentNullException(nameof(openSaveFileDialogService), "The openSaveFileDialogService may not be null.");
             }
 
+            this.messageBus = messageBus;
+
             this.openSaveFileDialogService = openSaveFileDialogService;
             this.AvailableDals = new List<IDalMetaData>();
             this.OpenSessions = new ReactiveList<ISession>(sessions);
             this.DialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
 
-            this.availableVersions = new Dictionary<string, Version>
-            {
-                { "ECSS-E-TM-10-25 (Version 2.4.1)", new Version("1.0.0") },
-                { "COMET 1.1.0", new Version("1.1.0") },
-                { "COMET 1.2.0", new Version("1.2.0") },
-                { "COMET 1.3.0", new Version("1.3.0") }
-            };
+            var versions = new MetaDataProvider().QuerySupportedModelVersions();
+
+            this.availableVersions = versions
+                .Select(
+                    x =>
+                        new KeyValuePair<string, Version>(
+                            x.Major == 1 && x.Minor == 0
+                                ? "ECSS-E-TM-10-25 (Version 2.4.1)"
+                                : $"CDP4-COMET {x.ToString(3)}",
+                            x))
+                .OrderBy(x => x.Value)
+                .ToDictionary(x => x.Key, x => x.Value);
 
             this.IsBusy = false;
 
-            this.WhenAnyValue(
-                vm => vm.SelectedSession).Subscribe(
+            this.WhenAnyValue(vm => vm.SelectedSession).Subscribe(
                 x =>
                 {
                     if (x == null)
@@ -171,7 +185,7 @@ namespace COMET.ViewModels
                     }
                     else
                     {
-                        this.Versions = 
+                        this.Versions =
                             this.availableVersions
                                 .Where(y => y.Value <= x.DalVersion)
                                 .ToDictionary(k => k.Key, v => v.Value);
@@ -190,11 +204,11 @@ namespace COMET.ViewModels
                 vm => vm.SelectedSession,
                 vm => vm.Path,
                 vm => vm.SelectedVersion,
-                (passwordRetype, password, selecteddal, selectedsession, path, selectedVersion) 
-                    => selecteddal != null && 
-                       selectedsession != null && 
-                       !string.IsNullOrEmpty(path) && 
-                       !string.IsNullOrEmpty(password) && 
+                (passwordRetype, password, selecteddal, selectedsession, path, selectedVersion)
+                    => selecteddal != null &&
+                       selectedsession != null &&
+                       !string.IsNullOrEmpty(path) &&
+                       !string.IsNullOrEmpty(password) &&
                        password == passwordRetype &&
                        selectedVersion.Key != default);
 
@@ -353,7 +367,7 @@ namespace COMET.ViewModels
                 var dal = this.dals.Single(x => x.Metadata == this.SelectedDal);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType(), this.SelectedVersion.Value);
 
-                var fileExportSession = dalInstance.CreateSession(creds);
+                var fileExportSession = dalInstance.CreateSession(creds, this.messageBus);
 
                 // create write
                 var operationContainers = new List<OperationContainer>();

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ErrorBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -30,7 +30,6 @@ namespace CDP4BuiltInRules.Tests
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading;
-    using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
 
@@ -66,12 +65,14 @@ namespace CDP4BuiltInRules.Tests
         private Assembler assembler;
         private SiteDirectory siteDir;
         private bool highlightTrigger;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
@@ -79,21 +80,22 @@ namespace CDP4BuiltInRules.Tests
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
             this.uri = new Uri("http://www.rheagroup.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.highlightTrigger = false;
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
-            
+
             this.browser = new ErrorBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -159,7 +161,7 @@ namespace CDP4BuiltInRules.Tests
             var testThing = new Lazy<Thing>(() => pocoConstant);
             testThing.Value.Cache.TryAdd(new CacheKey(testThing.Value.Iid, null), testThing);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.EndUpdate));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.EndUpdate));
             Assert.IsNotEmpty(this.browser.Errors);
         }
 
@@ -185,18 +187,18 @@ namespace CDP4BuiltInRules.Tests
 
             this.browser.SelectedThing = this.browser.Errors.First();
 
-            var highlightSubscription = CDPMessageBus.Current.Listen<HighlightEvent>(this.browser.SelectedThing.Thing)
+            var highlightSubscription = this.messageBus.Listen<HighlightEvent>(this.browser.SelectedThing.Thing)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.HighlightEventHandler());
 
             Assert.IsTrue(((ICommand)this.browser.HighlightCommand).CanExecute(null));
 
-            Assert.DoesNotThrowAsync(async() => await this.browser.HighlightCommand.Execute());
+            Assert.DoesNotThrowAsync(async () => await this.browser.HighlightCommand.Execute());
 
             Assert.IsTrue(this.highlightTrigger);
 
             // send again to verify cancel
-            Assert.DoesNotThrowAsync( async() => await this.browser.HighlightCommand.Execute());
+            Assert.DoesNotThrowAsync(async () => await this.browser.HighlightCommand.Execute());
         }
 
         private void HighlightEventHandler()
@@ -204,7 +206,8 @@ namespace CDP4BuiltInRules.Tests
             this.highlightTrigger = true;
         }
 
-        [Test, Apartment(ApartmentState.STA)]
+        [Test]
+        [Apartment(ApartmentState.STA)]
         public void VerifyThatCopyCommandExecutes()
         {
             var id = Guid.NewGuid();

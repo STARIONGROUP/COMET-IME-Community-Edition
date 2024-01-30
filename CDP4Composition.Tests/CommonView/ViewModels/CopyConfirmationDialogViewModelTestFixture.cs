@@ -28,17 +28,21 @@ namespace CDP4CommonView.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
-
-    using CDP4Common.CommonData;
-    using CDP4Common.EngineeringModelData;
-    using CDP4Dal;
-    using CDP4Dal.Permission;
-    using CDP4CommonView.ViewModels;
-    using NUnit.Framework;
-    using Moq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows.Input;
+
+    using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+
+    using CDP4CommonView.ViewModels;
+
+    using CDP4Dal;
+    using CDP4Dal.Permission;
+
+    using Moq;
+
+    using NUnit.Framework;
 
     using ReactiveUI;
 
@@ -53,26 +57,28 @@ namespace CDP4CommonView.Tests.ViewModels
         private Uri uri = new Uri("http://www.rheagroup.com");
         private Assembler assembler;
         private ElementDefinition elementDefinition;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
-
         }
 
         [Test]
         public async Task VerifyThatDialogCanBeConstructed()
         {
-            var copyableThings = new List<Thing> {this.elementDefinition};
+            var copyableThings = new List<Thing> { this.elementDefinition };
 
             var dialog = new CopyConfirmationDialogViewModel(copyableThings, new Dictionary<Thing, string>());
 
@@ -80,8 +86,8 @@ namespace CDP4CommonView.Tests.ViewModels
 
             Assert.IsTrue(((ICommand)dialog.ProceedCommand).CanExecute(null));
             Assert.IsTrue(((ICommand)dialog.CancelCommand).CanExecute(null));
-            
-            Assert.IsNotEmpty(dialog.CopyPermissionDetails);            
+
+            Assert.IsNotEmpty(dialog.CopyPermissionDetails);
             Assert.AreEqual("A partial copy will be performed.", dialog.CopyPermissionMessage);
         }
 
@@ -91,7 +97,7 @@ namespace CDP4CommonView.Tests.ViewModels
             var copyableThings = new List<Thing>();
 
             var dialog = new CopyConfirmationDialogViewModel(copyableThings, new Dictionary<Thing, string>());
-            
+
             Assert.IsFalse(((ICommand)dialog.ProceedCommand).CanExecute(null));
             Assert.IsEmpty(dialog.CopyPermissionDetails);
             Assert.AreEqual("The copy operation cannot be performed.", dialog.CopyPermissionMessage);

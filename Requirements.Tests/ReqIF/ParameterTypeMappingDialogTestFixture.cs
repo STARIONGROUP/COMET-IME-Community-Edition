@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeMappingDialogTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -97,16 +97,18 @@ namespace CDP4Requirements.Tests.ReqIF
         private ParameterType pt;
 
         private ParameterTypeMappingDialogViewModel dialog;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -159,6 +161,7 @@ namespace CDP4Requirements.Tests.ReqIF
 
             this.dialog = new ParameterTypeMappingDialogViewModel(this.reqIf.Lang, corecontent.DataTypes, null, this.iteration, this.session.Object, this.thingDialogNavigationService.Object);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [Test]

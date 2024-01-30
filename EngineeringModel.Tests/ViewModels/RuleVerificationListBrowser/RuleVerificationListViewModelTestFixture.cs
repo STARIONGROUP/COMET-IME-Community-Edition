@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -35,27 +35,27 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     using System.Windows;
     using System.Windows.Input;
 
-    using CDP4Common.CommonData;    
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
-    
-    using CDP4Dal;    
+
+    using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-    
+
     using CDP4EngineeringModel.ViewModels;
-    
+
     using CommonServiceLocator;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
 
     /// <summary>
@@ -72,7 +72,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IPanelNavigationService> panelNavigationService;
-        
+
         private Mock<IRuleVerificationService> ruleVerificationService;
         private List<Lazy<IBuiltInRule, IBuiltInRuleMetaData>> builtInRules;
         private string builtInRuleName;
@@ -88,6 +88,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         private Iteration iteration;
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
@@ -99,11 +100,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             this.SetupIRuleVerificationService();
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
-            
+
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
@@ -127,6 +129,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
@@ -158,21 +161,21 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
-        [Test]        
+        [Test]
         public void VerifyThatWhenParticipantIsNullArgumentNullExceptionIsThrown()
         {
             Assert.Throws<ArgumentNullException>(
                 () =>
-                new RuleVerificationListBrowserViewModel(
-                    this.iteration,
-                    null,
-                    this.session.Object,
-                    this.thingDialogNavigationService.Object,
-                    this.panelNavigationService.Object,
-                    null, null));
+                    new RuleVerificationListBrowserViewModel(
+                        this.iteration,
+                        null,
+                        this.session.Object,
+                        this.thingDialogNavigationService.Object,
+                        this.panelNavigationService.Object,
+                        null, null));
         }
 
         [Test]
@@ -193,6 +196,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
@@ -212,14 +216,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
             this.revision.SetValue(this.iteration, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
             var row = viewmodel.RuleVerificationListRowViewModels.Single(x => x.Thing == ruleVerificationList);
             Assert.AreEqual(row.Owner, this.domain);
 
             this.iteration.RuleVerificationList.Remove(ruleVerificationList);
             this.revision.SetValue(this.iteration, 3);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
             Assert.IsEmpty(viewmodel.RuleVerificationListRowViewModels);
         }
@@ -240,7 +244,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         {
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
             });
 
             var dropinfo = new Mock<IDropInfo>();
@@ -258,13 +262,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.SetupProperty(d => d.Effects);
             dropinfo.Object.Effects = DragDropEffects.All;
-            
+
             var droptarget = new Mock<IDropTarget>();
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null) }
             });
 
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
@@ -278,7 +282,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         {
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
             });
 
             var dropinfo = new Mock<IDropInfo>();
@@ -302,7 +306,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, null) }
             });
 
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
@@ -316,7 +320,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         {
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
             });
 
             var dropinfo = new Mock<IDropInfo>();
@@ -328,10 +332,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
 
             var viewmodel = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
-            
+
             Assert.That(viewmodel.Feedback, Is.Null.Or.Empty);
             await viewmodel.Drop(dropinfo.Object);
-            
+
             Assert.That(viewmodel.Feedback, Is.Not.Null.Or.Empty);
         }
 
@@ -360,12 +364,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
             var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
-            
+
             vm.SelectedThing = null;
-            Assert.IsFalse(((ICommand)vm.VerifyRuleVerificationList).CanExecute(null)); 
+            Assert.IsFalse(((ICommand)vm.VerifyRuleVerificationList).CanExecute(null));
         }
 
         [Test]
@@ -375,13 +380,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
             var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
             vm.SelectedThing = vm.RuleVerificationListRowViewModels.FirstOrDefault();
             vm.ComputePermission();
 
-            Assert.IsTrue(((ICommand)vm.VerifyRuleVerificationList).CanExecute(null)); 
+            Assert.IsTrue(((ICommand)vm.VerifyRuleVerificationList).CanExecute(null));
             await vm.VerifyRuleVerificationList.Execute();
 
             this.ruleVerificationService.Verify(x => x.Execute(this.session.Object, ruleVerificationList));

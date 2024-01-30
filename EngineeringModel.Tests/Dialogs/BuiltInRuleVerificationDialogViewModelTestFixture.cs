@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BuiltInRuleVerificationDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -37,23 +37,23 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Permission;
-    using CDP4Dal.Operations;
-
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
-   
+
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
 
     using CommonServiceLocator;
 
     using Moq;
-    
+
     using NUnit.Framework;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -70,7 +70,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IServiceLocator> serviceLocator;
-        
+        private CDPMessageBus messageBus;
+
         private Mock<IRuleVerificationService> ruleVerificationService;
         private List<Lazy<IBuiltInRule, IBuiltInRuleMetaData>> builtInRules;
         private string builtInRuleName;
@@ -90,7 +91,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 
             this.serviceLocator = new Mock<IServiceLocator>();
@@ -99,7 +101,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
-            
+
             this.SetupIRuleVerificationService();
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -126,6 +128,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 
@@ -175,7 +178,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual(2, viewModel.AvailableBuiltInRules.Count());
 
             Assert.AreEqual("-", viewModel.SelectedBuiltInRuleMetaData.Name);
-            
+
             Assert.IsFalse(viewModel.IsNameReadOnly);
         }
 

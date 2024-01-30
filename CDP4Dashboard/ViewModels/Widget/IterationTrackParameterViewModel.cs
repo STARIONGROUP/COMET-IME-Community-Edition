@@ -1,8 +1,27 @@
-﻿// -----------------------------------------------------------------------
-// <copyright file="IterationTrackParameterViewModel.cs" company="RHEA">
-// Copyright (c) 2020 RHEA Group. All rights reserved.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="IterationTrackParameterViewModel.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -----------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Dashboard.ViewModels.Widget
 {
@@ -192,12 +211,12 @@ namespace CDP4Dashboard.ViewModels.Widget
             this.AxisXTitle = "Revisions";
             this.AxisYTitle = this.Unit;
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(iterationTrackParameter)
+            this.Disposables.Add(session.CDPMessageBus.Listen<ObjectChangedEvent>(iterationTrackParameter)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(async _ => await this.RefreshData()));
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationTrackParameter.ParameterOrOverride)
+            session.CDPMessageBus.Listen<ObjectChangedEvent>(this.iterationTrackParameter.ParameterOrOverride)
                 .Where(objectChange => objectChange.EventKind == EventKind.Removed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(async _ => await this.OnDeleteCommand.Execute());
@@ -321,7 +340,7 @@ namespace CDP4Dashboard.ViewModels.Widget
 
             foreach (var parameterValueSet in addedValueSet)
             {
-                var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterValueSet)
+                var listener = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(parameterValueSet)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.iterationTrackParameter.ParameterOrOverride.RevisionNumber)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(async _ => await this.RefreshData());
@@ -357,7 +376,7 @@ namespace CDP4Dashboard.ViewModels.Widget
 
                 foreach (var binaryRelationship in binaryRelationshipsToVerify)
                 {
-                    complianceStates.Add(await new RelationalExpressionVerifier(binaryRelationship.Target as RelationalExpression, new RequirementVerificationConfiguration { Option = null })
+                    complianceStates.Add(await new RelationalExpressionVerifier(binaryRelationship.Target as RelationalExpression, new RequirementVerificationConfiguration { Option = null }, this.Session.CDPMessageBus)
                         .VerifyRequirementStateOfCompliance(new List<BinaryRelationship> { binaryRelationship }, this.iteration));
                 }
 

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PrefixedUnitDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-// 
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -66,7 +66,8 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
         private Mock<IServiceLocator> serviceLocator;
         private SiteDirectory siteDir;
         private SiteReferenceDataLibrary genericSiteReferenceDataLibrary;
-        
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void Setup()
         {
@@ -74,6 +75,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.dialogService = new Mock<IThingDialogNavigationService>();
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -108,13 +110,14 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]

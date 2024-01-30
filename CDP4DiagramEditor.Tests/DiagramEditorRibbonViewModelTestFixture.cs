@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramEditorRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru, Nathanael Smiechowski.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -67,11 +67,13 @@ namespace CDP4DiagramEditor.Tests
         private Iteration iteration;
         private IterationSetup iterationSetup;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://www.rheagroup.com");
             this.session = new Mock<ISession>();
             this.serviceLocator = new Mock<IServiceLocator>();
@@ -83,7 +85,6 @@ namespace CDP4DiagramEditor.Tests
             this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
             this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "John", Surname = "Doe" };
-
 
             this.model.Iteration.Add(this.iteration);
             this.model.EngineeringModelSetup = this.modelSetup;
@@ -97,6 +98,7 @@ namespace CDP4DiagramEditor.Tests
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>())
                 .Returns(this.navigationService.Object);
 
@@ -106,22 +108,25 @@ namespace CDP4DiagramEditor.Tests
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>())
                 .Returns(this.navigationService.Object);
+
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
-            var vm = new DiagramEditorRibbonViewModel();
+            var vm = new DiagramEditorRibbonViewModel(this.messageBus);
             Assert.NotNull(vm.Sessions);
             Assert.AreEqual(0, vm.Sessions.Count);
             Assert.NotNull(vm.Sessions);
@@ -132,11 +137,11 @@ namespace CDP4DiagramEditor.Tests
         [Test]
         public void VerifyThatSessionEventsAreCaught()
         {
-            var vm = new DiagramEditorRibbonViewModel();
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            var vm = new DiagramEditorRibbonViewModel(this.messageBus);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
             Assert.AreEqual(1, vm.Sessions.Count);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
             Assert.AreEqual(0, vm.Sessions.Count);
         }
 

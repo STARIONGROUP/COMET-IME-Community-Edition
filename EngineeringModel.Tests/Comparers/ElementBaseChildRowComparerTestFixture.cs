@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementBaseChildRowComparerTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,21 +28,26 @@ namespace CDP4EngineeringModel.Tests.Comparers
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.Comparers;
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
-    using ReactiveUI;
 
     [TestFixture]
     internal class ElementBaseChildRowComparerTestFixture
@@ -49,13 +73,14 @@ namespace CDP4EngineeringModel.Tests.Comparers
         private ElementUsage elementUsage;
         private ParameterType type;
         private ParameterValueSet valueSet;
+        private CDPMessageBus messageBus;
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
-
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.permissionService = new Mock<IPermissionService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -74,6 +99,7 @@ namespace CDP4EngineeringModel.Tests.Comparers
             this.option = new Option(Guid.NewGuid(), this.cache, this.uri);
             this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
             this.type = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "a" };
+
             this.valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
                 Published = new ValueArray<string>(new List<string> { "1" }),
@@ -102,12 +128,13 @@ namespace CDP4EngineeringModel.Tests.Comparers
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -180,8 +207,8 @@ namespace CDP4EngineeringModel.Tests.Comparers
             cpt.Component.Add(cpt2);
             cpt.Component.Add(cpt3);
             var parameter2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = cpt, Owner = this.domain, Container = this.elementDef };
-            
-            var values = new List<string> {"a", "b", "c"};
+
+            var values = new List<string> { "a", "b", "c" };
             var cptValueSet = new ParameterValueSet();
             cptValueSet.Manual = new ValueArray<string>(values);
             cptValueSet.Reference = new ValueArray<string>(values);
@@ -190,8 +217,8 @@ namespace CDP4EngineeringModel.Tests.Comparers
             cptValueSet.Published = new ValueArray<string>(values);
 
             parameter2.ValueSet.Add(cptValueSet);
-            
-            var type3 = new BooleanParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "abc", ShortName = "abc"};
+
+            var type3 = new BooleanParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "abc", ShortName = "abc" };
             var parameter3 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type3, Owner = this.domain, Container = this.elementDef };
             parameter3.ValueSet.Add(this.valueSet);
 

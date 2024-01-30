@@ -79,11 +79,13 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
 
         private Assembler assembler;
         private Mock<ISession> session;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
-            this.assembler = new Assembler(this.credentials.Uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.credentials.Uri, this.messageBus);
 
             this.SetUpThings();
             this.SetUpMethods();
@@ -93,6 +95,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         private void SetUpThings()
         {
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri);
+
             this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(
                 Guid.NewGuid(),
                 this.assembler.Cache,
@@ -423,6 +426,8 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             this.session
                 .Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>()))
                 .Returns(this.domain);
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         private void SetUpRows()
@@ -589,11 +594,11 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         public void VerifyPMeanIsNotCalculatedIfRedundancyIsNotCompound()
         {
             this.elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "redundancy")
-                .ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri) 
-                {
-                    Name = "redundancy",
-                    ShortName = "redundancy"
-                };
+                .ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "redundancy",
+                ShortName = "redundancy"
+            };
 
             var arrayAssembler = new CrossviewArrayAssembler(
                 this.excelRows,

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ErrorBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -25,7 +25,6 @@
 
 namespace CDP4BuiltInRules.ViewModels
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
@@ -37,10 +36,10 @@ namespace CDP4BuiltInRules.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.Events;
-    using CDP4Composition.PluginSettingService;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -58,7 +57,7 @@ namespace CDP4BuiltInRules.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Errors";
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ErrorBrowserViewModel"/> class.
         /// </summary>
@@ -75,7 +74,7 @@ namespace CDP4BuiltInRules.ViewModels
             this.Errors = new List<ErrorRowViewModel>();
             this.PopulateErrors();
         }
-        
+
         /// <summary>
         /// Gets the list of <see cref="ErrorRowViewModel"/>.
         /// </summary>
@@ -102,7 +101,7 @@ namespace CDP4BuiltInRules.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            
+
             this.ContextMenu.Add(new ContextMenuItemViewModel("Highlight", "", this.HighlightCommand, MenuItemKind.Highlight));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Error", "", this.CopyErrorCommand, MenuItemKind.Copy));
         }
@@ -145,7 +144,7 @@ namespace CDP4BuiltInRules.ViewModels
         {
             this.PopulateErrors();
         }
-        
+
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
@@ -161,7 +160,7 @@ namespace CDP4BuiltInRules.ViewModels
                 error.Dispose();
             }
         }
-        
+
         /// <summary>
         /// populates the <see cref="ErrorBrowser"/> with <see cref="ErrorRowViewModel"/>s.
         /// </summary>
@@ -203,11 +202,11 @@ namespace CDP4BuiltInRules.ViewModels
         private void ExecuteHighlightCommand()
         {
             // clear all highlights
-            CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
+            this.CDPMessageBus.SendMessage(new CancelHighlightEvent());
 
             // highlight the selected thing
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.SelectedThing.Thing), this.SelectedThing.Thing);
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.SelectedThing.Thing), null);
+            this.CDPMessageBus.SendMessage(new HighlightEvent(this.SelectedThing.Thing), this.SelectedThing.Thing);
+            this.CDPMessageBus.SendMessage(new HighlightEvent(this.SelectedThing.Thing), null);
         }
     }
 }

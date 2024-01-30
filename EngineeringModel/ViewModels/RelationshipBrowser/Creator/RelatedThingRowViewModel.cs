@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelatedThingRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -36,7 +36,7 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -63,12 +63,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// Initializes a new instance of the <see cref="RelatedThingRowViewModel"/> class
         /// </summary>
         /// <param name="thing">The associated <see cref="Thing"/></param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         /// <param name="callBack">The <see cref="Action"/> to call back</param>
-        public RelatedThingRowViewModel(Thing thing, Action<RelatedThingRowViewModel> callBack)
+        public RelatedThingRowViewModel(Thing thing, ICDPMessageBus messageBus, Action<RelatedThingRowViewModel> callBack)
         {
             this.Thing = thing;
 
-            var subscriber = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+            var subscriber = messageBus.Listen<ObjectChangedEvent>(this.Thing)
                 .Where(msg => msg.EventKind == EventKind.Updated)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.SetProperties());
@@ -95,8 +98,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string Denomination
         {
-            get { return this.denomination; }
-            set { this.RaiseAndSetIfChanged(ref this.denomination, value); }
+            get => this.denomination;
+            set => this.RaiseAndSetIfChanged(ref this.denomination, value);
         }
 
         /// <summary>
@@ -104,8 +107,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string ClassKind
         {
-            get { return this.classKind; }
-            set { this.RaiseAndSetIfChanged(ref this.classKind, value); }
+            get => this.classKind;
+            set => this.RaiseAndSetIfChanged(ref this.classKind, value);
         }
 
         /// <summary>

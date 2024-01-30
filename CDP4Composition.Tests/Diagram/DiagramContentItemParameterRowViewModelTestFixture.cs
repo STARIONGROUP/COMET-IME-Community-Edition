@@ -48,7 +48,7 @@ namespace CDP4Composition.Tests.Diagram
     {
         private Parameter parameter1;
         private Parameter parameter2;
-        private ISession session;
+        private Mock<ISession> session;
 
         [SetUp]
         public void SetUp()
@@ -129,13 +129,14 @@ namespace CDP4Composition.Tests.Diagram
                     })
                 });
 
-            this.session = Mock.Of<ISession>();
+            this.session = new Mock<ISession>();
+            this.session.Setup(x => x.CDPMessageBus).Returns(new CDPMessageBus());
         }
 
         [Test]
         public void VerifyThatDiagramContentItemChildStringContainsExpectedParts1()
         {
-            var rowViewModel = new DiagramContentItemParameterRowViewModel(this.parameter1, this.session, null);
+            var rowViewModel = new DiagramContentItemParameterRowViewModel(this.parameter1, this.session.Object, null);
 
             Assert.IsTrue(rowViewModel.DiagramContentItemChildString.Contains("value1"));
             Assert.IsTrue(rowViewModel.DiagramContentItemChildString.Contains("value2"));
@@ -148,7 +149,7 @@ namespace CDP4Composition.Tests.Diagram
         [Test]
         public void VerifyThatDiagramContentItemChildStringContainsExpectedParts2()
         {
-            var rowViewModel = new DiagramContentItemParameterRowViewModel(this.parameter2, this.session, null);
+            var rowViewModel = new DiagramContentItemParameterRowViewModel(this.parameter2, this.session.Object, null);
 
             Assert.IsTrue(rowViewModel.DiagramContentItemChildString.Contains("c1"));
             Assert.IsTrue(rowViewModel.DiagramContentItemChildString.Contains("c2"));

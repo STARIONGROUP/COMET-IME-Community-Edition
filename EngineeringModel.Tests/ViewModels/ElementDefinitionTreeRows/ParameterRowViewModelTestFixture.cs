@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -96,11 +96,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private RelationalExpression relationalExpression;
         private Mock<IThingCreator> thingCreator;
         private Mock<IServiceLocator> serviceLocator;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
@@ -238,12 +240,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -333,7 +336,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.AreEqual(o2s2Set.Reference[1], ValueSetConverter.ToValueSetString(o2s2c2Row.Reference, o2s2c2Row.ParameterType));
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatUpdateValueSetUpdatesRow(IViewModelBase<Thing> container, string scenario)
         {
             var valueset = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -346,7 +350,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             Assert.AreEqual("-", row.Manual);
             valueset.Manual = new ValueArray<string>(new List<string> { "test" });
-            CDPMessageBus.Current.SendObjectChangeEvent(valueset, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(valueset, EventKind.Updated);
 
             Assert.AreEqual("test", row.Manual);
             row.Dispose();
@@ -368,7 +372,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             o1s1c1Row.Switch = ParameterSwitchKind.REFERENCE;
             o1s1c1Row.CreateCloneAndWrite(ParameterSwitchKind.REFERENCE, "Switch");
 
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet) op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
         [Test]
@@ -389,7 +393,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             option1Row.Switch = ParameterSwitchKind.REFERENCE;
             option1Row.CreateCloneAndWrite(ParameterSwitchKind.REFERENCE, "Switch");
 
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet) op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
         [Test]
@@ -411,7 +415,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             option1Row.Switch = ParameterSwitchKind.REFERENCE;
             option1Row.CreateCloneAndWrite(ParameterSwitchKind.REFERENCE, "Switch");
 
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet) op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
         [Test]
@@ -428,7 +432,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             row.Switch = ParameterSwitchKind.REFERENCE;
             row.CreateCloneAndWrite(ParameterSwitchKind.REFERENCE, "Switch");
 
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet) op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
         }
 
         [Test]

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipMatrixViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -32,15 +32,17 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition;
-    using CDP4Composition.Services;
-    using CDP4Dal;
+
     using CDP4Dal.Events;
+
     using CDP4RelationshipMatrix.Settings;
+    using CDP4RelationshipMatrix.ViewModels;
+
     using CommonServiceLocator;
+
     using Moq;
+
     using NUnit.Framework;
-    using ViewModels;
 
     /// <summary>
     /// Suite of tests for the <see cref="RelationshipMatrixViewModel"/> class.
@@ -49,7 +51,6 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     public class RelationshipMatrixViewModelTestFixture : ViewModelTestBase
     {
         private Mock<IServiceLocator> serviceLocator;
-        
 
         [SetUp]
         public override void Setup()
@@ -81,12 +82,14 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             vm.SourceYConfiguration.SelectedClassKind =
                 vm.SourceYConfiguration.PossibleClassKinds.First(x => x == ClassKind.ElementDefinition);
+
             vm.SourceXConfiguration.SelectedClassKind =
                 vm.SourceXConfiguration.PossibleClassKinds.First(x => x == ClassKind.ElementDefinition);
 
             Assert.AreEqual(
                 this.srdl.DefinedCategory.Count(x => x.PermissibleClass.Contains(ClassKind.ElementDefinition)),
                 vm.SourceYConfiguration.PossibleCategories.Count);
+
             Assert.AreEqual(
                 this.srdl.DefinedCategory.Count(x => x.PermissibleClass.Contains(ClassKind.ElementDefinition)),
                 vm.SourceXConfiguration.PossibleCategories.Count);
@@ -98,8 +101,10 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             vm.SourceYConfiguration.SelectedCategories = new List<Category>(
                 vm.SourceYConfiguration.PossibleCategories.Where(x =>
                     x.Iid == this.catEd1.Iid || x.Iid == this.catEd2.Iid));
+
             vm.SourceXConfiguration.SelectedCategories =
                 new List<Category>(vm.SourceXConfiguration.PossibleCategories.Where(x => x.Iid == this.catEd2.Iid));
+
             vm.SourceYConfiguration.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.OR;
             vm.RelationshipConfiguration.SelectedRule = vm.RelationshipConfiguration.PossibleRules.Single();
 
@@ -131,12 +136,13 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             vm.SourceYConfiguration.SelectedCategories = new List<Category>(
                 vm.SourceYConfiguration.PossibleCategories.Where(x =>
                     x.Iid == this.catEd1.Iid || x.Iid == this.catEd2.Iid));
+
             vm.SourceYConfiguration.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.AND;
 
             Assert.AreEqual(1, vm.Matrix.Records.Count);
             Assert.AreEqual(3, vm.Matrix.Columns.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
             await vm.SwitchAxisCommand.Execute();
 
@@ -159,14 +165,17 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             vm.SourceYConfiguration.SelectedClassKind =
                 vm.SourceYConfiguration.PossibleClassKinds.First(x => x == ClassKind.ElementDefinition);
+
             vm.SourceXConfiguration.SelectedClassKind =
                 vm.SourceXConfiguration.PossibleClassKinds.First(x => x == ClassKind.ElementDefinition);
 
             vm.SourceYConfiguration.SelectedCategories = new List<Category>(
                 vm.SourceYConfiguration.PossibleCategories.Where(x =>
                     x.Iid == this.catEd1.Iid || x.Iid == this.catEd2.Iid));
+
             vm.SourceXConfiguration.SelectedCategories =
                 new List<Category>(vm.SourceXConfiguration.PossibleCategories.Where(x => x.Iid == this.catEd2.Iid));
+
             vm.SourceYConfiguration.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.OR;
             vm.RelationshipConfiguration.SelectedRule = vm.RelationshipConfiguration.PossibleRules.Single();
 

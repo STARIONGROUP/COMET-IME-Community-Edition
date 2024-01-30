@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BinaryRelationshipDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -35,19 +35,19 @@ namespace CDP4EngineeringModel.Tests
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Permission;
-    using CDP4Dal.Operations;
-
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -55,8 +55,8 @@ namespace CDP4EngineeringModel.Tests
     {
         private Mock<ISession> session;
         private Mock<IThingDialogNavigationService> dialogNavigationService;
-        private Mock<IPermissionService> permissionService; 
-        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache; 
+        private Mock<IPermissionService> permissionService;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory siteDir;
         private SiteReferenceDataLibrary srdl;
         private EngineeringModelSetup modelsetup;
@@ -76,11 +76,14 @@ namespace CDP4EngineeringModel.Tests
         private Requirement req2;
 
         private Uri uri = new Uri("http://test.com");
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
+
             this.dialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
 
@@ -90,7 +93,7 @@ namespace CDP4EngineeringModel.Tests
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
             this.siteDir.Domain.Add(this.domain);
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
-            this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri){RequiredRdl = this.srdl};
+            this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri) { RequiredRdl = this.srdl };
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup.RequiredRdl.Add(this.mrdl);
             this.modelsetup.ActiveDomain.Add(this.domain);
@@ -108,14 +111,13 @@ namespace CDP4EngineeringModel.Tests
             this.srdl.DefinedCategory.Add(this.requirementCat1);
             this.srdl.DefinedCategory.Add(this.requirementCat2);
 
-
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.modelsetup };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationSetup };
             this.model.Iteration.Add(this.iteration);
 
             this.reqSpec = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri);
             this.iteration.RequirementsSpecification.Add(this.reqSpec);
-            
+
             this.req1 = new Requirement(Guid.NewGuid(), this.cache, this.uri);
             this.req1.Category.Add(this.requirementCat1);
             this.req1.ClassKind = ClassKind.ActionItem;
@@ -126,17 +128,16 @@ namespace CDP4EngineeringModel.Tests
             this.reqSpec.Requirement.Add(this.req1);
             this.reqSpec.Requirement.Add(this.req2);
 
-            
-
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
-            var assembler = new Assembler(this.uri);
+            var assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.Assembler).Returns(assembler);
 
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 
@@ -147,6 +148,7 @@ namespace CDP4EngineeringModel.Tests
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
             var transaction = new ThingTransaction(transactionContext, clone);
+
             var vm = new BinaryRelationshipDialogViewModel(new BinaryRelationship(), transaction, this.session.Object,
                 true, ThingDialogKind.Create, this.dialogNavigationService.Object, clone);
 
@@ -154,11 +156,11 @@ namespace CDP4EngineeringModel.Tests
             Assert.AreEqual(0, vm.PossibleSource.Count);
             Assert.AreEqual(0, vm.PossibleTarget.Count);
             Assert.AreEqual(null, vm.Name);
-            
+
             vm.PossibleSource.Add(this.req1);
             vm.PossibleTarget.Add(this.req2);
 
-            vm.Category = new ReactiveList<Category>{this.relationshipCat};
+            vm.Category = new ReactiveList<Category> { this.relationshipCat };
             Assert.AreEqual(1, vm.PossibleSource.Count);
             Assert.AreEqual(1, vm.PossibleTarget.Count);
 

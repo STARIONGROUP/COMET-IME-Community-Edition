@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequirementBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="RequirementsBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -30,9 +30,9 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
-    using System.Windows;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -42,13 +42,14 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CDP4Requirements.ViewModels;
-    
+
     using CDP4RequirementsVerification;
 
     using CommonServiceLocator;
@@ -85,14 +86,16 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private Mock<IMessageBoxService> messageBoxService;
         private Person person;
         private Option option;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 
             this.permissionService = new Mock<IPermissionService>();
@@ -125,10 +128,10 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.panelNavigation = new Mock<IPanelNavigationService>();
             this.dialogNavigation = new Mock<IThingDialogNavigationService>();
 
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "test", ShortName = "test"};
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "test", ShortName = "test" };
             this.reqSpec.Owner = this.domain;
             this.participant.Domain.Add(this.domain);
-            
+
             this.iteration.RequirementsSpecification.Add(this.reqSpec);
             this.iteration.Option.Add(this.option);
             this.iteration.DefaultOption = this.option;
@@ -145,12 +148,13 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -165,13 +169,13 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.iteration.RequirementsSpecification.Add(reqspec2);
             revision.SetValue(this.iteration, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(2, vm.ReqSpecificationRows.Count);
 
             this.iteration.RequirementsSpecification.Remove(reqspec2);
             revision.SetValue(this.iteration, 3);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(1, vm.ReqSpecificationRows.Count);
         }
 
@@ -222,7 +226,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Requirement>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.dialogNavigation.Object, It.IsAny<RequirementsSpecification>(), null));
 
-            vm.SelectedThing = (RequirementsGroupRowViewModel) reqSpecRow.ContainedRows.Single(x => x.Thing is RequirementsGroup);
+            vm.SelectedThing = (RequirementsGroupRowViewModel)reqSpecRow.ContainedRows.Single(x => x.Thing is RequirementsGroup);
             Assert.IsTrue(vm.CanCreateRequirement);
             await vm.CreateRequirementCommand.Execute();
 
@@ -264,17 +268,17 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             Assert.IsTrue(vm.CanVerifyRequirements);
             vm.ExecuteVerifyRequirements(this.iteration.DefaultOption);
-            
+
             Assert.AreEqual(RequirementStateOfCompliance.Unknown, reqSpecRow.RequirementStateOfCompliance);
-            
+
             this.messageBoxService.Verify(
                 x => x.Show(
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<MessageBoxButton>(),
                     MessageBoxImage.Warning
-                    )
-                );
+                )
+            );
         }
     }
 }

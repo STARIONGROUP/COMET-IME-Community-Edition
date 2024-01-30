@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -30,7 +30,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     using System.Reactive.Concurrency;
     using System.Reflection;
 
-    using CDP4Common.CommonData;    
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -81,11 +81,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         private Iteration iteration;
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             this.revision = typeof(Thing).GetProperty("RevisionNumber");
+            this.messageBus = new CDPMessageBus();
 
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.serviceLocator = new Mock<IServiceLocator>();
@@ -98,9 +100,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
-            
+
             this.serviceLocator.Setup(x => x.GetInstance<IPermissionService>()).Returns(this.permissionService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.thingDialogNavigationService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(this.panelNavigationService.Object);
@@ -130,6 +132,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 
@@ -141,50 +144,50 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatRibbonViewModelCanBeConstructed()
         {
-            var viewmodel = new RuleVerificationListRibbonViewModel();
+            var viewmodel = new RuleVerificationListRibbonViewModel(this.messageBus);
             Assert.IsFalse(viewmodel.HasModels);
         }
 
         [Test]
         public void VerifyThatWhenSessionIsOpenedAndClosedItIsAddedToAndRemovedFromSessionCollection()
         {
-            var viewmodel = new RuleVerificationListRibbonViewModel();
+            var viewmodel = new RuleVerificationListRibbonViewModel(this.messageBus);
             Assert.IsEmpty(viewmodel.Sessions);
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
             Assert.IsNotEmpty(viewmodel.Sessions);
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
             Assert.IsEmpty(viewmodel.Sessions);
         }
 
         [Test]
         public void VerifyIfIterationIsAddedWhenMessageIsSent()
         {
-            var viewmodel = new RuleVerificationListRibbonViewModel();
+            var viewmodel = new RuleVerificationListRibbonViewModel(this.messageBus);
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
-                
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Added);
+            this.messageBus.SendMessage(openSessionEvent);
+
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Added);
             Assert.IsTrue(viewmodel.HasModels);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Removed);
             Assert.IsFalse(viewmodel.HasModels);
         }
 
         [Test]
         public void Verify_That_RibbonViewModel_Can_Be_Constructed()
         {
-            Assert.DoesNotThrow(() => new RuleVerificationListRibbonViewModel());
+            Assert.DoesNotThrow(() => new RuleVerificationListRibbonViewModel(this.messageBus));
         }
 
         [Test]

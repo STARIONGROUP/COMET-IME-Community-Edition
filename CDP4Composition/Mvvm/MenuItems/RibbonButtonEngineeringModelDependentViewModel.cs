@@ -63,7 +63,8 @@ namespace CDP4Composition.Mvvm
         /// <param name="instantiatePanelViewModelFunction">
         /// The instantiate Panel View Model Function.
         /// </param>
-        protected RibbonButtonEngineeringModelDependentViewModel(Func<EngineeringModel, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModelFunction)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        protected RibbonButtonEngineeringModelDependentViewModel(Func<EngineeringModel, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModelFunction, ICDPMessageBus messageBus)
         {
             this.InstantiatePanelViewModelFunction = instantiatePanelViewModelFunction;
 
@@ -71,15 +72,15 @@ namespace CDP4Composition.Mvvm
             this.Sessions = new List<ISession>();
             this.EngineeringModels.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSessions, out this.hasSessions, scheduler: RxApp.MainThreadScheduler);
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
+            messageBus.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
                 .Where(x => x.EventKind == EventKind.Added)
                 .Select(x => x.ChangedThing as EngineeringModel)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.EngineeringModelAddedEventHandler);
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
+            messageBus.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
                 .Where(x => x.EventKind == EventKind.Removed)
                 .Select(x => x.ChangedThing as EngineeringModel)
                 .ObserveOn(RxApp.MainThreadScheduler)

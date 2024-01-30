@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="LogInfoControlsViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4LogInfo.Tests.ViewModelTests
 {
@@ -40,10 +59,13 @@ namespace CDP4LogInfo.Tests.ViewModelTests
 
         private Mock<IPanelView> panelView;
 
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
 
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.navigationService = new Mock<IPanelNavigationService>();
@@ -61,13 +83,13 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public async Task VerifyThatCommandWorks()
         {
-            var vm = new LogInfoControlsViewModel(this.dialogNavigationService.Object);
+            var vm = new LogInfoControlsViewModel(this.dialogNavigationService.Object, this.messageBus);
 
             vm.IsChecked = true;
             await vm.OpenClosePanelCommand.Execute();
@@ -80,7 +102,7 @@ namespace CDP4LogInfo.Tests.ViewModelTests
 
             // Verify PanelEVentClosed
             vm.IsChecked = true;
-            CDPMessageBus.Current.SendMessage(new NavigationPanelEvent(vm.LogInfoPanel, this.panelView.Object, PanelStatus.Closed));
+            this.messageBus.SendMessage(new NavigationPanelEvent(vm.LogInfoPanel, this.panelView.Object, PanelStatus.Closed));
             Assert.IsFalse(vm.IsChecked);
         }
     }

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DomainFileStoreDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -73,12 +73,14 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private Participant participant;
 
         private DomainFileStore domainFileStore;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -101,11 +103,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.engineeringModel.EngineeringModelSetup = engineeringModelSetup;
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = new IterationSetup() };
-            this.engineeringModel.Iteration.Add(iteration);
+            this.engineeringModel.Iteration.Add(this.iteration);
             this.domainFileStore = new DomainFileStore(Guid.NewGuid(), this.cache, this.uri);
             this.iteration.DomainFileStore.Add(this.domainFileStore);
 
-            this.cache.TryAdd(new CacheKey(iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.iterationClone = this.iteration.Clone(false);
 
             var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
@@ -121,6 +123,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.session.Setup(x => x.OpenIterations).Returns(openIterations);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domainOfExpertise);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iterationClone)).Returns(this.domainOfExpertise);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
@@ -142,8 +145,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.domainFileStore.CreatedOn = createdOn;
             this.domainFileStore.Owner = this.domainOfExpertise;
 
-            var domainFileStoreDialogViewModel = 
-                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+            var domainFileStoreDialogViewModel =
+                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object, this.iterationClone);
 
             Assert.AreEqual(name, domainFileStoreDialogViewModel.Name);
@@ -164,8 +167,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.domainFileStore.Owner = null;
             this.domainFileStore.Container = null;
 
-            var domainFileStoreDialogViewModel = 
-                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+            var domainFileStoreDialogViewModel =
+                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object, this.iterationClone);
 
             Assert.AreEqual(name, domainFileStoreDialogViewModel.Name);
@@ -200,8 +203,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.domainFileStore.CreatedOn = createdOn;
             this.domainFileStore.Owner = this.domainOfExpertise;
 
-            var domainFileStoreDialogViewModel = 
-                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+            var domainFileStoreDialogViewModel =
+                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object, this.iterationClone);
 
             await domainFileStoreDialogViewModel.OkCommand.Execute();
@@ -216,8 +219,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var createdOn = DateTime.UtcNow;
             this.domainFileStore.Owner = this.domainOfExpertise;
 
-            var domainFileStoreDialogViewModel = 
-                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+            var domainFileStoreDialogViewModel =
+                new DomainFileStoreDialogViewModel(this.domainFileStore, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object, this.iterationClone);
 
             Assert.IsTrue(domainFileStoreDialogViewModel.OkCanExecute);

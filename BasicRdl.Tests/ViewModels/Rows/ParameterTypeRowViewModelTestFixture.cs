@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypeRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-// 
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -53,21 +53,24 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<ISession> session;
         private Uri uri;
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://test.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -76,12 +79,14 @@ namespace BasicRdl.Tests.ViewModels
             const string Name = "parameter type name";
             const string Shortname = "paramTypeName";
             var rdl = new ModelReferenceDataLibrary(Guid.NewGuid(), null, this.uri) { ShortName = "TestRDL" };
+
             var textParamType = new TextParameterType(Guid.NewGuid(), null, this.uri)
-                                    {
-                                        Name = Name,
-                                        ShortName = Shortname,
-                                        Container = rdl
-                                    };
+            {
+                Name = Name,
+                ShortName = Shortname,
+                Container = rdl
+            };
+
             var parameterTypeRowViewModel = new ParameterTypeRowViewModel(textParamType, this.session.Object, null);
 
             Assert.AreEqual(Name, parameterTypeRowViewModel.Name);
@@ -98,6 +103,7 @@ namespace BasicRdl.Tests.ViewModels
             var rev = typeof(Thing).GetProperty("RevisionNumber");
 
             var rdlshortnamename = "rdl shortname";
+
             var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ShortName = rdlshortnamename,
@@ -107,6 +113,7 @@ namespace BasicRdl.Tests.ViewModels
             {
                 ShortName = "RatioScale"
             };
+
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "simple quantity kind",
@@ -125,7 +132,7 @@ namespace BasicRdl.Tests.ViewModels
             simpleQuantityKind.Name = updatedName;
 
             rev.SetValue(simpleQuantityKind, 10);
-            CDPMessageBus.Current.SendObjectChangeEvent(simpleQuantityKind, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(simpleQuantityKind, EventKind.Updated);
 
             Assert.AreEqual(simpleQuantityKind.ShortName, parameterTypeRowViewModel.ShortName);
             Assert.AreEqual(simpleQuantityKind.Name, parameterTypeRowViewModel.Name);
@@ -136,9 +143,8 @@ namespace BasicRdl.Tests.ViewModels
 
             ratioScale.ShortName = updatedScale;
             rev.SetValue(ratioScale, 10);
-            CDPMessageBus.Current.SendObjectChangeEvent(ratioScale, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(ratioScale, EventKind.Updated);
             Assert.AreEqual(updatedScale, parameterTypeRowViewModel.DefaultScale);
-
         }
 
         [Test]

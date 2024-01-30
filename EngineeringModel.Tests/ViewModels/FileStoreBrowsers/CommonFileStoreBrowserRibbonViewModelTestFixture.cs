@@ -1,26 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommonFileStoreBrowserRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -35,22 +34,22 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Permission;
-    
+
     using CDP4EngineeringModel.ViewModels;
-    
+
     using CommonServiceLocator;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -79,6 +78,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
         private Iteration iteration;
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
@@ -87,6 +87,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -94,9 +95,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
-            
+
             this.serviceLocator.Setup(x => x.GetInstance<IPermissionService>()).Returns(this.permissionService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.thingDialogNavigationService.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(this.panelNavigationService.Object);
@@ -129,6 +130,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
         }
@@ -136,13 +138,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatRibbonViewModelCanBeConstructed()
         {
-            var viewmodel = new CommonFileStoreBrowserRibbonViewModel();
+            var viewmodel = new CommonFileStoreBrowserRibbonViewModel(this.messageBus);
             Assert.IsFalse(viewmodel.HasSessions);
         }
 

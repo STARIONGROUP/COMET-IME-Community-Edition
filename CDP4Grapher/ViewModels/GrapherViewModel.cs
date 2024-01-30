@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -45,8 +45,6 @@ namespace CDP4Grapher.ViewModels
     using CDP4Dal.Events;
 
     using CDP4Grapher.Behaviors;
-
-    using CommonServiceLocator;
 
     using DevExpress.Mvvm.Native;
 
@@ -176,7 +174,7 @@ namespace CDP4Grapher.ViewModels
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
-        
+
         /// <summary>
         /// Gets or sets the visibility of the grapher
         /// </summary>
@@ -225,47 +223,47 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.modelSetup)
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var engineeringModelSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.modelSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var domainOfExpertiseSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.iterationSetup)
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var iterationSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.iterationSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(iterationSetupSubscription);
 
-            var iterationSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>((Iteration)this.Thing.Container)
-                .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
+            var iterationSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>((Iteration)this.Thing.Container)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                 .Select(x => x.ChangedThing as Iteration)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(iterationSubscription);
 
-            var optionSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+            var optionSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing)
                 .Where(
                     objectChange =>
-                        (objectChange.EventKind == EventKind.Updated) &&
-                        (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
+                        objectChange.EventKind == EventKind.Updated &&
+                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                 .Select(x => x.ChangedThing as Option)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(optionSubscription);
 
-            var elementUsageSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementUsage))
+            var elementUsageSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ElementUsage))
                 .Where(objectChange => objectChange.EventKind != EventKind.Updated)
                 .Select(x => x.ChangedThing as ElementUsage)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -285,7 +283,7 @@ namespace CDP4Grapher.ViewModels
             if (iteration.TopElement != null)
             {
                 var elements = new NestedElementTreeGenerator().Generate(this.option, currentDomainOfExpertise).OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
-                this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e)));
+                this.GraphElements.AddRange(elements.Select(e => new GraphElementViewModel(e, this.CDPMessageBus)));
                 this.GrapherVisibility = Visibility.Visible;
                 this.GrapherPlaceholderVisibility = Visibility.Collapsed;
             }
@@ -306,9 +304,9 @@ namespace CDP4Grapher.ViewModels
 
             var newTree = new NestedElementTreeGenerator().GenerateNestedElements(this.option, currentDomainOfExpertise, graphElement.Thing.ElementUsage.Last().ElementDefinition)
                 .OrderBy(e => e.ElementUsage.Count).ThenBy(e => e.Name);
-            
+
             this.GraphElements.Clear();
-            this.GraphElements.AddRange(newTree.Select(e => new GraphElementViewModel(e)));
+            this.GraphElements.AddRange(newTree.Select(e => new GraphElementViewModel(e, this.CDPMessageBus)));
         }
 
         /// <summary>
@@ -345,7 +343,7 @@ namespace CDP4Grapher.ViewModels
             this.GraphElements.ForEach(x => x.NestedElementElementListener.Dispose());
             this.GraphElements.Clear();
         }
-        
+
         /// <summary>
         /// Sets the selected element and the selected element model code
         /// </summary>

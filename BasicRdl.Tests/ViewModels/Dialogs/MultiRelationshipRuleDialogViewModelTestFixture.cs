@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MultiRelationshipRuleDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-// 
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -68,12 +68,14 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IThingDialogNavigationService> dialogService;
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://www.rheagroup.com");
             this.dialogService = new Mock<IThingDialogNavigationService>();
 
@@ -90,7 +92,7 @@ namespace BasicRdl.Tests.ViewModels
             this.cat = new Category(Guid.NewGuid(), null, this.uri) { Name = "category", ShortName = "cat" };
             this.cat1 = new Category(Guid.NewGuid(), null, this.uri) { Name = "category1", ShortName = "cat1" };
             this.genericSiteReferenceDataLibrary.DefinedCategory.Add(this.cat);
-            this.genericSiteReferenceDataLibrary.DefinedCategory.Add(this.cat1);            
+            this.genericSiteReferenceDataLibrary.DefinedCategory.Add(this.cat1);
             this.siteDir.SiteReferenceDataLibrary.Add(this.genericSiteReferenceDataLibrary);
 
             this.siteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), null, this.uri);
@@ -111,13 +113,14 @@ namespace BasicRdl.Tests.ViewModels
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -166,6 +169,7 @@ namespace BasicRdl.Tests.ViewModels
             var name = "name";
             var minRelated = 2;
             var maxRelated = 3;
+
             var expectedCategories =
                 this.siteRdl.DefinedCategory.Concat(this.genericSiteReferenceDataLibrary.DefinedCategory).ToList();
 
@@ -173,7 +177,7 @@ namespace BasicRdl.Tests.ViewModels
             expectedRelatedCategories.Add(this.cat1);
             expectedRelatedCategories.Add(this.cat2);
 
-            var rule = new MultiRelationshipRule(Guid.NewGuid(), null, this.uri);         
+            var rule = new MultiRelationshipRule(Guid.NewGuid(), null, this.uri);
             rule.ShortName = shortname;
             rule.Name = name;
             this.siteRdl.Rule.Add(rule);

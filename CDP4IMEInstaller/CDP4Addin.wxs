@@ -68,15 +68,15 @@
           </RegistryKey>
 
           <RegistryKey Key="InprocServer32">
-            <RegistryKey Key="10.0.0.6">
-              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.6, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryKey Key="10.0.0.7">
+              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.7, Culture=neutral, PublicKeyToken=null"></RegistryValue>
               <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.Addin"></RegistryValue>
               <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
               <RegistryValue Type="string" Name="CodeBase" Value="file:///[#_17CAA5BE]"></RegistryValue>
             </RegistryKey>
 
             <RegistryValue Type="string" Value="mscoree.dll"></RegistryValue>
-            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.6, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.7, Culture=neutral, PublicKeyToken=null"></RegistryValue>
             <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.Addin"></RegistryValue>
             <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
             <RegistryValue Type="string" Name="ThreadingModel" Value="Both"></RegistryValue>
@@ -106,15 +106,15 @@
           </RegistryKey>
 
           <RegistryKey Key="InprocServer32">
-            <RegistryKey Key="10.0.0.6">
-              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.6, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryKey Key="10.0.0.7">
+              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.7, Culture=neutral, PublicKeyToken=null"></RegistryValue>
               <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
               <RegistryValue Type="string" Name="CodeBase" Value="[#_17CAA5BE]"></RegistryValue>
               <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
             </RegistryKey>
 
             <RegistryValue Type="string" Value="mscoree.dll"></RegistryValue>
-            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.6, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.7, Culture=neutral, PublicKeyToken=null"></RegistryValue>
             <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
             <RegistryValue Type="string" Name="CodeBase" Value="[#_17CAA5BE]"></RegistryValue>
             <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>

@@ -1,32 +1,31 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PythonScriptPanelViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Scripting.ViewModels
 {
     using System;
-    using System.IO;
     using System.Linq;
     using System.Text;
     using System.Threading;
@@ -44,8 +43,6 @@ namespace CDP4Scripting.ViewModels
     using IronPython.Hosting;
 
     using Microsoft.Scripting;
-
-    using ReactiveUI;
 
     /// <summary>
     /// The view-model for the <see cref="ScriptPanel"/> view
@@ -67,12 +64,13 @@ namespace CDP4Scripting.ViewModels
         /// </summary>
         /// <param name="panelTitle">The title of the panel associated to this view model.</param>
         /// <param name="scriptingProxy">A <see cref="IScriptingProxy"/> object to perform the script commands associated to CDP4.</param>
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="openSessions">The list of the open <see cref="ISession"/>.</param>
-        public PythonScriptPanelViewModel(string panelTitle, IScriptingProxy scriptingProxy, ReactiveList<ISession> openSessions) : base(panelTitle, scriptingProxy, "*.py", openSessions, true)
+        public PythonScriptPanelViewModel(string panelTitle, IScriptingProxy scriptingProxy, ICDPMessageBus messageBus, ReactiveList<ISession> openSessions) : base(panelTitle, scriptingProxy, messageBus, "*.py", openSessions, true)
         {
             this.LoadHighlightingSheet(PythonHighlighting);
 
-            this.Runtime = IronPython.Hosting.Python.CreateRuntime();
+            this.Runtime = Python.CreateRuntime();
             this.Runtime.LoadAssembly(typeof(string).Assembly);
             this.Runtime.LoadAssembly(typeof(Uri).Assembly);
 
@@ -122,7 +120,7 @@ namespace CDP4Scripting.ViewModels
                 {
                     Application.Current.Dispatcher.Invoke(
                         DispatcherPriority.Input,
-                        new Action(() =>this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {tae.Message}\n")));
+                        new Action(() => this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {tae.Message}\n")));
                 }
 
                 // The abortion of the thread is cancelled to avoid the loss of data, the cancelletation token is checked and will throw an exception to cancel the task properly if necessary
@@ -138,7 +136,7 @@ namespace CDP4Scripting.ViewModels
             {
                 Application.Current.Dispatcher.Invoke(
                     DispatcherPriority.Input,
-                    new Action(() =>this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {ex.Message}\n")));
+                    new Action(() => this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {ex.Message}\n")));
             }
             finally
             {

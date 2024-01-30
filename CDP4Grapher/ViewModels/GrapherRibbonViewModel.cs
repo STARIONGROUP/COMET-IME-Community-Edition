@@ -51,7 +51,10 @@ namespace CDP4Grapher.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="RibbonButtonIterationDependentViewModel"/> class
         /// </summary>
-        public GrapherRibbonViewModel() : base(InstantiatePanelViewModel)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public GrapherRibbonViewModel(ICDPMessageBus messageBus) : base(InstantiatePanelViewModel, messageBus)
         {
         }
 

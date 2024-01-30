@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeIconUriConverterTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -25,40 +25,39 @@
 
 namespace CDP4ProductTree.Tests.Converters
 {
-    using CDP4Dal;
-
-    using Moq;
-    
     using System;
-    using System.Threading;
-    using System.Windows.Media.Imaging;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Windows;
-    
-    using NUnit.Framework;
-    
-    
+    using System.Windows.Media.Imaging;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
+
     using CDP4CommonView;
 
     using CDP4Composition.Services.NestedElementTreeService;
+
+    using CDP4Dal;
 
     using CDP4ProductTree.ViewModels;
 
     using CommonServiceLocator;
 
+    using Moq;
+
+    using NUnit.Framework;
+
     using ParameterRowViewModel = CDP4ProductTree.ViewModels.ParameterRowViewModel;
-    using Thing = CDP4Common.CommonData.Thing;
 
     /// <summary>
     /// suite of tests for the <see cref="ProductTreeIconUriConverter"/>
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     internal class ProductTreeIconUriConverterTestFixture
     {
         private Mock<ISession> session;
@@ -79,11 +78,12 @@ namespace CDP4ProductTree.Tests.Converters
         private ProductTreeIconUriConverter converter;
         private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<IServiceLocator> serviceLocator;
-
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
             var ensurePackSchemeIsKnown = System.IO.Packaging.PackUriHelper.UriSchemePack;
             this.session = new Mock<ISession>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
@@ -116,6 +116,7 @@ namespace CDP4ProductTree.Tests.Converters
             this.elementdef.Parameter.Add(this.parameter);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.parameter.Iid, null), new Lazy<Thing>(() => this.parameter));
 

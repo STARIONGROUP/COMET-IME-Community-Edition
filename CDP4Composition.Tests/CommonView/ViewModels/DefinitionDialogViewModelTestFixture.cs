@@ -1,19 +1,19 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DefinitionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -28,24 +28,30 @@ namespace CDP4CommonView.Tests
     using System;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.MetaInfo;    
+    using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
+    using CDP4CommonView.ViewModels;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
-    using CDP4Dal.Operations;
-    using CommonServiceLocator;
-    using Moq;
-    using ReactiveUI;
-    using CDP4CommonView.ViewModels;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+
+    using CommonServiceLocator;
+
+    using Moq;
+
     using NUnit.Framework;
-    using System.Threading.Tasks;
-    using System.Windows.Input;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="DefinitionDialogViewModelTestFixture"/>
@@ -63,6 +69,7 @@ namespace CDP4CommonView.Tests
 
         private Assembler assembler;
         private Uri uri = new Uri("http://test.com");
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
@@ -73,11 +80,13 @@ namespace CDP4CommonView.Tests
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.navigation.Object);
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.simpleDefinition = new Definition(Guid.NewGuid(), null, null) { LanguageCode = "es-ES", Content = "Definition" };
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, null);
-            
+
             this.simpleDefinition.Note.Add("Note0");
             this.simpleDefinition.Example.Add("Note0");
 
@@ -89,6 +98,7 @@ namespace CDP4CommonView.Tests
             this.session.Setup(x => x.Dal).Returns(dal.Object);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         /// <summary>
@@ -98,7 +108,7 @@ namespace CDP4CommonView.Tests
         public void VerifyCreateNewEmptyDefinitionDialogViewModel()
         {
             this.viewmodel = new DefinitionDialogViewModel();
-            Assert.IsNotNull(this.viewmodel);            
+            Assert.IsNotNull(this.viewmodel);
         }
 
         /// <summary>
@@ -120,7 +130,7 @@ namespace CDP4CommonView.Tests
 
             //Test Note features
             await this.viewmodel.CreateNoteCommand.Execute();
-            Assert.AreEqual(this.viewmodel.Note.Count,2);
+            Assert.AreEqual(this.viewmodel.Note.Count, 2);
             this.viewmodel.SelectedNote = this.viewmodel.Note[0];
             Assert.IsTrue(this.viewmodel.SelectedNote.Value.Equals(this.simpleDefinition.Note[0]));
             await this.viewmodel.DeleteNoteCommand.Execute();
@@ -143,7 +153,7 @@ namespace CDP4CommonView.Tests
 
             var definition = new Definition() { LanguageCode = languageCode, Content = content };
 
-            var requirement = new Requirement();            
+            var requirement = new Requirement();
             var clone = requirement.Clone(false);
             clone.Definition.Add(definition);
 
@@ -169,7 +179,7 @@ namespace CDP4CommonView.Tests
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, null);
             transaction.CreateOrUpdate(clone);
-            
+
             Assert.DoesNotThrow(() => new DefinitionDialogViewModel(definition, transaction, this.session.Object, true, ThingDialogKind.Create, null, clone, null));
         }
 

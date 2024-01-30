@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RuleVerificationListRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,21 +30,25 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     using System.Linq;
     using System.Reflection;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
-    using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -54,6 +77,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         private Iteration iteration;
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
@@ -61,6 +85,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             this.revision = typeof(Thing).GetProperty("RevisionNumber");
             this.thingCreator = new Mock<IThingCreator>();
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -71,7 +96,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
             this.sitedir.SiteReferenceDataLibrary.Add(this.siteReferenceDataLibrary);
 
-            this.modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);            
+            this.modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
             this.modelsetup.RequiredRdl.Add(this.modelReferenceDataLibrary);
             this.modelReferenceDataLibrary.RequiredRdl = this.siteReferenceDataLibrary;
@@ -93,6 +118,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
@@ -101,16 +127,17 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatPropertiesAreSetAndContainRowsArePopulated()
         {
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri)
-                                           {
-                                               Owner = this.domain
-                                           };
+            {
+                Owner = this.domain
+            };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
             var listRowViewModel = new RuleVerificationListRowViewModel(ruleVerificationList, this.session.Object, null);
@@ -118,15 +145,15 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             // add a rule verification
             var builtInRuleVerification = new BuiltInRuleVerification(Guid.NewGuid(), this.cache, this.uri)
-                                              {
-                                                  Name = "BuiltIn",
-                                                  Status = RuleVerificationStatusKind.INCONCLUSIVE,                                                  
-                                                  IsActive = true
-                                              };
+            {
+                Name = "BuiltIn",
+                Status = RuleVerificationStatusKind.INCONCLUSIVE,
+                IsActive = true
+            };
 
             ruleVerificationList.RuleVerification.Add(builtInRuleVerification);
             this.revision.SetValue(ruleVerificationList, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(ruleVerificationList, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(ruleVerificationList, EventKind.Updated);
 
             var builtInRuleVerificationRow = listRowViewModel.ContainedRows.Single(x => x.Thing == builtInRuleVerification);
             Assert.AreEqual(builtInRuleVerification, builtInRuleVerificationRow.Thing);
@@ -134,20 +161,20 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             // add a rule verification
             var parameterizedCategoryRule = new ParameterizedCategoryRule(Guid.NewGuid(), this.cache, this.uri)
-                                                {
-                                                    Name = "Parameterized Category Rule"
-                                                };
+            {
+                Name = "Parameterized Category Rule"
+            };
 
             var userRuleVerification = new UserRuleVerification(Guid.NewGuid(), this.cache, this.uri)
-                                            {
-                                                Status = RuleVerificationStatusKind.INCONCLUSIVE,
-                                                IsActive = true,
-                                                Rule = parameterizedCategoryRule
-                                            };
+            {
+                Status = RuleVerificationStatusKind.INCONCLUSIVE,
+                IsActive = true,
+                Rule = parameterizedCategoryRule
+            };
 
             ruleVerificationList.RuleVerification.Add(userRuleVerification);
             this.revision.SetValue(ruleVerificationList, 3);
-            CDPMessageBus.Current.SendObjectChangeEvent(ruleVerificationList, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(ruleVerificationList, EventKind.Updated);
 
             var userRuleVerificationRow = listRowViewModel.ContainedRows.Single(x => x.Thing == userRuleVerification);
             Assert.AreEqual(userRuleVerification, userRuleVerificationRow.Thing);
@@ -156,13 +183,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             // Remove a rule verification
             ruleVerificationList.RuleVerification.Remove(builtInRuleVerification);
             this.revision.SetValue(ruleVerificationList, 4);
-            CDPMessageBus.Current.SendObjectChangeEvent(ruleVerificationList, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(ruleVerificationList, EventKind.Updated);
             Assert.AreEqual(1, listRowViewModel.ContainedRows.Count);
 
             // Remove a rule verification
             ruleVerificationList.RuleVerification.Remove(userRuleVerification);
             this.revision.SetValue(ruleVerificationList, 5);
-            CDPMessageBus.Current.SendObjectChangeEvent(ruleVerificationList, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(ruleVerificationList, EventKind.Updated);
             Assert.AreEqual(0, listRowViewModel.ContainedRows.Count);
         }
 
@@ -173,6 +200,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
             var listRowViewModel = new RuleVerificationListRowViewModel(ruleVerificationList, this.session.Object, null);
 
@@ -195,6 +223,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
             var listRowViewModel = new RuleVerificationListRowViewModel(ruleVerificationList, this.session.Object, null);
 
@@ -219,6 +248,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
             var listRowViewModel = new RuleVerificationListRowViewModel(ruleVerificationList, this.session.Object, null);
 
@@ -239,6 +269,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
             var listRowViewModel = new RuleVerificationListRowViewModel(ruleVerificationList, this.session.Object, null);
             listRowViewModel.ThingCreator = this.thingCreator.Object;
@@ -260,6 +291,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
             var listRowViewModel = new RuleVerificationListRowViewModel(ruleVerificationList, this.session.Object, null);
 
@@ -282,6 +314,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
             var listRowViewModel = new RuleVerificationListRowViewModel(ruleVerificationList, this.session.Object, null);
             listRowViewModel.ThingCreator = this.thingCreator.Object;
@@ -301,12 +334,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
         [Test]
         public void VerifyThatViolationAreAddedRemoved()
         {
-            var decompositionRule = new DecompositionRule(Guid.NewGuid(), this.cache, this.uri) {Name = "decomposition"};
+            var decompositionRule = new DecompositionRule(Guid.NewGuid(), this.cache, this.uri) { Name = "decomposition" };
 
             var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri)
             {
                 Owner = this.domain
             };
+
             this.iteration.RuleVerificationList.Add(ruleVerificationList);
 
             // add a rule verification
@@ -335,6 +369,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             var builtinRow =
                 listRowViewModel.ContainedRows.Single(x => x.Thing.ClassKind == ClassKind.BuiltInRuleVerification);
+
             var userRow = listRowViewModel.ContainedRows.Single(x => x.Thing.ClassKind == ClassKind.UserRuleVerification);
 
             Assert.IsEmpty(builtinRow.ContainedRows);
@@ -342,22 +377,22 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
 
             builtInRuleVerification.Violation.Add(violation);
             this.revision.SetValue(builtInRuleVerification, 10);
-            CDPMessageBus.Current.SendObjectChangeEvent(builtInRuleVerification, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(builtInRuleVerification, EventKind.Updated);
             Assert.IsNotEmpty(builtinRow.ContainedRows);
 
             builtInRuleVerification.Violation.Clear();
             this.revision.SetValue(builtInRuleVerification, 20);
-            CDPMessageBus.Current.SendObjectChangeEvent(builtInRuleVerification, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(builtInRuleVerification, EventKind.Updated);
             Assert.IsEmpty(builtinRow.ContainedRows);
 
             userRuleVerification.Violation.Add(violation);
             this.revision.SetValue(userRuleVerification, 10);
-            CDPMessageBus.Current.SendObjectChangeEvent(userRuleVerification, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(userRuleVerification, EventKind.Updated);
             Assert.IsNotEmpty(userRow.ContainedRows);
 
             userRuleVerification.Violation.Clear();
             this.revision.SetValue(userRuleVerification, 20);
-            CDPMessageBus.Current.SendObjectChangeEvent(userRuleVerification, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(userRuleVerification, EventKind.Updated);
             Assert.IsEmpty(userRow.ContainedRows);
         }
     }

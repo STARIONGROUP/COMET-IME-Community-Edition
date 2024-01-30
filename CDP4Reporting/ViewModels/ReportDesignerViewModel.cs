@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReportDesignerViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -35,7 +35,6 @@ namespace CDP4Reporting.ViewModels
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Reactive.Threading.Tasks;
-    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
@@ -58,8 +57,14 @@ namespace CDP4Reporting.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using CDP4Reporting.DataCollection;
+    using CDP4Reporting.DynamicTableChecker;
+    using CDP4Reporting.Events;
+    using CDP4Reporting.ReportScript;
     using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.Utilities;
+
+    using CommonServiceLocator;
 
     using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Printing;
@@ -68,18 +73,9 @@ namespace CDP4Reporting.ViewModels
 
     using ICSharpCode.AvalonEdit.Document;
 
-    using CommonServiceLocator;
-
     using NLog;
 
     using ReactiveUI;
-
-    using CDP4Reporting.DataCollection;
-    using CDP4Reporting.DynamicTableChecker;
-    using CDP4Reporting.Events;
-    using CDP4Reporting.ReportScript;
-
-    using DevExpress.Data.Helpers;
 
     using File = System.IO.File;
     using Parameter = DevExpress.XtraReports.Parameters.Parameter;
@@ -330,7 +326,7 @@ namespace CDP4Reporting.ViewModels
             : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             var dataSetAssembly = typeof(DataSet).Assembly;
-            DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(dataSetAssembly); 
+            DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(dataSetAssembly);
 
             ReportingSettings.OptionSelector = (options, option) =>
             {
@@ -399,7 +395,7 @@ namespace CDP4Reporting.ViewModels
                 });
 
             this.Disposables.Add(
-                CDPMessageBus.Current.Listen<ReportOutputEvent>()
+                this.CDPMessageBus.Listen<ReportOutputEvent>()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => this.AddOutput(x.Output))
             );

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="StateToParameterTypeMapperBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -56,8 +56,6 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
     using Moq;
 
     using NUnit.Framework;
-
-    using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="StateToParameterTypeMapperBrowserViewModel"/> class
@@ -110,9 +108,13 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         private Category elementDefinitionCategory_1;
         private Category elementDefinitionCategory_2;
 
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
+
             this.ribbonManager = new Mock<IFluentRibbonManager>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -179,7 +181,8 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
-            
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
             // PossibleElementDefinitionCategory
             this.elementDefinitionCategory_1 = new Category(Guid.NewGuid(), this.cache, this.uri) { Name = "Batteries", ShortName = "BAT" };
             this.elementDefinitionCategory_1.PermissibleClass.Add(ClassKind.ElementDefinition);
@@ -239,7 +242,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             //SourceParameterTypes
             this.sourceParameterType_1 = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri)
             {
-                Name = "Source 1", 
+                Name = "Source 1",
                 ShortName = "source1"
             };
 
@@ -247,7 +250,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             this.sourceParameterType_2 = new CompoundParameterType(Guid.NewGuid(), this.cache, this.uri)
             {
-                Name = "Source 2", 
+                Name = "Source 2",
                 ShortName = "source2"
             };
 
@@ -259,7 +262,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 });
 
             this.sourceParameterType_2.Component.Add(
-                new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri) 
+                new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri)
                 {
                     ShortName = "Value",
                     ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri)
@@ -531,7 +534,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 ParameterType = this.mappingParameterType_1,
                 ValueSet = { mappingParameterValueset1 }
             };
-            
+
             var mappingParameterOverride1 = new ParameterOverride(Guid.NewGuid(), this.cache, this.uri)
             {
                 Parameter = mappingParameter1,
@@ -613,7 +616,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.True);
 
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
-            Assert.That(((ICommand) this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand).CanExecute(null), Is.True);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand).CanExecute(null), Is.True);
             Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.True);
 
             this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Clear();
@@ -717,17 +720,17 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             var dataView = this.stateToParameterTypeMapperBrowserViewModel.DataSourceManager.DataTable.DefaultView;
 
             dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterMappingType}'";
-            
+
             var newMapping =
                 this.elementDefinition.Parameter
                     .First(
                         x => x.ParameterType == this.sourceParameterType_1);
-            
+
             dataView[0][this.actualFinitateSte_on.ShortName] = newMapping.ParameterType.Iid;
 
             dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterValueType}'";
 
-            var newValue = 
+            var newValue =
                 newMapping
                     .ValueSet
                     .First()
@@ -770,17 +773,17 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             var dataView = this.stateToParameterTypeMapperBrowserViewModel.DataSourceManager.DataTable.DefaultView;
 
             dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterMappingType}'";
-            
+
             var newMapping =
                 this.elementDefinition.Parameter
                     .First(
                         x => x.ParameterType == this.sourceParameterType_1);
-            
+
             dataView[0][this.actualFinitateSte_on.ShortName] = newMapping.ParameterType.Iid;
 
             dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterValueType}'";
 
-            var newValue = 
+            var newValue =
                 newMapping
                     .ValueSet
                     .First()
@@ -831,7 +834,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterValueType}'";
 
-            var newValueValue = 
+            var newValueValue =
                 newMapping
                     .ValueSet
                     .First()
@@ -840,7 +843,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             Assert.AreEqual(newValueValue, dataView[0][columnName].ToString());
         }
 
-                [Test]
+        [Test]
         public async Task Verify_that_SelectedCompoundMappingParameterChangedCommand_works()
         {
             this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
@@ -877,7 +880,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterValueType}'";
 
-            var newValueValue = 
+            var newValueValue =
                 newMapping
                     .ValueSet
                     .First()
@@ -885,7 +888,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             Assert.AreEqual(newValueValue, dataView[0][columnName].ToString());
 
-            var newShortName = 
+            var newShortName =
                 newMapping
                     .ValueSet
                     .First()
@@ -903,7 +906,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
                 this.dialogNavigationService.Object,
-                this.pluginSettingsService.Object);       
+                this.pluginSettingsService.Object);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
@@ -928,7 +931,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
                 this.dialogNavigationService.Object,
-                this.pluginSettingsService.Object);       
+                this.pluginSettingsService.Object);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
@@ -957,7 +960,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
                 this.dialogNavigationService.Object,
-                this.pluginSettingsService.Object);       
+                this.pluginSettingsService.Object);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
@@ -977,7 +980,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             await this.stateToParameterTypeMapperBrowserViewModel.Drop(dropInfo.Object);
             Assert.AreEqual(1, this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Count);
         }
-        
+
         [Test]
         public async Task VerifyThatScalarParameterTypeCanBeDroppedOnce()
         {
@@ -987,7 +990,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
                 this.dialogNavigationService.Object,
-                this.pluginSettingsService.Object);       
+                this.pluginSettingsService.Object);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
@@ -1022,7 +1025,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 this.thingDialogNavigationService.Object,
                 this.panelNavigationService.Object,
                 this.dialogNavigationService.Object,
-                this.pluginSettingsService.Object);       
+                this.pluginSettingsService.Object);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 

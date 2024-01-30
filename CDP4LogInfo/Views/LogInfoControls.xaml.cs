@@ -31,8 +31,10 @@ namespace CDP4LogInfo.Views
     using CDP4Composition.Ribbon;
     using CDP4Composition.Mvvm;
 
-    using CDP4LogInfo.ViewModels;    
-    
+    using CDP4Dal;
+
+    using CDP4LogInfo.ViewModels;
+
     /// <summary>
     /// Interaction logic for LogInfoControls.xaml
     /// </summary>
@@ -43,11 +45,17 @@ namespace CDP4LogInfo.Views
         /// <summary>
         /// Initializes a new instance of the <see cref="LogInfoControls"/> class
         /// </summary>
+        /// <param name="dialogNavigationService">
+        /// The injected <see cref="IDialogNavigationService"/>
+        /// </param>
+        /// <param name="messageBus">
+        /// The injected <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public LogInfoControls(IDialogNavigationService dialogNavigationService)
+        public LogInfoControls(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            this.DataContext = new LogInfoControlsViewModel(dialogNavigationService);
+            this.DataContext = new LogInfoControlsViewModel(dialogNavigationService, messageBus);
         }
     }
 }

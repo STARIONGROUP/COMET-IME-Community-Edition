@@ -88,19 +88,23 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="thingDialogNavigationService">
         /// The <see cref="IThingDialogNavigationService"/> that is used to navigate to a dialog of a specific <see cref="Thing"/>.
         /// </param>
+        /// <param name="messageBoxService">
+        /// The <see cref="IMessageBoxService"/>.
+        /// </param>
         /// <param name="container">The Container <see cref="Thing"/> of the created <see cref="MultiRelationshipRule"/></param>
         /// <param name="chainOfContainers">
         /// The optional chain of containers that contains the <paramref name="container"/> argument
         /// </param>
-        public PossibleFiniteStateListDialogViewModel(PossibleFiniteStateList possibleFiniteStateList, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
+        public PossibleFiniteStateListDialogViewModel(PossibleFiniteStateList possibleFiniteStateList, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, IMessageBoxService messageBoxService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(possibleFiniteStateList, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
+            this.messageBoxService = messageBoxService;
         }
         
         /// <summary>
         /// The <see cref="IMessageBoxService"/> used to show user messages.
         /// </summary>
-        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+        private readonly IMessageBoxService messageBoxService;
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to set the default <see cref="PossibleFiniteState"/>

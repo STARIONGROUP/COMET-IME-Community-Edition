@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="OrganizationBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Tests.OrganizationBrowser
 {
@@ -16,23 +35,29 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4SiteDirectory.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
     public class OrganizationBrowserViewModelTestFixture
     {
-        private readonly PropertyInfo revision = typeof (Thing).GetProperty("RevisionNumber");
+        private readonly PropertyInfo revision = typeof(Thing).GetProperty("RevisionNumber");
         private Mock<ISession> session;
         private SiteDirectory siteDir;
         private Organization orga1;
@@ -45,12 +70,14 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         private Mock<IPermissionService> permissionService;
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://test.com");
             this.session = new Mock<ISession>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
@@ -78,12 +105,13 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -91,24 +119,24 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         {
             var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
 
-            revision.SetValue(this.siteDir, 2);
+            this.revision.SetValue(this.siteDir, 2);
             this.siteDir.Organization.Add(this.orga2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
 
             Assert.AreEqual(2, vm.Organizations.Count);
 
             var row = vm.Organizations.Single(x => x.Thing == this.orga2);
             Assert.AreEqual(1, row.ContainedRows.Count);
 
-            revision.SetValue(this.siteDir, 20);
+            this.revision.SetValue(this.siteDir, 20);
             this.person.Organization = null;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
 
             Assert.AreEqual(0, row.ContainedRows.Count);
 
-            revision.SetValue(this.siteDir, 30);
+            this.revision.SetValue(this.siteDir, 30);
             this.siteDir.Organization.Remove(this.orga2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
             Assert.AreEqual(1, vm.Organizations.Count);
         }
 
@@ -132,7 +160,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
             var type = this.orga1.GetType();
             type.GetProperty("RevisionNumber").SetValue(this.orga1, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.orga1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.orga1, EventKind.Updated);
 
             var org = vm.Organizations.Single();
             Assert.AreEqual("rhea", org.Name);
@@ -147,7 +175,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
             Assert.IsFalse(((ICommand)vm.UpdateCommand).CanExecute(null));
 
             var organization = new Organization(Guid.NewGuid(), null, this.uri) { Name = "1", ShortName = "1" };
-            CDPMessageBus.Current.SendObjectChangeEvent(organization, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(organization, EventKind.Added);
 
             vm.SelectedThing = vm.Organizations.Single();
             vm.ComputePermission();
@@ -164,7 +192,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Organization>(), It.IsAny<ThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
 
             var organization = new Organization(Guid.NewGuid(), null, this.uri) { Name = "1", ShortName = "1" };
-            CDPMessageBus.Current.SendObjectChangeEvent(organization, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(organization, EventKind.Added);
 
             await vm.InspectCommand.Execute();
             Assert.Throws<MockException>(() => this.dialogNavigation.Verify(x => x.Navigate(organization, It.IsAny<ThingTransaction>(), this.session.Object, true, ThingDialogKind.Inspect, this.dialogNavigation.Object, It.IsAny<Thing>(), null)));
@@ -173,7 +201,7 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
 
             await vm.InspectCommand.Execute();
             this.dialogNavigation.Verify(x => x.Navigate(It.IsAny<Organization>(), It.IsAny<ThingTransaction>(), this.session.Object, true, ThingDialogKind.Inspect, this.dialogNavigation.Object, It.IsAny<Thing>(), null));
-            
+
             await vm.UpdateCommand.Execute();
         }
 
@@ -182,8 +210,8 @@ namespace CDP4SiteDirectory.Tests.OrganizationBrowser
         {
             var vm = new OrganizationBrowserViewModel(this.session.Object, this.siteDir, this.dialogNavigation.Object, this.navigation.Object, null, null);
             var organization = new Organization(Guid.NewGuid(), null, this.uri) { Name = "1", ShortName = "1" };
-            CDPMessageBus.Current.SendObjectChangeEvent(organization, EventKind.Added);
-            CDPMessageBus.Current.SendObjectChangeEvent(organization, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(organization, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(organization, EventKind.Added);
             Assert.AreEqual(1, vm.Thing.Organization.Count);
         }
     }

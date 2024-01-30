@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementSpecificationMappingDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -98,11 +98,13 @@ namespace CDP4Requirements.Tests.ReqIF
         private RequirementsModuleSettings settings;
         private string path;
         private Mock<IServiceLocator> serviceLocator;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -130,7 +132,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.reqIfSerialiser.Setup(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null)).Returns(new[] { this.reqIf });
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString());
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -169,6 +171,7 @@ namespace CDP4Requirements.Tests.ReqIF
             var thingFactory = new ThingFactory(this.iteration, new Dictionary<DatatypeDefinition, DatatypeDefinitionMap>(), new Dictionary<SpecType, SpecTypeMap>(), this.domain);
             this.dialog = new RequirementSpecificationMappingDialogViewModel(thingFactory, this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, "EN", this.settings.SavedConfigurations[0] as ImportMappingConfiguration);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [Test]

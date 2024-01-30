@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ThingSelectorViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -38,6 +38,7 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.DAL;
+
     using Moq;
 
     using NUnit.Framework;
@@ -86,19 +87,26 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
         /// </summary>
         private readonly List<Guid> preservedParametersIids = new List<Guid>();
 
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void SetUp()
         {
-            this.assembler = new Assembler(this.credentials.Uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.credentials.Uri, this.messageBus);
 
             this.dal = new Mock<IDal>();
             this.dal.SetupProperty(d => d.Session);
-            this.assembler = new Assembler(this.credentials.Uri);
+            this.assembler = new Assembler(this.credentials.Uri, this.messageBus);
 
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Dal).Returns(this.dal.Object);
             this.session.Setup(x => x.Credentials).Returns(this.credentials);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
             {
@@ -200,10 +208,10 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.AreEqual(0, elementDefinition.Categories.Count);
             Assert.AreEqual("ElementDefinition(Domain)", elementDefinition.ToString());
 
-            Assert.DoesNotThrowAsync(async () => await  viewModel.MoveItemsToTarget.Execute());
+            Assert.DoesNotThrowAsync(async () => await viewModel.MoveItemsToTarget.Execute());
 
             viewModel.SelectedTargetList = viewModel.ElementDefinitionTargetList;
-            Assert.DoesNotThrowAsync(async () => await  viewModel.MoveItemsToSource.Execute());
+            Assert.DoesNotThrowAsync(async () => await viewModel.MoveItemsToSource.Execute());
 
             viewModel.SelectedSourceList = viewModel.ElementDefinitionSourceList;
             Assert.DoesNotThrowAsync(async () => await viewModel.MoveItemsToTarget.Execute());
@@ -227,13 +235,13 @@ namespace CDP4CrossViewEditor.Tests.ViewModels
             Assert.AreEqual("SimpleQuantityKind", parameterType.Type);
             Assert.AreEqual("P_SimpleQuantityKind(SimpleQuantityKind)", parameterType.ToString());
 
-            Assert.DoesNotThrowAsync(async () => await  viewModel.MoveItemsToTarget.Execute());
+            Assert.DoesNotThrowAsync(async () => await viewModel.MoveItemsToTarget.Execute());
 
             viewModel.SelectedTargetList = viewModel.ParameterTypeTargetList;
-            Assert.DoesNotThrowAsync(async () => await  viewModel.MoveItemsToSource.Execute());
+            Assert.DoesNotThrowAsync(async () => await viewModel.MoveItemsToSource.Execute());
 
             viewModel.SelectedSourceList = viewModel.ParameterTypeSourceList;
-            Assert.DoesNotThrowAsync(async () => await  viewModel.ClearItems.Execute());
+            Assert.DoesNotThrowAsync(async () => await viewModel.ClearItems.Execute());
         }
     }
 }

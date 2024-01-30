@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOverrideRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,15 +28,21 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels.Dialogs;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -57,10 +82,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private PossibleFiniteStateList posStateList;
 
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
@@ -146,19 +173,22 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.cptParameter.ValueSet.Add(new ParameterValueSet(Guid.NewGuid(), null, this.uri)
             {
-                ActualOption = this.option1, 
+                ActualOption = this.option1,
                 ActualState = this.stateList.ActualState.First()
             });
+
             this.cptParameter.ValueSet.Add(new ParameterValueSet(Guid.NewGuid(), null, this.uri)
             {
                 ActualOption = this.option1,
                 ActualState = this.stateList.ActualState.Last()
             });
+
             this.cptParameter.ValueSet.Add(new ParameterValueSet(Guid.NewGuid(), null, this.uri)
             {
                 ActualOption = this.option2,
                 ActualState = this.stateList.ActualState.First()
             });
+
             this.cptParameter.ValueSet.Add(new ParameterValueSet(Guid.NewGuid(), null, this.uri)
             {
                 ActualOption = this.option2,
@@ -169,8 +199,9 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             {
                 Owner = this.activeDomain
             };
+
             this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), null, this.uri);
-            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), null, this.uri){ElementDefinition = this.elementDefinitionForUsage1};
+            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), null, this.uri) { ElementDefinition = this.elementDefinitionForUsage1 };
 
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
 
@@ -197,21 +228,22 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatParameterOverrideRowWorksNoOptionNoState()
         {
-            var value = new List<string> {"test"};
+            var value = new List<string> { "test" };
 
             var parameterValue = new ParameterValueSet(Guid.NewGuid(), null, this.uri);
             parameterValue.Manual = new ValueArray<string>(value);
@@ -221,8 +253,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.parameter.ValueSet.Add(parameterValue);
 
-            var poverride = new ParameterOverride(Guid.NewGuid(), null, this.uri) {Parameter = this.parameter};
-            var valueset = new ParameterOverrideValueSet(Guid.NewGuid(), null, this.uri) {ParameterValueSet = parameterValue};
+            var poverride = new ParameterOverride(Guid.NewGuid(), null, this.uri) { Parameter = this.parameter };
+            var valueset = new ParameterOverrideValueSet(Guid.NewGuid(), null, this.uri) { ParameterValueSet = parameterValue };
             valueset.Manual = new ValueArray<string>(value);
             poverride.ValueSet.Add(valueset);
 
@@ -276,8 +308,9 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             var o1row =
                 row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
+
             var o2row =
-               row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option2);
+                row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option2);
 
             Assert.AreEqual(o1row.Manual, "test");
             Assert.AreEqual(o2row.Reference, "test");
@@ -324,8 +357,9 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             var s1row =
                 row.ContainedRows.OfType<ParameterStateRowViewModel>().Single(x => x.ActualState == this.actualState1);
+
             var s2row =
-               row.ContainedRows.OfType<ParameterStateRowViewModel>().Single(x => x.ActualState == this.actualState2);
+                row.ContainedRows.OfType<ParameterStateRowViewModel>().Single(x => x.ActualState == this.actualState2);
 
             Assert.AreEqual(s1row.Manual, "test");
             Assert.AreEqual(s2row.Reference, "test");
@@ -367,7 +401,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             set2.Reference = new ValueArray<string>(value);
             set2.Computed = new ValueArray<string>(value);
             set2.Published = new ValueArray<string>(value);
-            
+
             this.parameter.ValueSet.Add(set1);
             this.parameter.ValueSet.Add(set2);
             this.parameter.ValueSet.Add(set3);

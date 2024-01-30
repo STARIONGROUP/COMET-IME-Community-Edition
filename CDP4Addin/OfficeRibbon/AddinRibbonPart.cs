@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AddinRibbonPart.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -85,10 +85,13 @@ namespace CDP4AddinCE
         /// <param name="appSettingService">
         /// The <see cref="IAppSettingsService{AddinAppSettings}"/> used to load application settings for the Addin
         /// </param>
-        public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IAppSettingsService<AddinAppSettings> appSettingService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IAppSettingsService<AddinAppSettings> appSettingService, ICDPMessageBus messageBus)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, messageBus)
         {
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
             this.appSettingService = appSettingService;
         }
 
@@ -106,7 +109,7 @@ namespace CDP4AddinCE
             switch (ribbonControlId)
             {
                 case "CDP4_Open":
-                    var dataSelection = new DataSourceSelectionViewModel(this.DialogNavigationService);
+                    var dataSelection = new DataSourceSelectionViewModel(this.DialogNavigationService, this.CDPMessageBus);
                     var dataSelectionResult = this.DialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
 
                     if (dataSelectionResult?.OpenModel ?? false)
@@ -175,7 +178,7 @@ namespace CDP4AddinCE
                 case "CDP4_SelectModelToOpen":
                     return this.session != null;
                 case "CDP4_SelectModelToClose":
-                    return (this.session != null) && (this.session.OpenIterations.Count > 0);
+                    return this.session != null && this.session.OpenIterations.Count > 0;
                 case "CDP4_Plugins":
                     return true;
                 default:

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -27,7 +27,6 @@ namespace CDP4Composition.Mvvm
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reactive.Linq;
 
     using CDP4Common;
@@ -149,7 +148,7 @@ namespace CDP4Composition.Mvvm
             this.Disposables = new List<IDisposable>();
             this.Thing = thing;
             this.Session = session;
-
+            this.CDPMessageBus = session.CDPMessageBus;
             this.RevisionNumber = thing.RevisionNumber;
             this.IDalUri = thing.IDalUri;
 
@@ -162,7 +161,7 @@ namespace CDP4Composition.Mvvm
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+                var thingSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
@@ -171,7 +170,7 @@ namespace CDP4Composition.Mvvm
             }
             else
             {
-                var thingObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(T));
+                var thingObserver = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(T));
 
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(
                     thingObserver, 
@@ -279,6 +278,11 @@ namespace CDP4Composition.Mvvm
         /// Gets the <see cref="Thing"/> that is represented by the view-model
         /// </summary>
         public T Thing { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICDPMessageBus"/>
+        /// </summary>
+        public ICDPMessageBus CDPMessageBus { get; private set; }
 
         /// <summary>
         /// Gets the list of <see cref="IDisposable"/> objects that are referenced by this class

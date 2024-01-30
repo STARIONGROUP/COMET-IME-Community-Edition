@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PanelNavigationService.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -45,8 +45,6 @@ namespace CDP4Composition.Navigation
 
     using NLog;
 
-    using ISession = CDP4Dal.ISession;
-
     /// <summary>
     /// The panel navigation service class that provides services to open a docking panel given a <see cref="Thing"/> or a <see cref="IPanelViewModel"/>
     /// </summary>
@@ -63,6 +61,11 @@ namespace CDP4Composition.Navigation
         /// The (injected) <see cref="IFilterStringService"/>
         /// </summary>
         private readonly IFilterStringService filterStringService;
+
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
 
         /// <summary>
         /// The logger for the current class
@@ -97,19 +100,24 @@ namespace CDP4Composition.Navigation
         /// The MEF injected <see cref="IPanelViewModel"/> which are decorated with <see cref="INameMetaData"/> and can be navigated to.
         /// </param>
         /// <param name="filterStringService">The MEF injected <see cref="IFilterStringService"/></param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
         public PanelNavigationService(
             [ImportMany] IEnumerable<IPanelView> panelViewKinds,
             [ImportMany] IEnumerable<IPanelViewModel> panelViewModelKinds,
             [ImportMany] IEnumerable<Lazy<IPanelViewModel, INameMetaData>> panelViewModelDecorated,
             DockLayoutViewModel dockLayoutViewModel,
-            IFilterStringService filterStringService)
+            IFilterStringService filterStringService,
+            ICDPMessageBus messageBus)
         {
             var sw = new Stopwatch();
             sw.Start();
             logger.Debug("Instantiating the PanelNavigationService");
             this.dockLayoutViewModel = dockLayoutViewModel;
             this.filterStringService = filterStringService;
+            this.messageBus = messageBus;
 
             this.dockLayoutViewModel.DockPanelViewModels.ItemsRemoved.Subscribe(this.CleanUpPanelsAndSendCloseEvent);
 
@@ -224,7 +232,7 @@ namespace CDP4Composition.Navigation
             if (this.AddInViewModelViewPairs.TryGetValue(viewModel, out var view))
             {
                 var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open);
-                CDPMessageBus.Current.SendMessage(openPanelEvent);
+                this.messageBus.SendMessage(openPanelEvent);
             }
             else
             {
@@ -275,9 +283,9 @@ namespace CDP4Composition.Navigation
         public void CloseInDock(Type viewModelType)
         {
             var viewModels = this.dockLayoutViewModel
-                                 .DockPanelViewModels
-                                 .Where(vm => vm.GetType() == viewModelType)
-                                 .ToList();
+                .DockPanelViewModels
+                .Where(vm => vm.GetType() == viewModelType)
+                .ToList();
 
             foreach (var vm in viewModels)
             {
@@ -299,7 +307,7 @@ namespace CDP4Composition.Navigation
             this.AddInViewModelViewPairs.Remove(panelViewModel);
 
             var closePanelEvent = new NavigationPanelEvent(panelViewModel, panelView, PanelStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closePanelEvent);
+            this.messageBus.SendMessage(closePanelEvent);
 
             panelView.DataContext = null;
             panelViewModel.Dispose();
@@ -319,7 +327,7 @@ namespace CDP4Composition.Navigation
         private void CleanUpPanelsAndSendCloseEvent(IPanelViewModel panelViewModel)
         {
             var closePanelEvent = new NavigationPanelEvent(panelViewModel, null, PanelStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closePanelEvent);
+            this.messageBus.SendMessage(closePanelEvent);
 
             panelViewModel.Dispose();
 
@@ -358,7 +366,7 @@ namespace CDP4Composition.Navigation
             }
 
             var openPanelEvent = new NavigationPanelEvent(viewModel, view, PanelStatus.Open);
-            CDPMessageBus.Current.SendMessage(openPanelEvent);
+            this.messageBus.SendMessage(openPanelEvent);
         }
 
         /// <summary>

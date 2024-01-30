@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PublicationBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -145,18 +145,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup" />
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup
-        {
-            get { return this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>(); }
-        }
+        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -164,8 +161,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string FilterString
         {
-            get { return this.filterString; }
-            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
+            get => this.filterString;
+            set => this.RaiseAndSetIfChanged(ref this.filterString, value);
         }
 
         /// <summary>
@@ -173,8 +170,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -182,8 +179,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreatePublication
         {
-            get { return this.canCreatePublication; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreatePublication, value); }
+            get => this.canCreatePublication;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreatePublication, value);
         }
 
         /// <summary>
@@ -191,8 +188,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool IsHidingEmptyDomains
         {
-            get { return this.isHidingEmptyDomains; }
-            set { this.RaiseAndSetIfChanged(ref this.isHidingEmptyDomains, value); }
+            get => this.isHidingEmptyDomains;
+            set => this.RaiseAndSetIfChanged(ref this.isHidingEmptyDomains, value);
         }
 
         /// <summary>
@@ -210,8 +207,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool? SelectAll
         {
-            get { return this.selectAll; }
-            private set { this.RaiseAndSetIfChanged(ref this.selectAll, value); }
+            get => this.selectAll;
+            private set => this.RaiseAndSetIfChanged(ref this.selectAll, value);
         }
 
         /// <summary>
@@ -262,7 +259,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected virtual void ExecuteHighlightElementCommand()
         {
             // clear all highlights
-            CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
+            this.CDPMessageBus.SendMessage(new CancelHighlightEvent());
 
             if (this.SelectedThing?.Thing == null || !(this.SelectedThing is PublicationParameterOrOverrideRowViewModel))
             {
@@ -272,8 +269,8 @@ namespace CDP4EngineeringModel.ViewModels
             var thing = this.SelectedThing.Thing.Container;
 
             // highlight the selected thing
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(thing), thing);
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(thing), null);
+            this.CDPMessageBus.SendMessage(new HighlightEvent(thing), thing);
+            this.CDPMessageBus.SendMessage(new HighlightEvent(thing), null);
         }
 
         /// <summary>
@@ -282,7 +279,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected virtual void ExecuteHighlightCommand()
         {
             // clear all highlights
-            CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
+            this.CDPMessageBus.SendMessage(new CancelHighlightEvent());
 
             if (this.SelectedThing?.Thing == null)
             {
@@ -290,8 +287,8 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             // highlight the selected thing
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.SelectedThing.Thing), this.SelectedThing.Thing);
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.SelectedThing.Thing), null);
+            this.CDPMessageBus.SendMessage(new HighlightEvent(this.SelectedThing.Thing), this.SelectedThing.Thing);
+            this.CDPMessageBus.SendMessage(new HighlightEvent(this.SelectedThing.Thing), null);
         }
 
         /// <summary>
@@ -382,84 +379,77 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.Disposables.Add(this.WhenAnyValue(vm => vm.IsHidingEmptyDomains).Subscribe(_ => this.ToggleEmptyDomains()));
 
-            var updatePublishableParameterListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase))
-                    .Where(
-                        objectChange => objectChange.EventKind == EventKind.Updated
-                                        && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
-                                        && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .Select(x => x.ChangedThing.Container as ParameterOrOverrideBase)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.UpdatePublishableParameter);
+            var updatePublishableParameterListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterValueSetBase))
+                .Where(
+                    objectChange => objectChange.EventKind == EventKind.Updated
+                                    && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
+                                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Select(x => x.ChangedThing.Container as ParameterOrOverrideBase)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.UpdatePublishableParameter);
 
             this.Disposables.Add(updatePublishableParameterListener);
 
-            var addParameterListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
-                    .Where(
-                        objectChange => objectChange.EventKind == EventKind.Added
-                                        && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
-                                        && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .Select(x => x.ChangedThing as ParameterOrOverrideBase)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.UpdatePublishableParameter);
+            var addParameterListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
+                .Where(
+                    objectChange => objectChange.EventKind == EventKind.Added
+                                    && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
+                                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Select(x => x.ChangedThing as ParameterOrOverrideBase)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.UpdatePublishableParameter);
 
             this.Disposables.Add(addParameterListener);
 
-            var updateParameterListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
-                    .Where(
-                        objectChange => objectChange.EventKind == EventKind.Updated
-                                        && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
-                                        && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .Select(x => x.ChangedThing as ParameterOrOverrideBase)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.RelocateParameterRowViewModel);
+            var updateParameterListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
+                .Where(
+                    objectChange => objectChange.EventKind == EventKind.Updated
+                                    && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
+                                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Select(x => x.ChangedThing as ParameterOrOverrideBase)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.RelocateParameterRowViewModel);
 
             this.Disposables.Add(updateParameterListener);
 
-            var removeParameterListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
-                    .Where(
-                        objectChange => objectChange.EventKind == EventKind.Removed
-                                        && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
-                                        && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .Select(x => x.ChangedThing as ParameterOrOverrideBase)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.RemovePublishableParameterRowViewModel);
+            var removeParameterListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase))
+                .Where(
+                    objectChange => objectChange.EventKind == EventKind.Removed
+                                    && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
+                                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Select(x => x.ChangedThing as ParameterOrOverrideBase)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.RemovePublishableParameterRowViewModel);
 
             this.Disposables.Add(removeParameterListener);
 
-            var addPublicationListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Publication))
-                    .Where(
-                        objectChange => objectChange.EventKind == EventKind.Added
-                                        && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
-                                        && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .Select(x => x.ChangedThing as Publication)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.AddPublicationRowViewModel);
+            var addPublicationListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Publication))
+                .Where(
+                    objectChange => objectChange.EventKind == EventKind.Added
+                                    && objectChange.ChangedThing.CacheKey.Iteration == this.Thing.Iid
+                                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Select(x => x.ChangedThing as Publication)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.AddPublicationRowViewModel);
 
             this.Disposables.Add(addPublicationListener);
 
-            var updatedEngineeringModelListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(x => this.UpdateDomains());
+            var updatedEngineeringModelListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x => this.UpdateDomains());
 
             this.Disposables.Add(updatedEngineeringModelListener);
 
-            var updateDomainOfExpretiseListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .Select(x => x.ChangedThing as DomainOfExpertise)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.UpdateDomainOfExpretiseRowViewModel);
+            var updateDomainOfExpretiseListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Select(x => x.ChangedThing as DomainOfExpertise)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.UpdateDomainOfExpretiseRowViewModel);
 
             this.Disposables.Add(updateDomainOfExpretiseListener);
 
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+            var engineeringModelSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                 .Where(
                     objectChange => objectChange.EventKind == EventKind.Updated
                                     && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
@@ -468,7 +458,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+            var domainOfExpertiseSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                 .Where(
                     objectChange => objectChange.EventKind == EventKind.Updated
                                     && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber
@@ -478,7 +468,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+            var iterationSetupSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
                 .Where(
                     objectChange => objectChange.EventKind == EventKind.Updated
                                     && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
@@ -871,9 +861,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.SelectedThing.ContainedRows.Count > 0)
             {
-                this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
-                    new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
-                    new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+                this.ContextMenu.Add(this.SelectedThing.IsExpanded ? new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) : new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
             }
 
             if (this.SelectedThing is PublicationParameterOrOverrideRowViewModel)

@@ -5,15 +5,15 @@
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -39,26 +39,25 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
-    using CDP4Dal;
-    using CDP4Dal.DAL;
-    using CDP4Dal.Permission;
-    using CDP4Dal.Operations;
-
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
+    using CDP4Dal;
+    using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+    using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.ViewModels;
 
     using CommonServiceLocator;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
-    
+
     using ParameterComponentValueRowViewModel = CDP4EngineeringModel.ViewModels.Dialogs.ParameterComponentValueRowViewModel;
     using ParameterOptionRowViewModel = CDP4EngineeringModel.ViewModels.Dialogs.ParameterOptionRowViewModel;
     using ParameterStateRowViewModel = CDP4EngineeringModel.ViewModels.Dialogs.ParameterStateRowViewModel;
-    using System.Security.Cryptography;
 
     [TestFixture]
     internal class ParameterDialogViewModelTestFixture
@@ -95,10 +94,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private ActualFiniteStateList asl;
         private ActualFiniteState as1;
         private ActualFiniteState as2;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://www.rheagroup.com");
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
@@ -127,15 +128,15 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
             elementDefinition.Parameter.Add(this.parameter);
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
-            this.option1 = new Option(Guid.NewGuid(), this.cache, this.uri) { Name = "opt1", ShortName = "o1"};
+            this.option1 = new Option(Guid.NewGuid(), this.cache, this.uri) { Name = "opt1", ShortName = "o1" };
             this.option2 = new Option(Guid.NewGuid(), this.cache, this.uri) { Name = "opt2", ShortName = "o2" };
             this.iteration.Option.Add(this.option1);
             this.iteration.Option.Add(this.option2);
             this.iteration.Element.Add(elementDefinition);
 
             this.psl = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
-            this.ps1 = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) {Name = "1", ShortName = "1"};
-            this.ps2 = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) {Name = "2", ShortName = "2"};
+            this.ps1 = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "1", ShortName = "1" };
+            this.ps2 = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri) { Name = "2", ShortName = "2" };
             this.psl.PossibleState.Add(this.ps1);
             this.psl.PossibleState.Add(this.ps2);
 
@@ -173,7 +174,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(testPerson);
 
-            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null),  new Lazy<Thing>(() => this.iteration));
+            this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 
             this.elementDefinitionClone = elementDefinition.Clone(false);
 
@@ -199,10 +200,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.simpleQt.PossibleScale.Add(this.realScale);
 
             this.cptPt = new CompoundParameterType(Guid.NewGuid(), this.cache, this.uri);
+
             this.c1 = new ParameterTypeComponent(Guid.NewGuid(), this.cache, this.uri)
             {
                 ParameterType = this.simpleQt, Scale = this.integerScale
             };
+
             this.cptPt.Component.Add(this.c1);
 
             this.srdl.Scale.Add(this.integerScale);
@@ -214,15 +217,15 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
-
         }
 
         [Test]
         public void VerifyThatPropertiesArePopulated()
         {
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
-            
+
             Assert.IsNotNull(vm.SelectedParameterType);
             Assert.IsNotNull(vm.SelectedOwner);
             Assert.AreEqual(1, vm.ValueSet.Count);
@@ -255,7 +258,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var textParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri);
             this.parameter.ParameterType = textParameterType;
             this.parameter.Scale = null;
-            
+
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
                 ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
 
@@ -270,8 +273,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         public void VerifyUpdateOkCanExecute()
         {
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
-    ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
-            
+                ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
+
             Assert.IsFalse(((ICommand)vm.OkCommand).CanExecute(null));
 
             vm.SelectedScale = this.integerScale;
@@ -313,7 +316,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         public void VerifyThatMakingOwnerOrOptionDependentOrStateDependentSetsIsValueSetEdittableToFalse()
         {
             var vm = new ParameterDialogViewModel(this.parameter, this.thingTransaction, this.session.Object, true,
-    ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
+                ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.elementDefinitionClone);
 
             Assert.IsTrue(vm.IsValueSetEditable);
 
@@ -326,7 +329,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             vm.SelectedStateDependence = vm.PossibleStateDependence.First();
             Assert.IsFalse(vm.IsValueSetEditable);
-            
+
             //reset
             vm.SelectedStateDependence = null;
             Assert.IsTrue(vm.IsValueSetEditable);
@@ -474,7 +477,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var row = vm.ValueSet.Single();
 
             var c1 = (ParameterComponentValueRowViewModel)row.ContainedRows.First();
-            
+
             c1.Manual = "5500000";
             var error = c1["Manual"];
 

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOverrideRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -81,11 +81,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private PossibleFiniteStateList posStateList;
 
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.session = new Mock<ISession>();
@@ -169,30 +171,35 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.cptParameter.ValueSet.Add(new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
-                ActualOption = this.option1, 
+                ActualOption = this.option1,
                 ActualState = this.stateList.ActualState.First()
             });
+
             this.cptParameter.ValueSet.Add(new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ActualOption = this.option1,
                 ActualState = this.stateList.ActualState.Last()
             });
+
             this.cptParameter.ValueSet.Add(new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ActualOption = this.option2,
                 ActualState = this.stateList.ActualState.First()
             });
+
             this.cptParameter.ValueSet.Add(new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ActualOption = this.option2,
                 ActualState = this.stateList.ActualState.Last()
             });
+
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.activeDomain
             };
+
             this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri){ElementDefinition = this.elementDefinitionForUsage1};
+            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { ElementDefinition = this.elementDefinitionForUsage1 };
 
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
 
@@ -219,21 +226,23 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatParameterOverrideRowWorks(IViewModelBase<Thing> container, string scenario)
         {
-            var value = new List<string> {"test"};
+            var value = new List<string> { "test" };
 
             var parameterValue = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
             parameterValue.Manual = new ValueArray<string>(value);
@@ -243,8 +252,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.parameter.ValueSet.Add(parameterValue);
 
-            var poverride = new ParameterOverride(Guid.NewGuid(), this.assembler.Cache, this.uri) {Parameter = this.parameter};
-            var valueset = new ParameterOverrideValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) {ParameterValueSet = parameterValue};
+            var poverride = new ParameterOverride(Guid.NewGuid(), this.assembler.Cache, this.uri) { Parameter = this.parameter };
+            var valueset = new ParameterOverrideValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterValueSet = parameterValue };
             valueset.Manual = new ValueArray<string>(value);
             poverride.ValueSet.Add(valueset);
 
@@ -260,7 +269,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             var rev = typeof(Thing).GetProperty("RevisionNumber");
             rev.SetValue(this.parameter, 10);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter, EventKind.Updated);
             Assert.AreEqual(2, row.ContainedRows.Count);
         }
     }

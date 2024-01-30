@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShellViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -70,7 +70,7 @@ namespace COMET.Tests
         /// the view-model under test
         /// </summary>
         private ShellViewModel viewModel;
-        
+
         /// <summary>
         /// mocked <see cref="IDialogNavigationService"/>
         /// </summary>
@@ -99,26 +99,25 @@ namespace COMET.Tests
         private Uri uri = new Uri("http://www.rheagroup.com");
 
         private IterationSetup iterationSetup;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            
             LogManager.Configuration = new LoggingConfiguration();
-
             this.navigationService = new Mock<IDialogNavigationService>();
-
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri);
-
             this.iteration = new Iteration(Guid.NewGuid(), null, this.uri) { IterationSetup = this.iterationSetup };
-
             this.session = new Mock<ISession>();
-            
-            this.session.Setup(x=>x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
+
+            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
-                {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null)}
+                { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
             });
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -127,7 +126,7 @@ namespace COMET.Tests
             var availableDals = new AvailableDals(dals);
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>()).Returns(availableDals);
 
-            this.viewModel = new ShellViewModel(this.navigationService.Object, null);
+            this.viewModel = new ShellViewModel(this.navigationService.Object, this.messageBus, null);
         }
 
         [TearDown]
@@ -141,7 +140,7 @@ namespace COMET.Tests
         [Test]
         public void VerifyThatArgumentNullExceptionIsThrown()
         {
-            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null, null));
+            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null, null, null));
         }
 
         [Test]
@@ -270,7 +269,7 @@ namespace COMET.Tests
         [Test]
         public void VerifyThatOpenModelSelectionOpensDialog()
         {
-            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
 
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<ModelOpeningDialogViewModel>())).Returns(null as IDialogResult);
 
@@ -280,14 +279,14 @@ namespace COMET.Tests
         [Test]
         public void VerifyThatSessionArePopulated()
         {
-            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Open));
 
             Assert.AreEqual(1, this.viewModel.OpenSessions.Count);
 
-            CDPMessageBus.Current.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Closed));
+            this.messageBus.SendMessage<SessionEvent>(new SessionEvent(this.session.Object, SessionStatus.Closed));
             Assert.AreEqual(0, this.viewModel.OpenSessions.Count);
         }
-        
+
         [Test]
         public async Task VerifyCheckForUpdateCommand()
         {

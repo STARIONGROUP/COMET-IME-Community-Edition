@@ -1,25 +1,25 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GraphElementViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@ namespace CDP4Grapher.ViewModels
     using System;
     using System.Linq;
     using System.Reactive.Linq;
-    
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -42,6 +42,11 @@ namespace CDP4Grapher.ViewModels
     /// </summary>
     public class GraphElementViewModel : ReactiveObject
     {
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
         /// <summary>
         /// The represented <see cref="NestedElement"/>
         /// </summary>
@@ -136,10 +141,14 @@ namespace CDP4Grapher.ViewModels
         /// Instanciate a <see cref="GrapherViewModel"/> updating its property with the given <see cref="NestedElement"/> property
         /// </summary>
         /// <param name="nestedElement">The represented nested element</param>
-        public GraphElementViewModel(NestedElement nestedElement)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public GraphElementViewModel(NestedElement nestedElement, ICDPMessageBus messageBus)
         {
+            this.messageBus = messageBus;
             this.Thing = nestedElement;
-            this.NestedElementElement = (ElementBase) nestedElement.ElementUsage.LastOrDefault() ?? nestedElement.RootElement;
+            this.NestedElementElement = (ElementBase)nestedElement.ElementUsage.LastOrDefault() ?? nestedElement.RootElement;
 
             if (nestedElement.ElementUsage.LastOrDefault() is { } elementUsage)
             {
@@ -155,7 +164,7 @@ namespace CDP4Grapher.ViewModels
             this.RegisterSubscriptions();
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Update all properties value
         /// </summary>
@@ -174,7 +183,7 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void RegisterSubscriptions()
         {
-            this.NestedElementElementListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.NestedElementElement)
+            this.NestedElementElementListener = this.messageBus.Listen<ObjectChangedEvent>(this.NestedElementElement)
                 .Where(
                     objectChange =>
                         objectChange.EventKind == EventKind.Updated &&

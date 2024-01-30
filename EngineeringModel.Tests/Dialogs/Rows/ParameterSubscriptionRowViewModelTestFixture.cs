@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSubscriptionRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -24,11 +24,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.Dialogs
-{ 
+{
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
@@ -36,12 +36,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation.Interfaces;
-    
+
     using CDP4Dal;
     using CDP4Dal.Permission;
-    
+
     using CDP4EngineeringModel.ViewModels.Dialogs;
-    
+
     using Moq;
 
     using NUnit.Framework;
@@ -87,11 +87,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private ParameterValueSet valueset2;
         private ParameterValueSet valueset3;
         private ParameterValueSet valueset4;
-
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
@@ -208,8 +209,9 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             {
                 Owner = this.activeDomain
             };
+
             this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), null, this.uri);
-            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), null, this.uri){ElementDefinition = this.elementDefinitionForUsage1};
+            this.elementUsage1 = new ElementUsage(Guid.NewGuid(), null, this.uri) { ElementDefinition = this.elementDefinitionForUsage1 };
 
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
 
@@ -229,6 +231,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "test", Surname = "test" };
             this.participant = new Participant(Guid.NewGuid(), null, this.uri) { Person = this.person, SelectedDomain = this.activeDomain };
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             this.modelsetup.Participant.Add(this.participant);
             this.model.EngineeringModelSetup = this.modelsetup;
@@ -239,33 +242,37 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatUpdateValueSetWorksCompoundOptionState()
         {
             this.subscription = new ParameterSubscription(Guid.NewGuid(), null, this.uri);
-            this.cptParameter.ParameterSubscription.Add(subscription);
+            this.cptParameter.ParameterSubscription.Add(this.subscription);
 
             this.subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri)
             {
                 SubscribedValueSet = this.valueset1
             });
+
             this.subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri)
             {
                 SubscribedValueSet = this.valueset2
             });
+
             this.subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri)
             {
                 SubscribedValueSet = this.valueset3
             });
+
             this.subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri)
             {
                 SubscribedValueSet = this.valueset4
             });
 
             var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null);
+
             var option1Row =
                 row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
 
@@ -273,13 +280,16 @@ namespace CDP4EngineeringModel.Tests.Dialogs
                 row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option2);
 
             var o1s1Row = option1Row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                    .Single(x => x.ActualState == this.actualState1);
+                .Single(x => x.ActualState == this.actualState1);
+
             var o1s2Row = option1Row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                    .Single(x => x.ActualState == this.actualState2);
+                .Single(x => x.ActualState == this.actualState2);
+
             var o2s1Row = option2Row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                    .Single(x => x.ActualState == this.actualState1);
+                .Single(x => x.ActualState == this.actualState1);
+
             var o2s2Row = option2Row.ContainedRows.OfType<ParameterStateRowViewModel>()
-                    .Single(x => x.ActualState == this.actualState2);
+                .Single(x => x.ActualState == this.actualState2);
 
             var o1s1c1Row = o1s1Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().First();
             var o1s1c2Row = o1s1Row.ContainedRows.OfType<ParameterComponentValueRowViewModel>().Last();
@@ -305,7 +315,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.IsTrue(o1s2c1Row.IsEditable());
             Assert.IsTrue(o2s1c1Row.IsEditable());
             Assert.IsTrue(o2s2c1Row.IsEditable());
-            
+
             o1s1c1Row.Switch = ParameterSwitchKind.REFERENCE;
             o1s1c2Row.Switch = ParameterSwitchKind.REFERENCE;
             o1s2c1Row.Switch = ParameterSwitchKind.REFERENCE;
@@ -355,17 +365,18 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.cptParameter.ValueSet.Add(this.valueset3);
 
             this.subscription = new ParameterSubscription(Guid.NewGuid(), null, this.uri);
-            this.cptParameter.ParameterSubscription.Add(subscription);
+            this.cptParameter.ParameterSubscription.Add(this.subscription);
 
             this.subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri)
             {
                 SubscribedValueSet = this.valueset1
             });
+
             this.subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri)
             {
                 SubscribedValueSet = this.valueset3
             });
-            
+
             var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null);
             var option1Row = row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option1);
             var option2Row = row.ContainedRows.OfType<ParameterOptionRowViewModel>().Single(x => x.ActualOption == this.option2);
@@ -384,7 +395,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.IsTrue(o1c2Row.IsEditable());
             Assert.IsTrue(o2c1Row.IsEditable());
             Assert.IsTrue(o2c2Row.IsEditable());
-            
+
             o1c1Row.Switch = ParameterSwitchKind.MANUAL;
             o1c2Row.Switch = ParameterSwitchKind.MANUAL;
             o2c1Row.Switch = ParameterSwitchKind.MANUAL;
@@ -407,7 +418,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual(o1Set.Manual[1], ValueSetConverter.ToValueSetString(o1c2Row.Manual, o1c2Row.ParameterType));
             Assert.AreEqual(o2Set.Manual[1], ValueSetConverter.ToValueSetString(o2c2Row.Manual, o2c2Row.ParameterType));
         }
-        
+
         [Test]
         public void VerifyThatRowIsBuiltCorrectlyCompoundNoOptionWithState()
         {
@@ -420,18 +431,20 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.cptParameter.ValueSet.Add(this.valueset2);
 
             this.subscription = new ParameterSubscription(Guid.NewGuid(), null, this.uri);
-            this.cptParameter.ParameterSubscription.Add(subscription);
+            this.cptParameter.ParameterSubscription.Add(this.subscription);
 
             this.subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri)
             {
                 SubscribedValueSet = this.valueset1
             });
+
             this.subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), null, this.uri)
             {
                 SubscribedValueSet = this.valueset2
             });
 
             var row = new ParameterSubscriptionRowViewModel(this.subscription, this.session.Object, null);
+
             var s1Row =
                 row.ContainedRows.OfType<ParameterStateRowViewModel>().Single(x => x.ActualState == this.actualState1);
 
@@ -452,7 +465,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.IsTrue(s1c2Row.IsEditable());
             Assert.IsTrue(s2c1Row.IsEditable());
             Assert.IsTrue(s2c2Row.IsEditable());
-            
+
             s1c1Row.Switch = ParameterSwitchKind.MANUAL;
             s1c2Row.Switch = ParameterSwitchKind.MANUAL;
             s2c1Row.Switch = ParameterSwitchKind.MANUAL;

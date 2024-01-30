@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ActualFiniteStateListRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 {
@@ -11,15 +30,20 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -38,12 +62,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         private Iteration iteration;
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             this.rev = typeof(Thing).GetProperty("RevisionNumber");
-
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
@@ -67,7 +92,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
-
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
         }
@@ -75,7 +100,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -98,7 +123,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             actualFiniteStateList.ActualState.Add(state);
 
             this.rev.SetValue(actualFiniteStateList, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(actualFiniteStateList, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(actualFiniteStateList, EventKind.Updated);
             var staterow = (ActualFiniteStateRowViewModel)row.ContainedRows.SingleOrDefault();
             Assert.IsNotNull(staterow);
         }
@@ -140,7 +165,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             actualStateList.ActualState.Remove(actualStateList.ActualState[1]);
 
             possibleStateList.RevisionNumber = 1;
-            CDPMessageBus.Current.SendObjectChangeEvent(possibleStateList, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(possibleStateList, EventKind.Updated);
 
             Assert.AreEqual(3, actualFiniteStateListRow.ContainedRows.Count);
             Assert.AreEqual(possibleState1.Name, ((ActualFiniteStateRowViewModel)actualFiniteStateListRow.ContainedRows[0]).Name);

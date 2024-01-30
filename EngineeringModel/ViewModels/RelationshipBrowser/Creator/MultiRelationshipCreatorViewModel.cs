@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MultiRelationshipCreatorViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -36,14 +36,14 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
 
     using CDP4Dal;
     using CDP4Dal.Events;
-    
+
     using ReactiveUI;
 
     public class MultiRelationshipCreatorViewModel : ReactiveObject, IRelationshipCreatorViewModel, IDropTarget
@@ -107,8 +107,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public RelatedThingRowViewModel SelectedRelatedThing
         {
-            get { return this.selectedRelatedThing; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedRelatedThing, value); }
+            get => this.selectedRelatedThing;
+            set => this.RaiseAndSetIfChanged(ref this.selectedRelatedThing, value);
         }
 
         /// <summary>
@@ -121,8 +121,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreate
         {
-            get { return this.canCreate; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreate, value); }
+            get => this.canCreate;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreate, value);
         }
 
         /// <summary>
@@ -136,8 +136,8 @@ namespace CDP4EngineeringModel.ViewModels
         [CDPVersion("1.2.0")]
         public string Name
         {
-            get { return this.name; }
-            set { this.RaiseAndSetIfChanged(ref this.name, value); }
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         /// <summary>
@@ -145,8 +145,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public List<Category> AppliedCategories
         {
-            get { return this.appliedCategories; }
-            set { this.RaiseAndSetIfChanged(ref this.appliedCategories, value); }
+            get => this.appliedCategories;
+            set => this.RaiseAndSetIfChanged(ref this.appliedCategories, value);
         }
 
         /// <summary>
@@ -157,10 +157,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the type of the <see cref="Relationship"/> to create
         /// </summary>
-        public string CreatorKind
-        {
-            get { return "Multi Relationship"; }
-        }
+        public string CreatorKind => "Multi Relationship";
 
         /// <summary>
         /// Re-initializes the view-model
@@ -185,6 +182,7 @@ namespace CDP4EngineeringModel.ViewModels
         public void DragOver(IDropInfo dropInfo)
         {
             var thing = dropInfo.Payload as Thing;
+
             if (thing != null && !this.RelatedThings.Select(x => x.Thing).Contains(thing) && thing.TopContainer is EngineeringModel)
             {
                 dropInfo.Effects = DragDropEffects.Copy;
@@ -200,12 +198,13 @@ namespace CDP4EngineeringModel.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             var thing = dropInfo.Payload as Thing;
+
             if (thing == null || this.RelatedThings.Select(x => x.Thing).Contains(thing))
             {
                 return;
             }
 
-            var row = new RelatedThingRowViewModel(thing, this.RemoveRelatedThing);
+            var row = new RelatedThingRowViewModel(thing, this.Session.CDPMessageBus, this.RemoveRelatedThing);
             this.RelatedThings.Add(row);
         }
 
@@ -256,12 +255,14 @@ namespace CDP4EngineeringModel.ViewModels
             this.requiredRdl = modelsetup.RequiredRdl.Single();
 
             var rdl = (ReferenceDataLibrary)this.requiredRdl;
+
             while (rdl != null)
             {
-                var subscriber = CDPMessageBus.Current.Listen<ObjectChangedEvent>(rdl)
+                var subscriber = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(rdl)
                     .Where(msg => msg.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.PopulateCategories());
+
                 this.Subscriptions.Add(subscriber);
                 rdl = rdl.RequiredRdl;
             }

@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CommonFileStoreBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
+//    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -122,7 +122,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.AddSubscriptions();
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Gets or sets the Contained <see cref="IRowViewModelBase{T}"/>
         /// </summary>
@@ -138,17 +138,17 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string CurrentModel
         {
-            get => this.currentModel; 
-            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value); 
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
-        
+
         /// <summary>
         /// Gets a value indicating whether the <see cref="CreateFolderCommand"/> can be executed
         /// </summary>
         public bool CanCreateFolder
         {
-            get => this.canCreateFolder; 
-            private set => this.RaiseAndSetIfChanged(ref this.canCreateFolder, value); 
+            get => this.canCreateFolder;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateFolder, value);
         }
 
         /// <summary>
@@ -156,8 +156,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanUploadFile
         {
-            get => this.canUploadFile; 
-            private set => this.RaiseAndSetIfChanged(ref this.canUploadFile, value); 
+            get => this.canUploadFile;
+            private set => this.RaiseAndSetIfChanged(ref this.canUploadFile, value);
         }
 
         /// <summary>
@@ -175,8 +175,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreateStore
         {
-            get => this.canCreateStore; 
-            private set => this.RaiseAndSetIfChanged(ref this.canCreateStore, value); 
+            get => this.canCreateStore;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateStore, value);
         }
 
         /// <summary>
@@ -197,16 +197,16 @@ namespace CDP4EngineeringModel.ViewModels
             base.InitializeCommands();
 
             this.CreateStoreCommand = ReactiveCommandCreator.Create(
-                () => this.ExecuteCreateCommand<CommonFileStore>(this.Thing.TopContainer), 
+                () => this.ExecuteCreateCommand<CommonFileStore>(this.Thing.TopContainer),
                 this.WhenAnyValue(x => x.CanCreateStore));
 
             this.CreateFolderCommand = ReactiveCommandCreator.Create(
-                () => this.ExecuteCreateCommandForFolder(this.SelectedThing.Thing), 
+                () => this.ExecuteCreateCommandForFolder(this.SelectedThing.Thing),
                 this.WhenAnyValue(x => x.CanCreateFolder));
 
             this.UploadFileCommand = ReactiveCommandCreator.Create(
                 () => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing),
-            this.WhenAnyValue(x => x.CanUploadFile));
+                this.WhenAnyValue(x => x.CanUploadFile));
         }
 
         /// <summary>
@@ -311,33 +311,39 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties()));
+            this.Disposables.Add(
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties()));
+            this.Disposables.Add(
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.EngineeringModelSetup)
-                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties()));
+            this.Disposables.Add(
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.EngineeringModelSetup)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
-                .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties()));
+            this.Disposables.Add(
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Container)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => this.UpdateProperties()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Folder))
-                .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
-                .Subscribe(_ => this.ComputePermission()));
+            this.Disposables.Add(
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Folder))
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                    .Subscribe(_ => this.ComputePermission()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(File))
-                .Where(objectChange => (objectChange.EventKind == EventKind.Updated))
-                .Subscribe(_ => this.ComputePermission()));
+            this.Disposables.Add(
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(File))
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
+                    .Subscribe(_ => this.ComputePermission()));
         }
 
         /// <summary>
