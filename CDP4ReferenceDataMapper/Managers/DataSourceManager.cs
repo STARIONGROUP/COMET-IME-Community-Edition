@@ -289,18 +289,22 @@ namespace CDP4ReferenceDataMapper.Managers
             }
 
             var valueRow = this.GetValueRowByMappingRow(row);
-            var parameterTypeIid = row[actualState].ToString();
 
             if (valueRow != null)
             {
+                var parameterTypeIid = row[actualState].ToString();
+
                 var newPropertyValue =
                     string.IsNullOrWhiteSpace(parameterTypeIid)
-                        ? null
+                        ? "-"
                         : this.GetElementDefinitionParameterValueForDataRow(row, new Guid(parameterTypeIid));
 
                 var updated = valueRow[actualState].ToString() != newPropertyValue;
 
-                this.SetValue(actualState, valueRow, newPropertyValue);
+                if (updated)
+                {
+                    this.SetValue(actualState, valueRow, newPropertyValue);
+                }
 
                 var newPropertyCustomName =
                     string.IsNullOrWhiteSpace(parameterTypeIid)
