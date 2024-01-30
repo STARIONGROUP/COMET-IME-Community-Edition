@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceManager.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -217,7 +217,7 @@ namespace CDP4ReferenceDataMapper.Managers
             this.DataTable = new DataTable();
             this.Things = new HashSet<Thing>();
         }
-        
+
         /// <summary>
         /// Returns the ShortName column name for a column holding the current value
         /// </summary>
@@ -249,6 +249,74 @@ namespace CDP4ReferenceDataMapper.Managers
                 x =>
                     x is ActualStateDataGridColumn actualStateDataGridColumn
                     && actualStateDataGridColumn.ActualFiniteState.ShortName == fieldName);
+        }
+
+        /// <summary>
+        /// Refreshes all values for mapped state values
+        /// </summary>
+        /// <returns>An integer value representing the number of values that were actually updated, meaning that their value was actually changed</returns>
+        public int RefreshAllMappedValues()
+        {
+            var updateCount = 0;
+
+            foreach (DataRow row in this.DataTable.Rows)
+            {
+                if (row[TypeColumnName].ToString() == ParameterMappingType)
+                {
+                    foreach (var actualState in this.GetMandatoryFiniteStates())
+                    {
+                        if (this.TryRefreshMappedValue(row, actualState.ShortName))
+                        {
+                            updateCount++;
+                        }
+                    }
+                }
+            }
+
+            return updateCount;
+        }
+
+        /// <summary>
+        /// Refreshes a specific state value for a specific mapping type (PARAM-MAP) <see cref="DataRow"/>
+        /// </summary>
+        /// <param name="row">The <see cref="DataRow"/></param>
+        /// <param name="actualState">The shortname of the <see cref="ActualFiniteState"/> to update</param>
+        public bool TryRefreshMappedValue(DataRow row, string actualState)
+        {
+            if (row[TypeColumnName].ToString() != ParameterMappingType)
+            {
+                return false;
+            }
+
+            var valueRow = this.GetValueRowByMappingRow(row);
+
+            if (valueRow != null)
+            {
+                var parameterTypeIid = row[actualState].ToString();
+
+                var newPropertyValue =
+                    string.IsNullOrWhiteSpace(parameterTypeIid)
+                        ? "-"
+                        : this.GetElementDefinitionParameterValueForDataRow(row, new Guid(parameterTypeIid));
+
+                var updated = valueRow[actualState].ToString() != newPropertyValue;
+
+                if (updated)
+                {
+                    this.SetValue(actualState, valueRow, newPropertyValue);
+                }
+
+                var newPropertyCustomName =
+                    string.IsNullOrWhiteSpace(parameterTypeIid)
+                        ? null
+                        : this.GetElementDefinitionParameterCustomShortNameForDataRow(row, new Guid(parameterTypeIid));
+
+                this.SetValue(this.GetShortNameColumnName(actualState), valueRow, newPropertyCustomName);
+
+                return updated;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -288,13 +356,13 @@ namespace CDP4ReferenceDataMapper.Managers
                 this.DataTable.Columns.Add(TypeColumnName, typeof(string));
             }
 
-            var newActualFiniteStates = 
+            var newActualFiniteStates =
                 this.GetMandatoryFiniteStates()
                     .Except(this.Columns.OfType<ActualStateDataGridColumn>().Select(x => x.ActualFiniteState))
                     .ToList();
 
             newActualFiniteStates.Sort(new ActualFiniteStateComparer());
-            
+
             var oldActualFiniteStates = this.Columns.OfType<ActualStateDataGridColumn>().Select(x => x.ActualFiniteState).Except(this.actualFiniteStateList.ActualState).ToList();
 
             foreach (var actualFiniteState in newActualFiniteStates)
@@ -467,11 +535,12 @@ namespace CDP4ReferenceDataMapper.Managers
             allowedParameterTypes.AddRange(
                 allParameterTypes
                     .OfType<CompoundParameterType>()
-                    .Where(x => 
-                        x.Component.Count > 1
-                        && x.Component[0].ParameterType is TextParameterType
-                        && x.Component[1].ParameterType is ScalarParameterType));
-            
+                    .Where(
+                        x =>
+                            x.Component.Count > 1
+                            && x.Component[0].ParameterType is TextParameterType
+                            && x.Component[1].ParameterType is ScalarParameterType));
+
             foreach (var elementDefinition in this.iteration.Element)
             {
                 if (!elementDefinition.IsMemberOfCategory(this.elementDefinitionCategory))
