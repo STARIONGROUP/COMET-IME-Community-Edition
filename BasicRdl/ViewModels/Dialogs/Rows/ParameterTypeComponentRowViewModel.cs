@@ -30,9 +30,9 @@ namespace BasicRdl.ViewModels
     using System.Linq;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition.Services;
 
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
 
@@ -57,7 +57,7 @@ namespace BasicRdl.ViewModels
         /// All possible ParameterTypes that are used to populate list of filtered ParameterType.
         /// </summary>
         private readonly ReactiveList<ParameterType> possibleParameterTypes;
-
+            
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeComponentRowViewModel"/> class
         /// </summary>
@@ -180,7 +180,7 @@ namespace BasicRdl.ViewModels
             {
                 if (columnName == "ShortName")
                 {
-                    var validationResult = ValidationService.ValidateProperty(columnName, this);
+                    var validationResult = this.ValidationService.ValidateObjectProperty(columnName, this);
                     this.ErrorMsg = validationResult;
                     ((CompoundParameterTypeDialogViewModel)this.ContainerViewModel).UpdateOkCanExecuteStatus();
                     return validationResult != null ? validationResult : string.Empty;

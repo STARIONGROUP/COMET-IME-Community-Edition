@@ -33,14 +33,12 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Validation;
 
     using CDP4Composition.Mvvm;
-    using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
-
-    using CommonServiceLocator;
 
     using ReactiveUI;
 

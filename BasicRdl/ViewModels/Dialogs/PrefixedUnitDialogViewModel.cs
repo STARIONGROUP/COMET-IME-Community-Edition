@@ -127,7 +127,7 @@ namespace BasicRdl.ViewModels
                     return null;
                 }
 
-                return ValidationService.ValidateProperty(columnName, this);
+                return this.ValidationService.ValidateProperty(columnName, this);
             } 
         }
 

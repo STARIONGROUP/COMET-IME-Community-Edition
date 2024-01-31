@@ -15,12 +15,13 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Common.CommonData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Validation;
+
     using CDP4CommonView;
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.Services;
     using CDP4Dal;
 
     using ReactiveUI;
@@ -219,7 +220,7 @@ namespace CDP4SiteDirectory.ViewModels
 
                 if (!this.PwdEditIsChecked || columnName != "PasswordConfirmation")
                 {
-                    return ValidationService.ValidateProperty(columnName, this);
+                    return this.ValidationService.ValidateProperty(columnName, this);
                 }
 
                 if (string.IsNullOrWhiteSpace(this.PasswordConfirmation) || this.PasswordConfirmation != this.Password)
@@ -240,12 +241,13 @@ namespace CDP4SiteDirectory.ViewModels
 
                 // confirmation ok
                 var validationError = this.ValidationErrors.SingleOrDefault(x => x.PropertyName == "PasswordConfirmation");
+
                 if (validationError!= null)
                 {
                     this.ValidationErrors.Remove(validationError);
                 }
 
-                return ValidationService.ValidateProperty(columnName, this);
+                return this.ValidationService.ValidateProperty(columnName, this);
             }
         }
 
