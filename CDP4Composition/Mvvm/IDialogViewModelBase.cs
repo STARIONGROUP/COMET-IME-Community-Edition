@@ -29,8 +29,8 @@ namespace CDP4Composition.Mvvm
     using System.Reactive;
 
     using CDP4Common.CommonData;
-    using CDP4Composition.Services;
-    
+    using CDP4Common.Validation;
+
     using ReactiveUI;
 
     /// <summary>

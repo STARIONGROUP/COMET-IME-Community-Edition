@@ -39,6 +39,7 @@ namespace CDP4Composition.Mvvm
 
     using CDP4Common.CommonData;
     using CDP4Common.Exceptions;
+    using CDP4Common.Validation;
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -174,6 +175,7 @@ namespace CDP4Composition.Mvvm
             this.isRoot = isRoot;
             this.dialogKind = dialogKind;
             this.serializer = new Cdp4JsonSerializer(this.Session.Dal.MetaDataProvider, this.Session.DalVersion);
+            this.ValidationService = new ImeValidationService();
 
             this.ChainOfContainer = chainOfContainers != null ? chainOfContainers.ToList() : new List<Thing>();
             this.ChainOfContainer.Add(this.Container);
@@ -202,6 +204,11 @@ namespace CDP4Composition.Mvvm
                     throw new InvalidEnumArgumentException("The provided dialogKind is Invalid");
             }
         }
+
+        /// <summary>
+        /// Gets the <see cref="IImeValidationService"/>
+        /// </summary>
+        protected IImeValidationService ValidationService { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DialogViewModelBase{T}"/> class
@@ -375,7 +382,7 @@ namespace CDP4Composition.Mvvm
         /// <remarks>
         /// Used by the view through the IDataErrorInfo interface to validate a field
         /// </remarks>
-        public virtual string this[string columnName] => ValidationService.ValidateProperty(columnName, this);
+        public virtual string this[string columnName] => this.ValidationService.ValidateProperty(columnName, this);
 
         /// <summary>
         /// Gets the <see cref="Uri"/> of the <see cref="Thing"/> with respect to it's data-source

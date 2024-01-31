@@ -146,6 +146,8 @@ namespace CDP4Composition.Mvvm
                 return;
             }
 
+            this.ValidationService = new ImeValidationService();
+
             this.InitializeSubscriptions();
             this.UpdateTooltip();
         }
@@ -296,6 +298,11 @@ namespace CDP4Composition.Mvvm
         protected List<IDisposable> HighlightCancelDisposables { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="IImeValidationService"/>
+        /// </summary>
+        protected IImeValidationService ValidationService { get; }
+
+        /// <summary>
         /// The ClassKind of the current thing
         /// </summary>
         public virtual string RowType
@@ -340,7 +347,7 @@ namespace CDP4Composition.Mvvm
         /// </remarks>
         public virtual string ValidateProperty(string columnName, object newValue)
         {
-            return ValidationService.ValidateProperty(columnName, newValue, this);
+            return this.ValidationService.ValidateProperty(columnName, newValue);
         }
 
         /// <summary>

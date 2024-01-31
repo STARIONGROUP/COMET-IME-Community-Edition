@@ -7,7 +7,9 @@
 namespace CDP4CommonView
 {
     using System.ComponentModel;
+
     using CDP4Composition.Services;
+
     using ReactiveUI;
 
     /// <summary>
@@ -45,6 +47,11 @@ namespace CDP4CommonView
         }
 
         /// <summary>
+        /// Gets the <see cref="IImeValidationService" />
+        /// </summary>
+        protected IImeValidationService ValidationService => new ImeValidationService();
+
+        /// <summary>
         /// Gets the error message for the property with the given name.
         /// </summary>
         /// <returns>
@@ -56,7 +63,7 @@ namespace CDP4CommonView
         /// </remarks>
         public string this[string columnName]
         {
-            get { return ValidationService.ValidateProperty(columnName, this); }
+            get { return this.ValidationService.ValidateObjectProperty(columnName, this); }
         }
 
         /// <summary>
