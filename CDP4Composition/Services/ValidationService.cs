@@ -40,6 +40,12 @@ namespace CDP4Composition.Services
     public static class ValidationService
     {
         /// <summary>
+        /// Gets the RFC 5321 REGEX to validate Email address.
+        /// <remarks>This regex is not 100% compliant with RFC 5321 but covers most cases</remarks>
+        /// </summary>
+        public const string Rfc5321Regex = @"^(?!\.)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]{1,64}(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.?)+[a-zA-Z]{2,}$";
+
+        /// <summary>
         /// The validation map provides the mapping between field names and <see cref="ValidationRule" />s.
         /// </summary>
         private static readonly Dictionary<string, ValidationRule> ValidationMap = new()
@@ -51,7 +57,7 @@ namespace CDP4Composition.Services
             { "NativeName", new ValidationRule { PropertyName = "NativeName", Rule = @"^[a-zA-Z][a-zA-Z0-9_]*$", ErrorText = "The NativeName must start with a letter and not contain any spaces or non alphanumeric characters." } },
             { "FileRevisionName", new ValidationRule { PropertyName = "Name", Rule = @"^([^()\s][\S\s]*)$", ErrorText = "The Name can not be empty or start with a whitespace." } },
             { "Name", new ValidationRule { PropertyName = "Name", Rule = @"^(\p{L}|\p{L}[^()]*[^()\s])$", ErrorText = "The Name must start with a letter and not contain any parentheses or trailing spaces." } },
-            { "EmailAddress", new ValidationRule { PropertyName = "EmailAddress", Rule = @"^([\w\.\-]+)@([\w\-]+)((\.(\w){2,3})+)$", ErrorText = "The Email must follow the RFC 5321 protocol." } },
+            { "EmailAddress", new ValidationRule { PropertyName = "EmailAddress", Rule = Rfc5321Regex, ErrorText = "The Email must follow the RFC 5321 protocol." } },
             { "TelephoneNumber", new ValidationRule { PropertyName = "TelephoneNumber", Rule = @"^(?!\s*$).+", ErrorText = "The Telephone Number must not be empty." } },
             { "UserPreference", new ValidationRule { PropertyName = "UserPreference", Rule = @"^(?!\s*$).+", ErrorText = "The User Preference must not be empty." } },
             { "LanguageCode", new ValidationRule { PropertyName = "LanguageCode", Rule = @"^(?!\s*$).+", ErrorText = "The Language Code must not be empty." } },
