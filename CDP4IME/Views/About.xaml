@@ -70,7 +70,7 @@
                                        Foreground="#FF2D2D2D"
                                        Opacity="0.5"
                                        TextWrapping="Wrap" >
-                                © 2015-2023 RHEA System S.A. All Rights Reserved. 
+                                © 2015-2024 RHEA System S.A. All Rights Reserved. 
                                 <Hyperlink NavigateUri="http://www.rheagroup.com" RequestNavigate="Hyperlink_OnRequestNavigate">www.rheagroup.com</Hyperlink>
                 </TextBlock>
             </Grid>
