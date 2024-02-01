@@ -233,6 +233,9 @@ namespace CDP4Reporting.Utilities
             }
         }
 
+        /// <summary>
+        /// Update the UI after parameter and/or datasource changes made by rebuild
+        /// </summary>
         private void RunUIUpdater()
         {
             this.reportDesignerDocument?.Dispatcher.Invoke(
