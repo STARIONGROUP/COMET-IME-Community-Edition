@@ -583,7 +583,7 @@ namespace CDP4Reporting.Tests.ViewModels
                         It.Is<OkDialogViewModel>(
                             okDialog =>
                                 okDialog.Title == "Warning" &&
-                                okDialog.Message.Contains("The following errors were found during ValueSet lookup") &&
+                                okDialog.Message.Contains("The following issues were found during updated parameter values lookup") &&
                                 okDialog.Message.Contains(tuple.path)
                         )
                     )
@@ -598,7 +598,7 @@ namespace CDP4Reporting.Tests.ViewModels
                         It.Is<OkDialogViewModel>(
                             okDialog =>
                                 okDialog.Title == "Warning" &&
-                                okDialog.Message.Contains("The following errors were found during ValueSet lookup") &&
+                                okDialog.Message.Contains("The following issues were found during updated parameter values lookup") &&
                                 okDialog.Message.Contains(tuple.newValue)
                         )
                     )

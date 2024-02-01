@@ -810,14 +810,13 @@ namespace CDP4Reporting.ViewModels
 
             if (errorTexts.Any())
             {
-                var okDialogViewModel = new OkDialogViewModel("Warning", $"The following errors were found during ValueSet lookup:\n\n {string.Join("\n", errorTexts)}");
+                var okDialogViewModel = new OkDialogViewModel("Warning", $"The following issues were found during updated parameter values lookup:\n\n {string.Join("\n", errorTexts)}");
                 this.DialogNavigationService.NavigateModal(okDialogViewModel);
             }
 
             if (!processedValueSets.Any())
             {
-                var okDialogViewModel = new OkDialogViewModel("Info", "No parameter changes found.");
-                this.DialogNavigationService.NavigateModal(okDialogViewModel);
+                this.messageBoxService.Show("No accessible/updatable parameter values found for the current user/domain.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
 
                 return;
             }
