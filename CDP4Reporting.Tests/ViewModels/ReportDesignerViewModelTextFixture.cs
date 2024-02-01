@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReportDesignerViewModelTextFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -583,7 +583,7 @@ namespace CDP4Reporting.Tests.ViewModels
                         It.Is<OkDialogViewModel>(
                             okDialog =>
                                 okDialog.Title == "Warning" &&
-                                okDialog.Message.Contains("The following errors were found during ValueSet lookup") &&
+                                okDialog.Message.Contains("The following issues were found during updated parameter values lookup") &&
                                 okDialog.Message.Contains(tuple.path)
                         )
                     )
@@ -598,7 +598,7 @@ namespace CDP4Reporting.Tests.ViewModels
                         It.Is<OkDialogViewModel>(
                             okDialog =>
                                 okDialog.Title == "Warning" &&
-                                okDialog.Message.Contains("The following errors were found during ValueSet lookup") &&
+                                okDialog.Message.Contains("The following issues were found during updated parameter values lookup") &&
                                 okDialog.Message.Contains(tuple.newValue)
                         )
                     )
@@ -753,7 +753,7 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             // initialize ReportScriptHandler
             var report = new XtraReport();
-            
+
             this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
                 , x =>
                 {

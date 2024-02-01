@@ -15,19 +15,21 @@
     <dxlc:LayoutControl View="Group"
                         Orientation="Vertical"
                         ScrollBars="None"
+                        MaxHeight="550"
                         Height="Auto">
 
         <dxlc:LayoutGroup VerticalAlignment="top"
                           Margin="3"
-                          Height="100"
+                          Height="Auto"
+                          MaxHeight="470"
                           View="Group"
                           Orientation="Horizontal">
 
             <dxlc:LayoutGroup HorizontalAlignment="Left"
                               VerticalAlignment="Stretch">
                 <dxlc:LayoutItem HorizontalAlignment="Left">
-                    <Image Source="pack://application:,,,/CDP4Composition;component/Resources/Images/Log/ExclamationRed_32x32.png"
-                           Height="40"/>
+                    <Image Source="pack://application:,,,/CDP4Composition;component/Resources/Images/Log/Warning_16x16.png"
+                           Height="16"/>
                 </dxlc:LayoutItem>
             </dxlc:LayoutGroup>
 
@@ -36,11 +38,11 @@
                               Orientation="Vertical">
 
                 <dxlc:LayoutGroup>
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
                         <TextBlock VerticalAlignment="Top"
                                    TextWrapping="Wrap"
                                    Text="{Binding Message, Mode=OneTime}"
-                                   FontSize="16"/>
+                                   FontSize="12"/>
                     </ScrollViewer>
                 </dxlc:LayoutGroup>
             </dxlc:LayoutGroup>

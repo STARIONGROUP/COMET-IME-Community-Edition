@@ -101,7 +101,7 @@ namespace CDP4Reporting.Utilities
 
             if (nestedParameters.Count == 0)
             {
-                errorText = $"Path {path} was not found in Product Tree for Option {option.ShortName}";
+                errorText = $"Path '{path}' was not found in Product Tree for Option '{option.ShortName}'";
                 return false;
             }
 
@@ -109,13 +109,13 @@ namespace CDP4Reporting.Utilities
 
             if (nestedParameters.Count == 0)
             {
-                errorText = $"Domain {this.IterationDependentDataCollector.DomainOfExpertise.Name} does not have access to Path {path}.";
+                errorText = $"Domain '{this.IterationDependentDataCollector.DomainOfExpertise.Name}' does not have access to Path '{path}'.";
                 return false;
             }
 
             if (nestedParameters.Count > 1)
             {
-                errorText = $"Multiple parameters found for Path {path}. Cannot write the value back to the model.";
+                errorText = $"Multiple parameters found for Path '{path}'. Cannot write the value back to the model.";
                 return false;
             }
 
@@ -123,13 +123,13 @@ namespace CDP4Reporting.Utilities
 
             if (nestedParameter.AssociatedParameter.ParameterType.NumberOfValues > 1)
             {
-                errorText = $"ParameterType {nestedParameter.AssociatedParameter.ParameterType.Name} is of a compound parameter type. Writing back values to the model for Compound parameter types is currently not supported.";
+                errorText = $"ParameterType '{nestedParameter.AssociatedParameter.ParameterType.Name}' is of a compound parameter type. Writing back values to the model for Compound parameter types is currently not supported.";
                 return false;
             }
 
             if (!this.IterationDependentDataCollector.Session.PermissionService.CanWrite(nestedParameter.AssociatedParameter))
             {
-                errorText = $"Domain {this.IterationDependentDataCollector.DomainOfExpertise.Name} does not have write access to Path {path}.";
+                errorText = $"Domain '{this.IterationDependentDataCollector.DomainOfExpertise.Name}' does not have write access to Path '{path}'.";
                 return false;
             }
 
@@ -145,7 +145,7 @@ namespace CDP4Reporting.Utilities
                 return processedValueSet.ValidationResult == ValidationResultKind.Valid;
             }
 
-            errorText = $"Update Path {path} failed due to unexpected valueSet type: {nestedParameter.ValueSet.GetType()}";
+            errorText = $"Update Path '{path}' failed due to unexpected valueSet type: '{nestedParameter.ValueSet.GetType()}'";
 
             return false;
         }
