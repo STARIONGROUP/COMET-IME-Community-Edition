@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReportDesignerViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -61,7 +61,6 @@ namespace CDP4Reporting.ViewModels
 
     using Microsoft.Practices.ServiceLocation;
 
-    using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Printing;
     using DevExpress.Xpf.Reports.UserDesigner;
     using DevExpress.XtraReports.UI;
@@ -76,8 +75,6 @@ namespace CDP4Reporting.ViewModels
     using CDP4Reporting.DynamicTableChecker;
     using CDP4Reporting.Events;
     using CDP4Reporting.ReportScript;
-
-    using DevExpress.Data.Helpers;
 
     using File = System.IO.File;
     using Parameter = DevExpress.XtraReports.Parameters.Parameter;
@@ -503,7 +500,7 @@ namespace CDP4Reporting.ViewModels
             this.lastSavedDataSourceText = "";
 
             this.CurrentReport = GetNewXtraReport();
-            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(this.CurrentReport), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
+            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(this.CurrentReport, this.currentReportDesignerDocument), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
 
             this.CurrentReportProjectFilePath = string.Empty;
         }
@@ -546,7 +543,7 @@ namespace CDP4Reporting.ViewModels
 
             var report = new XtraReport();
 
-            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
+            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(report, this.currentReportDesignerDocument), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
 
             using (var reportZipArchive = this.ReportScriptHandler.GetReportZipArchive(reportProjectFilePath))
             {
@@ -748,53 +745,8 @@ namespace CDP4Reporting.ViewModels
         [ExcludeFromCodeCoverage]
         private void TriggerRefreshUI()
         {
-            this.currentReportDesignerDocument?.MakeChanges(changes =>
-            {
-                var refreshDataSource = new ObjectDataSource
-                {
-                    DataSource = new object(),
-                    Name = "__temporaryDataSource__"
-                };
-
-                var refreshParameter = new Parameter
-                {
-                    Name = "__temporaryParameter__"
-                };
-
-                var triedAddDataSource = false;
-                var triedAddParameter = false;
-
-                try
-                {
-                    changes.AddItem(refreshDataSource);
-                    triedAddDataSource = true;
-                    changes.RemoveItem(refreshDataSource);
-                    changes.AddItem(refreshParameter);
-                    triedAddParameter = true;
-                    changes.RemoveItem(refreshParameter);
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    try
-                    {
-                        if (triedAddDataSource)
-                        {
-                            changes.RemoveItem(refreshDataSource);
-                        }
-
-                        if (triedAddParameter)
-                        {
-                            changes.RemoveItem(refreshParameter);
-                        }
-                    }
-                    catch
-                    {
-                    }
-                }
-            });
+            // null check added for Unit test compatibility
+            this.currentReportDesignerDocument?.ReportModel.UpdateDataSources();
         }
 
         /// <summary>

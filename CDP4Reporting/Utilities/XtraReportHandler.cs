@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="XtraReportHandler.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -25,10 +25,15 @@
 
 namespace CDP4Reporting.Utilities
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Windows.Threading;
+
+    using CDP4Composition.Utilities;
 
     using DevExpress.DataAccess.ObjectBinding;
+    using DevExpress.Xpf.Reports.UserDesigner;
     using DevExpress.XtraReports.Parameters;
     using DevExpress.XtraReports.UI;
 
@@ -43,6 +48,26 @@ namespace CDP4Reporting.Utilities
     public class XtraReportHandler : IXtraReportHandler<XtraReport, Parameter>
     {
         /// <summary>
+        /// The <see cref="ReportDesignerDocument"/> used to perform actions against
+        /// </summary>
+        private readonly ReportDesignerDocument reportDesignerDocument;
+
+        /// <summary>
+        /// The <see cref="SingleConcurrentActionRunner"/> that handles executing parameter refreshes in the UI
+        /// </summary>
+        private SingleConcurrentActionRunner addParameterRunner = new();
+
+        /// <summary>
+        /// A list of <see cref="Parameter"/>s to be removed from the current report.
+        /// </summary>
+        private List<Parameter> toBeRemovedParameters = new();
+
+        /// <summary>
+        /// A list of <see cref="Parameter"/>s to be added to the current report.
+        /// </summary>
+        private List<Parameter> toBeAddedParameters = new();
+
+        /// <summary>
         /// Gets the <see cref="XtraReport"/>
         /// </summary>
         public XtraReport Report { get; }
@@ -53,6 +78,17 @@ namespace CDP4Reporting.Utilities
         /// <param name="report">The <see cref="XtraReport"/></param>
         public XtraReportHandler(XtraReport report)
         {
+            this.Report = report;
+        }
+
+        /// <summary>
+        /// Creates a new instance of the <see cref="XtraReportHandler"/> class
+        /// </summary>
+        /// <param name="report">The <see cref="XtraReport"/></param>
+        /// <param name="reportDesignerDocument">The <see cref="ReportDesignerDocument"/> used to perform actions against</param>
+        public XtraReportHandler(XtraReport report, ReportDesignerDocument reportDesignerDocument)
+        {
+            this.reportDesignerDocument = reportDesignerDocument;
             this.Report = report;
         }
 
@@ -149,7 +185,12 @@ namespace CDP4Reporting.Utilities
         {
             if (this.Report.Parameters.Contains(reportParameter))
             {
-                this.Report.Parameters.Remove(reportParameter);
+                lock (this.addParameterRunner)
+                {
+                    this.toBeRemovedParameters.Add(reportParameter);
+
+                    this.addParameterRunner.DelayRunAction(this.RunUIUpdater, 200);
+                }
             }
         }
 
@@ -184,7 +225,56 @@ namespace CDP4Reporting.Utilities
         /// <param name="newReportParameter">The <see cref="Parameter"/></param>
         public void AddParameter(Parameter newReportParameter)
         {
-            this.Report.Parameters.Add(newReportParameter);
+            lock (this.addParameterRunner)
+            {
+                this.toBeAddedParameters.Add(newReportParameter);
+
+                this.addParameterRunner.DelayRunAction(this.RunUIUpdater, 200);
+            }
+        }
+
+        private void RunUIUpdater()
+        {
+            this.reportDesignerDocument?.Dispatcher.Invoke(
+                () =>
+                {
+                    this.reportDesignerDocument?.MakeChanges(changes =>
+                    {
+                        lock (this.addParameterRunner)
+                        {
+                            try
+                            {
+                                foreach (var parameter in this.toBeRemovedParameters)
+                                {
+                                    changes.RemoveItem(parameter);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                            finally
+                            {
+                                this.toBeRemovedParameters.Clear();
+                            }
+
+                            try
+                            {
+                                foreach (var parameter in this.toBeAddedParameters)
+                                {
+                                    changes.AddItem(parameter);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                            finally
+                            {
+                                this.toBeAddedParameters.Clear();
+                            }
+                        }
+                    });
+                }
+                , DispatcherPriority.ContextIdle);
         }
 
         /// <summary>
@@ -195,13 +285,15 @@ namespace CDP4Reporting.Utilities
         /// <returns>The <see cref="Parameter"/></returns>
         public Parameter GetNewParameter(IReportingParameter reportingParameter, bool parameterIsVisible)
         {
-            return new Parameter
+            var parameter = new Parameter
             {
                 Name = reportingParameter.ParameterName,
                 Description = reportingParameter.Name,
                 Type = reportingParameter.Type,
                 Visible = parameterIsVisible
             };
+
+            return parameter;
         }
 
         /// <summary>
