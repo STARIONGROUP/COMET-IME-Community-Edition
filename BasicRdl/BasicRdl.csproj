@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{BEDCC5C5-83B2-41ED-AC9F-895757553BF2}</ProjectGuid>
-    <MinIMEVersion>9.6.0</MinIMEVersion>
+    <MinIMEVersion>9.7.0</MinIMEVersion>
     <AssemblyName>CDP4BasicRdl</AssemblyName>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -10,8 +10,8 @@
     <Product>BasicRdl</Product>
     <Description>CDP4-COMET Basic Reference Data Library Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.6.0.0</AssemblyVersion>
-    <FileVersion>9.6.0.0</FileVersion>
+    <AssemblyVersion>9.7.0.0</AssemblyVersion>
+    <FileVersion>9.7.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{89E91585-C793-4D90-AB8C-FD295590665B}</ProjectGuid>
-    <MinIMEVersion>9.6.0</MinIMEVersion>
+    <MinIMEVersion>9.7.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4Dashboard</AssemblyTitle>
@@ -9,8 +9,8 @@
     <Product>Dashboard</Product>
     <Description>CDP4-COMET Dashboard Plugin</Description>
     <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.6.0.0</AssemblyVersion>
-    <FileVersion>9.6.0.0</FileVersion>
+    <AssemblyVersion>9.7.0.0</AssemblyVersion>
+    <FileVersion>9.7.0.0</FileVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
