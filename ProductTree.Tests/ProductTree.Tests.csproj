@@ -29,9 +29,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-	  <PackageReference Include="CDP4Common-CE" Version="26.1.0" />
-	  <PackageReference Include="CDP4Dal-CE" Version="26.1.0" />
-	  <PackageReference Include="CDP4JsonSerializer-CE" Version="26.1.0" />
+	  <PackageReference Include="CDP4Common-CE" Version="27.0.0-rc1" />
+	  <PackageReference Include="CDP4Dal-CE" Version="27.0.0-rc1" />
+	  <PackageReference Include="CDP4JsonSerializer-CE" Version="27.0.0-rc1" />
 	  <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
 	  <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
