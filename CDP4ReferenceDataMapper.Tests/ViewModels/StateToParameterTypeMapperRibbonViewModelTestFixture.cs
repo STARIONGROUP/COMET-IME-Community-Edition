@@ -27,7 +27,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 {
     using System;
     using System.Collections.Concurrent;
-    
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -37,11 +37,14 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Permission;
 
     using CDP4ReferenceDataMapper.ViewModels;
+
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -58,6 +61,8 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
+        private Mock<IMessageBoxService> messageBoxService;
+        private Mock<IServiceLocator> serviceLocator;
 
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
@@ -88,11 +93,17 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
-            
+            this.messageBoxService = new Mock<IMessageBoxService>();
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
+
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
-            
+
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
-            this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) {  ShortName = "TST", Name = "Test"  };
+            this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { ShortName = "TST", Name = "Test" };
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri) { IterationNumber = 1, Description = "iteraiton 1" };
             this.engineeringModelSetup.IterationSetup.Add(this.iterationSetup);
             this.siteDirectory.Model.Add(this.engineeringModelSetup);

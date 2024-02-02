@@ -35,10 +35,10 @@
   </PropertyGroup>  
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="25.1.0">
+    <PackageReference Include="CDP4Common-CE" Version="26.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="25.1.0">
+    <PackageReference Include="CDP4Dal-CE" Version="26.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.CodeParser" Version="22.2.6">

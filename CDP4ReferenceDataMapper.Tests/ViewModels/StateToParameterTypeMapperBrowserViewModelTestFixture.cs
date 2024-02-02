@@ -45,6 +45,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
@@ -52,6 +53,8 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
     using CDP4ReferenceDataMapper.Managers;
     using CDP4ReferenceDataMapper.ViewModels;
+
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -68,6 +71,8 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
+        private Mock<IMessageBoxService> messageBoxService;
+        private Mock<IServiceLocator> serviceLocator;
 
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
@@ -120,6 +125,12 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
+            this.messageBoxService = new Mock<IMessageBoxService>();
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
 
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
@@ -744,6 +755,71 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             //No Changes
             Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.Execute());
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
+        }
+
+        [Test]
+        public async Task Verify_that_RefreshValuesCommand_works()
+        {
+            this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
+                this.iteration,
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.panelNavigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginSettingsService.Object);
+
+            this.stateToParameterTypeMapperBrowserViewModel.SelectedElementDefinitionCategory = this.stateToParameterTypeMapperBrowserViewModel.PossibleElementDefinitionCategory.First();
+            this.stateToParameterTypeMapperBrowserViewModel.SelectedActualFiniteStateList = this.stateToParameterTypeMapperBrowserViewModel.PossibleActualFiniteStateList.First();
+            this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes = new ReactiveList<ParameterType> { this.sourceParameterType_1, this.sourceParameterType_2 };
+            this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
+            this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
+
+            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute();
+
+            //No Changes
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.Execute());
+            this.messageBoxService.Verify(x => x.Show(It.Is<string>(y => y.Contains("up-to-date")), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Exactly(1));
+
+            // Mapping added
+            var dataView = this.stateToParameterTypeMapperBrowserViewModel.DataSourceManager.DataTable.DefaultView;
+
+            dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterMappingType}'";
+
+            var newMapping =
+                this.elementDefinition.Parameter
+                    .First(
+                        x => x.ParameterType == this.sourceParameterType_1);
+
+            dataView[0][this.actualFinitateSte_on.ShortName] = newMapping.ParameterType.Iid;
+
+            dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterValueType}'";
+
+            var newValue =
+                newMapping
+                    .ValueSet
+                    .First()
+                    .Computed[0];
+
+            dataView[0][this.actualFinitateSte_on.ShortName] = newValue;
+
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.Execute());
+            this.messageBoxService.Verify(x => x.Show(It.Is<string>(y => y.Contains("update")), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Exactly(1));
+
+            //Actual Value Changes
+            this.elementDefinition.Parameter.First(x => x.ParameterType == this.sourceParameterType_1).ValueSet.First().Manual = new ValueArray<string>(new List<string> { "200" });
+
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.Execute());
+            this.messageBoxService.Verify(x => x.Show(It.Is<string>(y => y.Contains("update")), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Exactly(2));
+
+            //reset mapping to none
+            dataView = this.stateToParameterTypeMapperBrowserViewModel.DataSourceManager.DataTable.DefaultView;
+
+            dataView.RowFilter = $"{DataSourceManager.TypeColumnName} = '{DataSourceManager.ParameterMappingType}'";
+
+            dataView[0][this.actualFinitateSte_on.ShortName] = null;
+
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.Execute());
+            this.messageBoxService.Verify(x => x.Show(It.Is<string>(y => y.Contains("update")), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Exactly(3));
         }
 
         [Test]

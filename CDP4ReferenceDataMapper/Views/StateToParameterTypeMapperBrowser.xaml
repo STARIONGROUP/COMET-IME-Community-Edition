@@ -382,6 +382,13 @@
             </dxg:TreeListControl.View>
         </dxg:TreeListControl>
         <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Width="120"
+                    Height="25"
+                    Margin="3"
+                    Name="RefreshButton"
+                    Command="{Binding Path=RefreshValuesCommand}"
+                    Content="Refresh All Values" 
+                    HorizontalAlignment="Left"/>
             <Button Width="75"
                     Height="25"
                     Margin="3"

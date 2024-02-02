@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="StateToParameterTypeMapperBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -32,7 +32,6 @@ namespace CDP4ReferenceDataMapper.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
-    using System.Reactive.Threading.Tasks;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -53,6 +52,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
     using CDP4ReferenceDataMapper.Managers;
 
+    using CommonServiceLocator;
+
     using NLog;
 
     using ReactiveUI;
@@ -62,6 +63,11 @@ namespace CDP4ReferenceDataMapper.ViewModels
     /// </summary>
     public class StateToParameterTypeMapperBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel, IDropTarget
     {
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/>
+        /// </summary>
+        public IMessageBoxService MessageBoxService { get; } = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+
         /// <summary>
         /// The logger for the current class
         /// </summary>
@@ -319,6 +325,11 @@ namespace CDP4ReferenceDataMapper.ViewModels
         public ReactiveCommand<Unit, Unit> SaveValuesCommand { get; protected set; }
 
         /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to execute when all mapped values need to be refreshed
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> RefreshValuesCommand { get; protected set; }
+
+        /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
@@ -351,6 +362,8 @@ namespace CDP4ReferenceDataMapper.ViewModels
             this.SelectedMappingParameterChangedCommand = ReactiveCommandCreator.Create<object>(this.ExecuteSelectedMappingParameterChangedCommand);
 
             this.SaveValuesCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteSaveValuesCommand);
+
+            this.RefreshValuesCommand = ReactiveCommand.Create(this.ExecuteRefreshValuesCommand);
         }
 
         /// <summary>
@@ -412,6 +425,23 @@ namespace CDP4ReferenceDataMapper.ViewModels
         }
 
         /// <summary>
+        /// Executes when the user wants to refresh all values.
+        /// </summary>
+        private void ExecuteRefreshValuesCommand()
+        {
+            var refreshedValueCount = this.DataSourceManager.RefreshAllMappedValues();
+
+            if (refreshedValueCount == 0)
+            {
+                this.MessageBoxService?.Show("All mapped values were already up-to-date.", "No Changes Found", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                this.MessageBoxService?.Show($"{refreshedValueCount} mapped values were updated, but not yet saved.", "Values Changed", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+        
+        /// <summary>
         /// Executes when the <see cref="SelectedMappingParameterChangedCommand"/> was fired.
         /// </summary>
         /// <param name="obj"></param>
@@ -426,24 +456,7 @@ namespace CDP4ReferenceDataMapper.ViewModels
 
             this.DataSourceManager.SetValue(property, row.Row, parameterTypeIid);
 
-            var valueRow = this.DataSourceManager.GetValueRowByMappingRow(row.Row);
-
-            if (valueRow != null)
-            {
-                var newPropertyValue =
-                    string.IsNullOrWhiteSpace(parameterTypeIid)
-                        ? null
-                        : this.DataSourceManager.GetElementDefinitionParameterValueForDataRow(row.Row, new Guid(parameterTypeIid));
-
-                this.DataSourceManager.SetValue(property, valueRow, newPropertyValue);
-
-                var newPropertyCustomName =
-                    string.IsNullOrWhiteSpace(parameterTypeIid)
-                        ? null
-                        : this.DataSourceManager.GetElementDefinitionParameterCustomShortNameForDataRow(row.Row, new Guid(parameterTypeIid));
-
-                this.DataSourceManager.SetValue(this.DataSourceManager.GetShortNameColumnName(property), valueRow, newPropertyCustomName);
-            }
+            this.DataSourceManager.TryRefreshMappedValue(row.Row, property);
         }
 
         /// <summary>
