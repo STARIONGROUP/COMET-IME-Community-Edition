@@ -165,6 +165,21 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
+        public void VerifyCreateBehavior()
+        {
+            var name = "name";
+            var shortname = "shortname";
+
+            this.elementDefinition.Name = name;
+            this.elementDefinition.ShortName = shortname;
+            this.elementDefinition.Owner = this.domainOfExpertise;
+
+            var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            Assert.DoesNotThrow(() => elementDefinitionDialogViewModel.CreateBehaviorCommand.Execute(null));
+        }
+
+        [Test]
         public async Task VerifyOkExecuteWhenNotTopElement()
         {
             var name = "name";

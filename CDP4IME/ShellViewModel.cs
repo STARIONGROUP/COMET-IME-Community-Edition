@@ -31,6 +31,7 @@ namespace COMET
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
 
     using CDP4Composition.Events;
@@ -161,7 +162,7 @@ namespace COMET
 
             this.dialogNavigationService = dialogNavigationService;
             this.DockViewModel = dockViewModel;
-            this.Title = "CDP4-COMET IME - Community Edition";
+            this.Title = $"CDP4-COMET IME {Assembly.GetEntryAssembly()?.GetName().Version} - Community Edition";
 
             this.logTarget = new MemoryEventTarget();
             this.logTarget.EventReceived += this.LogEventReceived;

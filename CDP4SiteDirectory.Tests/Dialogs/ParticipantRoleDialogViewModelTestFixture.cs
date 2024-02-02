@@ -125,7 +125,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             Assert.IsNull(this.viewmodel.WriteException);
             Assert.IsTrue(this.viewmodel.DialogResult.Value);
-            Assert.AreEqual(49, this.transaction.AddedThing.Count());
+            Assert.AreEqual(50, this.transaction.AddedThing.Count());
         }
 
         [Test]

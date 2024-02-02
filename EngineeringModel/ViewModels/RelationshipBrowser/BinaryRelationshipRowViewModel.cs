@@ -26,6 +26,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Linq;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
@@ -49,6 +50,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for the <see cref="Name"/> property.
         /// </summary>
         private string name;
+
+        /// <summary>
+        /// Backing field for the <see cref="Categories"/> property.
+        /// </summary>
+        private string categories;
 
         /// <summary>
         /// Source thing before any update
@@ -137,6 +143,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.UpdateName();
+            this.UpdateCategories();
         }
 
         /// <summary>
@@ -154,6 +161,14 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.Name = this.Thing.Name;
             }
+        }
+
+        /// <summary>
+        /// Updates the relationship categories
+        /// </summary>
+        protected void UpdateCategories()
+        {
+            this.Categories = string.Join(", ", this.Thing.Category.Select(c => c.Name));
         }
 
         /// <summary>
@@ -202,6 +217,15 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get => this.name;
             set => this.RaiseAndSetIfChanged(ref this.name, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the categories of the <see cref="BinaryRelationship"/> that is represented by the current row-view-model
+        /// </summary>
+        public string Categories
+        {
+            get => this.categories;
+            set => this.RaiseAndSetIfChanged(ref this.categories, value);
         }
     }
 }

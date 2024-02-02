@@ -67,7 +67,27 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         /// <param name="header">The header for this menu item</param>
         /// <param name="inputGestureText">The Input Gesture text can shows a keyboard combination</param>
-        /// <param name="executeCommandAction">The action that the <see cref="ReactiveCommand{Unit, Unit}"/> shall execute</param>
+        /// <param name="executeCommandAction">The action that the <see cref="ReactiveCommand{Object}"/> shall execute</param>
+        /// <param name="canExecute">The state of the command</param>
+        /// <param name="menuItemKind">The <see cref="MenuItemKind"/></param>
+        /// <param name="thingKind">The <see cref="ClassKind"/> this menu-item operates on</param>
+        public ContextMenuItemViewModel(string header, string inputGestureText, Action<Thing> executeCommandAction, bool canExecute, MenuItemKind menuItemKind = MenuItemKind.None, ClassKind thingKind = ClassKind.Thing)
+        {
+            this.CanExecute = canExecute;
+            this.MenuCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExecute));
+            ((ReactiveCommand<object>)this.MenuCommand).Subscribe(_ => executeCommandAction(this.RelatedThing));
+            this.Header = header;
+            this.InputGestureText = inputGestureText;
+            this.MenuItemKind = menuItemKind;
+            this.thingKind = thingKind;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ContextMenuItemViewModel"/> class
+        /// </summary>
+        /// <param name="header">The header for this menu item</param>
+        /// <param name="inputGestureText">The Input Gesture text can shows a keyboard combination</param>
+        /// <param name="executeCommandAction">The action that the <see cref="ReactiveCommand{Object}"/> shall execute</param>
         /// <param name="thing">The <see cref="Thing"/> related to the command</param>
         /// <param name="canExecute">The state of the command</param>
         /// <param name="menuItemKind">The <see cref="MenuItemKind"/></param>

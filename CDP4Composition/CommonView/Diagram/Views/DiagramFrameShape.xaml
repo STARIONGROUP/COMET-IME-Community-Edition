@@ -1,0 +1,25 @@
+﻿<dxdiag:DiagramContentItem x:Class="CDP4CommonView.Diagram.Views.DiagramFrameShape"
+                           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                           xmlns:dxdiag="http://schemas.devexpress.com/winfx/2008/xaml/diagram"
+                           xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                           xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                           xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+                           mc:Ignorable="d"
+                           Background="Transparent"
+                           Height="{Binding Height, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                           Width="{Binding Width, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                           CanResize="True"
+                           CanAttachConnectorBeginPoint="False"
+                           CanAttachConnectorEndPoint="False"
+                           Stroke="Black"
+                           d:DesignHeight="300" d:DesignWidth="300">
+    <dxdiag:DiagramContentItem.Content>
+        <StackPanel>
+            <dxe:TextEdit NullTextForeground="LightCoral" NullText="Undefined" Text="{Binding DisplayText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Foreground="#FF505050" 
+                          Background="White" CornerRadius="20" BorderBrush="Black" BorderThickness="1" Margin="10"></dxe:TextEdit>
+        </StackPanel>
+
+    </dxdiag:DiagramContentItem.Content>
+</dxdiag:DiagramContentItem>

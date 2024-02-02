@@ -84,4 +84,10 @@
       <ExcludeAssets>runtime</ExcludeAssets>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\a_implies_b_16x16.png" />
+    <Resource Include="Resources\a_implies_not_b_16x16.png" />
+    <Resource Include="Resources\not_a_implies_b_16x16.png" />
+    <Resource Include="Resources\not_a_implies_not_b_16x16.png" />
+  </ItemGroup>
 </Project>

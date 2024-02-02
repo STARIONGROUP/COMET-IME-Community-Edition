@@ -31,6 +31,7 @@ namespace CDP4Composition.Diagram
     using System.Threading.Tasks;
     using System.Windows;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -102,6 +103,32 @@ namespace CDP4Composition.Diagram
             if (dropInfo.Payload is Tuple<ParameterType, MeasurementScale> parameterTypeAndScale)
             {
                 await this.ParameterDrop(dropInfo, parameterTypeAndScale);
+                dropInfo.Handled = true;
+            }
+
+            if (dropInfo.Payload is Category category)
+            {
+                await this.CategoryDrop(dropInfo, category);
+                dropInfo.Handled = true;
+            }
+        }
+
+        /// <summary>
+        /// Handle the drop of a <see cref="Category"/>
+        /// </summary>
+        /// <param name="dropInfo">The <see cref="IDropInfo"/> containing the payload</param>
+        /// <param name="category">The <see cref="Category"/></param>
+        private async Task CategoryDrop(IDropInfo dropInfo, Category category)
+        {
+            if (this.elementDefinition.Category.Any(x => x.Equals(category)))
+            {
+                dropInfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            if (this.session.OpenIterations.TryGetValue(this.elementDefinition.GetContainerOfType<Iteration>(), out var tuple))
+            {
+                await this.thingCreator.ApplyCategory(category, this.elementDefinition, this.session);
             }
         }
 
@@ -144,6 +171,59 @@ namespace CDP4Composition.Diagram
             {
                 this.ParameterDragOver(dropInfo, parameterTypeAndScale);
             }
+
+            if (dropInfo.Payload is Category category)
+            {
+                this.CategoryDragOver(dropInfo, category);
+            }
+        }
+
+        /// <summary>
+        /// Set the <see cref="IDropInfo.Effects"/> when the payload is an <see cref="Category"/>
+        /// </summary>
+        /// <param name="dropinfo">The <see cref="IDropInfo"/></param>
+        /// <param name="category">The <see cref="Category"/> in the payload</param>
+        private void CategoryDragOver(IDropInfo dropinfo, Category category)
+        {
+            // check if category is in the chain of rdls
+            var model = (EngineeringModel)this.elementDefinition.TopContainer;
+            var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
+            var rdlChains = new List<ReferenceDataLibrary> { mrdl };
+            rdlChains.AddRange(mrdl.RequiredRdls);
+
+            if (!rdlChains.Contains(category.Container))
+            {
+                dropinfo.Effects = DragDropEffects.None;
+
+                Logger.Warn("A category cannot be applied as it is not available in the current set of available reference data libraries.");
+                return;
+            }
+
+            if (!this.permissionService.CanWrite(this.elementDefinition))
+            {
+                dropinfo.Effects = DragDropEffects.None;
+                Logger.Warn("You do not have permission to apply the category.");
+                return;
+            }
+
+            // A category is already applied
+            if (this.elementDefinition.Category.Any(x => x.Equals(category)))
+            {
+                Logger.Warn("The category is already applied.");
+                dropinfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            // A category's permissable classes check
+            if (!category.PermissibleClass.Contains(ClassKind.ElementDefinition))
+            {
+                Logger.Warn("The category cannot be applied to this type.");
+                dropinfo.Effects = DragDropEffects.None;
+                return;
+            }
+
+            dropinfo.Effects = DragDropEffects.Copy;
+            dropinfo.Handled = true;
         }
 
         /// <summary>
@@ -162,7 +242,7 @@ namespace CDP4Composition.Diagram
             if (!rdlChains.Contains(tuple.Item1.Container))
             {
                 dropinfo.Effects = DragDropEffects.None;
-                Logger.Warn("A parameter with the current parameter type cannot be created as the parameter type does not belong to the available libraries.");
+                Logger.Warn("A parameter with the current parameter type cannot be created as the parameter type does not belong in the current set of available reference data libraries..");
                 return;
             }
 

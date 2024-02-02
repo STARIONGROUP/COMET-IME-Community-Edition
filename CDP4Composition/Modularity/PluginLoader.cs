@@ -35,12 +35,19 @@ namespace CDP4Composition.Modularity
 
     using CommonServiceLocator;
 
+    using NLog;
+
     /// <summary>
     /// The purpose of the <see cref="PluginLoader"/> is to load the various
     /// CDP4 plugins that are located in the plugins folder.
     /// </summary>
     public class PluginLoader<T> where T : AppSettings, new()
     {
+        /// <summary>
+        /// A <see cref="Logger"/> instance
+        /// </summary>
+        protected readonly Logger logger = LogManager.GetCurrentClassLogger();
+
         /// <summary>
         /// Gets or sets a list of disabled plugins
         /// </summary>
@@ -61,6 +68,7 @@ namespace CDP4Composition.Modularity
         /// </summary>
         public PluginLoader()
         {
+            this.logger.Info("Initializing plugin loader");
             this.DirectoryCatalogues = new List<DirectoryCatalog>();
 
             var directoryInfo = PluginUtilities.PluginDirectoryExists(out _);
@@ -70,13 +78,28 @@ namespace CDP4Composition.Modularity
                 this.GetManifests();
                 this.GetDisabledPlugins();
 
-                foreach (var manifest in this.ManifestsList.Where(m => !this.DisabledPlugins.Contains(m.ProjectGuid)))
+                foreach (var manifest in this.ManifestsList)
                 {
+                    this.logger.Info($"Initializing loading plugin from manifest {manifest.Name}");
+
+                    if (this.DisabledPlugins.Contains(manifest.ProjectGuid))
+                    {
+                        this.logger.Info($"Plugin {manifest.Name} is disabled. Skipping");
+                        continue;
+                    }
+
                     var path = Path.Combine(directoryInfo.FullName, manifest.Name);
+
+                    this.logger.Info($"Attempting loading plugin from path {path}");
 
                     if (Directory.Exists(path))
                     {
                         this.LoadPlugins(path);
+                        this.logger.Info($"Done loading plugin {manifest.Name} version {manifest.Version}");
+                    }
+                    else
+                    {
+                        this.logger.Error($"Plugin {manifest.Name} path {path} does not exist. Skipping load");
                     }
                 }
             }
@@ -89,6 +112,8 @@ namespace CDP4Composition.Modularity
         {
             var appSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<T>>();
             this.DisabledPlugins = appSettingsService.AppSettings.DisabledPlugins;
+
+            this.logger.Info($"Loaded list of diabaled plugins: {string.Join(", ", this.DisabledPlugins)}");
         }
 
         /// <summary>
@@ -108,6 +133,23 @@ namespace CDP4Composition.Modularity
         private void LoadPlugins(string path)
         {
             var dllCatalog = new DirectoryCatalog(path, "*.dll");
+
+            this.logger.Info($"Loading plugin files from path {path}: {string.Join("; ", dllCatalog.LoadedFiles.Select(p => new FileInfo(p).Name))}");
+
+            try
+            {
+                // try catch block as unit tests can throw an exception due to not all assemblies being preloaded.
+                // This is expected behavior
+                foreach (var composablePartDefinition in dllCatalog.Parts)
+                {
+                    this.logger.Info($"Imported part {composablePartDefinition}");
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error($"Parts catalog unavailable due to missing assembly. Error: {ex.Message}");
+            }
+
             this.DirectoryCatalogues.Add(dllCatalog);
         }
     }

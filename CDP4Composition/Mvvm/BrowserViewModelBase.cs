@@ -1027,7 +1027,7 @@ namespace CDP4Composition.Mvvm
         /// </param>
         /// <remarks>
         /// To allow a drag to be started, the <see cref="IDragInfo.Effects"/> property on <paramref name="dragInfo"/> 
-        /// should be set to a value other than <see cref="DragDropEffects.None"/>. 
+        /// should be set to a value other than <see cref="DragDropEffects.None"/>.
         /// </remarks>
         public virtual void StartDrag(IDragInfo dragInfo)
         {

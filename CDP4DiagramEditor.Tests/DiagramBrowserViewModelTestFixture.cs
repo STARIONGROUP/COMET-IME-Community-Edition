@@ -39,6 +39,7 @@ namespace CDP4DiagramEditor.Tests
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -48,11 +49,13 @@ namespace CDP4DiagramEditor.Tests
 
     using CDP4DiagramEditor.ViewModels;
 
+    using Microsoft.Practices.ServiceLocation;
+
     using Moq;
 
     using NUnit.Framework;
 
-    [TestFixture]
+    [TestFixture, Apartment(ApartmentState.STA)]
     internal class DiagramBrowserViewModelTestFixture
     {
         private Mock<ISession> session;
@@ -65,6 +68,8 @@ namespace CDP4DiagramEditor.Tests
         private IterationSetup iterationsetup;
         private Person person;
         private Participant participant;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IThingDialogNavigationService> navigation;
         private EngineeringModel model;
         private Iteration iteration;
         private DiagramCanvas diagram;
@@ -77,6 +82,9 @@ namespace CDP4DiagramEditor.Tests
         {
             this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.navigation = new Mock<IThingDialogNavigationService>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -97,7 +105,7 @@ namespace CDP4DiagramEditor.Tests
 
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.modelsetup };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationsetup };
-            this.diagram = new DiagramCanvas(Guid.NewGuid(), this.cache, this.uri) { Name = "diagram" };
+            this.diagram = new DiagramCanvas(Guid.NewGuid(), this.cache, this.uri) { Name = "diagram", PublicationState = PublicationState.Hidden};
             this.model.Iteration.Add(this.iteration);
             this.iteration.DiagramCanvas.Add(this.diagram);
 
@@ -118,7 +126,8 @@ namespace CDP4DiagramEditor.Tests
         }
 
         [Test]
-        public async Task VerifyThatRowsAreCreated()
+        [Apartment(ApartmentState.MTA)]
+        public void VerifyThatRowsAreCreated()
         {
             var viewmodel = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -135,12 +144,30 @@ namespace CDP4DiagramEditor.Tests
 
             viewmodel.SelectedThing = diagramrow;
 
-            await viewmodel.UpdateCommand.Execute();
+            viewmodel.OpenCommand.Execute(null);
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<DiagramEditorViewModel>()));
         }
 
         [Test]
-        public async Task VerifyComputePermissions()
+        [Apartment(ApartmentState.MTA)]
+        public void VerifyPublishDiagramWorks()
+        {
+            var viewmodel = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            Assert.AreEqual(1, viewmodel.Diagrams.Count);
+            var diagramrow = viewmodel.Diagrams.Single();
+
+            Assert.AreEqual(PublicationState.Hidden, diagramrow.PublicationState);
+
+            viewmodel.SelectedThing = diagramrow;
+            Assert.DoesNotThrowAsync(async () => await viewmodel.ReadyForPublicationCommand.ExecuteAsync(null));
+
+            Assert.DoesNotThrowAsync(async () => await viewmodel.PublishCommand.ExecuteAsync(null));
+
+        }
+
+        [Test]
+        public void VerifyComputePermissions()
         {
             var vm = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -152,14 +179,17 @@ namespace CDP4DiagramEditor.Tests
             vm.ComputePermission();
             Assert.That(((ICommand)vm.UpdateCommand).CanExecute(null), Is.True);
 
-            await vm.UpdateCommand.Execute();
+            vm.OpenCommand.Execute(null);
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<DiagramEditorViewModel>()));
         }
 
         [Test]
+        [Apartment(ApartmentState.MTA)]
         public void VerifyThatDiagramRowsAreUpdated()
         {
             var viewmodel = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            Assert.AreEqual(1, viewmodel.Diagrams.Count);
 
             var newdiagram = new DiagramCanvas(Guid.NewGuid(), null, this.uri);
             this.iteration.DiagramCanvas.Add(newdiagram);
@@ -201,6 +231,22 @@ namespace CDP4DiagramEditor.Tests
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             vm = new DiagramBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
+        }
+
+        [Test]
+        public void VerifyDragDropDiagramsWorks()
+        {
+            var viewmodel = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var dropinfo = new Mock<IDropInfo>();
+            var droptarget = new Mock<IDropTarget>();
+
+            dropinfo.Setup(x => x.TargetItem).Returns(droptarget.Object);
+            droptarget.Setup(x => x.Drop(It.IsAny<IDropInfo>())).Throws(new Exception("ex"));
+
+            viewmodel.Drop(dropinfo.Object);
+            droptarget.Verify(x => x.Drop(dropinfo.Object));
+
+            Assert.AreEqual("ex", viewmodel.Feedback);
         }
     }
 }

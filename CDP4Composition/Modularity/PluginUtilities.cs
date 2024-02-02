@@ -80,7 +80,7 @@ namespace CDP4Composition.Modularity
 #else
             var currentConfiguration = "Release";
 #endif
-
+            Logger.Info($"Reading plugin manifests for {currentConfiguration} configuration");
             var directoryInfo = PluginDirectoryExists(out var specificPluginFolderExists);
 
             if (directoryInfo.Exists)
@@ -89,14 +89,17 @@ namespace CDP4Composition.Modularity
                 {
                     if (!specificPluginFolderExists && (!manifest.Directory?.FullName.Contains($"{Path.DirectorySeparatorChar}{currentConfiguration}{Path.DirectorySeparatorChar}") ?? true))
                     {
+                        Logger.Info($"Plugin manifest {manifest.Name} skipped");
                         continue;
                     }
 
                     manifests.Add(JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(manifest.FullName)));
+                    Logger.Info($"Plugin manifest {manifest.Name} added");
                 }
             }
             else
             {
+                Logger.Error($"Plugin directory does not exist");
                 throw new FileNotFoundException();
             }
 
@@ -158,6 +161,7 @@ namespace CDP4Composition.Modularity
             }
 
             temporaryFolder = Path.Combine(temporaryFolder, pluginName);
+            Logger.Info($"Plugin temp folder found {temporaryFolder}");
 
             return new DirectoryInfo(temporaryFolder);
         }
@@ -180,6 +184,8 @@ namespace CDP4Composition.Modularity
                 downloadPath.Create();
             }
 
+            Logger.Info($"Plugin download folder located {downloadPath.FullName}");
+
             return downloadPath;
         }
 
@@ -199,10 +205,11 @@ namespace CDP4Composition.Modularity
                 if (GetPlugin(currentPlateformVersion, downloadedPluginFolder) is { manifest: { }, cdp4ckFile: { } } plugin)
                 {
                     updatablePlugins.Add(plugin);
+                    Logger.Info($"Added installable plugin {plugin.manifest.Name}");
                 }
             }
 
-            Logger.Debug(message: $"Found {updatablePlugins.Count} installable plugins");
+            Logger.Info(message: $"Found {updatablePlugins.Count} installable plugins");
             return updatablePlugins;
         }
 
@@ -220,10 +227,11 @@ namespace CDP4Composition.Modularity
 
                 if (manifest is { } && (manifest.MinIMEVersion is null || new Version(version: manifest.MinIMEVersion) <= imeVersion))
                 {
+                    Logger.Info($"Found installable plugin {manifest.Name}");
                     return (installableCdp4CkFullPath, manifest);
                 }
 
-                Logger.Debug(
+                Logger.Info(
                     manifest is { }
                     ? $"{manifest.MinIMEVersion} is higher than the current IME version please update before installing this plugin update {imeVersion}"
                     : $"{downloadedPluginFolder.Name} does not contain any manifest. skipping plugin: {downloadedPluginFolder.Name}");
@@ -252,6 +260,7 @@ namespace CDP4Composition.Modularity
             if (downloadedPluginFolder.EnumerateFiles().FirstOrDefault(f => f.Name.EndsWith(".plugin.manifest")) is { } manifestFile)
             {
                 manifest = JsonConvert.DeserializeObject<Manifest>(File.ReadAllText(Path.Combine(manifestFile.FullName)));
+                Logger.Info($"Deserialized manifest of installable plugin {manifest?.Name}");
             }
 
             return manifest;
@@ -269,6 +278,8 @@ namespace CDP4Composition.Modularity
             {
                 Directory.CreateDirectory(appDataPath);
             }
+
+            Logger.Info($"AppData folder located {appDataPath}");
 
             return appDataPath;
         }

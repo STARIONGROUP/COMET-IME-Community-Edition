@@ -134,5 +134,9 @@
     <Feature Id="GRAPHERPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4-COMET Grapher Plugin" Level="1">
       <ComponentGroupRef Id="CDP4GRAPHER_CG" />
     </Feature>
+
+    <Feature Id="DIAGRAMEDITORPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="COMET Diagram Editor Plugin" Level="1">
+      <ComponentGroupRef Id="CDP4DIAGRAMEDITOR_CG" />
+    </Feature>
   </Product>
 </Wix>
