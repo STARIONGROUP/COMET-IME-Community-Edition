@@ -488,7 +488,7 @@
                                          IsNodeMenuEnabled="True"
                                          RestoreTreeStateOnClearFilter="True"
                                          EnableDynamicLoading="False"
-                                         ShowAutoFilterNode="True"
+                                         ShowSearchPanel="True"
                                          NodeImageSelector="{StaticResource ImageSelector}"
                                          ExpandNodesOnFiltering="True"
                                          AllowEditing="False"

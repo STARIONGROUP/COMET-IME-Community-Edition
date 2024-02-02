@@ -27,7 +27,6 @@ namespace CDP4DiagramEditor.ViewModels
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Collections.Specialized;
     using System.Linq;
     using System.Reactive;
@@ -195,8 +194,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public DiagramPaletteViewModel PaletteViewModel
         {
-            get { return this.paletteViewModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.paletteViewModel, value); }
+            get => this.paletteViewModel;
+            private set => this.RaiseAndSetIfChanged(ref this.paletteViewModel, value);
         }
 
         /// <summary>
@@ -204,8 +203,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -213,8 +212,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -227,86 +226,86 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public bool CanCreateDiagram
         {
-            get { return this.canCreateDiagram; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateDiagram, value); }
+            get => this.canCreateDiagram;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateDiagram, value);
         }
 
         /// <summary>
         /// Gets the save command
         /// </summary>
-        public ReactiveCommand<Unit> SaveDiagramCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveDiagramCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the delete from model Command
         /// </summary>
-        public ReactiveCommand<object> DeleteFromModelCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteFromModelCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the delete from diagram Command
         /// </summary>
-        public ReactiveCommand<object> DeleteFromDiagramCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteFromDiagramCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the add relationships to diagram command
         /// </summary>
-        public ReactiveCommand<object> AddUsagesToDiagramCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> AddUsagesToDiagramCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the add usages to diagram command
         /// </summary>
-        public ReactiveCommand<object> AddBinaryRelationshipsToDiagramCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> AddBinaryRelationshipsToDiagramCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the add usages to existing elements diagram command
         /// </summary>
-        public ReactiveCommand<object> AddUsagesToExistingElementsDiagramCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> AddUsagesToExistingElementsDiagramCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the add usages to diagram command
         /// </summary>
-        public ReactiveCommand<object> AddBinaryRelationshipsToExistingElementsDiagramCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> AddBinaryRelationshipsToExistingElementsDiagramCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the RelationshipRules
         /// </summary>
         public DisposableReactiveList<RuleNavBarRelationViewModel> RelationshipRules
         {
-            get { return this.relationshipRules; }
-            set { this.RaiseAndSetIfChanged(ref this.relationshipRules, value); }
+            get => this.relationshipRules;
+            set => this.RaiseAndSetIfChanged(ref this.relationshipRules, value);
         }
 
         /// <summary>
         /// Gets or sets the set as top element Command
         /// </summary>
-        public ReactiveCommand<Unit> SetAsTopElementCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SetAsTopElementCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the unset top element Command
         /// </summary>
-        public ReactiveCommand<Unit> UnsetTopElementCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> UnsetTopElementCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as jpg
         /// </summary>
-        public ReactiveCommand<object> ExportDiagramAsJpg { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExportDiagramAsJpg { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as pdf
         /// </summary>
-        public ReactiveCommand<object> ExportDiagramAsPdf { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExportDiagramAsPdf { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram to clipboard
         /// </summary>
-        public ReactiveCommand<object> ExportDiagramToClipboard { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExportDiagramToClipboard { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the diagram has its top element set
         /// </summary>
         public bool IsTopDiagramElementSet
         {
-            get { return this.isTopDiagramElementSet; }
-            set { this.RaiseAndSetIfChanged(ref this.isTopDiagramElementSet, value); }
+            get => this.isTopDiagramElementSet;
+            set => this.RaiseAndSetIfChanged(ref this.isTopDiagramElementSet, value);
         }
 
         /// <summary>
@@ -314,8 +313,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public bool DropContextMenuIsOpen
         {
-            get { return this.dropContextMenuIsOpen; }
-            set { this.RaiseAndSetIfChanged(ref this.dropContextMenuIsOpen, value); }
+            get => this.dropContextMenuIsOpen;
+            set => this.RaiseAndSetIfChanged(ref this.dropContextMenuIsOpen, value);
         }
 
         /// <summary>
@@ -323,8 +322,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public DisposableReactiveList<IThingDiagramItemViewModel> ThingDiagramItemViewModels
         {
-            get { return this.thingDiagramItemViewModels; }
-            set { this.RaiseAndSetIfChanged(ref this.thingDiagramItemViewModels, value); }
+            get => this.thingDiagramItemViewModels;
+            set => this.RaiseAndSetIfChanged(ref this.thingDiagramItemViewModels, value);
         }
 
         /// <summary>
@@ -332,8 +331,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public DisposableReactiveList<IDiagramElementTreeRowViewModel> DiagramElementTreeRowViewModels
         {
-            get { return this.diagramElementTreeRowViewModels; }
-            set { this.RaiseAndSetIfChanged(ref this.diagramElementTreeRowViewModels, value); }
+            get => this.diagramElementTreeRowViewModels;
+            set => this.RaiseAndSetIfChanged(ref this.diagramElementTreeRowViewModels, value);
         }
 
         /// <summary>
@@ -341,8 +340,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public ReactiveList<IDiagramElementTreeRowViewModel> SelectedTreeRowViewModels
         {
-            get { return this.selectedTreeRowViewModels; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedTreeRowViewModels, value); }
+            get => this.selectedTreeRowViewModels;
+            set => this.RaiseAndSetIfChanged(ref this.selectedTreeRowViewModels, value);
         }
 
         /// <summary>
@@ -350,8 +349,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public ObservableCollectionCore<object> VisibleDiagramElementTreeRowViewModels
         {
-            get { return this.visibleDiagramElementTreeRowViewModels; }
-            set { this.RaiseAndSetIfChanged(ref this.visibleDiagramElementTreeRowViewModels, value); }
+            get => this.visibleDiagramElementTreeRowViewModels;
+            set => this.RaiseAndSetIfChanged(ref this.visibleDiagramElementTreeRowViewModels, value);
         }
 
         /// <summary>
@@ -359,8 +358,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public DisposableReactiveList<IDiagramConnectorViewModel> ConnectorViewModels
         {
-            get { return this.connectorViewModels; }
-            set { this.RaiseAndSetIfChanged(ref this.connectorViewModels, value); }
+            get => this.connectorViewModels;
+            set => this.RaiseAndSetIfChanged(ref this.connectorViewModels, value);
         }
 
         /// <summary>
@@ -368,8 +367,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public ReactiveList<DiagramItem> SelectedItems
         {
-            get { return this.selectedItems; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedItems, value); }
+            get => this.selectedItems;
+            set => this.RaiseAndSetIfChanged(ref this.selectedItems, value);
         }
 
         /// <summary>
@@ -377,8 +376,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public DiagramItem SelectedItem
         {
-            get { return this.selectedItem; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedItem, value); }
+            get => this.selectedItem;
+            set => this.RaiseAndSetIfChanged(ref this.selectedItem, value);
         }
 
         /// <summary>
@@ -433,7 +432,7 @@ namespace CDP4DiagramEditor.ViewModels
                 switch (diagramThing.DepictedThing)
                 {
                     case ElementUsage:
-                        newDrawnDiagramElement = new ElementUsageEdgeViewModel((DiagramEdge) diagramThing, this.Session, this);
+                        newDrawnDiagramElement = new ElementUsageEdgeViewModel((DiagramEdge)diagramThing, this.Session, this);
                         break;
                     case BinaryRelationship relationship:
                         if (relationship.IsConstraint())
@@ -496,7 +495,7 @@ namespace CDP4DiagramEditor.ViewModels
                     this.ThingDiagramItemViewModels.RemoveAndDispose(item);
                     this.Behavior.ItemPositions.Remove(item);
 
-                    var connectors = this.ConnectorViewModels.Where(x => ((DiagramEdge) x.DiagramThing).Source.DepictedThing == item.DiagramThing.DepictedThing || ((DiagramEdge) x.DiagramThing).Target.DepictedThing == item.DiagramThing.DepictedThing).ToArray();
+                    var connectors = this.ConnectorViewModels.Where(x => ((DiagramEdge)x.DiagramThing).Source.DepictedThing == item.DiagramThing.DepictedThing || ((DiagramEdge)x.DiagramThing).Target.DepictedThing == item.DiagramThing.DepictedThing).ToArray();
 
                     foreach (var diagramEdgeViewModel in connectors)
                     {
@@ -511,14 +510,10 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
-        /// Gets the save command
-        /// </summary>
-        public ReactiveCommand<Unit, Unit> SaveDiagramCommand { get; private set; }
-
-        /// <summary>
         /// Gets the diagram generator command
         /// </summary>
         public ReactiveCommand<Unit, Unit> GenerateDiagramCommandDeep { get; private set; }
+
         /// <param name="thing">The <see cref="Thing" /> by which to find and remove diagram things.</param>
         public void RemoveDiagramThingItemByThing(Thing thing)
         {
@@ -556,7 +551,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             if (this.Thing.Cache.TryGetValue(thing.CacheKey, out var returnedThing))
             {
-                return (TThing) returnedThing.Value;
+                return (TThing)returnedThing.Value;
             }
 
             return null;
@@ -644,7 +639,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             switch (dropInfo.Payload)
             {
-                case Thing rowPayload when ((!this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().Select(x => x.Thing).Contains(rowPayload)) && (!this.ConnectorViewModels.Select(x => x.Thing).Contains(rowPayload))):
+                case Thing rowPayload when !this.ThingDiagramItemViewModels.OfType<NamedThingDiagramContentItemViewModel>().Select(x => x.Thing).Contains(rowPayload) && !this.ConnectorViewModels.Select(x => x.Thing).Contains(rowPayload):
                     dropInfo.Effects = DragDropEffects.Copy;
                     return;
                 case Tuple<ParameterType, MeasurementScale> tuplePayload:
@@ -701,8 +696,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </remarks>
         public override bool IsDirty
         {
-            get { return this.isDirty; }
-            set { this.RaiseAndSetIfChanged(ref this.isDirty, value); }
+            get => this.isDirty;
+            set => this.RaiseAndSetIfChanged(ref this.isDirty, value);
         }
 
         /// <summary>
@@ -715,22 +710,22 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         private void InitializeListeners()
         {
-            this.Disposables.Add(CDPMessageBus.Current.Listen<SessionEvent>()
+            this.Disposables.Add(this.Session.CDPMessageBus.Listen<SessionEvent>()
                 .Where(sessionEvent => sessionEvent.Status == SessionStatus.Closed && sessionEvent.Session.Equals(this.Session))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.ClosePanel()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Container)
+            this.Disposables.Add(this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Container)
                 .Where(objectChange => objectChange.EventKind == EventKind.Removed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.ClosePanel()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
+            this.Disposables.Add(this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
                 .Where(objectChange => objectChange.EventKind != EventKind.Removed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.ComputeGeneratedConnectors()));
 
-            this.Disposables.Add(CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
+            this.Disposables.Add(this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
                 .Where(objectChange => objectChange.EventKind == EventKind.Removed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.RemoveGeneratedConnector));
@@ -825,8 +820,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             var bounds = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
-                X = (float) position.X,
-                Y = (float) position.Y,
+                X = (float)position.X,
+                Y = (float)position.Y,
                 Name = rowPayload.UserFriendlyName
             };
 
@@ -977,13 +972,13 @@ namespace CDP4DiagramEditor.ViewModels
             var deleteObservable = this.EventPublisher.GetEvent<DiagramDeleteEvent>().ObserveOn(RxApp.MainThreadScheduler).Subscribe(this.OnDiagramDeleteEvent);
 
             this.Disposables.Add(deleteObservable);
-            this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel> { ChangeTrackingEnabled = true };
-            this.ThingDiagramItemViewModels = new DisposableReactiveList<IThingDiagramItemViewModel> { ChangeTrackingEnabled = true };
+            this.RelationshipRules = new DisposableReactiveList<RuleNavBarRelationViewModel>();
+            this.ThingDiagramItemViewModels = new DisposableReactiveList<IThingDiagramItemViewModel>();
 
             this.ThingDiagramItemViewModels.Changed.Subscribe(this.UpdateTree);
 
-            this.DiagramElementTreeRowViewModels = new DisposableReactiveList<IDiagramElementTreeRowViewModel> { ChangeTrackingEnabled = true};
-            this.SelectedTreeRowViewModels = new ReactiveList<IDiagramElementTreeRowViewModel> { ChangeTrackingEnabled = true };
+            this.DiagramElementTreeRowViewModels = new DisposableReactiveList<IDiagramElementTreeRowViewModel>();
+            this.SelectedTreeRowViewModels = new ReactiveList<IDiagramElementTreeRowViewModel>();
 
             this.Disposables.Add(this.SelectedTreeRowViewModels.Changed.Subscribe(_ => this.SelectInDiagramFromTree()));
 
@@ -998,17 +993,14 @@ namespace CDP4DiagramEditor.ViewModels
                     }
                 }));
 
-            this.ConnectorViewModels = new DisposableReactiveList<IDiagramConnectorViewModel> { ChangeTrackingEnabled = true };
+            this.ConnectorViewModels = new DisposableReactiveList<IDiagramConnectorViewModel>();
 
             this.Disposables.Add(this.ConnectorViewModels.Changed.Subscribe(this.UpdateTree));
 
-            this.SelectedItems = new ReactiveList<DiagramItem> { ChangeTrackingEnabled = true };
+            this.SelectedItems = new ReactiveList<DiagramItem>();
 
             this.Disposables.Add(this.WhenAnyValue(vm => vm.SelectedItem)
-                .Subscribe(_ =>
-                {
-                    this.AugmentContextMenu();
-                }));
+                .Subscribe(_ => { this.AugmentContextMenu(); }));
         }
 
         /// <summary>
@@ -1086,6 +1078,7 @@ namespace CDP4DiagramEditor.ViewModels
                     {
                         this.RemoveConnectorFromTree(oldItem);
                     }
+
                     break;
             }
         }
@@ -1175,7 +1168,7 @@ namespace CDP4DiagramEditor.ViewModels
                 return;
             }
 
-            if(thing is DiagramPort port)
+            if (thing is DiagramPort port)
             {
                 var portItem = newItem as IDiagramPortViewModel;
 
@@ -1205,50 +1198,38 @@ namespace CDP4DiagramEditor.ViewModels
 
             var canExecute = this.WhenAnyValue(x => x.CanCreateDiagram, x => x.IsDirty, (x, y) => x && y);
 
-            this.SaveDiagramCommand = ReactiveCommand.CreateAsyncTask(canExecute, x => this.ExecuteSaveDiagramCommand(), RxApp.MainThreadScheduler);
+            this.SaveDiagramCommand = ReactiveCommandCreator.CreateAsyncTask(() => this.ExecuteSaveDiagramCommand(), canExecute);
             this.Disposables.Add(this.SaveDiagramCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message)));
 
-            this.UpdateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(i => i != null && this.PermissionService.CanWrite(this.GetThingFromSelectedItem())));
-            this.Disposables.Add(this.UpdateCommand.Subscribe(_ => this.ExecuteUpdateCommand()));
+            this.UpdateCommand = ReactiveCommandCreator.Create(this.ExecuteUpdateCommand, this.WhenAnyValue(x => x.SelectedItem).Select(i => i != null && this.PermissionService.CanWrite(this.GetThingFromSelectedItem())));
 
-            this.InspectCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(x => x != null && this.GetThingFromSelectedItem() != null));
-            this.Disposables.Add(this.InspectCommand.Subscribe(_ => this.ExecuteInspectCommand()));
+            this.InspectCommand = ReactiveCommandCreator.Create(this.ExecuteInspectCommand, this.WhenAnyValue(x => x.SelectedItem).Select(x => x != null && this.GetThingFromSelectedItem() != null));
 
-            this.DeleteFromDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(this.CanDeleteFromDiagram));
-            this.Disposables.Add(this.DeleteFromDiagramCommand.Subscribe(x => this.ExecuteDeleteFromDiagramCommand()));
+            this.DeleteFromDiagramCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteFromDiagramCommand, this.WhenAnyValue(x => x.SelectedItem).Select(this.CanDeleteFromDiagram));
 
-            this.DeleteFromModelCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(this.CanDeleteFromModel));
-            this.Disposables.Add(this.DeleteFromModelCommand.Subscribe(x => this.ExecuteDeleteFromModelCommand()));
+            this.DeleteFromModelCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteFromModelCommand, this.WhenAnyValue(x => x.SelectedItem).Select(this.CanDeleteFromModel));
 
-            this.AddUsagesToDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
-            this.Disposables.Add(this.AddUsagesToDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToDiagramCommand()));
+            this.AddUsagesToDiagramCommand = ReactiveCommandCreator.Create(this.ExecuteAddUsagesToDiagramCommand, this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
 
-            this.AddUsagesToExistingElementsDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
-            this.Disposables.Add(this.AddUsagesToExistingElementsDiagramCommand.Subscribe(x => this.ExecuteAddUsagesToExistingElementsDiagramCommand()));
+            this.AddUsagesToExistingElementsDiagramCommand = ReactiveCommandCreator.Create(this.ExecuteAddUsagesToExistingElementsDiagramCommand, this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
 
-            this.AddBinaryRelationshipsToDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ThingDiagramContentItemViewModel)));
-            this.Disposables.Add(this.AddBinaryRelationshipsToDiagramCommand.Subscribe(x => this.ExecuteAddBinaryRelationshipsToDiagramCommand()));
+            this.AddBinaryRelationshipsToDiagramCommand = ReactiveCommandCreator.Create(this.ExecuteAddBinaryRelationshipsToDiagramCommand, this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ThingDiagramContentItemViewModel)));
 
-            this.AddBinaryRelationshipsToExistingElementsDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
-            this.Disposables.Add(this.AddBinaryRelationshipsToExistingElementsDiagramCommand.Subscribe(x => this.ExecuteAddBinaryRelationshipsToExistingElementsDiagramCommand()));
+            this.AddBinaryRelationshipsToExistingElementsDiagramCommand = ReactiveCommandCreator.Create(this.ExecuteAddBinaryRelationshipsToExistingElementsDiagramCommand, this.WhenAnyValue(x => x.SelectedItem).Select(s => s != null && this.SelectedItems.OfType<DiagramContentItem>().Any(i => i.Content is ElementDefinitionDiagramContentItemViewModel)));
 
-            this.SetAsTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.SelectedItem)
-                    .Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItemViewModel }),
-                _ => this.ExecuteSetTopElementCommand(), RxApp.MainThreadScheduler);
+            this.SetAsTopElementCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteSetTopElementCommand, this.WhenAnyValue(x => x.SelectedItem).Select(s => s is DiagramContentItem { Content: ElementDefinitionDiagramContentItemViewModel }));
 
             this.Disposables.Add(this.SetAsTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message)));
 
-            this.UnsetTopElementCommand = ReactiveCommand.CreateAsyncTask(this.WhenAnyValue(x => x.IsTopDiagramElementSet, x => x.CanCreateDiagram, (x, y) => x && y),
-                _ => this.ExecuteUnsetTopElementCommand(), RxApp.MainThreadScheduler);
+            this.UnsetTopElementCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteUnsetTopElementCommand, this.WhenAnyValue(x => x.IsTopDiagramElementSet, x => x.CanCreateDiagram, (x, y) => x && y));
 
             this.Disposables.Add(this.UnsetTopElementCommand.ThrownExceptions.Subscribe(x => logger.Error(x.Message)));
 
-            this.ExportDiagramAsJpg = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
-            this.Disposables.Add(this.ExportDiagramAsJpg.Subscribe(_ => this.ExecuteExportDiagramAsJpg()));
-            this.ExportDiagramAsPdf = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
-            this.Disposables.Add(this.ExportDiagramAsPdf.Subscribe(_ => this.ExecuteExportDiagramAsPdf()));
-            this.ExportDiagramToClipboard = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
-            this.Disposables.Add(this.ExportDiagramToClipboard.Subscribe(_ => this.ExecuteExportDiagramToClipboard()));
+            this.ExportDiagramAsJpg = ReactiveCommandCreator.Create(this.ExecuteExportDiagramAsJpg, this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
+
+            this.ExportDiagramAsPdf = ReactiveCommandCreator.Create(this.ExecuteExportDiagramAsPdf, this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
+
+            this.ExportDiagramToClipboard = ReactiveCommandCreator.Create(this.ExecuteExportDiagramToClipboard, this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
         }
 
         /// <summary>
@@ -1433,7 +1414,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="thing">The thing</param>
         public void ExecuteInspectParameter(Thing thing)
         {
-            var containerClone = (thing.Container != null) ? thing.Container.Clone(false) : null;
+            var containerClone = thing.Container != null ? thing.Container.Clone(false) : null;
 
             var context = TransactionContextResolver.ResolveContext(this.Thing);
             var transaction = new ThingTransaction(context);
@@ -1531,7 +1512,7 @@ namespace CDP4DiagramEditor.ViewModels
                         continue;
                     }
 
-                    InterfaceConnectorTool.CreateConnector(iface, (DiagramPort) source.DiagramThing, (DiagramPort) target.DiagramThing, this.Behavior);
+                    InterfaceConnectorTool.CreateConnector(iface, (DiagramPort)source.DiagramThing, (DiagramPort)target.DiagramThing, this.Behavior);
                 }
 
                 // constraints
@@ -1765,7 +1746,6 @@ namespace CDP4DiagramEditor.ViewModels
             this.ComputeGeneratedConnectors();
         }
 
-
         /// <summary>
         /// Adds ElementUsages to the selected element definitions if they exist on diagram
         /// </summary>
@@ -1933,7 +1913,7 @@ namespace CDP4DiagramEditor.ViewModels
                 // conenctors without a Thing cannot be deleted
                 if ((connector.DataContext as Connection)?.DataItem is IDiagramConnectorViewModel connectorViewModel)
                 {
-                    return connectorViewModel.Thing != null ;
+                    return connectorViewModel.Thing != null;
                 }
             }
 
@@ -2112,7 +2092,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         private async void DeprecateThing(IDeprecatableThing thing)
         {
-            var clone = ((Thing) thing).Clone(false);
+            var clone = ((Thing)thing).Clone(false);
 
             var isDeprecatedPropertyInfo = clone.GetType().GetProperty("IsDeprecated");
 
@@ -2135,7 +2115,7 @@ namespace CDP4DiagramEditor.ViewModels
             }
             catch (Exception ex)
             {
-                logger.Error("An error was produced when (un)deprecating {0}: {1}", ((Thing) thing).ClassKind, ex.Message);
+                logger.Error("An error was produced when (un)deprecating {0}: {1}", ((Thing)thing).ClassKind, ex.Message);
                 this.Feedback = ex.Message;
             }
         }
@@ -2187,7 +2167,7 @@ namespace CDP4DiagramEditor.ViewModels
                 switch (diagramThing.DepictedThing)
                 {
                     case ElementDefinition:
-                        newDiagramElement = new ElementDefinitionDiagramContentItemViewModel((ArchitectureElement) diagramThing, this.Session, this);
+                        newDiagramElement = new ElementDefinitionDiagramContentItemViewModel((ArchitectureElement)diagramThing, this.Session, this);
                         break;
                     case Requirement:
                         newDiagramElement = new RequirementDiagramContentItemViewModel((DiagramObject)diagramThing, this.Session, this);
@@ -2303,8 +2283,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             var bound = new Bounds(Guid.NewGuid(), this.Thing.Cache, new Uri(this.Session.DataSourceUri))
             {
-                X = (float) diagramPosition.X,
-                Y = (float) diagramPosition.Y,
+                X = (float)diagramPosition.X,
+                Y = (float)diagramPosition.Y,
                 Height = Cdp4DiagramHelper.DefaultHeight,
                 Width = Cdp4DiagramHelper.DefaultWidth
             };
@@ -2355,7 +2335,7 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="target">The <see cref="DiagramObject" /> target</param>
         private void CreateDiagramConnector(Thing thing, DiagramObject source, DiagramObject target)
         {
-            var connectorItem = this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().SingleOrDefault(x => ((DiagramEdge) x.DiagramThing)?.DepictedThing == thing);
+            var connectorItem = this.ThingDiagramItemViewModels.OfType<ThingDiagramConnectorViewModel>().SingleOrDefault(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == thing);
 
             if (connectorItem != null)
             {
@@ -2422,7 +2402,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             foreach (var binaryRelationship in relationships)
             {
-                if (this.ConnectorViewModels.OfType<ThingDiagramConnectorViewModel>().Any(x => ((DiagramEdge) x.DiagramThing)?.DepictedThing == binaryRelationship))
+                if (this.ConnectorViewModels.OfType<ThingDiagramConnectorViewModel>().Any(x => ((DiagramEdge)x.DiagramThing)?.DepictedThing == binaryRelationship))
                 {
                     continue;
                 }
@@ -2459,7 +2439,7 @@ namespace CDP4DiagramEditor.ViewModels
                     return null;
                 }
 
-                this.CreateDiagramConnector(binaryRelationship, (DiagramObject) itemViewModel.DiagramThing, (DiagramObject) associatedViewModel.DiagramThing);
+                this.CreateDiagramConnector(binaryRelationship, (DiagramObject)itemViewModel.DiagramThing, (DiagramObject)associatedViewModel.DiagramThing);
                 return associatedViewModel;
             }
             else
@@ -2471,7 +2451,7 @@ namespace CDP4DiagramEditor.ViewModels
                     return null;
                 }
 
-                this.CreateDiagramConnector(binaryRelationship, (DiagramObject) associatedViewModel.DiagramThing, (DiagramObject) itemViewModel.DiagramThing);
+                this.CreateDiagramConnector(binaryRelationship, (DiagramObject)associatedViewModel.DiagramThing, (DiagramObject)itemViewModel.DiagramThing);
                 return associatedViewModel;
             }
         }

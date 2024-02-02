@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Cdp4DiagramBehavior.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -45,12 +45,12 @@ namespace CDP4CommonView.Diagram
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation;
 
+    using CommonServiceLocator;
+
     using DevExpress.Diagram.Core;
     using DevExpress.Mvvm.UI;
     using DevExpress.Xpf.Diagram;
     using DevExpress.Xpf.Ribbon;
-
-    using Microsoft.Practices.ServiceLocation;
 
     using ReactiveUI;
 
@@ -72,12 +72,12 @@ namespace CDP4CommonView.Diagram
         /// <summary>
         /// The dependency property that allows setting the <see cref="IEventPublisher" />
         /// </summary>
-        public static readonly DependencyProperty EventPublisherProperty = DependencyProperty.Register("EventPublisher", typeof(IEventPublisher), typeof(Cdp4DiagramBehavior));
+        public static readonly DependencyProperty EventPublisherProperty = DependencyProperty.Register(nameof(EventPublisher), typeof(IEventPublisher), typeof(Cdp4DiagramBehavior));
 
         /// <summary>
         /// The dependency property that allows setting the RibbonMergeCategoryName
         /// </summary>
-        public static readonly DependencyProperty RibbonMergeCategoryNameProperty = DependencyProperty.Register("RibbonMergeCategoryName", typeof(string), typeof(Cdp4DiagramBehavior));
+        public static readonly DependencyProperty RibbonMergeCategoryNameProperty = DependencyProperty.Register(nameof(RibbonMergeCategoryName), typeof(string), typeof(Cdp4DiagramBehavior));
 
         /// <summary>
         /// The <see cref="IDragInfo" /> object that contains information about the drag operation.
@@ -128,8 +128,8 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         public IEventPublisher EventPublisher
         {
-            get { return (IEventPublisher)this.GetValue(EventPublisherProperty); }
-            set { this.SetValue(EventPublisherProperty, value); }
+            get => (IEventPublisher)this.GetValue(EventPublisherProperty);
+            set => this.SetValue(EventPublisherProperty, value);
         }
 
         /// <summary>
@@ -137,8 +137,8 @@ namespace CDP4CommonView.Diagram
         /// </summary>
         public string RibbonMergeCategoryName
         {
-            get { return (string)this.GetValue(RibbonMergeCategoryNameProperty); }
-            set { this.SetValue(RibbonMergeCategoryNameProperty, value); }
+            get => (string)this.GetValue(RibbonMergeCategoryNameProperty);
+            set => this.SetValue(RibbonMergeCategoryNameProperty, value);
         }
 
         /// <summary>
@@ -202,14 +202,14 @@ namespace CDP4CommonView.Diagram
         {
             var openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
             var extension = format.ToString().ToLower();
-            var result = openSaveFileDialogService.GetSaveFileDialog($"Untitled", $".{extension}", $"{ format } file(*.{ extension }) | *.{ extension }; ", "", 0);
+            var result = openSaveFileDialogService.GetSaveFileDialog($"Untitled", $".{extension}", $"{format} file(*.{extension}) | *.{extension}; ", "", 0);
 
             if (string.IsNullOrWhiteSpace(result))
             {
                 return;
             }
 
-            using var writer = System.IO.File.Create(result);
+            using var writer = File.Create(result);
 
             this.AssociatedObject.ExportDiagram(writer, format, 144, 1);
         }
@@ -228,7 +228,7 @@ namespace CDP4CommonView.Diagram
             var bitmapSource = decoder.Frames[0];
             bitmapSource.Freeze();
 
-            System.Windows.Clipboard.SetImage(bitmapSource);
+            Clipboard.SetImage(bitmapSource);
         }
 
         /// <summary>
@@ -257,9 +257,9 @@ namespace CDP4CommonView.Diagram
             {
                 var thingDiagramItem = this.AssociatedObject.Items.FirstOrDefault(
                     c =>
-                    ((c as DiagramContentItem)?.Content is IDiagramItemOrConnector cont && (cont.DiagramThing == thing || cont.Thing == thing)) ||
-                    (c.DataContext is IDiagramItemOrConnector dc && (dc.DiagramThing == thing || dc.Thing == thing)) ||
-                    (((c as DiagramConnector)?.DataContext as Connection)?.DataItem is IDiagramItemOrConnector conn && (conn.DiagramThing == thing || conn.Thing == thing)));
+                        ((c as DiagramContentItem)?.Content is IDiagramItemOrConnector cont && (cont.DiagramThing == thing || cont.Thing == thing)) ||
+                        (c.DataContext is IDiagramItemOrConnector dc && (dc.DiagramThing == thing || dc.Thing == thing)) ||
+                        (((c as DiagramConnector)?.DataContext as Connection)?.DataItem is IDiagramItemOrConnector conn && (conn.DiagramThing == thing || conn.Thing == thing)));
 
                 if (thingDiagramItem != null)
                 {

@@ -41,7 +41,7 @@ namespace CDP4DiagramEditor.Tests
     using CDP4Common.Types;
 
     using CDP4CommonView.Diagram;
-    using CDP4Composition.Diagram;
+
     using CDP4Composition.Mvvm.Behaviours;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -58,13 +58,9 @@ namespace CDP4DiagramEditor.Tests
 
     using DevExpress.Xpf.Diagram;
 
-    using Microsoft.Practices.ServiceLocation;
-
     using Moq;
 
     using NUnit.Framework;
-
-    using ReactiveUI;
 
     using Point = System.Windows.Point;
 
@@ -111,6 +107,8 @@ namespace CDP4DiagramEditor.Tests
         private BinaryRelationship link1;
 
         private Mock<IServiceLocator> serviceLocator;
+        private CDPMessageBus messageBus;
+        private Mock<IThingCreator> thingCreator;
 
         [SetUp]
         public void Setup()
@@ -119,6 +117,7 @@ namespace CDP4DiagramEditor.Tests
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>()).Returns(Mock.Of<IThingCreator>());
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.assembler = new Assembler(this.uri, this.messageBus);
             this.permissionService = new Mock<IPermissionService>();
@@ -139,11 +138,13 @@ namespace CDP4DiagramEditor.Tests
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
             this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
+
             this.parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
             {
-                ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "pt", ShortName = "pt"},
+                ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "pt", ShortName = "pt" },
                 Scale = new RatioScale(Guid.NewGuid(), this.cache, this.uri)
             };
+
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
 
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri)
@@ -205,7 +206,7 @@ namespace CDP4DiagramEditor.Tests
             };
 
             this.diagramObject1 = new DiagramObject(Guid.NewGuid(), this.cache, this.uri) { DepictedThing = this.spec1 };
-            
+
             this.diagramObject2 = new DiagramObject(Guid.NewGuid(), this.cache, this.uri) { DepictedThing = this.spec2 };
             this.diagramObject3 = new DiagramObject(Guid.NewGuid(), this.cache, this.uri) { DepictedThing = this.spec3 };
 
@@ -219,6 +220,7 @@ namespace CDP4DiagramEditor.Tests
             this.elementDefinition = new ElementDefinition() { Name = "WhyNot", ShortName = "WhyNot" };
             this.iteration.Element.Add(this.elementDefinition);
             this.elementDefinition.Parameter.Add(this.parameter);
+
             this.bound1 = new Bounds(Guid.NewGuid(), this.cache, this.uri)
             {
                 X = 1,
@@ -247,6 +249,8 @@ namespace CDP4DiagramEditor.Tests
             this.session.Setup(x => x.OpenIterations).Returns(openedIterations);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.DataSourceUri).Returns("http://example.org");
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+ 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.mockExtendedDiagramBehavior.Setup(x => x.GetDiagramPositionFromMousePosition(It.IsAny<Point>())).Returns(new Point());
             this.mockDiagramBehavior.Setup(x => x.GetDiagramPositionFromMousePosition(It.IsAny<Point>())).Returns(new Point());
@@ -355,7 +359,7 @@ namespace CDP4DiagramEditor.Tests
 
             await viewModel.SaveDiagramCommand.Execute();
             this.cache.TryAdd(new CacheKey(this.diagram.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.diagram));
-            this.session.Verify(x => x.Write(It.Is<OperationContainer>(s=> true)));
+            this.session.Verify(x => x.Write(It.Is<OperationContainer>(s => true)));
             viewModel.Dispose();
         }
 
@@ -363,6 +367,7 @@ namespace CDP4DiagramEditor.Tests
         public async Task VerifyCanDeleteFromDiagramOnly()
         {
             this.diagram.DiagramElement.Clear();
+
             var viewModel = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
             {
                 Behavior = this.mockDiagramBehavior.Object
@@ -388,7 +393,7 @@ namespace CDP4DiagramEditor.Tests
             viewModel.SelectedItem = null;
             viewModel.SelectedItem = viewModel.ThingDiagramItemViewModels.First().DiagramRepresentation;
 
-            viewModel.DeleteFromDiagramCommand.Execute(null);
+            await viewModel.DeleteFromDiagramCommand.Execute();
 
             viewModel.Dispose();
         }
@@ -397,6 +402,7 @@ namespace CDP4DiagramEditor.Tests
         public async Task VerifyCanDeleteFromDiagramAndModel()
         {
             this.diagram.DiagramElement.Clear();
+
             var viewModel = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
             {
                 Behavior = this.mockDiagramBehavior.Object
@@ -422,7 +428,7 @@ namespace CDP4DiagramEditor.Tests
             viewModel.SelectedItem = null;
             viewModel.SelectedItem = viewModel.ThingDiagramItemViewModels.First().DiagramRepresentation;
 
-            viewModel.DeleteFromModelCommand.Execute(null);
+            await viewModel.DeleteFromModelCommand.Execute();
 
             viewModel.Dispose();
         }
@@ -431,6 +437,7 @@ namespace CDP4DiagramEditor.Tests
         public async Task VerifyDiagramFilteringWorks()
         {
             this.diagram.DiagramElement.Clear();
+
             var viewModel = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
             {
                 Behavior = this.mockDiagramBehavior.Object
@@ -461,6 +468,7 @@ namespace CDP4DiagramEditor.Tests
         public void VerifyInspectParameter()
         {
             this.diagram.DiagramElement.Clear();
+
             var viewModel = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
             {
                 Behavior = this.mockDiagramBehavior.Object
@@ -475,6 +483,7 @@ namespace CDP4DiagramEditor.Tests
         public async Task VerifyCanSubscribe()
         {
             this.diagram.DiagramElement.Clear();
+
             var viewModel = new DiagramEditorViewModel(this.diagram, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, this.pluginSettingsService.Object)
             {
                 Behavior = this.mockDiagramBehavior.Object

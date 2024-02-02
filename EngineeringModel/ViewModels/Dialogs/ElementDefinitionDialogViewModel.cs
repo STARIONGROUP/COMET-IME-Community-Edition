@@ -1,19 +1,19 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -28,17 +28,15 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
-    using CDP4CommonView.Views;
-
     using CDP4Composition.Attributes;
     using CDP4Composition.CommonView.HandCodedRows;
-    using CDP4Composition.CommonView.ViewModels;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -129,19 +127,15 @@ namespace CDP4EngineeringModel.ViewModels
             base.InitializeCommands();
 
             var canExecuteCreateBehaviorCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
-            this.CreateBehaviorCommand = ReactiveCommand.Create(canExecuteCreateBehaviorCommand);
-            this.CreateBehaviorCommand.Subscribe(_ => this.ExecuteCreateCommand<Behavior>(this.PopulateBehaviors));
+            this.CreateBehaviorCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Behavior>(this.PopulateBehaviors), canExecuteCreateBehaviorCommand);
 
             var canExecuteEditSelectedBehaviorCommand = this.WhenAny(vm => vm.SelectedBehavior, v => v.Value != null && !this.IsReadOnly);
-            this.EditBehaviorCommand = ReactiveCommand.Create(canExecuteEditSelectedBehaviorCommand);
-            this.EditBehaviorCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedBehavior.Thing, this.PopulateBehaviors));
+            this.EditBehaviorCommand = ReactiveCommandCreator.Create(() => this.ExecuteEditCommand(this.SelectedBehavior.Thing, this.PopulateBehaviors), canExecuteEditSelectedBehaviorCommand);
 
-            this.DeleteBehaviorCommand = ReactiveCommand.Create(canExecuteEditSelectedBehaviorCommand);
-            this.DeleteBehaviorCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedBehavior.Thing, this.PopulateBehaviors));
+            this.DeleteBehaviorCommand = ReactiveCommandCreator.Create(() => this.ExecuteDeleteCommand(this.SelectedBehavior.Thing, this.PopulateBehaviors), canExecuteEditSelectedBehaviorCommand);
 
             var canExecuteInspectSelectedBehaviorCommand = this.WhenAny(vm => vm.SelectedBehavior, v => v.Value != null);
-            this.InspectBehaviorCommand = ReactiveCommand.Create(canExecuteInspectSelectedBehaviorCommand);
-            this.InspectBehaviorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedBehavior.Thing));
+            this.InspectBehaviorCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedBehavior.Thing), canExecuteInspectSelectedBehaviorCommand);
         }
 
         /// <summary>
@@ -150,6 +144,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void PopulateBehaviors()
         {
             this.Behavior.Clear();
+
             foreach (var thing in this.Thing.Behavior.Where(t => t.ChangeKind != ChangeKind.Delete))
             {
                 var row = new BehaviorRowViewModel(thing, this.Session, this);
@@ -163,8 +158,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool IsTopElement
         {
-            get { return this.isTopElement; }
-            set { this.RaiseAndSetIfChanged(ref this.isTopElement, value); }
+            get => this.isTopElement;
+            set => this.RaiseAndSetIfChanged(ref this.isTopElement, value);
         }
 
         /// <summary>
@@ -172,8 +167,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool AreOrganizationsVisible
         {
-            get { return this.areOrganizationsVisible; }
-            set { this.RaiseAndSetIfChanged(ref this.areOrganizationsVisible, value); }
+            get => this.areOrganizationsVisible;
+            set => this.RaiseAndSetIfChanged(ref this.areOrganizationsVisible, value);
         }
 
         /// <summary>
@@ -181,8 +176,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public string ModelCode
         {
-            get { return this.modelCode; }
-            set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+            get => this.modelCode;
+            set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
         }
 
         /// <summary>
@@ -195,8 +190,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public ReactiveList<Organization> SelectedOrganizations
         {
-            get { return this.selectedOrganizations; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedOrganizations, value); }
+            get => this.selectedOrganizations;
+            set => this.RaiseAndSetIfChanged(ref this.selectedOrganizations, value);
         }
 
         /// <summary>
@@ -209,29 +204,29 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public BehaviorRowViewModel SelectedBehavior
         {
-            get { return this.selectedBehavior; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedBehavior, value); }
+            get => this.selectedBehavior;
+            set => this.RaiseAndSetIfChanged(ref this.selectedBehavior, value);
         }
 
         /// <summary>
         /// Gets the delete <see cref="ReactiveCommand"/> to delete a <see cref="Behavior"/>
         /// </summary>
-        public ReactiveCommand<object> DeleteBehaviorCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteBehaviorCommand { get; private set; }
 
         /// <summary>
         /// Gets the inspect <see cref="ReactiveCommand"/> to inspect a <see cref="Behavior"/>
         /// </summary>
-        public ReactiveCommand<object> InspectBehaviorCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> InspectBehaviorCommand { get; private set; }
 
         /// <summary>
         /// Gets the create <see cref="ReactiveCommand"/> to create a <see cref="Behavior"/>
         /// </summary>
-        public ReactiveCommand<object> CreateBehaviorCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateBehaviorCommand { get; private set; }
 
         /// <summary>
         /// Gets the edit <see cref="ReactiveCommand"/> to edit a <see cref="Behavior"/>
         /// </summary>
-        public ReactiveCommand<object> EditBehaviorCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> EditBehaviorCommand { get; private set; }
 
         /// <summary>
         /// Initialize the dialog
@@ -335,8 +330,10 @@ namespace CDP4EngineeringModel.ViewModels
             var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
 
             var allowedCategories = new List<Category>(mrdl.DefinedCategory.Where(c => c.PermissibleClass.Contains(this.Thing.ClassKind)));
-            allowedCategories.AddRange(mrdl.GetRequiredRdls().SelectMany(rdl => rdl.DefinedCategory)
-                        .Where(c => c.PermissibleClass.Contains(this.Thing.ClassKind)));
+
+            allowedCategories.AddRange(
+                mrdl.GetRequiredRdls().SelectMany(rdl => rdl.DefinedCategory)
+                    .Where(c => c.PermissibleClass.Contains(this.Thing.ClassKind)));
 
             this.PossibleCategory.AddRange(allowedCategories.OrderBy(c => c.ShortName));
         }
@@ -358,7 +355,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             this.AreOrganizationsVisible = true;
-
 
             var organizations = organizationalParticipations.Select(op => op.Organization).Except(new List<Organization> { model.EngineeringModelSetup.DefaultOrganizationalParticipant?.Organization });
 

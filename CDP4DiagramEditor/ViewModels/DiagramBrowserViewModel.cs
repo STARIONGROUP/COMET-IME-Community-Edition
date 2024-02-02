@@ -39,7 +39,6 @@ namespace CDP4DiagramEditor.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
-
     using CDP4Composition.DragDrop;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
@@ -77,6 +76,11 @@ namespace CDP4DiagramEditor.ViewModels
         private bool canCreateDiagram;
 
         /// <summary>
+        /// Backing field for <see cref="CanCreateArchitectureDiagram" />
+        /// </summary>
+        private bool canCreateArchitectureDiagram;
+
+        /// <summary>
         /// Backing field for <see cref="CurrentIteration" />
         /// </summary>
         private int currentIteration;
@@ -109,18 +113,15 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup" />
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup
-        {
-            get { return this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>(); }
-        }
+        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -128,8 +129,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -137,8 +138,17 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         public bool CanCreateDiagram
         {
-            get { return this.canCreateDiagram; }
-            set { this.RaiseAndSetIfChanged(ref this.canCreateDiagram, value); }
+            get => this.canCreateDiagram;
+            set => this.RaiseAndSetIfChanged(ref this.canCreateDiagram, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the create Architecture Diagram command is enabled
+        /// </summary>
+        public bool CanCreateArchitectureDiagram
+        {
+            get => this.canCreateArchitectureDiagram;
+            set => this.RaiseAndSetIfChanged(ref this.canCreateArchitectureDiagram, value);
         }
 
         /// <summary>
@@ -149,27 +159,27 @@ namespace CDP4DiagramEditor.ViewModels
         /// <summary>
         /// Gets or sets the Create Architecture Diagram Command
         /// </summary>
-        public ReactiveCommand<object> CreateArchitectureDiagramCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateArchitectureDiagramCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Open Command
         /// </summary>
-        public ReactiveCommand<object> OpenCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> OpenCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Hide Command
         /// </summary>
-        public ReactiveCommand<Unit> HideCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> HideCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Ready For Publication Command
         /// </summary>
-        public ReactiveCommand<Unit> ReadyForPublicationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> ReadyForPublicationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Publish Command
         /// </summary>
-        public ReactiveCommand<Unit> PublishCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> PublishCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -207,31 +217,29 @@ namespace CDP4DiagramEditor.ViewModels
                 this.ExecuteUpdateCommand,
                 canDelete);
 
-            this.CreateArchitectureDiagramCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateDiagram));
-            this.CreateArchitectureDiagramCommand.Subscribe(_ => this.ExecuteCreateCommand<ArchitectureDiagram>(this.Thing));
+            this.CreateArchitectureDiagramCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ArchitectureDiagram>(this.Thing), this.WhenAnyValue(vm => vm.CanCreateArchitectureDiagram));
 
-            this.DeleteCommand = ReactiveCommand.Create(canDelete);
-            this.DeleteCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedThing.Thing));
-            this.UpdateCommand = ReactiveCommand.Create(canDelete);
-            this.UpdateCommand.Subscribe(_ => this.ExecuteUpdateCommand());
-            this.OpenCommand = ReactiveCommand.Create(canDelete);
-            this.OpenCommand.Subscribe(_ => this.ExecuteOpenCommand());
+            this.DeleteCommand = ReactiveCommandCreator.Create(() => this.ExecuteDeleteCommand(this.SelectedThing.Thing), canDelete);
+            this.UpdateCommand = ReactiveCommandCreator.Create(this.ExecuteUpdateCommand, canDelete);
+            this.OpenCommand = ReactiveCommandCreator.Create(this.ExecuteOpenCommand, canDelete);
 
             // publication of diagrams
-            this.HideCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteHideCommand(this.SelectedThing.Thing as DiagramCanvas));
+            this.HideCommand = ReactiveCommandCreator.CreateAsyncTask(async () => await this.ExecuteHideCommand(this.SelectedThing.Thing as DiagramCanvas));
+
             this.HideCommand.ThrownExceptions
                 .Subscribe(this.LogAsyncException);
 
-            this.ReadyForPublicationCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteReadyForPublicationCommand(this.SelectedThing.Thing as DiagramCanvas));
+            this.ReadyForPublicationCommand = ReactiveCommandCreator.CreateAsyncTask(async () => await this.ExecuteReadyForPublicationCommand(this.SelectedThing.Thing as DiagramCanvas));
+
             this.ReadyForPublicationCommand.ThrownExceptions
                 .Subscribe(this.LogAsyncException);
 
-            this.PublishCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecutePublishCommand(this.SelectedThing.Thing as DiagramCanvas));
+            this.PublishCommand = ReactiveCommandCreator.CreateAsyncTask(async () => await this.ExecutePublishCommand(this.SelectedThing.Thing as DiagramCanvas));
+
             this.PublishCommand.ThrownExceptions
                 .Subscribe(this.LogAsyncException);
-            this.InspectCommand = ReactiveCommandCreator.Create(
-                this.ExecuteUpdateCommand,
-                this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null));
+
+            this.InspectCommand = ReactiveCommandCreator.Create(this.ExecuteUpdateCommand, this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null));
         }
 
         /// <summary>
@@ -252,6 +260,7 @@ namespace CDP4DiagramEditor.ViewModels
         {
             base.ComputePermission();
             this.CanCreateDiagram = this.PermissionService.CanWrite(ClassKind.DiagramCanvas, this.Thing);
+            this.CanCreateArchitectureDiagram = this.PermissionService.CanWrite(ClassKind.ArchitectureDiagram, this.Thing);
             this.CanWriteSelectedThing = true;
         }
 
@@ -405,7 +414,7 @@ namespace CDP4DiagramEditor.ViewModels
             {
                 DiagramCanvasRowViewModel row;
 
-                if(diagram is ArchitectureDiagram architectureDiagram)
+                if (diagram is ArchitectureDiagram architectureDiagram)
                 {
                     row = new ArchitectureDiagramRowViewModel(architectureDiagram, this.Session, this)
                     {
@@ -498,7 +507,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.Disposables.Add(iterationSetupSubscription);
 
-            var diagramSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DiagramCanvas))
+            var diagramSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DiagramCanvas))
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateDiagrams());

@@ -32,6 +32,7 @@ namespace CDP4CommonView.Diagram.ViewModels
 
     using CDP4Composition.Diagram;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
 
     using CDP4Dal;
 
@@ -55,7 +56,7 @@ namespace CDP4CommonView.Diagram.ViewModels
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="container">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        public PortContainerDiagramContentItem(DiagramObject thing, ISession session, IDiagramEditorViewModel container) : base(thing, session, container)
+        public PortContainerDiagramContentItemViewModel(DiagramObject thing, ISession session, IDiagramEditorViewModel container) : base(thing, session, container)
         {
             this.PortCollection = new DisposableReactiveList<IDiagramPortViewModel>();
         }

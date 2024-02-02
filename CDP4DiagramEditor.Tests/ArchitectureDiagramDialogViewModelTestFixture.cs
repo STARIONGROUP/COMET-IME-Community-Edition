@@ -1,25 +1,25 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ArchitectureDiagramDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +29,8 @@ namespace CDP4DiagramEditor.Tests
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
@@ -47,7 +49,7 @@ namespace CDP4DiagramEditor.Tests
 
     using CDP4DiagramEditor.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -71,12 +73,14 @@ namespace CDP4DiagramEditor.Tests
         private Mock<IThingDialogNavigationService> navigation;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Mock<IPermissionService> permissionService;
-
+        private CDPMessageBus messageBus;
+        
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.uri = new Uri("http://www.rheagroup.com");
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.serviceLocator = new Mock<IServiceLocator>();
@@ -96,7 +100,7 @@ namespace CDP4DiagramEditor.Tests
 
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
-            this.modelSetup.ActiveDomain.Add(new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "System"});
+            this.modelSetup.ActiveDomain.Add(new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "System" });
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri);
 
             this.model.Iteration.Add(this.iteration);
@@ -107,7 +111,8 @@ namespace CDP4DiagramEditor.Tests
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDir.SiteReferenceDataLibrary));
-
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+            
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
@@ -119,11 +124,11 @@ namespace CDP4DiagramEditor.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
-        public void VerifyThatCreateDiagramWorks()
+        public async Task VerifyThatCreateDiagramWorks()
         {
             var clone = this.iteration.Clone(false);
             this.transaction.CreateOrUpdate(clone);
@@ -138,12 +143,13 @@ namespace CDP4DiagramEditor.Tests
             nameCheck = viewmodel["Name"];
             Assert.IsTrue(viewmodel.OkCanExecute);
 
-            var result = viewmodel.OkCommand.ExecuteAsync(null);
+            await viewmodel.OkCommand.Execute();
+
             Assert.AreNotEqual(default, diagram.CreatedOn);
         }
 
         [Test]
-        public void VerifyDiagramPropertiesCanBeSet()
+        public async Task VerifyDiagramPropertiesCanBeSet()
         {
             var clone = this.iteration.Clone(false);
             this.transaction.CreateOrUpdate(clone);
@@ -166,7 +172,8 @@ namespace CDP4DiagramEditor.Tests
 
             Assert.IsTrue(viewmodel.OkCanExecute);
 
-            var result = viewmodel.OkCommand.ExecuteAsync(null);
+            await viewmodel.OkCommand.Execute();
+
             Assert.AreNotEqual(default, diagram.CreatedOn);
         }
     }

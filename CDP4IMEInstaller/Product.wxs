@@ -111,10 +111,6 @@
       <ComponentGroupRef Id="BUILTINRULES_CG" />
     </Feature>
 
-    <Feature Id="RELATIONSHIPEDITORPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4-COMET Relationship Editor Plugin" Level="1" >
-      <ComponentGroupRef Id="RELATIONSHIPEDITOR_CG" />
-    </Feature>
-
     <Feature Id="SCRIPTINGPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4-COMET Scripting Plugin" Level="1">
       <ComponentGroupRef Id="SCRIPTING_CG" />
     </Feature>

@@ -26,15 +26,11 @@
 namespace CDP4Composition.Composition
 {
     using System;
-    using System.Collections.Concurrent;
     using System.ComponentModel.Composition;
     using System.ComponentModel.Composition.Hosting;
-    using System.ComponentModel.Composition.Primitives;
     using System.Diagnostics;
     using System.IO;
-    using System.Reactive.Concurrency;
     using System.Reflection;
-    using System.Windows;
 
     using CDP4Composition.Exceptions;
     using CDP4Composition.Modularity;
@@ -43,7 +39,6 @@ namespace CDP4Composition.Composition
     using CommonServiceLocator;
 
     using NLog;
-    using NLog.Extensions.Logging;
 
     using ReactiveUI;
 
@@ -136,7 +131,7 @@ namespace CDP4Composition.Composition
         private void AddPluginCatalogs(AggregateCatalog catalog)
         {
             this.UpdateBootstrapperStatus("Loading CDP4-COMET Plugins");
-            
+
             var pluginLoader = new PluginLoader<T>();
             this.ResetStatusProgress();
             var counter = 1;

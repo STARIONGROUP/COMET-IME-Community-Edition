@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ConstraintCreatePaletteViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -35,6 +35,7 @@ namespace CDP4DiagramEditor.Tests.Palette
     using CDP4CommonView.Diagram;
 
     using CDP4Composition.Diagram;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Behaviours;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -46,47 +47,17 @@ namespace CDP4DiagramEditor.Tests.Palette
 
     using CDP4DiagramEditor.ViewModels.Palette;
 
-    using DevExpress.Xpf.Diagram;
+    using CommonServiceLocator;
 
-    using Microsoft.Practices.ServiceLocation;
+    using DevExpress.Xpf.Diagram;
 
     using Moq;
 
     using NUnit.Framework;
 
-    using ReactiveUI;
-
     [TestFixture]
     public class ConstraintCreatePaletteViewModelTestFixture
     {
-        [SetUp]
-        public void Setup()
-        {
-            this.serviceLocator = new Mock<IServiceLocator>();
-            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
-            this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>()).Returns(Mock.Of<IThingCreator>());
-
-            this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
-            this.permissionService = new Mock<IPermissionService>();
-            this.mockExtendedDiagramBehavior = new Mock<IExtendedDiagramOrgChartBehavior>();
-            this.mockDiagramBehavior = new Mock<ICdp4DiagramBehavior>();
-            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
-            this.panelNavigationService = new Mock<IPanelNavigationService>();
-            this.pluginSettingsService = new Mock<IPluginSettingsService>();
-            this.dropinfo = new Mock<IDiagramDropInfo>();
-            this.cache = this.assembler.Cache;
-
-            this.editor = new Mock<IDiagramEditorViewModel>();
-
-            this.selection = new ReactiveList<DiagramItem>();
-            this.editor.Setup(vm => vm.SelectedItems).Returns(this.selection);
-
-            this.diagram = new DiagramCanvas(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
-            this.palette = new DiagramPaletteViewModel(this.diagram, this.editor.Object);
-        }
-
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -106,6 +77,38 @@ namespace CDP4DiagramEditor.Tests.Palette
         private Assembler assembler;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private ReactiveList<DiagramItem> selection;
+        private CDPMessageBus messageBus;
+        
+        [SetUp]
+        public void Setup()
+        {
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>()).Returns(Mock.Of<IThingCreator>());
+
+            this.messageBus = new CDPMessageBus();
+            this.session = new Mock<ISession>();
+            this.assembler = new Assembler(this.uri, this.messageBus);
+            this.permissionService = new Mock<IPermissionService>();
+            this.mockExtendedDiagramBehavior = new Mock<IExtendedDiagramOrgChartBehavior>();
+            this.mockDiagramBehavior = new Mock<ICdp4DiagramBehavior>();
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+            
+            this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
+            this.panelNavigationService = new Mock<IPanelNavigationService>();
+            this.pluginSettingsService = new Mock<IPluginSettingsService>();
+            this.dropinfo = new Mock<IDiagramDropInfo>();
+            this.cache = this.assembler.Cache;
+
+            this.editor = new Mock<IDiagramEditorViewModel>();
+
+            this.selection = new ReactiveList<DiagramItem>();
+            this.editor.Setup(vm => vm.SelectedItems).Returns(this.selection);
+
+            this.diagram = new DiagramCanvas(Guid.NewGuid(), this.cache, this.uri) { Name = "model" };
+            this.palette = new DiagramPaletteViewModel(this.diagram, this.editor.Object);
+        }
 
         [Test]
         public void VerifyCreateConstraints()

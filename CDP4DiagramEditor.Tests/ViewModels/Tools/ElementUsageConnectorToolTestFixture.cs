@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageConnectorToolTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -47,9 +47,9 @@ namespace CDP4DiagramEditor.Tests.ViewModels.Tools
     using CDP4DiagramEditor.ViewModels;
     using CDP4DiagramEditor.ViewModels.Tools;
 
-    using DevExpress.Xpf.Diagram;
+    using CommonServiceLocator;
 
-    using Microsoft.Practices.ServiceLocation;
+    using DevExpress.Xpf.Diagram;
 
     using Moq;
 
@@ -59,15 +59,40 @@ namespace CDP4DiagramEditor.Tests.ViewModels.Tools
     [Apartment(ApartmentState.STA)]
     public class ElementUsageConnectorToolTestFixture
     {
+        private ElementUsageConnectorTool tool;
+        private Mock<IThingCreator> thingCreator;
+        private Mock<ICdp4DiagramBehavior> behavior;
+        private Mock<IDiagramEditorViewModel> editor;
+        private ElementDefinition beginThing;
+        private ElementDefinition endThing;
+        private ElementUsage usage;
+        private ArchitectureDiagram diagram;
+        private Iteration iteration;
+        private ArchitectureElement beginElement;
+        private ArchitectureElement endElement;
+        private ElementDefinitionDiagramContentItemViewModel beginVm;
+        private ElementDefinitionDiagramContentItemViewModel endVm;
+        private SiteDirectory sitedir;
+
+        private Uri uri;
+        private DomainOfExpertise domain;
+        private Mock<ISession> session;
+        private Assembler assembler;
+        private Mock<IPermissionService> permissionService;
+        private Mock<IServiceLocator> serviceLocator;
+
+        private List<Thing> cache;
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void Setup()
         {
             this.cache = new List<Thing>();
 
-            //RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://test.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "TestDoE" };
             this.sitedir.Domain.Add(this.domain);
@@ -129,6 +154,8 @@ namespace CDP4DiagramEditor.Tests.ViewModels.Tools
             this.editor.Setup(e => e.Thing).Returns(this.diagram);
             this.session.Setup(s => s.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domain);
             this.session.Setup(s => s.DataSourceUri).Returns(this.uri.ToString());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
             this.editor.Setup(e => e.Session).Returns(this.session.Object);
             this.editor.Setup(e => e.ConnectorViewModels).Returns(new DisposableReactiveList<IDiagramConnectorViewModel>());
             this.editor.Setup(e => e.ThingDiagramItemViewModels).Returns(thingViewModels);
@@ -136,30 +163,6 @@ namespace CDP4DiagramEditor.Tests.ViewModels.Tools
 
             this.thingCreator.Setup(c => c.CreateAndGetElementUsage(It.IsAny<ElementDefinition>(), It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), this.session.Object)).Returns(Task.FromResult(this.usage));
         }
-
-        private ElementUsageConnectorTool tool;
-        private Mock<IThingCreator> thingCreator;
-        private Mock<ICdp4DiagramBehavior> behavior;
-        private Mock<IDiagramEditorViewModel> editor;
-        private ElementDefinition beginThing;
-        private ElementDefinition endThing;
-        private ElementUsage usage;
-        private ArchitectureDiagram diagram;
-        private Iteration iteration;
-        private ArchitectureElement beginElement;
-        private ArchitectureElement endElement;
-        private ElementDefinitionDiagramContentItemViewModel beginVm;
-        private ElementDefinitionDiagramContentItemViewModel endVm;
-        private SiteDirectory sitedir;
-
-        private Uri uri;
-        private DomainOfExpertise domain;
-        private Mock<ISession> session;
-        private Assembler assembler;
-        private Mock<IPermissionService> permissionService;
-        private Mock<IServiceLocator> serviceLocator;
-
-        private List<Thing> cache;
 
         [Test]
         public void VerifyConnectorToolExitsWhenItemsNotSet()

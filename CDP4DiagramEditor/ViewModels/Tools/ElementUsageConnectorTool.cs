@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementUsageConnectorTool.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -37,10 +37,10 @@ namespace CDP4DiagramEditor.ViewModels.Tools
     using CDP4Composition.Diagram;
     using CDP4Composition.Services;
 
+    using CommonServiceLocator;
+
     using DevExpress.Diagram.Core;
     using DevExpress.Xpf.Diagram;
-
-    using Microsoft.Practices.ServiceLocation;
 
     using NLog;
 
@@ -62,18 +62,12 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         /// <summary>
         /// Gets the tool name
         /// </summary>
-        public override string ToolName
-        {
-            get { return "Element Usage Tool"; }
-        }
+        public override string ToolName => "Element Usage Tool";
 
         /// <summary>
         /// Gets the tool Id.
         /// </summary>
-        public override string ToolId
-        {
-            get { return nameof(ElementUsageConnectorTool); }
-        }
+        public override string ToolId => nameof(ElementUsageConnectorTool);
 
         /// <summary>
         /// Gets or sets the <see cref="IThingCreator" /> that is used to create different <see cref="Things" />.
@@ -81,7 +75,7 @@ namespace CDP4DiagramEditor.ViewModels.Tools
         public IThingCreator ThingCreator
         {
             get { return this.thingCreator ??= ServiceLocator.Current.GetInstance<IThingCreator>(); }
-            set { this.thingCreator = value; }
+            set => this.thingCreator = value;
         }
 
         /// <summary>
@@ -118,8 +112,8 @@ namespace CDP4DiagramEditor.ViewModels.Tools
 
             try
             {
-                var usage = await this.ThingCreator.CreateAndGetElementUsage(endItemContent.Thing as ElementDefinition, beginItemContent.Thing as ElementDefinition, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration) behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
-                CreateConnector(usage, (DiagramObject) beginItemContent.DiagramThing, (DiagramObject) endItemContent.DiagramThing, behavior);
+                var usage = await this.ThingCreator.CreateAndGetElementUsage(endItemContent.Thing as ElementDefinition, beginItemContent.Thing as ElementDefinition, behavior.ViewModel.Session.QuerySelectedDomainOfExpertise((Iteration)behavior.ViewModel.Thing.Container), behavior.ViewModel.Session);
+                CreateConnector(usage, (DiagramObject)beginItemContent.DiagramThing, (DiagramObject)endItemContent.DiagramThing, behavior);
             }
             catch (Exception ex)
             {

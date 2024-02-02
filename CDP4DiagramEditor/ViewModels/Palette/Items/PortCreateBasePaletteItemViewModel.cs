@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PortCreateBasePaletteItemViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -37,9 +37,9 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using CDP4Composition.Navigation;
     using CDP4Composition.Services;
 
-    using DevExpress.Xpf.Diagram;
+    using CommonServiceLocator;
 
-    using Microsoft.Practices.ServiceLocation;
+    using DevExpress.Xpf.Diagram;
 
     /// <summary>
     /// Base class for all port creation palette items
@@ -59,18 +59,12 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// <summary>
         /// Gets the palette group this item belongs to
         /// </summary>
-        public override PaletteGroup Group
-        {
-            get { return PaletteGroup.PortsAndInterfaces; }
-        }
+        public override PaletteGroup Group => PaletteGroup.PortsAndInterfaces;
 
         /// <summary>
         /// Gets the list of supported diagram types. When a supertype is listed all subtypes are also supported.
         /// </summary>
-        public override List<Type> SupportedDiagramTypes
-        {
-            get { return new() { typeof(ArchitectureDiagram) }; }
-        }
+        public override List<Type> SupportedDiagramTypes => new() { typeof(ArchitectureDiagram) };
 
         /// <summary>
         /// Creates a port of a certain kind
@@ -81,7 +75,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         {
             if (this.editorViewModel.SelectedItem is DiagramContentItem { Content: PortContainerDiagramContentItemViewModel container } target)
             {
-                var iteration = (Iteration) this.editorViewModel.Thing.Container;
+                var iteration = (Iteration)this.editorViewModel.Thing.Container;
 
                 // grab the ED from which to make a port from
                 var result = this.thingSelectorDialogService.SelectThing(iteration.Element,

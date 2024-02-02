@@ -253,8 +253,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             dropinfo2.Setup(x => x.Payload).Returns(this.file);
             await creator.TargetViewModel.Drop(dropinfo2.Object);
 
-            Assert.IsTrue(viewmodel.RelationshipCreator.CreateRelationshipCommand.CanExecute(null));
-            viewmodel.RelationshipCreator.CreateRelationshipCommand.Execute(null);
+            Assert.IsTrue(((ICommand)viewmodel.RelationshipCreator.CreateRelationshipCommand).CanExecute(null));
+            await viewmodel.RelationshipCreator.CreateRelationshipCommand.Execute();
 
             creator.ReInitializeControl();
             Assert.IsNull(creator.SourceViewModel.RelatedThing);

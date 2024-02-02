@@ -33,6 +33,8 @@ namespace CDP4Composition.Tests.Diagram
 
     using CDP4Dal;
 
+    using Moq;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -53,7 +55,7 @@ namespace CDP4Composition.Tests.Diagram
         [Test]
         public void VerifyThatNamedWithThingCanBeConstructed()
         {
-            var namedThingDiagramContentItem = new NamedThingDiagramContentItemViewModel(this.domainOfExpertise);
+            var namedThingDiagramContentItem = new NamedThingDiagramContentItemViewModel(this.domainOfExpertise, new Mock<ISession>().Object);
 
             Assert.AreEqual(this.domainOfExpertise, namedThingDiagramContentItem.Thing);
         }

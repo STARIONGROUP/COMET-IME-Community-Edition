@@ -206,14 +206,14 @@ namespace CDP4Composition.Diagram
         /// </summary>
         private void InitializeSubscriptions()
         {
-            var thingSubscription = this.messageBus.Listen<ObjectChangedEvent>(this.Thing)
+            var thingSubscription = this.session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.ObjectChangeEventHandler);
 
             this.Disposables.Add(thingSubscription);
 
-            var thingRemoveSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+            var thingRemoveSubscription = this.session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing)
                 .Where(objectChange => objectChange.EventKind == EventKind.Removed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.RemoveEventHandler);

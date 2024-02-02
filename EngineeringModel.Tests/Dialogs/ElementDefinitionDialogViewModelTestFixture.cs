@@ -165,7 +165,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
-        public void VerifyCreateBehavior()
+        public async Task VerifyCreateBehavior()
         {
             var name = "name";
             var shortname = "shortname";
@@ -176,7 +176,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
 
-            Assert.DoesNotThrow(() => elementDefinitionDialogViewModel.CreateBehaviorCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await elementDefinitionDialogViewModel.CreateBehaviorCommand.Execute());
         }
 
         [Test]

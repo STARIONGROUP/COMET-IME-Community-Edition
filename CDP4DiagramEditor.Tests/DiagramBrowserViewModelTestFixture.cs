@@ -30,6 +30,7 @@ namespace CDP4DiagramEditor.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Input;
 
@@ -49,13 +50,14 @@ namespace CDP4DiagramEditor.Tests
 
     using CDP4DiagramEditor.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
     using NUnit.Framework;
 
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     internal class DiagramBrowserViewModelTestFixture
     {
         private Mock<ISession> session;
@@ -105,7 +107,7 @@ namespace CDP4DiagramEditor.Tests
 
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.modelsetup };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationsetup };
-            this.diagram = new DiagramCanvas(Guid.NewGuid(), this.cache, this.uri) { Name = "diagram", PublicationState = PublicationState.Hidden};
+            this.diagram = new DiagramCanvas(Guid.NewGuid(), this.cache, this.uri) { Name = "diagram", PublicationState = PublicationState.Hidden };
             this.model.Iteration.Add(this.iteration);
             this.iteration.DiagramCanvas.Add(this.diagram);
 
@@ -127,7 +129,7 @@ namespace CDP4DiagramEditor.Tests
 
         [Test]
         [Apartment(ApartmentState.MTA)]
-        public void VerifyThatRowsAreCreated()
+        public async Task VerifyThatRowsAreCreated()
         {
             var viewmodel = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -144,13 +146,13 @@ namespace CDP4DiagramEditor.Tests
 
             viewmodel.SelectedThing = diagramrow;
 
-            viewmodel.OpenCommand.Execute(null);
+            await viewmodel.OpenCommand.Execute();
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<DiagramEditorViewModel>()));
         }
 
         [Test]
         [Apartment(ApartmentState.MTA)]
-        public void VerifyPublishDiagramWorks()
+        public async Task VerifyPublishDiagramWorks()
         {
             var viewmodel = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -160,14 +162,13 @@ namespace CDP4DiagramEditor.Tests
             Assert.AreEqual(PublicationState.Hidden, diagramrow.PublicationState);
 
             viewmodel.SelectedThing = diagramrow;
-            Assert.DoesNotThrowAsync(async () => await viewmodel.ReadyForPublicationCommand.ExecuteAsync(null));
+            Assert.DoesNotThrowAsync(async () => await viewmodel.ReadyForPublicationCommand.Execute());
 
-            Assert.DoesNotThrowAsync(async () => await viewmodel.PublishCommand.ExecuteAsync(null));
-
+            Assert.DoesNotThrowAsync(async () => await viewmodel.PublishCommand.Execute());
         }
 
         [Test]
-        public void VerifyComputePermissions()
+        public async Task VerifyComputePermissions()
         {
             var vm = new DiagramBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -179,7 +180,7 @@ namespace CDP4DiagramEditor.Tests
             vm.ComputePermission();
             Assert.That(((ICommand)vm.UpdateCommand).CanExecute(null), Is.True);
 
-            vm.OpenCommand.Execute(null);
+            await vm.OpenCommand.Execute();
             this.panelNavigationService.Verify(x => x.OpenInDock(It.IsAny<DiagramEditorViewModel>()));
         }
 

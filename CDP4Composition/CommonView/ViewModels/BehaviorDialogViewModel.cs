@@ -34,12 +34,14 @@ namespace CDP4Composition.CommonView.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4CommonView;
     using CDP4Composition.Attributes;
-
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
+
+    using DynamicData;
 
     using ReactiveUI;
 
@@ -158,9 +160,10 @@ namespace CDP4Composition.CommonView.ViewModels
                         this.Disposables.Add(vm.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
                         this.Disposables.Add(vm.BehaviorParameter.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
                         
-                        this.Disposables.Add(vm.BehaviorParameter.ItemChanged
-                                                                 .Where(i => i.PropertyName == nameof(BehavioralParameterRowViewModel.IsValid))
-                                                                 .Subscribe(_ => this.UpdateOkCanExecute()));
+                        this.Disposables.Add(
+                            vm.BehaviorParameter.ItemChanged
+                                .WhenPropertyChanged(x => x.IsValid)
+                                .Subscribe(_ => this.UpdateOkCanExecute()));
 
                         this.SelectedBehavioralModelKindViewModel = vm;
 

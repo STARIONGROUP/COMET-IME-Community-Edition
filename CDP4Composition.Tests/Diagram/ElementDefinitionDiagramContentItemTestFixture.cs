@@ -83,7 +83,7 @@ namespace CDP4Composition.Tests.Diagram
         [Test]
         public void VerifyThatElementDefinitionDiagramContentItemCanBeConstructed()
         {
-            var elementDefinitionDiagramContentItem = new ElementDefinitionDiagramContentItem(this.diagramObject, this.session.Object, null);
+            var elementDefinitionDiagramContentItem = new ElementDefinitionDiagramContentItemViewModel(this.diagramObject, this.session.Object, null);
 
             Assert.AreEqual(this.elementDefinition, elementDefinitionDiagramContentItem.Thing);
             Assert.AreEqual(2, elementDefinitionDiagramContentItem.DiagramContentItemChildren.Count);

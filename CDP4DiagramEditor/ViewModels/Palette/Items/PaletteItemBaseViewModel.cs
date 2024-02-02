@@ -33,6 +33,7 @@ namespace CDP4DiagramEditor.ViewModels.Palette
     using CDP4Common.DiagramData;
 
     using CDP4Composition.Diagram;
+    using CDP4Composition.Mvvm;
 
     using NLog;
 
@@ -63,13 +64,13 @@ namespace CDP4DiagramEditor.ViewModels.Palette
         /// </summary>
         protected PaletteItemBaseViewModel()
         {
-            this.AsyncCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteAsyncCommand());
+            this.AsyncCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteAsyncCommand);
         }
 
         /// <summary>
         /// The main command of the item
         /// </summary>
-        public ReactiveCommand<Unit> AsyncCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> AsyncCommand { get; private set; }
 
         /// <summary>
         /// Gets the label text

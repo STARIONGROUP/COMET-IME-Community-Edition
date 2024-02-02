@@ -60,127 +60,127 @@
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Charts" Version="22.2.6">
+    <PackageReference Include="DevExpress.Charts" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Charts.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Charts.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.CodeParser" Version="22.2.6">
+    <PackageReference Include="DevExpress.CodeParser" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data" Version="22.2.6">
+    <PackageReference Include="DevExpress.Data" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.6">
+    <PackageReference Include="DevExpress.Data.Desktop" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.DataAccess" Version="22.2.6">
+    <PackageReference Include="DevExpress.DataAccess" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Diagram.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Diagram.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Gauges.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Gauges.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Images" Version="22.2.6">
+    <PackageReference Include="DevExpress.Images" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Mvvm" Version="22.2.6">
+    <PackageReference Include="DevExpress.Mvvm" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Office.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Office.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Pdf.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.6">
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.PivotGrid.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.PivotGrid.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Printing.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Reporting.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Reporting.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.6">
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Sparkline.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Sparkline.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.SpellChecker.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Charts" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Charts" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Diagram" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Accordion" Version="23.2.4">
 	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.NavBar" Version="23.2.4">
 	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="23.2.4">
 	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Docking" Version="23.2.4">
 	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Office" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.PivotGrid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.PivotGrid" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Reporting" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Reporting" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Xpo" Version="22.2.6">
+    <PackageReference Include="DevExpress.Xpo" Version="23.2.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">

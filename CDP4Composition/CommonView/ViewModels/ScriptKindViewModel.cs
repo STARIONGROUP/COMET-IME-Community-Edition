@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptKindViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,9 +29,13 @@ namespace CDP4Composition.CommonView.ViewModels
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Types;
+
+    using CDP4Composition.CommonView.HandCodedRows;
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     using CDP4Dal.Operations;
@@ -73,8 +77,7 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <param name="parameter">The selectable <see cref="Parameter"/>s</param>
         public ScriptKindViewModel(IEnumerable<BehavioralParameter> behavioralParameters, string script, ISession session, BehaviorDialogViewModel containerViewModel, ContainerList<Parameter> parameter)
         {
-            this.BehaviorParameter = new ReactiveList<BehavioralParameterRowViewModel>();
-            this.BehaviorParameter.ChangeTrackingEnabled = true;
+            this.BehaviorParameter = new TrackedReactiveList<BehavioralParameterRowViewModel>();
 
             this.Script = script;
             this.session = session;
@@ -85,12 +88,10 @@ namespace CDP4Composition.CommonView.ViewModels
                 .Select(p => new BehavioralParameterRowViewModel(p, session, containerViewModel)));
 
             var canExecuteAddParameterCommand = this.WhenAnyValue(vm => vm.IsReadOnly, vm => vm.Parameters, (r, p) => !r && p.Any());
-            this.AddParameterCommand = ReactiveCommand.Create(canExecuteAddParameterCommand);
-            this.AddParameterCommand.Subscribe(_ => this.AddParameter());
+            this.AddParameterCommand = ReactiveCommandCreator.Create(this.AddParameter, canExecuteAddParameterCommand);
 
             var canExecuteDeleteParameterCommand = this.WhenAnyValue(vm => vm.IsReadOnly, vm => vm.Parameters, vm => vm.SelectedBehaviorParameter, (r, p, s) => !r && p.Any() && s is not null);
-            this.DeleteParameterCommand = ReactiveCommand.Create(canExecuteDeleteParameterCommand);
-            this.DeleteParameterCommand.Subscribe(_ => this.DeleteParameter());
+            this.DeleteParameterCommand = ReactiveCommandCreator.Create(this.DeleteParameter, canExecuteDeleteParameterCommand);
         }
 
         /// <summary>
@@ -127,12 +128,12 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <summary>
         /// <see cref="ReactiveCommand"/> to add a new parameter 
         /// </summary>
-        public ReactiveCommand<object> AddParameterCommand { get; }
+        public ReactiveCommand<Unit, Unit> AddParameterCommand { get; }
 
         /// <summary>
         /// <see cref="ReactiveCommand"/> to delete a parameter 
         /// </summary>
-        public ReactiveCommand<object> DeleteParameterCommand { get; }
+        public ReactiveCommand<Unit, Unit> DeleteParameterCommand { get; }
 
         /// <summary>
         /// The text of the script
@@ -172,7 +173,7 @@ namespace CDP4Composition.CommonView.ViewModels
         /// <summary>
         /// The <see cref="BehavioralParameterRowViewModel"/>s for this script
         /// </summary>
-        public ReactiveList<BehavioralParameterRowViewModel> BehaviorParameter { get; }
+        public TrackedReactiveList<BehavioralParameterRowViewModel> BehaviorParameter { get; }
 
         /// <summary>
         /// Gets or sets the selected <see cref="BehaviorRowViewModel"/>

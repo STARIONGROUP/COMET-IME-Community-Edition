@@ -1,23 +1,23 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DialogViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+//    Copyright (c) 2015-2024 RHEA System S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
 //    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
@@ -136,13 +136,6 @@ namespace CDP4Composition.Mvvm
         /// The <see cref="Exception" /> that has been caught trying to
         /// </summary>
         protected Exception writeException;
-
-        private ISpellDictionaryService dictionaryService;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DialogViewModelBase{T}" /> class
-        /// </summary>
-        private readonly Cdp4JsonSerializer serializer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DialogViewModelBase{T}"/> class
@@ -263,19 +256,6 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the <see cref="SpellChecker" /> instance that the <see cref="SpellingCheckerService" /> provides
         /// </summary>
-        public SpellChecker SpellChecker
-        {
-            get { return this.spellChecker; }
-        }
-
-        /// <summary>
-        /// Gets the chain of <see cref="Thing"/>s that contains the current one
-        /// </summary>
-        public List<Thing> ChainOfContainer { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="SpellChecker"/> instance that the <see cref="SpellingCheckerService"/> provides
-        /// </summary>
         public SpellChecker SpellChecker => this.spellChecker;
 
         /// <summary>
@@ -301,39 +281,27 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the inspect command for the selected container
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedContainerCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedContainerCommand { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the associated view is read-only
         /// </summary>
-        public virtual bool IsReadOnly
-        {
-            get { return this.dialogKind == ThingDialogKind.Inspect; }
-        }
+        public virtual bool IsReadOnly => this.dialogKind == ThingDialogKind.Inspect;
 
         /// <summary>
         /// Gets a value indicating whether a non-editable field is read-only
         /// </summary>
-        public virtual bool IsNonEditableFieldReadOnly
-        {
-            get { return this.dialogKind != ThingDialogKind.Create; }
-        }
+        public virtual bool IsNonEditableFieldReadOnly => this.dialogKind != ThingDialogKind.Create;
 
         /// <summary>
         /// Gets a value indicating whether the Ok button is visible
         /// </summary>
-        public bool IsOkVisible
-        {
-            get { return !this.IsReadOnly; }
-        }
+        public bool IsOkVisible => !this.IsReadOnly;
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="writeException" /> is not empty.
         /// </summary>
-        public bool HasException
-        {
-            get { return this.hasException.Value; }
-        }
+        public bool HasException => this.hasException.Value;
 
         /// <summary>
         /// Gets or sets a value that forces the window to close, specifying whether the user
@@ -344,9 +312,9 @@ namespace CDP4Composition.Mvvm
         /// </remarks>
         public bool? DialogResult
         {
-            get { return this.dialogResult; }
+            get => this.dialogResult;
 
-            set { this.RaiseAndSetIfChanged(ref this.dialogResult, value); }
+            set => this.RaiseAndSetIfChanged(ref this.dialogResult, value);
         }
 
         /// <summary>
@@ -355,9 +323,9 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public Exception WriteException
         {
-            get { return this.writeException; }
+            get => this.writeException;
 
-            set { this.RaiseAndSetIfChanged(ref this.writeException, value); }
+            set => this.RaiseAndSetIfChanged(ref this.writeException, value);
         }
 
         /// <summary>
@@ -365,7 +333,7 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public ISpellDictionaryService DictionaryService
         {
-            get { return this.dictionaryService; }
+            get => this.dictionaryService;
 
             set
             {
@@ -385,27 +353,12 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
-        /// Gets the <see cref="Uri" /> of the <see cref="Thing" /> with respect to it's data-source
-        /// </summary>
-        public string ThingUri { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="ReactiveCommand" /> that represents an "confirmation" of the dialog
-        /// </summary>
-        public ReactiveCommand<Unit> OkCommand { get; private set; }
-
-        /// <summary>
-        /// Gets the <see cref="ReactiveCommand" /> that represents an "cancellation" of the dialog
-        /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
-
-        /// <summary>
         /// Gets or sets a value indicating whether the <see cref="OkCommand" /> can be executed
         /// </summary>
         public bool OkCanExecute
         {
-            get { return this.okCanExecute; }
-            set { this.RaiseAndSetIfChanged(ref this.okCanExecute, value); }
+            get => this.okCanExecute;
+            set => this.RaiseAndSetIfChanged(ref this.okCanExecute, value);
         }
 
         /// <summary>
@@ -413,8 +366,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public Thing Container
         {
-            get { return this.container; }
-            set { this.RaiseAndSetIfChanged(ref this.container, value); }
+            get => this.container;
+            set => this.RaiseAndSetIfChanged(ref this.container, value);
         }
 
         /// <summary>
@@ -426,7 +379,7 @@ namespace CDP4Composition.Mvvm
         public string Error { get; set; }
 
         /// <summary>
-        /// Gets or sets the list of <see cref="ValidationService.ValidationRule" />s that are violated.
+        /// Gets or sets the list of <see cref="CDP4Common.Validation.ValidationService.ValidationRule" />s that are violated.
         /// </summary>
         public ReactiveList<ValidationService.ValidationRule> ValidationErrors { get; set; }
 
@@ -476,7 +429,6 @@ namespace CDP4Composition.Mvvm
             this.Disposables.Add(this.ValidationErrors.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
 
             this.ThingPreferenceRowViewModels = new ReactiveList<ThingPreferenceRowViewModel>();
-            this.ThingPreferenceRowViewModels.ChangeTrackingEnabled = true;
 
             this.Disposables.Add(this.ThingPreferenceRowViewModels.Changed.Subscribe(_ => this.UpdateOkCanExecute()));
 
@@ -729,13 +681,12 @@ namespace CDP4Composition.Mvvm
         /// <param name="repopulateMethod">the repopulate method to refresh the rows</param>
         protected void ExecuteDeleteCommand(Thing thing, Action repopulateMethod)
         {
-            if (IsExecuteDeleteCommandAllowed())
+            if (this.IsExecuteDeleteCommandAllowed())
             {
                 this.transaction.Delete(thing.Clone(false), this.Thing);
                 repopulateMethod();
             }
         }
-
 
         /// <summary>
         /// Checks if the Delete command is Allowed.
