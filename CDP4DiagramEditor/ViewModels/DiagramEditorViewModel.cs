@@ -1080,6 +1080,30 @@ namespace CDP4DiagramEditor.ViewModels
                     }
 
                     break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    
+                    foreach (var oldItem in this.ThingDiagramItemViewModels.OfType<IThingDiagramItemViewModel>())
+                    {
+                        this.RemoveItemFromTree(oldItem);
+                    }
+
+                    foreach (var oldItem in this.ThingDiagramItemViewModels.OfType<IDiagramConnectorViewModel>())
+                    {
+                        this.RemoveConnectorFromTree(oldItem);
+                    }
+
+                    foreach (var newItem in this.ThingDiagramItemViewModels.OfType<IThingDiagramItemViewModel>())
+                    {
+                        this.AddNewItemToTree(newItem);
+                    }
+
+                    foreach (var newItem in this.ThingDiagramItemViewModels.OfType<IDiagramConnectorViewModel>())
+                    {
+                        this.AddNewConnectorToTree(newItem);
+                    }
+
+                    break;
             }
         }
 
