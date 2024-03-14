@@ -2,7 +2,7 @@
 
 The CDP4-COMET Integrated Modelling Environment (IME) Community Editition (CE) is the RHEA Group open source Concurrent Design desktop application and Microsoft Excel integration compliant with ECSS-E-TM-10-25 Annex A and Annex C. CDP4-COMET IME makes use of a plugin framework, the end-user functionality is implemented in CDP4-COMET IME plugins that are loaded at run-time. This makes it straightforward to package, distribute and update the environment.
 
-The user manual for the CDP4-COMET IME is available [online](http://cdp4docs.rheagroup.com/)
+The user manual for the CDP4-COMET IME is available [online](https://www.rheagroup.com/document/cdp4-comet-manual/)
 
 ## Build status
 
