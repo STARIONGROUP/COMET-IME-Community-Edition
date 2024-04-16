@@ -107,7 +107,7 @@ namespace CDP4DiagramEditor.Tests
 
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.modelsetup };
             this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationsetup };
-            this.diagram = new DiagramCanvas(Guid.NewGuid(), this.cache, this.uri) { Name = "diagram", PublicationState = PublicationState.Hidden };
+            this.diagram = new DiagramCanvas(Guid.NewGuid(), this.cache, this.uri) { Name = "diagram", IsHidden = true };
             this.model.Iteration.Add(this.iteration);
             this.iteration.DiagramCanvas.Add(this.diagram);
 
@@ -159,12 +159,11 @@ namespace CDP4DiagramEditor.Tests
             Assert.AreEqual(1, viewmodel.Diagrams.Count);
             var diagramrow = viewmodel.Diagrams.Single();
 
-            Assert.AreEqual(PublicationState.Hidden, diagramrow.PublicationState);
+            Assert.AreEqual(true, diagramrow.IsHidden);
 
             viewmodel.SelectedThing = diagramrow;
-            Assert.DoesNotThrowAsync(async () => await viewmodel.ReadyForPublicationCommand.Execute());
 
-            Assert.DoesNotThrowAsync(async () => await viewmodel.PublishCommand.Execute());
+            Assert.DoesNotThrowAsync(async () => await viewmodel.UnHideCommand.Execute());
         }
 
         [Test]

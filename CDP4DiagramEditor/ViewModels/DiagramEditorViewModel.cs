@@ -2208,14 +2208,21 @@ namespace CDP4DiagramEditor.ViewModels
                         break;
                 }
 
-                var bound = diagramThing.Bounds.Single();
+                if (newDiagramElement != null)
+                {
+                    var bound = diagramThing.Bounds.SingleOrDefault();
 
-                var position = new Point { X = bound.X, Y = bound.Y };
+                    if (bound == null)
+                    {
+                    }
 
-                this.Behavior.ItemPositions.Add(newDiagramElement, position);
-                this.ThingDiagramItemViewModels.Add(newDiagramElement);
+                    var position = new Point { X = bound?.X ?? 0, Y = bound?.Y ?? 0 };
 
-                (newDiagramElement as PortContainerDiagramContentItemViewModel)?.UpdatePorts();
+                    this.Behavior.ItemPositions.Add(newDiagramElement, position);
+                    this.ThingDiagramItemViewModels.Add(newDiagramElement);
+
+                    (newDiagramElement as PortContainerDiagramContentItemViewModel)?.UpdatePorts();
+                }
             }
 
             this.ComputeDiagramTopElement();

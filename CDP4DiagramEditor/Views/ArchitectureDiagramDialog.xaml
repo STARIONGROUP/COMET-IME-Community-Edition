@@ -47,9 +47,23 @@
                                   ShowError="True"/>
 
                 </lc:LayoutItem>
-                <lc:LayoutItem Label="Publication State: ">
-                    <dxe:ComboBoxEdit EditValue="{Binding PublicationState, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" ItemsSource="{dxe:EnumItemsSource EnumType=diagramData:PublicationState}" />
+                <lc:LayoutItem Label="Is Hidden: ">
+                    <dxe:CheckEdit Name="IsHidden"
+                                   IsChecked="{Binding Path=IsHidden,
+                                                       Mode=TwoWay,
+                                                       UpdateSourceTrigger=PropertyChanged}" />
                 </lc:LayoutItem>
+                <lc:LayoutGroup Orientation="Horizontal">
+                    <lc:LayoutItem Label="Is Locked: ">
+                        <dxe:CheckEdit Name="IsLocked" 
+                                       IsChecked="{Binding Path=IsLocked, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                                       IsReadOnly="{Binding IsReadOnly}"/>
+                    </lc:LayoutItem>
+                    <lc:LayoutItem Label="Locked By: ">
+                        <TextBlock Name="LockedBy" Text="{Binding Path=LockedBy, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}" 
+                                   Visibility="{Binding Path=IsLocked, Mode=OneWay, UpdateSourceTrigger=PropertyChanged, Converter={dx:BooleanToVisibilityConverter}}"/>
+                    </lc:LayoutItem>
+                </lc:LayoutGroup>
             </lc:LayoutGroup>
 
             <items:AdvancedLayoutGroup />

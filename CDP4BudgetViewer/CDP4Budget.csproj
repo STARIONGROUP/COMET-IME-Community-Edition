@@ -35,10 +35,10 @@
   </PropertyGroup>  
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.0.0-rc1">
+    <PackageReference Include="CDP4Common-CE" Version="27.0.0-7902069906-395-1-PR-300">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.0.0-rc1">
+    <PackageReference Include="CDP4Dal-CE" Version="27.0.0-7902069906-395-1-PR-300">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.4">
@@ -143,7 +143,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="5.2.7">
+    <PackageReference Include="NLog" Version="5.2.8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
 	<PackageReference Include="NLog.Extensions.Logging" Version="5.2.2">

@@ -172,14 +172,9 @@ namespace CDP4DiagramEditor.ViewModels
         public ReactiveCommand<Unit, Unit> HideCommand { get; protected set; }
 
         /// <summary>
-        /// Gets or sets the Ready For Publication Command
+        /// Gets or sets the UnHide Command
         /// </summary>
-        public ReactiveCommand<Unit, Unit> ReadyForPublicationCommand { get; protected set; }
-
-        /// <summary>
-        /// Gets or sets the Publish Command
-        /// </summary>
-        public ReactiveCommand<Unit, Unit> PublishCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> UnHideCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -229,14 +224,9 @@ namespace CDP4DiagramEditor.ViewModels
             this.HideCommand.ThrownExceptions
                 .Subscribe(this.LogAsyncException);
 
-            this.ReadyForPublicationCommand = ReactiveCommandCreator.CreateAsyncTask(async () => await this.ExecuteReadyForPublicationCommand(this.SelectedThing.Thing as DiagramCanvas));
+            this.UnHideCommand = ReactiveCommandCreator.CreateAsyncTask(async () => await this.ExecuteUnHideCommand(this.SelectedThing.Thing as DiagramCanvas));
 
-            this.ReadyForPublicationCommand.ThrownExceptions
-                .Subscribe(this.LogAsyncException);
-
-            this.PublishCommand = ReactiveCommandCreator.CreateAsyncTask(async () => await this.ExecutePublishCommand(this.SelectedThing.Thing as DiagramCanvas));
-
-            this.PublishCommand.ThrownExceptions
+            this.UnHideCommand.ThrownExceptions
                 .Subscribe(this.LogAsyncException);
 
             this.InspectCommand = ReactiveCommandCreator.Create(this.ExecuteUpdateCommand, this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null));
@@ -280,21 +270,14 @@ namespace CDP4DiagramEditor.ViewModels
 
             if (this.SelectedThing.CanEditThing)
             {
-                // publication
-                switch (((DiagramCanvas)this.SelectedThing.Thing).PublicationState)
+                // IsHidden
+                if (((DiagramCanvas)this.SelectedThing.Thing).IsHidden)
                 {
-                    case PublicationState.Hidden:
-                        this.ContextMenu.Add(new ContextMenuItemViewModel("Ready for Publication", "", this.ReadyForPublicationCommand, MenuItemKind.Review));
-                        break;
-                    case PublicationState.ReadyForPublish:
-                        this.ContextMenu.Add(new ContextMenuItemViewModel("Hide", "CTRL+H", this.HideCommand, MenuItemKind.Hide));
-                        this.ContextMenu.Add(new ContextMenuItemViewModel("Publish", "CTRL+P", this.PublishCommand, MenuItemKind.Publish));
-                        break;
-                    case PublicationState.Published:
-                        this.ContextMenu.Add(new ContextMenuItemViewModel("Hide", "CTRL+H", this.HideCommand, MenuItemKind.Hide));
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    this.ContextMenu.Add(new ContextMenuItemViewModel("UnHide", "CTRL+U", this.UnHideCommand, MenuItemKind.Publish));
+                }
+                else
+                {
+                    this.ContextMenu.Add(new ContextMenuItemViewModel("Hide", "CTRL+H", this.HideCommand, MenuItemKind.Hide));
                 }
 
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Open Diagram", "CTRL+O", this.OpenCommand, MenuItemKind.Open));
@@ -331,8 +314,8 @@ namespace CDP4DiagramEditor.ViewModels
         /// Change the publication status of the 
         /// </summary>
         /// <param name="selectedThing">The selected diagram</param>
-        /// <param name="state">The state to change to.</param>
-        private async Task ChangePublicationStatus(DiagramCanvas selectedThing, PublicationState state)
+        /// <param name="isHidden">Is the DiagramVanvas hidden?</param>
+        private async Task ChangeIsHidden(DiagramCanvas selectedThing, bool isHidden)
         {
             if (selectedThing == null)
             {
@@ -341,7 +324,7 @@ namespace CDP4DiagramEditor.ViewModels
 
             var clone = selectedThing.Clone(false);
 
-            clone.PublicationState = state;
+            clone.IsHidden = isHidden;
 
             var transactionContext = TransactionContextResolver.ResolveContext(selectedThing);
             var transaction = new ThingTransaction(transactionContext, clone);
@@ -364,28 +347,14 @@ namespace CDP4DiagramEditor.ViewModels
         /// Publishes the diagram
         /// </summary>
         /// <param name="selectedThing">The selected diagram</param>
-        private async Task ExecutePublishCommand(DiagramCanvas selectedThing)
+        private async Task ExecuteUnHideCommand(DiagramCanvas selectedThing)
         {
-            if (selectedThing.PublicationState != PublicationState.ReadyForPublish)
+            if (!selectedThing.IsHidden)
             {
                 return;
             }
 
-            await this.ChangePublicationStatus(selectedThing, PublicationState.Published);
-        }
-
-        /// <summary>
-        /// Marks the diagram ready for publication
-        /// </summary>
-        /// <param name="selectedThing">The selected diagram</param>
-        private async Task ExecuteReadyForPublicationCommand(DiagramCanvas selectedThing)
-        {
-            if (selectedThing.PublicationState != PublicationState.Hidden)
-            {
-                return;
-            }
-
-            await this.ChangePublicationStatus(selectedThing, PublicationState.ReadyForPublish);
+            await this.ChangeIsHidden(selectedThing, false);
         }
 
         /// <summary>
@@ -394,12 +363,12 @@ namespace CDP4DiagramEditor.ViewModels
         /// <param name="selectedThing">The selected diagram</param>
         private async Task ExecuteHideCommand(DiagramCanvas selectedThing)
         {
-            if (selectedThing.PublicationState == PublicationState.Hidden)
+            if (selectedThing.IsHidden)
             {
                 return;
             }
 
-            await this.ChangePublicationStatus(selectedThing, PublicationState.Hidden);
+            await this.ChangeIsHidden(selectedThing, true);
         }
 
         /// <summary>
@@ -443,7 +412,7 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             // filter out the unpublished diagrams that are not owned
-            foreach (var row in this.Diagrams.Where(d => d.Thing.PublicationState != PublicationState.Published).ToList())
+            foreach (var row in this.Diagrams.Where(d => d.Thing.IsHidden).ToList())
             {
                 if (!this.CanReadDiagram(row.Thing))
                 {

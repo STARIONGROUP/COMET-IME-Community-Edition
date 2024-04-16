@@ -34,6 +34,11 @@ namespace CDP4CommonView
         private DateTime createdOn;
 
         /// <summary>
+        /// Backing field for <see cref="LockedBy"/>
+        /// </summary>
+        private Person lockedBy;
+        
+        /// <summary>
         /// Initializes a new instance of the <see cref="DiagramCanvasRowViewModel"/> class
         /// </summary>
         /// <param name="diagramCanvas">The <see cref="DiagramCanvas"/> associated with this row</param>
@@ -53,8 +58,16 @@ namespace CDP4CommonView
             get { return this.createdOn; }
             set { this.RaiseAndSetIfChanged(ref this.createdOn, value); }
         }
+        
+        /// <summary>
+        /// Gets or sets the LockedBy
+        /// </summary>
+        public Person LockedBy
+        {
+            get { return this.lockedBy; }
+            set { this.RaiseAndSetIfChanged(ref this.lockedBy, value); }
+        }
 
-	
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
         /// on the <see cref="Thing"/> that is being represented by the view-model
@@ -75,6 +88,7 @@ namespace CDP4CommonView
         {
             this.ModifiedOn = this.Thing.ModifiedOn;
             this.CreatedOn = this.Thing.CreatedOn;
+            this.LockedBy = this.Thing.LockedBy;
         }
     }
 }

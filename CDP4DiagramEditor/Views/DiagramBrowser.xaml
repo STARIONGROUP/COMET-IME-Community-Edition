@@ -91,7 +91,7 @@
                 <dxg:GridColumn FieldName="Name" SortOrder="Ascending" />
                 <dxg:GridColumn FieldName="Description" Header="Description" />
                 <dxg:GridColumn FieldName="OwnerShortName" Header="Owner" />
-                <dxg:GridColumn FieldName="PublicationState" Header="Publication State" />
+                <dxg:GridColumn FieldName="IsHidden" Header="Hidden" />
                 <dxg:GridColumn FieldName="CreatedOn" Header="Created On" />
             </dxg:GridControl.Columns>
 
@@ -99,7 +99,7 @@
                 <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
                 <KeyBinding Gesture="CTRL+E" Command="{Binding Path=UpdateCommand}"></KeyBinding>
                 <KeyBinding Gesture="CTRL+O" Command="{Binding Path=OpenCommand}"></KeyBinding>
-                <KeyBinding Gesture="CTRL+P" Command="{Binding Path=PublishCommand}"></KeyBinding>
+                <KeyBinding Gesture="CTRL+P" Command="{Binding Path=UnHideCommand}"></KeyBinding>
                 <KeyBinding Gesture="CTRL+H" Command="{Binding Path=HideCommand}"></KeyBinding>
             </dxg:GridControl.InputBindings>
         </dxg:GridControl>

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramCanvasRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Simon Wood
-// 
+//    Copyright (c) 2015-2024 RHEA System S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,6 +27,7 @@ namespace CDP4DiagramEditor.ViewModels.Rows
 {
     using CDP4Common.CommonData;
     using CDP4Common.DiagramData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Mvvm;
 
@@ -41,14 +42,24 @@ namespace CDP4DiagramEditor.ViewModels.Rows
     public class DiagramCanvasRowViewModel : CDP4CommonView.DiagramCanvasRowViewModel
     {
         /// <summary>
+        /// Backing field for <see cref="IsLocked"/>
+        /// </summary>
+        private bool isLocked;
+
+        /// <summary>
+        /// Backing field for <see cref="Locker"/>
+        /// </summary>
+        private string locker;
+
+        /// <summary>
         /// Backing field for <see cref="Description" />
         /// </summary>
         private string description;
 
         /// <summary>
-        /// Backing field for <see cref="PublicationState" />
+        /// Backing field for <see cref="IsHidden" />
         /// </summary>
-        private PublicationState publicationState;
+        private bool isHidden;
 
         /// <summary>
         /// Backing field for <see cref="OwnerShortName"/>
@@ -70,6 +81,24 @@ namespace CDP4DiagramEditor.ViewModels.Rows
         }
 
         /// <summary>
+        /// Gets a value indicating whether the current <see cref="DiagramCanvas"/> is locked
+        /// </summary>
+        public bool IsLocked
+        {
+            get => this.isLocked;
+            private set => this.RaiseAndSetIfChanged(ref this.isLocked, value);
+        }
+
+        /// <summary>
+        /// Gets the name of the person that locked the current <see cref="DiagramCanvas"/>
+        /// </summary>
+        public string Locker
+        {
+            get => this.locker;
+            private set => this.RaiseAndSetIfChanged(ref this.locker, value);
+        }
+
+        /// <summary>
         /// Gets or sets a value that represents the Description
         /// </summary>
         public string Description
@@ -79,12 +108,12 @@ namespace CDP4DiagramEditor.ViewModels.Rows
         }
 
         /// <summary>
-        /// Gets or sets the PublicationState
+        /// Gets or sets the IsHidden state
         /// </summary>
-        public PublicationState PublicationState
+        public bool IsHidden
         {
-            get { return this.publicationState; }
-            set { this.RaiseAndSetIfChanged(ref this.publicationState, value); }
+            get { return this.isHidden; }
+            set { this.RaiseAndSetIfChanged(ref this.isHidden, value); }
         }
 
         /// <summary>
@@ -115,7 +144,27 @@ namespace CDP4DiagramEditor.ViewModels.Rows
         private void UpdateProperties()
         {
             this.Description = this.Thing.Description;
-            this.PublicationState = this.Thing.PublicationState;
+            this.IsHidden = this.Thing.IsHidden;
+
+            this.IsLocked = this.Thing.LockedBy != null;
+
+            if (this.IsLocked)
+            {
+                this.Locker = this.Thing.LockedBy?.Name;
+            }
+            else
+            {
+                this.locker = string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Update the <see cref="ThingStatus"/> property
+        /// </summary>
+        protected override void UpdateThingStatus()
+        {
+            base.UpdateThingStatus();
+            this.ThingStatus = new ThingStatus(this.Thing) { IsLocked = this.Thing.LockedBy != null };
         }
     }
 }

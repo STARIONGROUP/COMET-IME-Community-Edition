@@ -12,13 +12,15 @@ namespace CDP4CommonView
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Windows.Input;
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.DiagramData;
-    
+    using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -37,6 +39,10 @@ namespace CDP4CommonView
         /// </summary>
         private DateTime createdOn;
 
+        /// <summary>
+        /// Backing field for <see cref="SelectedLockedBy"/>
+        /// </summary>
+        private Person selectedLockedBy;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DiagramCanvasDialogViewModel"/> class.
@@ -93,6 +99,20 @@ namespace CDP4CommonView
         }
 
         /// <summary>
+        /// Gets or sets the SelectedLockedBy
+        /// </summary>
+        public virtual Person SelectedLockedBy
+        {
+            get { return this.selectedLockedBy; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedLockedBy, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the possible <see cref="Person"/>s for <see cref="SelectedLockedBy"/>
+        /// </summary>
+        public ReactiveList<Person> PossibleLockedBy { get; protected set; }
+
+        /// <summary>
         /// Gets or sets the CreatedOn
         /// </summary>
         public virtual DateTime CreatedOn
@@ -102,11 +122,20 @@ namespace CDP4CommonView
         }
 
         /// <summary>
+        /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedLockedBy"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> InspectSelectedLockedByCommand { get; protected set; }
+
+        /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
         /// </summary>
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
+
+            var canExecuteInspectSelectedLockedByCommand = this.WhenAny(vm => vm.SelectedLockedBy, v => v.Value != null);
+            this.InspectSelectedLockedByCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedLockedByCommand);
+            this.InspectSelectedLockedByCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedLockedBy));
         }
 
         /// <summary>
@@ -118,6 +147,7 @@ namespace CDP4CommonView
             var clone = this.Thing;
 
             clone.CreatedOn = this.CreatedOn;
+            clone.LockedBy = this.SelectedLockedBy;
         }
 
         /// <summary>
@@ -126,6 +156,7 @@ namespace CDP4CommonView
         protected override void Initialize()
         {
             base.Initialize();
+            this.PossibleLockedBy = new ReactiveList<Person>();
         }
 
         /// <summary>
@@ -135,6 +166,16 @@ namespace CDP4CommonView
         {
             base.UpdateProperties();
             this.CreatedOn = this.Thing.CreatedOn;
+            this.SelectedLockedBy = this.Thing.LockedBy;
+            this.PopulatePossibleLockedBy();
+        }
+
+        /// <summary>
+        /// Populates the <see cref="PossibleLockedBy"/> property
+        /// </summary>
+        protected virtual void PopulatePossibleLockedBy()
+        {
+            this.PossibleLockedBy.Clear();
         }
     }
 }
