@@ -409,7 +409,7 @@ namespace CDP4EngineeringModel.ViewModels
                 return value;
             }
 
-            return ValueValidator.DefaultValue;
+            return ObjectValueValidator.DefaultValue;
         }
 
         /// <summary>

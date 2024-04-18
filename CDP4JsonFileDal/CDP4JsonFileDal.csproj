@@ -37,26 +37,26 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="26.1.0">
+    <PackageReference Include="CDP4Common-CE" Version="26.6.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="26.1.0">
+    <PackageReference Include="CDP4Dal-CE" Version="26.6.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="26.1.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="26.6.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="CDP4JsonFileDal-CE" Version="26.1.0" />
+	<PackageReference Include="CDP4JsonFileDal-CE" Version="26.6.2" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="5.2.7">
+    <PackageReference Include="NLog" Version="5.2.8">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.2.2">
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.8">
 	  <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
 	<PackageReference Include="System.Reactive" Version="5.0.0">

@@ -25,10 +25,10 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="26.1.0">
+    <PackageReference Include="CDP4Common-CE" Version="26.6.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="26.1.0">
+    <PackageReference Include="CDP4Dal-CE" Version="26.6.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DynamicLanguageRuntime" Version="1.3.3" />
