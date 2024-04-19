@@ -758,7 +758,7 @@ namespace CDP4Reporting.Tests.ViewModels
             // initialize ReportScriptHandler
             var report = new XtraReport();
 
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
                 , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { });
 
@@ -778,7 +778,7 @@ namespace CDP4Reporting.Tests.ViewModels
             // initialize ReportScriptHandler
             var report = new XtraReport();
 
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
                 , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { });
 
@@ -800,7 +800,7 @@ namespace CDP4Reporting.Tests.ViewModels
             // initialize ReportScriptHandler
             var report = new XtraReport();
 
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
                 , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { });
 
@@ -1019,7 +1019,7 @@ namespace CDP4Reporting.Tests.ViewModels
             // initialize ReportScriptHandler
             var report = new XtraReport();
 
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
                 , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { this.reportDesignerViewModel.Output = x; });
 

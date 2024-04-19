@@ -190,6 +190,11 @@ namespace CDP4Reporting.Utilities
         /// </summary>
         private void ExecuteParameterChanges()
         {
+            if (this.currentReportDesignerDocument == null)
+            {
+                return;
+            }
+
             Application.Current.Dispatcher.InvokeAsync(() =>
                 {
                     lock (this.toBeRemovedParameters)
