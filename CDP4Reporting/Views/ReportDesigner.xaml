@@ -210,7 +210,7 @@
                                     </dxb:InsertAction.Element>
                                 </dxb:InsertAction>
                             </dxrud:ReportDesigner.RibbonCustomizationActions>
-                            <dxrud:ReportDesignerClassicView/>
+                            <dxrud:ReportDesignerBrowserView AllowDrop="False" CloseWindowWhenLastTabIsClosed="False" TabDragDropMode="None"  />
                         </dxrud:ReportDesigner>
                     </dxdo:LayoutPanel>
                 </dxdo:LayoutGroup>

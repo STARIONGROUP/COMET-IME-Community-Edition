@@ -30,6 +30,8 @@ namespace CDP4Reporting.Views
 
     using CDP4Composition;
 
+    using DevExpress.Xpf.Reports.UserDesigner;
+
     /// <summary>
     /// Interaction logic for ReportDesigner.xaml
     /// </summary>

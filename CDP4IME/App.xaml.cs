@@ -97,6 +97,7 @@ namespace CDP4IME
             Current.MainWindow.Show();
             DXSplashScreen.Close();
         }
+
         /// <summary>
         /// Run the application in debug mode. Unhandled Exceptions are not caught.
         /// The application will crash
@@ -170,7 +171,7 @@ namespace CDP4IME
         /// </param>
         private static void AppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            HandleException(e.ExceptionObject as Exception);
+            HandleException(e?.ExceptionObject as Exception);
         }
 
         /// <summary>
@@ -185,6 +186,8 @@ namespace CDP4IME
             {
                 return;
             }
+
+            logger.Fatal(ex);
 
             ErrorReporter.ShowDialog(ex);
 

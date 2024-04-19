@@ -493,7 +493,7 @@ namespace CDP4Reporting.ViewModels
             this.lastSavedDataSourceText = "";
 
             this.CurrentReport = GetNewXtraReport();
-            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(this.CurrentReport), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
+            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(this.CurrentReport, this.currentReportDesignerDocument), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
 
             this.CurrentReportProjectFilePath = string.Empty;
         }
@@ -536,7 +536,7 @@ namespace CDP4Reporting.ViewModels
 
             var report = new XtraReport();
 
-            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
+            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(report, this.currentReportDesignerDocument), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
 
             using (var reportZipArchive = this.ReportScriptHandler.GetReportZipArchive(reportProjectFilePath))
             {
