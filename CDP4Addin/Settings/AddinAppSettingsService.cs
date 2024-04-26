@@ -36,6 +36,7 @@ namespace CDP4AddinCE.Settings
     [Export(typeof(IAppSettingsService<AddinAppSettings>))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     [ClassInterface(ClassInterfaceType.None)]
+    [ComVisible(false)]
     public class AddinAppSettingsService : AppSettingsService<AddinAppSettings>
     {
     }

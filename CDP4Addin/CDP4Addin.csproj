@@ -12,17 +12,18 @@
     <Copyright>Copyright © RHEA System S.A.</Copyright>
     <AssemblyVersion>10.0.0.8</AssemblyVersion>
     <FileVersion>10.0.0.8</FileVersion>
-    <RegisterForComInterop>true</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
     <OutputPath>..\CDP4IME\bin\$(Configuration)\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugType>full</DebugType>
     <OutputPath>..\CDP4IME\bin\$(Configuration)\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -71,8 +72,8 @@
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5" />
     <PackageReference Include="ExceptionReporter" Version="4.0.2" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
+    <PackageReference Include="NetOfficeFw.Core" Version="1.9.5" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.2.8" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.8" />
@@ -98,16 +99,6 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Update="Properties\Settings.Designer.cs">
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
     <Compile Update="TaskPaneWpfHostControl.cs" />
     <Compile Update="TaskPaneWpfHostControl.Designer.cs">
       <DependentUpon>TaskPaneWpfHostControl.cs</DependentUpon>
@@ -124,10 +115,6 @@
     <ProjectReference Include="..\CDP4ShellDialogs\CDP4ShellDialogs.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
     <EmbeddedResource Update="TaskPaneWpfHostControl.resx">
       <DependentUpon>TaskPaneWpfHostControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -139,11 +126,5 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="OfficeRibbon\FluentRibbonManager.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
   </ItemGroup>
 </Project>

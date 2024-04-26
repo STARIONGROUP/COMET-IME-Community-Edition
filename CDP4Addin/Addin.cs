@@ -77,7 +77,7 @@ namespace CDP4AddinCE
     /// provides the Fluent XML Ribbon and call-back implementations for the Fluent XML Ribbon controls
     /// </summary>
     [COMAddin("CDP4-COMET-CE Office Add-in", "The CDP4-COMET-CE Office Add-in provides COMET application integration with Microsoft Office Suite", 3)]
-    [Guid("0CAE241F-E861-4CBF-9636-72555CC33D8E")]
+    [Guid("FD48B640-1D3F-4922-854B-C69028CA469E")]
     [ProgId("CDP4CE.Addin")]
     [RegistryLocation(RegistrySaveLocation.LocalMachine)]
     public class Addin : COMAddin
@@ -134,12 +134,9 @@ namespace CDP4AddinCE
         {
             logger.Debug("starting CDP4-COMET-CE addin");
 
-            this.messageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
-
             this.PreloadAssemblies();
             this.RedirectAssemblies();
             this.SetupIdtExtensibility2Events();
-            this.SetupEventListeners();
 
             // Set the Theme of the application
             ThemeManager.ApplicationThemeName = Theme.SevenName;
@@ -750,6 +747,9 @@ namespace CDP4AddinCE
         /// </summary>
         private void InitializeMefImports()
         {
+            this.messageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
+            this.SetupEventListeners();
+
             var panelNavigationService = ServiceLocator.Current.GetInstance<IPanelNavigationService>();
             this.FluentRibbonManager = ServiceLocator.Current.GetInstance<IFluentRibbonManager>();
             var thingDialogNavigationService = ServiceLocator.Current.GetInstance<IThingDialogNavigationService>();

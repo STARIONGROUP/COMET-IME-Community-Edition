@@ -28,7 +28,6 @@ namespace CDP4AddinCE
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-    using System.Runtime.InteropServices;
     using System.Threading.Tasks;
 
     using CDP4AddinCE.Settings;
@@ -50,7 +49,6 @@ namespace CDP4AddinCE
     /// The purpose of the <see cref="AddinRibbonPart"/> class is to describe and provide a part of the Fluent Ribbon
     /// that is used in an Office addin. A <see cref="RibbonPart"/> always describes a ribbon group containing different controls
     /// </summary>
-    [ClassInterface(ClassInterfaceType.None)]
     public class AddinRibbonPart : RibbonPart
     {
         /// <summary>

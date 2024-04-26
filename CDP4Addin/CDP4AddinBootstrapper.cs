@@ -29,12 +29,14 @@ namespace CDP4AddinCE
     using System.Runtime.InteropServices;
 
     using CDP4AddinCE.Settings;
+
     using CDP4Composition.Composition;
 
     /// <summary>
     /// Bootstrapper implementation for the Addin
     /// </summary>
     [ClassInterface(ClassInterfaceType.None)]
+    [ComVisible(false)]
     public class CDP4AddinBootstrapper : COMETBootstrapper<AddinAppSettings>
     {
         /// <summary>

@@ -41,8 +41,8 @@
 	  <PackageReference Include="NLog.Extensions.Logging" Version="5.3.8" />
 	  <PackageReference Include="ReactiveUI" Version="18.3.1" />
 	  <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
+    <PackageReference Include="NetOfficeFw.Core" Version="1.9.5" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.5" />
   </ItemGroup>
 
   <ItemGroup>

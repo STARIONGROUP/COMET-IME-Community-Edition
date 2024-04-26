@@ -23,6 +23,10 @@
         <File Id="_D28C464F" Vital="yes" Source="$(var.COMET-CE.TargetDir)CDP4Dal.dll" KeyPath="yes" />
       </Component>
 
+      <Component Id="_45FDB1056060" Guid="{E28C464F-5B94-4A9B-8F8B-45FDB1056060}" Location="local" Win64="$(var.Win64)">
+        <File Id="_E28C464F" Vital="yes" Source="$(var.COMET-CE.TargetDir)CDP4DalCommon.dll" KeyPath="yes" />
+      </Component>
+
       <Component Id="_BEA8A4A3A59D" Guid="{F78B2EE0-16C9-4FDF-8BD8-BEA8A4A3A59D}" Location="local" Win64="$(var.Win64)">
         <File Id="_F78B2EE0" Vital="yes" Source="$(var.COMET-CE.TargetDir)CDP4JsonSerializer.dll" KeyPath="yes" />
       </Component>

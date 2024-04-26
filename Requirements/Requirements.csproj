@@ -181,10 +181,10 @@
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
 	<PackageReference Include="DotLiquid" Version="2.2.508" />
-	<PackageReference Include="NetOfficeFw.Core" Version="1.9.1">
+	<PackageReference Include="NetOfficeFw.Core" Version="1.9.5">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="NetOfficeFw.Excel" Version="1.9.1">
+	<PackageReference Include="NetOfficeFw.Excel" Version="1.9.5">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.3">
