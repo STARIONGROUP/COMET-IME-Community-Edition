@@ -1,5 +1,5 @@
 ﻿name: CDP4RequirementsVerification-CE
-version: 3.0.0
+version: 26.6.2
 project url: https://github.com/STARIONGROUP/COMET-SDK-Community-Edition
 license url: https://licenses.nuget.org/LGPL-3.0-only
 

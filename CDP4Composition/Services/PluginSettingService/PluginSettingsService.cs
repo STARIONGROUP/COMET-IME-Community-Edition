@@ -59,7 +59,7 @@ namespace CDP4Composition.PluginSettingService
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public readonly string Cdp4ConfigurationDirectoryFolder = $"STARION{Path.DirectorySeparatorChar}CDP4{Path.DirectorySeparatorChar}";
+        public readonly string Cdp4ConfigurationDirectoryFolder = $"STARION{Path.DirectorySeparatorChar}CDP4-COMET{Path.DirectorySeparatorChar}";
 
         /// <summary>
         /// The setting file extension

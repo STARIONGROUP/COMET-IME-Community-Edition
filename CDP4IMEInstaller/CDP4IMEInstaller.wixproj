@@ -86,6 +86,8 @@
     <Content Include="ThirdPartyLicense\AvalonEdit.txt" />
     <Content Include="ThirdPartyLicense\CastleCore.txt" />
     <Content Include="ThirdPartyLicense\CDP4Common-CE.txt" />
+    <Content Include="ThirdPartyLicense\CDP4DalCommon-CE.txt" />
+    <Content Include="ThirdPartyLicense\CDP4MessagePackSerializer-CE.txt" />
     <Content Include="ThirdPartyLicense\CDP4Reporting-CE.txt" />
     <Content Include="ThirdPartyLicense\ClosedXML.txt" />
     <Content Include="ThirdPartyLicense\CommonServiceLocator.txt" />
@@ -199,7 +201,7 @@
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
     <ProjectReference Include="..\CDP4IME\COMET-CE.csproj">
-      <Name>COMET-CE</Name>
+      <Name>CDP4-COMET-CE</Name>
       <Project>{4f899067-259e-4891-8a50-bf18f4961709}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>

@@ -45,7 +45,7 @@ namespace CDP4Composition.Utilities
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public static string ConfigFileRelativeFolder = $"STARION{Path.DirectorySeparatorChar}cdp4{Path.DirectorySeparatorChar}";
+        public static string ConfigFileRelativeFolder = $"STARION{Path.DirectorySeparatorChar}CDP4-COMET{Path.DirectorySeparatorChar}";
 
         /// <summary>
         /// Application configuration file name.
@@ -63,12 +63,41 @@ namespace CDP4Composition.Utilities
         public string ConfigurationFileDir => Path.Combine(AppDataFolder, ConfigFileRelativeFolder);
 
         /// <summary>
-        /// Read the uris to the JSON configuration file
+        /// Creates a new instance of the <see cref="UriConfigFileHandler"/> class
         /// </summary>
-        /// <returns>
-        /// an <see cref="IEnumerable{UriConfig}"/>
-        /// </returns>
-        public IEnumerable<UriConfig> Read()
+        public UriConfigFileHandler()
+        {
+            this.TryImportOld();
+        }
+
+        /// <summary>
+        /// Tries to import old config file
+        /// </summary>
+        private void TryImportOld()
+        {
+            if (!File.Exists(this.ConfigurationFilePath))
+            {
+                if (File.Exists(Path.Combine(AppDataFolder, $"RHEA{Path.DirectorySeparatorChar}CDP4-COMET{Path.DirectorySeparatorChar}", ConfigFileName)))
+                {
+                    File.Copy(Path.Combine(AppDataFolder, $"RHEA{Path.DirectorySeparatorChar}CDP4-COMET{Path.DirectorySeparatorChar}", ConfigFileName), this.ConfigurationFilePath);
+                    return;
+                }
+
+                if (File.Exists(Path.Combine(AppDataFolder, $"RHEA{Path.DirectorySeparatorChar}CDP4{Path.DirectorySeparatorChar}", ConfigFileName)))
+                {
+                    File.Copy(Path.Combine(AppDataFolder, $"RHEA{Path.DirectorySeparatorChar}CDP4{Path.DirectorySeparatorChar}", ConfigFileName), this.ConfigurationFilePath);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+            /// Read the uris to the JSON configuration file
+            /// </summary>
+            /// <returns>
+            /// an <see cref="IEnumerable{UriConfig}"/>
+            /// </returns>
+            public IEnumerable<UriConfig> Read()
         {
             List<UriConfig> configFileClientsList;
 
