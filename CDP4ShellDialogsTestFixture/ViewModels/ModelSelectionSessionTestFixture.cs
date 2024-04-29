@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ModelSelectionSessionTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="ModelSelectionSessionTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -61,25 +61,25 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
         public void Setup()
         {
             this.messageBus = new CDPMessageBus();
-            this.session = new Mock<ISession>() { Name = "http://www.rheagroup.com/" };
+            this.session = new Mock<ISession>() { Name = "https://www.stariongroup.eu/" };
             this.permissionService = new Mock<IPermissionService>();
 
-            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com")) { Name = "TestSiteDir" };
-            this.model1 = new EngineeringModelSetup(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com")) { Name = "model1" };
-            this.model2 = new EngineeringModelSetup(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com")) { Name = "model2" };
-            this.iteration11 = new IterationSetup(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com"));
-            this.iteration21 = new IterationSetup(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com"));
+            this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu")) { Name = "TestSiteDir" };
+            this.model1 = new EngineeringModelSetup(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu")) { Name = "model1" };
+            this.model2 = new EngineeringModelSetup(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu")) { Name = "model2" };
+            this.iteration11 = new IterationSetup(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu"));
+            this.iteration21 = new IterationSetup(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu"));
             this.frozenOnDate = "1992-01-12 12:12:30";
             this.iteration21.FrozenOn = DateTime.Parse(this.frozenOnDate);
 
-            this.iteration22 = new IterationSetup(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com"));
+            this.iteration22 = new IterationSetup(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu"));
 
-            this.person = new Person(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com")) { GivenName = "testPerson" };
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com")) { Name = "domaintest" };
+            this.person = new Person(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu")) { GivenName = "testPerson" };
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu")) { Name = "domaintest" };
 
             this.person.DefaultDomain = this.domain;
 
-            this.model1.Participant.Add(new Participant(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com"))
+            this.model1.Participant.Add(new Participant(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu"))
             {
                 Person = this.person,
                 Domain = { this.domain }
@@ -92,7 +92,7 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
             this.siteDirectory.Model.Add(this.model2);
             this.siteDirectory.Person.Add(this.person);
 
-            this.model2.Participant.Add(new Participant(Guid.NewGuid(), null, new Uri("http://www.rheagroup.com"))
+            this.model2.Participant.Add(new Participant(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu"))
             {
                 Person = this.person,
                 Domain = { this.domain }

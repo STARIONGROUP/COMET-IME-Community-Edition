@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ErrorBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="ErrorBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -79,7 +79,7 @@ namespace CDP4BuiltInRules.Tests
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.uri = new Uri("https://www.stariongroup.eu");
             this.assembler = new Assembler(this.uri, this.messageBus);
             this.highlightTrigger = false;
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
@@ -102,7 +102,7 @@ namespace CDP4BuiltInRules.Tests
         public void VerifyPanelProperties()
         {
             Assert.AreEqual("Errors, site directory", this.browser.Caption);
-            Assert.AreEqual("site directory\nhttp://www.rheagroup.com/\nJohn Doe", this.browser.ToolTip);
+            Assert.AreEqual("site directory\nhttps://www.stariongroup.eu/\nJohn Doe", this.browser.ToolTip);
         }
 
         [Test]

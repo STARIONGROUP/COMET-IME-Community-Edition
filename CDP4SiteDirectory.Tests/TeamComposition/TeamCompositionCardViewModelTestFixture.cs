@@ -1,11 +1,11 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="TeamCompositionCardViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="TeamCompositionCardViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -75,7 +75,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
 
             this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
-            this.url = new Uri("http://www.rheagroup.com");
+            this.url = new Uri("https://www.stariongroup.eu");
 
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -85,8 +85,8 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
             this.domainOfExpertise2 = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.url) { ShortName = "THR" };
 
             this.organization = new Organization(Guid.NewGuid(), this.cache, this.url);
-            this.organization.ShortName = "RHEA";
-            this.organization.Name = "RHEA";
+            this.organization.ShortName = "STARION";
+            this.organization.Name = "STARION";
 
             this.personRole = new PersonRole(Guid.NewGuid(), this.cache, this.url);
 
@@ -121,7 +121,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         {
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
 
-            Assert.AreEqual("RHEA", this.teamCompositionCardViewModel.Organization);
+            Assert.AreEqual("STARION", this.teamCompositionCardViewModel.Organization);
             Assert.AreEqual("SESS", this.teamCompositionCardViewModel.OrganizationalUnit);
             Assert.AreEqual("SYS THR", this.teamCompositionCardViewModel.DomainShortnames);
             Assert.IsTrue(this.teamCompositionCardViewModel.IsActive);
@@ -195,7 +195,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         [Test]
         public void VerifyThatIfEmailIsPresentEmailCanExecuteIsTrue()
         {
-            var email = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@rheagroup.com" };
+            var email = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@stariongroup.eu" };
             this.person.EmailAddress.Add(email);
 
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
@@ -208,10 +208,10 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         [Test]
         public void VerifThatDefaultEmailAddresIsUsed()
         {
-            var email = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@rheagroup.com" };
+            var email = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@stariongroup.eu" };
             this.person.EmailAddress.Add(email);
 
-            var defaultEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@rheagroup.com" };
+            var defaultEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@stariongroup.eu" };
             this.person.EmailAddress.Add(defaultEmail);
             this.person.DefaultEmailAddress = defaultEmail;
 
@@ -223,10 +223,10 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         [Test]
         public void VerifuThatIfNoDefaultEmailIsSetFirstEmailIsUsed()
         {
-            var firstEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@rheagroup.com" };
+            var firstEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@stariongroup.eu" };
             this.person.EmailAddress.Add(firstEmail);
 
-            var secondEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@rheagroup.com" };
+            var secondEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@stariongroup.eu" };
             this.person.EmailAddress.Add(secondEmail);
 
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
@@ -295,15 +295,15 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         [Test]
         public void VerifyThatUpdateToEmailAddressIsProcessed()
         {
-            var firstEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@rheagroup.com" };
+            var firstEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@stariongroup.eu" };
             this.person.EmailAddress.Add(firstEmail);
 
-            var secondEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@rheagroup.com" };
+            var secondEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@stariongroup.eu" };
             this.person.EmailAddress.Add(secondEmail);
 
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
 
-            firstEmail.Value = "johnsemail@rheagroup.com";
+            firstEmail.Value = "johnsemail@stariongroup.eu";
             var type = firstEmail.GetType();
             type.GetProperty("RevisionNumber").SetValue(firstEmail, 50);
 

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OptionSheetRowAssemblerTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="OptionSheetRowAssemblerTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace CDP4ParameterSheetGenerator.Tests.Generator
     [TestFixture]
     public class OptionSheetRowAssemblerTestFixture
     {
-        private Uri uri = new Uri("http://www.rheagroup.com");
+        private Uri uri = new Uri("https://www.stariongroup.eu");
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> concurentDictionary;
 

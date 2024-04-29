@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataSourceSelectionViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="DataSourceSelectionViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -118,8 +118,8 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             this.serviceLocator.Setup(x => x.GetInstance<ICDPMessageBus>())
                 .Returns(this.messageBus);
 
-            this.credentials = new Credentials("John", "Doe", new Uri("http://www.rheagroup.com"));
-            this.session.Setup(x => x.DataSourceUri).Returns("http://www.rheagroup.com");
+            this.credentials = new Credentials("John", "Doe", new Uri("https://www.stariongroup.eu"));
+            this.session.Setup(x => x.DataSourceUri).Returns("https://www.stariongroup.eu");
             this.session.Setup(x => x.Credentials).Returns(this.credentials);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
@@ -137,7 +137,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             viewmodel.UserName = "John";
             viewmodel.Password = "Dow";
-            viewmodel.Uri = "http://www.rheagroup.com";
+            viewmodel.Uri = "https://www.stariongroup.eu";
 
             Assert.IsTrue(((ICommand)viewmodel.OkCommand).CanExecute(null));
             await viewmodel.OkCommand.Execute().Catch(Observable.Return(Unit.Default));
@@ -184,10 +184,10 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             var cl1 = new UriConfig() { Alias = "BadAlias", Uri = "KKK", DalType = daltype0.DalType.ToString() };
             var row1 = new UriRowViewModel() { UriConfig = cl1 };
 
-            var cl2 = new UriConfig() { Uri = "http://www.rheagroup.com", DalType = daltype0.DalType.ToString() };
+            var cl2 = new UriConfig() { Uri = "https://www.stariongroup.eu", DalType = daltype0.DalType.ToString() };
             var row2 = new UriRowViewModel() { UriConfig = cl2 };
 
-            var cl3 = new UriConfig() { Uri = "http://www.rheagroup.com", DalType = daltype1.DalType.ToString() };
+            var cl3 = new UriConfig() { Uri = "https://www.stariongroup.eu", DalType = daltype1.DalType.ToString() };
             var row3 = new UriRowViewModel() { UriConfig = cl3 };
 
             viewmodel.AllDefinedUris.Clear();
@@ -223,13 +223,13 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             viewmodel.UserName = "John";
             viewmodel.Password = "Dow";
-            viewmodel.Uri = "http://www.rheagroup.com";
+            viewmodel.Uri = "https://www.stariongroup.eu";
 
             await viewmodel.OkCommand.Execute();
 
             Assert.AreEqual("A session with the username John already exists", viewmodel.ErrorMessage);
 
-            viewmodel.Uri = "http://www.rheagroup.com/";
+            viewmodel.Uri = "https://www.stariongroup.eu/";
 
             await viewmodel.OkCommand.Execute();
 

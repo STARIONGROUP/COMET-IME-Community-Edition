@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>CDP4Budget.Tests</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4Budget.Tests</Product>
     <Description>CDP4Budget Unit Tests</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

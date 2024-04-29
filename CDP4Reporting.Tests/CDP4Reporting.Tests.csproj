@@ -3,10 +3,10 @@
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4BuiltInRules.Tests</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4BuiltInRules.Tests</Product>
     <Description>CDP4BuiltInRules Unit Tests</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -32,8 +32,8 @@
     <PackageReference Include="CDP4Dal-CE" Version="26.6.2" />
     <PackageReference Include="CDP4JsonSerializer-CE" Version="26.6.2" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
-    <PackageReference Include="DevExpress.Reporting.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Reporting" Version="22.2.6" />
+    <PackageReference Include="DevExpress.Reporting.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Reporting" Version="23.2.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.2.8" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.8" />

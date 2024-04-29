@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="AppSettingsService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="AppSettingsService.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2020 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ namespace CDP4Composition.Services.AppSettingService
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public const string ConfigurationDirectoryFolder = @"RHEA\CDP4-COMET\";
+        public const string ConfigurationDirectoryFolder = @"STARION\CDP4-COMET\";
 
         /// <summary>
         /// The setting file extension

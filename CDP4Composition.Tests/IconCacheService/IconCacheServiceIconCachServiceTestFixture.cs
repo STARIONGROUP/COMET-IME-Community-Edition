@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IconCacheServiceIconCachServiceTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2016-2020 RHEA System S.A. All rights reserved
+// <copyright file="IconCacheServiceIconCachServiceTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2016-2020 Starion Group S.A. All rights reserved
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="HyperLinkDialogViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015 RHEA S.A.
+// <copyright file="HyperLinkDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 

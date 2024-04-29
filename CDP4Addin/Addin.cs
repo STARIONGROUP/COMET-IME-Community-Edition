@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Addin.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="Addin.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -77,7 +77,7 @@ namespace CDP4AddinCE
     /// provides the Fluent XML Ribbon and call-back implementations for the Fluent XML Ribbon controls
     /// </summary>
     [COMAddin("CDP4-COMET-CE Office Add-in", "The CDP4-COMET-CE Office Add-in provides COMET application integration with Microsoft Office Suite", 3)]
-    [Guid("0CAE241F-E861-4CBF-9636-72555CC33D8E")]
+    [Guid("FD48B640-1D3F-4922-854B-C69028CA469E")]
     [ProgId("CDP4CE.Addin")]
     [RegistryLocation(RegistrySaveLocation.LocalMachine)]
     public class Addin : COMAddin
@@ -134,12 +134,9 @@ namespace CDP4AddinCE
         {
             logger.Debug("starting CDP4-COMET-CE addin");
 
-            this.messageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
-
             this.PreloadAssemblies();
             this.RedirectAssemblies();
             this.SetupIdtExtensibility2Events();
-            this.SetupEventListeners();
 
             // Set the Theme of the application
             ThemeManager.ApplicationThemeName = Theme.SevenName;
@@ -367,6 +364,10 @@ namespace CDP4AddinCE
             logger.Trace("System.Runtime.CompilerServices.Unsafe");
             var compilerServices = new Version("6.0.0.0");
             this.RedirectAssembly("System.Runtime.CompilerServices.Unsafe", compilerServices, "b03f5f7f11d50a3a");
+
+            logger.Trace("Newtonsoft.Json");
+            var newtonsoftServices = new Version("13.0.3.0");
+            this.RedirectAssembly("Newtonsoft.Json", newtonsoftServices, "30ad4fe6b2a6aeed");
         }
 
         /// <summary>
@@ -750,6 +751,9 @@ namespace CDP4AddinCE
         /// </summary>
         private void InitializeMefImports()
         {
+            this.messageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
+            this.SetupEventListeners();
+
             var panelNavigationService = ServiceLocator.Current.GetInstance<IPanelNavigationService>();
             this.FluentRibbonManager = ServiceLocator.Current.GetInstance<IFluentRibbonManager>();
             var thingDialogNavigationService = ServiceLocator.Current.GetInstance<IThingDialogNavigationService>();

@@ -4,7 +4,7 @@
 	<TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4UpdateServerDal</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4UpdateServerDal</Product>
     <Description>COMET Update Server Dal</Description>
 	<UseWPF>true</UseWPF>

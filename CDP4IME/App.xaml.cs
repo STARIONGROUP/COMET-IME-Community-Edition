@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="App.xaml.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="App.xaml.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -97,6 +97,7 @@ namespace CDP4IME
             Current.MainWindow.Show();
             DXSplashScreen.Close();
         }
+
         /// <summary>
         /// Run the application in debug mode. Unhandled Exceptions are not caught.
         /// The application will crash
@@ -170,7 +171,7 @@ namespace CDP4IME
         /// </param>
         private static void AppDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            HandleException(e.ExceptionObject as Exception);
+            HandleException(e?.ExceptionObject as Exception);
         }
 
         /// <summary>
@@ -185,6 +186,8 @@ namespace CDP4IME
             {
                 return;
             }
+
+            logger.Fatal(ex);
 
             ErrorReporter.ShowDialog(ex);
 

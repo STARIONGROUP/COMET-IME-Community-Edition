@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BuiltInRuleRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="BuiltInRuleRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -56,7 +56,7 @@ namespace CDP4BuiltInRules.Tests.ViewModels
             this.draginfo = new Mock<IDragInfo>();
 
             this.iBuiltInRuleMetaData = new Mock<IBuiltInRuleMetaData>();
-            this.iBuiltInRuleMetaData.Setup(x => x.Author).Returns("RHEA");
+            this.iBuiltInRuleMetaData.Setup(x => x.Author).Returns("STARION");
             this.iBuiltInRuleMetaData.Setup(x => x.Name).Returns("shortnamerule");
             this.iBuiltInRuleMetaData.Setup(x => x.Description).Returns("verifies that the shortnames are correct");
 
@@ -68,7 +68,7 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         {
             var viewmodel = new BuiltInRuleRowViewModel(this.builtInRule, this.iBuiltInRuleMetaData.Object);
 
-            Assert.AreEqual("RHEA", viewmodel.Author);
+            Assert.AreEqual("STARION", viewmodel.Author);
             Assert.AreEqual("shortnamerule", viewmodel.Name);
             Assert.AreEqual("verifies that the shortnames are correct", viewmodel.Description);
 

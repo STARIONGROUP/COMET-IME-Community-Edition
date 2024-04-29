@@ -11,247 +11,247 @@
     <ComponentGroup Id="DEVEXPRESS" Directory="BIN">
 
       <Component Id="_7022D5D88555" Guid="{C02CAE1D-68F8-4826-A781-7022D5D88555}" Win64="$(var.Win64)">
-        <File Id="_C02CAE1D" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Charts.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_C02CAE1D" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Charts.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_F64146008CFE" Guid="{83A0095C-244D-44A1-B876-F64146008CFE}" Win64="$(var.Win64)">
-        <File Id="_83A0095C" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Charts.Designer.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_83A0095C" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Charts.Designer.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_C5E614A3A683" Guid="{71D12292-68AC-4BBF-9DF5-C5E614A3A683}" Win64="$(var.Win64)">
-        <File Id="_71D12292" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.CodeParser.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_71D12292" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.CodeParser.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_A726CFBE26D5" Guid="{90BBA601-EC72-48D0-B370-A726CFBE26D5}" Win64="$(var.Win64)">
-        <File Id="_90BBA601" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Data.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_90BBA601" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Data.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_F0F0E94FA752" Guid="{461C5BA0-DBDB-4F35-B87C-F0F0E94FA752}" Win64="$(var.Win64)">
-        <File Id="_461C5BA0" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Data.Desktop.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_461C5BA0" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Data.Desktop.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_2992F34AA343" Guid="{A159A34F-C2BC-4E62-AB7A-2992F34AA343}" Win64="$(var.Win64)">
-        <File Id="_A159A34F" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.DataAccess.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_A159A34F" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.DataAccess.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_E349BD871077" Guid="{10A6ACDC-91F1-4880-B0B1-E349BD871077}" Win64="$(var.Win64)">
-        <File Id="_10A6ACDC" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.DataVisualization.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_10A6ACDC" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.DataVisualization.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_F754919BF970" Guid="{0D4DF5E0-C0AA-47CA-9523-F754919BF970}" Win64="$(var.Win64)">
-        <File Id="_0D4DF5E0" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Diagram.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_0D4DF5E0" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Diagram.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_DFD301714730" Guid="{4CB6552B-C60B-4800-A508-DFD301714730}" Win64="$(var.Win64)">
-        <File Id="_4CB6552B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Drawing.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_4CB6552B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Drawing.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_0A5F0F537F43" Guid="{B9BFD73B-BF82-4742-9F04-0A5F0F537F43}" Win64="$(var.Win64)">
-        <File Id="_B9BFD73B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Images.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_B9BFD73B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Images.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_E69CF726B87B" Guid="{0D612BC9-69A2-4237-93E4-E69CF726B87B}" Win64="$(var.Win64)">
-        <File Id="_0D612BC9" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Mvvm.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_0D612BC9" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Mvvm.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_CFD96232C662" Guid="{6B2516CB-D935-4E94-A2E0-CFD96232C662}" Win64="$(var.Win64)">
-        <File Id="_6B2516CB" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Office.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_6B2516CB" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Office.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_1C2754BDEF90" Guid="{BE68B644-1558-4082-A5A7-1C2754BDEF90}" Win64="$(var.Win64)">
-        <File Id="_BE68B644" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Pdf.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_BE68B644" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Pdf.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_A69FD2974052" Guid="{A9F7341E-61D8-454C-8D03-A69FD2974052}" Win64="$(var.Win64)">
-        <File Id="_A9F7341E" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Pdf.v22.2.Drawing.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_A9F7341E" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Pdf.v23.2.Drawing.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_4A9CA28498D7" Guid="{3826E4B8-F154-4B0A-84F2-4A9CA28498D7}" Win64="$(var.Win64)">
-        <File Id="_3826E4B8" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.PivotGrid.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_3826E4B8" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.PivotGrid.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_8F6CBB324D48" Guid="{6215A1C8-B0AC-48C1-8D2A-8F6CBB324D48}" Win64="$(var.Win64)">
-        <File Id="_6215A1C8" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.RichEdit.v22.2.Export.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_6215A1C8" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.RichEdit.v23.2.Export.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_3631B07802CB" Guid="{4B9B71D8-4412-49A5-A1E5-3631B07802CB}" Win64="$(var.Win64)">
-        <File Id="_4B9B71D8" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Printing.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_4B9B71D8" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Printing.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_395C148DA6D3" Guid="{BF10AE75-20E2-41C5-8BD3-395C148DA6D3}" Win64="$(var.Win64)">
-        <File Id="_BF10AE75" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.RichEdit.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_BF10AE75" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.RichEdit.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_52604A2B655A" Guid="{40E62069-BCCC-406F-95A0-52604A2B655A}" Win64="$(var.Win64)">
-        <File Id="_40E62069" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Sparkline.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_40E62069" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Sparkline.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_7099E07131BB" Guid="{C6F208B7-78F8-4584-B2B0-7099E07131BB}" Win64="$(var.Win64)">
-        <File Id="_C6F208B7" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.SpellChecker.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_C6F208B7" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.SpellChecker.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_F668F0AA6236" Guid="{9071C230-2BF6-42BB-A935-F668F0AA6236}" Win64="$(var.Win64)">
-        <File Id="_9071C230" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Utils.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_9071C230" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Utils.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_C376A260FCCA" Guid="{514DF947-1C96-4F8D-A919-C376A260FCCA}" Win64="$(var.Win64)">
-        <File Id="_514DF947" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Accordion.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_514DF947" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Accordion.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_E6E58CD0325B" Guid="{794F805A-F925-48E3-9495-E6E58CD0325B}" Win64="$(var.Win64)">
-        <File Id="_794F805A" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Charts.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_794F805A" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Charts.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_B1F873E71FA5" Guid="{C5377FD4-C05C-40C4-8951-B1F873E71FA5}" Win64="$(var.Win64)">
-        <File Id="_C5377FD4" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.CodeView.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_C5377FD4" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.CodeView.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_1124878A5524" Guid="{41F121BD-75AC-4107-B5FC-1124878A5524}" Win64="$(var.Win64)">
-        <File Id="_41F121BD" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Core.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_41F121BD" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Core.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_B485AC75052B" Guid="{D695D0A9-3115-49ED-82A5-B485AC75052B}" Win64="$(var.Win64)">
-        <File Id="_D695D0A9" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Controls.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_D695D0A9" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Controls.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_438245661AE1" Guid="{E44FC402-03B0-4E2A-A918-438245661AE1}" Win64="$(var.Win64)">
-        <File Id="_E44FC402" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.DataAccess.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_E44FC402" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.DataAccess.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_87990B9C4AC7" Guid="{14D51648-6A12-48D7-BD14-87990B9C4AC7}" Win64="$(var.Win64)">
-        <File Id="_14D51648" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Diagram.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_14D51648" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Diagram.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_329DDD3B3028" Guid="{CED11B3D-8D6D-442E-B6EB-329DDD3B3028}" Win64="$(var.Win64)">
-        <File Id="_CED11B3D" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Docking.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_CED11B3D" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Docking.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_0C73D0B130A0" Guid="{A43E3DFA-5076-4D14-80D5-0C73D0B130A0}" Win64="$(var.Win64)">
-        <File Id="_A43E3DFA" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.DocumentViewer.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_A43E3DFA" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.DocumentViewer.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_7F20CBB63AE3" Guid="{2D29816F-7125-438F-B36D-7F20CBB63AE3}" Win64="$(var.Win64)">
-        <File Id="_2D29816F" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.ExpressionEditor.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_2D29816F" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.ExpressionEditor.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_5B4F714F0F70" Guid="{9B10747B-031D-4FCD-9E2D-5B4F714F0F70}" Win64="$(var.Win64)">
-        <File Id="_9B10747B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Grid.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_9B10747B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Grid.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_AEED67461EA4" Guid="{4BF10AF7-46B3-470E-90C2-AEED67461EA4}" Win64="$(var.Win64)">
-        <File Id="_4BF10AF7" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Grid.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_4BF10AF7" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Grid.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_36D53730526D" Guid="{0BA3E743-D3AC-49D6-827A-36D53730526D}" Win64="$(var.Win64)">
-        <File Id="_0BA3E743" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Grid.v22.2.Extensions.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_0BA3E743" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Grid.v23.2.Extensions.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_E62B225C62A7" Guid="{BA9DA4E2-2D8F-4D79-9677-E62B225C62A7}" Win64="$(var.Win64)">
-        <File Id="_BA9DA4E2" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Layout.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_BA9DA4E2" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Layout.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_1F8B72FC569D" Guid="{5440FCA7-FDFF-404B-8A34-1F8B72FC569D}" Win64="$(var.Win64)">
-        <File Id="_5440FCA7" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.LayoutControl.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_5440FCA7" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.LayoutControl.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_E4B7ECD6CC35" Guid="{B5D4E1CB-FCE1-41F5-AC53-E4B7ECD6CC35}" Win64="$(var.Win64)">
-        <File Id="_B5D4E1CB" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.NavBar.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_B5D4E1CB" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.NavBar.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_0DDB4CC55A04" Guid="{ED22B90E-D14C-46FD-9410-0DDB4CC55A04}" Win64="$(var.Win64)">
-        <File Id="_ED22B90E" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Office.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_ED22B90E" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Office.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_A9727703690B" Guid="{B37C23DB-E8FB-4B0E-BA48-A9727703690B}" Win64="$(var.Win64)">
-        <File Id="_B37C23DB" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.PivotGrid.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_B37C23DB" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.PivotGrid.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_B79038CBE4F5" Guid="{51C4C490-50F8-49A9-86E3-B79038CBE4F5}" Win64="$(var.Win64)">
-        <File Id="_51C4C490" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Printing.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_51C4C490" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Printing.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_3604FE92166F" Guid="{995D6C5B-0792-4EBC-A6DD-3604FE92166F}" Win64="$(var.Win64)">
-        <File Id="_995D6C5B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.PropertyGrid.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_995D6C5B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.PropertyGrid.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_D56ED025548D" Guid="{536398DE-BCA0-4756-B124-D56ED025548D}" Win64="$(var.Win64)">
-        <File Id="_536398DE" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Ribbon.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_536398DE" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Ribbon.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_5E0EC27ED878" Guid="{FFA5D964-3E1D-4375-B490-5E0EC27ED878}" Win64="$(var.Win64)">
-        <File Id="_FFA5D964" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.RichEdit.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_FFA5D964" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.RichEdit.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_E06731211115" Guid="{27BBFF45-CB03-475A-9A7C-E06731211115}" Win64="$(var.Win64)">
-        <File Id="_27BBFF45" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.ReportDesigner.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_27BBFF45" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.ReportDesigner.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_2C0712005553" Guid="{B21A5DDA-08F4-4988-BB3E-2C0712005553}" Win64="$(var.Win64)">
-        <File Id="_B21A5DDA" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.SpellChecker.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_B21A5DDA" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.SpellChecker.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_AFA996091AE4" Guid="{E3E747FB-3B71-4BA0-9818-AFA996091AE4}" Win64="$(var.Win64)">
-        <File Id="_E3E747FB" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Themes.Office2019Colorful.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_E3E747FB" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Themes.Office2019Colorful.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_0A164189F766" Guid="{E12B5FD0-85B1-44CE-B686-0A164189F766}" Win64="$(var.Win64)">
-        <File Id="_E12B5FD0" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Themes.Seven.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_E12B5FD0" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpf.Themes.Seven.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_B94032EE1CAA" Guid="{62646496-DC18-43D0-AE37-B94032EE1CAA}" Win64="$(var.Win64)">
-        <File Id="_62646496" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpo.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_62646496" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.Xpo.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_7116AA16559C" Guid="{5EAFD90B-7F26-4100-86B9-7116AA16559C}" Win64="$(var.Win64)">
-        <File Id="_5EAFD90B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraBars.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_5EAFD90B" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraBars.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_BF4FBB271E0D" Guid="{C3BD8574-1870-4780-B7D9-BF4FBB271E0D}" Win64="$(var.Win64)">
-        <File Id="_C3BD8574" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraCharts.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_C3BD8574" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraCharts.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_C1CC8F7DCB05" Guid="{83EF3F9A-B013-49C0-B841-C1CC8F7DCB05}" Win64="$(var.Win64)">
-        <File Id="_83EF3F9A" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraEditors.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_83EF3F9A" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraEditors.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_603C4C81ECC9" Guid="{939F9678-5859-4EC9-A15B-603C4C81ECC9}" Win64="$(var.Win64)">
-        <File Id="_939F9678" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraGauges.v22.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_939F9678" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraGauges.v23.2.Core.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_2978AA787293" Guid="{7F7DF990-9AA1-459B-BF10-2978AA787293}" Win64="$(var.Win64)">
-        <File Id="_7F7DF990" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraGrid.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_7F7DF990" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraGrid.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_57954C4C09E8" Guid="{89546FC2-40A5-4A25-9FAC-57954C4C09E8}" Win64="$(var.Win64)">
-        <File Id="_89546FC2" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraLayout.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_89546FC2" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraLayout.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_5998F0929FE8" Guid="{38D91884-536B-40BA-ADD7-5998F0929FE8}" Win64="$(var.Win64)">
-        <File Id="_38D91884" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraNavBar.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_38D91884" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraNavBar.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_0C7D56628EF1" Guid="{C9B60BF2-D299-4AF3-8C04-0C7D56628EF1}" Win64="$(var.Win64)">
-        <File Id="_C9B60BF2" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraPivotGrid.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_C9B60BF2" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraPivotGrid.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_129C536677D3" Guid="{1BACC5FE-5739-4048-954E-129C536677D3}" Win64="$(var.Win64)">
-        <File Id="_1BACC5FE" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraPrinting.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_1BACC5FE" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraPrinting.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_5569D5672272" Guid="{BC95F656-BEE7-4DFA-A9D2-5569D5672272}" Win64="$(var.Win64)">
-        <File Id="_BC95F656" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraReports.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_BC95F656" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraReports.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_2C569452A7C7" Guid="{36B17D24-2AA8-4E20-8A7C-2C569452A7C7}" Win64="$(var.Win64)">
-        <File Id="_36B17D24" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraTreeList.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_36B17D24" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraTreeList.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_FEFBE3BC62B3" Guid="{F26DEBE4-6BF2-4A72-8754-FEFBE3BC62B3}" Win64="$(var.Win64)">
-        <File Id="_F26DEBE4" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraVerticalGrid.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_F26DEBE4" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraVerticalGrid.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       <Component Id="_466F4136E0B2" Guid="{4043AEC7-1839-4094-8C59-466F4136E0B2}" Win64="$(var.Win64)">
-        <File Id="_4043AEC7" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraWizard.v22.2.dll" KeyPath="yes" Assembly=".net"></File>
+        <File Id="_4043AEC7" Vital="yes" Source="$(var.COMET-CE.TargetDir)DevExpress.XtraWizard.v23.2.dll" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
     </ComponentGroup>

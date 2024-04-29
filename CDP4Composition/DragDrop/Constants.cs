@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Constants.cs" company="RHEA System S.A.">
-//   Copyright (c) 2017 RHEA System S.A.
+// <copyright file="Constants.cs" company="Starion Group S.A.">
+//   Copyright (c) 2017 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 

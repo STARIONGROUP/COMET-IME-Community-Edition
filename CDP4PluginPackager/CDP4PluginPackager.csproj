@@ -3,10 +3,10 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net48</TargetFramework>
 		<LangVersion>latest</LangVersion>
-		<Authors>RHEA System S.A.</Authors>
-		<Company>RHEA System S.A.</Company>
+		<Authors>Starion Group S.A.</Authors>
+		<Company>Starion Group S.A.</Company>
 		<Description>CDP4-COMET Plugin Packager and Plugin Manifest generator</Description>
-		<Copyright>Copyright © RHEA System S.A.</Copyright>
+		<Copyright>Copyright © Starion Group S.A.</Copyright>
 		<DocumentationFile />
 		<OutputPath />
 	</PropertyGroup>

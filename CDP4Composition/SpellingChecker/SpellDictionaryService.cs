@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SpellDictionaryService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="SpellDictionaryService.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ namespace CDP4Composition
         /// <summary>
         /// The name of the application directoryInfo
         /// </summary>
-        private const string ApplicationFolderName = "RHEA\\CDP4";
+        private const string ApplicationFolderName = "STARION\\CDP4";
 
         /// <summary>
         /// The name of the directoryInfo where spelling and grammar dictionaries are to be stored.

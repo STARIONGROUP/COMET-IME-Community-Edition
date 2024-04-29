@@ -35,7 +35,7 @@ before_build:
   - cmd: nuget install NUnit.Console -Version 3.11.1 -OutputDirectory testrunner
   - cmd: nuget install NUnit.Runners -Version 3.11.1 -OutputDirectory testrunner
   - cmd: nuget sources add -name devexpress -source %DEVEXPRESS_API%
-  - cmd: nuget sources add -name github -source https://nuget.pkg.github.com/RHEAGROUP/index.json -username %GITHUB_USER% -password %GITHUB_TOKEN% -StorePasswordInClearText
+  - cmd: nuget sources add -name github -source https://nuget.pkg.github.com/STARIONGROUP/index.json -username %GITHUB_USER% -password %GITHUB_TOKEN% -StorePasswordInClearText
   - cmd: nuget restore -verbosity quiet
   - cmd: set "JAVA_HOME=C:\Program Files\Java\jdk11"
   - cmd: set "PATH=C:\Program Files\Java\jdk11\bin;%PATH%"

@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportDesignerViewModelTextFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="ReportDesignerViewModelTextFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -188,7 +188,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private static readonly Application application = new Application();
 
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private Assembler assembler;
         private SiteDirectory sitedir;
         private EngineeringModelSetup modelsetup;
@@ -758,7 +758,7 @@ namespace CDP4Reporting.Tests.ViewModels
             // initialize ReportScriptHandler
             var report = new XtraReport();
 
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
                 , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { });
 
@@ -778,7 +778,7 @@ namespace CDP4Reporting.Tests.ViewModels
             // initialize ReportScriptHandler
             var report = new XtraReport();
 
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
                 , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { });
 
@@ -800,7 +800,7 @@ namespace CDP4Reporting.Tests.ViewModels
             // initialize ReportScriptHandler
             var report = new XtraReport();
 
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
                 , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { });
 
@@ -1019,7 +1019,7 @@ namespace CDP4Reporting.Tests.ViewModels
             // initialize ReportScriptHandler
             var report = new XtraReport();
 
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
                 , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { this.reportDesignerViewModel.Output = x; });
 

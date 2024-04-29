@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportDesignerViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="ReportDesignerViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -493,7 +493,7 @@ namespace CDP4Reporting.ViewModels
             this.lastSavedDataSourceText = "";
 
             this.CurrentReport = GetNewXtraReport();
-            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(this.CurrentReport), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
+            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(this.CurrentReport, this.currentReportDesignerDocument), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
 
             this.CurrentReportProjectFilePath = string.Empty;
         }
@@ -536,7 +536,7 @@ namespace CDP4Reporting.ViewModels
 
             var report = new XtraReport();
 
-            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
+            this.ReportScriptHandler = new ReportScriptHandler<XtraReport, Parameter>(new XtraReportHandler(report, this.currentReportDesignerDocument), new CodeDomCodeCompiler(this.AddOutput), x => this.Errors = x, this.AddOutput);
 
             using (var reportZipArchive = this.ReportScriptHandler.GetReportZipArchive(reportProjectFilePath))
             {

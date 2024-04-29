@@ -3,10 +3,10 @@
 	<TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4OfficeInfrastructure.Tests</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4OfficeInfrastructure.Tests</Product>
     <Description>CDP4OfficeInfrastructure Unit Tests</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -41,8 +41,8 @@
 	  <PackageReference Include="NLog.Extensions.Logging" Version="5.3.8" />
 	  <PackageReference Include="ReactiveUI" Version="18.3.1" />
 	  <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
+    <PackageReference Include="NetOfficeFw.Core" Version="1.9.5" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.5" />
   </ItemGroup>
 
   <ItemGroup>

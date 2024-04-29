@@ -3,10 +3,10 @@
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4Addin.Tests</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4Addin.Tests</Product>
     <Description>CDP4Addin Unit tests</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -33,8 +33,8 @@
     <PackageReference Include="CDP4JsonSerializer-CE" Version="26.6.2" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.5" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.9.1" />
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.1" />
+    <PackageReference Include="NetOfficeFw.Core" Version="1.9.5" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.2.8" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.8" />
