@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>CDP4Scripting.Tests</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4Scripting.Tests</Product>
     <Description>CDP4-COMET Scripting Plugin Unit tests</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

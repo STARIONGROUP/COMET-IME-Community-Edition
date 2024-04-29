@@ -2,10 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>CDP4Grapher.Tests</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4Grapher.Tests</Product>
     <Description>Grapher Unit Tests</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
     <OutputPath>bin\$(Configuration)\</OutputPath>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>

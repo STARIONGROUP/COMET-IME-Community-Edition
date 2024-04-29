@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginManager.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="PluginManager.xaml.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2020 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 

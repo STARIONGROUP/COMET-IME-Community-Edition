@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="AttributeDefinitionMap.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="AttributeDefinitionMap.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 

@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DialogViewModelBaseTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="DialogViewModelBaseTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -86,7 +86,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.uri = new Uri("http://www.stariongroup.eu");
             this.session = new Mock<ISession>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.permissionService = new Mock<IPermissionService>();
@@ -121,7 +121,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, this.clone);
 
-            Assert.AreEqual("http://www.rheagroup.com:80/SiteDirectory/609d5d8f-f209-4905-967e-796970fefd84/person/f1cbaf64-afa6-4467-97e5-5d98803f2848", testdialog.ThingUri);
+            Assert.AreEqual("http://www.stariongroup.eu:80/SiteDirectory/609d5d8f-f209-4905-967e-796970fefd84/person/f1cbaf64-afa6-4467-97e5-5d98803f2848", testdialog.ThingUri);
         }
 
         [Test]

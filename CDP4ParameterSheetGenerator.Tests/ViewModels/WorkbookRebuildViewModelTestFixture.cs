@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WorkbookRebuildViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="WorkbookRebuildViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
 //    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -63,7 +63,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ViewModels
         public void SetUp()
         {
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.uri = new Uri("https://www.stariongroup.eu");
 
             this.textParameterType = new TextParameterType(Guid.NewGuid(), this.cache, this.uri);
             this.textParameterType.Name = "text";

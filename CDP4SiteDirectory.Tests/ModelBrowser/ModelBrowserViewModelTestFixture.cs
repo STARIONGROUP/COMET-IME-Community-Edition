@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ModelBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="ModelBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -71,7 +71,7 @@ namespace CDP4SiteDirectory.Tests
         {
             this.messageBus = new CDPMessageBus();
             this.revPropertyInfo = typeof(SiteDirectory).GetProperty("RevisionNumber");
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.uri = new Uri("https://www.stariongroup.eu");
             this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -160,7 +160,7 @@ namespace CDP4SiteDirectory.Tests
 
             var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
 
-            var testOrganization = new Organization(Guid.NewGuid(), null, this.uri) { Name = "RHEA" };
+            var testOrganization = new Organization(Guid.NewGuid(), null, this.uri) { Name = "STARION" };
             var testDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "Thermal" };
             var participant = new Participant(Guid.NewGuid(), null, this.uri);
             participant.Domain.Add(testDomain);
@@ -181,7 +181,7 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.SelectedThing = participantFolderRow.ContainedRows.First();
             var participantRow = participantFolderRow.ContainedRows.First() as ModelParticipantRowViewModel;
             Assert.NotNull(participantRow);
-            Assert.AreEqual("Organization: RHEA", participantRow.Description);
+            Assert.AreEqual("Organization: STARION", participantRow.Description);
             Assert.IsTrue(selectedThingChangedRaised);
             Assert.That(participantRow.ContainedRows.Single().Thing, Is.EqualTo(testDomain));
         }

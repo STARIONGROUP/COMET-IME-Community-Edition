@@ -1,11 +1,11 @@
 ﻿// ------------------------------------------------------------------------------------------------------------------
-// <copyright file="DisposableReactiveList.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="DisposableReactiveList.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@ namespace CDP4Composition.Mvvm.Types
         /// <summary>
         /// Overrides the method implementation in <see cref="ReactiveList{T}"/> and adds an <see cref="ObsoleteAttribute"/>
         /// so the code doesn't compile anymore when the method is unexpectedly being used.
-        /// <see href="https://github.com/RHEAGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt"/>
+        /// <see href="https://github.com/STARIONGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt"/>
         /// </summary>
         [Obsolete("Clear is deprecated, please use Clear(bool dispose) instead.", true)]
         public new void Clear()

@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequirementsSpecificationEditorViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="RequirementsSpecificationEditorViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -61,7 +61,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
     public class RequirementsSpecificationEditorViewModelTestFixture
     {
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private EngineeringModel model;
         private EngineeringModelSetup modelSetup;
         private Iteration iteration;
@@ -143,7 +143,7 @@ namespace CDP4Requirements.Tests.RequirementsSpecificationEditor
             Assert.AreEqual("Requirements Specification Editor: URD", vm.Caption);
             Assert.AreEqual("model", vm.CurrentModel);
             Assert.AreEqual("None", vm.DomainOfExpertise);
-            Assert.AreEqual("User Requirements Document\nhttp://www.rheagroup.com/\n ", vm.ToolTip);
+            Assert.AreEqual("User Requirements Document\nhttps://www.stariongroup.eu/\n ", vm.ToolTip);
             Assert.AreEqual(1, vm.CurrentIteration);
         }
 

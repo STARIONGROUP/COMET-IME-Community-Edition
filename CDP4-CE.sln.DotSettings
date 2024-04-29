@@ -243,13 +243,13 @@
 	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/EnableStyleCopSupport/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/CodeStyle/EditorConfig/ShowEditorConfigStatusBarIndicator/@EntryValue">True</s:Boolean>
 	<s:String x:Key="/Default/CodeStyle/FileHeader/FileHeaderText/@EntryValue">--------------------------------------------------------------------------------------------------------------------&#xD;
-&lt;copyright file="${File.FileName}" company="RHEA System S.A."&gt;&#xD;
-   Copyright (c) 2015-${CurrentDate.Year} RHEA System S.A.&#xD;
+&lt;copyright file="${File.FileName}" company="Starion Group S.A."&gt;&#xD;
+   Copyright (c) 2015-${CurrentDate.Year} Starion Group S.A.&#xD;
 &#xD;
    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary&#xD;
 &#xD;
    This file is part of CDP4-COMET-IME Community Edition. &#xD;
-   The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration&#xD;
+   The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration&#xD;
    compliant with ECSS-E-TM-10-25 Annex A and Annex C.&#xD;
 &#xD;
    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or&#xD;

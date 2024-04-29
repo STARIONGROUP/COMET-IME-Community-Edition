@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="WidgetDetailsBase.cs" company="RHEA">
-// Copyright (c) 2020 RHEA Group. All rights reserved.
+// <copyright file="WidgetDetailsBase.cs" company="Starion Group S.A.">
+// Copyright (c) 2020 Starion Group S.A. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SizeObserver.cs" company="RHEA System S.A.">
+// <copyright file="SizeObserver.cs" company="Starion Group S.A.">
 // This is a Code Snippet found here: https://gist.github.com/jrgcubano/54ecbc61cbfaaa83b4dd14de03adf296
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------

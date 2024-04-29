@@ -5,10 +5,10 @@
 	<TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>COMET.Tests</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>COMET.Tests</Product>
     <Description>COMET Unit Tests</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
     <LangVersion>latest</LangVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>

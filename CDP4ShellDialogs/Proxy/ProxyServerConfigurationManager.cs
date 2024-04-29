@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProxyServerConfigurationManager.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="ProxyServerConfigurationManager.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2018 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -21,7 +21,7 @@ namespace CDP4ShellDialogs.Proxy
         /// <summary>
         /// the web-proxy configuration registry key path
         /// </summary>
-        private const string RegistryPath = @"SOFTWARE\RHEA\CDP4\ProxyServerConfiguration";
+        private const string RegistryPath = @"SOFTWARE\STARION\CDP4\ProxyServerConfiguration";
 
         /// <summary>
         /// constant used as key for the port value

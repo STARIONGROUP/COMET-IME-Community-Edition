@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CrossviewWorkbookData.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CrossviewWorkbookData.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
 //    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -43,7 +43,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
     /// The purpose of the <see cref="CrossviewWorkbookData"/> class is to store session data in a <see cref="Workbook"/>
     /// as a custom XML part, and retrieve it from the workbook.
     /// </summary>
-    [XmlRoot("CDP4CrossviewData", Namespace = "http://cdp4crossviewdata.rheagroup.com")]
+    [XmlRoot("CDP4CrossviewData", Namespace = "http://cdp4crossviewdata.stariongroup.eu")]
     public class CrossviewWorkbookData : CustomOfficeData
     {
         /// <summary>

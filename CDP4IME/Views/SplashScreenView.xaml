@@ -75,7 +75,7 @@
                                Foreground="#FF2D2D2D"
                                Opacity="0.5"
                                TextWrapping="Wrap" >
-                        © 2015-2023 RHEA System S.A. All Rights Reserved.
+                        © 2015-2023 Starion Group S.A. All Rights Reserved.
                     </TextBlock>
                 </DockPanel>
             </Grid>

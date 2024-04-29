@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="AliasDialogViewModel.cs" company="RHEA S.A.">
-//   Copyright (c) 2015 RHEA S.A.
+// <copyright file="AliasDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 

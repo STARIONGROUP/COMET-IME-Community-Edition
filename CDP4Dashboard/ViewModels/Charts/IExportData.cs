@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="IExportData.cs" company="RHEA System S.A.">
-//   Copyright (c) 2020 RHEA System S.A.
+// <copyright file="IExportData.cs" company="Starion Group S.A.">
+//   Copyright (c) 2020 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 namespace CDP4Dashboard.ViewModels.Charts

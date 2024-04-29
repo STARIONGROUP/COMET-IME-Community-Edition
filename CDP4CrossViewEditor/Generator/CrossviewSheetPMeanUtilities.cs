@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CrossviewSheetPMeanUtilities.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CrossviewSheetPMeanUtilities.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
 //

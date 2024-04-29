@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DictionaryServiceTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="DictionaryServiceTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ namespace CDP4Composition.Tests.SpellingChecker
         public void SetUp()
         {
             var folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            var directoryInfo = Directory.CreateDirectory(folderPath + @"\RHEA\CDP4\dictionaries\en-US");
+            var directoryInfo = Directory.CreateDirectory(folderPath + @"\STARION\CDP4\dictionaries\en-US");
             try
             {
                 var aff_file = Path.Combine(TestContext.CurrentContext.TestDirectory, @"SpellingChecker\en_US.aff");
@@ -54,7 +54,7 @@ namespace CDP4Composition.Tests.SpellingChecker
             var folderPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             try
             {
-                Directory.Delete(folderPath + "\\RHEA\\CDP4\\dictionaries", true);
+                Directory.Delete(folderPath + "\\STARION\\CDP4\\dictionaries", true);
             }
             catch (IOException ex)
             {

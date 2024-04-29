@@ -3,10 +3,10 @@
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ParameterSheetGenerator.Tests</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4ParameterSheetGenerator.Tests</Product>
     <Description>CDP4ParameterSheetGenerator Unit Tests</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>

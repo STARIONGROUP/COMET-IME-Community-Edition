@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DisposableReactiveListTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="DisposableReactiveListTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -251,10 +251,10 @@ namespace CDP4Composition.Tests.Mvvm.Types
             foreach (var overriddenMethod in overriddenMethods)
             {
                 CollectionAssert.Contains(currentMethods.Select(x => x.Key), overriddenMethod, 
-                    $"Overridden method {nameof(ReactiveList<IDisposable>)}.{overriddenMethod} is not found anymore. Please refactor {nameof(DisposableReactiveList<IDisposable>)}. (see: https://github.com/RHEAGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt)");
+                    $"Overridden method {nameof(ReactiveList<IDisposable>)}.{overriddenMethod} is not found anymore. Please refactor {nameof(DisposableReactiveList<IDisposable>)}. (see: https://github.com/STARIONGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt)");
             }
 
-            var message = $"Method changes found in {nameof(ReactiveList<IDisposable>)}. Please check if {nameof(DisposableReactiveList<IDisposable>)} needs to be refactored, since all methods that result in removal of objects from {nameof(DisposableReactiveList<IDisposable>)} should be overridden. (see: https://github.com/RHEAGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt)";
+            var message = $"Method changes found in {nameof(ReactiveList<IDisposable>)}. Please check if {nameof(DisposableReactiveList<IDisposable>)} needs to be refactored, since all methods that result in removal of objects from {nameof(DisposableReactiveList<IDisposable>)} should be overridden. (see: https://github.com/STARIONGROUP/CDP4-IME-Community-Edition/wiki/MVVM#disposablereactivelistt)";
 
             Assert.AreEqual(19, currentMethods.Count, message);
             CollectionAssert.AreEquivalent(expectedMethods, currentMethods, message);
