@@ -22,7 +22,7 @@
 
     <UIRef Id="WixUI_Mondo" />
 
-    <WixVariable Id="WixUILicenseRtf" Value="$(var.COMET-CE.ProjectDir)license.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.CDP4-COMET-CE.ProjectDir)license.rtf" />
     <WixVariable Id="WixUIDialogBmp" Value="background.bmp" />
     <WixVariable Id="WixUIBannerBmp" Value="banner.bmp" />
 
@@ -34,7 +34,7 @@
     <Feature Id="CDP4IMEFeature" Absent="disallow" Title="CDP4-COMET IME" Level="1" ConfigurableDirectory="BIN" AllowAdvertise="no" InstallDefault="local" TypicalDefault="install">
       <ComponentGroupRef Id="DEPENDENCIES" />
       <ComponentGroupRef Id="DEVEXPRESS" />
-      <ComponentGroupRef Id="COMET-CE" />
+      <ComponentGroupRef Id="CDP4-COMET-CE" />
       <ComponentGroupRef Id="THIRDPARTYLICENSES" />
       <ComponentGroupRef Id="RESOURCEIMAGES" />
       <ComponentRef Id="ProgramMenuSTARIONDir"/>
