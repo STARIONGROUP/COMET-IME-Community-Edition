@@ -27,7 +27,7 @@ namespace CDP4Composition
         /// <summary>
         /// The name of the application directoryInfo
         /// </summary>
-        private const string ApplicationFolderName = "STARION\\CDP4";
+        private const string ApplicationFolderName = "STARION\\CDP4-COMET";
 
         /// <summary>
         /// The name of the directoryInfo where spelling and grammar dictionaries are to be stored.
