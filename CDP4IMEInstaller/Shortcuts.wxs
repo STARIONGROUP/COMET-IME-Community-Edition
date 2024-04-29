@@ -6,7 +6,7 @@
   <Fragment>
     <DirectoryRef Id="ApplicationProgramsFolder" >
       <Component Id="ShortcutCDP4CE" Guid="{E241E4F4-CFD0-4EAA-A838-6150670FF906}">
-        <Shortcut Id="ShortcutCDP4CE" Name="CDP4-COMET-CE" Description="COMET Community Edition" Target="[#fil_COMET_CE]" WorkingDirectory="BIN"/>                
+        <Shortcut Id="ShortcutCDP4CE" Name="CDP4-COMET-CE" Description="COMET Community Edition" Target="[#fil_CDP4_COMET_CE]" WorkingDirectory="BIN"/>                
         <RegistryValue Root="HKCU" Key="Software\STARION\COMET-CE" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
         <RemoveFile Id="RemoveOldStartMenuShortcut" On="install" Name="CDP4-COMET-CE.lnk"/>
       </Component>
@@ -16,7 +16,7 @@
         <RegistryKey Root="HKCU" Key="Software\STARION\CDP4-COMET-CE" Action="createAndRemoveOnUninstall">
           <RegistryValue Name="installed" Value="1" Type="integer" KeyPath="yes"/>
         </RegistryKey>
-        <Shortcut Id="DesktopShortcutCDP4CE" Directory="DesktopFolder" Name="CDP4-COMET-CE" Target="[#fil_COMET_CE]"/>
+        <Shortcut Id="DesktopShortcutCDP4CE" Directory="DesktopFolder" Name="CDP4-COMET-CE" Target="[#fil_CDP4_COMET_CE]"/>
         <RemoveFile Id="RemoveOldDesktopShortcut" On="install" Name="CDP4-COMET-CE.lnk"/>
       </Component>
     </DirectoryRef>
