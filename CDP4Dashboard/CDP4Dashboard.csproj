@@ -25,16 +25,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="26.6.2">
+    <PackageReference Include="CDP4Common-CE" Version="26.7.0-8895647155-637-1-PR-336">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="26.6.2">
+    <PackageReference Include="CDP4Dal-CE" Version="26.7.0-8895647155-637-1-PR-336">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="26.6.2">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="26.7.0-8895647155-637-1-PR-336">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="26.6.2">
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="26.7.0-8895647155-637-1-PR-336">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.Charts" Version="23.2.5">
@@ -172,7 +172,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="5.2.8">
+    <PackageReference Include="NLog" Version="5.3.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
 	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.8">
@@ -181,7 +181,7 @@
     <PackageReference Include="ReactiveUI.WPF" Version="18.3.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Splat" Version="14.4.1">
+    <PackageReference Include="Splat" Version="14.8.12">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
