@@ -553,7 +553,7 @@ namespace CDP4Requirements.ReqIFDal
             var definition = new Definition
             {
                 Content = theValue,
-                LanguageCode = this.LanguageCode
+                LanguageCode = this.LanguageCode ?? "en"
             };
 
             definedThing.Definition.Add(definition);

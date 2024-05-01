@@ -161,7 +161,8 @@ namespace CDP4Requirements.ViewModels
 
             foreach (var externalIdentifierMap in this.IterationClone.ExternalIdentifierMap)
             {
-                transaction.CreateOrUpdate(externalIdentifierMap);
+                var clonedExternalIdentifierMap = externalIdentifierMap.Clone(false);
+                transaction.CreateOrUpdate(clonedExternalIdentifierMap);
             }
 
             foreach (var specMap in this.thingFactory.SpecificationMap)
