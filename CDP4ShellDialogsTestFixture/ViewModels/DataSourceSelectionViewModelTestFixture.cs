@@ -268,5 +268,24 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             viewmodel.IsPasswordVisible = true;
             Assert.AreEqual(viewmodel.ShowPasswordButtonText, "Hide");
         }
+
+        [Test]
+        public void AssertThatIsFullTrustAllowedWorks()
+        {
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus);
+            Assert.That(viewmodel.IsFullTrustAllowed, Is.False);
+            Assert.That(viewmodel.IsFullTrustCheckBoxEnabled, Is.True);
+
+            viewmodel.IsFullTrustAllowed = true;
+            Assert.That(viewmodel.IsFullTrustAllowed, Is.True);
+
+            viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.First(x => x.DalType == DalType.File);
+            Assert.That(viewmodel.IsFullTrustCheckBoxEnabled, Is.False);
+            Assert.That(viewmodel.IsFullTrustAllowed, Is.False);
+
+            viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.First(x => x.DalType == DalType.Web);
+            Assert.That(viewmodel.IsFullTrustCheckBoxEnabled, Is.True);
+            Assert.That(viewmodel.IsFullTrustAllowed, Is.False);
+        }
     }
 }
