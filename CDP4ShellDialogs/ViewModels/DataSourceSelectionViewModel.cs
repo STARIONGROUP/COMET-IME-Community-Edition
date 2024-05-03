@@ -70,6 +70,16 @@ namespace CDP4ShellDialogs.ViewModels
         private string uri;
 
         /// <summary>
+        /// Backing field for the <see cref="isFullTrustAllowed"/> property.
+        /// </summary>
+        private bool isFullTrustAllowed;
+
+        /// <summary>
+        /// Backing field for the <see cref="isFullTrustCheckBoxEnabled"/> property.
+        /// </summary>
+        private bool isFullTrustCheckBoxEnabled = false;
+
+        /// <summary>
         /// Backing field for the <see cref="IsProxyEnabled"/> property.
         /// </summary>
         private bool isProxyEnabled;
@@ -170,6 +180,8 @@ namespace CDP4ShellDialogs.ViewModels
             this.dialogNavigationService = dialogNavigationService;
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
 
+            this.WhenAnyValue(vm => vm.SelectedDataSourceKind).Subscribe(_ => this.UpdateFullTrustCheckBoxEnabled());
+
             this.WhenAnyValue(vm => vm.IsProxyEnabled).Subscribe(_ => this.UpdateProxyAddressProperty());
             this.WhenAnyValue(vm => vm.IsPasswordVisible).Subscribe(_ => this.ChangeShowPasswordButtonText());
 
@@ -230,6 +242,24 @@ namespace CDP4ShellDialogs.ViewModels
         {
             get => this.uri;
             set => this.RaiseAndSetIfChanged(ref this.uri, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a connection shall be made using Full Trust policy.
+        /// </summary>
+        public bool IsFullTrustAllowed
+        {
+            get => this.isFullTrustAllowed;
+            set => this.RaiseAndSetIfChanged(ref this.isFullTrustAllowed, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the checkbox to allow FullTrust is enabled.
+        /// </summary>
+        public bool IsFullTrustCheckBoxEnabled
+        {
+            get => this.isFullTrustCheckBoxEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isFullTrustCheckBoxEnabled, value);
         }
 
         /// <summary>
@@ -416,7 +446,7 @@ namespace CDP4ShellDialogs.ViewModels
                     proxySettings = new ProxySettings(proxyUri, proxyServerConfiguration.UserName, proxyServerConfiguration.Password);
                 }
 
-                var credentials = new Credentials(this.UserName, this.Password, providedUri, proxySettings);
+                var credentials = new Credentials(this.UserName, this.Password, providedUri, this.IsFullTrustAllowed, proxySettings);
                 var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
 
@@ -589,6 +619,22 @@ namespace CDP4ShellDialogs.ViewModels
             this.ProxyPort = string.Empty;
 
             this.SelectedDataSourceKind = this.AvailableDataSourceKinds.FirstOrDefault(v => v.DalType == DalType.Web);
+        }
+
+        /// <summary>
+        /// updates the Full Trust checkbox
+        /// </summary>
+        private void UpdateFullTrustCheckBoxEnabled()
+        {
+            if (this.SelectedDataSourceKind?.DalType == DalType.Web)
+            {
+                this.IsFullTrustCheckBoxEnabled = true;
+            }
+            else
+            {
+                this.IsFullTrustCheckBoxEnabled = false;
+                this.IsFullTrustAllowed = false;
+            }
         }
 
         /// <summary>
