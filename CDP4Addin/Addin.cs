@@ -353,21 +353,21 @@ namespace CDP4AddinCE
             var systemBuffers = new Version("4.0.3.0");
             this.RedirectAssembly("System.Buffers", systemBuffers, "cc7b13ffcd2ddd51");
 
-            logger.Trace("System.memory");
+            logger.Trace("System.Memory");
             var systemMemory = new Version("4.0.1.2");
             this.RedirectAssembly("System.Memory", systemMemory, "cc7b13ffcd2ddd51");
 
+            logger.Trace("System.Numerics.Vectors");
+            var systemVectors = new Version("4.1.4.0");
+            this.RedirectAssembly("System.Numerics.Vectors", systemMemory, "b03f5f7f11d50a3a");
+
             logger.Trace("Microsoft.Bcl.AsyncInterfaces");
-            var asyncInterfaces = new Version("6.0.0.0");
+            var asyncInterfaces = new Version("8.0.0.0");
             this.RedirectAssembly("Microsoft.Bcl.AsyncInterfaces", asyncInterfaces, "cc7b13ffcd2ddd51");
 
             logger.Trace("System.Runtime.CompilerServices.Unsafe");
             var compilerServices = new Version("6.0.0.0");
             this.RedirectAssembly("System.Runtime.CompilerServices.Unsafe", compilerServices, "b03f5f7f11d50a3a");
-
-            logger.Trace("Newtonsoft.Json");
-            var newtonsoftServices = new Version("13.0.3.0");
-            this.RedirectAssembly("Newtonsoft.Json", newtonsoftServices, "30ad4fe6b2a6aeed");
         }
 
         /// <summary>

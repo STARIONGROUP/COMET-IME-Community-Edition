@@ -11,8 +11,8 @@
 	<Product>Requirements</Product>
 	<Description>CDP4-COMET Requirements Plugin</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>10.0.0.8</AssemblyVersion>
-	<FileVersion>10.0.0.8</FileVersion>
+	<AssemblyVersion>10.0.0.9</AssemblyVersion>
+	<FileVersion>10.0.0.9</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -54,7 +54,7 @@
     <PackageReference Include="CDP4RequirementsVerification-CE" Version="26.7.0-8940498145-641-1-PR-339">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="2.0.5">
+    <PackageReference Include="CommonServiceLocator" Version="2.0.7">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.Charts" Version="23.2.5">
@@ -180,7 +180,7 @@
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="DotLiquid" Version="2.2.508" />
+	<PackageReference Include="DotLiquid" Version="2.2.692" />
 	<PackageReference Include="NetOfficeFw.Core" Version="1.9.5">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
@@ -193,19 +193,19 @@
 	<PackageReference Include="NLog" Version="5.3.2">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.8">
+	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.10">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="ReactiveUI.WPF" Version="18.3.1">
+	<PackageReference Include="ReactiveUI.WPF" Version="20.0.1">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="ReactiveUI" Version="18.3.1">
+	<PackageReference Include="ReactiveUI" Version="20.0.1">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="System.ComponentModel.Composition" Version="6.0.0">
+	<PackageReference Include="System.ComponentModel.Composition" Version="8.0.0">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39">
+	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReqIFSharp" Version="4.0.0" />

@@ -18,7 +18,11 @@
 		    <File Id="fil_RelationshipMatrix_csvhelper" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)CsvHelper.dll" KeyPath="yes" />
 	    </Component>-->
 
-	    <Component Id="comp_ClosedXml" Guid="{3172DF0B-98E0-4F2B-88AF-AF90C0D45EBD}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_RelationshipMatrix_SixLabors_Fonts" Guid="{27D4ACFF-E6FF-48C7-B7A0-6C3D4160AA14}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_RelationshipMatrix_SixLabors_Fonts" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)SixLabors.Fonts.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_ClosedXml" Guid="{3172DF0B-98E0-4F2B-88AF-AF90C0D45EBD}" Location="local" Win64="$(var.Win64)">
 		    <File Id="fil_RelationshipMatrix_ClosedXml" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)ClosedXML.dll" KeyPath="yes" />
 	    </Component>		
 

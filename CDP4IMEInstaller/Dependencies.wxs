@@ -77,11 +77,15 @@
       </Component>
 
 	  <Component Id="comp_Newtonsoft_Json" Guid="{92569C63-3D66-4F94-83CA-B81D0CB55958}" Location="local" Win64="$(var.Win64)">
-		<File Id="fil_Newtonsoft_Json" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Newtonsoft.Json.dll" KeyPath="yes" />
+		    <File Id="fil_Newtonsoft_Json" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Newtonsoft.Json.dll" KeyPath="yes" />
 	  </Component>
 
-	  <Component Id="comp_NLog" Guid="{1AD65224-46C7-42CA-8A2D-51C2C48633BC}" Location="local" Win64="$(var.Win64)">
-		<File Id="fil_NLog" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)NLog.dll" KeyPath="yes" />
+    <Component Id="comp_Newtonsoft_Json_Bson" Guid="{92569C64-3D66-4F94-83CA-B81D0CB55959}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Newtonsoft_Json_Bson" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Newtonsoft.Json.Bson.dll" KeyPath="yes" />
+    </Component>
+
+    <Component Id="comp_NLog" Guid="{1AD65224-46C7-42CA-8A2D-51C2C48633BC}" Location="local" Win64="$(var.Win64)">
+		  <File Id="fil_NLog" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)NLog.dll" KeyPath="yes" />
 	  </Component>
 
 	  <Component Id="comp_NLogExtensions" Guid="{16D4EE52-5590-4FE7-9FBD-AAE8E6C31CC1}" Location="local" Win64="$(var.Win64)">
@@ -100,7 +104,11 @@
 		<File Id="fil_Splat" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Splat.dll" KeyPath="yes" />
 	  </Component>
 
-	  <Component Id="_7605D4E3" Guid="{7605D4E3-FE6E-4366-B37B-ADA9F0B76B66}" Win64="$(var.Win64)">
+      <Component Id="comp_SimpleMapi" Guid="{618C780F-E4E6-45AA-8538-97405890369E}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_SimpleMapi" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)SimpleMapi.NET.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="_7605D4E3" Guid="{7605D4E3-FE6E-4366-B37B-ADA9F0B76B66}" Win64="$(var.Win64)">
 	      <File Id="_ADA9F0B76B66" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Buffers.dll" KeyPath="yes"></File>
       </Component>
 
@@ -119,7 +127,15 @@
       <Component Id="_A8F01EE7" Guid="{A8F01EE7-22B8-4035-AA49-1A98EE45C128}" Win64="$(var.Win64)">
 	    <File Id="_1A98EE45C128" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes"></File>
       </Component>
-      
+
+      <Component Id="_BF16F5F2" Guid="{BF16F5F2-87D2-448F-9D18-3ADB29BA3EEF}" Win64="$(var.Win64)">
+        <File Id="_3ADB29BA3EEF" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Text.Encodings.Web.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="_BF16F5F3" Guid="{BF16F5F3-87D2-448F-9D18-4ADB29BA3EEF}" Win64="$(var.Win64)">
+        <File Id="_4ADB29BA3EEF" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Text.Json.dll" KeyPath="yes"></File>
+      </Component>
+
       <Component Id="_BF16F5F1" Guid="{BF16F5F1-87D2-448F-9D18-2ADB29BA3EEF}" Win64="$(var.Win64)">
 	    <File Id="_2ADB29BA3EEF" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Threading.Tasks.Extensions.dll" KeyPath="yes"></File>
       </Component>

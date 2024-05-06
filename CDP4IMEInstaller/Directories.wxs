@@ -17,7 +17,7 @@
                 <Directory Id="ENGINEERINGMODEL" Name="CDP4EngineeringModel"/>
                 <Directory Id="LOGINFO" Name="CDP4LogInfo"/>
                 <Directory Id="OBJECTBROWSER" Name="CDP4ObjectBrowser"/>
-                <Directory Id="PROPERTYGRID" Name="CDP4PropertyGrid"/>
+                <!--<Directory Id="PROPERTYGRID" Name="CDP4PropertyGrid"/>-->
                 <Directory Id="REQUIREMENTS" Name="CDP4Requirements"/>
                 <Directory Id="DASHBOARD" Name="CDP4Dashboard"/>
                 <Directory Id="CROSSVIEWEDITOR" Name="CDP4CrossViewEditor"/>

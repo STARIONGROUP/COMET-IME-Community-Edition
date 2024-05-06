@@ -9,8 +9,8 @@
     <Product>Grapher</Product>
     <Description>CDP4-COMET Grapher Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
-    <AssemblyVersion>10.0.0.8</AssemblyVersion>
-    <FileVersion>10.0.0.8</FileVersion>
+    <AssemblyVersion>10.0.0.9</AssemblyVersion>
+    <FileVersion>10.0.0.9</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -31,11 +31,11 @@
 	<PackageReference Include="CDP4Dal-CE" Version="26.7.0-8940498145-641-1-PR-339">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="2.0.5">
+    <PackageReference Include="CommonServiceLocator" Version="2.0.7">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DynamicLanguageRuntime" Version="1.3.3" />
-    <PackageReference Include="ReactiveUI.WPF" Version="18.3.1">
+    <PackageReference Include="DynamicLanguageRuntime" Version="1.3.4" />
+    <PackageReference Include="ReactiveUI.WPF" Version="20.0.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
