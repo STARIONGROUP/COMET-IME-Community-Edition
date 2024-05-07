@@ -99,10 +99,6 @@
       <ComponentGroupRef Id="REQUIREMENTS_CG" />
     </Feature>
 
-    <!--<Feature Id="PROPERTYGRIDPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="disallow" AllowAdvertise="no" Title="CDP4-COMET Property Grid Plugin" Level="1" >
-      <ComponentGroupRef Id="PROPERTYGRID_CG" />
-    </Feature>-->
-
     <Feature Id="LOGINFOPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4-COMET Logging Info Plugin" Level="1" >
       <ComponentGroupRef Id="LOGINFO_CG" />
     </Feature>
