@@ -62,5 +62,19 @@ namespace CDP4Composition.Services
         {
             return MessageBox.Show(messageBoxText, caption, button, icon);
         }
+
+        /// <summary>
+        /// Shows a MessageBox
+        /// </summary>
+        /// <param name="messageBoxText">The text</param>
+        /// <param name="caption">The caption</param>
+        /// <param name="button">The <see cref="MessageBoxButton"/></param>
+        /// <param name="icon">The <see cref="MessageBoxImage"/></param>
+        /// <param name="defaultMessageBoxResult">The default <see cref="MessageBoxResult"/></param>
+        /// <returns>A <see cref="MessageBoxResult"/></returns>
+        public MessageBoxResult ShowAlwaysOnTop(string messageBoxText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultMessageBoxResult)
+        {
+            return MessageBox.Show(messageBoxText, caption, button, icon, defaultMessageBoxResult, MessageBoxOptions.ServiceNotification);
+        }
     }
 }
