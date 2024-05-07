@@ -41,8 +41,8 @@
 	      <File Id="_3F08C72F64DD" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)ExceptionReporter.NET.dll" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="_F6C7CAE4" Guid="{F6C7CAE4-8637-48A7-BFD9-CBB32F240020}" Win64="$(var.Win64)">
-			<File Id="_CBB32F240020" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Hardcodet.Wpf.TaskbarNotification.dll" KeyPath="yes" ></File>
+      <Component Id="_F6C7CAE5" Guid="{F6C7CAE5-8637-48A7-BFD9-CBB32F240021}" Win64="$(var.Win64)">
+			<File Id="_CBB32F240021" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Hardcodet.NotifyIcon.Wpf.dll" KeyPath="yes" ></File>
 	  </Component>
       
       <Component Id="_0023C8C8A530" Guid="{2EAB5754-130B-4335-80A1-0023C8C8A530}" Location="local" Win64="$(var.Win64)">

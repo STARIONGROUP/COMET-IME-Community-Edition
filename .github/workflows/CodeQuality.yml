@@ -18,6 +18,9 @@ jobs:
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.1
 
+      - name: add STARION GitHub nuget feed
+        run: dotnet nuget add source https://nuget.pkg.github.com/STARIONGROUP/index.json -n GHRHEA -u gh -p ${{ secrets.GH_PR_TOKEN }} --store-password-in-clear-text
+
       - name: add DevExpress nuget feed
         run: dotnet nuget add source https://nuget.devexpress.com/api -n DXFeed -u DevExpress -p ${{ secrets.DEVEXPRESS_NUGET_KEY }} --store-password-in-clear-text
 

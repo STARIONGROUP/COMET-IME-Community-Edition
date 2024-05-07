@@ -57,7 +57,8 @@ namespace CDP4Reporting.ViewModels
             var parameters = new CompilerParameters
             {
                 GenerateInMemory = true,
-                GenerateExecutable = false
+                GenerateExecutable = false,
+                WarningLevel = 0
             };
 
             var currentAssemblies =

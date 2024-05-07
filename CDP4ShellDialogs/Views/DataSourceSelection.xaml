@@ -125,6 +125,14 @@
                                               ButtonKind="Toggle"/>
                                 </Grid>
                             </dxlc:LayoutItem>
+                            <dxlc:LayoutItem Label="Full Trust">
+                                <dxe:CheckEdit x:Name="FullTrustCheckBox"
+                                               IsChecked="{Binding IsFullTrustAllowed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                               IsEnabled ="{Binding IsFullTrustCheckBoxEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                               Margin="10,0,0,0"
+                                               HorizontalAlignment="Left"
+                                               ToolTip="Connect to a server using Full Trust policy" />
+                            </dxlc:LayoutItem>
                             <dxlc:LayoutItem Label="Use Proxy">
                                 <dxe:CheckEdit x:Name="ProxyCheckBox"
                                           IsChecked="{Binding IsProxyEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
