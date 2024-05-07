@@ -17,6 +17,9 @@
         <ResourceDictionary>
             <Image x:Key="Inspect" Source="{dx:DXImage Image=Find_16x16.png}" />
             <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </dx:DXWindow.Resources>
     <lc:LayoutControl Margin="5"
@@ -47,7 +50,9 @@
                                           IsReadOnly="{Binding IsReadOnly}"
                                           IsTextEditable="False"
                                           ItemsSource="{Binding Path=PossibleRelationshipCategory}"
-                                          ShowCustomItems="False" />
+                                          ItemContainerStyle="{StaticResource ComboBoxEditItemStyleDeprecated}" 
+                                          ShowCustomItems="False">
+                        </dxe:ComboBoxEdit>
                         <Button Grid.Column="1"
                                 Width="25"
                                 Height="25"
@@ -71,7 +76,7 @@
                                      ItemsSource="{Binding PossibleRelationshipCategory}"
                                      SelectionMode="Multiple">
                         <dxe:ListBoxEdit.StyleSettings>
-                            <dxe:CheckedListBoxEditStyleSettings />
+                            <dxe:CheckedListBoxEditStyleSettings ItemContainerStyle="{StaticResource ListBoxEditItemStyleDeprecated}" />
                         </dxe:ListBoxEdit.StyleSettings>
                     </dxe:ListBoxEdit>
                 </lc:LayoutItem>

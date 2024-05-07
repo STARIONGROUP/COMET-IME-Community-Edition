@@ -17,6 +17,7 @@
         <ResourceDictionary>
             <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/ErrorTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -71,6 +72,7 @@
                                           IsEnabled="{Binding HasLibrary}"
                                           IsReadOnly="{Binding IsReadOnly}"
                                           IsTextEditable="False"
+                                          ItemContainerStyle="{StaticResource ComboBoxEditItemStyleDeprecated}" 
                                           ItemsSource="{Binding Path=PossibleContainingCategory}"
                                           ShowCustomItems="False" />
                         <Button Grid.Column="1"
@@ -112,7 +114,7 @@
                                     ItemsSource="{Binding PossibleContainedCategory}"
                                     SelectionMode="Multiple">
                         <dxe:ListBoxEdit.StyleSettings>
-                            <dxe:CheckedListBoxEditStyleSettings />
+                            <dxe:CheckedListBoxEditStyleSettings ItemContainerStyle="{StaticResource ListBoxEditItemStyleDeprecated}" />
                         </dxe:ListBoxEdit.StyleSettings>
                     </dxe:ListBoxEdit>
                 </lc:LayoutItem>
