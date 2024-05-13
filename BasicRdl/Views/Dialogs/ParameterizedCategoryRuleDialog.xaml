@@ -45,8 +45,10 @@
                                           EditValue="{Binding Path=SelectedCategory, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           IsReadOnly="{Binding IsReadOnly}"
                                           IsTextEditable="False"
+                                          ItemContainerStyle="{StaticResource ComboBoxEditItemStyleDeprecated}"
                                           ItemsSource="{Binding Path=PossibleCategory}"
-                                          ShowCustomItems="False" />
+                                          ShowCustomItems="False" >
+                        </dxe:ComboBoxEdit>
                         <Button Grid.Column="1"
                                 Width="25"
                                 Height="25"

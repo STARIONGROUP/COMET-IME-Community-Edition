@@ -3,7 +3,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:mvvm="clr-namespace:CDP4Composition.Mvvm"
                     xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-                    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars">
+                    xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+                    xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
+                    xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors">
 
     <Image x:Key="EditIcon" x:Shared="False" Source="{dx:DXImage Image=EditName_16x16.png}" Height="16" Width="16"/>
     <Image x:Key="InspectIcon" x:Shared="False" Source="{dx:DXImage Image=Find_16x16.png}" Height="16" Width="16"/>
@@ -22,6 +24,27 @@
         -->
         <Setter Property="ContextMenu" Value="{x:Null}"/>
     </Style>
+
+    <Style BasedOn="{StaticResource {themes:EditorListBoxThemeKey ResourceKey=CheckBoxItemStyle}}" TargetType="{x:Type dxe:ListBoxEditItem}" x:Key="ListBoxEditItemStyleDeprecated">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsDeprecated}" Value="True">
+                <Setter Property="Background" Value="LightGray"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style BasedOn="{StaticResource {themes:EditorListBoxThemeKey ResourceKey=CheckBoxItemStyle}}" TargetType="{x:Type dxe:ComboBoxEditItem}" x:Key="ComboBoxEditItemStyleDeprecated">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding IsDeprecated}" Value="True">
+                <Setter Property="Background" Value="LightGray"/>
+                <Setter Property="Opacity" Value="0.5"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+
+    
 
     <Style TargetType ="{x:Type dxg:RowControl}" x:Key="RowStyleDeprecated">
         <Setter Property="ToolTip" Value="{Binding Row.Tooltip}" />
