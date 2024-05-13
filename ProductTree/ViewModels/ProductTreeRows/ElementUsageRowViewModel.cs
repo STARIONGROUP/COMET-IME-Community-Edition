@@ -362,6 +362,39 @@ namespace CDP4ProductTree.ViewModels
                     this.MessageBusHandler.GetHandler<ElementUsageHighlightEvent>()
                         .RegisterEventHandler(highlightUsageObserver, new MessageBusEventHandlerSubscription<ElementUsageHighlightEvent>(x => x.ElementDefinition.Equals(this.Thing.ElementDefinition), highlightUsageAction)));
             }
+
+            this.InitializeCategorySubscription();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="Category"/> subscription
+        /// </summary>
+        private void InitializeCategorySubscription()
+        {
+            Func<ObjectChangedEvent, bool> categoryDiscriminator =
+                objectChange =>
+                    objectChange.EventKind == EventKind.Updated
+                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache
+                    && this.Category.Contains(objectChange.ChangedThing);
+
+            Action<ObjectChangedEvent> categoryAction = x => this.UpdateCategories();
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var categoryRemoveListener =
+                    this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category))
+                        .Where(categoryDiscriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(categoryAction);
+
+                this.Disposables.Add(categoryRemoveListener);
+            }
+            else
+            {
+                var categoryObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category));
+
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(categoryObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Category), categoryDiscriminator, categoryAction)));
+            }
         }
 
         /// <summary>
@@ -476,16 +509,24 @@ namespace CDP4ProductTree.ViewModels
             this.Name = this.Thing.Name + " : " + this.ElementDefinition.Name;
             this.ShortName = this.Thing.ShortName + " : " + this.ElementDefinition.ShortName;
 
+            this.UpdateCategories();
+
+            this.UpdateOwnerNameAndShortName();
+
+            this.PopulateParameterOrOverride();
+        }
+
+        /// <summary>
+        /// Updates the Category display value
+        /// </summary>
+        private void UpdateCategories()
+        {
             var builder = new CategoryStringBuilder()
                 .AddCategories("EU", this.Thing.Category)
                 .AddCategories("ED", this.Thing.ElementDefinition.Category);
 
             this.Category = builder.GetCategories().Distinct();
             this.DisplayCategory = builder.Build();
-
-            this.UpdateOwnerNameAndShortName();
-
-            this.PopulateParameterOrOverride();
         }
 
         /// <summary>
