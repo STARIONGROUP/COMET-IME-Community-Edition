@@ -28,9 +28,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="5.1.1" />
-    <PackageReference Include="CDP4Common-CE" Version="26.7.0-8940498145-641-1-PR-339" />
-    <PackageReference Include="CDP4Dal-CE" Version="26.7.0-8940498145-641-1-PR-339" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="26.7.0-8940498145-641-1-PR-339" />
+    <PackageReference Include="CDP4Common-CE" Version="27.0.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="27.0.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.0.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.9.5" />

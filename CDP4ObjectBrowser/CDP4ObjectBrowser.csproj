@@ -36,13 +36,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="26.7.0-8940498145-641-1-PR-339">
+    <PackageReference Include="CDP4Common-CE" Version="27.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="26.7.0-8940498145-641-1-PR-339">
+    <PackageReference Include="CDP4Dal-CE" Version="27.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="26.7.0-8940498145-641-1-PR-339">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.5">
