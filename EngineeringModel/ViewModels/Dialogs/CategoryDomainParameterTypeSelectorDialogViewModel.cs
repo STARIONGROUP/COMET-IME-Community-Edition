@@ -67,6 +67,11 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         private bool isUncategorizedIncluded;
 
         /// <summary>
+        /// Backing field for <see cref="DialogTitle"/> property
+        /// </summary>
+        private string dialogTitle;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CategoryDomainParameterTypeSelectorDialogViewModel"/> class
         /// </summary>
         /// <param name="parameterTypes"></param>
@@ -100,7 +105,16 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// </summary>
 
         public IEnumerable<ParameterType> PossibleParameterTypes { get; private set; }
-        
+
+        /// <summary>
+        /// Gets or sets the Title of the dialog window
+        /// </summary>
+        public string DialogTitle
+        {
+            get => this.dialogTitle;
+            set => this.RaiseAndSetIfChanged(ref this.dialogTitle, value);
+        }
+
         /// <summary>
         /// Gets or sets the list of selected <see cref="Category"/>s
         /// </summary>

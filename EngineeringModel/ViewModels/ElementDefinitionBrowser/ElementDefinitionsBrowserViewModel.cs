@@ -1292,6 +1292,9 @@ namespace CDP4EngineeringModel.ViewModels
             var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
 
             var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(allowedParameterTypes, allowedCategories, allowedDomainOfExpertises);
+
+            categoryDomainParameterTypeSelectorDialogViewModel.DialogTitle = "Create Parameter Subscriptions";
+
             var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
@@ -1343,6 +1346,9 @@ namespace CDP4EngineeringModel.ViewModels
                 .Select(p => p.Owner).Distinct();
 
             var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(filteredParameterTypes, filteredCategories, filteredDomainOfExpertises);
+
+            categoryDomainParameterTypeSelectorDialogViewModel.DialogTitle = "Remove Parameter Subscriptions";
+
             var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)

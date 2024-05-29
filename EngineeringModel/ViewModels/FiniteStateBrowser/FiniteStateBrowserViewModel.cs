@@ -524,6 +524,9 @@ namespace CDP4EngineeringModel.ViewModels
             var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
 
             var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(allowedParameterTypes, allowedCategories, model.EngineeringModelSetup.ActiveDomain);
+
+            categoryDomainParameterTypeSelectorDialogViewModel.DialogTitle = "Apply ActualFiniteState to Parameters";
+
             var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)

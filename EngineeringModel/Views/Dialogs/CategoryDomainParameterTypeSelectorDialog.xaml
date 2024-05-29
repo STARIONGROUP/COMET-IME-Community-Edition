@@ -11,6 +11,9 @@
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              Height="250"
              Width="400"
+             Title="{Binding DialogTitle,
+                                        Mode=TwoWay,
+                                        UpdateSourceTrigger=PropertyChanged}"
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
     <dx:DXWindow.Resources>
