@@ -72,6 +72,13 @@ namespace BasicRdl.ViewModels
 
             this.Disposables.Add(containerSubscription);
 
+            var superCategorySubscription = session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.ObjectChangeEventHandler);
+
+            this.Disposables.Add(superCategorySubscription);
+
             this.UpdateProperties();
         }
 
