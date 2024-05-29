@@ -649,7 +649,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
             Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.SaveReportCommand.Execute());
-            Assert.AreEqual(null, this.reportDesignerViewModel.CurrentReportProjectFilePath);
+            Assert.AreEqual(string.Empty, this.reportDesignerViewModel.CurrentReportProjectFilePath);
         }
 
         [Test]
@@ -719,7 +719,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { });
             Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute());
-            Assert.AreEqual(null, this.reportDesignerViewModel.CurrentReportProjectFilePath);
+            Assert.AreEqual(string.Empty, this.reportDesignerViewModel.CurrentReportProjectFilePath);
         }
 
         [Test]
