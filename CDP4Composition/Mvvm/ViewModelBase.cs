@@ -348,7 +348,10 @@ namespace CDP4Composition.Mvvm
         /// </param>
         protected virtual void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
-            this.RevisionNumber = objectChange.ChangedThing.RevisionNumber;
+            if (objectChange?.ChangedThing?.RevisionNumber != null)
+            {
+                this.RevisionNumber = objectChange.ChangedThing.RevisionNumber;
+            }
         }
     }
 }

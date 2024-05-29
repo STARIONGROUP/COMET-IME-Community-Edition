@@ -401,6 +401,7 @@ namespace CDP4Reporting.ViewModels
             );
 
             this.InitializeDataSetExtensionsUsage();
+            this.InitializeNewReport();
         }
 
         /// <summary>
@@ -489,6 +490,14 @@ namespace CDP4Reporting.ViewModels
                 return;
             }
 
+            this.InitializeNewReport();
+        }
+
+        /// <summary>
+        /// Initializes a new Report
+        /// </summary>
+        private void InitializeNewReport()
+        {
             this.Document = new TextDocument(string.Empty);
             this.lastSavedDataSourceText = "";
 
