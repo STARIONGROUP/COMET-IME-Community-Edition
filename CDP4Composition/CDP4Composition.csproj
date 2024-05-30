@@ -29,10 +29,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.0.1" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.0.1" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.0.1" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.0.1" />
+    <PackageReference Include="CDP4Common-CE" Version="27.0.2" />
+    <PackageReference Include="CDP4Dal-CE" Version="27.0.2" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.0.2" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.0.2" />
     <PackageReference Include="CsvHelper" Version="32.0.3" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.5" />
