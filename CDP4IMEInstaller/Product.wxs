@@ -4,7 +4,7 @@
   <Product Id="*" Name="CDP4-COMET-CE" Language="1033" Version="10.0.0.11" Manufacturer="Starion Group S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
 
     <?include variables.wxi ?>
-  
+   
 		<Package InstallPrivileges="elevated" 
 		         InstallerVersion="200" 
 		         Compressed="yes" 
@@ -21,6 +21,7 @@
     <Property Id="WIXUI_INSTALLDIR" Value="CDP4INSTALLFOLDER"></Property>
 
     <UIRef Id="WixUI_Mondo" />
+    <UIRef Id="WixUI_ErrorProgressText" />
 
     <WixVariable Id="WixUILicenseRtf" Value="$(var.CDP4-COMET-CE.ProjectDir)license.rtf" />
     <WixVariable Id="WixUIDialogBmp" Value="background.bmp" />
