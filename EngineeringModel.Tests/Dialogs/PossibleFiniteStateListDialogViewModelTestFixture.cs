@@ -49,6 +49,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
     using CDP4EngineeringModel.ViewModels;
 
+    using CommonServiceLocator;
+
     using Moq;
 
     using NUnit.Framework;
@@ -60,6 +62,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IMessageBoxService> messageBoxService;
+        private Mock<IServiceLocator> serviceLocator;
 
         private Iteration iteration;
         private EngineeringModel model;
@@ -82,6 +85,10 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         [SetUp]
         public void Setup()
         {
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.messageBoxService = new Mock<IMessageBoxService>();
             this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -119,6 +126,10 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.session.Setup(x => x.Dal).Returns(dal.Object);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
+
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>())
+            .Returns(this.messageBoxService.Object);
+
         }
 
         [Test]
@@ -135,7 +146,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
             var transaction = new ThingTransaction(transactionContext, containerClone);
 
-            var vm = new PossibleFiniteStateListDialogViewModel(statelist, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.messageBoxService.Object, containerClone);
+            var vm = new PossibleFiniteStateListDialogViewModel(statelist, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, containerClone);
             Assert.AreEqual(statelist.Name, vm.Name);
             Assert.AreEqual(statelist.ShortName, vm.ShortName);
 
@@ -149,7 +160,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             statelist.PossibleState.Add(new PossibleFiniteState(Guid.NewGuid(), null, null));
             statelist.DefaultState = statelist.PossibleState.First();
-            vm = new PossibleFiniteStateListDialogViewModel(statelist, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.messageBoxService.Object, containerClone);
+            vm = new PossibleFiniteStateListDialogViewModel(statelist, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, containerClone);
             Assert.AreEqual(1, vm.PossibleState.Count);
             Assert.AreEqual(statelist.DefaultState, vm.SelectedDefaultState);
         }
@@ -171,7 +182,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
             var transaction = new ThingTransaction(transactionContext, containerClone);
 
-            var vm = new PossibleFiniteStateListDialogViewModel(statelist, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.messageBoxService.Object, containerClone);
+            var vm = new PossibleFiniteStateListDialogViewModel(statelist, transaction, this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, containerClone);
             vm.SelectedPossibleState = vm.PossibleState.Single();
             await vm.SetDefaultStateCommand.Execute();
 

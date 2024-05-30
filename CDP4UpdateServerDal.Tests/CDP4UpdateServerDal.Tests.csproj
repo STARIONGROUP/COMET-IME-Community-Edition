@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="CDP4Common-CE" Version="27.0.1" />
+	  <PackageReference Include="CDP4Common-CE" Version="27.0.2" />
   </ItemGroup>
 
   <ItemGroup>
