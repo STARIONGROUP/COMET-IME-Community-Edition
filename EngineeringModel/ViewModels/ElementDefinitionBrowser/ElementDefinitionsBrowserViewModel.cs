@@ -662,11 +662,6 @@ namespace CDP4EngineeringModel.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Subscriptions", "", this.BatchCreateSubscriptionCommand, MenuItemKind.Create, ClassKind.NotThing));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Delete Multiple Subscriptions", "", this.BatchDeleteSubscriptionCommand, MenuItemKind.Delete, ClassKind.NotThing));
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
-
             if (this.SelectedThing is IHaveModelCode)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
@@ -718,8 +713,6 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Add(editMenu);
                 this.ContextMenu.Add(inspectMenu);
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Delete", "", this.DeleteCommand, MenuItemKind.Delete, ClassKind.ElementUsage));
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
 
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Navigate to Element Definition", "", this.ChangeFocusCommand, MenuItemKind.Navigate, ClassKind.ElementDefinition));
 
