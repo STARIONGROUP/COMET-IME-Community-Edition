@@ -104,12 +104,24 @@
 		<File Id="fil_Splat" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Splat.dll" KeyPath="yes" />
 	  </Component>
 
+      <Component Id="comp_SplatNlog" Guid="{618C780F-E4E6-45AA-8538-97405890369F}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_SplatNlog" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Splat.Nlog.dll" KeyPath="yes" />
+      </Component>
+
       <Component Id="comp_SimpleMapi" Guid="{618C780F-E4E6-45AA-8538-97405890369E}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_SimpleMapi" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)SimpleMapi.NET.dll" KeyPath="yes" />
       </Component>
 
       <Component Id="_7605D4E3" Guid="{7605D4E3-FE6E-4366-B37B-ADA9F0B76B66}" Win64="$(var.Win64)">
 	      <File Id="_ADA9F0B76B66" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Buffers.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="_7805D4E3" Guid="{7805D4E3-FE6E-4366-B37B-ADA9F0B76B88}" Win64="$(var.Win64)">
+        <File Id="_ADA9F0B76B88" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.ComponentModel.Annotations.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="_7607D4E3" Guid="{7607D4E3-FE6E-4366-B37B-ADA9F0B76B77}" Win64="$(var.Win64)">
+        <File Id="_ADA9F0B76B77" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Collections.Immutable.dll" KeyPath="yes"></File>
       </Component>
 
       <Component Id="_A36A3ED6" Guid="{A36A3ED6-8B87-4D6A-960E-68E6F17B4205}" Win64="$(var.Win64)">

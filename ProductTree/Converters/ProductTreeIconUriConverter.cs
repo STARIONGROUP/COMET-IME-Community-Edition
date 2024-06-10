@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeIconUriConverter.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
@@ -96,31 +96,40 @@ namespace CDP4ProductTree
         /// </returns>
         private object GetIconForParameterOverride(ThingStatus thingStatus, ParameterUsageKind usage)
         {
-            Uri uri = null;
-
-            switch (usage)
+            try
             {
-                case ParameterUsageKind.Unused:
-                    uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/orangeball.jpg");
-                    break;
-                case ParameterUsageKind.SubscribedByOthers:
-                    uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/blueball.gif");
-                    break;
-                case ParameterUsageKind.Subscribed:
-                    uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/whiteball.jpg");
-                    break;
+                Uri uri = null;
+
+                switch (usage)
+                {
+                    case ParameterUsageKind.Unused:
+                        uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/orangeball.jpg");
+                        break;
+                    case ParameterUsageKind.SubscribedByOthers:
+                        uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/blueball.gif");
+                        break;
+                    case ParameterUsageKind.Subscribed:
+                        uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/whiteball.jpg");
+                        break;
+                }
+
+                if (uri == null)
+                {
+                    return null;
+                }
+
+                return thingStatus.HasError
+                    ? IconUtilities.WithErrorOverlay(uri)
+                    : thingStatus.HasRelationship
+                        ? IconUtilities.WithOverlay(uri, IconUtilities.RelationshipOverlayUri)
+                        : new BitmapImage(uri);
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
             }
 
-            if (uri == null)
-            {
-                return null;
-            }
-
-            return thingStatus.HasError
-                ? IconUtilities.WithErrorOverlay(uri)
-                : thingStatus.HasRelationship
-                    ? IconUtilities.WithOverlay(uri, IconUtilities.RelationshipOverlayUri)
-                    : new BitmapImage(uri);
+            return null;
         }
     }
 }

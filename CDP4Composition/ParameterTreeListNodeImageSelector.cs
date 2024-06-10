@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTreeListNodeImageSelector.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
@@ -71,24 +71,33 @@ namespace CDP4Composition
         /// <returns></returns>
         private object Convert(ParameterRowControlViewModel parameterRow)
         {
-            ClassKind valuesetRowType;
-            Enum.TryParse(parameterRow.RowType, out valuesetRowType);
-
-            if (parameterRow.Parameter != null && parameterRow.Parameter.StateDependence != null)
+            try
             {
-                var stateUri = new Uri(IconUtilities.ImageUri(ClassKind.ActualFiniteState).ToString());
-                var baseUri = new Uri(IconUtilities.ImageUri(parameterRow.Parameter.ClassKind).ToString());
-                return IconUtilities.WithOverlay(baseUri, stateUri);
+                ClassKind valuesetRowType;
+                Enum.TryParse(parameterRow.RowType, out valuesetRowType);
+
+                if (parameterRow.Parameter != null && parameterRow.Parameter.StateDependence != null)
+                {
+                    var stateUri = new Uri(IconUtilities.ImageUri(ClassKind.ActualFiniteState).ToString());
+                    var baseUri = new Uri(IconUtilities.ImageUri(parameterRow.Parameter.ClassKind).ToString());
+                    return IconUtilities.WithOverlay(baseUri, stateUri);
+                }
+
+                if (parameterRow.Parameter != null)
+                {
+                    return this.QueryIIconCacheService().QueryBitmapImage(new Uri(IconUtilities.ImageUri(parameterRow.Parameter.ClassKind).ToString()));
+                }
+
+                var uri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
+
+                return new BitmapImage(uri);
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
             }
 
-            if (parameterRow.Parameter != null)
-            {
-                return this.QueryIIconCacheService().QueryBitmapImage(new Uri(IconUtilities.ImageUri(parameterRow.Parameter.ClassKind).ToString()));
-            }
-
-            var uri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
-
-            return new BitmapImage(uri);
+            return null;
         }
 
         /// <summary>

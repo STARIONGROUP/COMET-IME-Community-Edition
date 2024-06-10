@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="App.xaml.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -23,29 +23,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Reactive.Concurrency;
+using System.Reflection;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+
+using CDP4Composition;
+using CDP4Composition.ErrorReporting.Views;
+
+using COMET;
+using COMET.Modularity;
+using COMET.Views;
+
+using DevExpress.Xpf.Core;
+
+using NLog;
+
+using ReactiveUI;
+using Splat;
+using Splat.NLog;
+
 namespace CDP4IME
 {
-    using System;
-    using System.IO;
-    using System.Reactive.Concurrency;
-    using System.Reflection;
-    using System.Text;
-    using System.Windows;
-    using System.Windows.Controls;
-
-    using CDP4Composition;
-    using CDP4Composition.ErrorReporting.Views;
-
-    using COMET;
-    using COMET.Modularity;
-    using COMET.Views;
-
-    using DevExpress.Xpf.Core;
-
-    using NLog;
-
-    using ReactiveUI;
-
     /// <summary>
     /// Interaction logic for Application
     /// </summary>
@@ -68,8 +72,10 @@ namespace CDP4IME
             ApplicationThemeHelper.ApplicationThemeName = Theme.SevenName;
             AppliedTheme.ThemeName = Theme.SevenName;
             ToolTipService.BetweenShowDelayProperty.OverrideMetadata(typeof(Control), new FrameworkPropertyMetadata());  
-            ToolTipService.InitialShowDelayProperty.OverrideMetadata(typeof(Control), new FrameworkPropertyMetadata(750));  
-           
+            ToolTipService.InitialShowDelayProperty.OverrideMetadata(typeof(Control), new FrameworkPropertyMetadata(750));
+
+            Locator.CurrentMutable.UseNLogWithWrappingFullLogger();
+
             RxApp.MainThreadScheduler = DispatcherScheduler.Current;
             base.OnStartup(e);
 
@@ -148,7 +154,8 @@ namespace CDP4IME
         private static void RunInReleaseMode()
         {
             AppDomain.CurrentDomain.UnhandledException += AppDomainUnhandledException;
-            
+            RxApp.DefaultExceptionHandler = new ImeDefaultExceptionHandler();
+
             try
             {
                 var bootstrapper = new CDP4IMEBootstrapper();
@@ -206,6 +213,39 @@ namespace CDP4IME
         private void OnAppStartup_UpdateThemeName(object sender, StartupEventArgs e)
         {
             ApplicationThemeHelper.UpdateApplicationThemeName();
-        }        
+        }
+
+        public class ImeDefaultExceptionHandler : IObserver<Exception>
+        {
+            public void OnNext(Exception value)
+            {
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
+
+                HandleException(value);
+            }
+
+            public void OnError(Exception error)
+            {
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
+
+                HandleException(error);
+            }
+
+            public void OnCompleted()
+            {
+                if (Debugger.IsAttached)
+                {
+                    Debugger.Break();
+                }
+
+                RxApp.MainThreadScheduler.Schedule(() => throw new NotImplementedException());
+            }
+        }
     }
 }
