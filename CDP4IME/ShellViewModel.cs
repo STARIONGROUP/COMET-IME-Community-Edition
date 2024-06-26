@@ -33,6 +33,8 @@ namespace COMET
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
+    using CDP4Common.ExceptionHandlerService;
+
     using CDP4Composition.Events;
     using CDP4Composition.Log;
     using CDP4Composition.Mvvm;
@@ -134,6 +136,11 @@ namespace COMET
         private readonly ICDPMessageBus messageBus;
 
         /// <summary>
+        /// The <see cref="IExceptionHandlerService"/>
+        /// </summary>
+        private readonly IExceptionHandlerService exceptionHandlerService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ShellViewModel"/> class.
         /// </summary>
         /// <param name="dialogNavigationService">
@@ -145,8 +152,9 @@ namespace COMET
         /// <param name="dockViewModel">
         /// The <see cref="DockLayoutViewModel" for the panel dock/>
         /// </param>
+        /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
         [ImportingConstructor]
-        public ShellViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, DockLayoutViewModel dockViewModel)
+        public ShellViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, DockLayoutViewModel dockViewModel, IExceptionHandlerService exceptionHandlerService)
         {
             if (dialogNavigationService == null)
             {
@@ -157,6 +165,7 @@ namespace COMET
             this.OpenSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
 
             this.messageBus = messageBus;
+            this.exceptionHandlerService = exceptionHandlerService;
             this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.dialogNavigationService = dialogNavigationService;
@@ -396,7 +405,7 @@ namespace COMET
         private async Task ExecuteOpenDataSourceRequest()
         {
             var openSessions = this.Sessions.Select(x => x.Session).ToList();
-            var dataSelection = new DataSourceSelectionViewModel(this.dialogNavigationService, this.messageBus, openSessions);
+            var dataSelection = new DataSourceSelectionViewModel(this.dialogNavigationService, this.messageBus, this.exceptionHandlerService, openSessions);
             var result = this.dialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
@@ -418,7 +427,7 @@ namespace COMET
         /// </summary>
         private void ExecuteSaveSessionCommand()
         {
-            var sessionExport = new DataSourceExportViewModel(this.Sessions.Select(x => x.Session), new OpenSaveFileDialogService(), this.messageBus);
+            var sessionExport = new DataSourceExportViewModel(this.Sessions.Select(x => x.Session), new OpenSaveFileDialogService(), this.messageBus, this.exceptionHandlerService);
             this.dialogNavigationService.NavigateModal(sessionExport);
         }
 

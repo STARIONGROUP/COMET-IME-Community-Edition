@@ -9,8 +9,8 @@
     <Product>CDP4SiteDirectory</Product>
     <Description>CDP4-COMET SiteDirectory Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
-    <AssemblyVersion>10.0.0.13</AssemblyVersion>
-    <FileVersion>10.0.0.13</FileVersion>
+    <AssemblyVersion>10.0.0.14</AssemblyVersion>
+    <FileVersion>10.0.0.14</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -37,13 +37,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-	<PackageReference Include="CDP4Common-CE" Version="27.0.2">
+	<PackageReference Include="CDP4Common-CE" Version="27.1.0-9663847089-700-1-PR-346">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="CDP4Dal-CE" Version="27.0.2">
+	<PackageReference Include="CDP4Dal-CE" Version="27.1.0-9663847089-700-1-PR-346">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="CDP4JsonSerializer-CE" Version="27.0.2">
+	<PackageReference Include="CDP4JsonSerializer-CE" Version="27.1.0-9663847089-700-1-PR-346">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">

@@ -32,6 +32,8 @@ namespace CDP4AddinCE
 
     using CDP4AddinCE.Settings;
 
+    using CDP4Common.ExceptionHandlerService;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -67,6 +69,11 @@ namespace CDP4AddinCE
         private readonly IAppSettingsService<AddinAppSettings> appSettingService;
 
         /// <summary>
+        /// The <see cref="IExceptionHandlerService"/>
+        /// </summary>
+        private readonly IExceptionHandlerService exceptionHandlerService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AddinRibbonPart"/> class.
         /// </summary>
         /// <param name="order">
@@ -86,11 +93,13 @@ namespace CDP4AddinCE
         /// <param name="messageBus">
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
-        public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IAppSettingsService<AddinAppSettings> appSettingService, ICDPMessageBus messageBus)
+        /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
+        public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IAppSettingsService<AddinAppSettings> appSettingService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, messageBus)
         {
             messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
             this.appSettingService = appSettingService;
+            this.exceptionHandlerService = exceptionHandlerService;
         }
 
         /// <summary>
@@ -107,7 +116,7 @@ namespace CDP4AddinCE
             switch (ribbonControlId)
             {
                 case "CDP4_Open":
-                    var dataSelection = new DataSourceSelectionViewModel(this.DialogNavigationService, this.CDPMessageBus);
+                    var dataSelection = new DataSourceSelectionViewModel(this.DialogNavigationService, this.CDPMessageBus, this.exceptionHandlerService);
                     var dataSelectionResult = this.DialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
 
                     if (dataSelectionResult?.OpenModel ?? false)

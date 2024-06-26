@@ -29,9 +29,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="5.1.1" />
-    <PackageReference Include="CDP4Common-CE" Version="27.0.2" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.0.2" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.0.2" />
+    <PackageReference Include="CDP4Common-CE" Version="27.1.0-9663847089-700-1-PR-346" />
+    <PackageReference Include="CDP4Dal-CE" Version="27.1.0-9663847089-700-1-PR-346" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.1.0-9663847089-700-1-PR-346" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.2.20220510" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

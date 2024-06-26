@@ -34,6 +34,7 @@ namespace COMET.Tests.ViewModels
     using System.Windows.Input;
 
     using CDP4Common.DTO;
+    using CDP4Common.ExceptionHandlerService;
 
     using CDP4Composition.Navigation;
 
@@ -85,6 +86,7 @@ namespace COMET.Tests.ViewModels
         private List<Thing> dalOutputs;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IOpenSaveFileDialogService> fileDialogService;
+        private Mock<IExceptionHandlerService> exceptionHandlerService;
         private CDPMessageBus messageBus;
 
         [SetUp]
@@ -96,6 +98,7 @@ namespace COMET.Tests.ViewModels
             this.session = new Mock<ISession>();
             this.mockedDal = new Mock<IDal>();
             this.fileDialogService = new Mock<IOpenSaveFileDialogService>();
+            this.exceptionHandlerService = new Mock<IExceptionHandlerService>();
             var openTaskCompletionSource = new TaskCompletionSource<IEnumerable<Thing>>();
             openTaskCompletionSource.SetResult(this.dalOutputs);
             this.mockedDal.Setup(x => x.IsValidUri(It.IsAny<string>())).Returns(true);
@@ -117,7 +120,7 @@ namespace COMET.Tests.ViewModels
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>())
                 .Returns(new AvailableDals(dataAccessLayerKinds));
 
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
         }
 
         [Test]
@@ -153,15 +156,15 @@ namespace COMET.Tests.ViewModels
         [Test]
         public void VerifyVersionChecks()
         {
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.AreEqual(1, this.viewModel.Versions.Count);
 
             this.session.Setup(x => x.DalVersion).Returns(new Version("1.1.0"));
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.AreEqual(2, this.viewModel.Versions.Count);
 
             this.session.Setup(x => x.DalVersion).Returns(new Version("1.2.0"));
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.AreEqual(3, this.viewModel.Versions.Count);
         }
 
