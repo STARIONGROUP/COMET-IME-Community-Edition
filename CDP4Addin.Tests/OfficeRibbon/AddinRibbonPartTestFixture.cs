@@ -38,6 +38,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
     using CDP4AddinCE.Settings;
 
     using CDP4Common.CommonData;
+    using CDP4Common.ExceptionHandlerService;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
@@ -72,6 +73,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
+        private Mock<IExceptionHandlerService> exceptionHandlerService;
         private Mock<ISession> session;
         private Assembler assembler;
         private Mock<IAppSettingsService<AddinAppSettings>> appSettingService;
@@ -99,6 +101,8 @@ namespace CDP4Addin.Tests.OfficeRibbon
             var iterationDictionary = new Dictionary<CDP4Common.EngineeringModelData.Iteration, Tuple<DomainOfExpertise, Participant>>();
             this.session.Setup(x => x.OpenIterations).Returns(iterationDictionary);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
+            this.exceptionHandlerService = new Mock<IExceptionHandlerService>();
 
             this.appSettingService = new Mock<IAppSettingsService<AddinAppSettings>>();
             this.appSettingService.Setup(x => x.AppSettings).Returns(new AddinAppSettings());
@@ -129,7 +133,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             this.amountOfRibbonControls = 9;
             this.order = 1;
 
-            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, this.dialogNavigationService.Object, null, this.appSettingService.Object, this.messageBus);
+            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, this.dialogNavigationService.Object, null, this.appSettingService.Object, this.messageBus, this.exceptionHandlerService.Object);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;
