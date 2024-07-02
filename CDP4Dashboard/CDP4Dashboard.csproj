@@ -25,16 +25,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.1.0-9712672762-712-1-PR-346">
+    <PackageReference Include="CDP4Common-CE" Version="27.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.1.0-9712672762-712-1-PR-346">
+    <PackageReference Include="CDP4Dal-CE" Version="27.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.1.0-9712672762-712-1-PR-346">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.1.0-9712672762-712-1-PR-346">
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.1.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.Charts" Version="23.2.5">
