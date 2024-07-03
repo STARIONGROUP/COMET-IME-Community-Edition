@@ -33,6 +33,7 @@ namespace CDP4ParameterSheetGenerator
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.ExceptionHandlerService;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Extensions;
@@ -152,7 +153,7 @@ namespace CDP4ParameterSheetGenerator
         {
             this.application.StatusBar = string.Empty;
 
-            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials);
+            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials, session.ExceptionHandlerService);
 
             try
             {
@@ -249,7 +250,7 @@ namespace CDP4ParameterSheetGenerator
         {
             this.application.StatusBar = string.Empty;
 
-            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials);
+            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials, session.ExceptionHandlerService);
 
             try
             {
@@ -360,7 +361,7 @@ namespace CDP4ParameterSheetGenerator
         {
             this.application.StatusBar = string.Empty;
 
-            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials);
+            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials, session.ExceptionHandlerService);
 
             try
             {
@@ -469,7 +470,7 @@ namespace CDP4ParameterSheetGenerator
         {
             this.application.StatusBar = string.Empty;
 
-            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials);
+            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials, session.ExceptionHandlerService);
 
             try
             {
@@ -560,12 +561,12 @@ namespace CDP4ParameterSheetGenerator
         /// <returns>
         /// An instance of <see cref="ISession"/> that is specific to the <see cref="Workbook"/>
         /// </returns>
-        private async Task<ISession> CreateWorkbookSession(IDal dal, Credentials credentials)
+        private async Task<ISession> CreateWorkbookSession(IDal dal, Credentials credentials, IExceptionHandlerService exceptionHandlerService)
         {
             var workbookDataDal = new WorkbookDataDal(this.workbook);
             var workbookData = workbookDataDal.Read();
 
-            var workbookSession = dal.CreateSession(credentials, this.CDPMessageBus);
+            var workbookSession = dal.CreateSession(credentials, this.CDPMessageBus, exceptionHandlerService);
 
             if (workbookData != null)
             {

@@ -36,6 +36,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
     using System.Windows.Input;
 
     using CDP4Common.DTO;
+    using CDP4Common.ExceptionHandlerService;
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Utilities;
@@ -79,6 +80,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         private List<Thing> dalOutputs;
 
         private Mock<IDialogNavigationService> navService;
+        private Mock<IExceptionHandlerService> exceptionHandlerService;
         private CDPMessageBus messageBus;
 
         [SetUp]
@@ -90,6 +92,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             this.tokenSource = new CancellationTokenSource();
             this.mockedDal = new Mock<IDal>();
             this.navService = new Mock<IDialogNavigationService>();
+            this.exceptionHandlerService = new Mock<IExceptionHandlerService>();
             this.mockedDal.Setup(x => x.IsValidUri(It.IsAny<string>())).Returns(true);
             var openTaskCompletionSource = new TaskCompletionSource<IEnumerable<Thing>>();
             openTaskCompletionSource.SetResult(this.dalOutputs);
@@ -127,7 +130,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public async Task AssertThatOkCommandCanExecuteAndASessionObjectIsSet()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
 
             Assert.IsTrue(((ICommand)viewmodel.CancelCommand).CanExecute(null));
 
@@ -151,7 +154,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public async Task AssertThatUriManagerDoesNotThrow()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.IsTrue(((ICommand)viewmodel.OpenUriManagerCommand).CanExecute(null));
             Assert.DoesNotThrowAsync(async () => await viewmodel.OpenUriManagerCommand.Execute());
         }
@@ -159,7 +162,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public async Task AssertThatProxyManagerDoesNotThrow()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.IsTrue(((ICommand)viewmodel.OpenProxyConfigurationCommand).CanExecute(null));
             Assert.DoesNotThrowAsync(async () => await viewmodel.OpenProxyConfigurationCommand.Execute());
         }
@@ -167,7 +170,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void AssertViewModelWorksWithMultipleUris()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
 
             Assert.IsTrue(((ICommand)viewmodel.CancelCommand).CanExecute(null));
             Assert.That(viewmodel.ErrorMessage, Is.Null.Or.Empty);
@@ -207,7 +210,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public async Task VerifyThatCancelWorks()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
 
             await viewmodel.CancelCommand.Execute();
 
@@ -219,7 +222,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         {
             var sessions = new List<ISession>();
             sessions.Add(this.session.Object);
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, sessions);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, sessions);
 
             viewmodel.UserName = "John";
             viewmodel.Password = "Dow";
@@ -239,7 +242,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void Verify_that_when_proxy_is_enabled_proxy_address_and_port_are_set()
         {
-            var vm = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus);
+            var vm = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.IsFalse(vm.IsProxyEnabled);
             Assert.AreEqual(string.Empty, vm.ProxyUri);
             Assert.AreEqual(string.Empty, vm.ProxyPort);
@@ -258,7 +261,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void AssertThatShowPasswordButtonTextMatchesState()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
 
             // When password is hidden button should be Show
             viewmodel.IsPasswordVisible = false;
@@ -272,7 +275,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void AssertThatIsFullTrustAllowedWorks()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.That(viewmodel.IsFullTrustAllowed, Is.False);
             Assert.That(viewmodel.IsFullTrustCheckBoxEnabled, Is.True);
 

@@ -25,6 +25,8 @@
 
 namespace CDP4Composition.Extensions
 {
+    using CDP4Common.ExceptionHandlerService;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
 
@@ -41,10 +43,11 @@ namespace CDP4Composition.Extensions
         /// <param name="dal">The <see cref="IDal"/></param>
         /// <param name="credentials">The <see cref="Credentials"/></param>
         /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
         /// <returns></returns>
-        public static ISession CreateSession(this IDal dal, Credentials credentials, ICDPMessageBus messageBus)
+        public static ISession CreateSession(this IDal dal, Credentials credentials, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService)
         {
-            var session = new Session(dal, credentials, messageBus);
+            var session = new Session(dal, credentials, messageBus, exceptionHandlerService);
 
             try
             {

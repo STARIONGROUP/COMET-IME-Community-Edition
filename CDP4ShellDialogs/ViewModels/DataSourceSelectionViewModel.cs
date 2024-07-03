@@ -33,6 +33,8 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
+    using CDP4Common.ExceptionHandlerService;
+
     using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
@@ -140,6 +142,11 @@ namespace CDP4ShellDialogs.ViewModels
         private readonly IEnumerable<ISession> openSessions;
 
         /// <summary>
+        /// The <see cref="IExceptionHandlerService"/>
+        /// </summary>
+        private readonly IExceptionHandlerService exceptionHandlerService;
+
+        /// <summary>
         /// The dialog navigation service.
         /// </summary>
         private IDialogNavigationService dialogNavigationService;
@@ -166,10 +173,11 @@ namespace CDP4ShellDialogs.ViewModels
         /// <param name="messageBus">
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
+        /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
         /// <param name="openSessions">
         /// The openSessions.
         /// </param>
-        public DataSourceSelectionViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, IEnumerable<ISession> openSessions = null)
+        public DataSourceSelectionViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService, IEnumerable<ISession> openSessions = null)
         {
             this.messageBus = messageBus;
 
@@ -177,6 +185,7 @@ namespace CDP4ShellDialogs.ViewModels
             this.IsBusy = false;
 
             this.openSessions = openSessions;
+            this.exceptionHandlerService = exceptionHandlerService;
             this.dialogNavigationService = dialogNavigationService;
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
 
@@ -452,7 +461,7 @@ namespace CDP4ShellDialogs.ViewModels
 
                 this.IsBusy = true;
 
-                this.session = dalInstance.CreateSession(credentials, this.messageBus);
+                this.session = dalInstance.CreateSession(credentials, this.messageBus, this.exceptionHandlerService);
 
                 try
                 {

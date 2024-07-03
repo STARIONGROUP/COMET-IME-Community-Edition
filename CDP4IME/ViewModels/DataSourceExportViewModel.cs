@@ -32,6 +32,7 @@ namespace COMET.ViewModels
     using System.Reactive;
     using System.Windows;
 
+    using CDP4Common.ExceptionHandlerService;
     using CDP4Common.MetaInfo;
 
     using CDP4Composition.Exceptions;
@@ -136,6 +137,11 @@ namespace COMET.ViewModels
         private readonly ICDPMessageBus messageBus;
 
         /// <summary>
+        /// The <see cref="IExceptionHandlerService"/>
+        /// </summary>
+        private readonly IExceptionHandlerService exceptionHandlerService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceExportViewModel"/> class.
         /// </summary>
         /// <param name="sessions">
@@ -147,7 +153,8 @@ namespace COMET.ViewModels
         /// <param name="messageBus">
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
-        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService, ICDPMessageBus messageBus)
+        /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
+        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService)
         {
             if (openSaveFileDialogService == null)
             {
@@ -155,6 +162,7 @@ namespace COMET.ViewModels
             }
 
             this.messageBus = messageBus;
+            this.exceptionHandlerService = exceptionHandlerService;
 
             this.openSaveFileDialogService = openSaveFileDialogService;
             this.AvailableDals = new List<IDalMetaData>();
@@ -367,7 +375,7 @@ namespace COMET.ViewModels
                 var dal = this.dals.Single(x => x.Metadata == this.SelectedDal);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType(), this.SelectedVersion.Value);
 
-                var fileExportSession = dalInstance.CreateSession(creds, this.messageBus);
+                var fileExportSession = dalInstance.CreateSession(creds, this.messageBus, this.exceptionHandlerService);
 
                 // create write
                 var operationContainers = new List<OperationContainer>();

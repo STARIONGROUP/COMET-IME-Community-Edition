@@ -126,7 +126,7 @@ namespace COMET.Tests
             var availableDals = new AvailableDals(dals);
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>()).Returns(availableDals);
 
-            this.viewModel = new ShellViewModel(this.navigationService.Object, this.messageBus, null);
+            this.viewModel = new ShellViewModel(this.navigationService.Object, this.messageBus, null, null);
         }
 
         [TearDown]
@@ -140,7 +140,7 @@ namespace COMET.Tests
         [Test]
         public void VerifyThatArgumentNullExceptionIsThrown()
         {
-            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null, null, null, null));
         }
 
         [Test]
