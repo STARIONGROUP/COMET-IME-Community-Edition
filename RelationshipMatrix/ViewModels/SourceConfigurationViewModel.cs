@@ -50,6 +50,11 @@ namespace CDP4RelationshipMatrix.ViewModels
     public class SourceConfigurationViewModel : MatrixConfigurationViewModelBase
     {
         /// <summary>
+        /// Valie indicating that the process of performing a Light Update is suppressed and should not be executed
+        /// </summary>
+        private bool suppressLightUpdate = false;
+
+        /// <summary>
         /// The possible choice of type of <see cref="Thing"/> to display in the matrix
         /// </summary>
         private readonly List<ClassKind> possibleClassKind = new List<ClassKind>();
@@ -130,7 +135,14 @@ namespace CDP4RelationshipMatrix.ViewModels
         public SourceConfigurationViewModel(ISession session, Iteration iteration, Action onUpdateAction, Action onLightUpdateAction,
             RelationshipMatrixPluginSettings settings) : base(session, iteration, onUpdateAction, settings)
         {
-            this.OnLightUpdateAction = onLightUpdateAction;
+            this.OnLightUpdateAction =
+                () =>
+                {
+                    if (!this.suppressLightUpdate)
+                    {
+                        onLightUpdateAction.Invoke();
+                    }
+                };
 
             this.possibleClassKind.AddRange(this.PluginSetting.PossibleClassKinds.OrderBy(x => x.ToString()));
             this.possibleDisplayKinds.AddRange(this.PluginSetting.PossibleDisplayKinds.OrderBy(x => x.ToString()));
@@ -147,8 +159,10 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.WhenAnyValue(x => x.SelectedClassKind).Skip(1).Subscribe(_ =>
             {
+                this.suppressLightUpdate = true;
                 this.PopulatePossibleCategories();
                 this.PopulatePossibleOwners();
+                this.suppressLightUpdate = false;
                 this.OnUpdateAction();
             });
 
@@ -213,8 +227,6 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.SelectedDisplayKind = source.SelectedDisplayKind;
             this.SelectedSortKind = source.SelectedSortKind;
             this.selectedSortOrder = source.SortOrder;
-
-            this.OnLightUpdateAction = onLightUpdateAction;
 
             // populate selected categories
             var categories = new List<Category>();
@@ -443,7 +455,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 categories.AddRange(this.SelectedCategories.Select(x => x.Name));
             }
 
-            this.CategoriesString = string.Join($" {this.SelectedBooleanOperatorKind} ", categories);
+            this.CategoriesString = string.Join($" {this.SelectedBooleanOperatorKind} ", categories.OrderBy(x => x).ToList());
         }
     }
 }

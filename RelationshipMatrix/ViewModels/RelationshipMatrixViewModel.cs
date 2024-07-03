@@ -51,7 +51,7 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4RelationshipMatrix.Settings;
 
     using CommonServiceLocator;
-
+    using DynamicData;
     using NLog;
 
     using ReactiveUI;
@@ -837,6 +837,81 @@ namespace CDP4RelationshipMatrix.ViewModels
                         if (sourceConfiguration.IncludeSubcategories)
                         {
                             categoryGroup.AddRange(category.AllDerivedCategories());
+                        }
+
+                        categoryLists.Add(thingCategories.Intersect(categoryGroup).Any());
+                    }
+
+                    return categoryLists.All(x => x);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the <see cref="ICategorizableThing" /> has any categories that fall under the filter criteria
+        /// This specific overload can receive extra parameters for performance reasons.
+        /// </summary>
+        /// <param name="thing">The <see cref="ICategorizableThing" /> to check</param>
+        /// <param name="sourceConfiguration">The <see cref="SourceConfigurationViewModel" /> that defines the parameters.</param>
+        /// <param name="thingCategoriesExcludingDerived">A precalculated collection of <see cref="Category"/>'s that can be used for faster execution of this overload of <see cref="IsCategoryApplicableToConfiguration"/>. The <see cref="Category"/>'s here should be defined based on <see cref="Thing"/>s.</param>
+        /// <param name="sourceConfigurationCategoriesIncludingDerived">A Dictionary that holds a collection of <see cref="Category"/>'s and their derived Categories that can be used for faster execution of this overload of <see cref="IsCategoryApplicableToConfiguration"/>. The <see cref="Category"/>'s here should be defined based on <see cref="Category"/>'s found in the applicable <see cref="SourceConfigurationViewModel.SelectedCategories"/>.</param>
+        /// <returns>True if the criteria is met.</returns>
+        public static bool IsCategoryApplicableToConfiguration(
+            ICategorizableThing thing,
+            SourceConfigurationViewModel sourceConfiguration, 
+            List<Category> thingCategoriesExcludingDerived,
+            Dictionary<Category, List<Category>> sourceConfigurationCategoriesIncludingDerived)
+        {
+            var thingCategories = new List<Category>(thing.Category);
+
+            // if the thing is ElementUsage, add the ElementDefinition categories
+            if (thing is ElementUsage usage)
+            {
+                thingCategories.AddRange(usage.ElementDefinition.Category);
+            }
+
+            foreach (var thingcategory in thingCategories.ToList())
+            {
+                if (thingCategoriesExcludingDerived.Contains(thingcategory))
+                {
+                    thingCategories.Add(thingcategory);
+                }
+            }
+
+            thingCategories = thingCategories.Distinct().ToList();
+
+            switch (sourceConfiguration.SelectedBooleanOperatorKind)
+            {
+                case CategoryBooleanOperatorKind.OR:
+                    // if subcategories should be selected, expand the list
+                    var allCategories = new List<Category>(sourceConfiguration.SelectedCategories);
+
+                    if (sourceConfiguration.IncludeSubcategories)
+                    {
+                        foreach (var category in sourceConfiguration.SelectedCategories)
+                        {
+                            if (sourceConfigurationCategoriesIncludingDerived.TryGetValue(category, out var value))
+                            {
+                                allCategories.AddRange(value);
+                            }
+                        }
+                    }
+
+                    return thingCategories.Intersect(allCategories).Any();
+                case CategoryBooleanOperatorKind.AND:
+                    var categoryLists = new List<bool>();
+
+                    foreach (var category in sourceConfiguration.SelectedCategories)
+                    {
+                        var categoryGroup = new List<Category> { category };
+
+                        if (sourceConfiguration.IncludeSubcategories)
+                        {
+                            if (sourceConfigurationCategoriesIncludingDerived.TryGetValue(category, out var value))
+                            {
+                                categoryGroup.AddRange(value);
+                            }
                         }
 
                         categoryLists.Add(thingCategories.Intersect(categoryGroup).Any());
