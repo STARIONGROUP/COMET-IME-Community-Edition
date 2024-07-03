@@ -84,9 +84,13 @@ namespace CDP4Composition.ExceptionHandlers
             {
                 this.messageboxService.Show("It is not allowed to write data to a frozen IterationSetup.", "Frozen Iteration", MessageBoxButton.OK, MessageBoxImage.Error);
 
-                if (this.messageboxService.Show("Do you want to try to close the current Iteration and open the Active Iteration?", "Open Active Iteration", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                if (Application.Current?.MainWindow != null)
                 {
-                    this.DispatchAction(() => this.StartCloseCurrentAndReopenActiveIteration(payload));
+                    if (this.messageboxService.Show("Do you want to try to close the current Iteration and open the Active Iteration?", "Open Active Iteration", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    {
+                        this.DispatchAction(() => this.StartCloseCurrentAndReopenActiveIteration(payload));
+                    }
+
                     return true;
                 }
             }
@@ -108,7 +112,7 @@ namespace CDP4Composition.ExceptionHandlers
             }
             else
             {
-                Application.Current.Dispatcher.InvokeAsync(
+                Application.Current.Dispatcher.Invoke(
                     action,
                     DispatcherPriority.Background);
             }
@@ -119,7 +123,7 @@ namespace CDP4Composition.ExceptionHandlers
         /// </summary>
         /// <param name="payload">The payload that was added to the generic call to the <see cref="ExceptionHandlerService"/></param>
         /// <returns>An awaitable <see cref="Task"/></returns>
-        private async Task StartCloseCurrentAndReopenActiveIteration(object[] payload)
+        private async void StartCloseCurrentAndReopenActiveIteration(object[] payload)
         {
             DXSplashScreen.Show<LoadingView>();
             this.DispatchAction(() => DXSplashScreen.SetState("Reopening Iteration..."));
@@ -130,7 +134,7 @@ namespace CDP4Composition.ExceptionHandlers
             {
                 var session = payload.OfType<ISession>().FirstOrDefault();
                 var operationContainer = payload.OfType<OperationContainer>().FirstOrDefault();
-                
+
                 if (session != null && operationContainer != null)
                 {
                     if (this.TryGetIterationIidFromContext(operationContainer, out var iterationIid))
