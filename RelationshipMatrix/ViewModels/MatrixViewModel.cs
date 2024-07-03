@@ -754,16 +754,39 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return sourceXCatThing;
             }
 
+            var applicableThings =
+                source
+                    .Where(this.IsDefinedThingDisplayAllowed)
+                    .OfType<ICategorizableThing>()
+                    .ToList();
+
+            var thingCategoriesExcludingDerived = applicableThings.SelectMany(x => x.Category).Distinct().ToList();
+            var elementUsageCategories = applicableThings.OfType<ElementUsage>().SelectMany(x => x.ElementDefinition.Category).ToList();
+
+            thingCategoriesExcludingDerived = thingCategoriesExcludingDerived.Union(elementUsageCategories).Distinct().ToList();
+
+            var sourceConfigurationCategoriesIncludingDerived = new Dictionary<Category, List<Category>>();
+
+            if (sourceConfigurationViewModel.IncludeSubcategories)
+            {
+                foreach (var category in sourceConfigurationViewModel.SelectedCategories)
+                {
+                    sourceConfigurationCategoriesIncludingDerived.Add(category, category.AllDerivedCategories().Union(new [] {category}).ToList());
+                }
+            }
+            else
+            {
+                foreach (var category in sourceConfigurationViewModel.SelectedCategories)
+                {
+                    sourceConfigurationCategoriesIncludingDerived.Add(category, new[] { category }.ToList());
+                }
+            }
+
             foreach (var definedThing in source)
             {
-                if (!this.IsDefinedThingDisplayAllowed(definedThing))
-                {
-                    continue;
-                }
-
                 var thing = (ICategorizableThing)definedThing;
 
-                if (RelationshipMatrixViewModel.IsCategoryApplicableToConfiguration(thing, sourceConfigurationViewModel))
+                if (RelationshipMatrixViewModel.IsCategoryApplicableToConfiguration(thing, sourceConfigurationViewModel, thingCategoriesExcludingDerived, sourceConfigurationCategoriesIncludingDerived))
                 {
                     if (definedThing is IOwnedThing ownedThing)
                     {

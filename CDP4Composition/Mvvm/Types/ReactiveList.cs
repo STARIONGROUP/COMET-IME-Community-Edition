@@ -340,9 +340,11 @@ namespace CDP4Composition.Mvvm
         /// <param name="remove">The <see cref="IEnumerable{T}"/></param>
         public void RemoveAll(IEnumerable<T> remove)
         {
-            foreach (var removable in remove)
+            var removeList = remove.ToList();
+            this.SourceList.RemoveMany(removeList);
+
+            foreach (var removable in removeList)
             {
-                this.SourceList.Remove(removable);
                 this.itemsRemoved?.OnNext(removable);
             }
         }
@@ -565,9 +567,13 @@ namespace CDP4Composition.Mvvm
         /// <param name="items">The items to add</param>
         public void AddRange(IEnumerable<T> items)
         {
-            foreach (var item in items)
+            var itemList = items.ToList();
+
+            this.SourceList.AddRange(itemList);
+
+            foreach (var item in itemList)
             {
-                this.Add(item);
+                this.itemsAdded?.OnNext(item);
             }
         }
 
