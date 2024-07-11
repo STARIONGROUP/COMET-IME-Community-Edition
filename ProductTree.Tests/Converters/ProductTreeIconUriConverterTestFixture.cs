@@ -39,6 +39,7 @@ namespace CDP4ProductTree.Tests.Converters
 
     using CDP4CommonView;
 
+    using CDP4Composition.Services;
     using CDP4Composition.Services.NestedElementTreeService;
 
     using CDP4Dal;
@@ -78,6 +79,7 @@ namespace CDP4ProductTree.Tests.Converters
         private ProductTreeIconUriConverter converter;
         private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<IServiceLocator> serviceLocator;
+        private Mock<IIconCacheService> iconCacheService;
         private CDPMessageBus messageBus;
 
         [SetUp]
@@ -124,7 +126,9 @@ namespace CDP4ProductTree.Tests.Converters
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             this.nestedElementTreeService = new Mock<INestedElementTreeService>();
+            this.iconCacheService = new Mock<IIconCacheService>();
             this.serviceLocator.Setup(x => x.GetInstance<INestedElementTreeService>()).Returns(this.nestedElementTreeService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IIconCacheService>()).Returns(this.iconCacheService.Object);
         }
 
         [Test]
@@ -160,14 +164,17 @@ namespace CDP4ProductTree.Tests.Converters
             var subscribedByOthersIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/blueball.gif";
             var subscribedIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/whiteball.jpg";
 
+            this.iconCacheService.Setup(x => x.QueryBitmapImage(new Uri(unusedIcon))).Returns(new BitmapImage(new Uri(unusedIcon)));
             var converterResult = (BitmapImage)this.converter.Convert(new object[] { row.ThingStatus, row.Usage }, null, null, null);
             Assert.AreEqual(unusedIcon, converterResult.UriSource.ToString());
 
             row.Usage = ParameterUsageKind.SubscribedByOthers;
+            this.iconCacheService.Setup(x => x.QueryBitmapImage(new Uri(subscribedByOthersIcon))).Returns(new BitmapImage(new Uri(subscribedByOthersIcon)));
             converterResult = (BitmapImage)this.converter.Convert(new object[] { row.ThingStatus, row.Usage }, null, null, null);
             Assert.AreEqual(subscribedByOthersIcon, converterResult.UriSource.ToString());
 
             row.Usage = ParameterUsageKind.Subscribed;
+            this.iconCacheService.Setup(x => x.QueryBitmapImage(new Uri(subscribedIcon))).Returns(new BitmapImage(new Uri(subscribedIcon)));
             converterResult = (BitmapImage)this.converter.Convert(new object[] { row.ThingStatus, row.Usage }, null, null, null);
             Assert.AreEqual(subscribedIcon, converterResult.UriSource.ToString());
         }

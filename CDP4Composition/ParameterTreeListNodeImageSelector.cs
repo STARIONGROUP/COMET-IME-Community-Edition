@@ -80,7 +80,7 @@ namespace CDP4Composition
                 {
                     var stateUri = new Uri(IconUtilities.ImageUri(ClassKind.ActualFiniteState).ToString());
                     var baseUri = new Uri(IconUtilities.ImageUri(parameterRow.Parameter.ClassKind).ToString());
-                    return IconUtilities.WithOverlay(baseUri, stateUri);
+                    this.QueryIIconCacheService().QueryOverlayBitmapSource(baseUri, stateUri, OverlayPositionKind.TopRight);
                 }
 
                 if (parameterRow.Parameter != null)
@@ -90,7 +90,7 @@ namespace CDP4Composition
 
                 var uri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
 
-                return new BitmapImage(uri);
+                return this.QueryIIconCacheService().QueryBitmapImage(uri);
             }
             catch (Exception e)
             {

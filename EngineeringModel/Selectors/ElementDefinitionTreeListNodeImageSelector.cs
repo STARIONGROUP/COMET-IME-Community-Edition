@@ -29,7 +29,6 @@ namespace CDP4EngineeringModel.Selectors
     using System.Globalization;
     using System.Linq;
     using System.Windows.Media;
-    using System.Windows.Media.Imaging;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -38,8 +37,11 @@ namespace CDP4EngineeringModel.Selectors
 
     using CDP4Composition;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
 
     using CDP4EngineeringModel.ViewModels;
+
+    using CommonServiceLocator;
 
     using DevExpress.Xpf.Grid;
     using DevExpress.Xpf.Grid.TreeList;
@@ -49,6 +51,11 @@ namespace CDP4EngineeringModel.Selectors
     /// </summary>
     public class ElementDefinitionTreeListNodeImageSelector : TreeListNodeImageSelector
     {
+        /// <summary>
+        /// The <see cref="IIconCacheService" />
+        /// </summary>
+        private IIconCacheService iconCacheService;
+
         /// <summary>
         /// Select node and adds icon to it
         /// </summary>
@@ -116,18 +123,18 @@ namespace CDP4EngineeringModel.Selectors
 
                     if (parameterBase.StateDependence != null || isCompound)
                     {
-                        return new BitmapImage(optionUri);
+                        return this.QueryIIconCacheService().QueryBitmapImage(optionUri);
                     }
 
                     var uri = new Uri(IconUtilities.ImageUri(parameterBase.ClassKind).ToString());
-                    return IconUtilities.WithOverlay(uri, optionUri);
+                    return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, optionUri, OverlayPositionKind.TopRight);
                 }
 
                 // row representing a component
                 if (valuesetRowType == ClassKind.ParameterTypeComponent)
                 {
                     var componentUri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
-                    return new BitmapImage(componentUri);
+                    return this.QueryIIconCacheService().QueryBitmapImage(componentUri);
                 }
 
                 // Row representing state
@@ -135,11 +142,11 @@ namespace CDP4EngineeringModel.Selectors
 
                 if (isCompound)
                 {
-                    return new BitmapImage(stateUri);
+                    return this.QueryIIconCacheService().QueryBitmapImage(stateUri);
                 }
 
                 var baseUri = new Uri(IconUtilities.ImageUri(parameterBase.ClassKind).ToString());
-                return IconUtilities.WithOverlay(baseUri, stateUri);
+                return this.QueryIIconCacheService().QueryOverlayBitmapSource(baseUri, stateUri, OverlayPositionKind.TopRight);
             }
             catch (Exception ex)
             {
@@ -147,6 +154,17 @@ namespace CDP4EngineeringModel.Selectors
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Queries the instance of the <see cref="IIconCacheService" /> that is to be used
+        /// </summary>
+        /// <returns>
+        /// An instance of <see cref="IIconCacheService" />
+        /// </returns>
+        private IIconCacheService QueryIIconCacheService()
+        {
+            return this.iconCacheService ??= ServiceLocator.Current.GetInstance<IIconCacheService>();
         }
     }
 }

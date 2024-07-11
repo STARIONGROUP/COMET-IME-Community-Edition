@@ -230,7 +230,7 @@ namespace CDP4Composition
         /// </returns>
         private IIconCacheService QueryIIconCacheService()
         {
-            return this.iconCacheService ?? (this.iconCacheService = ServiceLocator.Current.GetInstance<IIconCacheService>());
+            return this.iconCacheService ??= ServiceLocator.Current.GetInstance<IIconCacheService>();
         }
     }
 }

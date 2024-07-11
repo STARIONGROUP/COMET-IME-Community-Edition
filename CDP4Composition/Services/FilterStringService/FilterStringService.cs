@@ -194,7 +194,7 @@ namespace CDP4Composition.Services
         /// <summary>
         /// Remove the view from all registered disctionaries.
         /// </summary>
-        /// <param name="view">The view to remove.</param>
+        /// <param name="viewModel">The view to remove.</param>
         private void RemoveView(IPanelFilterableDataGridViewModel viewModel)
         {
             this.OpenDeprecatedViewModels.Remove(viewModel);
@@ -207,15 +207,12 @@ namespace CDP4Composition.Services
         /// <param name="viewModel">The view to refresh.</param>
         private void Refresh(IPanelFilterableDataGridViewModel viewModel)
         {
-            viewModel.FilterString = string.Empty;
-
-            // filters are always reenabled in case they were manually turned off.
-            viewModel.IsFilterEnabled = true;
+            var newFilterString = string.Empty;
 
             // deprecation state can be told no matter if the browser has the favorites vm assigned or not
             if (!this.ShowDeprecatedThings)
             {
-                viewModel.FilterString = DeprecatedFilterString;
+                newFilterString = DeprecatedFilterString;
             }
 
             // if the control is favoratable
@@ -225,21 +222,22 @@ namespace CDP4Composition.Services
 
                 if (!this.ShowDeprecatedThings && favoritesBrowserViewModel.ShowOnlyFavorites)
                 {
-                    viewModel.FilterString = FavoriteAndHideDeprecatedFilterString;
+                    newFilterString = FavoriteAndHideDeprecatedFilterString;
                 }
                 else if (this.ShowDeprecatedThings && favoritesBrowserViewModel.ShowOnlyFavorites)
                 {
-                    viewModel.FilterString = FavoriteFilterString;
+                    newFilterString = FavoriteFilterString;
                 }
                 else if (!this.ShowDeprecatedThings && !favoritesBrowserViewModel.ShowOnlyFavorites)
                 {
-                    viewModel.FilterString = DeprecatedFilterString;
-                }
-                else
-                {
-                    viewModel.FilterString = string.Empty;
+                    newFilterString = DeprecatedFilterString;
                 }
             }
+
+            // filters are always reenabled in case they were manually turned off.
+            viewModel.IsFilterEnabled = true;
+
+            viewModel.FilterString = newFilterString;
         }
     }
 }

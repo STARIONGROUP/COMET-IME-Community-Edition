@@ -29,14 +29,16 @@ namespace CDP4ProductTree
     using System.Globalization;
     using System.Linq;
     using System.Windows.Data;
-    using System.Windows.Media.Imaging;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
 
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
 
     using CDP4ProductTree.ViewModels;
+
+    using CommonServiceLocator;
 
     /// <summary>
     /// The purpose of the <see cref="ProductTreeIconUriConverter" /> is to return an icon based on the
@@ -44,6 +46,11 @@ namespace CDP4ProductTree
     /// </summary>
     public class ProductTreeIconUriConverter : IMultiValueConverter
     {
+        /// <summary>
+        /// The <see cref="IIconCacheService" />
+        /// </summary>
+        private IIconCacheService iconCacheService;
+
         /// <summary>
         /// Returns an GetImage (icon) if a ParameterOrOverride value is provided to display in the product tree.
         /// </summary>
@@ -119,10 +126,10 @@ namespace CDP4ProductTree
                 }
 
                 return thingStatus.HasError
-                    ? IconUtilities.WithErrorOverlay(uri)
+                    ? this.QueryIIconCacheService().QueryErrorOverlayBitmapSource(uri)
                     : thingStatus.HasRelationship
-                        ? IconUtilities.WithOverlay(uri, IconUtilities.RelationshipOverlayUri)
-                        : new BitmapImage(uri);
+                        ? this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.RelationshipOverlayUri, OverlayPositionKind.TopRight)
+                        : this.QueryIIconCacheService().QueryBitmapImage(uri);
             }
             catch (Exception e)
             {
@@ -130,6 +137,17 @@ namespace CDP4ProductTree
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// Queries the instance of the <see cref="IIconCacheService" /> that is to be used
+        /// </summary>
+        /// <returns>
+        /// An instance of <see cref="IIconCacheService" />
+        /// </returns>
+        private IIconCacheService QueryIIconCacheService()
+        {
+            return this.iconCacheService ??= ServiceLocator.Current.GetInstance<IIconCacheService>();
         }
     }
 }
