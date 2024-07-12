@@ -185,6 +185,11 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.Scale = compoundParameterType.Component[this.ValueIndex].Scale;
             this.ScaleShortName = this.Scale == null ? "-" : this.Scale.ShortName;
+
+            if (this.Thing is ParameterSubscription)
+            {
+                this.Published = this.Computed;
+            }
         }
 
         /// <summary>

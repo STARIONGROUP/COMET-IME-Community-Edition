@@ -11,8 +11,8 @@
 	<Product>CDP4EngineeringModel</Product>
 	<Description>CDP4-COMET Engineering Model Plugin</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>10.0.0.15</AssemblyVersion>
-	<FileVersion>10.0.0.15</FileVersion>
+	<AssemblyVersion>10.0.0.16</AssemblyVersion>
+	<FileVersion>10.0.0.16</FileVersion>
   <LangVersion>latest</LangVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
@@ -40,13 +40,13 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.1.0">
+    <PackageReference Include="CDP4Common-CE" Version="27.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.1.0">
+    <PackageReference Include="CDP4Dal-CE" Version="27.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.1.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">

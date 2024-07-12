@@ -423,12 +423,19 @@ namespace CDP4EngineeringModel.ViewModels
             var isOwner = false;
 
             if (this.Container is File file)
-            {                
-                var iteration = this.Container.GetContainerOfType<Iteration>();
-
-                if (iteration != null)
+            {
+                if (file.Container is CommonFileStore)
                 {
-                    isOwner = this.Session.QueryDomainOfExpertise(iteration).Contains(file.Owner);
+                    isOwner = true;
+                }
+                else
+                {
+                    var iteration = this.Container.GetContainerOfType<Iteration>();
+
+                    if (iteration != null)
+                    {
+                        isOwner = this.Session.QueryDomainOfExpertise(iteration).Contains(file.Owner);
+                    }
                 }
             }
 

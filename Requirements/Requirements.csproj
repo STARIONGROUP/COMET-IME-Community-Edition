@@ -11,8 +11,8 @@
 	<Product>Requirements</Product>
 	<Description>CDP4-COMET Requirements Plugin</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>10.0.0.15</AssemblyVersion>
-	<FileVersion>10.0.0.15</FileVersion>
+	<AssemblyVersion>10.0.0.16</AssemblyVersion>
+	<FileVersion>10.0.0.16</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -42,16 +42,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.1.0">
+    <PackageReference Include="CDP4Common-CE" Version="27.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.1.0">
+    <PackageReference Include="CDP4Dal-CE" Version="27.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.1.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.1.0">
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
@@ -181,10 +181,10 @@
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
 	<PackageReference Include="DotLiquid" Version="2.2.692" />
-	<PackageReference Include="NetOfficeFw.Core" Version="1.9.5">
+	<PackageReference Include="NetOfficeFw.Core" Version="1.9.6">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="NetOfficeFw.Excel" Version="1.9.5">
+	<PackageReference Include="NetOfficeFw.Excel" Version="1.9.6">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.3">
@@ -205,7 +205,7 @@
 	<PackageReference Include="System.ComponentModel.Composition" Version="8.0.0">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.77">
+	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReqIFSharp" Version="4.0.0" />

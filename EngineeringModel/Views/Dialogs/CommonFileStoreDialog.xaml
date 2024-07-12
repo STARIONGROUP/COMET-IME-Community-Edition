@@ -28,12 +28,6 @@
             <lc:LayoutGroup Header="Basic" Orientation="Vertical">
                 <items:NameLayoutItem />
                 <items:OwnerLayoutItem />
-                <lc:LayoutItem Label="Private:">
-                    <dxe:CheckEdit Name="IsHidden" 
-                                   IsChecked="{Binding Path=IsHidden, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                                   IsReadOnly="{Binding IsReadOnly}"/>
-
-                </lc:LayoutItem>
             </lc:LayoutGroup>
             <items:AdvancedLayoutGroup />
         </lc:LayoutGroup>

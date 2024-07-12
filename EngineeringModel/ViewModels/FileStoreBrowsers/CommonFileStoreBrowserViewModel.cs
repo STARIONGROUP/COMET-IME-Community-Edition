@@ -44,6 +44,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -55,7 +56,7 @@ namespace CDP4EngineeringModel.ViewModels
     /// <summary>
     /// The view-model for the <see cref="CommonFileStoreBrowserViewModel"/> view
     /// </summary>
-    public class CommonFileStoreBrowserViewModel : BrowserViewModelBase<EngineeringModel>, IPanelViewModel, IDropTarget
+    public class CommonFileStoreBrowserViewModel : BrowserViewModelBase<EngineeringModel>, IPanelViewModel, IDropTarget, IDownloadFileViewModel
     {
         /// <summary>
         /// The Panel Caption
@@ -88,9 +89,29 @@ namespace CDP4EngineeringModel.ViewModels
         private bool canUploadFile;
 
         /// <summary>
+        /// Backing field for <see cref="CanDownloadFile"/>
+        /// </summary>
+        private bool canDownloadFile;
+
+        /// <summary>
+        /// Backing field for <see cref="IsCancelButtonVisible"/>
+        /// </summary>
+        private bool isCancelButtonVisible;
+
+        /// <summary>
+        /// Backing field for <see cref="LoadingMessage"/>
+        /// </summary>
+        private string loadingMessage;
+
+        /// <summary>
         /// The <see cref="IOpenSaveFileDialogService"/>
         /// </summary>
         private readonly IOpenSaveFileDialogService fileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
+
+        /// <summary>
+        /// The (injected) <see cref="IDownloadFileService"/>
+        /// </summary>
+        private IDownloadFileService downloadFileService = ServiceLocator.Current.GetInstance<IDownloadFileService>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CommonFileStoreBrowserViewModel"/> class.
@@ -161,6 +182,33 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the <see cref="DownloadFileCommand"/> can be executed
+        /// </summary>
+        public bool CanDownloadFile
+        {
+            get => this.canDownloadFile;
+            private set => this.RaiseAndSetIfChanged(ref this.canDownloadFile, value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the Cancel button is visible on the <see cref="LoadingControl"/>
+        /// </summary>
+        public bool IsCancelButtonVisible
+        {
+            get => this.isCancelButtonVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isCancelButtonVisible, value);
+        }
+
+        /// <summary>
+        /// Gets a value the message text on the <see cref="LoadingControl"/>
+        /// </summary>
+        public string LoadingMessage
+        {
+            get => this.loadingMessage;
+            set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
+        }
+
+        /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="Folder"/>
         /// </summary>
         public ReactiveCommand<Unit, Unit> CreateFolderCommand { get; private set; }
@@ -169,6 +217,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ICommand"/> to upload a <see cref="CDP4Common.EngineeringModelData.File"/>
         /// </summary>
         public ReactiveCommand<Unit, Unit> UploadFileCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to download a file from the newest <see cref="FileRevision"/> that belongs to the selected <see cref="File"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> DownloadFileCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand"/> to cancel download of a file
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CancelDownloadCommand { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="CreateStoreCommand"/> can be executed
@@ -207,6 +265,17 @@ namespace CDP4EngineeringModel.ViewModels
             this.UploadFileCommand = ReactiveCommandCreator.Create(
                 () => this.ExecuteCreateCommandForFile(this.SelectedThing.Thing),
                 this.WhenAnyValue(x => x.CanUploadFile));
+
+            this.CancelDownloadCommand = ReactiveCommandCreator.Create(() => this.downloadFileService.CancelDownloadFile(this));
+
+            this.DownloadFileCommand = ReactiveCommandCreator.Create(() =>
+                {
+                    if (this.SelectedThing.Thing is File file)
+                    {
+                        this.downloadFileService.ExecuteDownloadFile(this, file);
+                    }
+                },
+                this.WhenAnyValue(x => x.CanDownloadFile));
         }
 
         /// <summary>
@@ -227,10 +296,12 @@ namespace CDP4EngineeringModel.ViewModels
             base.ComputePermission();
 
             var isContainer = this.SelectedThing?.Thing is CommonFileStore || this.SelectedThing?.Thing is Folder;
+            var isFile = this.SelectedThing?.Thing is File;
 
             this.CanCreateStore = this.PermissionService.CanWrite(ClassKind.CommonFileStore, this.Thing);
             this.CanCreateFolder = isContainer && this.PermissionService.CanWrite(ClassKind.Folder, this.SelectedThing.Thing);
             this.CanUploadFile = isContainer && this.PermissionService.CanWrite(ClassKind.File, this.SelectedThing.Thing);
+            this.CanDownloadFile = isFile && this.PermissionService.CanRead(this.SelectedThing.Thing);
         }
 
         /// <summary>
@@ -242,7 +313,8 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Common File Store", "", this.CreateStoreCommand, MenuItemKind.Create, ClassKind.CommonFileStore));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Folder", "", this.CreateFolderCommand, MenuItemKind.Create, ClassKind.Folder));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Upload a File to the File Store", "", this.UploadFileCommand, MenuItemKind.Create, ClassKind.File));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Add a File to the File Store", "", this.UploadFileCommand, MenuItemKind.Create, ClassKind.File));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Download File", "", this.DownloadFileCommand, MenuItemKind.Export, ClassKind.FileRevision));
         }
 
         /// <summary>

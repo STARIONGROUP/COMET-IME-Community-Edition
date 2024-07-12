@@ -237,7 +237,6 @@ namespace CDP4CommonView
             clone.Owner = this.SelectedOwner;
             clone.Category.Clear();
             clone.Category.AddRange(this.Category);
-
         }
 
         /// <summary>
