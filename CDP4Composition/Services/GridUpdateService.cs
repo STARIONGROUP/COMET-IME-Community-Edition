@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GridUpdateService.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
 //            Nathanael Smiechowski, Kamil Wojnowski
@@ -29,7 +29,9 @@ namespace CDP4Composition.Services
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
+    using System.Windows.Input;
 
+    using DevExpress.Xpf.Editors;
     using DevExpress.Xpf.Grid;
 
     using NLog;
@@ -95,28 +97,43 @@ namespace CDP4Composition.Services
             {
                 if ((bool?)e.NewValue == true)
                 {
-                    grid.BeginDataUpdate();
+                    if (grid is TreeListControl treeListControl)
+                    {
+                        if (treeListControl.View.ActiveEditor is PopupBaseEdit popupBaseEdit)
+                        {
+                            popupBaseEdit.ClosePopup();
+                        }
+
+                        treeListControl.View.CancelRowEdit();
+
+                        treeListControl.View.BeginDataUpdate(true);
+                        Mouse.OverrideCursor = Cursors.Wait;
+                    }
+                    else if (grid is GridControl gridControl)
+                    {
+                        // cancel out of any active edit.
+                        gridControl.View.CancelRowEdit();
+
+                        if (gridControl.View.ActiveEditor is PopupBaseEdit popupBaseEdit)
+                        {
+                            popupBaseEdit.ClosePopup();
+                        }
+
+                        gridControl.BeginDataUpdate();
+                    }
                 }
                 else if ((bool?)e.NewValue == false)
                 {
-                    var treeListControl = grid as TreeListControl;
-
-                    if (treeListControl != null)
+                    if (grid is TreeListControl treeListControl)
                     {
-                        treeListControl.View.CancelRowEdit();
-                        treeListControl.EndDataUpdate();
+                        treeListControl.View.EndDataUpdate();
                     }
-                    else
+                    else if (grid is GridControl gridControl && gridControl.DataController.IsUpdateLocked)
                     {
-                        var gridControl = grid as GridControl;
-
-                        if (gridControl != null && gridControl.DataController.IsUpdateLocked)
-                        {
-                            // cancel out of any active edit.
-                            gridControl.View.CancelRowEdit();
-                            grid.EndDataUpdate();
-                        }
+                        grid.EndDataUpdate();
                     }
+
+                    Mouse.OverrideCursor = null;
                 }
             }
             catch (Exception exception)

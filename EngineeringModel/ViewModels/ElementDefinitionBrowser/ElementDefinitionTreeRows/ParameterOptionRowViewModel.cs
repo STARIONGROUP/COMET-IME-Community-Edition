@@ -76,5 +76,18 @@ namespace CDP4EngineeringModel.ViewModels
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Option, discriminator, action)));
             }
         }
+
+        /// <summary>
+        /// Setting values for this <see cref="ParameterOptionRowViewModel"/>
+        /// </summary>
+        public override void SetValues()
+        {
+            base.SetValues();
+
+            if (this.Thing is ParameterSubscription)
+            {
+                this.Published = this.Computed;
+            }
+        }
     }
 }

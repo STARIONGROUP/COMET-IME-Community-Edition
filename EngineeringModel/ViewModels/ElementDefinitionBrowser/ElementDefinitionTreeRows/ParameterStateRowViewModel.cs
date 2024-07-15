@@ -79,6 +79,19 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Setting values for this <see cref="ParameterStateRowViewModel"/>
+        /// </summary>
+        public override void SetValues()
+        {
+            base.SetValues();
+
+            if (this.Thing is ParameterSubscription)
+            {
+                this.Published = this.Computed;
+            }
+        }
+
+        /// <summary>
         /// Initializes the <see cref="Option"/> related subscriptions
         /// </summary>
         private void InitializeOptionSubscriptions()

@@ -1,25 +1,48 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SimpleParameterValueDialogViewModel.cs" company="Starion Group S.A.">
-//   Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+    using CDP4Dal.Operations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -71,7 +94,7 @@ namespace CDP4Requirements.ViewModels
         /// <param name="chainOfContainers">
         /// The optional chain of containers that contains the <paramref name="container"/> argument
         /// </param>
-        public SimpleParameterValueDialogViewModel(SimpleParameterValue simpleParameterValue, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null) 
+        public SimpleParameterValueDialogViewModel(SimpleParameterValue simpleParameterValue, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(simpleParameterValue, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
             this.WhenAnyValue(vm => vm.SelectedScale).Subscribe(_ => this.UpdateOkCanExecute());
@@ -84,8 +107,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public Dialogs.SimpleParameterValueRowViewModel SelectedValue
         {
-            get { return this.selectedValue; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedValue, value); }
+            get => this.selectedValue;
+            set => this.RaiseAndSetIfChanged(ref this.selectedValue, value);
         }
 
         /// <summary>
@@ -118,6 +141,7 @@ namespace CDP4Requirements.ViewModels
         protected override void PopulatePossibleParameterType()
         {
             base.PopulatePossibleParameterType();
+
             if (this.Thing.ParameterType != null)
             {
                 this.PossibleParameterType.Add(this.Thing.ParameterType);
@@ -127,6 +151,7 @@ namespace CDP4Requirements.ViewModels
             {
                 var model = this.ChainOfContainer.First().TopContainer as EngineeringModel;
                 var containerRdl = model.EngineeringModelSetup.RequiredRdl.Single();
+
                 if (containerRdl != null)
                 {
                     var allTypes = new List<ParameterType>(containerRdl.ParameterType);
@@ -147,7 +172,7 @@ namespace CDP4Requirements.ViewModels
             {
                 foreach (var scale in ((QuantityKind)this.SelectedParameterType).AllPossibleScale)
                 {
-                    this.PossibleScale.Add(scale); 
+                    this.PossibleScale.Add(scale);
                 }
 
                 this.SelectedScale = this.SelectedScale ?? this.PossibleScale.FirstOrDefault();
@@ -161,6 +186,7 @@ namespace CDP4Requirements.ViewModels
         {
             base.UpdateTransaction();
             this.Thing.Value = new ValueArray<string>(this.Values.Select(x => x.Manual.ToValueSetString(x.ParameterType)));
+
             if (this.Thing.ParameterType is QuantityKind)
             {
                 this.Thing.Scale = this.Values.Single().Scale;
@@ -182,10 +208,12 @@ namespace CDP4Requirements.ViewModels
         {
             this.Values.ClearAndDispose();
             var cptPt = this.SelectedParameterType as CompoundParameterType;
+
             if (this.SelectedParameterType == null)
             {
                 return;
             }
+
             if (cptPt == null)
             {
                 this.Thing.ParameterType = this.SelectedParameterType;
@@ -194,10 +222,13 @@ namespace CDP4Requirements.ViewModels
                 var quantityKind = this.SelectedParameterType as QuantityKind;
                 row.ParameterType = this.SelectedParameterType;
                 this.Values.Add(row);
+
                 if (quantityKind == null)
                 {
                     return;
                 }
+
+                row.PossibleScale.Clear();
                 row.PossibleScale.AddRange(quantityKind.AllPossibleScale);
             }
             else
@@ -208,10 +239,13 @@ namespace CDP4Requirements.ViewModels
                     var quantityKind = cptPt.Component[index].ParameterType as QuantityKind;
                     row.ParameterType = this.SelectedParameterType;
                     this.Values.Add(row);
+
                     if (quantityKind == null)
                     {
                         return;
                     }
+
+                    row.PossibleScale.Clear();
                     row.PossibleScale.AddRange(quantityKind.AllPossibleScale);
                 }
             }
