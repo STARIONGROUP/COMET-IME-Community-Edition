@@ -3,13 +3,15 @@
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ShellDialogs</AssemblyTitle>
-    <Company>RHEA System S.A</Company>
+    <Company>Starion Group S.A</Company>
     <Product>CDP4ShellDialogs</Product>
     <Description>CDP4-COMET Shell Dialogs</Description>
-    <Copyright>Copyright © RHEA System S.A</Copyright>
-    <AssemblyVersion>9.7.0.0</AssemblyVersion>
-    <FileVersion>9.7.0.0</FileVersion>
+    <Copyright>Copyright © Starion Group S.A</Copyright>
+    <AssemblyVersion>10.0.0.19</AssemblyVersion>
+    <FileVersion>10.0.0.19</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -26,53 +28,46 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0" />
-    <PackageReference Include="CommonServiceLocator" Version="1.3" />
-    <PackageReference Include="DevExpress.CodeParser" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Data" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.6" />
-    <PackageReference Include="DevExpress.DataAccess" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Diagram.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Images" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Mvvm" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Office.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.6" />
-    <PackageReference Include="DevExpress.SpellChecker.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Diagram" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Xpo" Version="22.2.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="reactiveui" Version="6.4.0" />
-    <PackageReference Include="reactiveui-core" Version="6.4.0" />
-    <PackageReference Include="Rx-Core" Version="2.2.5" />
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
-    <PackageReference Include="Rx-Linq" Version="2.2.5" />
-    <PackageReference Include="Rx-Main" Version="2.2.5" />
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
-    <PackageReference Include="Rx-XAML" Version="2.2.5" />
-    <PackageReference Include="Splat" Version="1.6.0" />
+    <PackageReference Include="CDP4Common-CE" Version="27.2.1" />
+    <PackageReference Include="CDP4Dal-CE" Version="27.2.1" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.1" />
+    <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
+    <PackageReference Include="DevExpress.CodeParser" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Data" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="23.2.5" />
+    <PackageReference Include="DevExpress.DataAccess" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Diagram.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Images" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Mvvm" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Office.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="23.2.5" />
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Accordion" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.NavBar" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Docking" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Office" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Xpo" Version="23.2.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLog" Version="5.3.2" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.11" />
+    <PackageReference Include="ReactiveUI.WPF" Version="20.1.1" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
@@ -85,82 +80,12 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xaml" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\DataSourceSelection.xaml.cs">
-      <DependentUpon>DataSourceSelection.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ModelClosingDialog.xaml.cs">
-      <DependentUpon>ModelClosingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ModelIterationDomainSwitchDialog.xaml.cs">
-      <DependentUpon>ModelIterationDomainSwitchDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ModelOpeningDialog.xaml.cs">
-      <DependentUpon>ModelOpeningDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\PluginManager.xaml.cs">
-      <DependentUpon>PluginManager.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ProxyServer.xaml.cs">
-      <DependentUpon>ProxyServer.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UriManager.xaml.cs">
-      <DependentUpon>UriManager.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\DataSourceSelection.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ModelClosingDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ModelIterationDomainSwitchDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ModelOpeningDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\PluginManager.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ProxyServer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\UriManager.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\DataSourceSelection.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\DataSourceSelection.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelClosingDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelClosingDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelIterationDomainSwitchDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelIterationDomainSwitchDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelOpeningDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelOpeningDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\PluginManager.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\PluginManager.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ProxyServer.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ProxyServer.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\UriManager.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\UriManager.g.i.cs" />
   </ItemGroup>
 </Project>

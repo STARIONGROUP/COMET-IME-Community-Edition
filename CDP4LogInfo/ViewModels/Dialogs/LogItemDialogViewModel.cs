@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="LogInfoRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="LogInfoRowViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2018 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -80,6 +80,6 @@ namespace CDP4LogInfo.ViewModels.Dialogs
         /// <summary>
         /// Gets the Close Command
         /// </summary>
-        public ReactiveCommand<object> CloseCommand { get; private set; }
+        public ReactiveCommand<object, object> CloseCommand { get; private set; }
     }
 }

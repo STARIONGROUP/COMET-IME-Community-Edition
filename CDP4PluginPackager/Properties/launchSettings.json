@@ -1,7 +1,9 @@
 {
   "profiles": {
     "CDP4PluginPackager": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "pack config:Debug framework:net48\r\n",
+      "workingDirectory": "C:\\Users\\joratowski\\Git\\COMET-IME-Community-Edition\\BasicRdl"
     }
   }
 }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="LogInfoPanelViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="LogInfoPanelViewModelTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2023 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -8,13 +8,22 @@ namespace CDP4LogInfo.Tests.ViewModelTests
 {
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4Composition.Navigation;
+
     using CDP4LogInfo.ViewModels;
     using CDP4LogInfo.ViewModels.Dialogs;
+
     using Moq;
+
     using NLog;
     using NLog.Config;
-    using NUnit.Framework;    
+
+    using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -22,7 +31,7 @@ namespace CDP4LogInfo.Tests.ViewModelTests
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
-        private Mock<IDialogNavigationService>  dialogNavigationService;
+        private Mock<IDialogNavigationService> dialogNavigationService;
 
         [SetUp]
         public void Setup()
@@ -49,9 +58,9 @@ namespace CDP4LogInfo.Tests.ViewModelTests
             Assert.AreEqual(msg, row.Message);
             Assert.AreEqual(LogLevel.Warn, row.LogLevel);
             Assert.IsNotNull(row.TimeStamp);
-            Assert.IsNotNull(row.Logger);            
-            Assert.That(vm.Caption,  Is.Not.Null.Or.Empty);
-            Assert.That(vm.ToolTip,  Is.Not.Null.Or.Empty);
+            Assert.IsNotNull(row.Logger);
+            Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
         }
 
         [Test]
@@ -87,17 +96,19 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         }
 
         [Test]
-        public void VerifyThatClearWorks()
+        public async Task VerifyThatClearWorks()
         {
             var vm = new LogInfoPanelViewModel(this.dialogNavigationService.Object);
-            Assert.IsFalse(vm.ClearCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.ClearCommand).CanExecute(null));
 
             var msg = "err";
             logger.Log(LogLevel.Error, msg);
 
-            Assert.IsTrue(vm.ClearCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.ClearCommand).CanExecute(null));
 
-            vm.ClearCommand.Execute(null);
+            Assert.AreEqual(1, vm.LogEventInfo.Count);
+
+            await vm.ClearCommand.Execute();
             Assert.AreEqual(0, vm.LogEventInfo.Count);
         }
 
@@ -105,12 +116,12 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         public void verifyThatExportCanExecute()
         {
             var vm = new LogInfoPanelViewModel(this.dialogNavigationService.Object);
-            Assert.IsFalse(vm.ExportCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.ExportCommand).CanExecute(null));
 
             var msg = "err";
             logger.Log(LogLevel.Error, msg);
 
-            Assert.IsTrue(vm.ExportCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.ExportCommand).CanExecute(null));
         }
 
         [Test]
@@ -133,10 +144,10 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         public void VerifyThatUpdatingExportIsOnlyEnabledWhenMesagesArePresent()
         {
             var vm = new LogInfoPanelViewModel(this.dialogNavigationService.Object);
-            Assert.IsFalse(vm.ExportCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.ExportCommand).CanExecute(null));
             logger.Log(LogLevel.Error, "an error message");
             Assert.AreEqual(1, vm.LogEventInfo.Count);
-            Assert.IsTrue(vm.ExportCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.ExportCommand).CanExecute(null));
         }
 
         [Test]
@@ -203,7 +214,7 @@ namespace CDP4LogInfo.Tests.ViewModelTests
         }
 
         [Test]
-        public void Verif_that_when_ShowDetailsDialogCommand_is_executed_dialognavigationservices_is_navigated()
+        public async Task Verif_that_when_ShowDetailsDialogCommand_is_executed_dialognavigationservices_is_navigated()
         {
             var vm = new LogInfoPanelViewModel(this.dialogNavigationService.Object);
             vm.IsWarnLogelSelected = true;
@@ -211,7 +222,7 @@ namespace CDP4LogInfo.Tests.ViewModelTests
 
             vm.SelectedItem = vm.LogEventInfo.First();
 
-            vm.ShowDetailsDialogCommand.Execute(null);
+            await vm.ShowDetailsDialogCommand.Execute();
 
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<LogItemDialogViewModel>()));
         }

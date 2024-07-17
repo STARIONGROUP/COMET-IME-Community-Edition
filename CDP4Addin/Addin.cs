@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Addin.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="Addin.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -42,6 +42,8 @@ namespace CDP4AddinCE
     using CDP4AddinCE.Settings;
     using CDP4AddinCE.Utils;
 
+    using CDP4Common.ExceptionHandlerService;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
@@ -54,10 +56,13 @@ namespace CDP4AddinCE
 
     using CDP4OfficeInfrastructure;
 
+    using CommonServiceLocator;
+
     using DevExpress.Xpf.Core;
 
-    using Microsoft.Practices.ServiceLocation;
+    using ExceptionReporting;
 
+    using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Tools;
     using NetOffice.OfficeApi;
     using NetOffice.Tools;
@@ -67,18 +72,16 @@ namespace CDP4AddinCE
 
     using ReactiveUI;
 
-    using ExceptionReporting;
-
     using MessageBox = System.Windows.Forms.MessageBox;
 
     /// <summary>
     /// The <see cref="Addin"/> provides CDP4 integration with the Office Suite. It self-registers in the registry and
     /// provides the Fluent XML Ribbon and call-back implementations for the Fluent XML Ribbon controls
     /// </summary>
-    [COMAddin("CDP4-COMET-CE Office Add-in", "The CDP4-COMET-CE Office Add-in provides CDP4-COMET application integration with Microsoft Office Suite", 3)]
+    [COMAddin("CDP4-COMET-CE Office Add-in", "The CDP4-COMET-CE Office Add-in provides COMET application integration with Microsoft Office Suite", 3)]
     [Guid("FD48B640-1D3F-4922-854B-C69028CA469E")]
     [ProgId("CDP4CE.Addin")]
-    [RegistryLocation(RegistrySaveLocation.CurrentUser)]
+    [RegistryLocation(RegistrySaveLocation.LocalMachine)]
     public class Addin : COMAddin
     {
         /// <summary>
@@ -111,6 +114,11 @@ namespace CDP4AddinCE
         /// </summary>
         private IOfficeApplicationWrapper officeApplicationWrapper;
 
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private ICDPMessageBus messageBus;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Addin"/> class.
         /// </summary>
@@ -131,7 +139,6 @@ namespace CDP4AddinCE
             this.PreloadAssemblies();
             this.RedirectAssemblies();
             this.SetupIdtExtensibility2Events();
-            this.SetupEventListeners();
 
             // Set the Theme of the application
             ThemeManager.ApplicationThemeName = Theme.SevenName;
@@ -321,7 +328,7 @@ namespace CDP4AddinCE
         /// <param name="exception">The exception that occurred.</param>
         protected override void OnError(ErrorMethodKind methodKind, Exception exception)
         {
-            this.Utils.Dialog.ShowError(exception, "Unexpected state in CDP4-COMET-CE.Addin " + methodKind.ToString());
+            HandleException(exception);
         }
 
         /// <summary>
@@ -336,6 +343,7 @@ namespace CDP4AddinCE
             Assembly.Load("Markdown.Xaml");
             Assembly.Load("System.Net.Http.Formatting");
             Assembly.Load("System.Threading.Tasks.Extensions");
+            Assembly.Load("System.Runtime.CompilerServices.Unsafe");
         }
 
         /// <summary>
@@ -343,17 +351,25 @@ namespace CDP4AddinCE
         /// </summary>
         private void RedirectAssemblies()
         {
-            logger.Trace("Microsoft.Practices.ServiceLocation");
-            var serviceLocationTargetVersion = new Version("1.3.0.0");
-            this.RedirectAssembly("Microsoft.Practices.ServiceLocation", serviceLocationTargetVersion, "31bf3856ad364e35");
+            logger.Trace("System.Buffers");
+            var systemBuffers = new Version("4.0.3.0");
+            this.RedirectAssembly("System.Buffers", systemBuffers, "cc7b13ffcd2ddd51");
 
-            logger.Trace("System.Windows.Interactivity");
-            var windowsInteractivity = new Version("4.5.0.0");
-            this.RedirectAssembly("System.Windows.Interactivity", windowsInteractivity, "31bf3856ad364e35");
+            logger.Trace("System.Memory");
+            var systemMemory = new Version("4.0.1.2");
+            this.RedirectAssembly("System.Memory", systemMemory, "cc7b13ffcd2ddd51");
 
-            logger.Trace("System.Threading.Tasks.Extensions");
-            var threadingTasksExtensions = new Version("4.5.4.0");
-            this.RedirectAssembly("System.Threading.Tasks.Extensions", threadingTasksExtensions, "31bf3856ad364e35");
+            logger.Trace("System.Numerics.Vectors");
+            var systemVectors = new Version("4.1.4.0");
+            this.RedirectAssembly("System.Numerics.Vectors", systemMemory, "b03f5f7f11d50a3a");
+
+            logger.Trace("Microsoft.Bcl.AsyncInterfaces");
+            var asyncInterfaces = new Version("8.0.0.0");
+            this.RedirectAssembly("Microsoft.Bcl.AsyncInterfaces", asyncInterfaces, "cc7b13ffcd2ddd51");
+
+            logger.Trace("System.Runtime.CompilerServices.Unsafe");
+            var compilerServices = new Version("6.0.0.0");
+            this.RedirectAssembly("System.Runtime.CompilerServices.Unsafe", compilerServices, "b03f5f7f11d50a3a");
         }
 
         /// <summary>
@@ -415,17 +431,17 @@ namespace CDP4AddinCE
         /// </summary>
         private void SetupEventListeners()
         {
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            this.messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.PanelStatus == PanelStatus.Open)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.HandleOpenPanel);
 
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            this.messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.PanelStatus == PanelStatus.Closed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.HandleClosePanel);
 
-            CDPMessageBus.Current.Listen<SessionEvent>()
+            this.messageBus.Listen<SessionEvent>()
                 .Where(x => x.Status == SessionStatus.Closed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.HandleCloseSession);
@@ -506,7 +522,7 @@ namespace CDP4AddinCE
 
             var identifier = this.customTaskPanes.SingleOrDefault(x => x.Value.CustomTaskPane == customTaskPaneInst).Key;
             var hidePanelEvent = new HidePanelEvent(identifier);
-            CDPMessageBus.Current.SendMessage(hidePanelEvent);
+            this.messageBus.SendMessage(hidePanelEvent);
         }
 
         /// <summary>
@@ -626,7 +642,7 @@ namespace CDP4AddinCE
             catch (Exception ex)
             {
                 logger.Fatal(ex, "Bootstrapper exception: ");
-                this.Utils.Dialog.ShowError(ex, "Unexpected state in CDP4-COMET-CE.Addin");
+                HandleException(ex);
             }
         }
 
@@ -640,11 +656,12 @@ namespace CDP4AddinCE
         {
             logger.Error(ex);
 
-            var thread = new Thread(() =>
-            {
-                var exceptionReporter = new ExceptionReporter();
-                exceptionReporter.Show(ex);
-            });
+            var thread = new Thread(
+                () =>
+                {
+                    var exceptionReporter = new ExceptionReporter();
+                    exceptionReporter.Show(ex);
+                });
 
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -705,7 +722,7 @@ namespace CDP4AddinCE
         /// <param name="workbook">
         /// The workbook that was activated
         /// </param>
-        private void OnWorkbookActivateEvent(NetOffice.ExcelApi.Workbook workbook)
+        private void OnWorkbookActivateEvent(Workbook workbook)
         {
             logger.Debug("Workbook {0} activated", workbook.Name);
 
@@ -721,7 +738,7 @@ namespace CDP4AddinCE
         /// <param name="workbook">
         /// The workbook that was deactivated
         /// </param>
-        private void OnWorkbookDeactivateEvent(NetOffice.ExcelApi.Workbook workbook)
+        private void OnWorkbookDeactivateEvent(Workbook workbook)
         {
             logger.Debug("Workbook {0} deactivated", workbook.Name);
 
@@ -736,15 +753,19 @@ namespace CDP4AddinCE
         /// </summary>
         private void InitializeMefImports()
         {
+            this.messageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
+            this.SetupEventListeners();
+
             var panelNavigationService = ServiceLocator.Current.GetInstance<IPanelNavigationService>();
             this.FluentRibbonManager = ServiceLocator.Current.GetInstance<IFluentRibbonManager>();
             var thingDialogNavigationService = ServiceLocator.Current.GetInstance<IThingDialogNavigationService>();
             var dialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             var pluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
+            var exceptionHandlerService = ServiceLocator.Current.GetInstance<IExceptionHandlerService>();
 
             this.FluentRibbonManager.IsActive = true;
             var appSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<AddinAppSettings>>();
-            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService);
+            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService, this.messageBus, exceptionHandlerService);
             this.FluentRibbonManager.RegisterRibbonPart(ribbonpart);
             this.fluentRibbonXml = this.FluentRibbonManager.GetFluentXml();
 

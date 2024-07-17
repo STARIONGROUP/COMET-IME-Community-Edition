@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="MeasurementScaleDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="MeasurementScaleDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="MeasurementScale"/>
@@ -259,47 +260,47 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedUnit"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedUnitCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedUnitCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ScaleValueDefinition
         /// </summary>
-        public ReactiveCommand<object> CreateValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateValueDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ScaleValueDefinition
         /// </summary>
-        public ReactiveCommand<object> DeleteValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteValueDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ScaleValueDefinition
         /// </summary>
-        public ReactiveCommand<object> EditValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditValueDefinitionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ScaleValueDefinition
         /// </summary>
-        public ReactiveCommand<object> InspectValueDefinitionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectValueDefinitionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a MappingToReferenceScale
         /// </summary>
-        public ReactiveCommand<object> CreateMappingToReferenceScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateMappingToReferenceScaleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a MappingToReferenceScale
         /// </summary>
-        public ReactiveCommand<object> DeleteMappingToReferenceScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteMappingToReferenceScaleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a MappingToReferenceScale
         /// </summary>
-        public ReactiveCommand<object> EditMappingToReferenceScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditMappingToReferenceScaleCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a MappingToReferenceScale
         /// </summary>
-        public ReactiveCommand<object> InspectMappingToReferenceScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectMappingToReferenceScaleCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -312,35 +313,35 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedValueDefinitionCommand = this.WhenAny(vm => vm.SelectedValueDefinition, v => v.Value != null);
             var canExecuteEditSelectedValueDefinitionCommand = this.WhenAny(vm => vm.SelectedValueDefinition, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateValueDefinitionCommand = ReactiveCommand.Create(canExecuteCreateValueDefinitionCommand);
+            this.CreateValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteCreateValueDefinitionCommand);
             this.CreateValueDefinitionCommand.Subscribe(_ => this.ExecuteCreateCommand<ScaleValueDefinition>(this.PopulateValueDefinition));
 
-            this.DeleteValueDefinitionCommand = ReactiveCommand.Create(canExecuteEditSelectedValueDefinitionCommand);
+            this.DeleteValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueDefinitionCommand);
             this.DeleteValueDefinitionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedValueDefinition.Thing, this.PopulateValueDefinition));
 
-            this.EditValueDefinitionCommand = ReactiveCommand.Create(canExecuteEditSelectedValueDefinitionCommand);
+            this.EditValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueDefinitionCommand);
             this.EditValueDefinitionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedValueDefinition.Thing, this.PopulateValueDefinition));
 
-            this.InspectValueDefinitionCommand = ReactiveCommand.Create(canExecuteInspectSelectedValueDefinitionCommand);
+            this.InspectValueDefinitionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedValueDefinitionCommand);
             this.InspectValueDefinitionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedValueDefinition.Thing));
             
             var canExecuteCreateMappingToReferenceScaleCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedMappingToReferenceScaleCommand = this.WhenAny(vm => vm.SelectedMappingToReferenceScale, v => v.Value != null);
             var canExecuteEditSelectedMappingToReferenceScaleCommand = this.WhenAny(vm => vm.SelectedMappingToReferenceScale, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateMappingToReferenceScaleCommand = ReactiveCommand.Create(canExecuteCreateMappingToReferenceScaleCommand);
+            this.CreateMappingToReferenceScaleCommand = ReactiveCommandCreator.Create(canExecuteCreateMappingToReferenceScaleCommand);
             this.CreateMappingToReferenceScaleCommand.Subscribe(_ => this.ExecuteCreateCommand<MappingToReferenceScale>(this.PopulateMappingToReferenceScale));
 
-            this.DeleteMappingToReferenceScaleCommand = ReactiveCommand.Create(canExecuteEditSelectedMappingToReferenceScaleCommand);
+            this.DeleteMappingToReferenceScaleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedMappingToReferenceScaleCommand);
             this.DeleteMappingToReferenceScaleCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedMappingToReferenceScale.Thing, this.PopulateMappingToReferenceScale));
 
-            this.EditMappingToReferenceScaleCommand = ReactiveCommand.Create(canExecuteEditSelectedMappingToReferenceScaleCommand);
+            this.EditMappingToReferenceScaleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedMappingToReferenceScaleCommand);
             this.EditMappingToReferenceScaleCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedMappingToReferenceScale.Thing, this.PopulateMappingToReferenceScale));
 
-            this.InspectMappingToReferenceScaleCommand = ReactiveCommand.Create(canExecuteInspectSelectedMappingToReferenceScaleCommand);
+            this.InspectMappingToReferenceScaleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedMappingToReferenceScaleCommand);
             this.InspectMappingToReferenceScaleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedMappingToReferenceScale.Thing));
             var canExecuteInspectSelectedUnitCommand = this.WhenAny(vm => vm.SelectedUnit, v => v.Value != null);
-            this.InspectSelectedUnitCommand = ReactiveCommand.Create(canExecuteInspectSelectedUnitCommand);
+            this.InspectSelectedUnitCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedUnitCommand);
             this.InspectSelectedUnitCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedUnit));
         }
 

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ReviewItemDiscrepancyDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ReviewItemDiscrepancyDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ReviewItemDiscrepancy"/>
@@ -109,22 +110,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Solution
         /// </summary>
-        public ReactiveCommand<object> CreateSolutionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateSolutionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Solution
         /// </summary>
-        public ReactiveCommand<object> DeleteSolutionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteSolutionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Solution
         /// </summary>
-        public ReactiveCommand<object> EditSolutionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditSolutionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Solution
         /// </summary>
-        public ReactiveCommand<object> InspectSolutionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSolutionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -137,16 +138,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedSolutionCommand = this.WhenAny(vm => vm.SelectedSolution, v => v.Value != null);
             var canExecuteEditSelectedSolutionCommand = this.WhenAny(vm => vm.SelectedSolution, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateSolutionCommand = ReactiveCommand.Create(canExecuteCreateSolutionCommand);
+            this.CreateSolutionCommand = ReactiveCommandCreator.Create(canExecuteCreateSolutionCommand);
             this.CreateSolutionCommand.Subscribe(_ => this.ExecuteCreateCommand<Solution>(this.PopulateSolution));
 
-            this.DeleteSolutionCommand = ReactiveCommand.Create(canExecuteEditSelectedSolutionCommand);
+            this.DeleteSolutionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSolutionCommand);
             this.DeleteSolutionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedSolution.Thing, this.PopulateSolution));
 
-            this.EditSolutionCommand = ReactiveCommand.Create(canExecuteEditSelectedSolutionCommand);
+            this.EditSolutionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedSolutionCommand);
             this.EditSolutionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedSolution.Thing, this.PopulateSolution));
 
-            this.InspectSolutionCommand = ReactiveCommand.Create(canExecuteInspectSelectedSolutionCommand);
+            this.InspectSolutionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedSolutionCommand);
             this.InspectSolutionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSolution.Thing));
         }
 

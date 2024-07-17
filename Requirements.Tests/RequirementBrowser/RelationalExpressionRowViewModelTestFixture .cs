@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RelationalExpressionRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="RelationalExpressionRowViewModelTestFixture .cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests.RequirementBrowser
 {
@@ -25,7 +44,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
     using CDP4RequirementsVerification;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -41,7 +60,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     {
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private Iteration iteration;
 
         private Parameter parameter;
@@ -52,11 +71,13 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private Mock<IServiceLocator> serviceLocator;
 
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
@@ -65,6 +86,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
@@ -88,7 +110,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -184,7 +206,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             var type = this.relationalExpression.GetType();
             type.GetProperty("RevisionNumber")?.SetValue(this.relationalExpression, 50);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.relationalExpression, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.relationalExpression, EventKind.Updated);
 
             Assert.AreEqual(RequirementStateOfCompliance.Unknown, vm.RequirementStateOfCompliance);
         }

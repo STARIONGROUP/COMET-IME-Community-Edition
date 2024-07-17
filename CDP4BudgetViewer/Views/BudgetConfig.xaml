@@ -22,6 +22,10 @@
              mc:Ignorable="d">
     <dx:DXWindow.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
             <Image x:Key="CrossImage" x:Shared="False"  Source="{dx:DXImage Image=Delete_16x16.png}"></Image>
             <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
             <converters1:ReactiveListElementDefinitionConverter x:Key="ReactiveListElementDefinitionConverter"/>
@@ -62,7 +66,7 @@
                                           AllowNullInput="False"
                                           DisplayMember="Name">
                                 <dxe:ComboBoxEdit.StyleSettings>
-                                    <dxe:CheckedComboBoxStyleSettings />
+                                    <dxe:CheckedComboBoxStyleSettings ItemContainerStyle="{StaticResource ComboBoxEditItemStyleDeprecated}" />
                                 </dxe:ComboBoxEdit.StyleSettings>
                             </dxe:ComboBoxEdit>
                         </lc:LayoutItem>

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ApprovalDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ApprovalDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -17,7 +17,6 @@ namespace CDP4CommonView
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
-    using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
     
     using CDP4Composition.Mvvm;
@@ -27,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Approval"/>
@@ -143,12 +143,12 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedAuthor"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedAuthorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedAuthorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -157,11 +157,12 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedAuthorCommand = this.WhenAny(vm => vm.SelectedAuthor, v => v.Value != null);
-            this.InspectSelectedAuthorCommand = ReactiveCommand.Create(canExecuteInspectSelectedAuthorCommand);
-            this.InspectSelectedAuthorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedAuthor));
+            this.InspectSelectedAuthorCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedAuthor),
+                canExecuteInspectSelectedAuthorCommand);
+            
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
-            this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedOwner),
+                canExecuteInspectSelectedOwnerCommand);
         }
 
         /// <summary>

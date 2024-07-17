@@ -14,6 +14,30 @@
         <File Id="fil_Manifest_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)CDP4ServicesDal.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="comp_MessagePackSerializer_CDP4ServicesDal" Guid="{FBF4A8D4-E31A-448F-A66D-9D60FD485ADA}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_MessagePackSerializer_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)CDP4MessagePackSerializer.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_MessagePack_Annotations_CDP4ServicesDal" Guid="{20C10576-3226-46A5-986B-A319FA229CD8}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_MessagePack_Annotations_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)MessagePack.Annotations.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_MessagePack_CDP4ServicesDal" Guid="{4E16AC44-B97A-4A86-8AE3-58A54EB27B86}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_MessagePack_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)MessagePack.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_StringTools_CDP4ServicesDal" Guid="{62D576BC-D8E0-4887-A923-BF55EB7AC5B7}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_StringTools_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.NET.StringTools.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Immutable_CDP4ServicesDal" Guid="{417F785C-F9EE-428E-B784-DF45E510E17A}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Immutable_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Collections.Immutable.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Pipelines_CDP4ServicesDal" Guid="{0447E257-943F-4A1F-BB4D-7FC3AE24E5C4}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_Pipelines_CDP4ServicesDal"  Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.IO.Pipelines.dll" KeyPath="yes"></File>
+      </Component>
+
     </ComponentGroup>
   </Fragment>
 </Wix>

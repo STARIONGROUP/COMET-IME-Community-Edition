@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SiteDirectoryRibbonPartTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="SiteDirectoryRibbonPartTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,9 +30,10 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
     using System.Reactive.Concurrency;
     using System.Threading;
     using System.Windows;
-    using CDP4SiteDirectory.ViewModels;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -41,21 +42,27 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-    using Microsoft.Practices.ServiceLocation;
+
+    using CDP4SiteDirectory.ViewModels;
+
+    using CommonServiceLocator;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="SiteDirectoryRibbonPart"/> class
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class SiteDirectoryRibbonPartTestFixture
     {
         private Uri uri;
         private int amountOfRibbonControls;
         private int order;
-        private string ribbonxmlname;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IThingDialogNavigationService> dialogNavigationService;
@@ -64,12 +71,14 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
         private Mock<ISession> session;
         private Person person;
         private SiteDirectoryRibbonPart ribbonPart;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
-            this.uri = new Uri("http://www.rheageoup.com");
+            this.messageBus = new CDPMessageBus();
+            this.uri = new Uri("https://www.stariongroup.eu");
             this.SetupRecognizePackUir();
 
             this.session = new Mock<ISession>();
@@ -91,23 +100,24 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             this.permittingPermissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
             this.session.Setup(x => x.PermissionService).Returns(this.permittingPermissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.amountOfRibbonControls = 10;
             this.order = 1;
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>())
                 .Returns(this.dialogNavigationService.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
 
-            this.ribbonPart = new SiteDirectoryRibbonPart(this.order, this.panelNavigationService.Object, null, null, null);
-
-            
+            this.ribbonPart = new SiteDirectoryRibbonPart(this.order, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null, this.messageBus);
         }
 
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         /// <summary>
@@ -125,7 +135,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine(ex);
+                Console.WriteLine(ex);
             }
         }
 
@@ -144,7 +154,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
             Assert.IsNull(this.ribbonPart.Session);
         }
 
@@ -152,7 +162,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
         public void VerifyThatIfFluentRibbonIsNullTheSessionEventHasNoEffect()
         {
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
             Assert.IsNull(this.ribbonPart.Session);
         }
 
@@ -164,12 +174,12 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.AreEqual(this.session.Object, this.ribbonPart.Session);
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsNull(this.ribbonPart.Session);
         }
@@ -183,7 +193,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
 
             // open viemodels
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             this.ribbonPart.OnAction("ShowDomainsOfExpertise");
             this.panelNavigationService.Verify(x => x.OpenExistingOrOpenInAddIn(It.IsAny<DomainOfExpertiseBrowserViewModel>()));
@@ -208,7 +218,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
 
             // close viewmodels
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<DomainOfExpertiseBrowserViewModel>()));
             this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<ModelBrowserViewModel>()));
@@ -243,7 +253,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("unknownRibbonControlId"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled("ShowDomainsOfExpertise"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("ShowModels"));
@@ -255,7 +265,7 @@ namespace CDP4SiteDirectory.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("unknownRibbonControlId"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowDomainsOfExpertise"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowModels"));

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GrapherViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="GrapherViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,12 +32,11 @@ namespace CDP4Grapher.Tests.ViewModels
     using System.Windows;
 
     using CDP4Common.EngineeringModelData;
-    
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
-    using CDP4Dal;
     using CDP4Dal.Events;
 
     using CDP4Grapher.Tests.Data;
@@ -49,12 +48,11 @@ namespace CDP4Grapher.Tests.ViewModels
 
     using ReactiveUI;
 
-    using Assert = NUnit.Framework.Assert;
-
     /// <summary>
     /// Suite of tests for the <see cref="GrapherViewModel"/> class.
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class GrapherViewModelTestFixture : GrapherBaseTestData
     {
         private Mock<IThingDialogNavigationService> thingNavigationService;
@@ -104,25 +102,25 @@ namespace CDP4Grapher.Tests.ViewModels
         public void VerifySubscription()
         {
             var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
-            
+
             this.EngineeringModelSetup.Name = "updatedShortName";
-            CDPMessageBus.Current.SendObjectChangeEvent(this.EngineeringModelSetup, EventKind.Updated);
+            this.MessageBus.SendObjectChangeEvent(this.EngineeringModelSetup, EventKind.Updated);
             Assert.AreEqual(this.EngineeringModelSetup.Name, vm.CurrentModel);
 
             this.Iteration.TopElement = this.ElementDefinition1;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.Iteration, EventKind.Updated);
+            this.MessageBus.SendObjectChangeEvent(this.Iteration, EventKind.Updated);
             Assert.AreEqual(this.Iteration.TopElement, (vm.Thing.Container as Iteration)?.TopElement);
-            
+
             this.IterationSetup.Description = "updatedDescription";
-            CDPMessageBus.Current.SendObjectChangeEvent(this.IterationSetup, EventKind.Updated);
+            this.MessageBus.SendObjectChangeEvent(this.IterationSetup, EventKind.Updated);
             Assert.AreEqual(this.IterationSetup, (vm.Thing.Container as Iteration)?.IterationSetup);
 
             this.IterationSetup.Description = "updatedDescription";
-            CDPMessageBus.Current.SendObjectChangeEvent(this.IterationSetup, EventKind.Updated);
+            this.MessageBus.SendObjectChangeEvent(this.IterationSetup, EventKind.Updated);
             Assert.AreEqual(this.IterationSetup, (vm.Thing.Container as Iteration)?.IterationSetup);
 
             this.Option.Name = "updatedName";
-            CDPMessageBus.Current.SendObjectChangeEvent(this.Option, EventKind.Updated);
+            this.MessageBus.SendObjectChangeEvent(this.Option, EventKind.Updated);
             Assert.AreEqual(this.Option.Name, vm.Thing.Name);
         }
 
@@ -141,7 +139,7 @@ namespace CDP4Grapher.Tests.ViewModels
         {
             var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
             Assert.AreEqual(1, vm.GraphElements.Count);
-             vm.ExitIsolation();
+            vm.ExitIsolation();
             Assert.AreEqual(1, vm.GraphElements.Count);
         }
 

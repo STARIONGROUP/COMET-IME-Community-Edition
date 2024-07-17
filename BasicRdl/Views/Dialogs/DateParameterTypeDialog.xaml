@@ -7,7 +7,6 @@
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
-             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              d:DesignHeight="300"
              d:DesignWidth="395"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"

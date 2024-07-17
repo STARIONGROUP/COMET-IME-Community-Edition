@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ElementDefinitionRibbonViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
 {
@@ -10,19 +29,27 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+    
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    
     using CDP4Dal;
     using CDP4Dal.Permission;
+    
     using CDP4EngineeringModel.ViewModels;
-    using Microsoft.Practices.ServiceLocation;
+    
+    using CommonServiceLocator;
+    
     using Moq;
+    
     using NUnit.Framework;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -38,7 +65,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
 
-        private readonly Uri uri = new Uri("http://rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private Mock<IServiceLocator> serviceLocator;
         private Assembler assembler;
 
@@ -51,11 +78,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
         private Iteration iteration;
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
@@ -66,7 +95,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 
             this.serviceLocator.Setup(x => x.GetInstance<IPermissionService>()).Returns(this.permissionService.Object);
@@ -99,6 +128,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { {this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant)} });
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -109,13 +139,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionsBrowser
 
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatRibbonViewModelCanBeConstructed()
         {
-            var viewmodel = new ElementDefinitionRibbonViewModel();
+            var viewmodel = new ElementDefinitionRibbonViewModel(this.messageBus);
             Assert.IsFalse(viewmodel.HasModels);
         }
 

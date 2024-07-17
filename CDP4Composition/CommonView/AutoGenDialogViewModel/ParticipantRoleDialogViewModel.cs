@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParticipantRoleDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ParticipantRoleDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ParticipantRole"/>
@@ -123,22 +124,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ParticipantPermission
         /// </summary>
-        public ReactiveCommand<object> CreateParticipantPermissionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateParticipantPermissionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ParticipantPermission
         /// </summary>
-        public ReactiveCommand<object> DeleteParticipantPermissionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteParticipantPermissionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ParticipantPermission
         /// </summary>
-        public ReactiveCommand<object> EditParticipantPermissionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditParticipantPermissionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ParticipantPermission
         /// </summary>
-        public ReactiveCommand<object> InspectParticipantPermissionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectParticipantPermissionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -151,16 +152,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedParticipantPermissionCommand = this.WhenAny(vm => vm.SelectedParticipantPermission, v => v.Value != null);
             var canExecuteEditSelectedParticipantPermissionCommand = this.WhenAny(vm => vm.SelectedParticipantPermission, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateParticipantPermissionCommand = ReactiveCommand.Create(canExecuteCreateParticipantPermissionCommand);
+            this.CreateParticipantPermissionCommand = ReactiveCommandCreator.Create(canExecuteCreateParticipantPermissionCommand);
             this.CreateParticipantPermissionCommand.Subscribe(_ => this.ExecuteCreateCommand<ParticipantPermission>(this.PopulateParticipantPermission));
 
-            this.DeleteParticipantPermissionCommand = ReactiveCommand.Create(canExecuteEditSelectedParticipantPermissionCommand);
+            this.DeleteParticipantPermissionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParticipantPermissionCommand);
             this.DeleteParticipantPermissionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedParticipantPermission.Thing, this.PopulateParticipantPermission));
 
-            this.EditParticipantPermissionCommand = ReactiveCommand.Create(canExecuteEditSelectedParticipantPermissionCommand);
+            this.EditParticipantPermissionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParticipantPermissionCommand);
             this.EditParticipantPermissionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedParticipantPermission.Thing, this.PopulateParticipantPermission));
 
-            this.InspectParticipantPermissionCommand = ReactiveCommand.Create(canExecuteInspectSelectedParticipantPermissionCommand);
+            this.InspectParticipantPermissionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParticipantPermissionCommand);
             this.InspectParticipantPermissionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParticipantPermission.Thing));
         }
 

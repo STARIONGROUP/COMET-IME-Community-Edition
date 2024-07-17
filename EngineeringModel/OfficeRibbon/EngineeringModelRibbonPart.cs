@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EngineeringModelRibbonPart.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="EngineeringModelRibbonPart.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -43,16 +43,15 @@ namespace CDP4EngineeringModel
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
-    using CDP4EngineeringModel.Services;
-
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using ViewModels;
-
-    using ReactiveUI;
+    using CDP4EngineeringModel.Services;
+    using CDP4EngineeringModel.ViewModels;
 
     using NLog;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The purpose of the <see cref="EngineeringModelRibbonPart"/> class is to describe and provide a part of the Fluent Ribbon
@@ -124,8 +123,8 @@ namespace CDP4EngineeringModel
         /// <param name="changeOwnershipBatchService">
         /// The <see cref="IChangeOwnershipBatchService"/> used to change the ownership of multiple <see cref="IOwnedThing"/>s in a batch operation
         /// </param>
-        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService, IChangeOwnershipBatchService changeOwnershipBatchService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
+        public EngineeringModelRibbonPart(int order, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IThingDialogNavigationService thingDialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterSubscriptionBatchService parameterSubscriptionBatchService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService, IChangeOwnershipBatchService changeOwnershipBatchService, ICDPMessageBus messageBus)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, messageBus)
         {
             this.parameterSubscriptionBatchService = parameterSubscriptionBatchService;
             this.parameterActualFiniteStateListApplicationBatchService = parameterActualFiniteStateListApplicationBatchService;
@@ -137,13 +136,13 @@ namespace CDP4EngineeringModel
             this.openPublicationBrowsers = new List<PublicationBrowserViewModel>();
             this.Iterations = new List<Iteration>();
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.CDPMessageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
+            this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Iteration))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.IterationChangeEventHandler);
 
-            CDPMessageBus.Current.Listen<HidePanelEvent>()
+            this.CDPMessageBus.Listen<HidePanelEvent>()
                 .Subscribe(this.CloseHiddenPanel);
         }
 
@@ -280,13 +279,18 @@ namespace CDP4EngineeringModel
                     Tuple<DomainOfExpertise, Participant> tuple;
                     this.Session.OpenIterations.TryGetValue(iteration, out tuple);
 
-                    var label = string.Format("{0} - {1} : [{2}]", engineeringModel.EngineeringModelSetup.ShortName,
-                        iteration.IterationSetup.IterationNumber, tuple.Item1 == null ? String.Empty : tuple.Item1.ShortName);
+                    var label = string.Format(
+                        "{0} - {1} : [{2}]",
+                        engineeringModel.EngineeringModelSetup.ShortName,
+                        iteration.IterationSetup.IterationNumber,
+                        tuple.Item1 == null ? string.Empty : tuple.Item1.ShortName);
 
                     var menuContent =
                         string.Format(
                             "<button id=\"ShowElementDefinitionsBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
-                            iteration.Iid, label);
+                            iteration.Iid,
+                            label);
+
                     sb.Append(menuContent);
                 }
 
@@ -306,13 +310,18 @@ namespace CDP4EngineeringModel
                     Tuple<DomainOfExpertise, Participant> tuple;
                     this.Session.OpenIterations.TryGetValue(iteration, out tuple);
 
-                    var label = string.Format("{0} - {1} : [{2}]", engineeringModel.EngineeringModelSetup.ShortName,
-                        iteration.IterationSetup.IterationNumber, tuple.Item1 == null ? String.Empty : tuple.Item1.ShortName);
+                    var label = string.Format(
+                        "{0} - {1} : [{2}]",
+                        engineeringModel.EngineeringModelSetup.ShortName,
+                        iteration.IterationSetup.IterationNumber,
+                        tuple.Item1 == null ? string.Empty : tuple.Item1.ShortName);
 
                     var menuContent =
                         string.Format(
                             "<button id=\"ShowOptionBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
-                            iteration.Iid, label);
+                            iteration.Iid,
+                            label);
+
                     sb.Append(menuContent);
                 }
 
@@ -332,13 +341,18 @@ namespace CDP4EngineeringModel
                     Tuple<DomainOfExpertise, Participant> tuple;
                     this.Session.OpenIterations.TryGetValue(iteration, out tuple);
 
-                    var label = string.Format("{0} - {1} : [{2}]", engineeringModel.EngineeringModelSetup.ShortName,
-                        iteration.IterationSetup.IterationNumber, tuple.Item1 == null ? String.Empty : tuple.Item1.ShortName);
+                    var label = string.Format(
+                        "{0} - {1} : [{2}]",
+                        engineeringModel.EngineeringModelSetup.ShortName,
+                        iteration.IterationSetup.IterationNumber,
+                        tuple.Item1 == null ? string.Empty : tuple.Item1.ShortName);
 
                     var menuContent =
                         string.Format(
                             "<button id=\"ShowFiniteStateBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
-                            iteration.Iid, label);
+                            iteration.Iid,
+                            label);
+
                     sb.Append(menuContent);
                 }
 
@@ -358,13 +372,18 @@ namespace CDP4EngineeringModel
                     Tuple<DomainOfExpertise, Participant> tuple;
                     this.Session.OpenIterations.TryGetValue(iteration, out tuple);
 
-                    var label = string.Format("{0} - {1} : [{2}]", engineeringModel.EngineeringModelSetup.ShortName,
-                        iteration.IterationSetup.IterationNumber, tuple.Item1 == null ? String.Empty : tuple.Item1.ShortName);
+                    var label = string.Format(
+                        "{0} - {1} : [{2}]",
+                        engineeringModel.EngineeringModelSetup.ShortName,
+                        iteration.IterationSetup.IterationNumber,
+                        tuple.Item1 == null ? string.Empty : tuple.Item1.ShortName);
 
                     var menuContent =
                         string.Format(
                             "<button id=\"ShowPublicationBrowser_{0}\" label=\"{1}\" onAction=\"OnAction\" tag=\"{0}\" />",
-                            iteration.Iid, label);
+                            iteration.Iid,
+                            label);
+
                     sb.Append(menuContent);
                 }
 
@@ -471,6 +490,7 @@ namespace CDP4EngineeringModel
             {
                 var iteration = iterationEvent.ChangedThing as Iteration;
                 var browser = this.openElementDefinitionBrowsers.SingleOrDefault(x => x.Thing == iteration);
+
                 if (browser != null)
                 {
                     this.PanelNavigationService.CloseInAddIn(browser);
@@ -556,6 +576,7 @@ namespace CDP4EngineeringModel
         {
             var uniqueId = Guid.Parse(iterationId);
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+
             if (iteration == null)
             {
                 return;
@@ -563,6 +584,7 @@ namespace CDP4EngineeringModel
 
             // close the brower if it exists
             var browser = this.openElementDefinitionBrowsers.SingleOrDefault(x => x.Thing == iteration);
+
             if (browser != null)
             {
                 this.PanelNavigationService.CloseInAddIn(browser);
@@ -571,6 +593,7 @@ namespace CDP4EngineeringModel
             }
 
             var model = (EngineeringModel)iteration.Container;
+
             if (model == null)
             {
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
@@ -592,6 +615,7 @@ namespace CDP4EngineeringModel
         {
             var uniqueId = Guid.Parse(iterationId);
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+
             if (iteration == null)
             {
                 return;
@@ -599,6 +623,7 @@ namespace CDP4EngineeringModel
 
             // close the brower if it exists
             var browser = this.openOptionBrowsers.SingleOrDefault(x => x.Thing == iteration);
+
             if (browser != null)
             {
                 this.PanelNavigationService.CloseInAddIn(browser);
@@ -607,6 +632,7 @@ namespace CDP4EngineeringModel
             }
 
             var model = (EngineeringModel)iteration.Container;
+
             if (model == null)
             {
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
@@ -628,6 +654,7 @@ namespace CDP4EngineeringModel
         {
             var uniqueId = Guid.Parse(iterationId);
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+
             if (iteration == null)
             {
                 return;
@@ -635,6 +662,7 @@ namespace CDP4EngineeringModel
 
             // close the brower if it exists
             var browser = this.openFiniteStateBrowsers.SingleOrDefault(x => x.Thing == iteration);
+
             if (browser != null)
             {
                 this.PanelNavigationService.CloseInAddIn(browser);
@@ -643,6 +671,7 @@ namespace CDP4EngineeringModel
             }
 
             var model = (EngineeringModel)iteration.Container;
+
             if (model == null)
             {
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");
@@ -664,6 +693,7 @@ namespace CDP4EngineeringModel
         {
             var uniqueId = Guid.Parse(iterationId);
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+
             if (iteration == null)
             {
                 return;
@@ -671,6 +701,7 @@ namespace CDP4EngineeringModel
 
             // close the brower if it exists
             var browser = this.openPublicationBrowsers.SingleOrDefault(x => x.Thing == iteration);
+
             if (browser != null)
             {
                 this.PanelNavigationService.CloseInAddIn(browser);
@@ -679,6 +710,7 @@ namespace CDP4EngineeringModel
             }
 
             var model = (EngineeringModel)iteration.Container;
+
             if (model == null)
             {
                 throw new InvalidOperationException("The Container of an Iteration is not a EngineeringModel.");

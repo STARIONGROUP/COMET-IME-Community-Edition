@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RuleVerificationListDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="RuleVerificationListDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
@@ -10,20 +29,28 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Permission;
+    using CDP4Dal.Operations;
+
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+
     using CDP4EngineeringModel.ViewModels;
+    
     using Moq;
+    
     using NUnit.Framework;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -32,7 +59,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     [TestFixture]
     public class RuleVerificationListDialogViewModelTestFixture
     {
-        private Uri uri = new Uri("http://www.rheagroup.com");
+        private Uri uri = new Uri("https://www.stariongroup.eu");
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private IThingTransaction thingTransaction;
         private Mock<ISession> session;
@@ -45,12 +72,14 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private DomainOfExpertise aocsDomainOfExpertise;
 
         private RuleVerificationList ruleVerificationList;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -87,6 +116,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 
@@ -116,7 +146,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
                                 {
                                     Content = "some content",
                                     LanguageCode = "en-UK",
-                                    Uri = "http://www.rheagroup.com"
+                                    Uri = "https://www.stariongroup.eu"
                                 };
             this.ruleVerificationList.HyperLink.Add(hyperlink);
 
@@ -160,12 +190,12 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var ruleVerificationListDialogViewModel = new RuleVerificationListDialogViewModel(this.ruleVerificationList, this.thingTransaction, this.session.Object, true, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, this.iterationClone, null);
 
             Assert.IsFalse(ruleVerificationListDialogViewModel.OkCanExecute);
-            Assert.IsFalse(ruleVerificationListDialogViewModel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)ruleVerificationListDialogViewModel.OkCommand).CanExecute(null));
 
             ruleVerificationListDialogViewModel.SelectedOwner = this.systemDomainOfExpertise;
 
             Assert.IsTrue(ruleVerificationListDialogViewModel.OkCanExecute);
-            Assert.IsTrue(ruleVerificationListDialogViewModel.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)ruleVerificationListDialogViewModel.OkCommand).CanExecute(null));
         }
     }
 }

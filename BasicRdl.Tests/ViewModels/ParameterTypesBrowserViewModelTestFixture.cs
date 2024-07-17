@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterTypesBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="ParameterTypesBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -36,14 +36,14 @@ namespace BasicRdl.Tests.ViewModels
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.Services.FavoritesService;
     using CDP4Composition.Services;
+    using CDP4Composition.Services.FavoritesService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -67,6 +67,7 @@ namespace BasicRdl.Tests.ViewModels
         private ParameterTypesBrowserViewModel ParameterTypesBrowserViewModel;
         private Person person;
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
@@ -74,6 +75,7 @@ namespace BasicRdl.Tests.ViewModels
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -95,7 +97,7 @@ namespace BasicRdl.Tests.ViewModels
                 x.SubscribeToChanges(It.IsAny<ISession>(), It.IsAny<Type>(), It.IsAny<Action<HashSet<Guid>>>())).Returns(new Mock<IDisposable>().Object);
 
             this.uri = new Uri("http://test.com");
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.siteDirectory =
                 new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
@@ -105,6 +107,7 @@ namespace BasicRdl.Tests.ViewModels
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.ParameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(this.session.Object,
                 this.siteDirectory, this.dialogNavigationService.Object, this.panelNavigationService.Object, null, null,
@@ -114,7 +117,7 @@ namespace BasicRdl.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         /// <summary>
@@ -133,15 +136,15 @@ namespace BasicRdl.Tests.ViewModels
         {
             var textParamType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(textParamType, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(textParamType, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
-            CDPMessageBus.Current.SendObjectChangeEvent(textParamType, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(textParamType, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
             var booleanParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            CDPMessageBus.Current.SendObjectChangeEvent(booleanParamType, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(booleanParamType, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
-            CDPMessageBus.Current.SendObjectChangeEvent(booleanParamType, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(booleanParamType, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
             var defaultScale = new CyclicRatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -149,9 +152,9 @@ namespace BasicRdl.Tests.ViewModels
             var simpleQuantityKind =
                 new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(simpleQuantityKind, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(simpleQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
-            CDPMessageBus.Current.SendObjectChangeEvent(simpleQuantityKind, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(simpleQuantityKind, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
             var specializedQuantityKind =
@@ -160,17 +163,17 @@ namespace BasicRdl.Tests.ViewModels
                     DefaultScale = defaultScale
                 };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(specializedQuantityKind, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(specializedQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
-            CDPMessageBus.Current.SendObjectChangeEvent(specializedQuantityKind, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(specializedQuantityKind, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
             var derivedQuantityKind =
                 new DerivedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(derivedQuantityKind, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(derivedQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
-            CDPMessageBus.Current.SendObjectChangeEvent(derivedQuantityKind, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(derivedQuantityKind, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
         }
 
@@ -232,14 +235,14 @@ namespace BasicRdl.Tests.ViewModels
                 Container = sRdl
             };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(cat, EventKind.Added);
-            CDPMessageBus.Current.SendObjectChangeEvent(cat2, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(cat, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(cat2, EventKind.Added);
 
             var rev = typeof(Thing).GetProperty("RevisionNumber");
             rev.SetValue(sRdl, 3);
             sRdl.ShortName = "test";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(sRdl, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.ParameterTypes.Count(x => x.ContainerRdl == "test") == 2);
         }
     }

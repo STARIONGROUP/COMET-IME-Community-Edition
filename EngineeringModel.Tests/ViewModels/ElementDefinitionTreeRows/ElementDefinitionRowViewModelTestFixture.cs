@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ElementDefinitionRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -51,15 +51,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
     using NUnit.Framework;
 
     using ReactiveUI;
-
-    using Rule = System.Data.Rule;
 
     /// <summary>
     /// Suite of tests for the <see cref="ElementDefinitionRowViewModel"/>
@@ -79,14 +77,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private ModelReferenceDataLibrary modelReferenceDataLibrary;
         private Mock<IObfuscationService> obfuscationService;
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
-            this.uri = new Uri("http://www.rheagroup.com");
-            this.assembler = new Assembler(this.uri);
+            this.uri = new Uri("https://www.stariongroup.eu");
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.obfuscationService = new Mock<IObfuscationService>();
 
             this.permissionService = new Mock<IPermissionService>();
@@ -103,31 +103,32 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var siteDirectory = new SiteDirectory();
             var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var iterationsetup = new IterationSetup();
-            var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) {EngineeringModelSetup = engineeringModelSetup};            
+            var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) { EngineeringModelSetup = engineeringModelSetup };
             engineeringModelSetup.IterationSetup.Add(iterationsetup);
 
             var siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             siteDirectory.SiteReferenceDataLibrary.Add(siteReferenceDataLibrary);
-            this.modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) {RequiredRdl = siteReferenceDataLibrary};
+            this.modelReferenceDataLibrary = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { RequiredRdl = siteReferenceDataLibrary };
             engineeringModelSetup.RequiredRdl.Add(this.modelReferenceDataLibrary);
-            
+
             var person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "test", Surname = "test" };
             var participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Person = person };
             engineeringModelSetup.Participant.Add(participant);
-            
+
             this.session.Setup(x => x.ActivePerson).Returns(person);
-            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri) {IterationSetup = iterationsetup};
+            this.iteration = new Iteration(Guid.NewGuid(), null, this.uri) { IterationSetup = iterationsetup };
             engineeringModel.Iteration.Add(this.iteration);
             siteDirectory.Model.Add(engineeringModelSetup);
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { {this.iteration, new Tuple<DomainOfExpertise, Participant>(null, participant)}});
+            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(null, participant) } });
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -138,7 +139,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             elementDefinition.Owner = domainOfExpertise;
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
             row.ThingCreator = this.thingCreator.Object;
-            
+
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var ratioScale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
             simpleQuantityKind.DefaultScale = ratioScale;
@@ -148,7 +149,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             dropInfo.SetupProperty(x => x.Effects);
 
             row.Drop(dropInfo.Object);
-            
+
             this.thingCreator.Verify(x => x.CreateParameter(elementDefinition, null, simpleQuantityKind, ratioScale, domainOfExpertise, this.session.Object));
         }
 
@@ -160,7 +161,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             elementDefinition.Owner = domainOfExpertise;
             var row = new ElementDefinitionRowViewModel(elementDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
             row.ThingCreator = new TestThingCreatorThatThrowsExceptions();
-            
+
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var ratioScale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
             simpleQuantityKind.DefaultScale = ratioScale;
@@ -171,9 +172,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             row.Drop(dropInfo.Object);
 
-            Assert.AreEqual("The parameter could not be created", row.ErrorMsg);          
+            Assert.AreEqual("The parameter could not be created", row.ErrorMsg);
         }
-        
+
         [Test]
         public void VerifyThatDragElementDefinitionSetsCopyEffect()
         {
@@ -249,7 +250,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             elementDefinition.Owner = domainOfExpertise;
-            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) {ShortName = "PROD", Name = "Products"};
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "PROD", Name = "Products" };
             category.PermissibleClass.Add(ClassKind.ElementDefinition);
             this.modelReferenceDataLibrary.DefinedCategory.Add(category);
 
@@ -265,7 +266,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             row.DragOver(dropInfo.Object);
 
             Assert.That(dropInfo.Object.Effects, Is.EqualTo(DragDropEffects.Copy));
-            
+
             row.Drop(dropInfo.Object);
             Assert.IsFalse(row.HasError);
         }
@@ -345,7 +346,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VeriftyThatDomainChangesWorks(IViewModelBase<Thing> container, string scenario)
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -359,7 +361,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             domainOfExpertise.Name = "ChangedName";
             domainOfExpertise.ShortName = "ChangedShortName";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(domainOfExpertise, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(domainOfExpertise, EventKind.Updated);
 
             Assert.That(row.OwnerName == domainOfExpertise.Name);
             Assert.That(row.OwnerShortName == domainOfExpertise.ShortName);
@@ -380,6 +382,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         /// The <see cref="Thing"/>
         /// </summary>
         public Thing Thing { get; }
+
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        public ICDPMessageBus CDPMessageBus { get; }
 
         /// <summary>
         /// Disposes the instance
@@ -437,7 +444,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         /// The container <see cref="RuleVerificationList"/> of the <see cref="UserRuleVerification"/> that is to be created.
         /// </param>
         /// <param name="rule">
-        /// The <see cref="Rule"/> that the new <see cref="UserRuleVerification"/> references.
+        /// The <see cref="System.Data.Rule"/> that the new <see cref="UserRuleVerification"/> references.
         /// </param>
         /// <param name="session">
         /// The <see cref="ISession"/> in which the new <see cref="UserRuleVerification"/> is to be added

@@ -1,19 +1,19 @@
-﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="ParameterStateRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ParameterStateRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -40,7 +40,7 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -110,8 +110,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public ActualFiniteState ActualState
         {
-            get { return this.actualState; }
-            private set { this.RaiseAndSetIfChanged(ref this.actualState, value); }
+            get => this.actualState;
+            private set => this.RaiseAndSetIfChanged(ref this.actualState, value);
         }
 
         /// <summary>
@@ -119,8 +119,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public string ModelCode
         {
-            get { return this.modelCode; }
-            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+            get => this.modelCode;
+            private set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
         }
 
         /// <summary>
@@ -150,8 +150,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public bool IsPublishable
         {
-            get { return this.isPublishable; }
-            set { this.RaiseAndSetIfChanged(ref this.isPublishable, value); }
+            get => this.isPublishable;
+            set => this.RaiseAndSetIfChanged(ref this.isPublishable, value);
         }
 
         /// <summary>
@@ -159,8 +159,8 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         public bool IsDefault
         {
-            get { return this.isDefault; }
-            set { this.RaiseAndSetIfChanged(ref this.isDefault, value); }
+            get => this.isDefault;
+            set => this.RaiseAndSetIfChanged(ref this.isDefault, value);
         }
 
         /// <summary>
@@ -181,7 +181,7 @@ namespace CDP4ProductTree.ViewModels
             {
                 foreach (var possibleFiniteState in this.ActualState.PossibleState)
                 {
-                    var stateListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(possibleFiniteState)
+                    var stateListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(possibleFiniteState)
                         .Where(discriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(action);
@@ -191,12 +191,11 @@ namespace CDP4ProductTree.ViewModels
             }
             else
             {
-                var possibleFiniteStateObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(PossibleFiniteState));
+                var possibleFiniteStateObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(PossibleFiniteState));
 
                 foreach (var possibleFiniteState in this.ActualState.PossibleState)
                 {
-                    this.Disposables.Add( 
-                        this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(possibleFiniteStateObserver, new ObjectChangedMessageBusEventHandlerSubscription(possibleFiniteState, discriminator, action)));
+                    this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(possibleFiniteStateObserver, new ObjectChangedMessageBusEventHandlerSubscription(possibleFiniteState, discriminator, action)));
                 }
             }
         }

@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StateToParameterTypeMapperRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="StateToParameterTypeMapperRibbonViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -44,7 +44,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
     using CDP4ReferenceDataMapper.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -66,7 +66,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private SiteDirectory siteDirectory;
@@ -81,9 +81,13 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         private ModelReferenceDataLibrary modelReferenceDataLibrary;
         private SiteReferenceDataLibrary siteReferenceDataLibrary;
 
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
+
             this.ribbonManager = new Mock<IFluentRibbonManager>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -122,6 +126,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [Test]

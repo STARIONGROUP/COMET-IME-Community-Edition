@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ThingCreator.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="ThingCreator.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2019 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -93,8 +93,8 @@ namespace CDP4Composition.Services
             }
             catch (Exception ex)
             {
-                logger.Error("The parameter could not be created", ex);
-                throw ex;
+                logger.Error(ex, "The parameter could not be created");
+                throw;
             }     
         }
 
@@ -148,8 +148,8 @@ namespace CDP4Composition.Services
             }
             catch (Exception ex)
             {
-                logger.Error("The UserRuleVerification could not be created", ex);
-                throw ex;
+                logger.Error(ex, "The UserRuleVerification could not be created");
+                throw;
             }   
         }
 
@@ -203,8 +203,8 @@ namespace CDP4Composition.Services
             }
             catch (Exception ex)
             {
-                logger.Error("The BuiltInRuleVerification could not be created", ex);
-                throw ex;
+                logger.Error(ex, "The BuiltInRuleVerification could not be created");
+                throw;
             } 
         }
 
@@ -267,8 +267,8 @@ namespace CDP4Composition.Services
             }
             catch (Exception ex)
             {
-                logger.Error("The ElementUsage could not be created", ex);
-                throw ex;
+                logger.Error(ex, "The ElementUsage could not be created");
+                throw;
             }   
         }
 

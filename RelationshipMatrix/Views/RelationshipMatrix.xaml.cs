@@ -1,12 +1,13 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RelationshipMatrix.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="RelationshipMatrix.xaml.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2019 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4RelationshipMatrix.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
     
@@ -14,7 +15,7 @@ namespace CDP4RelationshipMatrix.Views
     /// Interaction logic for RelationshipMatrix view
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class RelationshipMatrix : IPanelView
+    public partial class RelationshipMatrix : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrix"/> class

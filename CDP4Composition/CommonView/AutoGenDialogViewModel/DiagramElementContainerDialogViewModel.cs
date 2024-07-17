@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DiagramElementContainerDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="DiagramElementContainerDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="DiagramElementContainer"/>
@@ -139,42 +140,42 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a DiagramElementThing
         /// </summary>
-        public ReactiveCommand<object> CreateDiagramElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateDiagramElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a DiagramElementThing
         /// </summary>
-        public ReactiveCommand<object> DeleteDiagramElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteDiagramElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a DiagramElementThing
         /// </summary>
-        public ReactiveCommand<object> EditDiagramElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditDiagramElementCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a DiagramElementThing
         /// </summary>
-        public ReactiveCommand<object> InspectDiagramElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectDiagramElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Bounds
         /// </summary>
-        public ReactiveCommand<object> CreateBoundsCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateBoundsCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Bounds
         /// </summary>
-        public ReactiveCommand<object> DeleteBoundsCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteBoundsCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Bounds
         /// </summary>
-        public ReactiveCommand<object> EditBoundsCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditBoundsCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Bounds
         /// </summary>
-        public ReactiveCommand<object> InspectBoundsCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectBoundsCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -187,32 +188,32 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedDiagramElementCommand = this.WhenAny(vm => vm.SelectedDiagramElement, v => v.Value != null);
             var canExecuteEditSelectedDiagramElementCommand = this.WhenAny(vm => vm.SelectedDiagramElement, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateDiagramElementCommand = ReactiveCommand.Create(canExecuteCreateDiagramElementCommand);
+            this.CreateDiagramElementCommand = ReactiveCommandCreator.Create(canExecuteCreateDiagramElementCommand);
             this.CreateDiagramElementCommand.Subscribe(_ => this.ExecuteCreateDiagramElementCommand());
 
-            this.DeleteDiagramElementCommand = ReactiveCommand.Create(canExecuteEditSelectedDiagramElementCommand);
+            this.DeleteDiagramElementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDiagramElementCommand);
             this.DeleteDiagramElementCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedDiagramElement.Thing, this.PopulateDiagramElement));
 
-            this.EditDiagramElementCommand = ReactiveCommand.Create(canExecuteEditSelectedDiagramElementCommand);
+            this.EditDiagramElementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDiagramElementCommand);
             this.EditDiagramElementCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedDiagramElement.Thing, this.PopulateDiagramElement));
 
-            this.InspectDiagramElementCommand = ReactiveCommand.Create(canExecuteInspectSelectedDiagramElementCommand);
+            this.InspectDiagramElementCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDiagramElementCommand);
             this.InspectDiagramElementCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDiagramElement.Thing));
             
             var canExecuteCreateBoundsCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedBoundsCommand = this.WhenAny(vm => vm.SelectedBounds, v => v.Value != null);
             var canExecuteEditSelectedBoundsCommand = this.WhenAny(vm => vm.SelectedBounds, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateBoundsCommand = ReactiveCommand.Create(canExecuteCreateBoundsCommand);
+            this.CreateBoundsCommand = ReactiveCommandCreator.Create(canExecuteCreateBoundsCommand);
             this.CreateBoundsCommand.Subscribe(_ => this.ExecuteCreateCommand<Bounds>(this.PopulateBounds));
 
-            this.DeleteBoundsCommand = ReactiveCommand.Create(canExecuteEditSelectedBoundsCommand);
+            this.DeleteBoundsCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedBoundsCommand);
             this.DeleteBoundsCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedBounds.Thing, this.PopulateBounds));
 
-            this.EditBoundsCommand = ReactiveCommand.Create(canExecuteEditSelectedBoundsCommand);
+            this.EditBoundsCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedBoundsCommand);
             this.EditBoundsCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedBounds.Thing, this.PopulateBounds));
 
-            this.InspectBoundsCommand = ReactiveCommand.Create(canExecuteInspectSelectedBoundsCommand);
+            this.InspectBoundsCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedBoundsCommand);
             this.InspectBoundsCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedBounds.Thing));
         }
 

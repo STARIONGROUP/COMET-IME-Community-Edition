@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OptionBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="OptionBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +28,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -70,10 +73,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private Option option;
         private DomainOfExpertise domain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -103,6 +108,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -111,11 +117,11 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
-        public void VerifyThatRowsAreCreated()
+        public async Task VerifyThatRowsAreCreated()
         {
             var viewmodel = new OptionBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -132,7 +138,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             viewmodel.SelectedThing = optionrow;
 
-            viewmodel.CreateCommand.Execute(null);
+            await viewmodel.CreateCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<Option>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<Iteration>(), null));
         }
 
@@ -147,13 +153,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var revision = typeof(Iteration).GetProperty("RevisionNumber");
             revision.SetValue(this.iteration, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(2, viewmodel.Options.Count);
 
             this.iteration.Option.Clear();
             revision.SetValue(this.iteration, 3);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(0, viewmodel.Options.Count);
         }
 
@@ -171,7 +177,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             revision.SetValue(this.iteration, 2);
             this.iteration.DefaultOption = this.option;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
             var defaultRow = viewmodel.Options.Single(x => x.IsDefaultOption);
             Assert.AreSame(this.option, defaultRow.Thing);
@@ -179,19 +185,19 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             revision.SetValue(this.iteration, 3);
             this.iteration.DefaultOption = newoption;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             defaultRow = viewmodel.Options.Single(x => x.IsDefaultOption);
             Assert.AreSame(newoption, defaultRow.Thing);
 
             revision.SetValue(this.iteration, 4);
             this.iteration.DefaultOption = null;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.IsFalse(viewmodel.Options.Any(x => x.IsDefaultOption));
         }
 
         [Test]
-        public void VerifyThatToggleDefaultCommandWorksForSet()
+        public async Task VerifyThatToggleDefaultCommandWorksForSet()
         {
             var newoption = new Option(Guid.NewGuid(), null, this.uri);
             this.iteration.Option.Add(newoption);
@@ -201,21 +207,21 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var optionRow = viewmodel.Options.First();
             optionRow.IsDefaultOption = true;
 
-            Assert.IsFalse(viewmodel.ToggleDefaultCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)viewmodel.ToggleDefaultCommand).CanExecute(null));
 
             optionRow.IsDefaultOption = false;
-            Assert.IsFalse(viewmodel.ToggleDefaultCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)viewmodel.ToggleDefaultCommand).CanExecute(null));
 
             viewmodel.SelectedThing = optionRow;
 
-            Assert.IsTrue(viewmodel.ToggleDefaultCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.ToggleDefaultCommand).CanExecute(null));
 
-            viewmodel.ToggleDefaultCommand.Execute(null);
+            await viewmodel.ToggleDefaultCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
 
         [Test]
-        public void VerifyThatToggleDefaultCommandWorksForUnSet()
+        public async Task VerifyThatToggleDefaultCommandWorksForUnSet()
         {
             var newoption = new Option(Guid.NewGuid(), null, this.uri);
             this.iteration.Option.Add(newoption);
@@ -225,16 +231,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var optionRow = viewmodel.Options.First();
             optionRow.IsDefaultOption = false;
 
-            Assert.IsFalse(viewmodel.ToggleDefaultCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)viewmodel.ToggleDefaultCommand).CanExecute(null));
 
             optionRow.IsDefaultOption = true;
-            Assert.IsFalse(viewmodel.ToggleDefaultCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)viewmodel.ToggleDefaultCommand).CanExecute(null));
 
             viewmodel.SelectedThing = optionRow;
 
-            Assert.IsTrue(viewmodel.ToggleDefaultCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.ToggleDefaultCommand).CanExecute(null));
 
-            viewmodel.ToggleDefaultCommand.Execute(null);
+            await viewmodel.ToggleDefaultCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
 

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterTypeMappingDialog.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="ParameterTypeMappingDialog.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 

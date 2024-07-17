@@ -7,7 +7,6 @@
     <ProjectGuid>2ee90906-5978-4c5a-a9be-1d8feb5adce9</ProjectGuid>
     <SchemaVersion>2.0</SchemaVersion>
     <OutputType>Package</OutputType>
-    
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
   </PropertyGroup>
@@ -44,7 +43,6 @@
     <Compile Include="BasicRDLPlugin.wxs" />
     <Compile Include="CDP4LogInfoPlugin.wxs" />
     <Compile Include="CDP4ObjectBrowserPlugin.wxs" />
-    <Compile Include="CDP4PropertyGridPlugin.wxs" />
     <Compile Include="CDP4RelationshipEditor.wxs" />
     <Compile Include="CDP4RelationshipMatrix.wxs" />
     <Compile Include="CDP4Scripting.wxs" />
@@ -87,7 +85,10 @@
     <Content Include="ThirdPartyLicense\AvalonEdit.txt" />
     <Content Include="ThirdPartyLicense\CastleCore.txt" />
     <Content Include="ThirdPartyLicense\CDP4Common-CE.txt" />
-    <Content Include="ThirdPartyLicense\CDP4Satsearch.txt" />
+    <Content Include="ThirdPartyLicense\CDP4DalCommon-CE.txt" />
+    <Content Include="ThirdPartyLicense\CDP4MessagePackSerializer-CE.txt" />
+    <Content Include="ThirdPartyLicense\CDP4Reporting-CE.txt" />
+    <Content Include="ThirdPartyLicense\ClosedXML.txt" />
     <Content Include="ThirdPartyLicense\CommonServiceLocator.txt" />
     <Content Include="ThirdPartyLicense\CDP4Dal-CE.txt" />
     <Content Include="ThirdPartyLicense\CDP4JsonFileDal-CE.txt" />
@@ -96,29 +97,37 @@
     <Content Include="ThirdPartyLicense\CDP4ServicesDal-CE.txt" />
     <Content Include="ThirdPartyLicense\CDP4WspDal-CE.txt" />
     <Content Include="ThirdPartyLicense\CsvHelper.txt" />
+    <Content Include="ThirdPartyLicense\DocumentFormat.OpenXml.txt" />
     <Content Include="ThirdPartyLicense\dotliquid.txt" />
     <Content Include="ThirdPartyLicense\DotNetZip.txt" />
+    <Content Include="ThirdPartyLicense\DynamicData.txt" />
     <Content Include="ThirdPartyLicense\DynamicLanguageRuntime.txt" />
     <Content Include="ThirdPartyLicense\ExceptionReporter.txt" />
+    <Content Include="ThirdPartyLicense\HandleBars.txt" />
     <Content Include="ThirdPartyLicense\Hardcodet.Wpf.TaskbarNotification.txt" />
     <Content Include="ThirdPartyLicense\IronPython.txt" />
     <Content Include="ThirdPartyLicense\Markdown.Xaml.txt" />
-    <Content Include="ThirdPartyLicense\Microsoft.AspNet.Mvc.txt" />
     <Content Include="ThirdPartyLicense\Microsoft.AspNet.WebApi.Client.txt" />
+    <Content Include="ThirdPartyLicense\Microsoft.Bcl.AsyncInterfaces.txt" />
+    <Content Include="ThirdPartyLicense\Microsoft.Bcl.HashCode.txt" />
     <Content Include="ThirdPartyLicense\Microsoft.CSharp.txt" />
+    <Content Include="ThirdPartyLicense\Microsoft.Net.Extensions.txt" />
+    <Content Include="ThirdPartyLicense\Microsoft.Xaml.Behaviors.Wpf.txt" />
     <Content Include="ThirdPartyLicense\MoonSharp.txt" />
-    <Content Include="ThirdPartyLicense\NetOffice.txt" />
+    <Content Include="ThirdPartyLicense\NetOfficeFw.txt" />
     <Content Include="ThirdPartyLicense\Newtonsoft.Json.txt" />
+    <Content Include="ThirdPartyLicense\NLog.Extensions.Logging.txt" />
     <Content Include="ThirdPartyLicense\NLog.txt" />
-    <Content Include="ThirdPartyLicense\reactiveui-core.txt" />
-    <Content Include="ThirdPartyLicense\reactiveui.txt" />
-    <Content Include="ThirdPartyLicense\Rx-Core.txt" />
-    <Content Include="ThirdPartyLicense\Rx-Interfaces.txt" />
-    <Content Include="ThirdPartyLicense\Rx-Linq.txt" />
-    <Content Include="ThirdPartyLicense\Rx-Main.txt" />
-    <Content Include="ThirdPartyLicense\Rx-PlatformServices.txt" />
-    <Content Include="ThirdPartyLicense\Rx-XAML.txt" />
+    <Content Include="ThirdPartyLicense\ReactiveUI.txt" />
+    <Content Include="ThirdPartyLicense\ReactiveUI.WPF.txt" />
+    <Content Include="ThirdPartyLicense\ReqIFSharp.txt" />
+    <Content Include="ThirdPartyLicense\Simple-Mapi.txt" />
     <Content Include="ThirdPartyLicense\Splat.txt" />
+    <Content Include="ThirdPartyLicense\System.Buffers.txt" />
+    <Content Include="ThirdPartyLicense\System.ComponentModel.Composition.txt" />
+    <Content Include="ThirdPartyLicense\System.Memory.txt" />
+    <Content Include="ThirdPartyLicense\System.Numerics.Vectors.txt" />
+    <Content Include="ThirdPartyLicense\System.Reactive.txt" />
     <Content Include="ThirdPartyLicense\System.Runtime.CompilerServices.Unsafe.txt" />
     <Content Include="ThirdPartyLicense\System.Threading.Tasks.Extensions.txt" />
     <Content Include="ThirdPartyLicense\System.ValueTuple.txt" />
@@ -190,9 +199,9 @@
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
       <RefTargetDir>INSTALLFOLDER</RefTargetDir>
     </ProjectReference>
-    <ProjectReference Include="..\CDP4IME\CDP4IME-CE.csproj">
-      <Name>CDP4IME-CE</Name>
-      <Project>{e8a6c54e-80c1-42e3-a2c2-d698b97be7c2}</Project>
+    <ProjectReference Include="..\CDP4IME\COMET-CE.csproj">
+      <Name>CDP4-COMET-CE</Name>
+      <Project>{4f899067-259e-4891-8a50-bf18f4961709}</Project>
       <Private>True</Private>
       <DoNotHarvest>True</DoNotHarvest>
       <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>

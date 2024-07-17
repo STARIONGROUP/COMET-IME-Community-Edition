@@ -1,27 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DiagramBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DiagramBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4DiagramEditor.ViewModels
 {
@@ -85,7 +85,7 @@ namespace CDP4DiagramEditor.ViewModels
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
-            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             this.UpdateDiagrams();
 
@@ -154,15 +154,21 @@ namespace CDP4DiagramEditor.ViewModels
                 vm => vm.CanWriteSelectedThing,
                 (selection, canWrite) => selection != null && canWrite);
 
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateDiagram));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<DiagramCanvas>(this.Thing));
+            this.CreateCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateCommand<DiagramCanvas>(this.Thing),
+                this.WhenAnyValue(vm => vm.CanCreateDiagram));
 
-            this.DeleteCommand = ReactiveCommand.Create(canDelete);
-            this.DeleteCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedThing.Thing));
-            this.UpdateCommand = ReactiveCommand.Create(canDelete);
-            this.UpdateCommand.Subscribe(_ => this.ExecuteUpdateCommand());
-            this.InspectCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null));
-            this.InspectCommand.Subscribe(_ => this.ExecuteUpdateCommand());
+            this.DeleteCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteDeleteCommand(this.SelectedThing.Thing),
+                canDelete);
+
+            this.UpdateCommand = ReactiveCommandCreator.Create(
+                this.ExecuteUpdateCommand,
+                canDelete);
+
+            this.InspectCommand = ReactiveCommandCreator.Create(
+                this.ExecuteUpdateCommand,
+                this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null));
         }
 
         /// <summary>
@@ -247,21 +253,21 @@ namespace CDP4DiagramEditor.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+            var engineeringModelSetupSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+            var domainOfExpertiseSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+            var iterationSetupSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
@@ -302,7 +308,7 @@ namespace CDP4DiagramEditor.ViewModels
             }
 
             var thing = this.SelectedThing.Thing;
-            var vm = new DiagramEditorViewModel((DiagramCanvas) thing, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
+            var vm = new DiagramEditorViewModel((DiagramCanvas)thing, this.Session, this.ThingDialogNavigationService, this.PanelNavigationService, this.DialogNavigationService, this.PluginSettingsService);
             this.PanelNavigationService.OpenInDock(vm);
         }
     }

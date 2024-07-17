@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="CompoundParameterTypeDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="CompoundParameterTypeDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="CompoundParameterType"/>
@@ -124,32 +125,32 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ParameterTypeComponent
         /// </summary>
-        public ReactiveCommand<object> CreateComponentCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateComponentCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ParameterTypeComponent
         /// </summary>
-        public ReactiveCommand<object> DeleteComponentCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteComponentCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ParameterTypeComponent
         /// </summary>
-        public ReactiveCommand<object> EditComponentCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditComponentCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ParameterTypeComponent
         /// </summary>
-        public ReactiveCommand<object> InspectComponentCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectComponentCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a ParameterTypeComponent 
         /// </summary>
-        public ReactiveCommand<object> MoveUpComponentCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpComponentCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a ParameterTypeComponent
         /// </summary>
-        public ReactiveCommand<object> MoveDownComponentCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownComponentCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -162,22 +163,22 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedComponentCommand = this.WhenAny(vm => vm.SelectedComponent, v => v.Value != null);
             var canExecuteEditSelectedComponentCommand = this.WhenAny(vm => vm.SelectedComponent, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateComponentCommand = ReactiveCommand.Create(canExecuteCreateComponentCommand);
+            this.CreateComponentCommand = ReactiveCommandCreator.Create(canExecuteCreateComponentCommand);
             this.CreateComponentCommand.Subscribe(_ => this.ExecuteCreateCommand<ParameterTypeComponent>(this.PopulateComponent));
 
-            this.DeleteComponentCommand = ReactiveCommand.Create(canExecuteEditSelectedComponentCommand);
+            this.DeleteComponentCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedComponentCommand);
             this.DeleteComponentCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedComponent.Thing, this.PopulateComponent));
 
-            this.EditComponentCommand = ReactiveCommand.Create(canExecuteEditSelectedComponentCommand);
+            this.EditComponentCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedComponentCommand);
             this.EditComponentCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedComponent.Thing, this.PopulateComponent));
 
-            this.InspectComponentCommand = ReactiveCommand.Create(canExecuteInspectSelectedComponentCommand);
+            this.InspectComponentCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedComponentCommand);
             this.InspectComponentCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedComponent.Thing));
 
-            this.MoveUpComponentCommand = ReactiveCommand.Create(canExecuteEditSelectedComponentCommand);
+            this.MoveUpComponentCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedComponentCommand);
             this.MoveUpComponentCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Component, this.SelectedComponent));
 
-            this.MoveDownComponentCommand = ReactiveCommand.Create(canExecuteEditSelectedComponentCommand);
+            this.MoveDownComponentCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedComponentCommand);
             this.MoveDownComponentCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Component, this.SelectedComponent));
         }
 

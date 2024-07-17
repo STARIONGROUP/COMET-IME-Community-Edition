@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PersonDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="PersonDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2019 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,16 +9,19 @@ namespace CDP4SiteDirectory.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Validation;
+
     using CDP4CommonView;
     using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.Services;
     using CDP4Dal;
 
     using ReactiveUI;
@@ -106,11 +109,11 @@ namespace CDP4SiteDirectory.ViewModels
 
             this.isSelectedRoleDeprecated =
                 this.WhenAny(x => x.SelectedRole, selectedRole => selectedRole.Value?.IsDeprecated == true)
-                    .ToProperty(this, x => x.IsSelectedRoleDeprecated, out this.isSelectedRoleDeprecated);
+                    .ToProperty(this, x => x.IsSelectedRoleDeprecated, out this.isSelectedRoleDeprecated, scheduler: RxApp.MainThreadScheduler);
 
             this.shoudDisplayPasswordNotSetWarning =
                 this.WhenAny(x => x.PwdEditIsChecked, x => !x.Value && this.dialogKind == ThingDialogKind.Create)
-                    .ToProperty(this, x => x.ShoudDisplayPasswordNotSetWarning, out this.shoudDisplayPasswordNotSetWarning);
+                    .ToProperty(this, x => x.ShoudDisplayPasswordNotSetWarning, out this.shoudDisplayPasswordNotSetWarning, scheduler: RxApp.MainThreadScheduler);
         }
 
         /// <summary>
@@ -151,7 +154,6 @@ namespace CDP4SiteDirectory.ViewModels
             set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
         }
 
-        
         /// <summary>
         /// Gets or sets the ShortName
         /// </summary>
@@ -161,7 +163,6 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.givenName; }
             set { this.RaiseAndSetIfChanged(ref this.givenName, value); }
         }
-
         
         /// <summary>
         /// Gets or sets the ShortName
@@ -176,13 +177,13 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to set the default <see cref="TelephoneNumber"/>
         /// </summary>
-        public ReactiveCommand<object> SetDefaultTelephoneNumberCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SetDefaultTelephoneNumberCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to set the default <see cref="EmailAddress"/>
         /// </summary>
-        public ReactiveCommand<object> SetDefaultEmailAddressCommand { get; private set; }
-        
+        public ReactiveCommand<Unit, Unit> SetDefaultEmailAddressCommand { get; private set; } 
+
         /// <summary>
         /// Returns true if new <see cref="Person"/> nas no passwords set
         /// </summary>
@@ -219,7 +220,7 @@ namespace CDP4SiteDirectory.ViewModels
 
                 if (!this.PwdEditIsChecked || columnName != "PasswordConfirmation")
                 {
-                    return ValidationService.ValidateProperty(columnName, this);
+                    return this.ValidationService.ValidateProperty(columnName, this);
                 }
 
                 if (string.IsNullOrWhiteSpace(this.PasswordConfirmation) || this.PasswordConfirmation != this.Password)
@@ -240,12 +241,13 @@ namespace CDP4SiteDirectory.ViewModels
 
                 // confirmation ok
                 var validationError = this.ValidationErrors.SingleOrDefault(x => x.PropertyName == "PasswordConfirmation");
+
                 if (validationError!= null)
                 {
                     this.ValidationErrors.Remove(validationError);
                 }
 
-                return ValidationService.ValidateProperty(columnName, this);
+                return this.ValidationService.ValidateProperty(columnName, this);
             }
         }
 
@@ -256,12 +258,10 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.InitializeCommands();
             this.SetDefaultTelephoneNumberCommand =
-                ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedTelephoneNumber).Select(x => x != null && !this.IsReadOnly));
-            this.SetDefaultTelephoneNumberCommand.Subscribe(_ => this.ExecuteSetDefaultTelephoneNumberCommand());
+                ReactiveCommandCreator.Create(this.ExecuteSetDefaultTelephoneNumberCommand, this.WhenAnyValue(x => x.SelectedTelephoneNumber).Select(x => x != null && !this.IsReadOnly));
 
             this.SetDefaultEmailAddressCommand =
-                ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedEmailAddress).Select(x => x != null && !this.IsReadOnly));
-            this.SetDefaultEmailAddressCommand.Subscribe(_ => this.ExecuteSetDefaultEmailAddressCommand());
+                ReactiveCommandCreator.Create(this.ExecuteSetDefaultEmailAddressCommand, this.WhenAnyValue(x => x.SelectedEmailAddress).Select(x => x != null && !this.IsReadOnly));
         }
 
         /// <summary>

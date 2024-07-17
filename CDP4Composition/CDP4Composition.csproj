@@ -1,16 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>CDP4Composition</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
-    <Product>CDP4Composition</Product>
-    <Description>CDP4-COMET Composition and Infrastructure library</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.7.0.0</AssemblyVersion>
-    <FileVersion>9.7.0.0</FileVersion>
-    <OutputPath>bin\$(Configuration)\</OutputPath>
-    <LangVersion>latest</LangVersion>
+	<TargetFramework>net48</TargetFramework>
+	<SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+	<AssemblyTitle>CDP4Composition</AssemblyTitle>
+	<Company>Starion Group S.A.</Company>
+	<Product>CDP4Composition</Product>
+	<Description>CDP4-COMET Composition and Infrastructure library</Description>
+	<Copyright>Copyright © Starion Group S.A.</Copyright>
+	<AssemblyVersion>10.0.0.19</AssemblyVersion>
+	<FileVersion>10.0.0.19</FileVersion>
+	<OutputPath>bin\$(Configuration)\</OutputPath>
+	<LangVersion>latest</LangVersion>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -27,56 +29,55 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="2.0.0" />
-    <PackageReference Include="CommonServiceLocator" Version="1.3" />
-    <PackageReference Include="DevExpress.CodeParser" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Data" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.6" />
-    <PackageReference Include="DevExpress.DataAccess" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Diagram.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Images" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Mvvm" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Office.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.6" />
-    <PackageReference Include="DevExpress.SpellChecker.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Diagram" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="22.2.6" />
-    <PackageReference Include="DevExpress.Xpo" Version="22.2.6" />
-    <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2" />
+    <PackageReference Include="CDP4Common-CE" Version="27.2.1" />
+    <PackageReference Include="CDP4Dal-CE" Version="27.2.1" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.1" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.2.1" />
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
+    <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
+    <PackageReference Include="DevExpress.CodeParser" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Data" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Data.Desktop" Version="23.2.5" />
+    <PackageReference Include="DevExpress.DataAccess" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Diagram.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Images" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Mvvm" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Office.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Pdf.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Printing.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="23.2.5" />
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Accordion" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.NavBar" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Docking" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Office" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.5" />
+    <PackageReference Include="DevExpress.Xpo" Version="23.2.5" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
     <PackageReference Include="Markdown.Xaml" Version="1.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="NLog" Version="4.7.10" />
-    <PackageReference Include="reactiveui" Version="6.4.0" />
-    <PackageReference Include="reactiveui-core" Version="6.4.0" />
-    <PackageReference Include="Rx-Core" Version="2.2.5" />
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5" />
-    <PackageReference Include="Rx-Linq" Version="2.2.5" />
-    <PackageReference Include="Rx-Main" Version="2.2.5" />
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5" />
-    <PackageReference Include="Rx-XAML" Version="2.2.5" />
-    <PackageReference Include="Splat" Version="1.6.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="NLog" Version="5.3.2" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.11" />
+    <PackageReference Include="ReactiveUI.WPF" Version="20.1.1" />
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
@@ -86,212 +87,13 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Web" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="CommonView\Diagram\DiagramPortShape.xaml.cs">
-      <DependentUpon>DiagramPortShape.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\AdvancedLayoutGroup.xaml.cs">
-      <DependentUpon>AdvancedLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\AliasLayoutGroup.xaml.cs">
-      <DependentUpon>AliasLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\CategoryLayoutGroup.xaml.cs">
-      <DependentUpon>CategoryLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\CitationLayoutGroup.xaml.cs">
-      <DependentUpon>CitationLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\DefaultScaleLayoutItem.xaml.cs">
-      <DependentUpon>DefaultScaleLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\DefinitionLayoutGroup.xaml.cs">
-      <DependentUpon>DefinitionLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\ErrorMessageLayoutGroup.xaml.cs">
-      <DependentUpon>ErrorMessageLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\ExcludeOptionsLayoutGroup.xaml.cs">
-      <DependentUpon>ExcludeOptionsLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\FilteredLanguageCodeControl.xaml.cs">
-      <DependentUpon>FilteredLanguageCodeControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\HyperLinkLayoutGroup.xaml.cs">
-      <DependentUpon>HyperLinkLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\InlineEditContentUserControl.xaml.cs">
-      <DependentUpon>InlineEditContentUserControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\IsDeprecatedLayoutItem.xaml.cs">
-      <DependentUpon>IsDeprecatedLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\IsMaximumInclusiveLayoutItem.xaml.cs">
-      <DependentUpon>IsMaximumInclusiveLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\IsMinimumInclusiveLayoutItem.xaml.cs">
-      <DependentUpon>IsMinimumInclusiveLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\LanguageCodeControl.xaml.cs">
-      <DependentUpon>LanguageCodeControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\MappingToReferenceScaleGroup.xaml.cs">
-      <DependentUpon>MappingToReferenceScaleGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\MaximumPermissibleValueLayoutItem.xaml.cs">
-      <DependentUpon>MaximumPermissibleValueLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\MeasurementUnitLayoutItem.xaml.cs">
-      <DependentUpon>MeasurementUnitLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\MinimumPermissibleValueLayoutItem.xaml.cs">
-      <DependentUpon>MinimumPermissibleValueLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\NameLayoutItem.xaml.cs">
-      <DependentUpon>NameLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\NegativeValueConnotationLayoutItem.xaml.cs">
-      <DependentUpon>NegativeValueConnotationLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\NumberSetLayoutItem.xaml.cs">
-      <DependentUpon>NumberSetLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\OwnerLayoutItem.xaml.cs">
-      <DependentUpon>OwnerLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\ParameterSubscriptionLayoutGroup.xaml.cs">
-      <DependentUpon>ParameterSubscriptionLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\ParameterTypeLayoutItem.xaml.cs">
-      <DependentUpon>ParameterTypeLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\PositiveValueConnotationLayoutItem.xaml.cs">
-      <DependentUpon>PositiveValueConnotationLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\ReferenceSourceLayoutItem.xaml.cs">
-      <DependentUpon>ReferenceSourceLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\ScaleLayoutItem.xaml.cs">
-      <DependentUpon>ScaleLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\SelectedParameterTypeLayoutItem.xaml.cs">
-      <DependentUpon>SelectedParameterTypeLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\SelectedScaleLayoutItem.xaml.cs">
-      <DependentUpon>SelectedScaleLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\ShortNameContainerLayoutItem.xaml.cs">
-      <DependentUpon>ShortNameContainerLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\ShortNameLayoutItem.xaml.cs">
-      <DependentUpon>ShortNameLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\StateDependenceLayoutItem.xaml.cs">
-      <DependentUpon>StateDependenceLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\SymbolLayoutItem.xaml.cs">
-      <DependentUpon>SymbolLayoutItem.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\UserValidationButtonsLayoutGroup.xaml.cs">
-      <DependentUpon>UserValidationButtonsLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Items\ValueDefinitionLayoutGroup.xaml.cs">
-      <DependentUpon>ValueDefinitionLayoutGroup.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Resources\ErrorTemplate.xaml.cs">
-      <DependentUpon>ErrorTemplate.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Resources\RibbonMenuItemTemplate.xaml.cs">
-      <DependentUpon>RibbonMenuItemTemplate.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Resources\ValueSetTemplates.xaml.cs">
-      <DependentUpon>ValueSetTemplates.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\UserControls\CDPTextBox.xaml.cs">
-      <DependentUpon>CDPTextBox.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\AliasDialog.xaml.cs">
-      <DependentUpon>AliasDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\AnnotationFloatingDialog.xaml.cs">
-      <DependentUpon>AnnotationFloatingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\AnnotationTooltip.xaml.cs">
-      <DependentUpon>AnnotationTooltip.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\CitationDialog.xaml.cs">
-      <DependentUpon>CitationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\CopyConfirmationDialog.xaml.cs">
-      <DependentUpon>CopyConfirmationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\DefinitionDialog.xaml.cs">
-      <DependentUpon>DefinitionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\HyperlinkDialog.xaml.cs">
-      <DependentUpon>HyperLinkDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\OkDialog.xaml.cs">
-      <DependentUpon>OkDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\ReferenceSourceDialog.xaml.cs">
-      <DependentUpon>ReferenceSourceDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="CommonView\Views\YesNoDialog.xaml.cs">
-      <DependentUpon>YesNoDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\BrowserHeader.xaml.cs">
-      <DependentUpon>BrowserHeader.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ConfirmationDialog - Copy.xaml.cs">
-      <DependentUpon>ConfirmationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ElementParameterRowControl.xaml.cs">
-      <DependentUpon>ElementParameterRowControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\CommonThingControl.xaml.cs">
-      <DependentUpon>CommonThingControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ConfirmationDialog.xaml.cs">
-      <DependentUpon>ConfirmationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\LoadingControl.xaml.cs">
-      <DependentUpon>LoadingControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\InformationDialog.xaml.cs">
-      <DependentUpon>InformationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ManageSavedUserPreferencesDialog.xaml.cs">
-      <DependentUpon>ManageSavedUserPreferencesDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ManageConfigurationsDialog.xaml.cs">
-      <DependentUpon>ManageConfigurationsDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SavedUserPreferenceDialog.xaml.cs">
-      <DependentUpon>SavedUserPreferenceDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SavedConfigurationDialog.xaml.cs">
-      <DependentUpon>SavedConfigurationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SessionHeader.xaml.cs">
-      <DependentUpon>SessionHeader.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\GenericConfirmationDialog.xaml.cs">
-      <DependentUpon>GenericConfirmationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SubmitConfirmation.xaml.cs">
-      <DependentUpon>SubmitConfirmation.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ThingSelectorDialog.xaml.cs">
-      <DependentUpon>ThingSelectorDialog.xaml</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\Dictionaries\en_GB.aff" />
@@ -371,336 +173,5 @@
     <Resource Include="Resources\Images\Thing\domainofexpertise_32x32.png" />
     <Resource Include="Resources\Images\Thing\category_16x16.png" />
     <Resource Include="Resources\Images\Thing\category_32x32.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="CommonView\Diagram\Views\DiagramPortShape.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\WarningLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\AdvancedLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\DefinitionDisplayLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\AliasLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\CategoryLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\CitationLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\DefaultScaleLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\DefinitionLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\ErrorMessageLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\ExcludeOptionsLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\FilteredLanguageCodeControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\HyperLinkLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\InlineEditContentUserControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\IsDeprecatedLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\IsMaximumInclusiveLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\IsMinimumInclusiveLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\LanguageCodeControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\MappingToReferenceScaleGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\MaximumPermissibleValueLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\MeasurementUnitLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\MinimumPermissibleValueLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\NameLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\NegativeValueConnotationLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\NumberSetLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\AliasDisplayLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\OwnerLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\ParameterSubscriptionLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\ParameterTypeLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\PositiveValueConnotationLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\ReferenceSourceLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\ScaleLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\SelectedParameterTypeLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\SelectedScaleLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\ShortNameContainerLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\ShortNameLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\StateDependenceLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\SymbolLayoutItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\UserValidationButtonsLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Items\ValueDefinitionLayoutGroup.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Resources\CDP4Styles.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Resources\ErrorTemplate.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Resources\Markdown.Styles.Default.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Resources\RibbonMenuItemTemplate.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Resources\ValueSetTemplates.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\UserControls\CDPTextBox.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\AliasDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\AnnotationFloatingDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\AnnotationTooltip.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\CitationDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\CopyConfirmationDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\DefinitionDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\HyperLinkDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\OkDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\ReferenceSourceDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="CommonView\Views\YesNoDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SelectedThingGroupControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\BrowserHeader.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\CustomFilterEditorDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ElementParameterRowControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\CommonThingControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ConfirmationDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\LoadingControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\InformationDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ManageSavedUserPreferencesDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ManageConfigurationsDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SavedUserPreferenceDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SavedConfigurationDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SessionHeader.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\GenericConfirmationDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\SubmitConfirmation.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ThingSelectorDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x64\Release\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\BrowserHeader.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\BrowserHeader.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\CommonThingControl.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\CommonThingControl.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ConfirmationDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ConfirmationDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\GenericConfirmationDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\GenericConfirmationDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\InformationDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\InformationDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\LoadingControl.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\LoadingControl.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SessionHeader.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SessionHeader.g.i.cs" />
-    <Compile Remove="obj\x64\Release\Views\BrowserHeader.g.cs" />
-    <Compile Remove="obj\x64\Release\Views\CommonThingControl.g.cs" />
-    <Compile Remove="obj\x64\Release\Views\ConfirmationDialog.g.cs" />
-    <Compile Remove="obj\x64\Release\Views\GenericConfirmationDialog.g.cs" />
-    <Compile Remove="obj\x64\Release\Views\InformationDialog.g.cs" />
-    <Compile Remove="obj\x64\Release\Views\LoadingControl.g.cs" />
-    <Compile Remove="obj\x64\Release\Views\SessionHeader.g.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="CommonView\Items\AliasDisplayLayoutItem.xaml" />
-    <None Remove="CommonView\Items\DefinitionDisplayLayoutItem.xaml" />
-    <None Remove="CommonView\Items\WarningLayoutItem.xaml" />
-    <None Remove="Resources\Images\cometlogo.png" />
-    <None Remove="Resources\Images\cometlogo_48x48.png" />
-    <None Remove="Views\CustomFilterEditorDialog.xaml" />
-    <None Remove="Views\ElementParameterRowControl.xaml" />
-    <None Remove="Views\ManageConfigurationsDialog.xaml" />
-    <None Remove="Views\ManageSavedUserPreferencesDialog.xaml" />
-    <None Remove="Views\SavedConfigurationDialog.xaml" />
-    <None Remove="Views\SavedUserPreferenceDialog.xaml" />
-    <None Remove="Views\SelectedThingGroupControl.xaml" />
-    <None Remove="Views\SubmitConfirmation.xaml" />
   </ItemGroup>
 </Project>

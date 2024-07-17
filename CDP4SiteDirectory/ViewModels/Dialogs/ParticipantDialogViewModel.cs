@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParticipantDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="ParticipantDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2020 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ namespace CDP4SiteDirectory.ViewModels
 
             this.isSelectedRoleDeprecated =
                 this.WhenAny(x => x.SelectedRole, selectedRole => selectedRole.Value?.IsDeprecated == true)
-                    .ToProperty(this, x => x.IsSelectedRoleDeprecated, out this.isSelectedRoleDeprecated);
+                    .ToProperty(this, x => x.IsSelectedRoleDeprecated, out this.isSelectedRoleDeprecated, scheduler: RxApp.MainThreadScheduler);
         }
 
         /// <summary>

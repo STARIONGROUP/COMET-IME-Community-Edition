@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ImageService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2018 RHEA System S.A.
+// <copyright file="ImageService.cs" company="Starion Group S.A.">
+//   Copyright (c) 2018 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 

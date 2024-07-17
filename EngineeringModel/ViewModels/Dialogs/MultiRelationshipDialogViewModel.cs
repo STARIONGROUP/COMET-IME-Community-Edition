@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MultiRelationshipDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="MultiRelationshipDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 // 
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -28,6 +28,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common;
@@ -36,6 +37,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -111,12 +113,12 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// <summary>
         /// Gets or sets the create entry <see cref="ICommand" /> to create a new entry for related thing
         /// </summary>
-        public ReactiveCommand<object> CreateThingEntryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateThingEntryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the delete row <see cref="ICommand" /> to delete a row from related thing list
         /// </summary>
-        public ReactiveCommand<object> DeleteRowCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteRowCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Name of the current <see cref="BinaryRelationship" />
@@ -158,11 +160,9 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
 
             this.WhenAnyValue(x => x.Name).Subscribe(x => this.UpdateOkCanExecute());
 
-            this.CreateThingEntryCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsReadOnly).Select(x => !x));
-            this.CreateThingEntryCommand.Subscribe(_ => this.ExecuteCreateEntryCommand());
+            this.CreateThingEntryCommand = ReactiveCommandCreator.Create(this.ExecuteCreateEntryCommand, this.WhenAnyValue(x => x.IsReadOnly).Select(x => !x));
 
-            this.DeleteRowCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.IsReadOnly).Select(x => !x));
-            this.DeleteRowCommand.Subscribe(_ => this.ExecuteDeleteRow());
+            this.DeleteRowCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteRow, this.WhenAnyValue(x => x.IsReadOnly).Select(x => !x));
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         }
 
         /// <summary>
-        /// Populate the <see cref="RelationshipDialogViewModel{T}.PossibleOwner" /> property
+        /// Populate the <see cref="CDP4CommonView.RelationshipDialogViewModel{T}.PossibleOwner" /> property
         /// </summary>
         protected override void PopulatePossibleOwner()
         {

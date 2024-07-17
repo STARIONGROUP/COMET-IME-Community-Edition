@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BasicRDLRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="ExtendedRdlRibbonViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,6 +27,8 @@ namespace BasicRDL.Tests
 {
     using System;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using BasicRdl.ViewModels;
 
@@ -39,7 +41,7 @@ namespace BasicRDL.Tests
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -56,16 +58,18 @@ namespace BasicRDL.Tests
         private Uri uri;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IPanelNavigationService> navigationService;
-        private Mock<IPermissionService> permissionService; 
+        private Mock<IPermissionService> permissionService;
         private Mock<ISession> session;
         private Person person;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.messageBus = new CDPMessageBus();
+            this.uri = new Uri("https://www.stariongroup.eu");
             this.session = new Mock<ISession>();
             this.serviceLocator = new Mock<IServiceLocator>();
             this.navigationService = new Mock<IPanelNavigationService>();
@@ -77,6 +81,8 @@ namespace BasicRDL.Tests
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(siteDirectory);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>())
@@ -86,27 +92,27 @@ namespace BasicRDL.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
-        public void VerifyConstantBrowserRibbon()
+        public async Task VerifyConstantBrowserRibbon()
         {
-            var viewmodel = new ConstantBrowserRibbonViewModel();
+            var viewmodel = new ConstantBrowserRibbonViewModel(this.messageBus);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            viewmodel.OpenSingleBrowserCommand.Execute(null);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            await viewmodel.OpenSingleBrowserCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
         }
 
         [Test]
-        public void VerifyGlossaryBrowserRibbon()
+        public async Task VerifyGlossaryBrowserRibbon()
         {
-            var viewmodel = new GlossaryBrowserRibbonViewModel();
+            var viewmodel = new GlossaryBrowserRibbonViewModel(this.messageBus);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
-            viewmodel.OpenSingleBrowserCommand.Execute(null);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            await viewmodel.OpenSingleBrowserCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
         }

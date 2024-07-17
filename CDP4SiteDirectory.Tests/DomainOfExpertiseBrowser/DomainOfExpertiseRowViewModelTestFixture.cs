@@ -1,6 +1,26 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DomainOfExpertiseRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="DomainOfExpertiseRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,16 +28,18 @@ namespace CDP4SiteDirectory.Tests
 {
     using System;
     using System.Reactive.Concurrency;
+
     using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-
-    using CDP4SiteDirectory.ViewModels;
 
     using Moq;
 
     using NUnit.Framework;
+
     using ReactiveUI;
 
     /// <summary>
@@ -33,11 +55,13 @@ namespace CDP4SiteDirectory.Tests
         private string shortName;
         private bool isDeprecated;
         private Mock<ISession> session;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.name = "name";
             this.shortName = "shortname";
@@ -49,12 +73,14 @@ namespace CDP4SiteDirectory.Tests
                 ShortName = this.shortName,
                 IsDeprecated = this.isDeprecated
             };
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();            
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -79,11 +105,12 @@ namespace CDP4SiteDirectory.Tests
             this.domainOfExpertise.Name = newName;
             this.domainOfExpertise.ShortName = newShortname;
             this.domainOfExpertise.IsDeprecated = newIsDeprecated;
-            // workaround to modify a read-only field
-            var type = domainOfExpertise.GetType();
-            type.GetProperty("RevisionNumber").SetValue(domainOfExpertise, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(domainOfExpertise, EventKind.Updated);
+            // workaround to modify a read-only field
+            var type = this.domainOfExpertise.GetType();
+            type.GetProperty("RevisionNumber").SetValue(this.domainOfExpertise, 50);
+
+            this.messageBus.SendObjectChangeEvent(this.domainOfExpertise, EventKind.Updated);
 
             Assert.AreEqual(newName, vm.Name);
             Assert.AreEqual(newShortname, vm.ShortName);

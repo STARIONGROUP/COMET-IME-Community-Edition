@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SiteRdlClosingDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="SiteRdlClosingDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +29,9 @@ namespace BasicRDL.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using BasicRdl.ViewModels;
 
@@ -41,7 +44,7 @@ namespace BasicRDL.Tests
     using CDP4Dal;
     using CDP4Dal.Permission;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -64,12 +67,14 @@ namespace BasicRDL.Tests
         private SiteReferenceDataLibrary siteRDL1;
         private SiteReferenceDataLibrary siteRDL2;
         private ModelReferenceDataLibrary mRdl;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -77,7 +82,7 @@ namespace BasicRDL.Tests
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.navigation.Object);
 
             this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "testPerson" };
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.uri = new Uri("https://www.stariongroup.eu");
             this.session = new Mock<ISession>();
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, new Uri("http://test.com")) { Name = "TestSiteDir" };
             this.siteRDL2 = new SiteReferenceDataLibrary(Guid.NewGuid(), null, null);
@@ -86,15 +91,16 @@ namespace BasicRDL.Tests
             this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteRDL2);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.navigation.Object);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
-            this.mRdl = new ModelReferenceDataLibrary(Guid.NewGuid(), null, this.uri){RequiredRdl = this.siteRDL2};
+            this.mRdl = new ModelReferenceDataLibrary(Guid.NewGuid(), null, this.uri) { RequiredRdl = this.siteRDL2 };
 
             var lazysiteDirectory = new Lazy<Thing>(() => this.siteDirectory);
             this.assembler.Cache.GetOrAdd(new CacheKey(lazysiteDirectory.Value.Iid, null), lazysiteDirectory);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(this.openReferenceDataLibraries);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.openReferenceDataLibraries.Add(this.siteRDL1);
             this.openReferenceDataLibraries.Add(this.siteRDL2);
@@ -104,7 +110,7 @@ namespace BasicRDL.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         /// <summary>
@@ -131,18 +137,18 @@ namespace BasicRDL.Tests
             var viewmodel = new SiteRdlClosingDialogViewModel(sessions);
 
             viewmodel.SelectedSiteRdlToClose = viewmodel.SessionsAvailable.Single();
-            Assert.IsFalse(viewmodel.CloseCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)viewmodel.CloseCommand).CanExecute(null));
 
             viewmodel.SelectedSiteRdlToClose = viewmodel.SessionsAvailable.Single().ContainedRows.Single(x => x.Thing == this.siteRDL1);
-            Assert.IsTrue(viewmodel.CloseCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.CloseCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyThatCancelCommandsReturnCorrectResult()
+        public async Task VerifyThatCancelCommandsReturnCorrectResult()
         {
             var sessions = new List<ISession> { this.session.Object };
             var viewmodel = new SiteRdlClosingDialogViewModel(sessions);
-            viewmodel.CancelCommand.Execute(null);
+            await viewmodel.CancelCommand.Execute();
 
             Assert.IsTrue(viewmodel.DialogResult.Result.HasValue);
             Assert.IsFalse(viewmodel.DialogResult.Result.Value);

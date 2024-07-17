@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WorkbookData.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="WorkbookData.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,7 +16,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
     /// The purpose of the <see cref="WorkbookData"/> is to serialize and deserialize <see cref="CDP4Common.EngineeringModelData.Iteration"/> to and from
     /// an custom XML part of a <see cref="Workbook"/>
     /// </summary>
-    [XmlRoot("CDP4Data", Namespace = "http://cdp4data.rheagroup.com")]
+    [XmlRoot("CDP4Data", Namespace = "http://cdp4data.stariongroup.eu")]
     public class WorkbookData : CustomOfficeData
     {
         /// <summary>

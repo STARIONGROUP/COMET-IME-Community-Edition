@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="LogarithmicScaleDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="LogarithmicScaleDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="LogarithmicScale"/>
@@ -170,27 +171,27 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedReferenceQuantityKind"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedReferenceQuantityKindCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedReferenceQuantityKindCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ScaleReferenceQuantityValue
         /// </summary>
-        public ReactiveCommand<object> CreateReferenceQuantityValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateReferenceQuantityValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ScaleReferenceQuantityValue
         /// </summary>
-        public ReactiveCommand<object> DeleteReferenceQuantityValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteReferenceQuantityValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ScaleReferenceQuantityValue
         /// </summary>
-        public ReactiveCommand<object> EditReferenceQuantityValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditReferenceQuantityValueCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ScaleReferenceQuantityValue
         /// </summary>
-        public ReactiveCommand<object> InspectReferenceQuantityValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectReferenceQuantityValueCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -203,19 +204,19 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedReferenceQuantityValueCommand = this.WhenAny(vm => vm.SelectedReferenceQuantityValue, v => v.Value != null);
             var canExecuteEditSelectedReferenceQuantityValueCommand = this.WhenAny(vm => vm.SelectedReferenceQuantityValue, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateReferenceQuantityValueCommand = ReactiveCommand.Create(canExecuteCreateReferenceQuantityValueCommand);
+            this.CreateReferenceQuantityValueCommand = ReactiveCommandCreator.Create(canExecuteCreateReferenceQuantityValueCommand);
             this.CreateReferenceQuantityValueCommand.Subscribe(_ => this.ExecuteCreateCommand<ScaleReferenceQuantityValue>(this.PopulateReferenceQuantityValue));
 
-            this.DeleteReferenceQuantityValueCommand = ReactiveCommand.Create(canExecuteEditSelectedReferenceQuantityValueCommand);
+            this.DeleteReferenceQuantityValueCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedReferenceQuantityValueCommand);
             this.DeleteReferenceQuantityValueCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedReferenceQuantityValue.Thing, this.PopulateReferenceQuantityValue));
 
-            this.EditReferenceQuantityValueCommand = ReactiveCommand.Create(canExecuteEditSelectedReferenceQuantityValueCommand);
+            this.EditReferenceQuantityValueCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedReferenceQuantityValueCommand);
             this.EditReferenceQuantityValueCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedReferenceQuantityValue.Thing, this.PopulateReferenceQuantityValue));
 
-            this.InspectReferenceQuantityValueCommand = ReactiveCommand.Create(canExecuteInspectSelectedReferenceQuantityValueCommand);
+            this.InspectReferenceQuantityValueCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedReferenceQuantityValueCommand);
             this.InspectReferenceQuantityValueCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedReferenceQuantityValue.Thing));
             var canExecuteInspectSelectedReferenceQuantityKindCommand = this.WhenAny(vm => vm.SelectedReferenceQuantityKind, v => v.Value != null);
-            this.InspectSelectedReferenceQuantityKindCommand = ReactiveCommand.Create(canExecuteInspectSelectedReferenceQuantityKindCommand);
+            this.InspectSelectedReferenceQuantityKindCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedReferenceQuantityKindCommand);
             this.InspectSelectedReferenceQuantityKindCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedReferenceQuantityKind));
         }
 

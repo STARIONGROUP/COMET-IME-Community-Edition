@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="SiteRdlBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="SiteRdlBrowserViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2020 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -106,8 +106,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSiteRdl));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<SiteReferenceDataLibrary>(this.Thing));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<SiteReferenceDataLibrary>(this.Thing), this.WhenAnyValue(x => x.CanCreateSiteRdl));
         }
 
         /// <summary>

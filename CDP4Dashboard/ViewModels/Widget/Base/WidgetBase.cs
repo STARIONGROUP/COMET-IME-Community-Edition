@@ -1,6 +1,6 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="WidgetBase.cs" company="RHEA">
-// Copyright (c) 2020 RHEA Group. All rights reserved.
+// <copyright file="WidgetBase.cs" company="Starion Group S.A.">
+// Copyright (c) 2020 Starion Group S.A. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
@@ -9,10 +9,13 @@ namespace CDP4Dashboard.ViewModels.Widget.Base
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Reactive;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Media;
     using System.Windows.Media.Imaging;
+
+    using CDP4Composition.Mvvm;
 
     using Microsoft.Win32;
 
@@ -82,23 +85,20 @@ namespace CDP4Dashboard.ViewModels.Widget.Base
         /// <summary>
         /// Gets the copy image to the clipboard command
         /// </summary>
-        public ReactiveCommand<object> CopyImageToClipboardCommand { get; }
+        public ReactiveCommand<Control, Unit> CopyImageToClipboardCommand { get; }
 
         /// <summary>
         /// Gets the save image to a file command
         /// </summary>
-        public ReactiveCommand<object> SaveImageToFileCommand { get; }
+        public ReactiveCommand<Control, Unit> SaveImageToFileCommand { get; }
 
         /// <summary>
         /// Instantiates an instance of WidtgetBase
         /// </summary>
         protected WidgetBase()
         {
-            this.SaveImageToFileCommand = ReactiveCommand.Create();
-            this.SaveImageToFileCommand.Subscribe(x => this.SaveImageToFile(x as Control));
-
-            this.CopyImageToClipboardCommand = ReactiveCommand.Create();
-            this.CopyImageToClipboardCommand.Subscribe(x => this.CopyImageToClipboard(x as Control));
+            this.SaveImageToFileCommand = ReactiveCommandCreator.Create<Control>(this.SaveImageToFile);
+            this.CopyImageToClipboardCommand = ReactiveCommandCreator.Create<Control>(this.CopyImageToClipboard);
         }
 
         /// <summary>

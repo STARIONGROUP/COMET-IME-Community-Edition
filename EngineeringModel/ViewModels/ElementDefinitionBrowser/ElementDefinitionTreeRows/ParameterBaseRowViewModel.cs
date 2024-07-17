@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ParameterBaseRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -272,7 +272,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var parameterTypeListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
+                var parameterTypeListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.ParameterType)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
@@ -281,12 +281,45 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var parameterTypeObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterType));
+                var parameterTypeObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterType));
 
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterTypeObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ParameterType, discriminator, action)));
             }
 
             this.SetOwnerListener();
+
+            this.InitializeCategorySubscription();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="Category"/> subscription
+        /// </summary>
+        private void InitializeCategorySubscription()
+        {
+            Func<ObjectChangedEvent, bool> categoryDiscriminator =
+                objectChange =>
+                    objectChange.EventKind == EventKind.Updated
+                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache
+                    && this.Category.Contains(objectChange.ChangedThing);
+
+            Action<ObjectChangedEvent> categoryAction = x => this.UpdateCategories();
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var categoryRemoveListener =
+                    this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category))
+                        .Where(categoryDiscriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(categoryAction);
+
+                this.Disposables.Add(categoryRemoveListener);
+            }
+            else
+            {
+                var categoryObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category));
+
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(categoryObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Category), categoryDiscriminator, categoryAction)));
+            }
         }
 
         /// <summary>
@@ -302,7 +335,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             if (columnName == "Manual" || columnName == "Reference")
             {
-                return ParameterValueValidator.Validate(newValue, this.ParameterType, this.Thing.Scale);
+                return ParameterValueValidator.Validate(newValue, this.Thing.ParameterType, this.Thing.Scale);
             }
 
             return null;
@@ -558,7 +591,7 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 foreach (var state in this.Thing.StateDependence.ActualState)
                 {
-                    var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(state)
+                    var listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(state)
                         .Where(discriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(action);
@@ -568,7 +601,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var stateObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ActualFiniteState));
+                var stateObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ActualFiniteState));
 
                 foreach (var state in this.Thing.StateDependence.ActualState)
                 {

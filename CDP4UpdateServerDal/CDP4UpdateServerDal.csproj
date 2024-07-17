@@ -1,25 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+	<TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4UpdateServerDal</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4UpdateServerDal</Product>
-    <Description>CDP4-COMET Update Server Dal</Description>
+    <Description>COMET Update Server Dal</Description>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
+    <PackageReference Include="CDP4Common-CE" Version="27.2.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
+	<ItemGroup>
+		<Reference Include="System.Net.Http" />
+	</ItemGroup>
 
 </Project>

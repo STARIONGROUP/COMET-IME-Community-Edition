@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DecompositionRuleRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="DecompositionRuleRowViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2018 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!

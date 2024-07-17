@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ItemsSourceHelper.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="ItemsSourceHelper.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2018 Starion Group S.A.
 //   Source @ https://github.com/DevExpress-Examples/how-to-implement-the-itemssource-property-for-the-layoutgroup-layoutcontrol-control-e5081/tree/13.2.7%2B/CS/LayoutControlItemsSource
 // </copyright>
 // -------------------------------------------------------------------------------------------------

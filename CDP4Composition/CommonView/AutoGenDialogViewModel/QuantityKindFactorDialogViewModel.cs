@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="QuantityKindFactorDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="QuantityKindFactorDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="QuantityKindFactor"/>
@@ -123,7 +124,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedQuantityKind"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedQuantityKindCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedQuantityKindCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -132,7 +133,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedQuantityKindCommand = this.WhenAny(vm => vm.SelectedQuantityKind, v => v.Value != null);
-            this.InspectSelectedQuantityKindCommand = ReactiveCommand.Create(canExecuteInspectSelectedQuantityKindCommand);
+            this.InspectSelectedQuantityKindCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedQuantityKindCommand);
             this.InspectSelectedQuantityKindCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedQuantityKind));
         }
 

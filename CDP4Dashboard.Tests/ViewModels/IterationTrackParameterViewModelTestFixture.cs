@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file=IterationTrackParameterViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="IterationTrackParameterViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests.ViewModels.Rows
 {
@@ -13,6 +32,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
     using System.Reflection;
     using System.Threading;
     using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -36,13 +56,14 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
     /// <summary>
     /// Tests if <see cref="IterationTrackParameterViewModel{TThing,TValueSet}"/> works set correctly
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     internal class IterationTrackParameterViewModelTestFixture
     {
         private Mock<ISession> session;
         private Iteration iteration;
         private readonly PropertyInfo revision = typeof(Thing).GetProperty("RevisionNumber");
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private Mock<IPermissionService> permissionService;
         private Assembler assembler;
         private DomainOfExpertise domain;
@@ -52,11 +73,13 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         private ParameterOverrideValueSet parameterOverrideValueSet;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private IterationTrackParameterViewModel<Parameter, ParameterValueSet> iterationTrackParameterViewModel;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.session = new Mock<ISession>();
@@ -66,6 +89,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache = this.assembler.Cache;
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test" };
@@ -84,7 +108,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
                 Manual = parameterValueArray,
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
- 
+
             ((Parameter)this.iterationTrackParameterForParameter.ParameterOrOverride).ValueSet.Add(this.parameterValueSet);
 
             var parameterOverrideValueArray = new ValueArray<string>(new[] { "20" });
@@ -110,7 +134,7 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -122,13 +146,13 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
             Assert.AreEqual(1, this.iterationTrackParameterViewModel.LineSeriesCollection.Count);
             Assert.AreEqual(1, this.iterationTrackParameterViewModel.LineSeriesCollection.First().Lines.Count());
 
-            Assert.AreEqual(this.iterationTrackParameterViewModel.StatusIndicatorColor.ToString(),  CDP4Color.Inconclusive.GetBrush().ToString());
-            Assert.AreEqual( "10 [SC]", this.iterationTrackParameterViewModel.CurrentValue);
+            Assert.AreEqual(this.iterationTrackParameterViewModel.StatusIndicatorColor.ToString(), CDP4Color.Inconclusive.GetBrush().ToString());
+            Assert.AreEqual("10 [SC]", this.iterationTrackParameterViewModel.CurrentValue);
             Assert.AreEqual("- [SC]", this.iterationTrackParameterViewModel.PreviousValue);
 
             Assert.AreEqual(IterationTrackParameterViewModel<Parameter, ParameterValueSet>.StatusIndicatorUnknown, this.iterationTrackParameterViewModel.StatusIndicator);
             Assert.IsTrue(this.iterationTrackParameterViewModel.PercentageChange.Contains(IterationTrackParameterViewModel<Parameter, ParameterValueSet>.StatusIndicatorUnknown));
-            
+
             Assert.AreEqual(this.iterationTrackParameterViewModel.ModelCode, ((Parameter)this.iterationTrackParameterForParameter.ParameterOrOverride).ModelCode());
         }
 
@@ -137,7 +161,8 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         {
             var text = "no_text_please";
             Clipboard.SetData(DataFormats.UnicodeText, text);
-            this.iterationTrackParameterViewModel.OnCopyDataCommand.Execute(null);
+            ((ICommand)this.iterationTrackParameterViewModel.OnCopyDataCommand).Execute(default);
+
             Assert.AreNotEqual(text, Clipboard.GetData(DataFormats.UnicodeText));
         }
 
@@ -145,11 +170,11 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
         public void verify_that_subscriptions_and_revision_selection_work()
         {
             var oldParameterValueSet = this.parameterValueSet.Clone(false);
-            this.parameterValueSet.Manual = new ValueArray<string>(new [] { "15" });
+            this.parameterValueSet.Manual = new ValueArray<string>(new[] { "15" });
             this.parameterValueSet.RevisionNumber = 2;
             this.parameterValueSet.Revisions.Add(oldParameterValueSet.RevisionNumber, oldParameterValueSet);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameterValueSet, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameterValueSet, EventKind.Updated);
 
             Assert.AreEqual(1, this.iterationTrackParameterViewModel.LineSeriesCollection.Count);
             Assert.AreEqual(1, this.iterationTrackParameterViewModel.LineSeriesCollection.First().Lines.Count());
@@ -159,9 +184,10 @@ namespace CDP4Requirements.Tests.ViewModels.Rows
             this.parameterValueSet.RevisionNumber = 3;
             this.parameterValueSet.Revisions.Add(oldParameterValueSet2.RevisionNumber, oldParameterValueSet2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameterValueSet, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameterValueSet, EventKind.Updated);
 
             Assert.AreEqual(1, this.iterationTrackParameterViewModel.LineSeriesCollection.Count);
+
             //only after publication a value is selected to be used in a Widget
             Assert.AreEqual(2, this.iterationTrackParameterViewModel.LineSeriesCollection.First().Lines.Count());
         }

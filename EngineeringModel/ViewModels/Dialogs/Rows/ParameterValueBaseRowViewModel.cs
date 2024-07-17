@@ -1,24 +1,46 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterValueBaseRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ParameterValueBaseRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
+// 
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+// 
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+// 
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+// 
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+// 
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels.Dialogs
 {
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Validation;
+
     using CDP4Composition.Mvvm;
-    using CDP4Composition.Services;
     using CDP4Composition.ViewModels;
+
     using CDP4Dal;
+
     using ReactiveUI;
-    using System.Collections.Generic;
 
     /// <summary>
     /// The base row view-model that displays the value-set of a <see cref="ParameterBase"/> 
@@ -26,7 +48,6 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     /// </summary>
     public abstract class ParameterValueBaseRowViewModel : CDP4CommonView.ParameterBaseRowViewModel<ParameterBase>, IDialogValueSetRow
     {
-        #region Fields
         /// <summary>
         /// The manual field name
         /// </summary>
@@ -74,15 +95,12 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// This represent the row code used to identify the current row in the validation errors list
         /// </remarks>
         protected readonly string RowCode;
-        
+
         /// <summary>
         /// The <see cref="IDialogViewModelBase{ParameterBase}"/> context
         /// </summary>
         protected readonly IDialogViewModelBase<ParameterBase> DialogViewModel;
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterValueBaseRowViewModel"/> class
         /// </summary>
@@ -114,7 +132,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             this.ActualState = actualState;
             this.ValueIndex = valueIndex;
             this.ParameterTypeClassKind = this.ParameterType.ClassKind;
-            
+
             this.WhenAnyValue(vm => vm.Switch).Skip(1).Subscribe(_ => this.UpdateActualValue());
             this.WhenAnyValue(vm => vm.Manual).Skip(1).Subscribe(_ => this.UpdateActualValue());
             this.WhenAnyValue(vm => vm.Computed).Skip(1).Subscribe(_ => this.UpdateActualValue());
@@ -127,9 +145,11 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             this.DialogViewModel = (IDialogViewModelBase<ParameterBase>)this.TopContainerViewModel;
 
             var subscription = this.Thing as ParameterSubscription;
+
             if (subscription != null)
             {
                 var parameter = (ParameterOrOverrideBase)subscription.Container;
+
                 if (parameter.Owner != null)
                 {
                     this.OwnerName = "[" + parameter.Owner.Name + "]";
@@ -145,10 +165,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                 }
             }
         }
-        #endregion
 
-        #region Properties
-        
         /// <summary>
         /// Gets or sets the <see cref="ClassKind"/> of the <see cref="ParameterType"/> represented by this <see cref="IValueSetRow"/>
         /// </summary>
@@ -162,18 +179,21 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             get
             {
                 var enumPt = this.Thing.ParameterType as EnumerationParameterType;
+
                 if (enumPt != null)
                 {
                     return enumPt.AllowMultiSelect;
                 }
 
                 var cpt = this.Thing.ParameterType as CompoundParameterType;
+
                 if (cpt == null)
                 {
                     return false;
                 }
 
                 enumPt = cpt.Component[this.ValueIndex].ParameterType as EnumerationParameterType;
+
                 if (enumPt == null)
                 {
                     return false;
@@ -188,8 +208,8 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// </summary>
         public bool IsDefault
         {
-            get { return this.isDefault; }
-            set { this.RaiseAndSetIfChanged(ref this.isDefault, value); }
+            get => this.isDefault;
+            set => this.RaiseAndSetIfChanged(ref this.isDefault, value);
         }
 
         /// <summary>
@@ -200,12 +220,14 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             get
             {
                 var enumValues = new ReactiveList<EnumerationValueDefinition>();
+
                 if (this.Thing == null)
                 {
                     return enumValues;
                 }
 
                 var enumPt = this.Thing.ParameterType as EnumerationParameterType;
+
                 if (enumPt != null)
                 {
                     enumValues.AddRange(enumPt.ValueDefinition);
@@ -213,9 +235,11 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                 }
 
                 var cpt = this.Thing.ParameterType as CompoundParameterType;
+
                 if (cpt != null)
                 {
                     enumPt = cpt.Component[this.ValueIndex].ParameterType as EnumerationParameterType;
+
                     if (enumPt != null)
                     {
                         enumValues.AddRange(enumPt.ValueDefinition);
@@ -231,10 +255,9 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// </summary>
         public string Formula
         {
-            get { return this.formula; }
-            set { this.RaiseAndSetIfChanged(ref this.formula, value); }
+            get => this.formula;
+            set => this.RaiseAndSetIfChanged(ref this.formula, value);
         }
-        #endregion
 
         /// <summary>
         /// Check that the values of this row are valid
@@ -243,6 +266,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         public virtual void CheckValues(MeasurementScale scale)
         {
             this.Scale = scale;
+
             if (this.ContainedRows.Count == 0)
             {
                 this.RaisePropertyChanged(ManualPropertyName);
@@ -305,8 +329,6 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             }
         }
 
-        #region Validation
-
         /// <summary>
         /// Gets the error message for the property with the given name.
         /// </summary>
@@ -326,12 +348,14 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                     var propertyCode = this.RowCode + ManualPropertyName;
 
                     var rule = this.DialogViewModel.ValidationErrors.SingleOrDefault(x => x.PropertyName == propertyCode);
+
                     if (rule != null)
                     {
                         this.DialogViewModel.ValidationErrors.Remove(rule);
                     }
 
                     var validationMsg = ParameterValueValidator.Validate(this.Manual, this.ParameterType, this.Scale);
+
                     if (!string.IsNullOrWhiteSpace(validationMsg))
                     {
                         var validationRule = new ValidationService.ValidationRule
@@ -352,12 +376,14 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                     var propertyCode = this.RowCode + ReferencePropertyName;
 
                     var rule = this.DialogViewModel.ValidationErrors.SingleOrDefault(x => x.PropertyName == propertyCode);
+
                     if (rule != null)
                     {
                         this.DialogViewModel.ValidationErrors.Remove(rule);
                     }
 
                     var validationMsg = ParameterValueValidator.Validate(this.Reference, this.ParameterType, this.Scale);
+
                     if (!string.IsNullOrWhiteSpace(validationMsg))
                     {
                         var validationRule = new ValidationService.ValidationRule
@@ -404,6 +430,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             }
 
             var parameterSubscription = this.Thing as ParameterSubscription;
+
             if (parameterSubscription != null && propertyName == "Reference")
             {
                 return false;
@@ -412,17 +439,13 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             return true;
         }
 
-        #endregion
-
-        #region Private Methods
-
-
         /// <summary>
         /// Sets the values of this row in the case where the represented thing is a <see cref="ParameterSubscription"/>
         /// </summary>
         private void SetParameterSubscriptionValues()
         {
             var parameterSubscription = this.Thing as ParameterSubscription;
+
             if (parameterSubscription == null)
             {
                 return;
@@ -434,9 +457,10 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             }
 
             var valueSet = this.GetParameterSubscriptionValueSet();
+
             if (valueSet == null)
             {
-                logger.Error("No Value set was found for the option: {0}, state: {1}", (this.ActualOption == null) ? "null" : this.ActualOption.Name, (this.ActualState == null) ? "null" : this.ActualState.Name);
+                logger.Error("No Value set was found for the option: {0}, state: {1}", this.ActualOption == null ? "null" : this.ActualOption.Name, this.ActualState == null ? "null" : this.ActualState.Name);
                 return;
             }
 
@@ -458,6 +482,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             }
 
             ParameterValueSetBase valueSet;
+
             if (this.Thing is Parameter)
             {
                 valueSet = this.GetParameterValueSet();
@@ -469,7 +494,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
 
             if (valueSet == null)
             {
-                logger.Error("No Value set was found for the option: {0}, state: {1}", (this.ActualOption == null) ? "null" : this.ActualOption.Name, (this.ActualState == null) ? "null" : this.ActualState.Name);
+                logger.Error("No Value set was found for the option: {0}, state: {1}", this.ActualOption == null ? "null" : this.ActualOption.Name, this.ActualState == null ? "null" : this.ActualState.Name);
                 return;
             }
 
@@ -483,6 +508,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             this.Switch = valueSet.ValueSwitch;
             this.Published = valueSet.Published.Count() > this.ValueIndex ? valueSet.Published[this.ValueIndex] : "-";
             this.IsDefault = valueSet.ActualState?.IsDefault ?? false;
+
             if (valueSet.Published.Count() <= this.ValueIndex)
             {
                 this.Error = "No ValueSet found for this component";
@@ -497,6 +523,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         {
             var parameterOverride = (ParameterOverride)this.Thing;
             ParameterOverrideValueSet valueSet = null;
+
             if (this.ActualOption == null && this.ActualState == null)
             {
                 return parameterOverride.ValueSet.FirstOrDefault();
@@ -527,6 +554,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         private ParameterValueSet GetParameterValueSet()
         {
             var parameter = (Parameter)this.Thing;
+
             if (this.ActualOption == null && this.ActualState == null)
             {
                 return parameter.ValueSet.FirstOrDefault();
@@ -554,6 +582,7 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
             var parameterSubscription = (ParameterSubscription)this.Thing;
 
             ParameterSubscriptionValueSet valueSet;
+
             if (this.ActualOption == null && this.ActualState == null)
             {
                 valueSet = parameterSubscription.ValueSet.FirstOrDefault();
@@ -573,6 +602,5 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
 
             return valueSet;
         }
-        #endregion Private Methods
     }
 }

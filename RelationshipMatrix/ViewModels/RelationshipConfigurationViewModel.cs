@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RelationshipConfigurationViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="RelationshipConfigurationViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,12 +27,14 @@ namespace CDP4RelationshipMatrix.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -147,7 +149,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the selected <see cref="BinaryRelationshipRule"/>
         /// </summary>
-        public ReactiveCommand<object> InspectRuleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectRuleCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -155,8 +157,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         private void InitializeCommands()
         {
             var canExecuteInpsectRuleCommand = this.WhenAny(vm => vm.SelectedRule, v => v.Value != null);
-            this.InspectRuleCommand = ReactiveCommand.Create(canExecuteInpsectRuleCommand);
-            this.InspectRuleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRule));
+            this.InspectRuleCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedRule), canExecuteInpsectRuleCommand);
         }
 
         /// <summary>

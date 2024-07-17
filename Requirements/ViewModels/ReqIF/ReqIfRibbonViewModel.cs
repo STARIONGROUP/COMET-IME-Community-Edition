@@ -1,24 +1,51 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ReqIfRibbonViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ReqIfRibbonViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Windows.Input;
+
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
-    using CDP4Dal.Events;    
-    using Microsoft.Practices.ServiceLocation;
+    using CDP4Dal.Events;
+
+    using CDP4Requirements.ReqIFDal;
+
+    using CommonServiceLocator;
+
     using ReactiveUI;
-    using ReqIFDal;
+
     using ReqIFSharp;
 
     /// <summary>
@@ -35,7 +62,7 @@ namespace CDP4Requirements.ViewModels
         /// The <see cref="IDialogNavigationService"/>
         /// </summary>
         protected readonly IDialogNavigationService DialogNavigationService;
-        
+
         /// <summary>
         /// The <see cref="IPluginSettingsService"/>
         /// </summary>
@@ -50,7 +77,12 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="CanImportExport"/>
         /// </summary>
         private bool canImportExport;
-        
+
+        /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        protected readonly ICDPMessageBus CDPMessageBus;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ReqIfRibbonViewModel"/> class
         /// </summary>
@@ -60,24 +92,22 @@ namespace CDP4Requirements.ViewModels
             this.ThingDialogNavigationService = ServiceLocator.Current.GetInstance<IThingDialogNavigationService>();
             this.PluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
             this.OpenSaveDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
+            this.CDPMessageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
 
             this.Sessions = new ReactiveList<ISession>();
             this.Iterations = new ReactiveList<Iteration>();
-            this.Iterations.ChangeTrackingEnabled = true;
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.CDPMessageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
+            this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Iteration))
                 .Subscribe(this.IterationEventHandler);
 
-            this.Iterations.CountChanged.Subscribe(x => { this.CanImportExport = (x > 0); });
+            this.Iterations.CountChanged.Subscribe(x => { this.CanImportExport = x > 0; });
             var isImportExportEnable = this.WhenAnyValue(x => x.CanImportExport);
 
-            this.ExportCommand = ReactiveCommand.Create(isImportExportEnable);
-            this.ExportCommand.Subscribe(x => this.ExecuteExportCommand());
+            this.ExportCommand = ReactiveCommandCreator.Create(this.ExecuteExportCommand, isImportExportEnable);
 
-            this.ImportCommand = ReactiveCommand.Create(isImportExportEnable);
-            this.ImportCommand.Subscribe(x => this.ExecuteImportCommand());
+            this.ImportCommand = ReactiveCommandCreator.Create(this.ExecuteImportCommand, isImportExportEnable);
         }
 
         /// <summary>
@@ -85,19 +115,19 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public bool CanImportExport
         {
-            get { return this.canImportExport; }
-            set { this.RaiseAndSetIfChanged(ref this.canImportExport, value); }
+            get => this.canImportExport;
+            set => this.RaiseAndSetIfChanged(ref this.canImportExport, value);
         }
 
         /// <summary>
         /// Gets the ReqIF export <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> ExportCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExportCommand { get; private set; }
 
         /// <summary>
         /// Gets the ReqIF import <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> ImportCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ImportCommand { get; private set; }
 
         /// <summary>
         /// Gets the List of <see cref="ISession"/> that are open
@@ -107,7 +137,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the list of <see cref="Iteration"/>s that are open
         /// </summary>
-        public ReactiveList<Iteration> Iterations { get; private set; } 
+        public ReactiveList<Iteration> Iterations { get; private set; }
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for <see cref="Iteration"/>s added
@@ -164,8 +194,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void ExecuteExportCommand()
         {
-             var reqifExportDialogViewModel = new ReqIfExportDialogViewModel(this.Sessions, this.Iterations, this.OpenSaveDialogService, new ReqIFSerializer(false));
-             this.DialogNavigationService.NavigateModal(reqifExportDialogViewModel);
+            var reqifExportDialogViewModel = new ReqIfExportDialogViewModel(this.Sessions, this.Iterations, this.OpenSaveDialogService, new ReqIFSerializer(false));
+            this.DialogNavigationService.NavigateModal(reqifExportDialogViewModel);
         }
 
         /// <summary>

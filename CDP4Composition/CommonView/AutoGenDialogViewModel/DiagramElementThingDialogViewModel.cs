@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DiagramElementThingDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="DiagramElementThingDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="DiagramElementThing"/>
@@ -147,32 +148,32 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedDepictedThing"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedDepictedThingCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedDepictedThingCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedSharedStyle"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedSharedStyleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedSharedStyleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a OwnedStyle
         /// </summary>
-        public ReactiveCommand<object> CreateLocalStyleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateLocalStyleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a OwnedStyle
         /// </summary>
-        public ReactiveCommand<object> DeleteLocalStyleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteLocalStyleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a OwnedStyle
         /// </summary>
-        public ReactiveCommand<object> EditLocalStyleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditLocalStyleCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a OwnedStyle
         /// </summary>
-        public ReactiveCommand<object> InspectLocalStyleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectLocalStyleCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -185,22 +186,22 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedLocalStyleCommand = this.WhenAny(vm => vm.SelectedLocalStyle, v => v.Value != null);
             var canExecuteEditSelectedLocalStyleCommand = this.WhenAny(vm => vm.SelectedLocalStyle, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateLocalStyleCommand = ReactiveCommand.Create(canExecuteCreateLocalStyleCommand);
+            this.CreateLocalStyleCommand = ReactiveCommandCreator.Create(canExecuteCreateLocalStyleCommand);
             this.CreateLocalStyleCommand.Subscribe(_ => this.ExecuteCreateCommand<OwnedStyle>(this.PopulateLocalStyle));
 
-            this.DeleteLocalStyleCommand = ReactiveCommand.Create(canExecuteEditSelectedLocalStyleCommand);
+            this.DeleteLocalStyleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedLocalStyleCommand);
             this.DeleteLocalStyleCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedLocalStyle.Thing, this.PopulateLocalStyle));
 
-            this.EditLocalStyleCommand = ReactiveCommand.Create(canExecuteEditSelectedLocalStyleCommand);
+            this.EditLocalStyleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedLocalStyleCommand);
             this.EditLocalStyleCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedLocalStyle.Thing, this.PopulateLocalStyle));
 
-            this.InspectLocalStyleCommand = ReactiveCommand.Create(canExecuteInspectSelectedLocalStyleCommand);
+            this.InspectLocalStyleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedLocalStyleCommand);
             this.InspectLocalStyleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedLocalStyle.Thing));
             var canExecuteInspectSelectedDepictedThingCommand = this.WhenAny(vm => vm.SelectedDepictedThing, v => v.Value != null);
-            this.InspectSelectedDepictedThingCommand = ReactiveCommand.Create(canExecuteInspectSelectedDepictedThingCommand);
+            this.InspectSelectedDepictedThingCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDepictedThingCommand);
             this.InspectSelectedDepictedThingCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDepictedThing));
             var canExecuteInspectSelectedSharedStyleCommand = this.WhenAny(vm => vm.SelectedSharedStyle, v => v.Value != null);
-            this.InspectSelectedSharedStyleCommand = ReactiveCommand.Create(canExecuteInspectSelectedSharedStyleCommand);
+            this.InspectSelectedSharedStyleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedSharedStyleCommand);
             this.InspectSelectedSharedStyleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSharedStyle));
         }
 

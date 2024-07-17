@@ -1,29 +1,56 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ActualFiniteStateListDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ActualFiniteStateListDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+
     using CDP4EngineeringModel.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     using ReactiveUI;
@@ -58,13 +85,15 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private PossibleFiniteState state22;
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
-        private Uri uri = new Uri("http://www.rheagroup.com");
+        private Uri uri = new Uri("https://www.stariongroup.eu");
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
 
@@ -112,17 +141,18 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
-        public void VerifyThatPropertiesAreSet()
+        public async Task VerifyThatPropertiesAreSet()
         {
             var statelist = new ActualFiniteStateList();
             var containerClone = this.iteration.Clone(false);
@@ -141,15 +171,15 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual(0, vm.PossibleFiniteStateListRow.Count);
             Assert.AreEqual(0, vm.ActualState.Count);
 
-            Assert.IsTrue(vm.AddPossibleFiniteStateListCommand.CanExecute(null));
-            vm.AddPossibleFiniteStateListCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.AddPossibleFiniteStateListCommand).CanExecute(null));
+            await vm.AddPossibleFiniteStateListCommand.Execute();
             Assert.AreEqual(1, vm.PossibleFiniteStateListRow.Count);
 
             var pfsl1 = vm.PossibleFiniteStateListRow.First();
             Assert.AreEqual(2, pfsl1.PossiblePossibleFiniteStateList.Count);
 
-            Assert.IsTrue(vm.AddPossibleFiniteStateListCommand.CanExecute(null));
-            vm.AddPossibleFiniteStateListCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.AddPossibleFiniteStateListCommand).CanExecute(null));
+            await vm.AddPossibleFiniteStateListCommand.Execute();
             Assert.AreEqual(2, vm.PossibleFiniteStateListRow.Count);
 
             var pfsl2 = vm.PossibleFiniteStateListRow.Last();
@@ -160,7 +190,6 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             Assert.IsTrue(vm.OkCanExecute);
         }
-
 
         [Test]
         public void VerifyThatParameterlessContructorExists()

@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="StateToParameterTypeMapperBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="StateToParameterTypeMapperBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -29,8 +29,10 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -39,6 +41,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
     using CDP4Composition;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -51,13 +54,11 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
     using CDP4ReferenceDataMapper.Managers;
     using CDP4ReferenceDataMapper.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
     using NUnit.Framework;
-
-    using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="StateToParameterTypeMapperBrowserViewModel"/> class
@@ -75,7 +76,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
 
         private StateToParameterTypeMapperBrowserViewModel stateToParameterTypeMapperBrowserViewModel;
@@ -112,9 +113,13 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         private Category elementDefinitionCategory_1;
         private Category elementDefinitionCategory_2;
 
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
+
             this.ribbonManager = new Mock<IFluentRibbonManager>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -187,6 +192,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             // PossibleElementDefinitionCategory
             this.elementDefinitionCategory_1 = new Category(Guid.NewGuid(), this.cache, this.uri) { Name = "Batteries", ShortName = "BAT" };
@@ -578,7 +584,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 this.pluginSettingsService.Object);
 
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.Caption, Is.EqualTo("Parameter to Actual Finite State Mapping, iteration_1"));
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.ToolTip, Is.EqualTo("Test\nhttp://www.rheagroup.com/\nJohn Doe"));
+            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.ToolTip, Is.EqualTo("Test\nhttps://www.stariongroup.eu/\nJohn Doe"));
 
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleElementDefinitionCategory.Count, Is.EqualTo(2));
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.PossibleActualFiniteStateList.Count, Is.EqualTo(1));
@@ -598,41 +604,41 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
                 this.dialogNavigationService.Object,
                 this.pluginSettingsService.Object);
 
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.ClearSettingsCommand.CanExecute(null), Is.True);
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.CanExecute(null), Is.False);
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.ClearSettingsCommand).CanExecute(null), Is.True);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand).CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.False);
 
             this.stateToParameterTypeMapperBrowserViewModel.SelectedElementDefinitionCategory = this.stateToParameterTypeMapperBrowserViewModel.PossibleElementDefinitionCategory.First();
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.CanExecute(null), Is.False);
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand).CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.False);
 
             this.stateToParameterTypeMapperBrowserViewModel.SelectedActualFiniteStateList = this.stateToParameterTypeMapperBrowserViewModel.PossibleActualFiniteStateList.First();
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.CanExecute(null), Is.False);
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand).CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.False);
 
             this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Add(new SimpleQuantityKind());
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.CanExecute(null), Is.False);
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand).CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.False);
             this.stateToParameterTypeMapperBrowserViewModel.SelectedSourceParameterType = this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.First();
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.True);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.True);
 
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.CanExecute(null), Is.False);
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.True);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand).CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.True);
 
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.CanExecute(null), Is.True);
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.True);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand).CanExecute(null), Is.True);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.True);
 
             this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Clear();
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.CanExecute(null), Is.True);
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.True);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand).CanExecute(null), Is.True);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.True);
             this.stateToParameterTypeMapperBrowserViewModel.SelectedSourceParameterType = null;
-            Assert.That(this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.CanExecute(null), Is.False);
+            Assert.That(((ICommand)this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand).CanExecute(null), Is.False);
         }
 
         [Test]
-        public void Verify_that_when_ClearSettingsCommand_is_executed_SelectedItems_and_rowviewmodels_are_cleared()
+        public async Task Verify_that_when_ClearSettingsCommand_is_executed_SelectedItems_and_rowviewmodels_are_cleared()
         {
             this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
                 this.iteration,
@@ -648,7 +654,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
 
-            this.stateToParameterTypeMapperBrowserViewModel.ClearSettingsCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.ClearSettingsCommand.Execute();
 
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.SelectedElementDefinitionCategory, Is.Null);
             Assert.That(this.stateToParameterTypeMapperBrowserViewModel.SelectedActualFiniteStateList, Is.Null);
@@ -658,7 +664,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         }
 
         [Test]
-        public void Verify_that_SelectedRowChangedCommand_works()
+        public async Task Verify_that_SelectedRowChangedCommand_works()
         {
             this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
                 this.iteration,
@@ -674,7 +680,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
 
-            this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute();
 
             var dataView = this.stateToParameterTypeMapperBrowserViewModel.DataSourceManager.DataTable.DefaultView;
 
@@ -720,7 +726,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
 
-            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.ExecuteAsyncTask();
+            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute();
 
             var dataView = this.stateToParameterTypeMapperBrowserViewModel.DataSourceManager.DataTable.DefaultView;
 
@@ -743,11 +749,11 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             dataView[0][this.actualFinitateSte_on.ShortName] = newValue;
 
-            Assert.DoesNotThrowAsync(() => this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.Execute());
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
 
             //No Changes
-            Assert.DoesNotThrowAsync(() => this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.Execute());
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
         }
 
@@ -768,10 +774,10 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
 
-            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.ExecuteAsyncTask();
+            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute();
 
             //No Changes
-            Assert.DoesNotThrowAsync(() => this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.Execute());
             this.messageBoxService.Verify(x => x.Show(It.Is<string>(y => y.Contains("up-to-date")), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Exactly(1));
 
             // Mapping added
@@ -796,13 +802,13 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             dataView[0][this.actualFinitateSte_on.ShortName] = newValue;
 
-            Assert.DoesNotThrowAsync(() => this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.Execute());
             this.messageBoxService.Verify(x => x.Show(It.Is<string>(y => y.Contains("update")), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Exactly(1));
 
             //Actual Value Changes
             this.elementDefinition.Parameter.First(x => x.ParameterType == this.sourceParameterType_1).ValueSet.First().Manual = new ValueArray<string>(new List<string> { "200" });
 
-            Assert.DoesNotThrowAsync(() => this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.Execute());
             this.messageBoxService.Verify(x => x.Show(It.Is<string>(y => y.Contains("update")), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Exactly(2));
 
             //reset mapping to none
@@ -812,7 +818,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             dataView[0][this.actualFinitateSte_on.ShortName] = null;
 
-            Assert.DoesNotThrowAsync(() => this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.RefreshValuesCommand.Execute());
             this.messageBoxService.Verify(x => x.Show(It.Is<string>(y => y.Contains("update")), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Exactly(3));
         }
 
@@ -833,10 +839,10 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
 
-            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.ExecuteAsyncTask(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute();
 
             //No Changes
-            Assert.DoesNotThrowAsync(() => this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrow(() => this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.Execute());
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(0));
 
             //Changes
@@ -863,7 +869,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
 
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception());
 
-            Assert.DoesNotThrowAsync(() => this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.ExecuteAsyncTask());
+            Assert.DoesNotThrowAsync(async () => await this.stateToParameterTypeMapperBrowserViewModel.SaveValuesCommand.Execute());
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
         }
 
@@ -884,7 +890,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
 
-            this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute();
 
             var newMapping =
                 this.elementDefinition.Parameter
@@ -898,7 +904,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             var columnName = this.actualFinitateSte_on.ShortName;
             var tuple = (dataView[0], columnName, newValue: newMappingValue);
 
-            await this.stateToParameterTypeMapperBrowserViewModel.SelectedMappingParameterChangedCommand.ExecuteAsyncTask(tuple);
+            await this.stateToParameterTypeMapperBrowserViewModel.SelectedMappingParameterChangedCommand.Execute(tuple);
 
             Assert.AreEqual(newMappingValue, dataView[0][columnName].ToString());
 
@@ -930,7 +936,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetMappingParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetMappingParameterType.First();
             this.stateToParameterTypeMapperBrowserViewModel.SelectedTargetValueParameterType = this.stateToParameterTypeMapperBrowserViewModel.PossibleTargetValueParameterType.First();
 
-            this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.StartMappingCommand.Execute();
 
             var newMapping =
                 this.elementDefinition.Parameter
@@ -944,7 +950,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             var columnName = this.actualFinitateSte_on.ShortName;
             var tuple = (dataView[0], columnName, newValue: newMappingValue);
 
-            await this.stateToParameterTypeMapperBrowserViewModel.SelectedMappingParameterChangedCommand.ExecuteAsyncTask(tuple);
+            await this.stateToParameterTypeMapperBrowserViewModel.SelectedMappingParameterChangedCommand.Execute(tuple);
 
             Assert.AreEqual(newMappingValue, dataView[0][columnName].ToString());
 
@@ -1118,7 +1124,7 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
         }
 
         [Test]
-        public void Verify_that_RemoveSelectedSourceParameterTypeCommand_works()
+        public async Task Verify_that_RemoveSelectedSourceParameterTypeCommand_works()
         {
             this.stateToParameterTypeMapperBrowserViewModel = new StateToParameterTypeMapperBrowserViewModel(
                 this.iteration,
@@ -1137,19 +1143,19 @@ namespace CDP4ReferenceDataMapper.Tests.ViewModels.StateToParameterTypeMapper
             Assert.AreEqual(2, this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Count);
             this.stateToParameterTypeMapperBrowserViewModel.SelectedSourceParameterType = null;
 
-            this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.Execute();
             Assert.AreEqual(2, this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Count);
 
             this.stateToParameterTypeMapperBrowserViewModel.SelectedSourceParameterType = new SimpleQuantityKind(Guid.NewGuid(), null, null);
-            this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.Execute();
             Assert.AreEqual(2, this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Count);
 
             this.stateToParameterTypeMapperBrowserViewModel.SelectedSourceParameterType = this.sourceParameterType_1;
-            this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.Execute();
             Assert.AreEqual(1, this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Count);
 
             this.stateToParameterTypeMapperBrowserViewModel.SelectedSourceParameterType = this.sourceParameterType_2;
-            this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.Execute(null);
+            await this.stateToParameterTypeMapperBrowserViewModel.RemoveSelectedSourceParameterTypeCommand.Execute();
             Assert.AreEqual(0, this.stateToParameterTypeMapperBrowserViewModel.SourceParameterTypes.Count);
         }
     }

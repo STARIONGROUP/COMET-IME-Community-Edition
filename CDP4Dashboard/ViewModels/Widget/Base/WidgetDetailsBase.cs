@@ -1,13 +1,15 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="WidgetDetailsBase.cs" company="RHEA">
-// Copyright (c) 2020 RHEA Group. All rights reserved.
+// <copyright file="WidgetDetailsBase.cs" company="Starion Group S.A.">
+// Copyright (c) 2020 Starion Group S.A. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
 namespace CDP4Dashboard.ViewModels.Widget.Base
 {
     using System;
+    using System.Reactive;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -43,22 +45,19 @@ namespace CDP4Dashboard.ViewModels.Widget.Base
         /// </summary>
         protected WidgetDetailsBase()
         {
-            this.OnOKCommand = ReactiveCommand.Create();
-            this.OnOKCommand.Subscribe(_ => this.OnOk());
-
-            this.OnCancelCommand = ReactiveCommand.Create();
-            this.OnCancelCommand.Subscribe(_ => this.OnCancel());
+            this.OnOKCommand = ReactiveCommandCreator.Create(this.OnOk);
+            this.OnCancelCommand = ReactiveCommandCreator.Create(this.OnCancel);
         }
 
         /// <summary>
         /// Gets the on OK command.
         /// </summary>
-        public ReactiveCommand<object> OnOKCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> OnOKCommand { get; set; }
 
         /// <summary>
         /// Gets the on cancel command.
         /// </summary>
-        public ReactiveCommand<object> OnCancelCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> OnCancelCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the title of the widget

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementUsageRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ElementUsageRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -51,7 +51,7 @@ namespace ProductTree.Tests.ProductTreeRows
     using CDP4ProductTree.Tests.ProductTreeRows;
     using CDP4ProductTree.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -67,7 +67,7 @@ namespace ProductTree.Tests.ProductTreeRows
         private Mock<ISession> session;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IThingCreator> thingCreator;
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
 
         private SiteDirectory siteDir;
         private EngineeringModel model;
@@ -94,10 +94,12 @@ namespace ProductTree.Tests.ProductTreeRows
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
         private readonly string nestedElementPath = "PATH";
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.permissionService = new Mock<IPermissionService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -107,7 +109,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.thingCreator = new Mock<IThingCreator>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
- 
+
             this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>())
                 .Returns(this.thingCreator.Object);
 
@@ -116,7 +118,7 @@ namespace ProductTree.Tests.ProductTreeRows
 
             this.serviceLocator.Setup(x => x.GetInstance<INestedElementTreeService>()).Returns(this.nestedElementTreeService.Object);
 
-            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" , ShortName = "dom" };
+            this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain", ShortName = "dom" };
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri);
             this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
@@ -129,8 +131,8 @@ namespace ProductTree.Tests.ProductTreeRows
             this.category1 = new Category(Guid.NewGuid(), this.cache, this.uri);
             this.category2 = new Category(Guid.NewGuid(), this.cache, this.uri);
 
-            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain};
-            this.elementDef3 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain};
+            this.elementDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.elementDef3 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
 
             this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, Name = "Element definition 1", ShortName = "ED1" };
 
@@ -139,21 +141,21 @@ namespace ProductTree.Tests.ProductTreeRows
 
             this.elementDef5 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, Name = "Element definition 5", ShortName = "ED5" };
 
-            this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
-            { ElementDefinition = this.elementDef2, Owner = this.domain, Name = "Element usage 1" ,ShortName = "EU1"};
+            this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
+                { ElementDefinition = this.elementDef2, Owner = this.domain, Name = "Element usage 1", ShortName = "EU1" };
 
-            this.elementUsage4 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
-                { ElementDefinition = this.elementDef4, Container = this.elementDef4, Owner = this.domain, Name = "Element usage 4" ,ShortName = "EU4"};
-            
+            this.elementUsage4 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
+                { ElementDefinition = this.elementDef4, Container = this.elementDef4, Owner = this.domain, Name = "Element usage 4", ShortName = "EU4" };
+
             this.elementUsage4.Category.Add(this.category2);
 
-            this.elementUsage5 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
-                { ElementDefinition = this.elementDef5, Container = this.elementDef5, Owner = this.domain, Name = "Element usage 5" ,ShortName = "EU5"};
+            this.elementUsage5 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
+                { ElementDefinition = this.elementDef5, Container = this.elementDef5, Owner = this.domain, Name = "Element usage 5", ShortName = "EU5" };
 
             this.elementDef5.Category.Add(this.category1);
 
-            this.elementUsage6 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) 
-                { ElementDefinition = this.elementDef4, Container = this.elementDef5, Owner = this.domain, Name = "Element usage 6" ,ShortName = "EU6"};
+            this.elementUsage6 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
+                { ElementDefinition = this.elementDef4, Container = this.elementDef5, Owner = this.domain, Name = "Element usage 6", ShortName = "EU6" };
 
             this.valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
             this.valueSet.Published = new ValueArray<string>(new List<string> { "1" });
@@ -186,12 +188,13 @@ namespace ProductTree.Tests.ProductTreeRows
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -221,10 +224,11 @@ namespace ProductTree.Tests.ProductTreeRows
         public void VerifyThatNullElementDefThrows()
         {
             this.elementUsage.ElementDefinition = null;
-            Assert.Throws<NullReferenceException>(() =>  new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null));
+            Assert.Throws<NullReferenceException>(() => new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null));
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatPopulateGroupWorks(IViewModelBase<Thing> container, string scenario)
         {
             var revisionProperty = typeof(ElementUsage).GetProperty("RevisionNumber");
@@ -250,7 +254,7 @@ namespace ProductTree.Tests.ProductTreeRows
             group11.ContainingGroup = null;
             revisionProperty.SetValue(group11, 10);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(group11, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(group11, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreEqual(0, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
 
@@ -258,7 +262,7 @@ namespace ProductTree.Tests.ProductTreeRows
             group11.ContainingGroup = group1;
             revisionProperty.SetValue(group11, 20);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(group11, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(group11, EventKind.Updated);
             Assert.AreEqual(1, vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreSame(group11, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Single().Thing);
 
@@ -269,8 +273,8 @@ namespace ProductTree.Tests.ProductTreeRows
             revisionProperty.SetValue(this.elementDef, 30);
             revisionProperty.SetValue(group11, 30);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
-            CDPMessageBus.Current.SendObjectChangeEvent(group11, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(group11, EventKind.Updated);
 
             Assert.AreEqual(2, vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreEqual(0, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
@@ -282,13 +286,14 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementDef.ParameterGroup.Remove(group11);
             revisionProperty.SetValue(this.elementDef, 40);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDef, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreEqual(0, group1row.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
             Assert.AreEqual(0, group2row.ContainedRows.OfType<ParameterGroupRowViewModel>().Count());
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatPopulateParameterOrOverrideWorks(IViewModelBase<Thing> container, string scenario)
         {
             var revisionProperty = typeof(ElementUsage).GetProperty("RevisionNumber");
@@ -304,19 +309,20 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementDef.ContainedElement.Clear();
 
             var type1 = new EnumerationParameterType(Guid.NewGuid(), this.cache, this.uri) { Name = "type1" };
-            var parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type1, Owner = this.domain};
+            var parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type1, Owner = this.domain };
             parameter1.ValueSet.Add(this.valueSet);
-            var parameter2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type1, Owner = this.domain};
+            var parameter2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = type1, Owner = this.domain };
             parameter2.ValueSet.Add(this.valueSet);
 
             this.elementDef.Parameter.Add(parameter2);
             this.elementDef.Parameter.Add(parameter1);
 
-            var override1 = new ParameterOverride(Guid.NewGuid(), this.cache, this.uri) {Parameter = parameter1, Owner = this.domain};
+            var override1 = new ParameterOverride(Guid.NewGuid(), this.cache, this.uri) { Parameter = parameter1, Owner = this.domain };
             override1.ValueSet.Add(this.valueSetOverride);
             this.elementUsage.ParameterOverride.Add(override1);
 
             var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, container);
+
             // **************************************************************************************
 
             // check added parameter
@@ -331,7 +337,7 @@ namespace ProductTree.Tests.ProductTreeRows
             parameter1.Group = group11;
             revisionProperty.SetValue(parameter1, 10);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(parameter1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(parameter1, EventKind.Updated);
             Assert.AreEqual(1, vm.ContainedRows.OfType<ParameterOrOverrideBaseRowViewModel>().Count());
 
             var group11row = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Single().ContainedRows.OfType<ParameterGroupRowViewModel>().Single();
@@ -341,7 +347,7 @@ namespace ProductTree.Tests.ProductTreeRows
             parameter1.Group = group1;
             revisionProperty.SetValue(parameter1, 20);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(parameter1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(parameter1, EventKind.Updated);
             Assert.AreEqual(1, vm.ContainedRows.OfType<ParameterOrOverrideBaseRowViewModel>().Count());
 
             var group1row = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().Single();
@@ -351,7 +357,7 @@ namespace ProductTree.Tests.ProductTreeRows
             parameter1.Group = null;
             revisionProperty.SetValue(parameter1, 30);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(parameter1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(parameter1, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.OfType<ParameterOrOverrideBaseRowViewModel>().Count());
             Assert.AreEqual(0, group11row.ContainedRows.OfType<ParameterOrOverrideBaseRowViewModel>().Count());
 
@@ -359,17 +365,18 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementUsage.ParameterOverride.Clear();
             revisionProperty.SetValue(this.elementUsage, 40);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementUsage, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementUsage, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.OfType<ParameterOrOverrideBaseRowViewModel>().Count());
             var param1row = vm.ContainedRows.OfType<ParameterRowViewModel>().SingleOrDefault(x => x.Thing == parameter1);
             Assert.IsNotNull(param1row);
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatOptionDependencyIsHandled(IViewModelBase<Thing> container, string scenario)
         {
             var newDef = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri);
-            var newUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) {ElementDefinition = newDef};
+            var newUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { ElementDefinition = newDef };
 
             this.elementDef2.ContainedElement.Add(newUsage);
 
@@ -382,16 +389,16 @@ namespace ProductTree.Tests.ProductTreeRows
 
             newUsage.ExcludeOption.Add(this.option);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(newUsage, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(newUsage, EventKind.Updated);
             Assert.IsFalse(vm.ContainedRows.Select(x => x.Thing).Contains(newUsage));
 
             revisionProperty.SetValue(newUsage, 30);
             newUsage.ExcludeOption.Clear();
 
-            CDPMessageBus.Current.SendObjectChangeEvent(newUsage, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(newUsage, EventKind.Updated);
             Assert.IsTrue(vm.ContainedRows.Select(x => x.Thing).Contains(newUsage));
         }
-        
+
         [Test]
         public void VerifyThatDragOverWorks()
         {
@@ -421,7 +428,6 @@ namespace ProductTree.Tests.ProductTreeRows
 
             Assert.AreEqual(DragDropEffects.None, dropinfo.Object.Effects);
         }
-
 
         [Test]
         public async Task VerifyThatDropWorks()
@@ -484,6 +490,5 @@ namespace ProductTree.Tests.ProductTreeRows
 
             CollectionAssert.AreEquivalent(expectedCategories, row.Category);
         }
-
     }
 }

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed.
-// 
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+// <copyright file="ParameterDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +28,7 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
@@ -138,8 +139,13 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.WhenAnyValue(vm => vm.SelectedOwner).Subscribe(_ => this.UpdateOkCanExecute());
             this.WhenAnyValue(vm => vm.SelectedScale).Subscribe(_ => this.UpdateOkCanExecute());
-            this.WhenAnyValue(vm => vm.IsOptionDependent).Subscribe(_ => this.IsValueSetEditable = this.IsOptionDependent == this.Thing.IsOptionDependent && this.SelectedStateDependence == this.Thing.StateDependence);
-            this.WhenAnyValue(vm => vm.SelectedStateDependence).Subscribe(_ => this.IsValueSetEditable = this.IsOptionDependent == this.Thing.IsOptionDependent && this.SelectedStateDependence == this.Thing.StateDependence);
+
+            this.WhenAnyValue(
+                vm => vm.IsOptionDependent,
+                vm => vm.SelectedStateDependence,
+                vm => vm.SelectedOwner)
+                .Subscribe(_ => this.UpdateIsValueSetEditable());
+
             this.WhenAnyValue(vm => vm.SelectedScale).Where(x => x != null).Subscribe(_ => this.CheckValueValidation());
             this.WhenAnyValue(vm => vm.SelectedGroupSelection).Subscribe(x => this.SelectedGroup = x != null ? x.Thing : null);
             this.WhenAnyValue(vm => vm.DisplayedValueSet).Where(x => x != null).Subscribe(_ => this.LoadValueSetGrid());
@@ -243,7 +249,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand" /> to inspect a ParameterValueSet
         /// </summary>
-        public ReactiveCommand<object> InspectStateDependenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectStateDependenceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the parameter is state dependent.
@@ -301,15 +307,9 @@ namespace CDP4EngineeringModel.ViewModels
             this.ValueSet = new DisposableReactiveList<Dialogs.ParameterRowViewModel>();
             this.PossibleGroups = new ReactiveList<GroupSelectionViewModel>();
 
-            this.AvailableValueSets = new ReactiveList<ValueSetRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.AvailableValueSets = new ReactiveList<ValueSetRowViewModel>();
 
-            this.ValueSetGridViewModels = new ReactiveList<SampledFunctionParameterTypeValueSetGridViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.ValueSetGridViewModels = new ReactiveList<SampledFunctionParameterTypeValueSetGridViewModel>();
         }
 
         /// <summary>
@@ -320,8 +320,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.InitializeCommands();
 
             var canExecuteInspectStateDependenceCommand = this.WhenAny(vm => vm.SelectedStateDependence, s => s.Value != null);
-            this.InspectStateDependenceCommand = ReactiveCommand.Create(canExecuteInspectStateDependenceCommand);
-            this.InspectStateDependenceCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedStateDependence));
+            this.InspectStateDependenceCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedStateDependence), canExecuteInspectStateDependenceCommand);
         }
 
         /// <summary>
@@ -352,6 +351,16 @@ namespace CDP4EngineeringModel.ViewModels
             base.UpdateOkCanExecute();
 
             this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null && this.IsSelectedScaleValid();
+        }
+
+        /// <summary>
+        /// Updates the value of <see cref="IsValueSetEditable"/> 
+        /// </summary>
+        private void UpdateIsValueSetEditable()
+        {
+            this.IsValueSetEditable = this.IsOptionDependent == this.Thing.IsOptionDependent
+                                      && this.SelectedStateDependence == this.Thing.StateDependence
+                                      && this.SelectedOwner == this.Thing.Owner;
         }
 
         /// <summary>

@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterSheetGeneratorRibbonPart.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="ParameterSheetGeneratorRibbonPart.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -13,18 +32,26 @@ namespace CDP4ParameterSheetGenerator
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
+
     using CDP4Common.EngineeringModelData;
+
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    using CDP4OfficeInfrastructure;    
+
+    using CDP4OfficeInfrastructure;
     using CDP4OfficeInfrastructure.OfficeDal;
+
     using CDP4ParameterSheetGenerator.ViewModels;
+
     using NetOffice.ExcelApi;
+
     using NLog;
+
     using ReactiveUI;
 
     /// <summary>
@@ -68,17 +95,20 @@ namespace CDP4ParameterSheetGenerator
         /// </param>
         /// <param name="officeApplicationWrapper">
         /// The instance of <see cref="IOfficeApplicationWrapper"/> that provides access to the loaded Office application.
-        /// </param>        
-        public ParameterSheetGeneratorRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
+        /// </param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public ParameterSheetGeneratorRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper, ICDPMessageBus messageBus)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, messageBus)
         {
             this.ExcelQuery = new ExcelQuery();
             this.officeApplicationWrapper = officeApplicationWrapper;
             this.Iterations = new List<Iteration>();
-            
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Iteration))
+            messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+
+            messageBus.Listen<ObjectChangedEvent>(typeof(Iteration))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.IterationChangeEventHandler);
         }
@@ -240,7 +270,7 @@ namespace CDP4ParameterSheetGenerator
                     var engineeringModel = (EngineeringModel)iteration.Container;
 
                     var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
-                    
+
                     var domainShortName = selectedDomainOfExpertise == null ? string.Empty : selectedDomainOfExpertise.ShortName;
                     var label = $"{engineeringModel.EngineeringModelSetup.ShortName} - {iteration.IterationSetup.IterationNumber} : [{domainShortName}]";
 
@@ -252,7 +282,7 @@ namespace CDP4ParameterSheetGenerator
                 menuxml = sb.ToString();
             }
 
-            this.UpdateControlIdentifiers(menuxml);      
+            this.UpdateControlIdentifiers(menuxml);
             return menuxml;
         }
 
@@ -275,14 +305,17 @@ namespace CDP4ParameterSheetGenerator
                 case "Rebuild":
                     return this.IsRebuildEnabled();
                 case "SynchronizeAll":
-                    return false; 
-                    // TODO: replace with when synchronize has been implemented - return this.IsSubmitOrSynchornizeEnabled();
+                    return false;
+
+                // TODO: replace with when synchronize has been implemented - return this.IsSubmitOrSynchornizeEnabled();
                 case "SynchronizeParameters":
                     return false;
-                    // TODO: replace with when synchronize has been implemented - return this.IsSubmitOrSynchornizeEnabled();
+
+                // TODO: replace with when synchronize has been implemented - return this.IsSubmitOrSynchornizeEnabled();
                 case "SynchronizeSubscriptions":
                     return false;
-                    // TODO: replace with when synchronize has been implemented - return this.IsSubmitOrSynchornizeEnabled();
+
+                // TODO: replace with when synchronize has been implemented - return this.IsSubmitOrSynchornizeEnabled();
                 case "SubmitAll":
                     return this.IsSubmitOrSynchronizeEnabled();
                 case "SubmitParameters":
@@ -335,11 +368,12 @@ namespace CDP4ParameterSheetGenerator
             }
 
             var activeWorkbook = this.ExcelQuery.QueryActiveWorkbook(this.officeApplicationWrapper.Excel);
+
             if (activeWorkbook == null)
             {
                 return "Rebuild";
             }
-            
+
             var workbookSessionDal = new WorkbookSessionDal(activeWorkbook);
             var workbookSession = workbookSessionDal.Read();
 
@@ -352,7 +386,7 @@ namespace CDP4ParameterSheetGenerator
 
                 return sb.ToString();
             }
-                
+
             return "Rebuild";
         }
 
@@ -399,6 +433,7 @@ namespace CDP4ParameterSheetGenerator
             }
 
             var activeWorkbook = this.ExcelQuery.QueryActiveWorkbook(this.officeApplicationWrapper.Excel);
+
             if (activeWorkbook == null)
             {
                 return false;
@@ -406,6 +441,7 @@ namespace CDP4ParameterSheetGenerator
 
             var workbookSessionDal = new WorkbookSessionDal(activeWorkbook);
             var workbookSession = workbookSessionDal.Read();
+
             if (workbookSession == null)
             {
                 return false;
@@ -434,6 +470,7 @@ namespace CDP4ParameterSheetGenerator
             {
                 var uniqueId = Guid.Parse(iterationId);
                 var iteration = this.Iterations.SingleOrDefault(x => x.Iid == uniqueId);
+
                 if (iteration == null)
                 {
                     logger.Debug("The workbook cannot be rebuilt: iteration {0} cannot be found", uniqueId);
@@ -442,8 +479,9 @@ namespace CDP4ParameterSheetGenerator
 
                 var engineeringModel = iteration.Container as EngineeringModel;
                 var activeParticipant = engineeringModel.EngineeringModelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
-                
+
                 var workbook = this.QueryIterationWorkbook(this.officeApplicationWrapper.Excel, iteration);
+
                 if (workbook == null)
                 {
                     var selectedDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
@@ -452,6 +490,7 @@ namespace CDP4ParameterSheetGenerator
                     this.DialogNavigationService.NavigateModal(workbookSelectionViewModel);
 
                     var dialogResult = workbookSelectionViewModel.DialogResult;
+
                     if (dialogResult.Result.HasValue && dialogResult.Result.Value)
                     {
                         workbook = ((WorkbookSelectionDialogResult)dialogResult).Workbook;
@@ -467,13 +506,13 @@ namespace CDP4ParameterSheetGenerator
 
                 try
                 {
-                    var workbookOperator = new WorkbookOperator(application, workbook, this.DialogNavigationService);
+                    var workbookOperator = new WorkbookOperator(application, workbook, this.DialogNavigationService, this.CDPMessageBus);
                     await workbookOperator.Rebuild(this.Session, iteration, activeParticipant);
                 }
                 catch (Exception ex)
                 {
-                    logger.Error(ex);             
-                }                
+                    logger.Error(ex);
+                }
             }
         }
 
@@ -485,6 +524,7 @@ namespace CDP4ParameterSheetGenerator
             var application = this.officeApplicationWrapper.Excel;
 
             var activeWorkbook = this.ExcelQuery.QueryActiveWorkbook(application);
+
             if (activeWorkbook == null)
             {
                 return;
@@ -492,12 +532,14 @@ namespace CDP4ParameterSheetGenerator
 
             var workbookSessionDal = new WorkbookSessionDal(activeWorkbook);
             var workbookSession = workbookSessionDal.Read();
+
             if (workbookSession == null)
             {
                 return;
             }
 
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == workbookSession.IterationSetup.IterationIid);
+
             if (iteration == null)
             {
                 logger.Debug("The output parameters cannot be submitted: iteration {0} cannot be found", workbookSession.IterationSetup.IterationIid);
@@ -506,12 +548,12 @@ namespace CDP4ParameterSheetGenerator
 
             try
             {
-                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService);
+                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService, this.CDPMessageBus);
                 await workbookOperator.SubmitOutput(this.Session, iteration);
             }
             catch (Exception ex)
             {
-                logger.Error(ex);                
+                logger.Error(ex);
             }
         }
 
@@ -523,6 +565,7 @@ namespace CDP4ParameterSheetGenerator
             var application = this.officeApplicationWrapper.Excel;
 
             var activeWorkbook = this.ExcelQuery.QueryActiveWorkbook(application);
+
             if (activeWorkbook == null)
             {
                 return;
@@ -530,12 +573,14 @@ namespace CDP4ParameterSheetGenerator
 
             var workbookSessionDal = new WorkbookSessionDal(activeWorkbook);
             var workbookSession = workbookSessionDal.Read();
+
             if (workbookSession == null)
             {
                 return;
             }
 
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == workbookSession.IterationSetup.IterationIid);
+
             if (iteration == null)
             {
                 logger.Debug("The input parameters cannot be submitted: iteration {0} cannot be found", workbookSession.IterationSetup.IterationIid);
@@ -544,7 +589,7 @@ namespace CDP4ParameterSheetGenerator
 
             try
             {
-                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService);
+                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService, this.CDPMessageBus);
                 await workbookOperator.SubmitInput(this.Session, iteration);
             }
             catch (Exception ex)
@@ -561,6 +606,7 @@ namespace CDP4ParameterSheetGenerator
             var application = this.officeApplicationWrapper.Excel;
 
             var activeWorkbook = this.ExcelQuery.QueryActiveWorkbook(application);
+
             if (activeWorkbook == null)
             {
                 return;
@@ -568,12 +614,14 @@ namespace CDP4ParameterSheetGenerator
 
             var workbookSessionDal = new WorkbookSessionDal(activeWorkbook);
             var workbookSession = workbookSessionDal.Read();
+
             if (workbookSession == null)
             {
                 return;
             }
 
             var iteration = this.Iterations.SingleOrDefault(x => x.Iid == workbookSession.IterationSetup.IterationIid);
+
             if (iteration == null)
             {
                 logger.Debug("The values cannot be submitted: iteration {0} cannot be found", workbookSession.IterationSetup.IterationIid);
@@ -582,7 +630,7 @@ namespace CDP4ParameterSheetGenerator
 
             try
             {
-                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService);
+                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService, this.CDPMessageBus);
                 await workbookOperator.SubmitAll(this.Session, iteration);
             }
             catch (Exception ex)

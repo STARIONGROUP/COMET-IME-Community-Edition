@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RibbonPart.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="RibbonPart.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,11 +34,15 @@ namespace CDP4Composition
     using System.Text;
     using System.Threading.Tasks;
     using System.Xml.Linq;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.PluginSettingService;
     using CDP4Composition.OfficeRibbon;
+    using CDP4Composition.PluginSettingService;
+
+    using CDP4Dal;
     using CDP4Dal.Permission;
+
     using NLog;
 
     /// <summary>
@@ -52,7 +75,10 @@ namespace CDP4Composition
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        protected RibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        protected RibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, ICDPMessageBus messageBus)
         {
             var ribbonXmlResource = this.GetRibbonXmlResourceName();
 
@@ -63,6 +89,7 @@ namespace CDP4Composition
             this.ThingDialogNavigationService = thingDialogNavigationService;
             this.DialogNavigationService = dialogNavigationService;
             this.PluginSettingsService = pluginSettingsService;
+            this.CDPMessageBus = messageBus;
         }
 
         /// <summary>
@@ -104,6 +131,11 @@ namespace CDP4Composition
         /// </summary>
         public IPluginSettingsService PluginSettingsService { get; private set; }
 
+        /// <summary name="messageBus">
+        /// Gets the <see cref="ICDPMessageBus"/>
+        /// </summary>
+        public ICDPMessageBus CDPMessageBus { get; }
+
         /// <summary>
         /// Gets the order in which the ribbon xml is to be ordered in the Office Fluent Ribbon 
         /// </summary>
@@ -122,13 +154,7 @@ namespace CDP4Composition
         /// <summary>
         /// Gets the list of unique id's of the controls present on the current Ribbon
         /// </summary>
-        public List<string> ControlIdentifiers
-        {
-            get
-            {
-                return this.controlIdentifiers;
-            }
-        }
+        public List<string> ControlIdentifiers => this.controlIdentifiers;
 
         /// <summary>
         /// Invokes the action as a result of a ribbon control being clicked, selected, etc.
@@ -444,14 +470,15 @@ namespace CDP4Composition
             var resourceName = string.Format("{0}.Resources.RibbonXml.{1}.xml", @namespace, ribbonXmlResource);
 
             var assembly = this.GetCurrentAssembly();
-            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+
+            using (var stream = assembly.GetManifestResourceStream(resourceName))
             {
                 if (stream == null)
                 {
                     logger.Debug("The {0} could not be found", resourceName);
                     return string.Empty;
                 }
-                
+
                 using (var reader = new StreamReader(stream))
                 {
                     var xmlstring = reader.ReadToEnd();
@@ -463,6 +490,7 @@ namespace CDP4Composition
 
                         var doc = XDocument.Parse(xmlstring);
                         var ribbonxmlnode = doc.Root;
+
                         if (ribbonxmlnode != null)
                         {
                             foreach (var node in ribbonxmlnode.Nodes())
@@ -479,7 +507,7 @@ namespace CDP4Composition
                     catch (Exception ex)
                     {
                         logger.Error(ex);
-                        return string.Empty;    
+                        return string.Empty;
                     }
                 }
             }

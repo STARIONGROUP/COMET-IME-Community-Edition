@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CommonFileStoreBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CommonFileStoreBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,7 +28,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -37,18 +39,18 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-    
+
     using CDP4EngineeringModel.ViewModels;
-    
-    using Microsoft.Practices.ServiceLocation;
-    
+
+    using CommonServiceLocator;
+
     using Moq;
-    
+
     using NUnit.Framework;
 
     /// <summary>
@@ -77,6 +79,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private DomainOfExpertise domain;
         private Assembler assembler;
         private PropertyInfo rev = typeof(Thing).GetProperty("RevisionNumber");
+        private CDPMessageBus messageBus;
 
         private CommonFileStore store;
         private Folder folder1;
@@ -89,6 +92,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -99,22 +103,26 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IOpenSaveFileDialogService>()).Returns(this.fileDialogService.Object);
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "model"
             };
+
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 ShortName = "person",
                 GivenName = "person",
             };
+
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Person = this.person,
@@ -125,7 +133,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             {
                 Name = "domain", ShortName = "d"
             };
+
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 RequiredRdl = this.srdl
@@ -144,6 +154,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             {
                 EngineeringModelSetup = this.engineeringModelSetup
             };
+
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 IterationSetup = this.iterationSetup
@@ -155,6 +166,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.assembler.Cache.GetOrAdd(new CacheKey(this.model.Iid, null), lazyModel);
 
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
             this.session.Setup(x => x.OpenIterations)
                 .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                 {
@@ -162,27 +174,33 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                 });
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.store = new CommonFileStore(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.folder1 = new Folder(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
                 CreatedOn = new DateTime(1, 1, 1),
                 Creator = this.participant
             };
+
             this.folder2 = new Folder(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "2",
                 CreatedOn = new DateTime(1, 1, 1),
                 Creator = this.participant
             };
+
             this.file = new File(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
             this.fileRevision1 = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
                 Creator = this.participant,
                 CreatedOn = new DateTime(1, 1, 1)
             };
+
             this.fileRevision2 = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
@@ -194,7 +212,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -203,7 +221,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
             Assert.IsEmpty(vm.ContainedRows);
-            
+
             Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
             Assert.That(vm.DomainOfExpertise, Is.Null.Or.Empty);
@@ -220,7 +238,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.model.CommonFileStore.Add(this.store);
             this.rev.SetValue(this.model.EngineeringModelSetup, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
 
             vm.ComputePermission();
 
@@ -237,7 +255,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.folder2.ContainingFolder = this.folder1;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.store, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.store, EventKind.Updated);
             Assert.AreEqual(1, storeRow.ContainedRows.Count);
 
             var folder1Row = storeRow.ContainedRows.Single();
@@ -247,54 +265,54 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.file.FileRevision.Add(this.fileRevision1);
 
             this.rev.SetValue(this.store, 5);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.store, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.store, EventKind.Updated);
             Assert.AreEqual(2, storeRow.ContainedRows.Count);
 
             this.fileRevision2.ContainingFolder = this.folder2;
             this.file.FileRevision.Add(this.fileRevision2);
             this.rev.SetValue(this.file, 3);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.file, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.file, EventKind.Updated);
 
             Assert.AreEqual(1, folder2Row.ContainedRows.Count);
 
             this.folder2.ContainingFolder = null;
             this.rev.SetValue(this.folder2, 5);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.folder2, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.folder2, EventKind.Updated);
             Assert.IsTrue(storeRow.ContainedRows.Contains(folder2Row));
 
             var folder3 = new Folder(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
-                ContainingFolder = this.folder1, 
+                ContainingFolder = this.folder1,
                 Creator = this.participant
             };
 
             this.store.Folder.Add(folder3);
             this.rev.SetValue(this.store, 10);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.store, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.store, EventKind.Updated);
 
             Assert.AreEqual(2, storeRow.ContainedRows.Count);
             Assert.AreEqual(1, folder1Row.ContainedRows.Count);
 
             folder3.ContainingFolder = this.folder2;
             this.rev.SetValue(folder3, 10);
-            CDPMessageBus.Current.SendObjectChangeEvent(folder3, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(folder3, EventKind.Updated);
 
             Assert.AreEqual(2, folder2Row.ContainedRows.Count);
         }
 
         [Test]
-        public void VerifyThatCreateStoreCommandWorks()
+        public async Task VerifyThatCreateStoreCommandWorks()
         {
             var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
             this.model.CommonFileStore.Add(this.store);
             this.rev.SetValue(this.model.EngineeringModelSetup, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
             vm.ComputePermission();
 
             //No row selected
-            vm.CreateStoreCommand.Execute(null);
+            await vm.CreateStoreCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -310,7 +328,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             //CommonFileStore row selected
             vm.SelectedThing = vm.ContainedRows.First();
 
-            vm.CreateStoreCommand.Execute(null);
+            await vm.CreateStoreCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -325,7 +343,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyThatCreateFileCommandWorks()
+        public async Task VerifyThatCreateFileCommandWorks()
         {
             var vm = new CommonFileStoreBrowserViewModel(this.model, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
@@ -336,29 +354,29 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.model.CommonFileStore.Add(this.store);
             this.rev.SetValue(this.model.EngineeringModelSetup, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.model.EngineeringModelSetup, EventKind.Updated);
             vm.ComputePermission();
 
             //DomainFileStore row selected
             vm.SelectedThing = vm.ContainedRows.First();
 
-            vm.UploadFileCommand.Execute(null);
+            await vm.UploadFileCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
-                        It.IsAny<File>(),
-                        It.IsAny<IThingTransaction>(),
-                        It.IsAny<ISession>(),
-                        true,
-                        ThingDialogKind.Create,
-                        this.thingDialogNavigationService.Object,
-                        It.IsAny<CommonFileStore>(),
-                        null), Times.Once());
+                    It.IsAny<File>(),
+                    It.IsAny<IThingTransaction>(),
+                    It.IsAny<ISession>(),
+                    true,
+                    ThingDialogKind.Create,
+                    this.thingDialogNavigationService.Object,
+                    It.IsAny<CommonFileStore>(),
+                    null), Times.Once());
 
             //Main folder row selected
             vm.SelectedThing = vm.ContainedRows.First().ContainedRows.First();
 
-            vm.UploadFileCommand.Execute(null);
+            await vm.UploadFileCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(
@@ -374,7 +392,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             //Sub folder row selected
             vm.SelectedThing = vm.ContainedRows.First().ContainedRows.First().ContainedRows.First();
 
-            vm.UploadFileCommand.Execute(null);
+            await vm.UploadFileCommand.Execute();
 
             this.thingDialogNavigationService.Verify(
                 x => x.Navigate(

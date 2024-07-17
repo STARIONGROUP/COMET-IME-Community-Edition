@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterOverrideDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ParameterOverrideDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ParameterOverride"/>
@@ -128,27 +129,27 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedParameter"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedParameterCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ParameterOverrideValueSet
         /// </summary>
-        public ReactiveCommand<object> CreateValueSetCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateValueSetCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ParameterOverrideValueSet
         /// </summary>
-        public ReactiveCommand<object> DeleteValueSetCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteValueSetCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ParameterOverrideValueSet
         /// </summary>
-        public ReactiveCommand<object> EditValueSetCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditValueSetCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ParameterOverrideValueSet
         /// </summary>
-        public ReactiveCommand<object> InspectValueSetCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectValueSetCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -161,19 +162,19 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedValueSetCommand = this.WhenAny(vm => vm.SelectedValueSet, v => v.Value != null);
             var canExecuteEditSelectedValueSetCommand = this.WhenAny(vm => vm.SelectedValueSet, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateValueSetCommand = ReactiveCommand.Create(canExecuteCreateValueSetCommand);
+            this.CreateValueSetCommand = ReactiveCommandCreator.Create(canExecuteCreateValueSetCommand);
             this.CreateValueSetCommand.Subscribe(_ => this.ExecuteCreateCommand<ParameterOverrideValueSet>(this.PopulateValueSet));
 
-            this.DeleteValueSetCommand = ReactiveCommand.Create(canExecuteEditSelectedValueSetCommand);
+            this.DeleteValueSetCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueSetCommand);
             this.DeleteValueSetCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedValueSet.Thing, this.PopulateValueSet));
 
-            this.EditValueSetCommand = ReactiveCommand.Create(canExecuteEditSelectedValueSetCommand);
+            this.EditValueSetCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedValueSetCommand);
             this.EditValueSetCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedValueSet.Thing, this.PopulateValueSet));
 
-            this.InspectValueSetCommand = ReactiveCommand.Create(canExecuteInspectSelectedValueSetCommand);
+            this.InspectValueSetCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedValueSetCommand);
             this.InspectValueSetCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedValueSet.Thing));
             var canExecuteInspectSelectedParameterCommand = this.WhenAny(vm => vm.SelectedParameter, v => v.Value != null);
-            this.InspectSelectedParameterCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterCommand);
+            this.InspectSelectedParameterCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterCommand);
             this.InspectSelectedParameterCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameter));
         }
 

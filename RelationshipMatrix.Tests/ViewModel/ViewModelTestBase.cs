@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ViewModelTestBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="ViewModelTestBase.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru.
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,10 +29,12 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
     using System.Reflection;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
@@ -42,12 +44,12 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
     using CDP4Dal;
     using CDP4Dal.Permission;
-    using Microsoft.Practices.ServiceLocation;
+
+    using CommonServiceLocator;
+
     using Moq;
 
     using ReactiveUI;
-
-    using ViewModels;
 
     public abstract class ViewModelTestBase
     {
@@ -71,9 +73,9 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         protected IterationSetup iterationSetup;
         protected ModelReferenceDataLibrary mrdl;
         protected SiteReferenceDataLibrary srdl;
-        
+
         protected Participant participant;
-        protected Uri uri = new Uri("http://rhea.test.com");
+        protected Uri uri = new Uri("http://starion.test.com");
         protected DomainOfExpertise domain;
         protected Category catEd1;
         protected Category catEd2;
@@ -90,11 +92,13 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         protected ElementDefinition elementDef22;
         protected ElementDefinition elementDef31;
         protected PropertyInfo rev = typeof(Thing).GetProperty("RevisionNumber");
+        protected CDPMessageBus messageBus;
 
         public virtual void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.filterStringService = new Mock<IFilterStringService>();
@@ -113,7 +117,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.session = new Mock<ISession>();
             this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -125,7 +129,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             this.catEd1 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "cat1" };
             this.catEd2 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "cat2" };
-            this.catEd3 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat3sub1", ShortName = "cat3sub1", SuperCategory = new List<Category> { this.catEd1 }};
+            this.catEd3 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat3sub1", ShortName = "cat3sub1", SuperCategory = new List<Category> { this.catEd1 } };
             this.catEd4 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat4sub3", ShortName = "cat3sub4", SuperCategory = new List<Category> { this.catEd3 } };
             this.catRel = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "catrel", ShortName = "catrel" };
 
@@ -204,8 +208,11 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+
             this.session.Setup(x => x.OpenIterations).Returns(
-                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> {{this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant)}});
+                new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.settings = new RelationshipMatrixPluginSettings();
             this.settings.PossibleClassKinds.Add(ClassKind.ElementDefinition);

@@ -1,16 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{F541DA64-5C66-45FE-822C-CF93964A3F52}</ProjectGuid>
-    <MinIMEVersion>9.7.0</MinIMEVersion>
+    <MinIMEVersion>10.0.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <AssemblyTitle>CDP4DiagramEditor</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4DiagramEditor</Product>
     <Description>CDP4-COMET Diagram Editor plugin</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.7.0.0</AssemblyVersion>
-    <FileVersion>9.7.0.0</FileVersion>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
+    <AssemblyVersion>10.0.0.19</AssemblyVersion>
+    <FileVersion>10.0.0.19</FileVersion>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -23,111 +25,57 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0">
+    <PackageReference Include="CDP4Common-CE" Version="27.2.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0">
+    <PackageReference Include="CDP4Dal-CE" Version="27.2.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DynamicLanguageRuntime" Version="1.3.0" />
-    <PackageReference Include="reactiveui" Version="6.4.0">
+    <PackageReference Include="DynamicLanguageRuntime" Version="1.3.4" />
+    <PackageReference Include="ReactiveUI.WPF" Version="20.1.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="reactiveui-core" Version="6.4.0">
+    <PackageReference Include="Splat" Version="15.1.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Rx-Core" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Linq" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Main" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-XAML" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Splat" Version="1.6.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122">
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CSharp">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationCore">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml.cs">
-      <DependentUpon>DiagramRibbonPageCategory.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\DiagramDialog.xaml.cs">
-      <DependentUpon>DiagramDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\DiagramEditor.xaml.cs">
-      <DependentUpon>DiagramEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\DiagramEditorRibbon.xaml.cs">
-      <DependentUpon>DiagramEditorRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\DiagramBrowser.xaml.cs">
-      <DependentUpon>DiagramBrowser.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Views\ContextualRibbonPages\DiagramRibbonPageCategory.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DiagramDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\DiagramEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DiagramEditorRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DiagramBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
+	  <Reference Include="Microsoft.CSharp">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="PresentationCore">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="PresentationFramework">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.ComponentModel.Composition">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.Configuration">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.IO.Compression">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.ServiceModel">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.Transactions">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.Xaml">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.Web">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="WindowsBase">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">

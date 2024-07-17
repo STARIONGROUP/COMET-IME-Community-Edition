@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProductTreeIconUriConverter.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ProductTreeIconUriConverter.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 // 
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -29,14 +29,16 @@ namespace CDP4ProductTree
     using System.Globalization;
     using System.Linq;
     using System.Windows.Data;
-    using System.Windows.Media.Imaging;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
 
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Services;
 
     using CDP4ProductTree.ViewModels;
+
+    using CommonServiceLocator;
 
     /// <summary>
     /// The purpose of the <see cref="ProductTreeIconUriConverter" /> is to return an icon based on the
@@ -44,6 +46,11 @@ namespace CDP4ProductTree
     /// </summary>
     public class ProductTreeIconUriConverter : IMultiValueConverter
     {
+        /// <summary>
+        /// The <see cref="IIconCacheService" />
+        /// </summary>
+        private IIconCacheService iconCacheService;
+
         /// <summary>
         /// Returns an GetImage (icon) if a ParameterOrOverride value is provided to display in the product tree.
         /// </summary>
@@ -96,31 +103,51 @@ namespace CDP4ProductTree
         /// </returns>
         private object GetIconForParameterOverride(ThingStatus thingStatus, ParameterUsageKind usage)
         {
-            Uri uri = null;
-
-            switch (usage)
+            try
             {
-                case ParameterUsageKind.Unused:
-                    uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/orangeball.jpg");
-                    break;
-                case ParameterUsageKind.SubscribedByOthers:
-                    uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/blueball.gif");
-                    break;
-                case ParameterUsageKind.Subscribed:
-                    uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/whiteball.jpg");
-                    break;
+                Uri uri = null;
+
+                switch (usage)
+                {
+                    case ParameterUsageKind.Unused:
+                        uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/orangeball.jpg");
+                        break;
+                    case ParameterUsageKind.SubscribedByOthers:
+                        uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/blueball.gif");
+                        break;
+                    case ParameterUsageKind.Subscribed:
+                        uri = new Uri("pack://application:,,,/CDP4Composition;component/Resources/Images/whiteball.jpg");
+                        break;
+                }
+
+                if (uri == null)
+                {
+                    return null;
+                }
+
+                return thingStatus.HasError
+                    ? this.QueryIIconCacheService().QueryErrorOverlayBitmapSource(uri)
+                    : thingStatus.HasRelationship
+                        ? this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, IconUtilities.RelationshipOverlayUri, OverlayPositionKind.TopRight)
+                        : this.QueryIIconCacheService().QueryBitmapImage(uri);
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
             }
 
-            if (uri == null)
-            {
-                return null;
-            }
+            return null;
+        }
 
-            return thingStatus.HasError
-                ? IconUtilities.WithErrorOverlay(uri)
-                : thingStatus.HasRelationship
-                    ? IconUtilities.WithOverlay(uri, IconUtilities.RelationshipOverlayUri)
-                    : new BitmapImage(uri);
+        /// <summary>
+        /// Queries the instance of the <see cref="IIconCacheService" /> that is to be used
+        /// </summary>
+        /// <returns>
+        /// An instance of <see cref="IIconCacheService" />
+        /// </returns>
+        private IIconCacheService QueryIIconCacheService()
+        {
+            return this.iconCacheService ??= ServiceLocator.Current.GetInstance<IIconCacheService>();
         }
     }
 }

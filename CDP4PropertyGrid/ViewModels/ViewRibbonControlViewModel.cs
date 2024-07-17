@@ -1,39 +1,41 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ViewRibbonControlViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ViewRibbonControlViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4PropertyGrid.ViewModels
 {
     using System;
+    using System.Reactive;
     using System.Reactive.Linq;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
 
     using CDP4Dal;
     
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     
     using ReactiveUI;
 
@@ -43,6 +45,11 @@ namespace CDP4PropertyGrid.ViewModels
     public class ViewRibbonControlViewModel : ReactiveObject
     {
         /// <summary>
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        public ICDPMessageBus CDPMessageBus { get; }
+
+        /// <summary>
         /// Backing field for <see cref="IsChecked"/>
         /// </summary>
         private bool isChecked;
@@ -50,12 +57,15 @@ namespace CDP4PropertyGrid.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ViewRibbonControlViewModel"/> class
         /// </summary>
-        public ViewRibbonControlViewModel()
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public ViewRibbonControlViewModel(ICDPMessageBus messageBus)
         {
-            this.OpenClosePanelCommand = ReactiveCommand.Create();
-            this.OpenClosePanelCommand.Subscribe(_ => this.ExecuteOpenClosePanel());
+            this.CDPMessageBus = messageBus;
+            this.OpenClosePanelCommand = ReactiveCommandCreator.Create(this.ExecuteOpenClosePanel);
 
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            this.CDPMessageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel.GetType() == typeof(PropertyGridViewModel) && x.PanelStatus == PanelStatus.Closed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(x => this.HandleClosedPanel());
@@ -73,7 +83,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// <summary>
         /// Gets the open or close Log Panel
         /// </summary>
-        public ReactiveCommand<object> OpenClosePanelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenClosePanelCommand { get; private set; }
 
         /// <summary>
         /// Executes the Open or Close panel command
@@ -84,7 +94,7 @@ namespace CDP4PropertyGrid.ViewModels
 
             if (this.IsChecked)
             {
-                panelNavigationService.OpenInDock(new PropertyGridViewModel(true));
+                panelNavigationService.OpenInDock(new PropertyGridViewModel(true, this.CDPMessageBus));
             }
             else
             {

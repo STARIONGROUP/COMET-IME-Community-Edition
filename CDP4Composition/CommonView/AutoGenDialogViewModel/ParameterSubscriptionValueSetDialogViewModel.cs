@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParameterSubscriptionValueSetDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ParameterSubscriptionValueSetDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ParameterSubscriptionValueSet"/>
@@ -138,7 +139,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedSubscribedValueSet"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedSubscribedValueSetCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedSubscribedValueSetCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -147,7 +148,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedSubscribedValueSetCommand = this.WhenAny(vm => vm.SelectedSubscribedValueSet, v => v.Value != null);
-            this.InspectSelectedSubscribedValueSetCommand = ReactiveCommand.Create(canExecuteInspectSelectedSubscribedValueSetCommand);
+            this.InspectSelectedSubscribedValueSetCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedSubscribedValueSetCommand);
             this.InspectSelectedSubscribedValueSetCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSubscribedValueSet));
         }
 

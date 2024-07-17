@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="EngineeringModelSetupRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="EngineeringModelSetupRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2021 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -42,14 +42,13 @@ namespace CDP4SiteDirectory.ViewModels
 
     using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
     using DomainOfExpertiseRowViewModel = ModelBrowser.Rows.DomainOfExpertiseRowViewModel;
+    using DevExpress.Mvvm.Native;
 
     /// <summary>
     /// The Row-view-model representing a <see cref="EngineeringModelSetup"/>
     /// </summary>
     public class EngineeringModelSetupRowViewModel : CDP4CommonView.EngineeringModelSetupRowViewModel
     {
-        #region Fields
-
         /// <summary>
         /// The row containing all the <see cref="Participant"/> in this <see cref="EngineeringModelSetup"/> row
         /// </summary>
@@ -80,9 +79,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private readonly UnderscoreCapitalsToSpacedTitleCaseConverter titleConverter = new UnderscoreCapitalsToSpacedTitleCaseConverter();
 
-        #endregion
-
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="EngineeringModelSetupRowViewModel"/> class
         /// </summary>
@@ -110,10 +106,11 @@ namespace CDP4SiteDirectory.ViewModels
             this.ContainedRows.Add(this.organizationFolderRow);
 
             this.UpdateProperties();
-        }
-        #endregion
 
-        #region Public Properties
+            this.participantFolderRow.ContainedRows.ForEach(x => x.ContainedRows.CollectionChanged += (s, e) => 
+                this.UpdateContainers());
+        }
+
         /// <summary>
         /// Gets or sets the description of the <see cref="EngineeringModelSetup"/> that is represented by the current row-view-model
         /// </summary>
@@ -122,9 +119,7 @@ namespace CDP4SiteDirectory.ViewModels
             get { return this.description; }
             set { this.RaiseAndSetIfChanged(ref this.description, value); }
         }
-        #endregion
 
-        #region override row-base
         /// <summary>
         /// The object changed event handler
         /// </summary>
@@ -134,7 +129,6 @@ namespace CDP4SiteDirectory.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        #endregion
 
         /// <summary>
         /// Update the properties of the current row-view-model

@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ContextMenuBehaviorTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ContextMenuBehaviorTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Tests.Mvvm.Behaviours
 {
@@ -11,62 +30,80 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
     using System.Linq;
     using System.Threading;
     using System.Windows;
-    using System.Windows.Input;    
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
+
     using DevExpress.Xpf.Grid;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="ContextMenuBehavior"/> class.
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class ContextMenuBehaviorTestFixture
     {
         private ContextMenuBehavior contextMenuBehavior;
 
         private GridControl gridControl;
 
-        private readonly Mock<ISession> session = new Mock<ISession>();
+        private Mock<ISession> session;
 
         private GridColumn gridColumn;
-        
+
         private Mock<IPermissionService> permissionService;
 
         private TestBrowserViewModel testBrowserViewModel;
 
         private Mock<IPanelNavigationService> panelNavigation;
 
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
+            this.session = new Mock<ISession>();
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
             this.permissionService = new Mock<IPermissionService>();
             this.panelNavigation = new Mock<IPanelNavigationService>();
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
-            var uri = new Uri("http://www.rheagroup.com");
+            var uri = new Uri("https://www.stariongroup.eu");
             var fileType = new FileType(Guid.NewGuid(), null, uri);
             var testRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), null, uri) { Name = "Test RDL" };
             testRdl.FileType.Add(fileType);
             var siteDir = new SiteDirectory(Guid.NewGuid(), null, uri) { Name = "SiteDir" };
             siteDir.SiteReferenceDataLibrary.Add(testRdl);
+
             this.session.Setup(x => x.OpenReferenceDataLibraries)
                 .Returns(new List<SiteReferenceDataLibrary> { testRdl });
+
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+
             this.testBrowserViewModel = new TestBrowserViewModel(
                 this.session.Object,
                 siteDir,
                 null,
                 this.panelNavigation.Object,
                 null, null);
+
             this.gridControl = new GridControl { DataContext = this.testBrowserViewModel };
             this.gridColumn = new GridColumn { FieldName = "Name" };
             this.gridControl.Columns.Add(this.gridColumn);
@@ -75,11 +112,10 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
             this.contextMenuBehavior.Attach(this.gridControl);
         }
 
-
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -92,37 +128,35 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
         public void VerifyThatContextMenuIsPopulatedWhenMouseEventIsRaised()
         {
             var mouseButtonEventArgs = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Right)
-                                           {
-                                               RoutedEvent = UIElement.MouseRightButtonUpEvent,
-                                               Source = this.gridControl
-                                            };
-            
+            {
+                RoutedEvent = UIElement.MouseRightButtonUpEvent,
+                Source = this.gridControl
+            };
+
             this.gridControl.RaiseEvent(mouseButtonEventArgs);
 
-            Assert.IsTrue(this.testBrowserViewModel.ContextMenu.Any(x => x.Header == "Create a File Type")); 
+            Assert.IsTrue(this.testBrowserViewModel.ContextMenu.Any(x => x.Header == "Create a File Type"));
         }
 
         [Test]
         public void VerifyThatBrowserCommandsAreInitializedOnLeftMouseClickOnRow()
         {
-            Assert.IsFalse(this.testBrowserViewModel.UpdateCommand.CanExecute(null));
-            Assert.IsFalse(this.testBrowserViewModel.InspectCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.testBrowserViewModel.UpdateCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.testBrowserViewModel.InspectCommand).CanExecute(null));
 
             this.testBrowserViewModel.SelectedThing = this.testBrowserViewModel.FileTypes.First();
 
             var rightClickEventArgs = new MouseButtonEventArgs(Mouse.PrimaryDevice, 0, MouseButton.Left)
-                                          {
-                                              RoutedEvent = UIElement.MouseLeftButtonUpEvent,
-                                              Source = this.gridControl
-                                          };
+            {
+                RoutedEvent = UIElement.MouseLeftButtonUpEvent,
+                Source = this.gridControl
+            };
 
             this.gridControl.RaiseEvent(rightClickEventArgs);
 
-            Assert.IsTrue(this.testBrowserViewModel.UpdateCommand.CanExecute(null));
-            Assert.IsTrue(this.testBrowserViewModel.InspectCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.testBrowserViewModel.UpdateCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.testBrowserViewModel.InspectCommand).CanExecute(null));
         }
-
-
 
         internal class FileTypeRowViewModel : CDP4CommonView.FileTypeRowViewModel
         {
@@ -187,8 +221,8 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
             /// </summary>
             public bool CanWriteFileType
             {
-                get { return this.canWriteFileType; }
-                set { this.RaiseAndSetIfChanged(ref this.canWriteFileType, value); }
+                get => this.canWriteFileType;
+                set => this.RaiseAndSetIfChanged(ref this.canWriteFileType, value);
             }
 
             /// <summary>
@@ -206,8 +240,7 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
             /// </summary>
             protected override void Initialize()
             {
-                this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanWriteFileType));
-                this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<FileType>());
+                this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<FileType>(), this.WhenAnyValue(x => x.CanWriteFileType));
             }
 
             /// <summary>
@@ -238,6 +271,7 @@ namespace CDP4Composition.Tests.Mvvm.Behaviours
             protected override void Dispose(bool disposing)
             {
                 base.Dispose(disposing);
+
                 foreach (var fileType in this.FileTypes)
                 {
                     fileType.Dispose();

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WorkbookSession.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="WorkbookSession.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@ namespace CDP4OfficeInfrastructure.OfficeDal
     /// The purpose of the <see cref="WorkbookSession"/> class is to store session data in a <see cref="Workbook"/> as a 
     /// custom XML part, and retrieve it from the workbook.
     /// </summary>
-    [XmlRoot("CDP4Session", Namespace = "http://cdp4session.rheagroup.com")]
+    [XmlRoot("CDP4Session", Namespace = "http://cdp4session.stariongroup.eu")]
     public class WorkbookSession : CustomOfficeData
     {
         /// <summary>

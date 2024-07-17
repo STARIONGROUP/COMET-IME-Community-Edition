@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PublicationBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="PublicationBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +29,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
@@ -79,12 +80,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private DomainOfExpertise domain;
         private DomainOfExpertise otherDomain;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -118,7 +121,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.parameter1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtype1", ShortName = "pat1" }, Owner = this.domain };
             this.parameter2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtype2", ShortName = "pat2" }, Owner = this.domain };
-            this.parameter3= new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtypeadd", ShortName = "padd" }, Owner = this.domain };
+            this.parameter3 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtypeadd", ShortName = "padd" }, Owner = this.domain };
 
             var parameterforoverride = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "paramtype3", ShortName = "pat3" } };
 
@@ -157,7 +160,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.FromResult("some result"));
-            
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
         }
@@ -185,7 +188,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -217,13 +220,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var revision = typeof(Iteration).GetProperty("RevisionNumber");
             revision.SetValue(this.iteration, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(2, viewmodel.Publications.Count);
 
             this.iteration.Publication.Clear();
             revision.SetValue(this.iteration, 3);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(0, viewmodel.Publications.Count);
         }
 
@@ -241,13 +244,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             Assert.AreEqual(2, viewmodel.Domains.Count);
 
             this.modelsetup.ActiveDomain.Add(domain2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.modelsetup, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.modelsetup, EventKind.Updated);
             Assert.AreEqual(3, viewmodel.Domains.Count);
-
         }
 
         [Test]
-        public void VerifySelectAllTrue()
+        public async Task VerifySelectAllTrue()
         {
             var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -256,7 +258,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.publication.Domain.Add(domain2);
             this.modelsetup.ActiveDomain.Add(domain2);
 
-            viewmodel.SelectAllCommand.Execute(true);
+            await viewmodel.SelectAllCommand.Execute(true);
 
             Assert.That(viewmodel.SelectAll, Is.True);
             Assert.That(viewmodel.Domains, Is.All.Matches<PublicationDomainOfExpertiseRowViewModel>(d => d.ToBePublished));
@@ -267,7 +269,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         {
             var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
-            var domain2 = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain2", ShortName = "DM2"};
+            var domain2 = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain2", ShortName = "DM2" };
             this.sitedir.Domain.Add(domain2);
             this.publication.Domain.Add(domain2);
             this.modelsetup.ActiveDomain.Add(domain2);
@@ -280,7 +282,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         }
 
         [Test]
-        public void VerifyPartialSelection()
+        public async Task VerifyPartialSelection()
         {
             var viewmodel = new PublicationBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -289,10 +291,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.publication.Domain.Add(domain2);
             this.modelsetup.ActiveDomain.Add(domain2);
 
-            viewmodel.SelectAllCommand.Execute(true);
+            await viewmodel.SelectAllCommand.Execute(true);
 
             viewmodel.Domains.First().ToBePublished = false;
-            viewmodel.PublicationRowCheckedCommand.Execute(null);
+            await viewmodel.PublicationRowCheckedCommand.Execute();
 
             Assert.That(viewmodel.SelectAll, Is.Null);
             Assert.That(viewmodel.Domains[0].ToBePublished, Is.False);
@@ -306,55 +308,59 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.parameter3.ValueSet.First().Published = new ValueArray<string>(new List<string>() { "-" },
                 this.parameter3.ValueSet.First());
+
             this.parameter3.ValueSet.First().ValueSwitch = ParameterSwitchKind.REFERENCE;
+
             this.parameter3.ValueSet.First().Reference = new ValueArray<string>(new List<string>() { "20" },
                 this.parameter3.ValueSet.First());
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter3, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(this.parameter3, EventKind.Added);
 
             Assert.AreEqual(2, viewmodel.Domains.Count);
             Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
 
             this.parameter1.ValueSet.First().Published = new ValueArray<string>(new List<string>() { "-" },
                 this.parameter1.ValueSet.First());
+
             this.parameter1.ValueSet.First().ValueSwitch = ParameterSwitchKind.MANUAL;
+
             this.parameter1.ValueSet.First().Manual = new ValueArray<string>(new List<string>() { "-" },
                 this.parameter1.ValueSet.First());
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
 
             Assert.AreEqual(2, viewmodel.Domains.Count);
             Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
 
             this.parameter1.ValueSet.First().Manual = new ValueArray<string>(new List<string> { "134" });
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1.ValueSet.First(), EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1.ValueSet.First(), EventKind.Updated);
             Assert.AreEqual(2, viewmodel.Domains[0].ContainedRows.Count);
 
             // verify that same row is updated
             this.parameter1.ValueSet.First().Manual = new ValueArray<string>(new List<string>() { "213" });
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
             Assert.AreEqual(2, viewmodel.Domains[0].ContainedRows.Count);
 
             // verify that ownership of the parameter is changed
             this.parameter1.Owner = this.otherDomain;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
             Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
             Assert.AreEqual(1, viewmodel.Domains[1].ContainedRows.Count);
 
             // verify that value is removed
             this.parameter1.ValueSet.First().Manual = new ValueArray<string>(new List<string> { "-" });
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
             Assert.AreEqual(0, viewmodel.Domains[1].ContainedRows.Count);
 
             // verify that parameter is removed
             this.parameter1.ValueSet.First().Manual = new ValueArray<string>(new List<string> { "268" });
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
             Assert.AreEqual(1, viewmodel.Domains[1].ContainedRows.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Removed);
             Assert.AreEqual(0, viewmodel.Domains[1].ContainedRows.Count);
         }
 
@@ -365,13 +371,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.parameter1.ValueSet.First().Published = new ValueArray<string>(new List<string>() { "-" },
                 this.parameter1.ValueSet.First());
+
             this.parameter1.ValueSet.First().ValueSwitch = ParameterSwitchKind.MANUAL;
 
             // verify that same row is updated
             this.parameter1.ValueSet.First().Manual = new ValueArray<string>(new List<string>() { "213" },
                 this.parameter1.ValueSet.First());
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1.ValueSet[0], EventKind.Updated);
             Assert.AreEqual(1, viewmodel.Domains[0].ContainedRows.Count);
 
             viewmodel.Domains[0].ToBePublished = true;

@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterTypeComponentRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ParameterTypeComponentRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Jaime Bernar
 // 
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 // 
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -30,7 +30,10 @@ namespace BasicRdl.ViewModels
     using System.Linq;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
+
     using CDP4Dal;
 
     using ReactiveUI;
@@ -54,7 +57,7 @@ namespace BasicRdl.ViewModels
         /// All possible ParameterTypes that are used to populate list of filtered ParameterType.
         /// </summary>
         private readonly ReactiveList<ParameterType> possibleParameterTypes;
-
+            
         /// <summary>
         /// Initializes a new instance of the <see cref="ParameterTypeComponentRowViewModel"/> class
         /// </summary>
@@ -75,8 +78,6 @@ namespace BasicRdl.ViewModels
 
             this.possibleParameterTypes = containerViewModel.PossibleParameterType;
             this.PossibleParameterType = new ReactiveList<ParameterType>();
-
-            this.PossibleParameterType.ChangeTrackingEnabled = true;
 
             this.PossibleParameterType.AddRange(this.possibleParameterTypes);
 
@@ -179,7 +180,7 @@ namespace BasicRdl.ViewModels
             {
                 if (columnName == "ShortName")
                 {
-                    var validationResult = ValidationService.ValidateProperty(columnName, this);
+                    var validationResult = this.ValidationService.ValidateObjectProperty(columnName, this);
                     this.ErrorMsg = validationResult;
                     ((CompoundParameterTypeDialogViewModel)this.ContainerViewModel).UpdateOkCanExecuteStatus();
                     return validationResult != null ? validationResult : string.Empty;

@@ -1,8 +1,27 @@
-// -------------------------------------------------------------------------------------------------
-// <copyright file="ModelClosingDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ModelClosingDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ShellDialogs.ViewModels
 {
@@ -13,14 +32,19 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4CommonView;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
+
     using CDP4Dal;
+
     using ReactiveUI;
 
     /// <summary>
@@ -45,10 +69,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets the dialog box title
         /// </summary>
-        public string DialogTitle
-        {
-            get { return "Iteration Selection"; }
-        }
+        public string DialogTitle => "Iteration Selection";
 
         /// <summary>
         /// Gets the list of <see cref="BaseRowViewModel"/> available
@@ -63,32 +84,33 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets the Select <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<Unit> CloseCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CloseCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// The initialize reactive commands.
         /// </summary>
         private void InitializeReactiveCommands()
         {
-            this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>> { ChangeTrackingEnabled = true };
+            this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>>();
             this.IsBusy = false;
             var canOk = this.WhenAnyValue(x => x.SelectedIterations.Count, count => count != 0);
-            this.CloseCommand = ReactiveCommand.CreateAsyncTask(canOk, x => this.ExecuteClose(), RxApp.MainThreadScheduler);
-            this.CloseCommand.ThrownExceptions.Select(ex => ex).Subscribe(x =>
-            {
-                this.ErrorMessage = x.Message;
-                this.IsBusy = false;
-            });
+            this.CloseCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteClose, canOk, RxApp.MainThreadScheduler);
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CloseCommand.ThrownExceptions.Select(ex => ex).Subscribe(
+                x =>
+                {
+                    this.ErrorMessage = x.Message;
+                    this.IsBusy = false;
+                });
 
-            this.SelectedIterations.ChangeTrackingEnabled = true;
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
+            this.CancelCommand.Subscribe();
+
             this.SelectedIterations.ItemsAdded.Subscribe(this.FilterIterationSelectionItems);
         }
 
@@ -109,11 +131,13 @@ namespace CDP4ShellDialogs.ViewModels
                 var session = modelrow.Session;
 
                 Lazy<Thing> cachedIteration;
-                if (session.Assembler.Cache.TryGetValue(new CacheKey(iteration.Thing.Iid, null),
-                    out cachedIteration))
+
+                if (session.Assembler.Cache.TryGetValue(
+                        new CacheKey(iteration.Thing.Iid, null),
+                        out cachedIteration))
                 {
-                    var modelSetup = (EngineeringModelSetup) modelrow.Thing.Container;
-                    await session.CloseIterationSetup((IterationSetup) iteration.Thing);
+                    var modelSetup = (EngineeringModelSetup)modelrow.Thing.Container;
+                    await session.CloseIterationSetup((IterationSetup)iteration.Thing);
 
                     if (session.OpenIterations.Keys.Count(it => it.IterationSetup.Container == modelSetup) == 1)
                     {
@@ -180,6 +204,7 @@ namespace CDP4ShellDialogs.ViewModels
         private void FilterIterationSelectionItems(IViewModelBase<Thing> row)
         {
             var iterationRow = row as ModelSelectionIterationSetupRowViewModel;
+
             if (iterationRow == null)
             {
                 // Cant remove directly from the reactiveList: KeyNotFoundException

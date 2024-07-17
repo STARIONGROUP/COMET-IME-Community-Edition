@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PanelNavigationServiceTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="PanelNavigationServiceTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +30,7 @@ namespace CDP4Composition.Tests.Navigation
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Threading;
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
@@ -49,7 +50,7 @@ namespace CDP4Composition.Tests.Navigation
 
     using ReactiveUI;
 
-    [TestFixture]
+    [TestFixture, Apartment(ApartmentState.STA)]
     public class PanelNavigationServiceTestFixture
     {
         private Mock<IDialogNavigationService> dialogNavigationService;
@@ -73,11 +74,14 @@ namespace CDP4Composition.Tests.Navigation
         private Mock<INameMetaData> describeMetaData;
         private DockLayoutViewModel dockLayoutViewModel;
         private PanelNavigationService NavigationService;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.messageBus = new CDPMessageBus();
 
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -103,7 +107,7 @@ namespace CDP4Composition.Tests.Navigation
 
             this.dockLayoutViewModel = new DockLayoutViewModel(dialogNavigationService.Object);
 
-            this.NavigationService = new PanelNavigationService(this.viewList, this.viewModelList, this.viewModelDecoratedList, this.dockLayoutViewModel, this.filterStringService.Object);
+            this.NavigationService = new PanelNavigationService(this.viewList, this.viewModelList, this.viewModelDecoratedList, this.dockLayoutViewModel, this.filterStringService.Object, this.messageBus);
 
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -113,7 +117,7 @@ namespace CDP4Composition.Tests.Navigation
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -139,7 +143,7 @@ namespace CDP4Composition.Tests.Navigation
         {
             this.NavigationService.OpenExistingOrOpenInAddIn(this.panelViewModel);
             var opened = false;
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>().Subscribe(x => { opened = true; });
+            this.messageBus.Listen<NavigationPanelEvent>().Subscribe(x => { opened = true; });
             Assert.IsFalse(opened);
 
             this.NavigationService.OpenExistingOrOpenInAddIn(this.panelViewModel);
@@ -151,7 +155,7 @@ namespace CDP4Composition.Tests.Navigation
         public void VerifyThatOpenExisitngOrOpenWorks()
         {
             var opened = false;
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>().Subscribe(x => { opened = true; });
+            this.messageBus.Listen<NavigationPanelEvent>().Subscribe(x => { opened = true; });
 
             this.NavigationService.OpenExistingOrOpenInAddIn(this.panelViewModel);
             Assert.IsTrue(opened);
@@ -187,7 +191,7 @@ namespace CDP4Composition.Tests.Navigation
         {
             var closed = false;
 
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            this.messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel == this.panelViewModel && x.PanelStatus == PanelStatus.Closed)
                 .Subscribe(x => { closed = true; });
 
@@ -205,7 +209,7 @@ namespace CDP4Composition.Tests.Navigation
         {
             var closed = false;
 
-            CDPMessageBus.Current.Listen<NavigationPanelEvent>()
+            this.messageBus.Listen<NavigationPanelEvent>()
                 .Where(x => x.ViewModel == this.panelViewModel && x.PanelStatus == PanelStatus.Closed)
                 .Subscribe(x => { closed = true; });
 
@@ -241,7 +245,9 @@ namespace CDP4Composition.Tests.Navigation
 
 namespace CDP4Composition.Tests.Views
 {
-    public class Test : IPanelView
+    using System.Windows.Controls;
+
+    public class Test : UserControl, IPanelView
     {
         public Test()
         {
@@ -254,7 +260,7 @@ namespace CDP4Composition.Tests.Views
         public object DataContext { get; set; }
     }
 
-    public class TestGrid : IPanelView
+    public class TestGrid : UserControl, IPanelView
     {
         public TestGrid()
         {
@@ -272,6 +278,7 @@ namespace CDP4Composition.Tests.Views
 namespace CDP4Composition.Tests.ViewModels
 {
     using System;
+    using System.Windows.Controls;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -281,7 +288,7 @@ namespace CDP4Composition.Tests.ViewModels
 
     using CDP4Dal;
 
-    public class TestViewModel : IPanelViewModel
+    public class TestViewModel : UserControl, IPanelViewModel
     {
         public TestViewModel(string uri = default(string))
         {
@@ -340,7 +347,7 @@ namespace CDP4Composition.Tests.ViewModels
         }
     }
 
-    public class ExceptionViewModel : IPanelViewModel
+    public class ExceptionViewModel : UserControl, IPanelViewModel
     {
         public ExceptionViewModel(string uri = default(string))
         {
@@ -374,7 +381,7 @@ namespace CDP4Composition.Tests.ViewModels
         }
     }
 
-    public class TestGridViewModel : IPanelViewModel
+    public class TestGridViewModel : UserControl, IPanelViewModel
     {
         public TestGridViewModel()
         {

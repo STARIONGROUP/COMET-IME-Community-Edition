@@ -1,20 +1,42 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RibbonPartTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="RibbonPartTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Tests
 {
-    using System;
     using System.Reflection;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    using CDP4Dal.Permission;
+
+    using CDP4Dal;
+
     using Moq;
+
     using NUnit.Framework;
-    
+
     /// <summary>
     /// Suite of tests for the <see cref="RibbonPart"/> class
     /// </summary>
@@ -39,7 +61,7 @@ namespace CDP4Composition.Tests
         [Test]
         public void VerifyThatTheExpectedRibbonXmlIsReturned()
         {
-            var ribbonPart = new RibbonPartTesting(this.order, this.panelNavigationService.Object, null, null, null);
+            var ribbonPart = new RibbonPartTesting(this.order, this.panelNavigationService.Object, null, null, null, new CDPMessageBus());
             Assert.AreEqual(this.order, ribbonPart.Order);
             Assert.AreEqual(this.ribbonXml, ribbonPart.RibbonXml);
         }
@@ -47,7 +69,7 @@ namespace CDP4Composition.Tests
         [Test]
         public void VerifyThatDefaultValueIsReturnedForMethodsThatAreNotOverriden()
         {
-            var ribbonPart = new RibbonPartTesting(this.order, this.panelNavigationService.Object, null, null, null);
+            var ribbonPart = new RibbonPartTesting(this.order, this.panelNavigationService.Object, null, null, null, new CDPMessageBus());
 
             Assert.DoesNotThrow(() => ribbonPart.OnAction("testId"));
 
@@ -83,8 +105,8 @@ namespace CDP4Composition.Tests
 
     internal class RibbonPartTesting : RibbonPart
     {
-        internal RibbonPartTesting(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
+        internal RibbonPartTesting(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, ICDPMessageBus cdpMessageBus)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, cdpMessageBus)
         {
         }
 
@@ -95,7 +117,7 @@ namespace CDP4Composition.Tests
 
         protected override Assembly GetCurrentAssembly()
         {
-            return Assembly.GetExecutingAssembly();            
+            return Assembly.GetExecutingAssembly();
         }
     }
 }

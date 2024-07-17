@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UriManagerViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="UriManagerViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,11 +27,16 @@ namespace CDP4ShellDialogs.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
+
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Utilities;
-    using CDP4Dal.Composition;
-    using ReactiveUI;
     
+    using CDP4Dal.Composition;
+
+    using ReactiveUI;
+
     /// <summary>
     /// The purpose of the <see cref="UriManagerViewModel"/> is to manage the configured uris
     /// </summary>
@@ -28,22 +52,20 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public UriManagerViewModel()
         {
-            this.ApplyCommand = ReactiveCommand.Create();
-            this.ApplyCommand.Subscribe(_ => this.ExecuteApply());
-            this.DeleteRowCommand = ReactiveCommand.Create();
-            this.DeleteRowCommand.Subscribe(_ => this.DeleteSelectedRow());
+            this.ApplyCommand = ReactiveCommandCreator.Create(this.ExecuteApply);
+            this.DeleteRowCommand = ReactiveCommandCreator.Create(this.DeleteSelectedRow);
 
             this.UriRowList = new ReactiveList<UriRowViewModel>();
             this.RePopulateUriRows();
 
             this.DalTypesList = new ReactiveList<DalType>();
+
             foreach (DalType type in Enum.GetValues(typeof(DalType)))
             {
                 this.DalTypesList.Add(type);
             }
 
-            this.CloseCommand = ReactiveCommand.Create();
-            this.CloseCommand.Subscribe(_ => this.ExecuteClose());
+            this.CloseCommand = ReactiveCommandCreator.Create(this.ExecuteClose);
         }
 
         /// <summary>
@@ -92,17 +114,17 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// Gets the <see cref="CloseCommand"/>
         /// </summary>
-        public ReactiveCommand<object> CloseCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CloseCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ApplyCommand"/>
         /// </summary>
-        public ReactiveCommand<object> ApplyCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ApplyCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="DeleteRowCommand"/>
         /// </summary>
-        public ReactiveCommand<object> DeleteRowCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteRowCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="UriRowList"/> to display

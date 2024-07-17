@@ -1,12 +1,13 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DomainOfExpertiseBrowser.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="DomainOfExpertiseBrowser.xaml.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2019 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -16,7 +17,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for DomainOfExpertiseBrowser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class DomainOfExpertiseBrowser : IPanelView
+    public partial class DomainOfExpertiseBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

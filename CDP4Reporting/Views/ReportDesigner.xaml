@@ -12,8 +12,8 @@
     xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
-    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
+    xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
     x:Class="CDP4Reporting.Views.ReportDesigner"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="650">
@@ -47,11 +47,11 @@
                                     HorizontalScrollBarVisibility="Auto"
                                     HorizontalContentAlignment="Stretch"
                                     FontSize="10pt">
-                            <i:Interaction.Triggers>
-                                <i:EventTrigger EventName="TextChanged">
-                                    <i:InvokeCommandAction Command="{Binding Path=DataSourceTextChangedCommand}"/>
-                                </i:EventTrigger>
-                            </i:Interaction.Triggers>
+                            <b:Interaction.Triggers>
+                                <b:EventTrigger EventName="TextChanged">
+                                    <b:InvokeCommandAction Command="{Binding Path=DataSourceTextChangedCommand}"/>
+                                </b:EventTrigger>
+                            </b:Interaction.Triggers>
                         </avalonEdit:TextEditor>
                     </dxdo:LayoutPanel>
                     <dxdo:LayoutPanel>
@@ -210,7 +210,7 @@
                                     </dxb:InsertAction.Element>
                                 </dxb:InsertAction>
                             </dxrud:ReportDesigner.RibbonCustomizationActions>
-                            <dxrud:ReportDesignerClassicView/>
+                            <dxrud:ReportDesignerBrowserView AllowDrop="False" CloseWindowWhenLastTabIsClosed="False" TabDragDropMode="None"  />
                         </dxrud:ReportDesigner>
                     </dxdo:LayoutPanel>
                 </dxdo:LayoutGroup>

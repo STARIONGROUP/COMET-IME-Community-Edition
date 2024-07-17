@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CategoryBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="CategoryBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,12 +27,13 @@ namespace BasicRdl.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using BasicRdl.Views;
 
-    using CDP4Common.CommonData;
     using CDP4Common;
+    using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
@@ -42,10 +43,10 @@ namespace BasicRdl.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -79,10 +80,19 @@ namespace BasicRdl.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public CategoryBrowserViewModel(ISession session, SiteDirectory thing,
-            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
-            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+        public CategoryBrowserViewModel(
+            ISession session,
+            SiteDirectory thing,
+            IThingDialogNavigationService thingDialogNavigationService,
+            IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService,
+            IPluginSettingsService pluginSettingsService)
+            : base(
+                thing,
+                session,
+                thingDialogNavigationService,
+                panelNavigationService,
+                dialogNavigationService,
                 pluginSettingsService)
         {
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
@@ -94,23 +104,20 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets the rows representing <see cref="Category"/>
         /// </summary>
-        public DisposableReactiveList<CategoryRowViewModel> Categories
-        {
-            get { return this.categories; }
-        }
+        public DisposableReactiveList<CategoryRowViewModel> Categories => this.categories;
 
         /// <summary>
         /// Gets or sets the Highlight Command
         /// </summary>
-        public ReactiveCommand<object> HighlightCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> HighlightCommand { get; protected set; }
 
         /// <summary>
         /// Gets a value indicating whether a category may be created
         /// </summary>
         public bool CanCreateRdlElement
         {
-            get { return this.canCreateRdlElement; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value); }
+            get => this.canCreateRdlElement;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value);
         }
 
         /// <summary>
@@ -127,6 +134,7 @@ namespace BasicRdl.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var category in this.Categories)
             {
                 category.Dispose();
@@ -140,8 +148,9 @@ namespace BasicRdl.ViewModels
         {
             base.Initialize();
             var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
-                .Where(x => openDataLibrariesIids.Contains(x.Iid)))
+                         .Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var category in referenceDataLibrary.DefinedCategory)
                 {
@@ -160,11 +169,9 @@ namespace BasicRdl.ViewModels
             var canSelectableCommandsExecute =
                 this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null && !(x.Thing is NotThing));
 
-            this.HighlightCommand = ReactiveCommand.Create(canSelectableCommandsExecute);
-            this.HighlightCommand.Subscribe(_ => this.ExecuteHighlightCommand());
+            this.HighlightCommand = ReactiveCommandCreator.Create(this.ExecuteHighlightCommand, canSelectableCommandsExecute);
 
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<Category>());
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Category>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
         }
 
         /// <summary>
@@ -183,10 +190,20 @@ namespace BasicRdl.ViewModels
         {
             base.PopulateContextMenu();
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Category", "", this.CreateCommand,
-                MenuItemKind.Create, ClassKind.Category));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Highlight", "", this.HighlightCommand,
-                MenuItemKind.Highlight));
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Category",
+                    "",
+                    this.CreateCommand,
+                    MenuItemKind.Create,
+                    ClassKind.Category));
+
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Highlight",
+                    "",
+                    this.HighlightCommand,
+                    MenuItemKind.Highlight));
         }
 
         /// <summary>
@@ -194,31 +211,34 @@ namespace BasicRdl.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var addListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Category))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Added &&
-                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .Select(x => x.ChangedThing as Category)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.AddCategoryRowViewModel);
+            var addListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category))
+                .Where(
+                    objectChange => objectChange.EventKind == EventKind.Added &&
+                                    objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Select(x => x.ChangedThing as Category)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.AddCategoryRowViewModel);
+
             this.Disposables.Add(addListener);
 
-            var removeListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Category))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Removed &&
-                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .Select(x => x.ChangedThing as Category)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.RemoveCategoryRowViewModel);
+            var removeListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category))
+                .Where(
+                    objectChange => objectChange.EventKind == EventKind.Removed &&
+                                    objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Select(x => x.ChangedThing as Category)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.RemoveCategoryRowViewModel);
+
             this.Disposables.Add(removeListener);
 
-            var rdlUpdateListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated &&
-                                           objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
-                    .Select(x => x.ChangedThing as ReferenceDataLibrary)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.RefreshContainerName);
+            var rdlUpdateListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
+                .Where(
+                    objectChange => objectChange.EventKind == EventKind.Updated &&
+                                    objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .Select(x => x.ChangedThing as ReferenceDataLibrary)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.RefreshContainerName);
+
             this.Disposables.Add(rdlUpdateListener);
         }
 
@@ -246,6 +266,7 @@ namespace BasicRdl.ViewModels
         private void RemoveCategoryRowViewModel(Category category)
         {
             var row = this.Categories.SingleOrDefault(rowViewModel => rowViewModel.Thing == category);
+
             if (row != null)
             {
                 this.Categories.RemoveAndDispose(row);
@@ -280,12 +301,15 @@ namespace BasicRdl.ViewModels
         private void ExecuteHighlightCommand()
         {
             // clear all highlights
-            CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
+            this.CDPMessageBus.SendMessage(new CancelHighlightEvent());
 
             // highlight the selected thing
-            CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.SelectedThing.Thing as Category),
+            this.CDPMessageBus.SendMessage(
+                new HighlightByCategoryEvent(this.SelectedThing.Thing as Category),
                 this.SelectedThing.Thing);
-            CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.SelectedThing.Thing as Category),
+
+            this.CDPMessageBus.SendMessage(
+                new HighlightByCategoryEvent(this.SelectedThing.Thing as Category),
                 null);
         }
     }

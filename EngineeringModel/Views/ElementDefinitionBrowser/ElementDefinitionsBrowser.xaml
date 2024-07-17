@@ -12,13 +12,13 @@
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
              xmlns:engineeringModelData="clr-namespace:CDP4Common.EngineeringModelData;assembly=CDP4Common"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:service="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:views="clr-namespace:CDP4Composition.Views;assembly=CDP4Composition"
              xmlns:commonData="clr-namespace:CDP4Common.CommonData;assembly=CDP4Common"
              xmlns:behaviors="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:selectors="clr-namespace:CDP4EngineeringModel.Selectors"
              d:DesignHeight="400"
              d:DesignWidth="300"
@@ -79,10 +79,10 @@
                                  CurrentItem="{Binding FocusedRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  SelectionMode="Row"
                                  service:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
-                <i:Interaction.Behaviors>
+                <b:Interaction.Behaviors>
                     <dragDrop:FrameworkElementDragBehavior />
                     <dragDrop:FrameworkElementDropBehavior />
-                </i:Interaction.Behaviors>
+                </b:Interaction.Behaviors>
                 <dxmvvm:Interaction.Behaviors>
                     <cdp4Composition:ContextMenuBehavior />
                 </dxmvvm:Interaction.Behaviors>
@@ -167,20 +167,20 @@
                             <ControlTemplate>
                                 <Image x:Name="Icon"
                                        Height="16"
-                                       Source="pack://application:,,,/DevExpress.Images.v22.2;component/Images/Maps/EnableClustering_16x16.png"
+                                       Source="pack://application:,,,/DevExpress.Images.v23.2;component/Images/Maps/EnableClustering_16x16.png"
                                        Visibility="Collapsed" />
                                 <ControlTemplate.Triggers>
                                     <DataTrigger Binding="{Binding Path=RowData.Row, Converter={StaticResource DataTypeConverter}}" Value="{x:Type viewModels:ElementUsageRowViewModel}">
                                         <Setter TargetName="Icon" Property="Visibility" Value="Visible" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Path=RowData.Row.HasExcludes}" Value="{x:Null}">
-                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v22.2;component/Images/Maps/LegendNone2_16x16.png" />
+                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v23.2;component/Images/Maps/LegendNone2_16x16.png" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Path=RowData.Row.HasExcludes}" Value="True">
-                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v22.2;component/Images/Maps/InlineSizeLegend_16x16.png" />
+                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v23.2;component/Images/Maps/InlineSizeLegend_16x16.png" />
                                     </DataTrigger>
                                     <DataTrigger Binding="{Binding Path=RowData.Row.HasExcludes}" Value="False">
-                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v22.2;component/Images/Maps/EnableClustering_16x16.png" />
+                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v23.2;component/Images/Maps/EnableClustering_16x16.png" />
                                     </DataTrigger>
                                 </ControlTemplate.Triggers>
                             </ControlTemplate>
@@ -207,16 +207,16 @@
                                             <ControlTemplate>
                                                 <Image x:Name="Icon"
                                                        Height="16"
-                                                       Source="pack://application:,,,/DevExpress.Images.v22.2;component/Images/Maps/EnableClustering_16x16.png" />
+                                                       Source="pack://application:,,,/DevExpress.Images.v23.2;component/Images/Maps/EnableClustering_16x16.png" />
                                                 <ControlTemplate.Triggers>
                                                     <DataTrigger Binding="{Binding Path=DataContext.RowData.Row.HasExcludes}" Value="True">
-                                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v22.2;component/Images/Maps/InlineSizeLegend_16x16.png" />
+                                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v23.2;component/Images/Maps/InlineSizeLegend_16x16.png" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Path=DataContext.RowData.Row.HasExcludes}" Value="False">
-                                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v22.2;component/Images/Maps/EnableClustering_16x16.png" />
+                                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v23.2;component/Images/Maps/EnableClustering_16x16.png" />
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Path=DataContext.RowData.Row.HasExcludes}" Value="{x:Null}">
-                                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v22.2;component/Images/Maps/LegendNone2_16x16.png" />
+                                                        <Setter TargetName="Icon" Property="Source" Value="pack://application:,,,/DevExpress.Images.v23.2;component/Images/Maps/LegendNone2_16x16.png" />
                                                     </DataTrigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>

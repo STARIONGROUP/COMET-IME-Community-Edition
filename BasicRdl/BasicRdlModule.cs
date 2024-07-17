@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BasicRdlModule.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="BasicRdlModule.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -33,6 +33,8 @@ namespace BasicRdl
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services.FavoritesService;
+
+    using CDP4Dal;
 
     /// <summary>
     /// The <see cref="IModule"/> implementation for the <see cref="BasicRdlModule"/> Component
@@ -59,8 +61,11 @@ namespace BasicRdl
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
         /// <param name="favoritesService">The <see cref="IFavoritesService"/> to be used to store and retrieve favorite things.</param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public BasicRdlModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IFavoritesService favoritesService)
+        public BasicRdlModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IFavoritesService favoritesService, ICDPMessageBus messageBus)
         {
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
@@ -68,6 +73,7 @@ namespace BasicRdl
             this.DialogNavigationService = dialogNavigationService;
             this.PluginSettingsService = pluginSettingsService;
             this.FavoritesService = favoritesService;
+            this.MessageBus = messageBus;
         }
 
         /// <summary>
@@ -100,6 +106,11 @@ namespace BasicRdl
         /// </summary>
         internal IFavoritesService FavoritesService { get; private set; }
 
+        /// <summary name="MessageBus">
+        /// Gets the <see cref="ICDPMessageBus"/>
+        /// </summary>
+        internal ICDPMessageBus MessageBus { get; }
+
         /// <summary>
         /// Initialize the Module
         /// </summary>
@@ -113,7 +124,7 @@ namespace BasicRdl
         /// </summary>
         private void RegisterRibbonParts()
         {
-            var rdlRibbonPart = new BasicRdlRibbonPart(20, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.FavoritesService);
+            var rdlRibbonPart = new BasicRdlRibbonPart(20, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.FavoritesService, this.MessageBus);
             this.RibbonManager.RegisterRibbonPart(rdlRibbonPart);
         }
     }

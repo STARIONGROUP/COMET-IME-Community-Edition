@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BrowserViewModelBase.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="BrowserViewModelBase.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood, Jaime Bernar
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,15 +28,16 @@ namespace CDP4Composition.Mvvm
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Threading;
 
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Common;
 
     using CDP4CommonView;
 
@@ -48,7 +49,7 @@ namespace CDP4Composition.Mvvm
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.ViewModels;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
@@ -56,7 +57,7 @@ namespace CDP4Composition.Mvvm
     using DevExpress.Xpf.Grid;
 
     using NLog;
-    
+
     using ReactiveUI;
 
     using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
@@ -216,29 +217,29 @@ namespace CDP4Composition.Mvvm
             this.CreateContextMenu = new ReactiveList<ContextMenuItemViewModel>();
             this.SelectedRows = new ReactiveList<IRowViewModelBase<Thing>>();
 
-            this.WhenAnyValue(vm => vm.SelectedThing).Subscribe(_ =>
-            {
-                this.OnSelectedThingChanged();
-                this.ComputePermission();
-                this.PopulateContextMenu();
-                this.PopulateCreateContextMenu();
-            });
+            this.Disposables.Add(
+                this.WhenAnyValue(vm => vm.SelectedThing).Subscribe(
+                    _ =>
+                    {
+                        this.OnSelectedThingChanged();
+                        this.ComputePermission();
+                        this.PopulateContextMenu();
+                        this.PopulateCreateContextMenu();
+                    }));
 
             var activePerson = this.Session.ActivePerson;
-            this.Person = (activePerson == null) ? string.Empty : this.Session.ActivePerson.Name;
+            this.Person = activePerson == null ? string.Empty : this.Session.ActivePerson.Name;
+
             if (activePerson != null)
             {
-                var personSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Session.ActivePerson)
+                var personSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Session.ActivePerson)
                     .Where(
                         objectChange =>
                             objectChange.EventKind == EventKind.Updated &&
                             objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(
-                        _ =>
-                        {
-                            this.Person = this.Session.ActivePerson.Name;
-                        });
+                    .Subscribe(_ => { this.Person = this.Session.ActivePerson.Name; });
+
                 this.Disposables.Add(personSubscription);
             }
         }
@@ -248,8 +249,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public string DomainOfExpertise
         {
-            get { return this.domainOfExpertise; }
-            protected set { this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value); }
+            get => this.domainOfExpertise;
+            protected set => this.RaiseAndSetIfChanged(ref this.domainOfExpertise, value);
         }
 
         /// <summary>
@@ -260,8 +261,11 @@ namespace CDP4Composition.Mvvm
         /// </remarks>
         public virtual bool IsDirty
         {
-            get { return false; }
-            set { var x = value; }
+            get => false;
+            set
+            {
+                var x = value;
+            }
         }
 
         /// <summary>
@@ -269,8 +273,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public bool IsSelected
         {
-            get { return isSelected; }
-            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+            get => this.isSelected;
+            set => this.RaiseAndSetIfChanged(ref this.isSelected, value);
         }
 
         /// <summary>
@@ -278,8 +282,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public string FilterString
         {
-            get { return this.filterString; }
-            set { this.RaiseAndSetIfChanged(ref this.filterString, value); }
+            get => this.filterString;
+            set => this.RaiseAndSetIfChanged(ref this.filterString, value);
         }
 
         /// <summary>
@@ -287,8 +291,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public bool IsFilterEnabled
         {
-            get { return this.isFilterEnabled; }
-            set { this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value); }
+            get => this.isFilterEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isFilterEnabled, value);
         }
 
         /// <summary>
@@ -296,49 +300,37 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public bool IsAddButtonEnabled
         {
-            get { return this.isAddButtonEnabled; }
-            private set { this.RaiseAndSetIfChanged(ref this.isAddButtonEnabled, value); }
+            get => this.isAddButtonEnabled;
+            private set => this.RaiseAndSetIfChanged(ref this.isAddButtonEnabled, value);
         }
 
         /// <summary>
         /// Gets the <see cref="IDialogNavigationService"/> used to navigate to a <see cref="IDialogViewModel"/>
         /// </summary>
-        public IDialogNavigationService DialogNavigationService
-        {
-            get { return this.dialogNavigationService; }
-        }
+        public IDialogNavigationService DialogNavigationService => this.dialogNavigationService;
 
         /// <summary>
         /// Gets the <see cref="IPanelNavigationService"/> used to navigate to a <see cref="BrowserViewModelBase{T}"/>
         /// </summary>
-        public IPanelNavigationService PanelNavigationService
-        {
-            get { return this.panelNavigationService; }
-        }
+        public IPanelNavigationService PanelNavigationService => this.panelNavigationService;
 
         /// <summary>
         /// Gets the <see cref="IThingDialogNavigationService"/> used to navigate to a <see cref="IThingDialogViewModel"/>
         /// </summary>
-        public IThingDialogNavigationService ThingDialogNavigationService
-        {
-            get { return this.thingDialogNavigationService; }
-        }
+        public IThingDialogNavigationService ThingDialogNavigationService => this.thingDialogNavigationService;
 
         /// <summary>
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files
         /// </summary>
-        public IPluginSettingsService PluginSettingsService
-        {
-            get { return this.pluginSettingsService; }
-        }
+        public IPluginSettingsService PluginSettingsService => this.pluginSettingsService;
 
         /// <summary>
         /// Gets or sets a value indicating whether it is possible to write on the <see cref="SelectedThing"/>
         /// </summary>
         public bool CanWriteSelectedThing
         {
-            get { return this.canWriteSelectedThing; }
-            set { this.RaiseAndSetIfChanged(ref this.canWriteSelectedThing, value); }
+            get => this.canWriteSelectedThing;
+            set => this.RaiseAndSetIfChanged(ref this.canWriteSelectedThing, value);
         }
 
         /// <summary>
@@ -350,63 +342,63 @@ namespace CDP4Composition.Mvvm
             protected set => this.RaiseAndSetIfChanged(ref this.loadingMessage, value);
         }
 
-        public Dictionary<DataViewBase, Dictionary<string, (CustomFilterOperatorType, IEnumerable<IRowViewModelBase<Thing>>)>> CustomFilterOperators { get; } = 
+        public Dictionary<DataViewBase, Dictionary<string, (CustomFilterOperatorType, IEnumerable<IRowViewModelBase<Thing>>)>> CustomFilterOperators { get; } =
             new Dictionary<DataViewBase, Dictionary<string, (CustomFilterOperatorType, IEnumerable<IRowViewModelBase<Thing>>)>>();
 
         /// <summary>
         /// Gets or sets the Create Command
         /// </summary>
-        public ReactiveCommand<object> CreateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the delete Command
         /// </summary>
-        public ReactiveCommand<object> DeleteCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the deprecate command
         /// </summary>
-        public ReactiveCommand<object> DeprecateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeprecateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit Command
         /// </summary>
-        public ReactiveCommand<object> UpdateCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> UpdateCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> InspectCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> RefreshCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> RefreshCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> ExportCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> ExportCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect Command
         /// </summary>
-        public ReactiveCommand<object> HelpCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> HelpCommand { get; protected set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> that changes the focus of a grid
         /// </summary>
-        public ReactiveCommand<object> ChangeFocusCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ChangeFocusCommand { get; private set; }
 
         /// <summary>
         /// Gets the Expand Rows Command
         /// </summary>
-        public ReactiveCommand<object> ExpandRowsCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExpandRowsCommand { get; private set; }
 
         /// <summary>
         /// Gets the Expand Rows Command
         /// </summary>
-        public ReactiveCommand<object> CollpaseRowsCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CollpaseRowsCommand { get; private set; }
 
         /// <summary>
         /// Gets the Context Menu for this browser
@@ -421,18 +413,15 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the data-source
         /// </summary>
-        public string DataSource
-        {
-            get { return this.Thing.IDalUri.ToString(); }
-        }
+        public string DataSource => this.Thing.IDalUri.ToString();
 
         /// <summary>
         /// Gets or sets the name of the active <see cref="Person"/>
         /// </summary>
         public string Person
         {
-            get { return this.person; }
-            set { this.RaiseAndSetIfChanged(ref this.person, value); }
+            get => this.person;
+            set => this.RaiseAndSetIfChanged(ref this.person, value);
         }
 
         /// <summary>
@@ -440,8 +429,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public bool HasUpdateStarted
         {
-            get { return this.hasUpdateStarted; }
-            protected set { this.RaiseAndSetIfChanged(ref this.hasUpdateStarted, value); }
+            get => this.hasUpdateStarted;
+            protected set => this.RaiseAndSetIfChanged(ref this.hasUpdateStarted, value);
         }
 
         /// <summary>
@@ -449,9 +438,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public IRowViewModelBase<Thing> SelectedThing
         {
-            get { return this.selectedThing; }
-            set
-            { this.RaiseAndSetIfChanged(ref this.selectedThing, value); }
+            get => this.selectedThing;
+            set => this.RaiseAndSetIfChanged(ref this.selectedThing, value);
         }
 
         /// <summary>
@@ -464,8 +452,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public IRowViewModelBase<Thing> FocusedRow
         {
-            get { return this.focusedRow; }
-            set { this.RaiseAndSetIfChanged(ref this.focusedRow, value); }
+            get => this.focusedRow;
+            set => this.RaiseAndSetIfChanged(ref this.focusedRow, value);
         }
 
         /// <summary>
@@ -473,8 +461,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public string SelectedThingClassKindString
         {
-            get { return this.selectedThingClassKindString; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedThingClassKindString, value); }
+            get => this.selectedThingClassKindString;
+            set => this.RaiseAndSetIfChanged(ref this.selectedThingClassKindString, value);
         }
 
         /// <summary>
@@ -482,8 +470,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public string Feedback
         {
-            get { return this.feedback; }
-            set { this.RaiseAndSetIfChanged(ref this.feedback, value); }
+            get => this.feedback;
+            set => this.RaiseAndSetIfChanged(ref this.feedback, value);
         }
 
         /// <summary>
@@ -496,8 +484,8 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public string Caption
         {
-            get { return this.caption; }
-            protected set { this.RaiseAndSetIfChanged(ref this.caption, value); }
+            get => this.caption;
+            protected set => this.RaiseAndSetIfChanged(ref this.caption, value);
         }
 
         /// <summary>
@@ -505,10 +493,10 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         public string ToolTip
         {
-            get { return this.tooltip; }
-            protected set { this.RaiseAndSetIfChanged(ref this.tooltip, value); }
+            get => this.tooltip;
+            protected set => this.RaiseAndSetIfChanged(ref this.tooltip, value);
         }
-        
+
         /// <summary>
         /// Execute the generic <see cref="CreateCommand"/>
         /// </summary>
@@ -536,7 +524,7 @@ namespace CDP4Composition.Mvvm
                 var context = container ?? this.Thing;
                 var transactionContext = TransactionContextResolver.ResolveContext(context);
 
-                var containerClone = (container != null) ? container.Clone(false) : null;
+                var containerClone = container != null ? container.Clone(false) : null;
                 var transaction = new ThingTransaction(transactionContext, containerClone);
                 this.thingDialogNavigationService.Navigate(thing, transaction, this.Session, true, ThingDialogKind.Create, this.thingDialogNavigationService, containerClone);
             }
@@ -567,7 +555,7 @@ namespace CDP4Composition.Mvvm
         /// </param>
         protected virtual async void ExecuteDeleteCommand(Thing thing)
         {
-            if (thing == null | !IsDeleteCommandAllowed())
+            if ((thing == null) | !this.IsDeleteCommandAllowed())
             {
                 return;
             }
@@ -611,7 +599,6 @@ namespace CDP4Composition.Mvvm
             return true;
         }
 
-
         /// <summary>
         /// Execute the <see cref="DeprecateCommand"/>
         /// </summary>
@@ -626,6 +613,7 @@ namespace CDP4Composition.Mvvm
             var clone = thing.Clone(false);
 
             var isDeprecatedPropertyInfo = clone.GetType().GetProperty("IsDeprecated");
+
             if (isDeprecatedPropertyInfo == null)
             {
                 return;
@@ -708,7 +696,7 @@ namespace CDP4Composition.Mvvm
                 return;
             }
 
-            var containerClone = (thing.Container != null) ? thing.Container.Clone(false) : null;
+            var containerClone = thing.Container != null ? thing.Container.Clone(false) : null;
 
             var context = TransactionContextResolver.ResolveContext(this.Thing);
             var transaction = new ThingTransaction(context);
@@ -752,7 +740,10 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/> that needs to be checked</param>
         /// <returns>True if delete is allowed, otherwise false</returns>
-        protected virtual bool IsDeleteAllowed(Thing thing) => true;
+        protected virtual bool IsDeleteAllowed(Thing thing)
+        {
+            return true;
+        }
 
         /// <summary>
         /// Write the inline operations to the Data-access-layer
@@ -801,9 +792,10 @@ namespace CDP4Composition.Mvvm
                 return;
             }
 
-            CDPMessageBus.Current.SendMessage(new SelectedThingChangedEvent(thing, this.Session));
+            this.Session.CDPMessageBus.SendMessage(new SelectedThingChangedEvent(thing, this.Session));
 
-            this.SelectedThingClassKindString = thing.ClassKind == ClassKind.NotThing ? string.Empty
+            this.SelectedThingClassKindString = thing.ClassKind == ClassKind.NotThing
+                ? string.Empty
                 : this.camelCaseToSpaceConverter.Convert(thing.ClassKind, null, null, null).ToString();
         }
 
@@ -851,6 +843,7 @@ namespace CDP4Composition.Mvvm
         private void ExecuteCollapseRows()
         {
             var rowViewModelBase = this.SelectedThing;
+
             if (rowViewModelBase != null)
             {
                 rowViewModelBase.CollapseAllRows();
@@ -863,10 +856,11 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         protected virtual void InitializeCommands()
         {
-            var sessionEventListener = CDPMessageBus.Current.Listen<SessionEvent>()
+            var sessionEventListener = this.Session.CDPMessageBus.Listen<SessionEvent>()
                 .Where(sessionEvent => sessionEvent.Session == this.Session && (sessionEvent.Status == SessionStatus.BeginUpdate || sessionEvent.Status == SessionStatus.EndUpdate))
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.OnAssemblerUpdate);
+
             this.Disposables.Add(sessionEventListener);
 
             var canDelete = this.WhenAnyValue(
@@ -874,43 +868,26 @@ namespace CDP4Composition.Mvvm
                 vm => vm.CanWriteSelectedThing,
                 (selection, canWrite) => selection != null && canWrite && !(selection.Thing is IDeprecatableThing) && !(selection.Thing is ActualFiniteState) && this.IsDeleteAllowed(selection.Thing));
 
-            this.DeleteCommand = ReactiveCommand.Create(canDelete);
-            this.DeleteCommand.Subscribe(_ => this.ExecuteDeleteCommand());
-
-            this.UpdateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanWriteSelectedThing));
-            this.UpdateCommand.Subscribe(_ => this.ExecuteUpdateCommand());
-
-            this.DeprecateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanWriteSelectedThing));
-            this.DeprecateCommand.Subscribe(_ => this.ExecuteDeprecateCommand());
-
-            this.InspectCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null && !(x.Thing is NotThing)));
-            this.InspectCommand.Subscribe(_ => this.ExecuteInspectCommand());
-
-            this.RefreshCommand = ReactiveCommand.Create();
-            this.RefreshCommand.Subscribe(_ => this.ExecuteRefreshCommand());
-
-            this.ExportCommand = ReactiveCommand.Create();
-            this.ExportCommand.Subscribe(_ => this.ExecuteExportCommand());
-
-            this.HelpCommand = ReactiveCommand.Create();
-            this.HelpCommand.Subscribe(_ => this.ExecuteHelpCommand());
-
-            this.ChangeFocusCommand = ReactiveCommand.Create();
-            this.ChangeFocusCommand.Subscribe(_ => this.ExecuteChangeFocusCommand());
-
-            this.ExpandRowsCommand = ReactiveCommand.Create();
-            this.ExpandRowsCommand.Subscribe(_ => this.ExecuteExpandRows());
-
-            this.CollpaseRowsCommand = ReactiveCommand.Create();
-            this.CollpaseRowsCommand.Subscribe(_ => this.ExecuteCollapseRows());
+            this.DeleteCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteCommand, canDelete);
+            this.UpdateCommand = ReactiveCommandCreator.Create(this.ExecuteUpdateCommand, this.WhenAnyValue(x => x.CanWriteSelectedThing));
+            this.DeprecateCommand = ReactiveCommandCreator.Create(this.ExecuteDeprecateCommand, this.WhenAnyValue(x => x.CanWriteSelectedThing));
+            this.InspectCommand = ReactiveCommandCreator.Create(this.ExecuteInspectCommand, this.WhenAnyValue(x => x.SelectedThing).Select(x => x != null && !(x.Thing is NotThing)));
+            this.RefreshCommand = ReactiveCommandCreator.Create(this.ExecuteRefreshCommand);
+            this.ExportCommand = ReactiveCommandCreator.Create(this.ExecuteExportCommand);
+            this.HelpCommand = ReactiveCommandCreator.Create(this.ExecuteHelpCommand);
+            this.ChangeFocusCommand = ReactiveCommandCreator.Create(this.ExecuteChangeFocusCommand);
+            this.ExpandRowsCommand = ReactiveCommandCreator.Create(this.ExecuteExpandRows);
+            this.CollpaseRowsCommand = ReactiveCommandCreator.Create(this.ExecuteCollapseRows);
 
             var iteration = this.Thing as Iteration ?? this.Thing.GetContainerOfType<Iteration>();
+
             if (iteration != null)
             {
-                var domainSwitchSubscription = CDPMessageBus.Current.Listen<DomainChangedEvent>()
+                var domainSwitchSubscription = this.Session.CDPMessageBus.Listen<DomainChangedEvent>()
                     .Where(x => x.Iteration.Iid == iteration.Iid)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(x => this.UpdateDomain(x));
+                    .Subscribe(this.UpdateDomain);
+
                 this.Disposables.Add(domainSwitchSubscription);
             }
         }
@@ -921,6 +898,7 @@ namespace CDP4Composition.Mvvm
         public virtual void PopulateContextMenu()
         {
             this.ContextMenu.Clear();
+
             if (this.SelectedThing is null or RuleViolationRowViewModel)
             {
                 return;
@@ -936,7 +914,7 @@ namespace CDP4Composition.Mvvm
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Inspect", "CTRL+I", this.InspectCommand, MenuItemKind.Inspect));
 
                 if (this.SelectedThing.CanEditThing)
-                { 
+                {
                     if (this.SelectedThing.Thing is IDeprecatableThing deprecableThing)
                     {
                         this.ContextMenu.Add(new ContextMenuItemViewModel(deprecableThing.IsDeprecated ? "Un-Deprecate" : "Deprecate", "", this.DeprecateCommand, MenuItemKind.Deprecate));
@@ -946,7 +924,7 @@ namespace CDP4Composition.Mvvm
                         this.ContextMenu.Add(new ContextMenuItemViewModel(string.Format("Delete this {0}", this.camelCaseToSpaceConverter.Convert(this.SelectedThing.Thing.ClassKind, null, null, null)), "", this.DeleteCommand, MenuItemKind.Delete));
                     }
                 }
-               
+
                 var categorizableThing = this.SelectedThing.Thing as ICategorizableThing;
 
                 if (categorizableThing != null && categorizableThing.Category.Any())
@@ -965,9 +943,7 @@ namespace CDP4Composition.Mvvm
 
             if (this.SelectedThing.ContainedRows.Count > 0)
             {
-                this.ContextMenu.Add(this.SelectedThing.IsExpanded ?
-                    new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
-                    new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+                this.ContextMenu.Add(this.SelectedThing.IsExpanded ? new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) : new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
 
                 if (this.selectedThing.IsExpanded && !this.selectedThing.AllChildRowsExpanded())
                 {
@@ -1056,6 +1032,7 @@ namespace CDP4Composition.Mvvm
         public virtual void StartDrag(IDragInfo dragInfo)
         {
             var dragSource = dragInfo.Payload as IDragSource;
+
             if (dragSource != null)
             {
                 dragSource.StartDrag(dragInfo);
@@ -1081,7 +1058,7 @@ namespace CDP4Composition.Mvvm
         {
             var changeLoadingMessage = loadingMessage != string.Empty;
             this.IsBusy = true;
-            
+
             if (changeLoadingMessage)
             {
                 this.LoadingMessage = loadingMessage;

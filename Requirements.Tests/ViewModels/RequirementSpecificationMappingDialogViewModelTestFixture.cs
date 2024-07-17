@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequirementSpecificationMappingDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="RequirementSpecificationMappingDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,6 +30,8 @@ namespace CDP4Requirements.Tests.ReqIF
     using System.IO;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -47,7 +49,7 @@ namespace CDP4Requirements.Tests.ReqIF
     using CDP4Requirements.ReqIFDal;
     using CDP4Requirements.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -96,11 +98,13 @@ namespace CDP4Requirements.Tests.ReqIF
         private RequirementsModuleSettings settings;
         private string path;
         private Mock<IServiceLocator> serviceLocator;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -128,7 +132,7 @@ namespace CDP4Requirements.Tests.ReqIF
             this.reqIfSerialiser.Setup(x => x.Deserialize(It.IsAny<string>(), It.IsAny<bool>(), null)).Returns(new[] { this.reqIf });
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString());
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -167,23 +171,24 @@ namespace CDP4Requirements.Tests.ReqIF
             var thingFactory = new ThingFactory(this.iteration, new Dictionary<DatatypeDefinition, DatatypeDefinitionMap>(), new Dictionary<SpecType, SpecTypeMap>(), this.domain);
             this.dialog = new RequirementSpecificationMappingDialogViewModel(thingFactory, this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, "EN", this.settings.SavedConfigurations[0] as ImportMappingConfiguration);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [Test]
-        public void VerifyThatCancelCommandWorks()
+        public async Task VerifyThatCancelCommandWorks()
         {
-            this.dialog.CancelCommand.Execute(null);
+            await this.dialog.CancelCommand.Execute();
             Assert.IsFalse(this.dialog.DialogResult.Result.Value);
         }
 
         [Test]
-        public void VerifyThatExecuteSaveMappingWorks()
+        public async Task VerifyThatExecuteSaveMappingWorks()
         {
-            this.dialog.SaveMappingCommand.Execute(null);
+            await this.dialog.SaveMappingCommand.Execute();
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<SavedConfigurationDialogViewModel<RequirementsModuleSettings>>()), Times.Once);
             this.settings.SavedConfigurations.Cast<ImportMappingConfiguration>().First().Name = "Loft";
 
-            this.dialog.SaveMappingCommand.Execute(null);
+            await this.dialog.SaveMappingCommand.Execute();
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<SavedConfigurationDialogViewModel<RequirementsModuleSettings>>()), Times.Once);
             this.pluginSettingService.Verify(x => x.Write(It.IsAny<PluginSettings>(), It.IsAny<JsonConverter[]>()), Times.Once);
         }

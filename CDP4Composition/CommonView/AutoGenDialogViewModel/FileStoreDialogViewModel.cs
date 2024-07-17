@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="FileStoreDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="FileStoreDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="FileStore"/>
@@ -164,47 +165,47 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Folder
         /// </summary>
-        public ReactiveCommand<object> CreateFolderCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateFolderCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Folder
         /// </summary>
-        public ReactiveCommand<object> DeleteFolderCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteFolderCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Folder
         /// </summary>
-        public ReactiveCommand<object> EditFolderCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditFolderCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Folder
         /// </summary>
-        public ReactiveCommand<object> InspectFolderCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectFolderCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a File
         /// </summary>
-        public ReactiveCommand<object> CreateFileCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateFileCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a File
         /// </summary>
-        public ReactiveCommand<object> DeleteFileCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteFileCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a File
         /// </summary>
-        public ReactiveCommand<object> EditFileCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditFileCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a File
         /// </summary>
-        public ReactiveCommand<object> InspectFileCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectFileCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -217,35 +218,35 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedFolderCommand = this.WhenAny(vm => vm.SelectedFolder, v => v.Value != null);
             var canExecuteEditSelectedFolderCommand = this.WhenAny(vm => vm.SelectedFolder, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateFolderCommand = ReactiveCommand.Create(canExecuteCreateFolderCommand);
+            this.CreateFolderCommand = ReactiveCommandCreator.Create(canExecuteCreateFolderCommand);
             this.CreateFolderCommand.Subscribe(_ => this.ExecuteCreateCommand<Folder>(this.PopulateFolder));
 
-            this.DeleteFolderCommand = ReactiveCommand.Create(canExecuteEditSelectedFolderCommand);
+            this.DeleteFolderCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedFolderCommand);
             this.DeleteFolderCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedFolder.Thing, this.PopulateFolder));
 
-            this.EditFolderCommand = ReactiveCommand.Create(canExecuteEditSelectedFolderCommand);
+            this.EditFolderCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedFolderCommand);
             this.EditFolderCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedFolder.Thing, this.PopulateFolder));
 
-            this.InspectFolderCommand = ReactiveCommand.Create(canExecuteInspectSelectedFolderCommand);
+            this.InspectFolderCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedFolderCommand);
             this.InspectFolderCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedFolder.Thing));
             
             var canExecuteCreateFileCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedFileCommand = this.WhenAny(vm => vm.SelectedFile, v => v.Value != null);
             var canExecuteEditSelectedFileCommand = this.WhenAny(vm => vm.SelectedFile, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateFileCommand = ReactiveCommand.Create(canExecuteCreateFileCommand);
+            this.CreateFileCommand = ReactiveCommandCreator.Create(canExecuteCreateFileCommand);
             this.CreateFileCommand.Subscribe(_ => this.ExecuteCreateCommand<File>(this.PopulateFile));
 
-            this.DeleteFileCommand = ReactiveCommand.Create(canExecuteEditSelectedFileCommand);
+            this.DeleteFileCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedFileCommand);
             this.DeleteFileCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedFile.Thing, this.PopulateFile));
 
-            this.EditFileCommand = ReactiveCommand.Create(canExecuteEditSelectedFileCommand);
+            this.EditFileCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedFileCommand);
             this.EditFileCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedFile.Thing, this.PopulateFile));
 
-            this.InspectFileCommand = ReactiveCommand.Create(canExecuteInspectSelectedFileCommand);
+            this.InspectFileCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedFileCommand);
             this.InspectFileCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedFile.Thing));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

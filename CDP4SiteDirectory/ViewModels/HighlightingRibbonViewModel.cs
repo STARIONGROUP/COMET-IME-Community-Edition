@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HighlightingRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="HighlightingRibbonViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -27,9 +27,11 @@ namespace CDP4SiteDirectory.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using CDP4Composition.Events;
+    using CDP4Composition.Mvvm;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -41,6 +43,11 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class HighlightingRibbonViewModel : ReactiveObject
     {
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
         /// <summary>
         /// Backing field for <see cref="HasSession"/>
         /// </summary>
@@ -54,29 +61,29 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="HighlightingRibbonViewModel"/> class
         /// </summary>
-        public HighlightingRibbonViewModel()
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public HighlightingRibbonViewModel(ICDPMessageBus messageBus)
         {
-            this.openSessions = new ReactiveList<ISession> { ChangeTrackingEnabled = true };
-            this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
+            this.messageBus = messageBus;
+            this.openSessions = new ReactiveList<ISession>();
+            this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            this.ClearHighlightingCommand = ReactiveCommand.Create();
-            this.ClearHighlightingCommand.Subscribe(_ => this.ExecuteClearHighlightingCommand());
+            this.ClearHighlightingCommand = ReactiveCommandCreator.Create(this.ExecuteClearHighlightingCommand);
         }
 
         /// <summary>
         /// Gets a value indicating whether there are open <see cref="ISession"/>s
         /// </summary>
-        public bool HasSession
-        {
-            get { return this.hasSession.Value; }
-        }
+        public bool HasSession => this.hasSession.Value;
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to clear highlighting.
         /// </summary>
-        public ReactiveCommand<object> ClearHighlightingCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ClearHighlightingCommand { get; private set; }
 
         /// <summary>
         /// The event-handler that is invoked by the subscription that listens for updates
@@ -93,13 +100,14 @@ namespace CDP4SiteDirectory.ViewModels
                     this.openSessions.Add(sessionChange.Session);
                     break;
                 case SessionStatus.Closed:
+                {
+                    var sessionToRemove = this.openSessions.SingleOrDefault(x => x == sessionChange.Session);
+
+                    if (sessionToRemove != null)
                     {
-                        var sessionToRemove = this.openSessions.SingleOrDefault(x => x == sessionChange.Session);
-                        if (sessionToRemove != null)
-                        {
-                            this.openSessions.Remove(sessionToRemove);
-                        }
+                        this.openSessions.Remove(sessionToRemove);
                     }
+                }
 
                     break;
             }
@@ -111,7 +119,7 @@ namespace CDP4SiteDirectory.ViewModels
         private void ExecuteClearHighlightingCommand()
         {
             // clear all highlights
-            CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
+            this.messageBus.SendMessage(new CancelHighlightEvent());
         }
     }
 }

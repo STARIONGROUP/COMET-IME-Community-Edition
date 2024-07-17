@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ElementDefinitionDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ElementDefinition"/>
@@ -166,62 +167,62 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ElementUsage
         /// </summary>
-        public ReactiveCommand<object> CreateContainedElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateContainedElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ElementUsage
         /// </summary>
-        public ReactiveCommand<object> DeleteContainedElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteContainedElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ElementUsage
         /// </summary>
-        public ReactiveCommand<object> EditContainedElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditContainedElementCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ElementUsage
         /// </summary>
-        public ReactiveCommand<object> InspectContainedElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectContainedElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Parameter
         /// </summary>
-        public ReactiveCommand<object> CreateParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Parameter
         /// </summary>
-        public ReactiveCommand<object> DeleteParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteParameterCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Parameter
         /// </summary>
-        public ReactiveCommand<object> EditParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditParameterCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Parameter
         /// </summary>
-        public ReactiveCommand<object> InspectParameterCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectParameterCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ParameterGroup
         /// </summary>
-        public ReactiveCommand<object> CreateParameterGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterGroupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ParameterGroup
         /// </summary>
-        public ReactiveCommand<object> DeleteParameterGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteParameterGroupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ParameterGroup
         /// </summary>
-        public ReactiveCommand<object> EditParameterGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditParameterGroupCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ParameterGroup
         /// </summary>
-        public ReactiveCommand<object> InspectParameterGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectParameterGroupCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -234,48 +235,48 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedContainedElementCommand = this.WhenAny(vm => vm.SelectedContainedElement, v => v.Value != null);
             var canExecuteEditSelectedContainedElementCommand = this.WhenAny(vm => vm.SelectedContainedElement, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateContainedElementCommand = ReactiveCommand.Create(canExecuteCreateContainedElementCommand);
+            this.CreateContainedElementCommand = ReactiveCommandCreator.Create(canExecuteCreateContainedElementCommand);
             this.CreateContainedElementCommand.Subscribe(_ => this.ExecuteCreateCommand<ElementUsage>(this.PopulateContainedElement));
 
-            this.DeleteContainedElementCommand = ReactiveCommand.Create(canExecuteEditSelectedContainedElementCommand);
+            this.DeleteContainedElementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedContainedElementCommand);
             this.DeleteContainedElementCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedContainedElement.Thing, this.PopulateContainedElement));
 
-            this.EditContainedElementCommand = ReactiveCommand.Create(canExecuteEditSelectedContainedElementCommand);
+            this.EditContainedElementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedContainedElementCommand);
             this.EditContainedElementCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedContainedElement.Thing, this.PopulateContainedElement));
 
-            this.InspectContainedElementCommand = ReactiveCommand.Create(canExecuteInspectSelectedContainedElementCommand);
+            this.InspectContainedElementCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedContainedElementCommand);
             this.InspectContainedElementCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedContainedElement.Thing));
             
             var canExecuteCreateParameterCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedParameterCommand = this.WhenAny(vm => vm.SelectedParameter, v => v.Value != null);
             var canExecuteEditSelectedParameterCommand = this.WhenAny(vm => vm.SelectedParameter, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateParameterCommand = ReactiveCommand.Create(canExecuteCreateParameterCommand);
+            this.CreateParameterCommand = ReactiveCommandCreator.Create(canExecuteCreateParameterCommand);
             this.CreateParameterCommand.Subscribe(_ => this.ExecuteCreateCommand<Parameter>(this.PopulateParameter));
 
-            this.DeleteParameterCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterCommand);
+            this.DeleteParameterCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterCommand);
             this.DeleteParameterCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedParameter.Thing, this.PopulateParameter));
 
-            this.EditParameterCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterCommand);
+            this.EditParameterCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterCommand);
             this.EditParameterCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedParameter.Thing, this.PopulateParameter));
 
-            this.InspectParameterCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterCommand);
+            this.InspectParameterCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterCommand);
             this.InspectParameterCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameter.Thing));
             
             var canExecuteCreateParameterGroupCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedParameterGroupCommand = this.WhenAny(vm => vm.SelectedParameterGroup, v => v.Value != null);
             var canExecuteEditSelectedParameterGroupCommand = this.WhenAny(vm => vm.SelectedParameterGroup, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateParameterGroupCommand = ReactiveCommand.Create(canExecuteCreateParameterGroupCommand);
+            this.CreateParameterGroupCommand = ReactiveCommandCreator.Create(canExecuteCreateParameterGroupCommand);
             this.CreateParameterGroupCommand.Subscribe(_ => this.ExecuteCreateCommand<ParameterGroup>(this.PopulateParameterGroup));
 
-            this.DeleteParameterGroupCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterGroupCommand);
+            this.DeleteParameterGroupCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterGroupCommand);
             this.DeleteParameterGroupCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedParameterGroup.Thing, this.PopulateParameterGroup));
 
-            this.EditParameterGroupCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterGroupCommand);
+            this.EditParameterGroupCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterGroupCommand);
             this.EditParameterGroupCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedParameterGroup.Thing, this.PopulateParameterGroup));
 
-            this.InspectParameterGroupCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterGroupCommand);
+            this.InspectParameterGroupCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterGroupCommand);
             this.InspectParameterGroupCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameterGroup.Thing));
         }
 

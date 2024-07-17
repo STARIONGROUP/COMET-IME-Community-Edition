@@ -4,8 +4,8 @@
   <targets>
     <!--
     <target name="logfile" xsi:type="File" createDirs="true" 
-            fileName="${specialfolder:LocalApplicationData}/RHEA/CDP4/Addin.log" 
-            archiveFileName="${specialfolder:LocalApplicationData}/RHEA/CDP4/Addin.log.{#}" 
+            fileName="${specialfolder:LocalApplicationData}/STARION/CDP4-COMET/Addin.log" 
+            archiveFileName="${specialfolder:LocalApplicationData}/STARION/CDP4-COMET/Addin.log.{#}" 
             archiveEvery="Day" 
             archiveNumbering="Rolling"
             layout="${longdate}|${level:uppercase=true}|${logger}|${message}">     

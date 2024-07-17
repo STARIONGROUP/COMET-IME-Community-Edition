@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="QuantityKindFactorDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+// <copyright file="QuantityKindFactorDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +29,7 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Windows.Input;
 
     using BasicRdl.ViewModels.Dialogs;
 
@@ -44,7 +45,7 @@ namespace BasicRdl.Tests.ViewModels
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -89,7 +90,7 @@ namespace BasicRdl.Tests.ViewModels
             this.siteDir.SiteReferenceDataLibrary.Add(rdl);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             var chainOfContainers = new[] { rdl };
-            
+
             this.cache.TryAdd(new CacheKey(testDerivedQuantityKind.Iid, null), new Lazy<Thing>(() => testDerivedQuantityKind));
             var clone = testDerivedQuantityKind.Clone(false);
 
@@ -99,6 +100,7 @@ namespace BasicRdl.Tests.ViewModels
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(new CDPMessageBus());
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
 
             this.viewmodel = new QuantityKindFactorDialogViewModel(this.quantityKindFactor, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, clone, chainOfContainers);
@@ -115,7 +117,7 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyThatOkCommandWorks()
         {
-            this.viewmodel.OkCommand.Execute(null);
+            ((ICommand)this.viewmodel.OkCommand).Execute(default);
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
             Assert.IsNull(this.viewmodel.WriteException);
@@ -127,7 +129,7 @@ namespace BasicRdl.Tests.ViewModels
         {
             this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Throws(new Exception("test"));
 
-            this.viewmodel.OkCommand.Execute(null);
+            ((ICommand)this.viewmodel.OkCommand).Execute(default);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
             Assert.IsNotNull(this.viewmodel.WriteException);
@@ -137,14 +139,14 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyUpdateOkCanExecute()
         {
-            Assert.IsFalse(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
             Assert.That(this.viewmodel.Exponent, Is.Null.Or.Empty);
             Assert.IsNotEmpty(this.viewmodel.PossibleQuantityKind);
             Assert.IsNull(this.viewmodel.SelectedQuantityKind);
             this.viewmodel.Exponent = "2";
-            Assert.IsFalse(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
             this.viewmodel.SelectedQuantityKind = this.viewmodel.PossibleQuantityKind.First();
-            Assert.IsTrue(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
         }
 
         [Test]

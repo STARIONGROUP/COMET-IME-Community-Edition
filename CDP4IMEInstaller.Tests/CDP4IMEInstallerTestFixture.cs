@@ -1,12 +1,12 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CDP4IMEInstallerTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CDP4IMEInstallerTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -44,7 +44,7 @@ namespace CDP4IMEInstaller.Tests
     public class CDP4IMEInstallerTestFixture
     {
         private KnownAssembliesClassDrop knownAssembliesClassDrop;
-        private string devExpressVersion = "v22.2";
+        private string devExpressVersion = "v23.2";
         private string currentConfiguration;
 
         [SetUp]

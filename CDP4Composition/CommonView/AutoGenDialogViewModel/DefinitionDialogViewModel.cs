@@ -1,11 +1,11 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DefinitionDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA S.A.
+// <copyright file="DefinitionDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Kamil Wojnowski, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -46,6 +46,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Definition"/>
@@ -185,22 +186,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Citation
         /// </summary>
-        public ReactiveCommand<object> CreateCitationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateCitationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Citation
         /// </summary>
-        public ReactiveCommand<object> DeleteCitationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteCitationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Citation
         /// </summary>
-        public ReactiveCommand<object> EditCitationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditCitationCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Citation
         /// </summary>
-        public ReactiveCommand<object> InspectCitationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectCitationCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -213,16 +214,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedCitationCommand = this.WhenAny(vm => vm.SelectedCitation, v => v.Value != null);
             var canExecuteEditSelectedCitationCommand = this.WhenAny(vm => vm.SelectedCitation, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateCitationCommand = ReactiveCommand.Create(canExecuteCreateCitationCommand);
+            this.CreateCitationCommand = ReactiveCommandCreator.Create(canExecuteCreateCitationCommand);
             this.CreateCitationCommand.Subscribe(_ => this.ExecuteCreateCommand<Citation>(this.PopulateCitation));
 
-            this.DeleteCitationCommand = ReactiveCommand.Create(canExecuteEditSelectedCitationCommand);
+            this.DeleteCitationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedCitationCommand);
             this.DeleteCitationCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedCitation.Thing, this.PopulateCitation));
 
-            this.EditCitationCommand = ReactiveCommand.Create(canExecuteEditSelectedCitationCommand);
+            this.EditCitationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedCitationCommand);
             this.EditCitationCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedCitation.Thing, this.PopulateCitation));
 
-            this.InspectCitationCommand = ReactiveCommand.Create(canExecuteInspectSelectedCitationCommand);
+            this.InspectCitationCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedCitationCommand);
             this.InspectCitationCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedCitation.Thing));
         }
 

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BasicRdlRibbonPartTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="BasicRdlRibbonPartTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -48,18 +48,19 @@ namespace BasicRdl.Tests
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
     using NUnit.Framework;
 
     using ReactiveUI;
-    
+
     /// <summary>
     /// TestFixture for the <see cref="BasicRdlRibbonPart"/>
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]    
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class BasicRdlRibbonPartTestFixture
     {
         private Uri uri;
@@ -74,13 +75,15 @@ namespace BasicRdl.Tests
         private Person person;
         private Mock<IFavoritesService> favoritesService;
         private Mock<IFilterStringService> filterStringService;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.messageBus = new CDPMessageBus();
+            this.uri = new Uri("https://www.stariongroup.eu");
             this.SetupRecognizePackUir();
 
             this.session = new Mock<ISession>();
@@ -102,15 +105,17 @@ namespace BasicRdl.Tests
 
             this.favoritesService.Setup(x => x.GetFavoriteItemsCollectionByType(It.IsAny<ISession>(), It.IsAny<Type>()))
                 .Returns(new HashSet<Guid>());
+
             this.favoritesService.Setup(x =>
                 x.SubscribeToChanges(It.IsAny<ISession>(), It.IsAny<Type>(), It.IsAny<Action<HashSet<Guid>>>())).Returns(new Mock<IDisposable>().Object);
 
             this.session.Setup(x => x.PermissionService).Returns(this.permittingPermissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.amountOfRibbonControls = 6;
             this.order = 1;
 
-            this.ribbonPart = new BasicRdlRibbonPart(this.order, this.panelNavigationService.Object, null, null, null, this.favoritesService.Object);
+            this.ribbonPart = new BasicRdlRibbonPart(this.order, this.panelNavigationService.Object, null, null, null, this.favoritesService.Object, this.messageBus);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.dialogNavigationService.Object);
@@ -120,7 +125,7 @@ namespace BasicRdl.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         /// <summary>
@@ -138,8 +143,8 @@ namespace BasicRdl.Tests
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine(ex);
-            }            
+                Console.WriteLine(ex);
+            }
         }
 
         [Test]
@@ -157,7 +162,7 @@ namespace BasicRdl.Tests
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
             Assert.IsNull(this.ribbonPart.Session);
         }
 
@@ -165,7 +170,7 @@ namespace BasicRdl.Tests
         public void VerifyThatIfFluentRibbonIsNullTheSessionEventHasNoEffect()
         {
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
             Assert.IsNull(this.ribbonPart.Session);
         }
 
@@ -177,12 +182,12 @@ namespace BasicRdl.Tests
             fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.AreEqual(this.session.Object, this.ribbonPart.Session);
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsNull(this.ribbonPart.Session);
         }
@@ -196,7 +201,7 @@ namespace BasicRdl.Tests
 
             // open viemodels
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             await this.ribbonPart.OnAction("ShowMeasurementUnits");
             this.panelNavigationService.Verify(x => x.OpenExistingOrOpenInAddIn(It.IsAny<MeasurementUnitsBrowserViewModel>()));
@@ -215,7 +220,7 @@ namespace BasicRdl.Tests
 
             // close viewmodels
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<MeasurementUnitsBrowserViewModel>()));
             this.panelNavigationService.Verify(x => x.CloseInAddIn(It.IsAny<MeasurementScalesBrowserViewModel>()));
@@ -246,7 +251,7 @@ namespace BasicRdl.Tests
             Assert.IsFalse(this.ribbonPart.GetEnabled("unknownRibbonControlId"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(openSessionEvent);
+            this.messageBus.SendMessage(openSessionEvent);
 
             Assert.IsTrue(this.ribbonPart.GetEnabled("ShowMeasurementUnits"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("ShowMeasurementScales"));
@@ -256,7 +261,7 @@ namespace BasicRdl.Tests
             Assert.IsFalse(this.ribbonPart.GetEnabled("unknownRibbonControlId"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(closeSessionEvent);
+            this.messageBus.SendMessage(closeSessionEvent);
 
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowMeasurementUnits"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("ShowMeasurementScales"));

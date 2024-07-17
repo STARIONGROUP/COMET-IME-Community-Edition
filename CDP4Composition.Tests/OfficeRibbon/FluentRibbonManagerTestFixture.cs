@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FluentRibbonManagerTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="FluentRibbonManagerTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -16,10 +35,13 @@ namespace CDP4Composition.Tests
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    using CDP4Dal.Permission;
+
+    using CDP4Dal;
+
     using Moq;
+
     using NUnit.Framework;
-    
+
     /// <summary>
     /// Suite of tests for the <see cref="FluentRibbonManager"/> class
     /// </summary>
@@ -30,7 +52,7 @@ namespace CDP4Composition.Tests
         private RibbonPartTest ribbonPart;
         private string existingribbonpartid;
         private string nonexsitingribbonpartid;
-        private string ribbonXml;        
+        private string ribbonXml;
         private const string content = "some content";
 
         [SetUp]
@@ -44,8 +66,8 @@ namespace CDP4Composition.Tests
 
             this.nonexsitingribbonpartid = "a non exsting control";
 
-            this.ribbonPart = new RibbonPartTest(1, this.panelNavigationService.Object, null, null, null);
-            this.fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);            
+            this.ribbonPart = new RibbonPartTest(1, this.panelNavigationService.Object, null, null, null, new CDPMessageBus());
+            this.fluentRibbonManager.RegisterRibbonPart(this.ribbonPart);
         }
 
         [Test]
@@ -65,6 +87,7 @@ namespace CDP4Composition.Tests
                     }
                 }
             }
+
             Assert.That(fluentXml, Is.Not.Null.Or.Empty);
         }
 
@@ -114,7 +137,7 @@ namespace CDP4Composition.Tests
         public void VerifyThatGetScreenTipReturnsExpected()
         {
             Assert.AreEqual(string.Empty, this.fluentRibbonManager.GetScreentip(this.nonexsitingribbonpartid));
-            
+
             var screentip = this.GenerateRandomString(1024);
             this.ribbonPart.Screentip = screentip;
             Assert.AreEqual(screentip, this.fluentRibbonManager.GetScreentip(this.existingribbonpartid));
@@ -258,11 +281,11 @@ namespace CDP4Composition.Tests
         public string GenerateRandomString(int length)
         {
             var random = new Random();
-            string randomString = string.Empty;
+            var randomString = string.Empty;
             int randNumber;
 
             // Loop ‘length’ times to generate a random number or character
-            for (int i = 0; i < length; i++)
+            for (var i = 0; i < length; i++)
             {
                 if (random.Next(1, 3) == 1)
                 {
@@ -272,7 +295,7 @@ namespace CDP4Composition.Tests
                 {
                     randNumber = random.Next(48, 58); //int {0-9}
                 }
-                
+
                 // append random char or digit to random string
                 randomString = randomString + (char)randNumber;
             }
@@ -290,8 +313,8 @@ namespace CDP4Composition.Tests
     /// </summary>
     internal class RibbonPartTest : RibbonPart
     {
-        internal RibbonPartTest(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService)
+        internal RibbonPartTest(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, ICDPMessageBus messageBus)
+            : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, messageBus)
         {
         }
 

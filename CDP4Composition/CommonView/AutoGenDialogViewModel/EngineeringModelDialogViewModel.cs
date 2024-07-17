@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="EngineeringModelDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="EngineeringModelDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -29,6 +29,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="EngineeringModel"/>
@@ -242,137 +243,137 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedEngineeringModelSetup"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedEngineeringModelSetupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedEngineeringModelSetupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a CommonFileStore
         /// </summary>
-        public ReactiveCommand<object> CreateCommonFileStoreCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateCommonFileStoreCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a CommonFileStore
         /// </summary>
-        public ReactiveCommand<object> DeleteCommonFileStoreCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteCommonFileStoreCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a CommonFileStore
         /// </summary>
-        public ReactiveCommand<object> EditCommonFileStoreCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditCommonFileStoreCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a CommonFileStore
         /// </summary>
-        public ReactiveCommand<object> InspectCommonFileStoreCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectCommonFileStoreCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ModelLogEntry
         /// </summary>
-        public ReactiveCommand<object> CreateLogEntryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateLogEntryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ModelLogEntry
         /// </summary>
-        public ReactiveCommand<object> DeleteLogEntryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteLogEntryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ModelLogEntry
         /// </summary>
-        public ReactiveCommand<object> EditLogEntryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditLogEntryCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ModelLogEntry
         /// </summary>
-        public ReactiveCommand<object> InspectLogEntryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectLogEntryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Iteration
         /// </summary>
-        public ReactiveCommand<object> CreateIterationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateIterationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Iteration
         /// </summary>
-        public ReactiveCommand<object> DeleteIterationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteIterationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Iteration
         /// </summary>
-        public ReactiveCommand<object> EditIterationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditIterationCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Iteration
         /// </summary>
-        public ReactiveCommand<object> InspectIterationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectIterationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Book
         /// </summary>
-        public ReactiveCommand<object> CreateBookCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateBookCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Book
         /// </summary>
-        public ReactiveCommand<object> DeleteBookCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteBookCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Book
         /// </summary>
-        public ReactiveCommand<object> EditBookCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditBookCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Book
         /// </summary>
-        public ReactiveCommand<object> InspectBookCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectBookCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a Book 
         /// </summary>
-        public ReactiveCommand<object> MoveUpBookCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpBookCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a Book
         /// </summary>
-        public ReactiveCommand<object> MoveDownBookCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownBookCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a EngineeringModelDataNote
         /// </summary>
-        public ReactiveCommand<object> CreateGenericNoteCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateGenericNoteCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a EngineeringModelDataNote
         /// </summary>
-        public ReactiveCommand<object> DeleteGenericNoteCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteGenericNoteCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a EngineeringModelDataNote
         /// </summary>
-        public ReactiveCommand<object> EditGenericNoteCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditGenericNoteCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a EngineeringModelDataNote
         /// </summary>
-        public ReactiveCommand<object> InspectGenericNoteCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectGenericNoteCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ModellingAnnotationItem
         /// </summary>
-        public ReactiveCommand<object> CreateModellingAnnotationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateModellingAnnotationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ModellingAnnotationItem
         /// </summary>
-        public ReactiveCommand<object> DeleteModellingAnnotationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteModellingAnnotationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ModellingAnnotationItem
         /// </summary>
-        public ReactiveCommand<object> EditModellingAnnotationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditModellingAnnotationCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ModellingAnnotationItem
         /// </summary>
-        public ReactiveCommand<object> InspectModellingAnnotationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectModellingAnnotationCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -385,105 +386,105 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedCommonFileStoreCommand = this.WhenAny(vm => vm.SelectedCommonFileStore, v => v.Value != null);
             var canExecuteEditSelectedCommonFileStoreCommand = this.WhenAny(vm => vm.SelectedCommonFileStore, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateCommonFileStoreCommand = ReactiveCommand.Create(canExecuteCreateCommonFileStoreCommand);
+            this.CreateCommonFileStoreCommand = ReactiveCommandCreator.Create(canExecuteCreateCommonFileStoreCommand);
             this.CreateCommonFileStoreCommand.Subscribe(_ => this.ExecuteCreateCommand<CommonFileStore>(this.PopulateCommonFileStore));
 
-            this.DeleteCommonFileStoreCommand = ReactiveCommand.Create(canExecuteEditSelectedCommonFileStoreCommand);
+            this.DeleteCommonFileStoreCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedCommonFileStoreCommand);
             this.DeleteCommonFileStoreCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedCommonFileStore.Thing, this.PopulateCommonFileStore));
 
-            this.EditCommonFileStoreCommand = ReactiveCommand.Create(canExecuteEditSelectedCommonFileStoreCommand);
+            this.EditCommonFileStoreCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedCommonFileStoreCommand);
             this.EditCommonFileStoreCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedCommonFileStore.Thing, this.PopulateCommonFileStore));
 
-            this.InspectCommonFileStoreCommand = ReactiveCommand.Create(canExecuteInspectSelectedCommonFileStoreCommand);
+            this.InspectCommonFileStoreCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedCommonFileStoreCommand);
             this.InspectCommonFileStoreCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedCommonFileStore.Thing));
             
             var canExecuteCreateLogEntryCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedLogEntryCommand = this.WhenAny(vm => vm.SelectedLogEntry, v => v.Value != null);
             var canExecuteEditSelectedLogEntryCommand = this.WhenAny(vm => vm.SelectedLogEntry, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateLogEntryCommand = ReactiveCommand.Create(canExecuteCreateLogEntryCommand);
+            this.CreateLogEntryCommand = ReactiveCommandCreator.Create(canExecuteCreateLogEntryCommand);
             this.CreateLogEntryCommand.Subscribe(_ => this.ExecuteCreateCommand<ModelLogEntry>(this.PopulateLogEntry));
 
-            this.DeleteLogEntryCommand = ReactiveCommand.Create(canExecuteEditSelectedLogEntryCommand);
+            this.DeleteLogEntryCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedLogEntryCommand);
             this.DeleteLogEntryCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedLogEntry.Thing, this.PopulateLogEntry));
 
-            this.EditLogEntryCommand = ReactiveCommand.Create(canExecuteEditSelectedLogEntryCommand);
+            this.EditLogEntryCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedLogEntryCommand);
             this.EditLogEntryCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedLogEntry.Thing, this.PopulateLogEntry));
 
-            this.InspectLogEntryCommand = ReactiveCommand.Create(canExecuteInspectSelectedLogEntryCommand);
+            this.InspectLogEntryCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedLogEntryCommand);
             this.InspectLogEntryCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedLogEntry.Thing));
             
             var canExecuteCreateIterationCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedIterationCommand = this.WhenAny(vm => vm.SelectedIteration, v => v.Value != null);
             var canExecuteEditSelectedIterationCommand = this.WhenAny(vm => vm.SelectedIteration, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateIterationCommand = ReactiveCommand.Create(canExecuteCreateIterationCommand);
+            this.CreateIterationCommand = ReactiveCommandCreator.Create(canExecuteCreateIterationCommand);
             this.CreateIterationCommand.Subscribe(_ => this.ExecuteCreateCommand<Iteration>(this.PopulateIteration));
 
-            this.DeleteIterationCommand = ReactiveCommand.Create(canExecuteEditSelectedIterationCommand);
+            this.DeleteIterationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedIterationCommand);
             this.DeleteIterationCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedIteration.Thing, this.PopulateIteration));
 
-            this.EditIterationCommand = ReactiveCommand.Create(canExecuteEditSelectedIterationCommand);
+            this.EditIterationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedIterationCommand);
             this.EditIterationCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedIteration.Thing, this.PopulateIteration));
 
-            this.InspectIterationCommand = ReactiveCommand.Create(canExecuteInspectSelectedIterationCommand);
+            this.InspectIterationCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedIterationCommand);
             this.InspectIterationCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedIteration.Thing));
             
             var canExecuteCreateBookCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedBookCommand = this.WhenAny(vm => vm.SelectedBook, v => v.Value != null);
             var canExecuteEditSelectedBookCommand = this.WhenAny(vm => vm.SelectedBook, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateBookCommand = ReactiveCommand.Create(canExecuteCreateBookCommand);
+            this.CreateBookCommand = ReactiveCommandCreator.Create(canExecuteCreateBookCommand);
             this.CreateBookCommand.Subscribe(_ => this.ExecuteCreateCommand<Book>(this.PopulateBook));
 
-            this.DeleteBookCommand = ReactiveCommand.Create(canExecuteEditSelectedBookCommand);
+            this.DeleteBookCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedBookCommand);
             this.DeleteBookCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedBook.Thing, this.PopulateBook));
 
-            this.EditBookCommand = ReactiveCommand.Create(canExecuteEditSelectedBookCommand);
+            this.EditBookCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedBookCommand);
             this.EditBookCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedBook.Thing, this.PopulateBook));
 
-            this.InspectBookCommand = ReactiveCommand.Create(canExecuteInspectSelectedBookCommand);
+            this.InspectBookCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedBookCommand);
             this.InspectBookCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedBook.Thing));
 
-            this.MoveUpBookCommand = ReactiveCommand.Create(canExecuteEditSelectedBookCommand);
+            this.MoveUpBookCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedBookCommand);
             this.MoveUpBookCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Book, this.SelectedBook));
 
-            this.MoveDownBookCommand = ReactiveCommand.Create(canExecuteEditSelectedBookCommand);
+            this.MoveDownBookCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedBookCommand);
             this.MoveDownBookCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Book, this.SelectedBook));
             
             var canExecuteCreateGenericNoteCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedGenericNoteCommand = this.WhenAny(vm => vm.SelectedGenericNote, v => v.Value != null);
             var canExecuteEditSelectedGenericNoteCommand = this.WhenAny(vm => vm.SelectedGenericNote, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateGenericNoteCommand = ReactiveCommand.Create(canExecuteCreateGenericNoteCommand);
+            this.CreateGenericNoteCommand = ReactiveCommandCreator.Create(canExecuteCreateGenericNoteCommand);
             this.CreateGenericNoteCommand.Subscribe(_ => this.ExecuteCreateCommand<EngineeringModelDataNote>(this.PopulateGenericNote));
 
-            this.DeleteGenericNoteCommand = ReactiveCommand.Create(canExecuteEditSelectedGenericNoteCommand);
+            this.DeleteGenericNoteCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedGenericNoteCommand);
             this.DeleteGenericNoteCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedGenericNote.Thing, this.PopulateGenericNote));
 
-            this.EditGenericNoteCommand = ReactiveCommand.Create(canExecuteEditSelectedGenericNoteCommand);
+            this.EditGenericNoteCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedGenericNoteCommand);
             this.EditGenericNoteCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedGenericNote.Thing, this.PopulateGenericNote));
 
-            this.InspectGenericNoteCommand = ReactiveCommand.Create(canExecuteInspectSelectedGenericNoteCommand);
+            this.InspectGenericNoteCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedGenericNoteCommand);
             this.InspectGenericNoteCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedGenericNote.Thing));
             
             var canExecuteCreateModellingAnnotationCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedModellingAnnotationCommand = this.WhenAny(vm => vm.SelectedModellingAnnotation, v => v.Value != null);
             var canExecuteEditSelectedModellingAnnotationCommand = this.WhenAny(vm => vm.SelectedModellingAnnotation, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateModellingAnnotationCommand = ReactiveCommand.Create(canExecuteCreateModellingAnnotationCommand);
+            this.CreateModellingAnnotationCommand = ReactiveCommandCreator.Create(canExecuteCreateModellingAnnotationCommand);
             this.CreateModellingAnnotationCommand.Subscribe(_ => this.ExecuteCreateModellingAnnotationCommand());
 
-            this.DeleteModellingAnnotationCommand = ReactiveCommand.Create(canExecuteEditSelectedModellingAnnotationCommand);
+            this.DeleteModellingAnnotationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedModellingAnnotationCommand);
             this.DeleteModellingAnnotationCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedModellingAnnotation.Thing, this.PopulateModellingAnnotation));
 
-            this.EditModellingAnnotationCommand = ReactiveCommand.Create(canExecuteEditSelectedModellingAnnotationCommand);
+            this.EditModellingAnnotationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedModellingAnnotationCommand);
             this.EditModellingAnnotationCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedModellingAnnotation.Thing, this.PopulateModellingAnnotation));
 
-            this.InspectModellingAnnotationCommand = ReactiveCommand.Create(canExecuteInspectSelectedModellingAnnotationCommand);
+            this.InspectModellingAnnotationCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedModellingAnnotationCommand);
             this.InspectModellingAnnotationCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedModellingAnnotation.Thing));
             var canExecuteInspectSelectedEngineeringModelSetupCommand = this.WhenAny(vm => vm.SelectedEngineeringModelSetup, v => v.Value != null);
-            this.InspectSelectedEngineeringModelSetupCommand = ReactiveCommand.Create(canExecuteInspectSelectedEngineeringModelSetupCommand);
+            this.InspectSelectedEngineeringModelSetupCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedEngineeringModelSetupCommand);
             this.InspectSelectedEngineeringModelSetupCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedEngineeringModelSetup));
         }
 

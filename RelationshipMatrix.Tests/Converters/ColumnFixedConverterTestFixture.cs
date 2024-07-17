@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ColumnFixedConverterTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2018-2019 RHEA System S.A.
+// <copyright file="ColumnFixedConverterTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2018-2019 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 

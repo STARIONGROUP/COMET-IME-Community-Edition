@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="SiteRdlBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="SiteRdlBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
 {
@@ -10,19 +29,28 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4SiteDirectory.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -35,18 +63,20 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         private Mock<ISession> session;
         private Person person;
         private Mock<IPermissionService> permissionService;
-        private Mock<IThingDialogNavigationService> thingDialogNavigationService; 
-        private PropertyInfo revInfo = typeof (Thing).GetProperty("RevisionNumber");
-            
+        private Mock<IThingDialogNavigationService> thingDialogNavigationService;
+        private PropertyInfo revInfo = typeof(Thing).GetProperty("RevisionNumber");
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
-            this.uri = new Uri("http://www.rheagroup.com");
-            this.assembler = new Assembler(this.uri);
+            this.uri = new Uri("https://www.stariongroup.eu");
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -70,12 +100,13 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -91,18 +122,18 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         public void VerifyThatEventAreCaught()
         {
             var viewModel = new SiteRdlBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
-            
-            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), null, this.uri) { Name = "rdl0", ShortName = "0", Container = this.siteDir};
-            
+
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), null, this.uri) { Name = "rdl0", ShortName = "0", Container = this.siteDir };
+
             this.siteDir.SiteReferenceDataLibrary.Add(rdl);
             this.revInfo.SetValue(this.siteDir, 10);
-            
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
+
+            this.messageBus.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
             Assert.AreEqual(4, viewModel.SiteRdls.Count);
 
             this.siteDir.SiteReferenceDataLibrary.Remove(rdl);
             this.revInfo.SetValue(this.siteDir, 20);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.siteDir, EventKind.Updated);
             Assert.AreEqual(3, viewModel.SiteRdls.Count);
 
             var rdl21 = viewModel.SiteRdls.SingleOrDefault(x => x.Name == "rdl21" && x.ShortName == "21" && x.RequiredRdlShortName == "2");
@@ -119,7 +150,7 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
         }
 
         [Test]
-        public void VerifyThatCreateCommandWorks()
+        public async Task VerifyThatCreateCommandWorks()
         {
             this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
 
@@ -132,9 +163,8 @@ namespace CDP4SiteDirectory.Tests.SiteRdlBrowser
             viewModel.PopulateContextMenu();
             Assert.AreEqual(1, viewModel.ContextMenu.Count);
 
-            viewModel.CreateCommand.Execute(null);
+            await viewModel.CreateCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<SiteReferenceDataLibrary>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<SiteDirectory>(), null));
         }
-
     }
 }

@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProcessedValueSet.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="ProcessedValueSet.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
 //    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -171,9 +171,9 @@ namespace CDP4Composition.ViewModels
                 isManualValueDirty = true;
                 logger.Debug("The ParameterValueSet.Manual ValueArray has an incorrect number of slots {0}", original.Iid);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
 
             bool isFormualValueDirty;          
@@ -187,9 +187,9 @@ namespace CDP4Composition.ViewModels
                 isFormualValueDirty = true;
                 logger.Debug("The ParameterValueSet.Formula ValueArray has an incorrect number of slots {0}", original.Iid);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
 
             bool isComputedValueDirty;
@@ -203,9 +203,9 @@ namespace CDP4Composition.ViewModels
                 isComputedValueDirty = true;
                 logger.Debug("The ParameterValueSet.Computed ValueArray has an incorrect number of slots {0}", original.Iid);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
 
             bool isReferenceValueDirty;
@@ -219,9 +219,9 @@ namespace CDP4Composition.ViewModels
                 isReferenceValueDirty = true;
                 logger.Debug("The ParameterValueSet.Reference ValueArray has an incorrect number of slots {0}", original.Iid);
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
 
             var isSwitchKindDirty = original.ValueSwitch != switchKind;
@@ -283,14 +283,14 @@ namespace CDP4Composition.ViewModels
             {
                 isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 isManualValueDirty = true;
                 logger.Debug("The ParameterOverrideValueSet.Manual ValueArray has an incorrect number of slots {0}", original.Iid);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
             
             bool isFormualValueDirty;
@@ -299,14 +299,14 @@ namespace CDP4Composition.ViewModels
             {
                 isFormualValueDirty = original.Formula[componentIndex] != formulaValue;
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 isFormualValueDirty = true;
                 logger.Debug("The ParameterOverrideValueSet.Formula ValueArray has an incorrect number of slots {0}", original.Iid);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
             
             bool isComputedValueDirty;            
@@ -315,14 +315,14 @@ namespace CDP4Composition.ViewModels
             {
                 isComputedValueDirty = original.Computed[componentIndex] != stringComputedValue;
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 isComputedValueDirty = true;
                 logger.Debug("The ParameterOverrideValueSet.Computed ValueArray has an incorrect number of slots {0}", original.Iid);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
 
             bool isReferenceValueDirty;            
@@ -331,14 +331,14 @@ namespace CDP4Composition.ViewModels
             {
                 isReferenceValueDirty = original.Reference[componentIndex] != stringReferenceValue;
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 isReferenceValueDirty = true;
                 logger.Debug("The ParameterOverrideValueSet.Reference ValueArray has an incorrect number of slots {0}", original.Iid);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
 
             var isSwitchKindDirty = original.ValueSwitch != switchKind;
@@ -389,14 +389,14 @@ namespace CDP4Composition.ViewModels
             {
                 isManualValueDirty = original.Manual[componentIndex] != stringManualValue;
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentOutOfRangeException)
             {
                 isManualValueDirty = true;
                 logger.Debug("The ParameterSubscriptionValueSet.Manual ValueArray has an incorrect number of slots {0}", original.Iid);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                throw e;
+                throw;
             }
 
             var isSwitchKindDirty = original.ValueSwitch != switchKind;
@@ -465,9 +465,9 @@ namespace CDP4Composition.ViewModels
                 logger.Debug("The IValueSet.Manual ValueArray has an incorrect number of slots");
                 return true;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             return false;
@@ -509,9 +509,9 @@ namespace CDP4Composition.ViewModels
                 logger.Debug("The IValueSet.Computed ValueArray has an incorrect number of slots");
                 return true;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             return false;
@@ -553,9 +553,9 @@ namespace CDP4Composition.ViewModels
                 logger.Debug("The IValueSet.Reference ValueArray has an incorrect number of slots");
                 return true;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             return false;
@@ -597,9 +597,9 @@ namespace CDP4Composition.ViewModels
                 logger.Debug("The IValueSet.Formula ValueArray has an incorrect number of slots");
                 return true;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             return false;
@@ -701,9 +701,9 @@ namespace CDP4Composition.ViewModels
                 clone.ResetManual();
                 clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             try
@@ -715,9 +715,9 @@ namespace CDP4Composition.ViewModels
                 clone.ResetFormula();
                 clone.Formula[valueSetValues.ComponentIndex] = valueSetValues.FormulaValue;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
 
             try
@@ -729,9 +729,9 @@ namespace CDP4Composition.ViewModels
                 clone.ResetComputed();
                 clone.Computed[valueSetValues.ComponentIndex] = valueSetValues.ComputedValue;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
 
             try
@@ -743,9 +743,9 @@ namespace CDP4Composition.ViewModels
                 clone.ResetReference();
                 clone.Reference[valueSetValues.ComponentIndex] = valueSetValues.ReferenceValue;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             clone.ValueSwitch = valueSetValues.SwitchKind;
@@ -771,9 +771,9 @@ namespace CDP4Composition.ViewModels
                 clone.ResetManual();
                 clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             try
@@ -785,9 +785,9 @@ namespace CDP4Composition.ViewModels
                 clone.ResetComputed();
                 clone.Computed[valueSetValues.ComponentIndex] = valueSetValues.ComputedValue;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             try
@@ -799,9 +799,9 @@ namespace CDP4Composition.ViewModels
                 clone.ResetFormula();
                 clone.Formula[valueSetValues.ComponentIndex] = valueSetValues.FormulaValue;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             try
@@ -813,9 +813,9 @@ namespace CDP4Composition.ViewModels
                 clone.ResetReference();
                 clone.Reference[valueSetValues.ComponentIndex] = valueSetValues.ReferenceValue;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
 
             clone.ValueSwitch = valueSetValues.SwitchKind;
@@ -841,9 +841,9 @@ namespace CDP4Composition.ViewModels
                 clone.ResetManual();
                 clone.Manual[valueSetValues.ComponentIndex] = valueSetValues.ManualValue;
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                throw exception;
+                throw;
             }
             
             clone.ValueSwitch = valueSetValues.SwitchKind;

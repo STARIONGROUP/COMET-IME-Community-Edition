@@ -1,24 +1,51 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="TeamCompositionCardViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="TeamCompositionCardViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Tests.TeamComposition
 {
     using System;
     using System.Collections.Concurrent;
     using System.Reactive.Concurrency;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
+
     using CDP4SiteDirectory.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     [TestFixture]
@@ -39,51 +66,54 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         private Organization organization;
         private Person person;
         private TeamCompositionCardViewModel teamCompositionCardViewModel;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
-            this.url = new Uri("http://www.rheagroup.com");
-            
+            this.url = new Uri("https://www.stariongroup.eu");
+
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
 
-            this.domainOfExpertise1 = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.url) {ShortName = "SYS"};
+            this.domainOfExpertise1 = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.url) { ShortName = "SYS" };
             this.domainOfExpertise2 = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.url) { ShortName = "THR" };
 
             this.organization = new Organization(Guid.NewGuid(), this.cache, this.url);
-            this.organization.ShortName = "RHEA";
-            this.organization.Name = "RHEA";
+            this.organization.ShortName = "STARION";
+            this.organization.Name = "STARION";
 
             this.personRole = new PersonRole(Guid.NewGuid(), this.cache, this.url);
+
             this.person = new Person(Guid.NewGuid(), this.cache, this.url)
-                              {
-                                  OrganizationalUnit = "SESS",
-                                  Organization = this.organization,
-                                  Role = this.personRole
-                              };
+            {
+                OrganizationalUnit = "SESS",
+                Organization = this.organization,
+                Role = this.personRole
+            };
 
             this.participantRole = new ParticipantRole(Guid.NewGuid(), this.cache, this.url);
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.url);
             this.participant.Person = this.person;
             this.participant.Role = this.participantRole;
             this.participant.IsActive = true;
-            
+
             this.participant.Domain.Add(this.domainOfExpertise1);
             this.participant.Domain.Add(this.domainOfExpertise2);
 
-
             this.session.Setup(x => x.DataSourceUri).Returns(this.url.ToString);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -91,7 +121,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         {
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
 
-            Assert.AreEqual("RHEA", this.teamCompositionCardViewModel.Organization);
+            Assert.AreEqual("STARION", this.teamCompositionCardViewModel.Organization);
             Assert.AreEqual("SESS", this.teamCompositionCardViewModel.OrganizationalUnit);
             Assert.AreEqual("SYS THR", this.teamCompositionCardViewModel.DomainShortnames);
             Assert.IsTrue(this.teamCompositionCardViewModel.IsActive);
@@ -111,9 +141,9 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
             var type = this.person.GetType();
             type.GetProperty("RevisionNumber").SetValue(this.person, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.person, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.person, EventKind.Updated);
 
-            Assert.AreEqual(this.person.Name, this.teamCompositionCardViewModel.Person); 
+            Assert.AreEqual(this.person.Name, this.teamCompositionCardViewModel.Person);
         }
 
         [Test]
@@ -129,7 +159,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
             var type = this.personRole.GetType();
             type.GetProperty("RevisionNumber").SetValue(this.personRole, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.personRole, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.personRole, EventKind.Updated);
 
             Assert.AreEqual(this.personRole.Name, this.teamCompositionCardViewModel.PersonRole);
         }
@@ -147,7 +177,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
             var type = this.participantRole.GetType();
             type.GetProperty("RevisionNumber").SetValue(this.participantRole, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.participantRole, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.participantRole, EventKind.Updated);
 
             Assert.AreEqual(this.participantRole.Name, this.teamCompositionCardViewModel.ParticipantRole);
         }
@@ -156,32 +186,32 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         public void VerifyThatEmailCanExecuteIsFalseWhenNoEmailExists()
         {
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
-            
+
             Assert.That(this.teamCompositionCardViewModel.EmailAddress, Is.Null.Or.Empty);
 
-            Assert.IsFalse(this.teamCompositionCardViewModel.OpenEmail.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.teamCompositionCardViewModel.OpenEmail).CanExecute(null));
         }
 
         [Test]
         public void VerifyThatIfEmailIsPresentEmailCanExecuteIsTrue()
         {
-            var email = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@rheagroup.com" };
+            var email = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@stariongroup.eu" };
             this.person.EmailAddress.Add(email);
 
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
 
             Assert.AreEqual(email.Value, this.teamCompositionCardViewModel.EmailAddress);
 
-            Assert.IsTrue(this.teamCompositionCardViewModel.OpenEmail.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.teamCompositionCardViewModel.OpenEmail).CanExecute(null));
         }
 
         [Test]
         public void VerifThatDefaultEmailAddresIsUsed()
         {
-            var email = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@rheagroup.com" };
+            var email = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@stariongroup.eu" };
             this.person.EmailAddress.Add(email);
 
-            var defaultEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@rheagroup.com" };
+            var defaultEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@stariongroup.eu" };
             this.person.EmailAddress.Add(defaultEmail);
             this.person.DefaultEmailAddress = defaultEmail;
 
@@ -193,12 +223,12 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         [Test]
         public void VerifuThatIfNoDefaultEmailIsSetFirstEmailIsUsed()
         {
-            var firstEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@rheagroup.com" };
+            var firstEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@stariongroup.eu" };
             this.person.EmailAddress.Add(firstEmail);
 
-            var secondEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@rheagroup.com" };
+            var secondEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@stariongroup.eu" };
             this.person.EmailAddress.Add(secondEmail);
-            
+
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
 
             Assert.AreEqual(firstEmail.Value, this.teamCompositionCardViewModel.EmailAddress);
@@ -257,7 +287,7 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
             var type = firstNumber.GetType();
             type.GetProperty("RevisionNumber").SetValue(firstNumber, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(firstNumber, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(firstNumber, EventKind.Updated);
 
             Assert.AreEqual(firstNumber.Value, this.teamCompositionCardViewModel.TelephoneNumber);
         }
@@ -265,19 +295,19 @@ namespace CDP4SiteDirectory.Tests.TeamComposition
         [Test]
         public void VerifyThatUpdateToEmailAddressIsProcessed()
         {
-            var firstEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@rheagroup.com" };
+            var firstEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "johndoe@stariongroup.eu" };
             this.person.EmailAddress.Add(firstEmail);
 
-            var secondEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@rheagroup.com" };
+            var secondEmail = new EmailAddress(Guid.NewGuid(), this.cache, this.url) { Value = "default@stariongroup.eu" };
             this.person.EmailAddress.Add(secondEmail);
 
             this.teamCompositionCardViewModel = new TeamCompositionCardViewModel(this.participant, this.session.Object, null);
 
-            firstEmail.Value = "johnsemail@rheagroup.com";
+            firstEmail.Value = "johnsemail@stariongroup.eu";
             var type = firstEmail.GetType();
             type.GetProperty("RevisionNumber").SetValue(firstEmail, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(firstEmail, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(firstEmail, EventKind.Updated);
 
             Assert.AreEqual(firstEmail.Value, this.teamCompositionCardViewModel.EmailAddress);
         }

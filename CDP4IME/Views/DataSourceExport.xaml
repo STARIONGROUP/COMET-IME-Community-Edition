@@ -1,4 +1,4 @@
-﻿<dx:DXWindow x:Class="CDP4IME.Views.DataSourceExport"
+﻿<dx:DXWindow x:Class="COMET.Views.DataSourceExport"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -41,6 +41,9 @@
                                       SelectedItem="{Binding Path=SelectedDal,
                                                  Mode=TwoWay,
                                                  UpdateSourceTrigger=PropertyChanged}" />
+                </dxlc:LayoutItem>
+                <dxlc:LayoutItem AddColonToLabel="True" Label="Export Publications">
+                    <dxe:CheckEdit IsChecked="{Binding Path= ExportPublications, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                 </dxlc:LayoutItem>
                 <dxlc:LayoutItem AddColonToLabel="True" Label="Model version">
                     <dxe:ComboBoxEdit DisplayMember="Key"

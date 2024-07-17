@@ -6,6 +6,7 @@
                   xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                   xmlns:converters="clr-namespace:CDP4Composition.Converters"
+                  xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
                   Header="Category"
                   Orientation="Vertical"
                   mc:Ignorable="d"
@@ -13,6 +14,9 @@
                   VerticalAlignment="Stretch">
     <dxlc:LayoutGroup.Resources>
         <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
             <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
         </ResourceDictionary>
     </dxlc:LayoutGroup.Resources>
@@ -30,7 +34,7 @@
                         ItemsSource="{Binding PossibleCategory}"
                         SelectionMode="Multiple">
             <dxe:ListBoxEdit.StyleSettings>
-                <dxe:CheckedListBoxEditStyleSettings />
+                <dxe:CheckedListBoxEditStyleSettings ItemContainerStyle="{StaticResource ListBoxEditItemStyleDeprecated}" />
             </dxe:ListBoxEdit.StyleSettings>
         </dxe:ListBoxEdit>
     </dxlc:LayoutItem>

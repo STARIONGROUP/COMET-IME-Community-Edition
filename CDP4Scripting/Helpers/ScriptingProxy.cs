@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ScriptingProxy.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="ScriptingProxy.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,7 +32,7 @@ namespace CDP4Scripting.Helpers
     using System.Text;
     using System.Windows;
     using System.Windows.Threading;
-    
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
@@ -54,7 +54,8 @@ namespace CDP4Scripting.Helpers
     /// <summary>
     /// The purpose of the <see cref="ScriptingProxy"/> class is to provide access to an <see cref="EngineeringModel"/>
     /// </summary>
-    [Export(typeof(IScriptingProxy)), PartCreationPolicy(CreationPolicy.Shared)]
+    [Export(typeof(IScriptingProxy))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class ScriptingProxy : IScriptingProxy
     {
         /// <summary>
@@ -63,6 +64,7 @@ namespace CDP4Scripting.Helpers
         /// <param name="thingDialogNavigationService">The (MEF injected) instance of <see cref="IThingDialogNavigationService"/>.</param>
         /// <param name="panelNavigationService">The (MEF injected) instance of <see cref="IPanelNavigationService"/>.</param>
         /// <param name="dialogNavigationService">The (MEF injected) instance of <see cref="IDialogNavigationService"/>.</param>
+        /// <param name="loggerfactory">The (MEF injected) instance of <see cref="ILoggerFactory"/>.</param>
         [ImportingConstructor]
         public ScriptingProxy(IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService)
         {
@@ -157,17 +159,19 @@ namespace CDP4Scripting.Helpers
             var sb = new StringBuilder();
             sb.AppendLine("CDP4-COMET Commands \n");
 
-            sb.AppendLine("CDP4-COMET contains a list of commands you can perform from the script. You can use a command as follows : " + $"{ScriptPanelViewModel.Command}.CommandName(parameters) \n");
+            sb.AppendLine(string.Format("COMET contains a list of commands you can perform from the script. You can use a command as follows : " +
+                              "{0}.CommandName(parameters) \n", ScriptPanelViewModel.Command));
 
             sb.AppendLine("List of the commands available \n");
 
             var methods = typeof(ScriptingProxy).GetMethods();
 
             var properties = typeof(ScriptingProxy).GetProperties();
-            
+
             foreach (var property in properties)
             {
                 var attrs = property.GetCustomAttributes(typeof(DocumentationAttribute), false);
+
                 if (attrs.Length == 0)
                 {
                     continue;
@@ -176,6 +180,7 @@ namespace CDP4Scripting.Helpers
                 foreach (var attr in attrs)
                 {
                     var cmdAttr = attr as DocumentationAttribute;
+
                     if (cmdAttr?.Name != null && cmdAttr.Description != null)
                     {
                         sb.AppendLine($"{cmdAttr.Name} : {cmdAttr.Description}");
@@ -186,6 +191,7 @@ namespace CDP4Scripting.Helpers
             foreach (var method in methods)
             {
                 var attrs = method.GetCustomAttributes(typeof(DocumentationAttribute), false);
+
                 if (attrs.Length == 0)
                 {
                     continue;
@@ -194,6 +200,7 @@ namespace CDP4Scripting.Helpers
                 foreach (var attr in attrs)
                 {
                     var cmdAttr = attr as DocumentationAttribute;
+
                     if (cmdAttr?.Name != null && cmdAttr.Description != null)
                     {
                         sb.AppendLine($"{cmdAttr.Name} : {cmdAttr.Description}");
@@ -202,8 +209,8 @@ namespace CDP4Scripting.Helpers
             }
 
             Application.Current.Dispatcher.Invoke(
-                        DispatcherPriority.Input,
-                        new Action(() => this.ScriptingPanelViewModel.OutputTerminal.AppendText(sb.ToString())));
+                DispatcherPriority.Input,
+                new Action(() => this.ScriptingPanelViewModel.OutputTerminal.AppendText(sb.ToString())));
         }
 
         /// <summary>
@@ -219,8 +226,8 @@ namespace CDP4Scripting.Helpers
             else
             {
                 Application.Current.Dispatcher.Invoke(
-                        DispatcherPriority.Input,
-                        new Action(() => this.ScriptingPanelViewModel.OutputTerminal.AppendText("\nNot supported for this language")));
+                    DispatcherPriority.Input,
+                    new Action(() => this.ScriptingPanelViewModel.OutputTerminal.AppendText("\nNot supported for this language")));
             }
         }
 
@@ -247,16 +254,18 @@ namespace CDP4Scripting.Helpers
             if (this.ScriptingPanelViewModel.SelectedSession == null)
             {
                 Application.Current.Dispatcher.Invoke(
-                DispatcherPriority.Input,
-                new Action(() =>
-                    this.ScriptingPanelViewModel.OutputTerminal.AppendText("No session is selected to run the script. ModelCode cannot be executed.\n")));
+                    DispatcherPriority.Input,
+                    new Action(() =>
+                        this.ScriptingPanelViewModel.OutputTerminal.AppendText("No session is selected to run the script. ModelCode cannot be executed.\n")));
+
                 return null;
             }
 
             var data = this.ScriptingPanelViewModel.SelectedSession.Assembler.Cache.Select(x => x.Value)
-                        .Where(lazy => lazy.Value.ClassKind == ClassKind.EngineeringModel)
-                        .Select(lazy => lazy.Value)
-                        .Cast<EngineeringModel>();
+                .Where(lazy => lazy.Value.ClassKind == ClassKind.EngineeringModel)
+                .Select(lazy => lazy.Value)
+                .Cast<EngineeringModel>();
+
             try
             {
                 var engineeringModel = this.FindEngineeringModel(data, splitCommand[0]);
@@ -265,7 +274,7 @@ namespace CDP4Scripting.Helpers
                 var parameter = this.FindParameter(element.Parameter, splitCommand[3]);
                 var value = this.FindValue(parameter.ValueSet, splitCommand[4]);
 
-                return (value);
+                return value;
             }
             catch (Exception ex)
             {
@@ -275,7 +284,7 @@ namespace CDP4Scripting.Helpers
                 return null;
             }
         }
-        
+
         /// <summary>
         /// Get the engineeringmodel by name
         /// </summary>
@@ -349,9 +358,9 @@ namespace CDP4Scripting.Helpers
                 if (elementDefinition.UserFriendlyShortName.ToLower() == elementShortName.ToLower())
                 {
                     return elementDefinition;
-                } 
+                }
             }
-       
+
             return null;
         }
 
@@ -399,25 +408,25 @@ namespace CDP4Scripting.Helpers
             foreach (var valueSet in data)
             {
                 switch (parameterSwitch.ToLower())
-                    {
-                        case "actualvalue":
-                            return valueSet.ActualValue.FirstOrDefault();
+                {
+                    case "actualvalue":
+                        return valueSet.ActualValue.FirstOrDefault();
 
-                        case "computed":    
-                            return valueSet.Computed.FirstOrDefault();
+                    case "computed":
+                        return valueSet.Computed.FirstOrDefault();
 
-                        case "formula":
-                            return valueSet.Formula.FirstOrDefault();
+                    case "formula":
+                        return valueSet.Formula.FirstOrDefault();
 
-                        case "manual":
-                            return valueSet.Manual.FirstOrDefault();
+                    case "manual":
+                        return valueSet.Manual.FirstOrDefault();
 
-                        case "published":
-                            return valueSet.Published.FirstOrDefault();
+                    case "published":
+                        return valueSet.Published.FirstOrDefault();
 
-                        // By default return reference value
-                        default:
-                            return valueSet.Reference.FirstOrDefault();    
+                    // By default return reference value
+                    default:
+                        return valueSet.Reference.FirstOrDefault();
                 }
             }
 
@@ -436,7 +445,7 @@ namespace CDP4Scripting.Helpers
         /// Null if no <see cref="EngineeringModel"/> has a short name that matches with the string entered in parameter.
         /// </returns>
         [Documentation("GetEngineeringModel(string engineeringModelShortName)",
-        "Gets and engineering model.\nA connection to a data source and an open model are required")]
+            "Gets and engineering model.\nA connection to a data source and an open model are required")]
         public EngineeringModel GetEngineeringModel(string engineeringModelShortName)
         {
             if (this.ScriptingPanelViewModel == null)
@@ -448,15 +457,16 @@ namespace CDP4Scripting.Helpers
             {
                 Application.Current.Dispatcher.Invoke(
                     DispatcherPriority.Input,
-                    new Action(() => 
+                    new Action(() =>
                         this.ScriptingPanelViewModel.OutputTerminal.AppendText("No session is selected to run the script. You need to be connected to execute this script.\n")));
+
                 return null;
             }
 
             var engineeringModels = this.ScriptingPanelViewModel.SelectedSession.Assembler.Cache.Select(x => x.Value)
-                       .Where(lazy => lazy.Value.ClassKind == ClassKind.EngineeringModel)
-                       .Select(lazy => lazy.Value)
-                       .Cast<EngineeringModel>();
+                .Where(lazy => lazy.Value.ClassKind == ClassKind.EngineeringModel)
+                .Select(lazy => lazy.Value)
+                .Cast<EngineeringModel>();
 
             foreach (var engineeringModel in engineeringModels)
             {
@@ -486,10 +496,11 @@ namespace CDP4Scripting.Helpers
         /// Null if there is no match.
         /// </returns>
         [Documentation("GetEngineeringModelIteration(string engineeringModelShortName, int iterationNumber)",
-        "Gets and engineering model iteration.\nA connection to a data source and an open model are required")]
+            "Gets and engineering model iteration.\nA connection to a data source and an open model are required")]
         public Iteration GetEngineeringModelIteration(string engineeringModelShortName, int iterationNumber)
         {
             var engineeringModel = this.GetEngineeringModel(engineeringModelShortName);
+
             if (engineeringModel == null)
             {
                 return null;
@@ -527,10 +538,11 @@ namespace CDP4Scripting.Helpers
         /// Null if there is no match.
         /// </returns>
         [Documentation("GetElementDefinition(string engineeringModelShortName, int iterationNumber, string elementDefinitionName)",
-        "Gets an element definition.\nA connection to a data source and an open model are required")]
+            "Gets an element definition.\nA connection to a data source and an open model are required")]
         public ElementDefinition GetElementDefinition(string engineeringModelShortName, int iterationNumber, string elementDefinitionName)
         {
             var iteration = this.GetEngineeringModelIteration(engineeringModelShortName, iterationNumber);
+
             if (iteration == null)
             {
                 return null;
@@ -549,7 +561,6 @@ namespace CDP4Scripting.Helpers
                 new Action(() =>
                     this.ScriptingPanelViewModel.OutputTerminal.AppendText($"Element definition {elementDefinitionName} for the iteration {iterationNumber} of the engineering model {engineeringModelShortName} was not found.")));
             return null;
-
         }
 
         /// <summary>
@@ -572,16 +583,18 @@ namespace CDP4Scripting.Helpers
         /// Null if there is no match.
         /// </returns>
         [Documentation("GetParameter(string engineeringModelShortName, int iterationNumber, string elementDefinitionName, string parameterName)",
-        "Gets a parameter.\nA connection to a data source and an open model are required")]
+            "Gets a parameter.\nA connection to a data source and an open model are required")]
         public Parameter GetParameter(string engineeringModelShortName, int iterationNumber, string elementDefinitionName, string parameterName)
         {
             var elementDefinition = this.GetElementDefinition(engineeringModelShortName, iterationNumber, elementDefinitionName);
+
             if (elementDefinition == null)
             {
                 return null;
             }
 
             parameterName = elementDefinitionName + "." + parameterName;
+
             foreach (var parameter in elementDefinition.Parameter)
             {
                 if (parameter.UserFriendlyShortName.ToLower() == parameterName.ToLower())
@@ -633,6 +646,7 @@ namespace CDP4Scripting.Helpers
         public string GetValue(string engineeringModelShortName, int iterationNumber, string elementDefinitionName, string parameterName, string parameterSwitch)
         {
             var parameter = this.GetParameter(engineeringModelShortName, iterationNumber, elementDefinitionName, parameterName);
+
             if (parameter == null)
             {
                 return null;
@@ -682,9 +696,10 @@ namespace CDP4Scripting.Helpers
             if (this.ScriptingPanelViewModel.SelectedSession == null)
             {
                 Application.Current.Dispatcher.Invoke(
-                DispatcherPriority.Input,
-                new Action(() =>
-                    this.ScriptingPanelViewModel.OutputTerminal.AppendText("No session is selected to run the script. You need to be connected to execute this script.\n")));
+                    DispatcherPriority.Input,
+                    new Action(() =>
+                        this.ScriptingPanelViewModel.OutputTerminal.AppendText("No session is selected to run the script. You need to be connected to execute this script.\n")));
+
                 return null;
             }
 
@@ -705,6 +720,7 @@ namespace CDP4Scripting.Helpers
             foreach (var method in methods)
             {
                 var attrs = method.GetCustomAttributes(typeof(DocumentationAttribute), false);
+
                 if (attrs.Length == 0)
                 {
                     continue;
@@ -713,6 +729,7 @@ namespace CDP4Scripting.Helpers
                 foreach (var attr in attrs)
                 {
                     var cmdAttr = attr as DocumentationAttribute;
+
                     if (cmdAttr?.Name != null && cmdAttr.Description != null)
                     {
                         this.CommandCompletionData.Add(new EditorCompletionData(cmdAttr.Name, cmdAttr.Description));
@@ -723,6 +740,7 @@ namespace CDP4Scripting.Helpers
             foreach (var property in properties)
             {
                 var attrs = property.GetCustomAttributes(typeof(DocumentationAttribute), false);
+
                 if (attrs.Length == 0)
                 {
                     continue;
@@ -731,6 +749,7 @@ namespace CDP4Scripting.Helpers
                 foreach (var attr in attrs)
                 {
                     var cmdAttr = attr as DocumentationAttribute;
+
                     if (cmdAttr?.Name != null && cmdAttr.Description != null)
                     {
                         this.CommandCompletionData.Add(new EditorCompletionData(cmdAttr.Name, cmdAttr.Description));

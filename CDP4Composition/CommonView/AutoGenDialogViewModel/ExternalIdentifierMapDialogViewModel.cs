@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ExternalIdentifierMapDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ExternalIdentifierMapDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ExternalIdentifierMap"/>
@@ -204,32 +205,32 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedExternalFormat"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedExternalFormatCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedExternalFormatCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a IdCorrespondence
         /// </summary>
-        public ReactiveCommand<object> CreateCorrespondenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateCorrespondenceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a IdCorrespondence
         /// </summary>
-        public ReactiveCommand<object> DeleteCorrespondenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteCorrespondenceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a IdCorrespondence
         /// </summary>
-        public ReactiveCommand<object> EditCorrespondenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditCorrespondenceCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a IdCorrespondence
         /// </summary>
-        public ReactiveCommand<object> InspectCorrespondenceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectCorrespondenceCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -242,22 +243,22 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedCorrespondenceCommand = this.WhenAny(vm => vm.SelectedCorrespondence, v => v.Value != null);
             var canExecuteEditSelectedCorrespondenceCommand = this.WhenAny(vm => vm.SelectedCorrespondence, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateCorrespondenceCommand = ReactiveCommand.Create(canExecuteCreateCorrespondenceCommand);
+            this.CreateCorrespondenceCommand = ReactiveCommandCreator.Create(canExecuteCreateCorrespondenceCommand);
             this.CreateCorrespondenceCommand.Subscribe(_ => this.ExecuteCreateCommand<IdCorrespondence>(this.PopulateCorrespondence));
 
-            this.DeleteCorrespondenceCommand = ReactiveCommand.Create(canExecuteEditSelectedCorrespondenceCommand);
+            this.DeleteCorrespondenceCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedCorrespondenceCommand);
             this.DeleteCorrespondenceCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedCorrespondence.Thing, this.PopulateCorrespondence));
 
-            this.EditCorrespondenceCommand = ReactiveCommand.Create(canExecuteEditSelectedCorrespondenceCommand);
+            this.EditCorrespondenceCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedCorrespondenceCommand);
             this.EditCorrespondenceCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedCorrespondence.Thing, this.PopulateCorrespondence));
 
-            this.InspectCorrespondenceCommand = ReactiveCommand.Create(canExecuteInspectSelectedCorrespondenceCommand);
+            this.InspectCorrespondenceCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedCorrespondenceCommand);
             this.InspectCorrespondenceCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedCorrespondence.Thing));
             var canExecuteInspectSelectedExternalFormatCommand = this.WhenAny(vm => vm.SelectedExternalFormat, v => v.Value != null);
-            this.InspectSelectedExternalFormatCommand = ReactiveCommand.Create(canExecuteInspectSelectedExternalFormatCommand);
+            this.InspectSelectedExternalFormatCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedExternalFormatCommand);
             this.InspectSelectedExternalFormatCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedExternalFormat));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

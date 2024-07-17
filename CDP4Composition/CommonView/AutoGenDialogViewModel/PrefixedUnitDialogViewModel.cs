@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="PrefixedUnitDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="PrefixedUnitDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="PrefixedUnit"/>
@@ -109,7 +110,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedPrefix"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedPrefixCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedPrefixCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -118,7 +119,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedPrefixCommand = this.WhenAny(vm => vm.SelectedPrefix, v => v.Value != null);
-            this.InspectSelectedPrefixCommand = ReactiveCommand.Create(canExecuteInspectSelectedPrefixCommand);
+            this.InspectSelectedPrefixCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedPrefixCommand);
             this.InspectSelectedPrefixCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedPrefix));
         }
 

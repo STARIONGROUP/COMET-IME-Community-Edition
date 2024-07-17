@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PropertyGridViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="PropertyGridViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -37,6 +37,7 @@ namespace CDP4PropertyGrid.ViewModels
     using CDP4Dal;
 
     using CDP4PropertyGrid.Views;
+
     using ReactiveUI;
 
     /// <summary>
@@ -66,10 +67,14 @@ namespace CDP4PropertyGrid.ViewModels
         /// <param name="initialize">
         /// a value indicating whether the viewmodel should be initialized
         /// </param>
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public PropertyGridViewModel(bool initialize)
+        public PropertyGridViewModel(bool initialize, ICDPMessageBus messageBus)
         {
             this.thingViewModel = new ThingViewModel<Thing>();
+            this.CDPMessageBus = messageBus;
 
             if (initialize)
             {
@@ -90,6 +95,7 @@ namespace CDP4PropertyGrid.ViewModels
         public PropertyGridViewModel(Thing thing, ISession session)
         {
             this.thingViewModel = new ThingViewModel<Thing>(thing, session);
+            this.CDPMessageBus = session.CDPMessageBus;
             this.Initialize();
         }
 
@@ -98,7 +104,7 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         private void Initialize()
         {
-            this.selectedThingChangedSubscription = CDPMessageBus.Current.Listen<SelectedThingChangedEvent>().Subscribe(this.HandleSelectedThingChanged);
+            this.selectedThingChangedSubscription = this.CDPMessageBus.Listen<SelectedThingChangedEvent>().Subscribe(this.HandleSelectedThingChanged);
         }
 
         /// <summary>
@@ -136,14 +142,19 @@ namespace CDP4PropertyGrid.ViewModels
         /// </summary>
         public bool IsSelected
         {
-            get { return isSelected; }
-            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+            get => this.isSelected;
+            set => this.RaiseAndSetIfChanged(ref this.isSelected, value);
         }
 
         /// <summary>
         /// Gets the <see cref="Thing"/> that is represented by the view-model
         /// </summary>
         public Thing Thing => this.thingViewModel.Thing;
+
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        public ICDPMessageBus CDPMessageBus { get; }
 
         /// <summary>
         /// Creates a new internal view model when the Thing changes
@@ -156,7 +167,7 @@ namespace CDP4PropertyGrid.ViewModels
             this.thingViewModel.Dispose();
 
             this.thingViewModel = new ThingViewModel<Thing>(selectedThingChangedEvent.SelectedThing, selectedThingChangedEvent.Session);
-            this.RaisePropertyChanged(nameof(Thing));
+            this.RaisePropertyChanged(nameof(this.Thing));
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OptionOverviewViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="OptionOverviewViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2018 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,6 +10,9 @@ namespace CDP4Budget.ViewModels
     using System.Dynamic;
     using System.Linq;
     using CDP4Common.EngineeringModelData;
+
+    using CDP4Composition.Mvvm;
+
     using ReactiveUI;
     using Services;
 

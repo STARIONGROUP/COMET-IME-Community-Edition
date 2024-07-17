@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ModelClosingDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="ModelClosingDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,16 +31,21 @@ namespace CDP4ShellDialogs.Tests
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
 
     using CDP4ShellDialogs.ViewModels;
+
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -63,13 +68,24 @@ namespace CDP4ShellDialogs.Tests
         private DomainOfExpertise domain;
         private Assembler assembler;
         private Mock<IPermissionService> permissionService;
+        private CDPMessageBus messageBus;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IMessageBoxService> messageBoxService;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.messageBoxService = new Mock<IMessageBoxService>();
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>())
+                .Returns(this.messageBoxService.Object);
+
+            this.messageBus = new CDPMessageBus();
+            this.uri = new Uri("https://www.stariongroup.eu");
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -105,7 +121,7 @@ namespace CDP4ShellDialogs.Tests
             this.siteDirectory.Model.Add(this.model2);
             this.siteDirectory.Person.Add(this.person);
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             var lazysiteDirectory = new Lazy<Thing>(() => this.siteDirectory);
             this.assembler.Cache.GetOrAdd(new CacheKey(lazysiteDirectory.Value.Iid, null), lazysiteDirectory);
@@ -123,12 +139,13 @@ namespace CDP4ShellDialogs.Tests
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -137,17 +154,17 @@ namespace CDP4ShellDialogs.Tests
             var sessions = new List<ISession> { this.session.Object };
             var viewmodel = new ModelClosingDialogViewModel(sessions);
 
-            Assert.IsFalse(viewmodel.CloseCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)viewmodel.CloseCommand).CanExecute(null));
 
             viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iterationSetup11, this.participant, this.session.Object));
             Assert.AreEqual("Iteration Selection", viewmodel.DialogTitle);
-            Assert.IsTrue(viewmodel.CloseCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.CloseCommand).CanExecute(null));
 
             var iteration = new Iteration(this.iterationSetup11.IterationIid, this.assembler.Cache, this.uri);
             iteration.IterationSetup = this.iterationSetup11;
 
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { iteration, null } });
-            await viewmodel.CloseCommand.ExecuteAsync();
+            await viewmodel.CloseCommand.Execute();
 
             var res = viewmodel.DialogResult;
             Assert.IsNotNull(res);
@@ -169,13 +186,13 @@ namespace CDP4ShellDialogs.Tests
         }
 
         [Test]
-        public void VerifyThatExecuteCancelWork()
+        public async Task VerifyThatExecuteCancelWork()
         {
             var sessions = new List<ISession> { this.session.Object };
             var viewmodel = new ModelClosingDialogViewModel(sessions);
             viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iterationSetup11, this.participant, this.session.Object));
 
-            viewmodel.CancelCommand.Execute(null);
+            await viewmodel.CancelCommand.Execute();
 
             var res = viewmodel.DialogResult;
             Assert.IsNotNull(res);

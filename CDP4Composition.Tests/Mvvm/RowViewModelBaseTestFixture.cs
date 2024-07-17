@@ -1,19 +1,19 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RowViewModelBaseTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="RowViewModelBaseTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Jaime Bernar
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -25,28 +25,33 @@
 
 namespace CDP4Composition.Tests.Mvvm
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
+    using CDP4Composition.Events;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-    using CDP4Common.Types;
+
     using Moq;
+
     using NUnit.Framework;
-    using System;
 
     using ReactiveUI;
-    using CDP4Composition.MessageBus;
-    using CDP4Composition.Events;
-    using CDP4Common.EngineeringModelData;
 
     [TestFixture]
     public class RowViewModelBaseTestFixture
@@ -62,11 +67,14 @@ namespace CDP4Composition.Tests.Mvvm
         private ElementDefinition elementDefinition;
         private Category category;
         private BinaryRelationship binaryRelationShip;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
             this.session = new Mock<ISession>();
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.cache, null);
@@ -84,6 +92,7 @@ namespace CDP4Composition.Tests.Mvvm
             this.dialogNavigation = new Mock<IThingDialogNavigationService>();
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             this.permissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.cache.TryAdd(new CacheKey(this.siteDir.Iid, null), new Lazy<Thing>(() => this.siteDir));
@@ -92,7 +101,7 @@ namespace CDP4Composition.Tests.Mvvm
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -109,7 +118,7 @@ namespace CDP4Composition.Tests.Mvvm
             var row = new RowTestClass(this.person, this.session.Object);
             row.ShortName = "a";
             Assert.That(row.ValidateProperty("ShortName", "a"), Is.Null.Or.Empty);
-            
+
             Assert.That(row.ValidateProperty("ShortName", "---"), Is.Not.Null.Or.Not.Empty);
         }
 
@@ -121,10 +130,10 @@ namespace CDP4Composition.Tests.Mvvm
 
             row.isUpdatePropertyCalled = false;
 
-            var rev = typeof (Thing).GetProperty("RevisionNumber");
+            var rev = typeof(Thing).GetProperty("RevisionNumber");
             rev.SetValue(this.person, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.person, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.person, EventKind.Updated);
             Assert.IsTrue(row.isUpdatePropertyCalled);
         }
 
@@ -137,10 +146,10 @@ namespace CDP4Composition.Tests.Mvvm
 
             row.isUpdatePropertyCalled = false;
 
-            var rev = typeof (Thing).GetProperty("RevisionNumber");
+            var rev = typeof(Thing).GetProperty("RevisionNumber");
             rev.SetValue(this.person, 50);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.person, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.person, EventKind.Updated);
             Assert.IsTrue(row.isUpdatePropertyCalled);
         }
 
@@ -150,7 +159,7 @@ namespace CDP4Composition.Tests.Mvvm
             var row = new RowTestClass(this.person, this.session.Object);
             Assert.IsFalse(row.IsHighlighted);
 
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.person), this.person);
+            this.messageBus.SendMessage(new HighlightEvent(this.person), this.person);
             Assert.IsTrue(row.IsHighlighted);
         }
 
@@ -161,10 +170,10 @@ namespace CDP4Composition.Tests.Mvvm
             var row = new RowTestClass(this.person, this.session.Object, containerViewModel);
             Assert.IsFalse(row.IsHighlighted);
 
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.person), this.person);
+            this.messageBus.SendMessage(new HighlightEvent(this.person), this.person);
             Assert.IsFalse(row.IsHighlighted);
 
-            CDPMessageBus.Current.SendMessage(new HighlightEvent(this.person), null);
+            this.messageBus.SendMessage(new HighlightEvent(this.person), null);
             Assert.IsTrue(row.IsHighlighted);
         }
 
@@ -174,10 +183,10 @@ namespace CDP4Composition.Tests.Mvvm
             var row = new CategorizableRowTestClass(this.elementDefinition, this.session.Object);
             Assert.IsFalse(row.IsHighlighted);
 
-            CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.category), this.category);
+            this.messageBus.SendMessage(new HighlightByCategoryEvent(this.category), this.category);
             Assert.IsFalse(row.IsHighlighted);
 
-            CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.category), null);
+            this.messageBus.SendMessage(new HighlightByCategoryEvent(this.category), null);
             Assert.IsTrue(row.IsHighlighted);
         }
 
@@ -188,20 +197,20 @@ namespace CDP4Composition.Tests.Mvvm
             var row = new CategorizableRowTestClass(this.elementDefinition, this.session.Object, containerViewModel);
             Assert.IsFalse(row.IsHighlighted);
 
-            CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.category), this.category);
+            this.messageBus.SendMessage(new HighlightByCategoryEvent(this.category), this.category);
             Assert.IsFalse(row.IsHighlighted);
 
-            CDPMessageBus.Current.SendMessage(new HighlightByCategoryEvent(this.category), null);
+            this.messageBus.SendMessage(new HighlightByCategoryEvent(this.category), null);
             Assert.IsTrue(row.IsHighlighted);
         }
-                
+
         [Test]
         public void VerifyThatUpdateRelationshipMsgIsCaughtForDirectMessageBusSubscription()
         {
             var row = new CategorizableRowTestClass(this.elementDefinition, this.session.Object);
             Assert.IsFalse(row.ThingStatusHasChanged);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.binaryRelationShip, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.binaryRelationShip, EventKind.Updated);
             Assert.IsTrue(row.ThingStatusHasChanged);
         }
 
@@ -212,7 +221,7 @@ namespace CDP4Composition.Tests.Mvvm
             var row = new CategorizableRowTestClass(this.elementDefinition, this.session.Object, containerViewModel);
             Assert.IsFalse(row.ThingStatusHasChanged);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.binaryRelationShip, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.binaryRelationShip, EventKind.Updated);
             Assert.IsTrue(row.ThingStatusHasChanged);
         }
 
@@ -221,7 +230,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var row = new RowTestClass(this.person, this.session.Object);
             row.CreateCloneAndWrite("abc", "ShortName");
-            
+
             this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.Person)op.Operations.Single().ModifiedThing).ShortName == "abc")));
         }
 
@@ -229,7 +238,7 @@ namespace CDP4Composition.Tests.Mvvm
         public void VerifyThatCreateCloneThrows()
         {
             var row = new RowTestClass(this.person, this.session.Object);
-            
+
             Assert.Throws<InvalidOperationException>(() => row.CreateCloneAndWrite("abc", "Exception"));
         }
 
@@ -261,7 +270,7 @@ namespace CDP4Composition.Tests.Mvvm
         public void VerifyThatComputeGenericRowWork()
         {
             var row = new RowTestClass(this.person, this.session.Object);
-            row.ComputeRow(new List<Person>{this.person});
+            row.ComputeRow(new List<Person> { this.person });
             Assert.AreEqual(1, row.ContainedRows.Count);
 
             row.ComputeRow(new List<Person>());
@@ -289,21 +298,18 @@ namespace CDP4Composition.Tests.Mvvm
             internal CategorizableRowTestClass(ElementDefinition elementDefinition, ISession session)
                 : base(elementDefinition, session, null)
             {
-
             }
 
             internal CategorizableRowTestClass(ElementDefinition elementDefinition, ISession session, IViewModelBase<Thing> containerViewModel)
                 : base(elementDefinition, session, containerViewModel)
             {
-
             }
+
             protected override void UpdateThingStatus()
             {
-                ThingStatusHasChanged = true;
+                this.ThingStatusHasChanged = true;
             }
-
         }
-
 
         internal class RowTestClass : RowViewModelBase<Person>
         {
@@ -365,6 +371,11 @@ namespace CDP4Composition.Tests.Mvvm
         /// The <see cref="Thing"/>
         /// </summary>
         public Thing Thing { get; }
+
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        public ICDPMessageBus CDPMessageBus { get; }
 
         /// <summary>
         /// Disposes the instance

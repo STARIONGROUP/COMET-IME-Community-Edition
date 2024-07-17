@@ -1,32 +1,31 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ModelParticipantRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="ModelParticipantRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.ViewModels
 {
     using System;
-    using System.Linq;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
@@ -46,7 +45,6 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class ModelParticipantRowViewModel : CDP4CommonView.ParticipantRowViewModel
     {
-        #region fields
         /// <summary>
         /// Backing field for <see cref="Description"/>
         /// </summary>
@@ -61,9 +59,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// Indicates if the domain of expertise should be shown as subnodes
         /// </summary>
         private readonly bool showDomains;
-        #endregion
 
-        #region Constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="ParticipantRowViewModel"/> class
         /// </summary>
@@ -76,15 +72,14 @@ namespace CDP4SiteDirectory.ViewModels
             this.showDomains = showDomains;
             this.UpdateProperties();
         }
-        #endregion
 
         /// <summary>
         /// Gets the description.
         /// </summary>
         public string Description
         {
-            get { return this.description; }
-            private set { this.RaiseAndSetIfChanged(ref this.description, value); }
+            get => this.description;
+            private set => this.RaiseAndSetIfChanged(ref this.description, value);
         }
 
         /// <summary>
@@ -92,8 +87,8 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public string Name
         {
-            get { return this.name; }
-            private set { this.RaiseAndSetIfChanged(ref this.name, value); }
+            get => this.name;
+            private set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         /// <summary>
@@ -104,6 +99,7 @@ namespace CDP4SiteDirectory.ViewModels
             this.ContainedRows.ClearAndDispose();
 
             var person = this.Thing.Person;
+
             if (person is null)
             {
                 // its normally impossible
@@ -112,12 +108,12 @@ namespace CDP4SiteDirectory.ViewModels
 
             var givenname = person.GivenName ?? string.Empty;
             var surname = person.Surname ?? string.Empty;
-            var organizationName = (person.Organization == null) ? "none" : person.Organization.Name;
+            var organizationName = person.Organization == null ? "none" : person.Organization.Name;
 
             this.Name = $"{givenname} {surname}";
             this.Description = $"Organization: {organizationName}";
 
-            this.RowStatus = (this.Thing.IsActive && person.IsActive && !person.IsDeprecated)
+            this.RowStatus = this.Thing.IsActive && person.IsActive && !person.IsDeprecated
                 ? RowStatusKind.Active
                 : RowStatusKind.Inactive;
 
@@ -142,10 +138,12 @@ namespace CDP4SiteDirectory.ViewModels
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
-            var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Person)
+
+            var thingSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Person)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(thingSubscription);
         }
 

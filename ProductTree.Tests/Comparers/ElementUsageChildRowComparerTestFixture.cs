@@ -1,8 +1,27 @@
-﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="ElementUsageChildRowComparerTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ElementUsageChildRowComparerTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -----------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ProductTree.Tests.Comparers
 {
@@ -10,14 +29,19 @@ namespace ProductTree.Tests.Comparers
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Dal;
+
     using CDP4ProductTree.Comparers;
     using CDP4ProductTree.ViewModels;
+
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -49,11 +73,12 @@ namespace ProductTree.Tests.Comparers
 
         private ParameterGroup gr;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
-
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "domain" };
 
@@ -75,24 +100,27 @@ namespace ProductTree.Tests.Comparers
                 Manual = new ValueArray<string>(new List<string> { "1" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
+
             this.vs2 = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
                 Published = new ValueArray<string>(new List<string> { "1" }),
                 Manual = new ValueArray<string>(new List<string> { "1" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL
             };
+
             this.ovs1 = new ParameterOverrideValueSet(Guid.NewGuid(), this.cache, this.uri)
             {
                 Published = new ValueArray<string>(new List<string> { "1" }),
                 Manual = new ValueArray<string>(new List<string> { "1" }),
                 ValueSwitch = ParameterSwitchKind.MANUAL,
-                ParameterValueSet =  this.vs1
+                ParameterValueSet = this.vs1
             };
-            this.gr = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) {Name = "gr"};
 
-            this.p1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) {ParameterType = this.type1};
-            this.p2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) {ParameterType = this.type2};
-            this.po1 = new ParameterOverride(Guid.NewGuid(), this.cache, this.uri) {Parameter = this.p1};
+            this.gr = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "gr" };
+
+            this.p1 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.type1 };
+            this.p2 = new Parameter(Guid.NewGuid(), this.cache, this.uri) { ParameterType = this.type2 };
+            this.po1 = new ParameterOverride(Guid.NewGuid(), this.cache, this.uri) { Parameter = this.p1 };
             this.p1.ValueSet.Add(this.vs1);
             this.p2.ValueSet.Add(this.vs2);
             this.po1.ValueSet.Add(this.ovs1);
@@ -120,16 +148,16 @@ namespace ProductTree.Tests.Comparers
             this.iteration.Element.Add(this.elementDef2);
             this.elementDef.ContainedElement.Add(this.elementUsage);
 
-
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]

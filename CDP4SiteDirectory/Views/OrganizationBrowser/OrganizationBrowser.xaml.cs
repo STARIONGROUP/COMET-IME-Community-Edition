@@ -1,12 +1,13 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="OrganizationBrowser.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="OrganizationBrowser.xaml.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2019 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -16,7 +17,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for OrganizationBrowser.xaml
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class OrganizationBrowser : IPanelView
+    public partial class OrganizationBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

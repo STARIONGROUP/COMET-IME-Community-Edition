@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterOrOverrideBaseRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ParameterOrOverrideBaseRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -48,7 +48,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
     using CDP4ProductTree.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -60,7 +60,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<ISession> session;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private Parameter parameter1;
         private ParameterType parameterType1;
         private ActualFiniteStateList stateList;
@@ -84,11 +84,13 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         private Mock<IThingCreator> thingCreator;
         private Mock<IServiceLocator> serviceLocator;
         private readonly string nestedParameterPath = "PATH";
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             var ensurePackSchemeIsKnown = PackUriHelper.UriSchemePack;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
@@ -143,6 +145,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.parameter1.Iid, null), new Lazy<Thing>(() => this.parameter1));
             this.converter = new ProductTreeIconUriConverter();
@@ -168,7 +171,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -283,7 +286,8 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             Assert.AreEqual("dom", row.OwnerShortName);
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatPropertiesArePopulatedForScalarStateDependent(IViewModelBase<Thing> container, string scenario)
         {
             // **************************INPUT***************************************
@@ -320,14 +324,15 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             // update publish value and check that isPublishable is false
             this.valueset.Manual = published;
             this.valueset.RevisionNumber = 10;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.valueset, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.valueset, EventKind.Updated);
             Assert.IsFalse(row.IsPublishable);
 
             Assert.AreEqual("domain", row.OwnerName);
             Assert.AreEqual("dom", row.OwnerShortName);
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatOnUpdateOfStateTheRowIsUpdated(IViewModelBase<Thing> container, string scenario)
         {
             // **************************INPUT***************************************
@@ -352,7 +357,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             var row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, container);
             Assert.AreEqual(1, row.ContainedRows.Count);
             this.state1.Kind = ActualFiniteStateKind.FORBIDDEN;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.state1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.state1, EventKind.Updated);
             Assert.AreEqual(0, row.ContainedRows.Count);
         }
 
@@ -498,7 +503,8 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             Assert.IsTrue(s2c2.Value.Contains("s2value2"));
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatParameterTypeUpdatesAreHandled(IViewModelBase<Thing> container, string scenario)
         {
             // **********************************************************************
@@ -527,7 +533,7 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             this.parameterType1.Name = "updatept1";
             this.parameterType1.RevisionNumber = 100;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameterType1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameterType1, EventKind.Updated);
 
             Assert.AreEqual("updatept1", row.Name);
         }

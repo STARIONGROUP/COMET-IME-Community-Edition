@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BuiltInRulesRibbonPageViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="BuiltInRulesRibbonPageViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -25,6 +25,10 @@
 
 namespace CDP4BuiltInRules.Tests.ViewModels
 {
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4BuiltInRules.ViewModels;
 
     using CDP4Composition.Navigation;
@@ -57,7 +61,7 @@ namespace CDP4BuiltInRules.Tests.ViewModels
         {
             var viewmodel = new BuiltInRulesRibbonPageViewModel(this.panelNavigationService.Object, this.dialogNavigationService.Object, this.ruleVerificationService.Object);
 
-            Assert.IsTrue(viewmodel.OpenBrowser.CanExecute(null));
+            Assert.IsTrue(((ICommand)viewmodel.OpenBrowser).CanExecute(null));
         }
     }
 }

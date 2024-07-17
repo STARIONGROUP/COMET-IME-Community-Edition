@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterSheetProcessor.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="ParameterSheetProcessor.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -50,9 +50,6 @@ namespace CDP4ParameterSheetGenerator.Generator
 
     using NLog;
 
-    using Application = NetOffice.ExcelApi.Application;
-    using Exception = System.Exception;
-
     /// <summary>
     /// The purpose <see cref="ParameterSheetProcessor"/> is to process the contents of the Parameter sheet
     /// </summary>
@@ -77,7 +74,7 @@ namespace CDP4ParameterSheetGenerator.Generator
         /// The array that contains the formula of the parameter section of the parameter sheet
         /// </summary>
         private object[,] parameterFormula;
-        
+
         /// <summary>
         /// The <see cref="ISession"/> that is specific to the <see cref="Workbook"/> that is being processed.
         /// </summary>
@@ -127,15 +124,15 @@ namespace CDP4ParameterSheetGenerator.Generator
         {
             var sw = new Stopwatch();
             sw.Start();
-            
+
             application.Cursor = XlMousePointer.xlWait;
 
             application.StatusBar = "Processing Parameter sheet";
 
             this.parameterSheet = ParameterSheetUtilities.RetrieveParameterSheet(workbook);
-            
+
             var temporaryProcessedValueSets = new Dictionary<Guid, ProcessedValueSet>();
-            
+
             var numberFormatInfo = this.QuerayNumberFormatInfo(application);
 
             var rowType = string.Empty;
@@ -169,8 +166,8 @@ namespace CDP4ParameterSheetGenerator.Generator
 
                     if (rowType != string.Empty
                         && (rowType == ParameterSheetConstants.PVS || rowType == ParameterSheetConstants.PVSCT
-                            || rowType == ParameterSheetConstants.POVS || rowType == ParameterSheetConstants.POVSCT
-                            || rowType == ParameterSheetConstants.PSVS || rowType == ParameterSheetConstants.PSVSCT))
+                                                                   || rowType == ParameterSheetConstants.POVS || rowType == ParameterSheetConstants.POVSCT
+                                                                   || rowType == ParameterSheetConstants.PSVS || rowType == ParameterSheetConstants.PSVSCT))
                     {
                         rowIid = Convert.ToString(this.parameterContent[i, ParameterSheetConstants.IdColumn]);
 
@@ -191,6 +188,7 @@ namespace CDP4ParameterSheetGenerator.Generator
                         }
 
                         var lazyThing = this.workbookSession.Assembler.Cache.Select(item => item.Value).SingleOrDefault(item => item.Value.Iid == Guid.Parse(thingIid));
+
                         if (lazyThing != null)
                         {
                             var thing = lazyThing.Value;
@@ -253,9 +251,9 @@ namespace CDP4ParameterSheetGenerator.Generator
                 }
 
                 processedValueSets = new Dictionary<Guid, ProcessedValueSet>(temporaryProcessedValueSets);
-            }   
+            }
         }
-        
+
         /// <summary>
         /// Queries the appropriate <see cref="NumberFormatInfo"/> based on the decimal separator and thousands separator of the excel application
         /// </summary>
@@ -268,6 +266,7 @@ namespace CDP4ParameterSheetGenerator.Generator
         private NumberFormatInfo QuerayNumberFormatInfo(Application application)
         {
             NumberFormatInfo numberFormatInfo = null;
+
             if (application.UseSystemSeparators)
             {
                 numberFormatInfo = ExcelNumberFormatProvider.CreateExcelNumberFormatInfo(true);
@@ -297,6 +296,7 @@ namespace CDP4ParameterSheetGenerator.Generator
             object computedValue;
 
             var computedObject = this.parameterContent[i, ParameterSheetConstants.ComputedColumn];
+
             if (computedObject != null && !ExcelErrors.IsXLCVErr(computedObject))
             {
                 computedValue = computedObject;
@@ -320,9 +320,10 @@ namespace CDP4ParameterSheetGenerator.Generator
         /// </returns>
         private string QueryFormulaValue(int i)
         {
-            string formulaValue = "-";
+            var formulaValue = "-";
 
             var formulaObject = this.parameterFormula[i, ParameterSheetConstants.ComputedColumn];
+
             if (formulaObject != null && !ExcelErrors.IsXLCVErr(formulaObject))
             {
                 formulaValue = Convert.ToString(formulaObject);
@@ -345,6 +346,7 @@ namespace CDP4ParameterSheetGenerator.Generator
             object manualValue;
 
             var manualObject = this.parameterContent[i, ParameterSheetConstants.ManualColumn];
+
             if (manualObject != null && !ExcelErrors.IsXLCVErr(manualObject))
             {
                 manualValue = manualObject;
@@ -371,6 +373,7 @@ namespace CDP4ParameterSheetGenerator.Generator
             object referenceValue;
 
             var referenceObject = this.parameterContent[i, ParameterSheetConstants.ReferenceColumn];
+
             if (referenceObject != null && !ExcelErrors.IsXLCVErr(referenceObject))
             {
                 referenceValue = referenceObject;
@@ -415,6 +418,7 @@ namespace CDP4ParameterSheetGenerator.Generator
             object actualValue;
 
             var actualObject = this.parameterContent[i, ParameterSheetConstants.ActualValueColumn];
+
             if (actualObject != null && !ExcelErrors.IsXLCVErr(actualObject))
             {
                 actualValue = actualObject;
@@ -473,8 +477,9 @@ namespace CDP4ParameterSheetGenerator.Generator
 
             ParameterSheetUtilities.QueryParameterTypeAndScale(parameterValueSet, componentIndex, out parameterType, out measurementScale);
 
-            ValidationResult validSwitch;            
+            ValidationResult validSwitch;
             var isValidSwitchKind = Enum.IsDefined(typeof(ParameterSwitchKind), switchValue);
+
             if (isValidSwitchKind)
             {
                 switchKind = (ParameterSwitchKind)Enum.Parse(typeof(ParameterSwitchKind), switchValue);
@@ -483,7 +488,7 @@ namespace CDP4ParameterSheetGenerator.Generator
             else
             {
                 switchKind = ParameterSwitchKind.MANUAL;
-                validSwitch = new ValidationResult { ResultKind = ValidationResultKind.Invalid, Message = string.Format("{0} is not a valid Parameter Switch Kind", switchValue) };                    
+                validSwitch = new ValidationResult { ResultKind = ValidationResultKind.Invalid, Message = string.Format("{0} is not a valid Parameter Switch Kind", switchValue) };
             }
 
             if (validSwitch.ResultKind > validationResult)
@@ -534,24 +539,28 @@ namespace CDP4ParameterSheetGenerator.Generator
                 }
 
                 validManualValue = parameterType.Validate(manualValue, measurementScale, provider);
+
                 if (validManualValue.ResultKind > validationResult)
                 {
                     validationResult = validManualValue.ResultKind;
                 }
 
                 validComputedValue = parameterType.Validate(computedValue, measurementScale, provider);
+
                 if (validComputedValue.ResultKind > validationResult)
                 {
                     validationResult = validComputedValue.ResultKind;
                 }
 
                 validReferenceValue = parameterType.Validate(referenceValue, measurementScale, provider);
+
                 if (validReferenceValue.ResultKind > validationResult)
                 {
                     validationResult = validReferenceValue.ResultKind;
                 }
 
                 validActualValue = parameterType.Validate(actualValue, measurementScale, provider);
+
                 if (validActualValue.ResultKind > validationResult)
                 {
                     validationResult = validActualValue.ResultKind;
@@ -566,19 +575,22 @@ namespace CDP4ParameterSheetGenerator.Generator
 
             ProcessedValueSet processedValueSet;
             var valueSetExists = processedValueSets.TryGetValue(parameterValueSet.Iid, out processedValueSet);
+
             if (!valueSetExists)
             {
                 processedValueSet = new ProcessedValueSet(parameterValueSet, validationResult);
             }
-            
+
             ValueSetValues valueSetValues;
+
             if (processedValueSet.IsDirty(componentIndex, parameterType, switchKind, manualValue, computedValue, referenceValue, formulaValue, out valueSetValues))
             {
                 processedValueSet.UpdateClone(valueSetValues);
+
                 if (!valueSetExists)
                 {
                     processedValueSets.Add(parameterValueSet.Iid, processedValueSet);
-                }                
+                }
             }
         }
 
@@ -630,6 +642,7 @@ namespace CDP4ParameterSheetGenerator.Generator
 
             ValidationResult validSwitch;
             var isValidSwitchKind = Enum.IsDefined(typeof(ParameterSwitchKind), switchValue);
+
             if (isValidSwitchKind)
             {
                 switchKind = (ParameterSwitchKind)Enum.Parse(typeof(ParameterSwitchKind), switchValue);
@@ -681,24 +694,28 @@ namespace CDP4ParameterSheetGenerator.Generator
                 }
 
                 validManualValue = parameterType.Validate(manualValue, measurementScale, provider);
+
                 if (validManualValue.ResultKind > validationResult)
                 {
                     validationResult = validManualValue.ResultKind;
                 }
 
                 validComputedValue = parameterType.Validate(computedValue, measurementScale, provider);
+
                 if (validComputedValue.ResultKind > validationResult)
                 {
                     validationResult = validComputedValue.ResultKind;
                 }
 
                 validReferenceValue = parameterType.Validate(referenceValue, measurementScale, provider);
+
                 if (validReferenceValue.ResultKind > validationResult)
                 {
                     validationResult = validReferenceValue.ResultKind;
                 }
 
                 validActualValue = parameterType.Validate(actualValue, measurementScale, provider);
+
                 if (validActualValue.ResultKind > validationResult)
                 {
                     validationResult = validActualValue.ResultKind;
@@ -712,19 +729,22 @@ namespace CDP4ParameterSheetGenerator.Generator
 
             ProcessedValueSet processedValueSet;
             var valueSetExists = processedValueSets.TryGetValue(parameterOverrideValueSet.Iid, out processedValueSet);
+
             if (!valueSetExists)
             {
                 processedValueSet = new ProcessedValueSet(parameterOverrideValueSet, validationResult);
             }
-            
+
             ValueSetValues valueSetValues;
+
             if (processedValueSet.IsDirty(componentIndex, parameterType, switchKind, manualValue, computedValue, referenceValue, formulaValue, out valueSetValues))
             {
                 processedValueSet.UpdateClone(valueSetValues);
+
                 if (!valueSetExists)
                 {
                     processedValueSets.Add(parameterOverrideValueSet.Iid, processedValueSet);
-                }                
+                }
             }
         }
 
@@ -767,6 +787,7 @@ namespace CDP4ParameterSheetGenerator.Generator
 
             ValidationResult validSwitch;
             var isValidSwitchKind = Enum.IsDefined(typeof(ParameterSwitchKind), switchValue);
+
             if (isValidSwitchKind)
             {
                 switchKind = (ParameterSwitchKind)Enum.Parse(typeof(ParameterSwitchKind), switchValue);
@@ -797,6 +818,7 @@ namespace CDP4ParameterSheetGenerator.Generator
                 }
 
                 validManualValue = parameterType.Validate(manualValue, measurementScale, provider);
+
                 if (validManualValue.ResultKind > validationResult)
                 {
                     validationResult = validManualValue.ResultKind;
@@ -807,19 +829,22 @@ namespace CDP4ParameterSheetGenerator.Generator
 
             ProcessedValueSet processedValueSet;
             var valueSetExists = valuesets.TryGetValue(parameterSubscriptionValueSet.Iid, out processedValueSet);
+
             if (!valueSetExists)
             {
                 processedValueSet = new ProcessedValueSet(parameterSubscriptionValueSet, validationResult);
             }
-            
+
             ValueSetValues valueSetValues;
+
             if (processedValueSet.IsDirty(componentIndex, parameterType, switchKind, manualValue, null, null, null, out valueSetValues))
             {
                 processedValueSet.UpdateClone(valueSetValues);
+
                 if (!valueSetExists)
                 {
                     valuesets.Add(parameterSubscriptionValueSet.Iid, processedValueSet);
-                }                
+                }
             }
         }
     }

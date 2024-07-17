@@ -3,22 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
-             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
-             xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              Height="300"
              d:DesignWidth="571"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
-    <dx:DXWindow.Resources>
-        <ResourceDictionary>
-            <converters:ReactiveClassKindToObjectListConverter x:Key="ReactiveClassKindToObjectListConverter" />
-            <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
-        </ResourceDictionary>
-    </dx:DXWindow.Resources>
     <lc:LayoutControl Margin="5"
                       Orientation="Vertical"
                       ScrollBars="None">

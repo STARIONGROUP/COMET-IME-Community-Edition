@@ -1,17 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{BEDCC5C5-83B2-41ED-AC9F-895757553BF2}</ProjectGuid>
-    <MinIMEVersion>9.7.0</MinIMEVersion>
-    <AssemblyName>CDP4BasicRdl</AssemblyName>
-    <TargetFramework>net48</TargetFramework>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>CDP4BasicRdl</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
-    <Product>BasicRdl</Product>
-    <Description>CDP4-COMET Basic Reference Data Library Plugin</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.7.0.0</AssemblyVersion>
-    <FileVersion>9.7.0.0</FileVersion>
+	<ProjectGuid>{BEDCC5C5-83B2-41ED-AC9F-895757553BF2}</ProjectGuid>
+	<MinIMEVersion>10.0.0</MinIMEVersion>
+	<AssemblyName>CDP4BasicRdl</AssemblyName>
+	<TargetFramework>net48</TargetFramework>
+	<SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+	<AssemblyTitle>CDP4BasicRdl</AssemblyTitle>
+	<Company>Starion Group S.A.</Company>
+	<Product>BasicRdl</Product>
+	<Description>CDP4-COMET Basic Reference Data Library Plugin</Description>
+	<Copyright>Copyright © Starion Group S.A.</Copyright>
+	<AssemblyVersion>10.0.0.19</AssemblyVersion>
+	<FileVersion>10.0.0.19</FileVersion>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -35,177 +37,153 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0">
+    <PackageReference Include="CDP4Common-CE" Version="27.2.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0">
+    <PackageReference Include="CDP4Dal-CE" Version="27.2.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="1.3">
+    <PackageReference Include="CommonServiceLocator" Version="2.0.7">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Charts" Version="22.2.6">
+    <PackageReference Include="DevExpress.Charts" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Charts.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Charts.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.CodeParser" Version="22.2.6">
+    <PackageReference Include="DevExpress.CodeParser" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data" Version="22.2.6">
+    <PackageReference Include="DevExpress.Data" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.6">
+    <PackageReference Include="DevExpress.Data.Desktop" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.DataAccess" Version="22.2.6">
+    <PackageReference Include="DevExpress.DataAccess" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Diagram.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Diagram.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Gauges.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Gauges.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Images" Version="22.2.6">
+    <PackageReference Include="DevExpress.Images" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Mvvm" Version="22.2.6">
+    <PackageReference Include="DevExpress.Mvvm" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Office.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Office.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Pdf.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.6">
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.PivotGrid.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.PivotGrid.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Printing.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Reporting.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Reporting.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.6">
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Sparkline.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Sparkline.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.SpellChecker.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Charts" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Charts" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Diagram" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Accordion" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.6">
+	<PackageReference Include="DevExpress.Wpf.NavBar" Version="23.2.5">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.6">
+	<PackageReference Include="DevExpress.Wpf.Ribbon" Version="23.2.5">
 	  <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.6">
+	<PackageReference Include="DevExpress.Wpf.Docking" Version="23.2.5">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Office" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.PivotGrid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.PivotGrid" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Reporting" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Reporting" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Xpo" Version="22.2.6">
+    <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DotLiquid" Version="2.2.508" />
-    <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2">
+    <PackageReference Include="DotLiquid" Version="2.2.692" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
+    <PackageReference Include="NLog" Version="5.3.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="4.7.10">
-      <ExcludeAssets>runtime</ExcludeAssets>
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.11">
+	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="reactiveui" Version="6.4.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="reactiveui-core" Version="6.4.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Core" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Linq" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Main" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-XAML" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Splat" Version="1.6.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
+    <PackageReference Include="ReactiveUI.WPF" Version="20.1.1">
+	  <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
@@ -239,6 +217,9 @@
     <Reference Include="System.Xaml">
       <Private>false</Private>
     </Reference>
+	<Reference Include="System.Web">
+	  <Private>false</Private>
+	</Reference>
     <Reference Include="System.Data.DataSetExtensions">
       <Private>false</Private>
     </Reference>
@@ -248,195 +229,34 @@
     <Reference Include="WindowsBase">
       <Private>false</Private>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\Dialogs\ArrayParameterTypeDialog.xaml.cs">
-      <DependentUpon>ArrayParameterTypeDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\CompoundParameterTypeDialog.xaml.cs">
-      <DependentUpon>CompoundParameterTypeDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\ConstantDialog.xaml.cs">
-      <DependentUpon>ConstantDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\UnitPrefixDialog.xaml.cs">
-      <DependentUpon>UnitPrefixDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReportGeneratorDialogs\HtmlExportGlossarySelectionDialog.xaml.cs">
-      <DependentUpon>HtmlExportGlossarySelectionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\ReferenceSourceRibbon.xaml.cs">
-      <DependentUpon>ReferenceSourceRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReferenceSourceBrowser.xaml.cs">
-      <DependentUpon>ReferenceSourceBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\SiteRdlSelectionRibbon.xaml.cs">
-      <DependentUpon>SiteRdlSelectionRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SiteRdlClosingDialog.xaml.cs">
-      <DependentUpon>SiteRdlClosingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SiteRdlOpeningDialog.xaml.cs">
-      <DependentUpon>SiteRdlOpeningDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UnitPrefixBrowser.xaml.cs">
-      <DependentUpon>UnitPrefixBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\FileTypeBrowser.xaml.cs">
-      <DependentUpon>FileTypeBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ConstantsBrowser.xaml.cs">
-      <DependentUpon>ConstantsBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\FileTypeDialog.xaml.cs">
-      <DependentUpon>FileTypeDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\DecompositionRuleDialog.xaml.cs">
-      <DependentUpon>DecompositionRuleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\GlossaryDialog.xaml.cs">
-      <DependentUpon>GlossaryDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\ReferencerRuleDialog.xaml.cs">
-      <DependentUpon>ReferencerRuleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\TermDialog.xaml.cs">
-      <DependentUpon>TermDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\EnumerationParameterTypeDialog.xaml.cs">
-      <DependentUpon>EnumerationParameterTypeDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\IntervalScaleDialog.xaml.cs">
-      <DependentUpon>IntervalScaleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\EnumerationValueDefinitionDialog.xaml.cs">
-      <DependentUpon>EnumerationValueDefinitionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\LogarithmicScaleDialog.xaml.cs">
-      <DependentUpon>LogarithmicScaleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\MappingToReferenceScaleDialog.xaml.cs">
-      <DependentUpon>MappingToReferenceScaleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\OrdinalScaleDialog.xaml.cs">
-      <DependentUpon>OrdinalScaleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\CyclicRatioScaleDialog.xaml.cs">
-      <DependentUpon>CyclicRatioScaleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\ParameterizedCategoryRuleDialog.xaml.cs">
-      <DependentUpon>ParameterizedCategoryRuleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\ScaleReferenceQuantityValueDialog.xaml.cs">
-      <DependentUpon>ScaleReferenceQuantityValueDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\ScaleValueDefinitionDialog.xaml.cs">
-      <DependentUpon>ScaleValueDefinitionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\DateTimeParameterTypeDialog.xaml.cs">
-      <DependentUpon>DateTimeParameterTypeDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\DerivedQuantityKindDialog.xaml.cs">
-      <DependentUpon>DerivedQuantityKindDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\RatioScaleDialog.xaml.cs">
-      <DependentUpon>RatioScaleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\SpecializedQuantityKindDialog.xaml.cs">
-      <DependentUpon>SpecializedQuantityKindDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\SimpleQuantityKindDialog.xaml.cs">
-      <DependentUpon>SimpleQuantityKindDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\TimeOfDayParameterTypeDialog.xaml.cs">
-      <DependentUpon>TimeOfDayParameterTypeDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\DateParameterTypeDialog.xaml.cs">
-      <DependentUpon>DateParameterTypeDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\BooleanParameterTypeDialog.xaml.cs">
-      <DependentUpon>BooleanParameterTypeDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\TextParameterTypeDialog.xaml.cs">
-      <DependentUpon>TextParameterTypeDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\QuantityKindFactorDialog.xaml.cs">
-      <DependentUpon>QuantityKindFactorDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\GlossaryBrowser.xaml.cs">
-      <DependentUpon>GlossaryBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\BasicRdlRibbon.xaml.cs">
-      <DependentUpon>BasicRdlRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\CategoryBrowser.xaml.cs">
-      <DependentUpon>CategoryBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\UnitPrefixRibbon.xaml.cs">
-      <DependentUpon>UnitPrefixRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\FileTypeBrowserRibbon.xaml.cs">
-      <DependentUpon>FileTypeBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\ConstantBrowserRibbon.xaml.cs">
-      <DependentUpon>ConstantBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\GlossaryBrowserRibbon.xaml.cs">
-      <DependentUpon>GlossaryBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\ParameterTypeRibbon.xaml.cs">
-      <DependentUpon>ParameterTypeRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\RulesRibbon.xaml.cs">
-      <DependentUpon>RulesRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\MeasurementUnitsRibbon.xaml.cs">
-      <DependentUpon>MeasurementUnitsRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\MeasurementScalesRibbon.xaml.cs">
-      <DependentUpon>MeasurementScalesRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\BinaryRelationshipRuleDialog.xaml.cs">
-      <DependentUpon>BinaryRelationshipRuleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\CategoryDialog.xaml.cs">
-      <DependentUpon>CategoryDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\DerivedUnitDialog.xaml.cs">
-      <DependentUpon>DerivedUnitDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\LinearConversionUnitDialog.xaml.cs">
-      <DependentUpon>LinearConversionUnitDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\MultiRelationshipRuleDialog.xaml.cs">
-      <DependentUpon>MultiRelationshipRuleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\PrefixedUnitDialog.xaml.cs">
-      <DependentUpon>PrefixedUnitDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Ribbons\CategoryRibbon.xaml.cs">
-      <DependentUpon>CategoryRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\SimpleUnitDialog.xaml.cs">
-      <DependentUpon>SimpleUnitDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\UnitFactorDialog.xaml.cs">
-      <DependentUpon>UnitFactorDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\MeasurementScalesBrowser.xaml.cs">
-      <DependentUpon>MeasurementScalesBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\MeasurementUnitsBrowser.xaml.cs">
-      <DependentUpon>MeasurementUnitsBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ParameterTypesBrowser.xaml.cs">
-      <DependentUpon>ParameterTypesBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\RulesBrowser.xaml.cs">
-      <DependentUpon>RulesBrowser.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<Reference Update="System">
+	  <Private>false</Private>
+	</Reference>
+	<Reference Update="System.Core">
+	  <Private>false</Private>
+	</Reference>
+	<Reference Update="System.Data">
+	  <Private>false</Private>
+	</Reference>
+	<Reference Update="System.Drawing">
+	  <Private>false</Private>
+	</Reference>
+	<Reference Update="System.IO.Compression.FileSystem">
+	  <Private>false</Private>
+	</Reference>
+	<Reference Update="System.Numerics">
+	  <Private>false</Private>
+	</Reference>
+	<Reference Update="System.Runtime.Serialization">
+	  <Private>false</Private>
+	</Reference>
+	<Reference Update="System.Xml">
+	  <Private>false</Private>
+	</Reference>
+	<Reference Update="System.Xml.Linq">
+	  <Private>false</Private>
+	</Reference>
+  </ItemGroup> 
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
@@ -448,438 +268,11 @@
     <EmbeddedResource Include="Resources\DotLiquidTemplate\GlossaryReportTemplate.liquid" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\Dialogs\ArrayParameterTypeDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\CompoundParameterTypeDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\ConstantDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\SampledFunctionParameterTypeDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\UnitPrefixDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ReportGeneratorDialogs\HtmlExportGlossarySelectionDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Ribbons\ReferenceSourceRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ReferenceSourceBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\SiteRdlSelectionRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\SiteRdlClosingDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\SiteRdlOpeningDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\UnitPrefixBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\FileTypeBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ConstantsBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\FileTypeDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\DecompositionRuleDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\GlossaryDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\ReferencerRuleDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\TermDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\IntervalScaleDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\EnumerationParameterTypeDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\EnumerationValueDefinitionDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\LogarithmicScaleDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\MappingToReferenceScaleDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\OrdinalScaleDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\ParameterizedCategoryRuleDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\CyclicRatioScaleDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\ScaleReferenceQuantityValueDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\ScaleValueDefinitionDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\DateTimeParameterTypeDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\DerivedQuantityKindDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\RatioScaleDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\SpecializedQuantityKindDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\SimpleQuantityKindDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\TimeOfDayParameterTypeDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\DateParameterTypeDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\BooleanParameterTypeDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\TextParameterTypeDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\QuantityKindFactorDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\GlossaryBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\BasicRdlRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\CategoryBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\UnitPrefixRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\FileTypeBrowserRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\ConstantBrowserRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\GlossaryBrowserRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\ParameterTypeRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\RulesRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\MeasurementUnitsRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Ribbons\MeasurementScalesRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\BinaryRelationshipRuleDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\CategoryDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\DerivedUnitDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\LinearConversionUnitDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\MultiRelationshipRuleDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\PrefixedUnitDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\SimpleUnitDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\UnitFactorDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Ribbons\CategoryRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\MeasurementScalesBrowser.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\MeasurementUnitsBrowser.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ParameterTypesBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\RulesBrowser.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RibbonXml\rdlribbon.xml">
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\CategoryBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\CategoryBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ConstantsBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ConstantsBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\FileTypeBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\FileTypeBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\GlossaryBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\GlossaryBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\MeasurementScalesBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\MeasurementScalesBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\MeasurementUnitsBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\MeasurementUnitsBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ParameterTypesBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ParameterTypesBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReferenceSourceBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReferenceSourceBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RulesBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RulesBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteRdlClosingDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteRdlClosingDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteRdlOpeningDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteRdlOpeningDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\UnitPrefixBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\UnitPrefixBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ArrayParameterTypeDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ArrayParameterTypeDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\BinaryRelationshipRuleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\BinaryRelationshipRuleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\BooleanParameterTypeDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\BooleanParameterTypeDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\CategoryDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\CategoryDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\CompoundParameterTypeDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\CompoundParameterTypeDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ConstantDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ConstantDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\CyclicRatioScaleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\CyclicRatioScaleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DateParameterTypeDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DateParameterTypeDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DateTimeParameterTypeDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DateTimeParameterTypeDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DecompositionRuleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DecompositionRuleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DerivedQuantityKindDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DerivedQuantityKindDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DerivedUnitDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DerivedUnitDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\EnumerationParameterTypeDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\EnumerationParameterTypeDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\EnumerationValueDefinitionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\EnumerationValueDefinitionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\FileTypeDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\FileTypeDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\GlossaryDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\GlossaryDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\IntervalScaleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\IntervalScaleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\LinearConversionUnitDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\LinearConversionUnitDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\LogarithmicScaleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\LogarithmicScaleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\MappingToReferenceScaleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\MappingToReferenceScaleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\MultiRelationshipRuleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\MultiRelationshipRuleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\OrdinalScaleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\OrdinalScaleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterizedCategoryRuleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParameterizedCategoryRuleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\PrefixedUnitDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\PrefixedUnitDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\QuantityKindFactorDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\QuantityKindFactorDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RatioScaleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RatioScaleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ReferencerRuleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ReferencerRuleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ScaleReferenceQuantityValueDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ScaleReferenceQuantityValueDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ScaleValueDefinitionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ScaleValueDefinitionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SimpleQuantityKindDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SimpleQuantityKindDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SimpleUnitDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SimpleUnitDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SpecializedQuantityKindDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SpecializedQuantityKindDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\TermDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\TermDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\TextParameterTypeDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\TextParameterTypeDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\TimeOfDayParameterTypeDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\TimeOfDayParameterTypeDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\UnitFactorDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\UnitFactorDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\UnitPrefixDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\UnitPrefixDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReportGeneratorDialogs\HtmlExportGlossarySelectionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReportGeneratorDialogs\HtmlExportGlossarySelectionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\BasicRdlRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\BasicRdlRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\CategoryRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\CategoryRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\ConstantBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\ConstantBrowserRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\FileTypeBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\FileTypeBrowserRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\GlossaryBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\GlossaryBrowserRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\MeasurementScalesRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\MeasurementScalesRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\MeasurementUnitsRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\MeasurementUnitsRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\ParameterTypeRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\ParameterTypeRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\ReferenceSourceRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\ReferenceSourceRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\RulesRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\RulesRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\SiteRdlSelectionRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\SiteRdlSelectionRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\UnitPrefixRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Ribbons\UnitPrefixRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Release\Views\Ribbons\SiteRdlSelectionRibbon.g.cs" />
-  </ItemGroup>
-  <ItemGroup>
+  <!--<ItemGroup>
     <None Remove="Views\Dialogs\SampledFunctionParameterTypeDialog.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Core">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Data">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Drawing">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.IO.Compression.FileSystem">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Numerics">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml.Linq">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
+  </ItemGroup>-->
 </Project>

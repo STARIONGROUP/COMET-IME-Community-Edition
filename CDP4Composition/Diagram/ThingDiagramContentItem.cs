@@ -1,25 +1,25 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ThingDiagramContentItem.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="ThingDiagramContentItem.cs" company="Starion Group S.A.">
+// //    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -44,16 +44,18 @@ namespace CDP4Composition.Diagram
 
     using ReactiveUI;
 
-    using PropertyChangingEventArgs = ReactiveUI.PropertyChangingEventArgs;
-    using PropertyChangingEventHandler = ReactiveUI.PropertyChangingEventHandler;
-
     /// <summary>
     /// Represents a diagram content control class that can store a <see cref="Thing"/>.
     /// </summary>
     public abstract class ThingDiagramContentItem : DiagramContentItem, IThingDiagramItem, IReactiveObject, IDisposable
     {
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
         /// <summary> 
-        /// <see cref="ReactiveUI.PropertyChangingEventHandler"/> event
+        /// <see cref="PropertyChangingEventHandler"/> event
         /// </summary>
         public event PropertyChangingEventHandler PropertyChanging;
 
@@ -82,8 +84,12 @@ namespace CDP4Composition.Diagram
         /// </summary>
         /// <param name="thing">
         /// The thing represented.</param>
-        protected ThingDiagramContentItem(Thing thing)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        protected ThingDiagramContentItem(Thing thing, ICDPMessageBus messageBus)
         {
+            this.messageBus = messageBus;
             this.Thing = thing;
             this.Content = thing;
             this.InitializeSubscriptions();
@@ -96,8 +102,12 @@ namespace CDP4Composition.Diagram
         /// The diagramThing contained</param>
         /// <param name="containerViewModel">
         /// The view model container of kind <see cref="IDiagramEditorViewModel"/></param>
-        protected ThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel containerViewModel)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        protected ThingDiagramContentItem(DiagramObject diagramThing, IDiagramEditorViewModel containerViewModel, ICDPMessageBus messageBus)
         {
+            this.messageBus = messageBus;
             this.containerViewModel = containerViewModel;
             this.Thing = diagramThing.DepictedThing;
             this.Content = diagramThing.DepictedThing;
@@ -150,7 +160,7 @@ namespace CDP4Composition.Diagram
         /// </summary>
         private void InitializeSubscriptions()
         {
-            var thingSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing)
+            var thingSubscription = this.messageBus.Listen<ObjectChangedEvent>(this.Thing)
                 .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.ObjectChangeEventHandler);
@@ -237,7 +247,7 @@ namespace CDP4Composition.Diagram
         /// <summary>
         /// Executes the PropertyChanging event
         /// </summary>
-        /// <param name="args">The <see cref="ReactiveUI.PropertyChangingEventArgs"/></param>
+        /// <param name="args">The <see cref="PropertyChangingEventArgs"/></param>
         void IReactiveObject.RaisePropertyChanging(PropertyChangingEventArgs args)
         {
             var propertyChanging = this.PropertyChanging;

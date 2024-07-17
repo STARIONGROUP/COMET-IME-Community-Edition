@@ -1,26 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IconUtilities.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="IconUtilities.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -76,12 +75,21 @@ namespace CDP4Common.Helpers
 
         public static ImageSource ToImageSource(this Icon icon)
         {
-            var imageSource = Imaging.CreateBitmapSourceFromHIcon(
-                icon.Handle,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
+            try
+            {
+                var imageSource = Imaging.CreateBitmapSourceFromHIcon(
+                    icon.Handle,
+                    Int32Rect.Empty,
+                    BitmapSizeOptions.FromEmptyOptions());
 
-            return imageSource;
+                return imageSource;
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -95,16 +103,25 @@ namespace CDP4Common.Helpers
         /// </returns>
         public static Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage)
         {
-            using (var outStream = new MemoryStream())
+            try
             {
-                BitmapEncoder enc = new PngBitmapEncoder();
-                enc.Frames.Add(BitmapFrame.Create(bitmapImage, null, null, null));
-                enc.Save(outStream);
+                using (var outStream = new MemoryStream())
+                {
+                    BitmapEncoder enc = new PngBitmapEncoder();
+                    enc.Frames.Add(BitmapFrame.Create(bitmapImage, null, null, null));
+                    enc.Save(outStream);
 
-                var bitmap = new Bitmap(outStream);
+                    var bitmap = new Bitmap(outStream);
 
-                return new Bitmap(bitmap);
+                    return new Bitmap(bitmap);
+                }
             }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -124,17 +141,26 @@ namespace CDP4Common.Helpers
         /// </returns>
         public static Bitmap BitmapImage2Bitmap(BitmapImage bitmapImage, int width, int height)
         {
-            using (var outStream = new MemoryStream())
+            try
             {
-                BitmapEncoder enc = new PngBitmapEncoder();
+                using (var outStream = new MemoryStream())
+                {
+                    BitmapEncoder enc = new PngBitmapEncoder();
 
-                enc.Frames.Add(BitmapFrame.Create(bitmapImage, null, null, null));
-                enc.Save(outStream);
+                    enc.Frames.Add(BitmapFrame.Create(bitmapImage, null, null, null));
+                    enc.Save(outStream);
 
-                var bitmap = new Bitmap(outStream);
+                    var bitmap = new Bitmap(outStream);
 
-                return new Bitmap(bitmap, width, height);
+                    return new Bitmap(bitmap, width, height);
+                }
             }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -148,7 +174,16 @@ namespace CDP4Common.Helpers
         /// </returns>
         public static BitmapSource WithErrorOverlay(Uri uri)
         {
-            return WithOverlay(uri, ErrorImageUri);
+            try
+            {
+                return WithOverlay(uri, ErrorImageUri);
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -168,25 +203,34 @@ namespace CDP4Common.Helpers
         /// </returns>
         public static BitmapSource WithOverlay(Uri iconUri, Uri overlayUri, OverlayPositionKind overlayPosition = OverlayPositionKind.TopRight)
         {
-            var source = new BitmapImage(iconUri);
-            var overlay = new BitmapImage(overlayUri);
-
-            var thingBitMapImage = BitmapImage2Bitmap(source);
-            var overlayBitMapImage = BitmapImage2Bitmap(overlay, (int)Math.Floor(thingBitMapImage.Width * 0.75D), (int)Math.Floor(thingBitMapImage.Height * 0.75D));
-
-            var img = new Bitmap(
-                    (int)Math.Floor(thingBitMapImage.Width * 1.4D),
-                    (int)Math.Floor(thingBitMapImage.Height * 1.0D),
-                System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            using (var gr = Graphics.FromImage(img))
+            try
             {
-                gr.CompositingMode = CompositingMode.SourceOver;
-                gr.DrawImage(thingBitMapImage, GetMainImagePoint(img, thingBitMapImage));
-                gr.DrawImage(overlayBitMapImage, GetOverlayPoint(overlayPosition, img, overlayBitMapImage));
+                var source = new BitmapImage(iconUri);
+                var overlay = new BitmapImage(overlayUri);
+
+                var thingBitMapImage = BitmapImage2Bitmap(source);
+                var overlayBitMapImage = BitmapImage2Bitmap(overlay, (int)Math.Floor(thingBitMapImage.Width * 0.75D), (int)Math.Floor(thingBitMapImage.Height * 0.75D));
+
+                var img = new Bitmap(
+                        (int)Math.Floor(thingBitMapImage.Width * 1.4D),
+                        (int)Math.Floor(thingBitMapImage.Height * 1.0D),
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                using (var gr = Graphics.FromImage(img))
+                {
+                    gr.CompositingMode = CompositingMode.SourceOver;
+                    gr.DrawImage(thingBitMapImage, GetMainImagePoint(img, thingBitMapImage));
+                    gr.DrawImage(overlayBitMapImage, GetOverlayPoint(overlayPosition, img, overlayBitMapImage));
+                }
+
+                return Bitmap2BitmapSource(img);
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
             }
 
-            return Bitmap2BitmapSource(img);
+            return null;
         }
 
         /// <summary>

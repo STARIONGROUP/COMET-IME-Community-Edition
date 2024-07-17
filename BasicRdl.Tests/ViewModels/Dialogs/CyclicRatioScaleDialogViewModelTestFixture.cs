@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CyclicRatioScaleDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CyclicRatioScaleDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,7 +29,10 @@ namespace BasicRdl.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
-    
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+    using System.Windows.Input;
+
     using CDP4Common.CommonData;
     using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
@@ -43,17 +46,19 @@ namespace BasicRdl.Tests.ViewModels
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
-    
+
     using ReactiveUI;
+
+    using CyclicRatioScaleDialogViewModel = BasicRdl.ViewModels.CyclicRatioScaleDialogViewModel;
 
     [TestFixture]
     internal class CyclicRatioScaleDialogViewModelTestFixture
     {
-        private BasicRdl.ViewModels.CyclicRatioScaleDialogViewModel viewmodel;
+        private CyclicRatioScaleDialogViewModel viewmodel;
         private CyclicRatioScale cyclicRatioScale;
         private SiteDirectory siteDir;
         private ThingTransaction transaction;
@@ -84,7 +89,7 @@ namespace BasicRdl.Tests.ViewModels
             this.rdl.Scale.Add(testScale);
             var svd1 = new ScaleValueDefinition(Guid.NewGuid(), null, null) { Name = "ReferenceSVD", ShortName = "RSVD" };
             var svd2 = new ScaleValueDefinition(Guid.NewGuid(), null, null) { Name = "DependentSVD", ShortName = "DSVD" };
-            this.cyclicRatioScale = new CyclicRatioScale(Guid.NewGuid(), null, null) { Name = "ratioScale", ShortName = "dqk", Modulus = "modulus"};
+            this.cyclicRatioScale = new CyclicRatioScale(Guid.NewGuid(), null, null) { Name = "ratioScale", ShortName = "dqk", Modulus = "modulus" };
             this.cyclicRatioScale.ValueDefinition.Add(svd1);
             this.cyclicRatioScale.ValueDefinition.Add(svd2);
             this.rdl.ParameterType.Add(new SimpleQuantityKind { Name = "testSQK", ShortName = "tSQK" });
@@ -99,9 +104,10 @@ namespace BasicRdl.Tests.ViewModels
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(new CDPMessageBus());
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
 
-            this.viewmodel = new BasicRdl.ViewModels.CyclicRatioScaleDialogViewModel(this.cyclicRatioScale, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.navigation.Object);
+            this.viewmodel = new CyclicRatioScaleDialogViewModel(this.cyclicRatioScale, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.navigation.Object);
         }
 
         [Test]
@@ -125,62 +131,62 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyUpdateOkCanExecute()
         {
             Assert.IsNull(this.viewmodel.SelectedUnit);
-            Assert.IsFalse(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
 
             this.viewmodel.SelectedUnit = this.viewmodel.PossibleUnit.First();
-            Assert.IsTrue(this.viewmodel.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.OkCommand).CanExecute(null));
         }
 
         [Test]
         public void VerifValueDefinitionCommands()
         {
-            Assert.IsTrue(this.viewmodel.CreateValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.InspectValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.EditValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.DeleteValueDefinitionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.CreateValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.InspectValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.EditValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.DeleteValueDefinitionCommand).CanExecute(null));
 
             this.viewmodel.SelectedValueDefinition = this.viewmodel.ValueDefinition.First();
 
-            Assert.IsTrue(this.viewmodel.InspectValueDefinitionCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.EditValueDefinitionCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.DeleteValueDefinitionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.InspectValueDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.EditValueDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.DeleteValueDefinitionCommand).CanExecute(null));
         }
 
         [Test]
         public void VerifMappingToReferenceScaleCommands()
         {
-            Assert.IsTrue(this.viewmodel.CreateMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.InspectMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.EditMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsFalse(this.viewmodel.DeleteMappingToReferenceScaleCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.CreateMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.InspectMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.EditMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.DeleteMappingToReferenceScaleCommand).CanExecute(null));
 
             var mtrs = new MappingToReferenceScale(Guid.NewGuid(), null, null);
             var mtrsr = new MappingToReferenceScaleRowViewModel(mtrs, this.session.Object, null);
             this.viewmodel.MappingToReferenceScale.Add(mtrsr);
             this.viewmodel.SelectedMappingToReferenceScale = this.viewmodel.MappingToReferenceScale.First();
 
-            Assert.IsTrue(this.viewmodel.InspectMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.EditMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsTrue(this.viewmodel.DeleteMappingToReferenceScaleCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.InspectMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.EditMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewmodel.DeleteMappingToReferenceScaleCommand).CanExecute(null));
 
             this.viewmodel.ValueDefinition.Clear();
-            Assert.IsFalse(this.viewmodel.CreateMappingToReferenceScaleCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.viewmodel.CreateMappingToReferenceScaleCommand).CanExecute(null));
         }
 
         [Test]
-        public void VerifyInspectValueDefinition()
+        public async Task VerifyInspectValueDefinition()
         {
-            var vm = this.viewmodel; 
+            var vm = this.viewmodel;
             Assert.IsNull(vm.SelectedValueDefinition);
 
             vm.SelectedValueDefinition = vm.ValueDefinition.First();
-            Assert.IsTrue(vm.InspectValueDefinitionCommand.CanExecute(null));
-            vm.InspectValueDefinitionCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectValueDefinitionCommand).CanExecute(null));
+            await vm.InspectValueDefinitionCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<ScaleValueDefinition>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 
         [Test]
-        public void VerifyInspectMappingToReferenceScale()
+        public async Task VerifyInspectMappingToReferenceScale()
         {
             var vm = this.viewmodel;
             Assert.IsNull(vm.SelectedMappingToReferenceScale);
@@ -189,8 +195,8 @@ namespace BasicRdl.Tests.ViewModels
             var mtrsr = new MappingToReferenceScaleRowViewModel(mtrs, this.session.Object, null);
             vm.MappingToReferenceScale.Add(mtrsr);
             vm.SelectedMappingToReferenceScale = vm.MappingToReferenceScale.First();
-            Assert.IsTrue(vm.InspectMappingToReferenceScaleCommand.CanExecute(null));
-            vm.InspectMappingToReferenceScaleCommand.Execute(null);
+            Assert.IsTrue(((ICommand)vm.InspectMappingToReferenceScaleCommand).CanExecute(null));
+            await vm.InspectMappingToReferenceScaleCommand.Execute();
             this.navigation.Verify(x => x.Navigate(It.IsAny<MappingToReferenceScale>(), It.IsAny<ThingTransaction>(), this.session.Object, false, ThingDialogKind.Inspect, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 
@@ -204,24 +210,24 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyReactiveCommandsCanExecuteOnInspectMode()
         {
-            var vm = new BasicRdl.ViewModels.CyclicRatioScaleDialogViewModel(this.cyclicRatioScale, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.navigation.Object, this.rdl, null);
-            Assert.IsFalse(vm.CreateAliasCommand.CanExecute(null));
-            Assert.IsFalse(vm.CreateDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(vm.CreateHyperLinkCommand.CanExecute(null));
-            Assert.IsFalse(vm.CreateMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsFalse(vm.CreateValueDefinitionCommand.CanExecute(null));
+            var vm = new CyclicRatioScaleDialogViewModel(this.cyclicRatioScale, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.navigation.Object, this.rdl, null);
+            Assert.IsFalse(((ICommand)vm.CreateAliasCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.CreateDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.CreateHyperLinkCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.CreateMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.CreateValueDefinitionCommand).CanExecute(null));
 
             vm.SelectedValueDefinition = this.viewmodel.ValueDefinition.First();
             var mtrs = new MappingToReferenceScale(Guid.NewGuid(), null, null);
             var mtrsr = new MappingToReferenceScaleRowViewModel(mtrs, this.session.Object, null);
             vm.SelectedMappingToReferenceScale = mtrsr;
 
-            Assert.IsTrue(vm.InspectValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(vm.EditValueDefinitionCommand.CanExecute(null));
-            Assert.IsFalse(vm.DeleteValueDefinitionCommand.CanExecute(null));
-            Assert.IsTrue(vm.InspectMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsFalse(vm.EditMappingToReferenceScaleCommand.CanExecute(null));
-            Assert.IsFalse(vm.DeleteMappingToReferenceScaleCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.InspectValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.EditValueDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.DeleteValueDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.InspectMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.EditMappingToReferenceScaleCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.DeleteMappingToReferenceScaleCommand).CanExecute(null));
         }
     }
 }

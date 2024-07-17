@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProductTreeViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ProductTreeViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -29,8 +29,11 @@ namespace ProductTree.Tests
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading;
+    using System.Threading.Tasks;
     using System.Windows;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -49,7 +52,7 @@ namespace ProductTree.Tests
 
     using CDP4ProductTree.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -84,11 +87,13 @@ namespace ProductTree.Tests
         private DomainOfExpertise domain;
         private Assembler assembler;
         private readonly string nestedParameterPath = "PATH";
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
 
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -103,7 +108,7 @@ namespace ProductTree.Tests
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
 
@@ -161,12 +166,14 @@ namespace ProductTree.Tests
                 {
                     { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, null) }
                 });
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -198,7 +205,7 @@ namespace ProductTree.Tests
             revisionNumber.SetValue(this.option, 50);
             this.option.Name = "blablabla";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.option, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.option, EventKind.Updated);
             Assert.AreEqual("blablabla", vm.CurrentOption);
         }
 
@@ -215,7 +222,7 @@ namespace ProductTree.Tests
             var iterationNumber = typeof(IterationSetup).GetProperty("IterationNumber");
             iterationNumber.SetValue(this.iterationSetup, 1);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iterationSetup, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iterationSetup, EventKind.Updated);
             Assert.AreEqual(1, vm.CurrentIteration);
         }
 
@@ -230,7 +237,7 @@ namespace ProductTree.Tests
             this.domain.Name = "System";
             this.domain.ShortName = "SYS";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.domain, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.domain, EventKind.Updated);
             Assert.AreEqual("System [SYS]", vm.DomainOfExpertise);
         }
 
@@ -244,7 +251,7 @@ namespace ProductTree.Tests
 
             this.person.GivenName = "Jane";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.person, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.person, EventKind.Updated);
             Assert.AreEqual("Jane Doe", vm.Person);
         }
 
@@ -257,7 +264,7 @@ namespace ProductTree.Tests
             revisionNumber.SetValue(this.iteration, 50);
             this.iteration.TopElement = null;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreEqual(0, vm.TopElement.Count);
         }
 
@@ -272,12 +279,12 @@ namespace ProductTree.Tests
             var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.iteration.TopElement = elementdef;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreSame(elementdef, vm.TopElement.Single().Thing);
         }
 
         [Test]
-        public void VerifyExecuteCreateSubscriptionCommand()
+        public async Task VerifyExecuteCreateSubscriptionCommand()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
@@ -302,31 +309,31 @@ namespace ProductTree.Tests
             elementdef.Parameter.Add(parameter);
             this.iteration.TopElement = elementdef;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreSame(elementdef, vm.TopElement.Single().Thing);
             Assert.AreEqual(1, vm.TopElement.Single().ContainedRows.Count);
             var paramRow = vm.TopElement.Single().ContainedRows.First() as ParameterOrOverrideBaseRowViewModel;
             Assert.NotNull(paramRow);
             vm.SelectedThing = paramRow;
 
-            Assert.IsTrue(vm.CreateSubscriptionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.CreateSubscriptionCommand).CanExecute(null));
             Assert.AreEqual(0, paramRow.Thing.ParameterSubscription.Count);
 
             vm.SelectedThing = null;
-            vm.CreateSubscriptionCommand.Execute(null);
+            await vm.CreateSubscriptionCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
 
             vm.SelectedThing = vm.TopElement.Single();
-            vm.CreateSubscriptionCommand.Execute(null);
+            await vm.CreateSubscriptionCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
 
             vm.SelectedThing = paramRow;
-            vm.CreateSubscriptionCommand.Execute(null);
+            await vm.CreateSubscriptionCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
         }
 
         [Test]
-        public void VerifyExecuteDeleteSubscriptionCommand()
+        public async Task VerifyExecuteDeleteSubscriptionCommand()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
 
@@ -352,7 +359,7 @@ namespace ProductTree.Tests
             elementdef.Parameter.Add(parameter);
             this.iteration.TopElement = elementdef;
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.AreSame(elementdef, vm.TopElement.Single().Thing);
             Assert.AreEqual(1, vm.TopElement.Single().ContainedRows.Count);
             var paramRow = vm.TopElement.Single().ContainedRows.First() as ParameterOrOverrideBaseRowViewModel;
@@ -362,13 +369,13 @@ namespace ProductTree.Tests
             vm.PopulateContextMenu();
             Assert.AreEqual(8, vm.ContextMenu.Count);
 
-            Assert.IsTrue(vm.DeleteSubscriptionCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.DeleteSubscriptionCommand).CanExecute(null));
             Assert.AreEqual(1, paramRow.Thing.ParameterSubscription.Count);
-            vm.DeleteSubscriptionCommand.Execute(null);
+            await vm.DeleteSubscriptionCommand.Execute();
         }
 
         [Test]
-        public void VerifyCopyPathToClipboardCommand()
+        public async Task VerifyCopyPathToClipboardCommand()
         {
             var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration, ShortName = "ELEMENT" };
             var anotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Not owned" };
@@ -399,7 +406,7 @@ namespace ProductTree.Tests
 
             Clipboard.SetText("Reset");
 
-            vm.CopyPathToClipboardCommand.Execute(null);
+            await vm.CopyPathToClipboardCommand.Execute();
 
             Assert.IsTrue(Clipboard.GetDataObject().GetData(typeof(string)).ToString().Contains($"{this.nestedParameterPath}"));
         }
@@ -412,13 +419,13 @@ namespace ProductTree.Tests
 
             this.domain = null;
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
-            
+
             vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
         [Test]
-        public void VerifyCreateParameterOverride()
+        public async Task VerifyCreateParameterOverride()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
@@ -452,18 +459,18 @@ namespace ProductTree.Tests
             this.iteration.TopElement = elementdef;
             vm.SelectedThing = parameterRow;
 
-            Assert.IsTrue(vm.CreateOverrideCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.CreateOverrideCommand).CanExecute(null));
 
             vm.SelectedThing = null;
-            vm.CreateOverrideCommand.Execute(null);
+            await vm.CreateOverrideCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
 
             vm.SelectedThing = vm.TopElement.Single();
-            vm.CreateOverrideCommand.Execute(null);
+            await vm.CreateOverrideCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
 
             vm.SelectedThing = parameterRow;
-            vm.CreateOverrideCommand.Execute(parameter);
+            await vm.CreateOverrideCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
 
             vm.PopulateContextMenu();
@@ -482,19 +489,19 @@ namespace ProductTree.Tests
             var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain, Container = elementdef, ParameterType = boolParamType };
             elementdef.Parameter.Add(parameter);
 
-            Assert.IsFalse(vm.CreateOverrideCommand.CanExecute(parameter));
+            Assert.IsFalse(((ICommand)vm.CreateOverrideCommand).CanExecute(parameter));
         }
 
         [Test]
-        public void VerifyToggleNamesAndShortNames()
+        public async Task VerifyToggleNamesAndShortNames()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             Assert.IsFalse(vm.IsDisplayShortNamesOn);
-            Assert.IsTrue(vm.ToggleUsageNamesCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.ToggleUsageNamesCommand).CanExecute(null));
 
-            vm.ToggleUsageNamesCommand.Execute(null);
+            await vm.ToggleUsageNamesCommand.Execute();
             Assert.IsTrue(vm.IsDisplayShortNamesOn);
-            vm.ToggleUsageNamesCommand.Execute(null);
+            await vm.ToggleUsageNamesCommand.Execute();
             Assert.IsFalse(vm.IsDisplayShortNamesOn);
             Assert.DoesNotThrow(vm.Dispose);
         }

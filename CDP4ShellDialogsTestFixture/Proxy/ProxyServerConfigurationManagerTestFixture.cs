@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProxyServerConfigurationManagerTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="ProxyServerConfigurationManagerTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2018 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -24,7 +24,7 @@ namespace CDP4ShellDialogs.Tests.Proxy
         {
             try
             {
-                Registry.CurrentUser.DeleteSubKeyTree(@"SOFTWARE\RHEA\CDP4\ProxyServerConfiguration");
+                Registry.CurrentUser.DeleteSubKeyTree(@"SOFTWARE\STARION\CDP4\ProxyServerConfiguration");
             }
             catch (Exception e)
             {
@@ -44,7 +44,7 @@ namespace CDP4ShellDialogs.Tests.Proxy
         {
             try
             {
-                Registry.CurrentUser.DeleteSubKeyTree(@"SOFTWARE\RHEA\CDP4\ProxyServerConfiguration");
+                Registry.CurrentUser.DeleteSubKeyTree(@"SOFTWARE\STARION\CDP4\ProxyServerConfiguration");
             }
             catch (Exception e)
             {

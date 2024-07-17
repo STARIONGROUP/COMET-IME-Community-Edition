@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ModelBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="ModelBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed.
 // 
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET-IME Community Edition.
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 // 
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 // 
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 //    Lesser General Public License for more details.
@@ -28,6 +28,7 @@ namespace CDP4SiteDirectory.ViewModels
     using System;
     using System.ComponentModel.Composition;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -42,8 +43,6 @@ namespace CDP4SiteDirectory.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
-
-    using CDP4SiteDirectory.Views;
 
     using ReactiveUI;
 
@@ -108,12 +107,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand" /> to create a new <see cref="Participant" />
         /// </summary>
-        public ReactiveCommand<object> CreateParticipantCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateParticipantCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand" /> to create a new <see cref="IterationSetup" />
         /// </summary>
-        public ReactiveCommand<object> CreateIterationSetupCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateIterationSetupCommand { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the current user can create a <see cref="IterationSetup" />
@@ -165,13 +164,9 @@ namespace CDP4SiteDirectory.ViewModels
             base.InitializeCommands();
 
             this.ComputeStaticPermission();
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateEngineeringModelSetup));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<EngineeringModelSetup>(this.Thing));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<EngineeringModelSetup>(this.Thing), this.WhenAnyValue(x => x.CanCreateEngineeringModelSetup));
 
-            this.CreateParticipantCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateParticipant));
-
-            this.CreateParticipantCommand.Subscribe(
-                _ =>
+            this.CreateParticipantCommand = ReactiveCommandCreator.Create(() =>
                 {
                     var container = this.GetSelectedModelSetupContainer();
 
@@ -181,12 +176,10 @@ namespace CDP4SiteDirectory.ViewModels
                     }
 
                     this.ExecuteCreateCommand<Participant>(container);
-                });
+                }, 
+                this.WhenAnyValue(x => x.CanCreateParticipant));
 
-            this.CreateIterationSetupCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateIterationSetup));
-
-            this.CreateIterationSetupCommand.Subscribe(
-                _ =>
+            this.CreateIterationSetupCommand = ReactiveCommandCreator.Create(() =>
                 {
                     var container = this.GetSelectedModelSetupContainer();
 
@@ -196,7 +189,8 @@ namespace CDP4SiteDirectory.ViewModels
                     }
 
                     this.ExecuteCreateCommand<IterationSetup>(container);
-                });
+                }, 
+                this.WhenAnyValue(x => x.CanCreateIterationSetup));
         }
 
         /// <summary>
@@ -229,9 +223,8 @@ namespace CDP4SiteDirectory.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Participant", "", this.CreateParticipantCommand, MenuItemKind.Create, ClassKind.Participant));
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Iteration Setup", "", this.CreateIterationSetupCommand, MenuItemKind.Create, ClassKind.IterationSetup));
             }
-            else if (this.SelectedThing is ModelParticipantRowViewModel)
+            else if (this.SelectedThing is ModelParticipantRowViewModel participantRowViewModel)
             {
-                var participantRowViewModel = (ModelParticipantRowViewModel)this.SelectedThing;
                 var engineeringModelSetup = (EngineeringModelSetup)participantRowViewModel.Thing.Container;
 
                 if (engineeringModelSetup.Participant.Count == 1)
@@ -252,9 +245,7 @@ namespace CDP4SiteDirectory.ViewModels
             }
             else
             {
-                var folderRowViewModel = this.SelectedThing as FolderRowViewModel;
-
-                if (folderRowViewModel != null)
+                if (this.SelectedThing is FolderRowViewModel folderRowViewModel)
                 {
                     if (folderRowViewModel.ShortName == "Iterations")
                     {
@@ -292,7 +283,7 @@ namespace CDP4SiteDirectory.ViewModels
                                                && modelSetup.StudyPhase != StudyPhaseKind.PREPARATION_PHASE
                                                && this.PermissionService.CanWrite(ClassKind.IterationSetup, modelSetup);
 
-                this.canCreateParticipant = modelSetup != null &&
+                this.CanCreateParticipant = modelSetup != null &&
                                             this.PermissionService.CanWrite(ClassKind.Participant, modelSetup);
             }
             else
@@ -303,7 +294,7 @@ namespace CDP4SiteDirectory.ViewModels
                                                && modelSetup.StudyPhase != StudyPhaseKind.PREPARATION_PHASE
                                                && this.PermissionService.CanWrite(ClassKind.IterationSetup, modelSetup);
 
-                this.canCreateParticipant = modelSetup != null &&
+                this.CanCreateParticipant = modelSetup != null &&
                                             this.PermissionService.CanWrite(ClassKind.Participant, modelSetup);
             }
         }
@@ -357,9 +348,7 @@ namespace CDP4SiteDirectory.ViewModels
         /// <returns>The <see cref="EngineeringModelSetup" /></returns>
         private EngineeringModelSetup GetSelectedModelSetupContainer()
         {
-            var folderRow = this.SelectedThing as FolderRowViewModel;
-
-            if (folderRow != null)
+            if (this.SelectedThing is FolderRowViewModel folderRow)
             {
                 return (EngineeringModelSetup)this.SelectedThing.ContainerViewModel.Thing;
             }
@@ -377,7 +366,10 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private void ComputeStaticPermission()
         {
-            this.CanCreateEngineeringModelSetup = this.PermissionService.CanWrite(ClassKind.EngineeringModelSetup, this.Thing);
+            this.CanCreateEngineeringModelSetup = 
+                this.PermissionService.CanWrite(ClassKind.EngineeringModelSetup, this.Thing)
+                ||
+                this.PermissionService.CanCreateOverride(ClassKind.EngineeringModelSetup, ClassKind.SiteDirectory);
         }
     }
 }

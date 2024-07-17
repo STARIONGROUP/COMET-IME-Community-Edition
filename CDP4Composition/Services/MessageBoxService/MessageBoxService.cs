@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CDP4MessageBoxService.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CDP4MessageBoxService.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -61,6 +61,20 @@ namespace CDP4Composition.Services
         public MessageBoxResult Show(string messageBoxText, string caption, MessageBoxButton button, MessageBoxImage icon)
         {
             return MessageBox.Show(messageBoxText, caption, button, icon);
+        }
+
+        /// <summary>
+        /// Shows a MessageBox
+        /// </summary>
+        /// <param name="messageBoxText">The text</param>
+        /// <param name="caption">The caption</param>
+        /// <param name="button">The <see cref="MessageBoxButton"/></param>
+        /// <param name="icon">The <see cref="MessageBoxImage"/></param>
+        /// <param name="defaultMessageBoxResult">The default <see cref="MessageBoxResult"/></param>
+        /// <returns>A <see cref="MessageBoxResult"/></returns>
+        public MessageBoxResult ShowAlwaysOnTop(string messageBoxText, string caption, MessageBoxButton button, MessageBoxImage icon, MessageBoxResult defaultMessageBoxResult)
+        {
+            return MessageBox.Show(messageBoxText, caption, button, icon, defaultMessageBoxResult, MessageBoxOptions.ServiceNotification);
         }
     }
 }

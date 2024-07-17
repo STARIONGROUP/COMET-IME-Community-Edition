@@ -1,26 +1,25 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="FileRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="FileRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -36,47 +35,51 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
-    
+
     using CDP4EngineeringModel.ViewModels;
-    
+
     using Moq;
-    
+
     using NUnit.Framework;
 
     /// <summary>
     /// Suite of tests for the <see cref="FileRowViewModel"/>
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class FileRowViewModelTestFixture
     {
         private PropertyInfo revisionNumberPropertyInfo = typeof(Thing).GetProperty("RevisionNumber");
 
         private Mock<ISession> session;
         private Mock<IFileStoreFileAndFolderHandler> fileStoreFileAndFolderHandler;
-        private Uri uri = new Uri("http://www.rheagroup.com");
+        private Uri uri = new Uri("https://www.stariongroup.eu");
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+        private CDPMessageBus messageBus;
 
         private Person person;
         private Participant participant;
         private DomainFileStore store;
-        
+
         private File file;
         private FileRevision fileRevision1;
         private FileRevision fileRevision2;
-        
+
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.person = new Person(Guid.NewGuid(), this.cache, this.uri)
             {
                 ShortName = "person",
                 GivenName = "John",
-                Surname = "Doe" 
+                Surname = "Doe"
             };
 
             this.participant = new Participant(Guid.NewGuid(), this.cache, this.uri)
@@ -87,7 +90,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
 
             this.store = new DomainFileStore(Guid.NewGuid(), this.cache, this.uri);
             this.file = new File(Guid.NewGuid(), this.cache, this.uri);
-           
+
             this.fileRevision1 = new FileRevision(Guid.NewGuid(), this.cache, this.uri)
             {
                 Name = "1",
@@ -129,7 +132,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
 
             this.file.LockedBy = this.person;
             this.revisionNumberPropertyInfo.SetValue(this.file, 10);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.file, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.file, EventKind.Updated);
 
             Assert.IsTrue(viewModel.IsLocked);
             Assert.AreEqual("John Doe", viewModel.Locker);
@@ -137,7 +140,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
 
             this.file.FileRevision.Add(this.fileRevision2);
             this.revisionNumberPropertyInfo.SetValue(this.file, 11);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.file, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.file, EventKind.Updated);
 
             Assert.AreEqual(this.fileRevision2.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture), viewModel.CreationDate);
             Assert.AreEqual(this.fileRevision2.Name, viewModel.Name);

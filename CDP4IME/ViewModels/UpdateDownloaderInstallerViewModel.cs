@@ -1,28 +1,29 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PluginInstallerViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="PluginInstallerViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-Plugin Installer Community Edition. 
-//    The CDP4-Plugin Installer Community Edition is the RHEA Plugin Installer for the CDP4-IME Community Edition.
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-Plugin Installer Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-Plugin Installer Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.ViewModels
+namespace COMET.ViewModels
 {
     using System;
     using System.Collections.Generic;
@@ -30,6 +31,7 @@ namespace CDP4IME.ViewModels
     using System.IO;
     using System.Linq;
     using System.Net.Http;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -39,19 +41,20 @@ namespace CDP4IME.ViewModels
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Modularity;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services.AppSettingService;
     using CDP4Composition.Utilities;
 
-    using CDP4IME.Behaviors;
-    using CDP4IME.Services;
-    using CDP4IME.Settings;
-    using CDP4IME.Views;
-
     using CDP4UpdateServerDal;
 
-    using Microsoft.Practices.ServiceLocation;
+    using COMET.Behaviors;
+    using COMET.Services;
+    using COMET.Settings;
+    using COMET.Views;
+
+    using CommonServiceLocator;
 
     using NLog;
 
@@ -186,27 +189,27 @@ namespace CDP4IME.ViewModels
         /// <summary>
         /// Gets the Command that will cancel the operations close the view
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Gets the Command that will install all plugin selected for installation
         /// </summary>
-        public ReactiveCommand<object> InstallCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> InstallCommand { get; private set; }
 
         /// <summary>
         /// Gets the Command that will Download all plugin selected and ime version
         /// </summary>
-        public ReactiveCommand<object> DownloadCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> DownloadCommand { get; private set; }
 
         /// <summary>
         /// Gets the Command to select/unselect all available updates
         /// </summary>
-        public ReactiveCommand<object> SelectAllUpdateCheckBoxCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SelectAllUpdateCheckBoxCommand { get; private set; }
         
         /// <summary>
         /// Gets the Command to auto restart after selected things have done downloading
         /// </summary>
-        public ReactiveCommand<object> RestartAfterDownloadCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> RestartAfterDownloadCommand { get; private set; }
 
         /// <summary>
         /// Gets a <see cref="List{T}"/> of type <see cref="PluginRowViewModel"/> that holds the properties for <see cref="PluginRow"/>
@@ -228,7 +231,7 @@ namespace CDP4IME.ViewModels
         /// Gets <see cref="IEnumerable{T}"/> of type <code>(string ThingName, string Version)</code> containing new versions
         /// </summary>
         public IEnumerable<(string ThingName, string Version)> DownloadableThings { get; private set; } = new List<(string ThingName, string Version)>();
-        
+
         /// <summary>
         /// Gets a instance of <see cref="IUpdateServerClient"/>
         /// </summary>
@@ -287,10 +290,8 @@ namespace CDP4IME.ViewModels
         /// </summary>
         private void InitializeDownloadRelativeCommand()
         {
-            this.DownloadCommand = ReactiveCommand.Create(this.isInstallationOrDownloadInProgressObservable);
-            this.DownloadCommand.Subscribe(async _ => await this.DownloadCommandExecute());
-            this.RestartAfterDownloadCommand = ReactiveCommand.Create();
-            this.RestartAfterDownloadCommand.Subscribe(_ => this.RestartAfterDownloadCommandExecute());
+            this.DownloadCommand = ReactiveCommandCreator.CreateAsyncTask(this.DownloadCommandExecute, this.isInstallationOrDownloadInProgressObservable);
+            this.RestartAfterDownloadCommand = ReactiveCommandCreator.Create(this.RestartAfterDownloadCommandExecute);
         }
 
         /// <summary>
@@ -299,10 +300,8 @@ namespace CDP4IME.ViewModels
         private void InitializeCommand()
         {
             this.isInstallationOrDownloadInProgressObservable = this.WhenAny(x => x.isInstallationOrDownloadInProgress, b => !b.Value);
-            this.SelectAllUpdateCheckBoxCommand = ReactiveCommand.Create(this.isInstallationOrDownloadInProgressObservable);
-            this.SelectAllUpdateCheckBoxCommand.Subscribe(_ => this.SelectDeselectAllPluginCommandExecute());
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.CancelCommandExecute());
+            this.SelectAllUpdateCheckBoxCommand = ReactiveCommandCreator.Create(this.SelectDeselectAllPluginCommandExecute, this.isInstallationOrDownloadInProgressObservable);
+            this.CancelCommand = ReactiveCommandCreator.Create(this.CancelCommandExecute);
         }
 
         /// <summary>
@@ -310,7 +309,7 @@ namespace CDP4IME.ViewModels
         /// </summary>
         private void InitializeInstallationRelativeCommand()
         {
-            this.InstallCommand = ReactiveCommand.Create(this.isInstallationOrDownloadInProgressObservable);
+            this.InstallCommand = ReactiveCommandCreator.Create(this.isInstallationOrDownloadInProgressObservable);
 
             var currentDispatcher = Dispatcher.CurrentDispatcher;
             
@@ -547,7 +546,7 @@ namespace CDP4IME.ViewModels
         private void CancelCommandExecute()
         {
             this.CancellationTokenSource?.Cancel();
-            this.Behavior.Close();
+            this.Behavior?.Close();
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RequirementsSpecificationDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="RequirementsSpecificationDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="RequirementsSpecification"/>
@@ -123,22 +124,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Requirement
         /// </summary>
-        public ReactiveCommand<object> CreateRequirementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateRequirementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Requirement
         /// </summary>
-        public ReactiveCommand<object> DeleteRequirementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteRequirementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Requirement
         /// </summary>
-        public ReactiveCommand<object> EditRequirementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditRequirementCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Requirement
         /// </summary>
-        public ReactiveCommand<object> InspectRequirementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectRequirementCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -151,16 +152,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedRequirementCommand = this.WhenAny(vm => vm.SelectedRequirement, v => v.Value != null);
             var canExecuteEditSelectedRequirementCommand = this.WhenAny(vm => vm.SelectedRequirement, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateRequirementCommand = ReactiveCommand.Create(canExecuteCreateRequirementCommand);
+            this.CreateRequirementCommand = ReactiveCommandCreator.Create(canExecuteCreateRequirementCommand);
             this.CreateRequirementCommand.Subscribe(_ => this.ExecuteCreateCommand<Requirement>(this.PopulateRequirement));
 
-            this.DeleteRequirementCommand = ReactiveCommand.Create(canExecuteEditSelectedRequirementCommand);
+            this.DeleteRequirementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRequirementCommand);
             this.DeleteRequirementCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedRequirement.Thing, this.PopulateRequirement));
 
-            this.EditRequirementCommand = ReactiveCommand.Create(canExecuteEditSelectedRequirementCommand);
+            this.EditRequirementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRequirementCommand);
             this.EditRequirementCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedRequirement.Thing, this.PopulateRequirement));
 
-            this.InspectRequirementCommand = ReactiveCommand.Create(canExecuteInspectSelectedRequirementCommand);
+            this.InspectRequirementCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRequirementCommand);
             this.InspectRequirementCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRequirement.Thing));
         }
 

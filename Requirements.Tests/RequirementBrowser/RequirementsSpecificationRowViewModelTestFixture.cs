@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RequirementsSpecificationRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="RequirementsSpecificationRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests.RequirementBrowser
 {
@@ -12,25 +31,28 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using System.Reactive.Concurrency;
     using System.Reflection;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
-    using CDP4Composition.DragDrop;
-    using CDP4Dal;
-    using CDP4Dal.Events;
-    using CDP4Dal.Permission;
-    using CDP4Requirements.ViewModels;
-    using Moq;
-    using NUnit.Framework;
-    using ReactiveUI;
 
-    using RequirementsSpecificationRowViewModel = CDP4Requirements.ViewModels.RequirementsSpecificationRowViewModel;
+    using CDP4Composition.DragDrop;
+
+    using CDP4Dal.Events;
+    using CDP4Dal.Operations;
+
+    using CDP4Requirements.ViewModels;
+
+    using Moq;
+
+    using NUnit.Framework;
+
+    using ReactiveUI;
 
     [TestFixture]
     internal class RequirementsSpecificationRowViewModelTestFixture : OrderHandlerServiceTestFixtureBase
     {
-        private readonly PropertyInfo revision = typeof (Thing).GetProperty("RevisionNumber");
+        private readonly PropertyInfo revision = typeof(Thing).GetProperty("RevisionNumber");
 
         private RequirementsBrowserViewModel requirementBrowserViewModel;
         private List<Category> categories;
@@ -50,14 +72,14 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
             var row = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, this.requirementBrowserViewModel);
-        
+
             Assert.AreEqual("spec1", row.Name);
             Assert.AreEqual("spec1", row.ShortName);
             Assert.AreEqual("category1, category2", row.Categories);
@@ -83,14 +105,14 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             this.revision.SetValue(this.grp1, 2);
             this.revision.SetValue(this.spec2, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.grp1, EventKind.Updated);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.grp1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.spec2, EventKind.Updated);
 
             Assert.AreEqual(6, grp1Row.ContainedRows.Count);
 
             this.spec2.Group.Remove(this.grp2);
             this.revision.SetValue(this.spec2, 3);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.spec2, EventKind.Updated);
 
             groups = row.ContainedRows.Where(x => x.Thing is RequirementsGroup);
             Assert.AreEqual(2, groups.Count());
@@ -106,18 +128,17 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             this.req21.Group = null;
             this.revision.SetValue(this.req21, 2);
-             
-            CDPMessageBus.Current.SendObjectChangeEvent(this.req21, EventKind.Updated);
+
+            this.messageBus.SendObjectChangeEvent(this.req21, EventKind.Updated);
             reqRows = spec2Row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
             Assert.AreEqual(1, reqRows.Count);
-
 
             var grp1Row = spec2Row.ContainedRows.Single(x => x.Thing.Iid == this.grp1.Iid);
             Assert.IsFalse(grp1Row.ContainedRows.Any(x => x.Thing.Iid == this.req21.Iid));
             this.req21.Group = this.grp4;
             this.revision.SetValue(this.req21, 3);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.req21, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.req21, EventKind.Updated);
             Assert.IsFalse(grp1Row.ContainedRows.Any(x => x.Thing.Iid == this.req21.Iid));
 
             var grp11Row = grp1Row.ContainedRows.Single(x => x.Thing.Iid == this.grp4.Iid);
@@ -125,7 +146,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.req21.Group = null;
             this.revision.SetValue(this.req21, 4);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.req21, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.req21, EventKind.Updated);
             Assert.IsFalse(grp11Row.ContainedRows.Any(x => x.Thing.Iid == this.req21.Iid));
             Assert.IsTrue(spec2Row.ContainedRows.Any(x => x.Thing.Iid == this.req21.Iid));
 
@@ -133,14 +154,14 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.spec2.Requirement.Add(newreq);
             this.revision.SetValue(this.spec2, 5);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.spec2, EventKind.Updated);
             reqRows = spec2Row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
             Assert.AreEqual(2, reqRows.Count);
 
             this.spec2.Requirement.Remove(newreq);
             this.revision.SetValue(this.spec2, 6);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.spec2, EventKind.Updated);
             reqRows = spec2Row.ContainedRows.Where(x => x.Thing is Requirement).ToList();
             Assert.AreEqual(1, reqRows.Count);
         }
@@ -163,19 +184,18 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             this.revision.SetValue(this.grp1, 2);
             this.revision.SetValue(this.spec2, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.grp1, EventKind.Updated);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.grp1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.spec2, EventKind.Updated);
 
             Assert.AreEqual(6, grp1Row.ContainedRows.Count);
 
             this.spec2.Group.Remove(this.grp2);
             this.revision.SetValue(this.spec2, 3);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.spec2, EventKind.Updated);
 
             groups = row.ContainedRows.Where(x => x.Thing is RequirementsGroup);
             Assert.AreEqual(2, groups.Count());
         }
-
 
         [Test]
         public void VerifyDragOver()
@@ -239,7 +259,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         {
             this.spec1.IsDeprecated = true;
             var row = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, this.requirementBrowserViewModel);
-            Assert.IsTrue(row.IsDeprecated); 
+            Assert.IsTrue(row.IsDeprecated);
         }
 
         [Test]

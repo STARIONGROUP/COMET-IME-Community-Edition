@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ReferenceDataLibraryRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA System S.A.
+// <copyright file="ReferenceDataLibraryRowViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -106,7 +106,7 @@ namespace CDP4ObjectBrowser
             this.constantFolder = new CDP4Composition.FolderRowViewModel("Constant", "Constant", this.Session, this);
             this.ContainedRows.Add(this.constantFolder);
 
-            var rdlListener = CDPMessageBus.Current.Listen<SessionEvent>()
+            var rdlListener = this.CDPMessageBus.Listen<SessionEvent>()
                 .Where(objectChange => objectChange.Status == SessionStatus.RdlOpened || objectChange.Status == SessionStatus.RdlClosed)
                 .Subscribe(_ => this.UpdateProperties());
             this.Disposables.Add(rdlListener);

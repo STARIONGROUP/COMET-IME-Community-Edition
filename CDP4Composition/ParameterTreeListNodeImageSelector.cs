@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterTreeListNodeImageSelector.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ParameterTreeListNodeImageSelector.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 // 
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -38,7 +38,7 @@ namespace CDP4Composition
     using DevExpress.Xpf.Grid;
     using DevExpress.Xpf.Grid.TreeList;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     /// <summary>
     /// ParameterTreeListNodeImageSelector used to select the tree nodes and adds the icons to it
@@ -71,24 +71,33 @@ namespace CDP4Composition
         /// <returns></returns>
         private object Convert(ParameterRowControlViewModel parameterRow)
         {
-            ClassKind valuesetRowType;
-            Enum.TryParse(parameterRow.RowType, out valuesetRowType);
-
-            if (parameterRow.Parameter != null && parameterRow.Parameter.StateDependence != null)
+            try
             {
-                var stateUri = new Uri(IconUtilities.ImageUri(ClassKind.ActualFiniteState).ToString());
-                var baseUri = new Uri(IconUtilities.ImageUri(parameterRow.Parameter.ClassKind).ToString());
-                return IconUtilities.WithOverlay(baseUri, stateUri);
+                ClassKind valuesetRowType;
+                Enum.TryParse(parameterRow.RowType, out valuesetRowType);
+
+                if (parameterRow.Parameter != null && parameterRow.Parameter.StateDependence != null)
+                {
+                    var stateUri = new Uri(IconUtilities.ImageUri(ClassKind.ActualFiniteState).ToString());
+                    var baseUri = new Uri(IconUtilities.ImageUri(parameterRow.Parameter.ClassKind).ToString());
+                    this.QueryIIconCacheService().QueryOverlayBitmapSource(baseUri, stateUri, OverlayPositionKind.TopRight);
+                }
+
+                if (parameterRow.Parameter != null)
+                {
+                    return this.QueryIIconCacheService().QueryBitmapImage(new Uri(IconUtilities.ImageUri(parameterRow.Parameter.ClassKind).ToString()));
+                }
+
+                var uri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
+
+                return this.QueryIIconCacheService().QueryBitmapImage(uri);
+            }
+            catch (Exception e)
+            {
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
             }
 
-            if (parameterRow.Parameter != null)
-            {
-                return this.QueryIIconCacheService().QueryBitmapImage(new Uri(IconUtilities.ImageUri(parameterRow.Parameter.ClassKind).ToString()));
-            }
-
-            var uri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
-
-            return new BitmapImage(uri);
+            return null;
         }
 
         /// <summary>
@@ -99,7 +108,7 @@ namespace CDP4Composition
         /// </returns>
         private IIconCacheService QueryIIconCacheService()
         {
-            return this.iconCacheService ?? (this.iconCacheService = ServiceLocator.Current.GetInstance<IIconCacheService>());
+            return this.iconCacheService ??= ServiceLocator.Current.GetInstance<IIconCacheService>();
         }
     }
 }

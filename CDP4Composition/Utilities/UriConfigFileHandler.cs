@@ -1,12 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UriConfigFileHandler.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="UriConfigFileHandler.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -45,7 +45,7 @@ namespace CDP4Composition.Utilities
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public static string ConfigFileRelativeFolder = $"RHEA{Path.DirectorySeparatorChar}cdp4{Path.DirectorySeparatorChar}";
+        public static string ConfigFileRelativeFolder = $"STARION{Path.DirectorySeparatorChar}CDP4-COMET{Path.DirectorySeparatorChar}";
 
         /// <summary>
         /// Application configuration file name.
@@ -63,12 +63,41 @@ namespace CDP4Composition.Utilities
         public string ConfigurationFileDir => Path.Combine(AppDataFolder, ConfigFileRelativeFolder);
 
         /// <summary>
-        /// Read the uris to the JSON configuration file
+        /// Creates a new instance of the <see cref="UriConfigFileHandler"/> class
         /// </summary>
-        /// <returns>
-        /// an <see cref="IEnumerable{UriConfig}"/>
-        /// </returns>
-        public IEnumerable<UriConfig> Read()
+        public UriConfigFileHandler()
+        {
+            this.TryImportOld();
+        }
+
+        /// <summary>
+        /// Tries to import old config file
+        /// </summary>
+        private void TryImportOld()
+        {
+            if (!File.Exists(this.ConfigurationFilePath))
+            {
+                if (File.Exists(Path.Combine(AppDataFolder, $"RHEA{Path.DirectorySeparatorChar}CDP4-COMET{Path.DirectorySeparatorChar}", ConfigFileName)))
+                {
+                    File.Copy(Path.Combine(AppDataFolder, $"RHEA{Path.DirectorySeparatorChar}CDP4-COMET{Path.DirectorySeparatorChar}", ConfigFileName), this.ConfigurationFilePath);
+                    return;
+                }
+
+                if (File.Exists(Path.Combine(AppDataFolder, $"RHEA{Path.DirectorySeparatorChar}CDP4{Path.DirectorySeparatorChar}", ConfigFileName)))
+                {
+                    File.Copy(Path.Combine(AppDataFolder, $"RHEA{Path.DirectorySeparatorChar}CDP4{Path.DirectorySeparatorChar}", ConfigFileName), this.ConfigurationFilePath);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+            /// Read the uris to the JSON configuration file
+            /// </summary>
+            /// <returns>
+            /// an <see cref="IEnumerable{UriConfig}"/>
+            /// </returns>
+            public IEnumerable<UriConfig> Read()
         {
             List<UriConfig> configFileClientsList;
 

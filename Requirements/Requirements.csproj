@@ -1,18 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{CB6F4AD4-4DFA-4F99-A2E8-9B468820266E}</ProjectGuid>
-    <MinIMEVersion>9.7.0</MinIMEVersion>
-    <RootNamespace>CDP4Requirements</RootNamespace>
-    <AssemblyName>CDP4Requirements</AssemblyName>
-    <TargetFramework>net48</TargetFramework>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>CDP4Requirements</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
-    <Product>Requirements</Product>
-    <Description>CDP4-COMET Requirements Plugin</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.7.0.0</AssemblyVersion>
-    <FileVersion>9.7.0.0</FileVersion>
+	<ProjectGuid>{CB6F4AD4-4DFA-4F99-A2E8-9B468820266E}</ProjectGuid>
+	<MinIMEVersion>10.0.0</MinIMEVersion>
+	<RootNamespace>CDP4Requirements</RootNamespace>
+	<AssemblyName>CDP4Requirements</AssemblyName>
+	<TargetFramework>net48</TargetFramework>
+	<SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+	<AssemblyTitle>CDP4Requirements</AssemblyTitle>
+	<Company>Starion Group S.A.</Company>
+	<Product>Requirements</Product>
+	<Description>CDP4-COMET Requirements Plugin</Description>
+	<Copyright>Copyright © Starion Group S.A.</Copyright>
+	<AssemblyVersion>10.0.0.19</AssemblyVersion>
+	<FileVersion>10.0.0.19</FileVersion>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -40,200 +42,176 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0">
+    <PackageReference Include="CDP4Common-CE" Version="27.2.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0">
+    <PackageReference Include="CDP4Dal-CE" Version="27.2.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="2.0.0">
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.2.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="1.3">
+    <PackageReference Include="CommonServiceLocator" Version="2.0.7">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Charts" Version="22.2.6">
+    <PackageReference Include="DevExpress.Charts" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Charts.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Charts.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.CodeParser" Version="22.2.6">
+    <PackageReference Include="DevExpress.CodeParser" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data" Version="22.2.6">
+    <PackageReference Include="DevExpress.Data" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.6">
+    <PackageReference Include="DevExpress.Data.Desktop" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.DataAccess" Version="22.2.6">
+    <PackageReference Include="DevExpress.DataAccess" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Diagram.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Diagram.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Gauges.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Gauges.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Images" Version="22.2.6">
+    <PackageReference Include="DevExpress.Images" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Mvvm" Version="22.2.6">
+    <PackageReference Include="DevExpress.Mvvm" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Office.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Office.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Pdf.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.6">
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.PivotGrid.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.PivotGrid.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Printing.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Reporting.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Reporting.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.6">
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Sparkline.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Sparkline.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.SpellChecker.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Charts" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Charts" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Diagram" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	  <PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.6">
-		  <ExcludeAssets>runtime</ExcludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.6">
-		  <ExcludeAssets>runtime</ExcludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.6">
-		  <ExcludeAssets>runtime</ExcludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.6">
-		  <ExcludeAssets>runtime</ExcludeAssets>
-	  </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.6">
+	<PackageReference Include="DevExpress.Wpf.Accordion" Version="23.2.5">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.NavBar" Version="23.2.5">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Ribbon" Version="23.2.5">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Docking" Version="23.2.5">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Office" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.PivotGrid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.PivotGrid" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Reporting" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Reporting" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Xpo" Version="22.2.6">
+    <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DotLiquid" Version="2.2.508" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.MSProject" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.Outlook" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.PowerPoint" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NetOfficeFw.Word" Version="1.7.4.8">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NLog" Version="4.7.10">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="reactiveui" Version="6.4.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="reactiveui-core" Version="6.4.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="ReqIFSharp" Version="4.0.0" />
-    <PackageReference Include="Rx-Core" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Linq" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Main" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-XAML" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Splat" Version="1.6.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
+	<PackageReference Include="DotLiquid" Version="2.2.692" />
+	<PackageReference Include="NetOfficeFw.Core" Version="1.9.6">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="NetOfficeFw.Excel" Version="1.9.6">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.3">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="NLog" Version="5.3.2">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.11">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="ReactiveUI.WPF" Version="20.1.1">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="ReactiveUI" Version="20.1.1">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="System.ComponentModel.Composition" Version="8.0.0">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="ReqIFSharp" Version="4.0.0" />
+	<PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore">
@@ -277,89 +255,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Update="Views\Dialogs\OrExpressionDialog.xaml.cs">
-      <DependentUpon>OrExpressionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\ExclusiveOrExpressionDialog.xaml.cs">
-      <DependentUpon>ExclusiveOrExpressionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\NotExpressionDialog.xaml.cs">
-      <DependentUpon>NotExpressionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\ParametricConstraintDialog.xaml.cs">
-      <DependentUpon>ParametricConstraintDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\AndExpressionDialog.xaml.cs">
-      <DependentUpon>AndExpressionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\RelationalExpressionDialog.xaml.cs">
-      <DependentUpon>RelationalExpressionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\RequirementsSpecificationDialog.xaml.cs">
-      <DependentUpon>RequirementsSpecificationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\RequirementDialog.xaml.cs">
-      <DependentUpon>RequirementDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\RequirementsGroupDialog.xaml.cs">
-      <DependentUpon>RequirementsGroupDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\RequirementsContainerParameterValueDialog.xaml.cs">
-      <DependentUpon>RequirementsContainerParameterValueDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\HtmlExportRibbon.xaml.cs">
-      <DependentUpon>HtmlExportRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\HtmlReport\HtmlExportRequirementsSpecificationSelectionDialog.xaml.cs">
-      <DependentUpon>HtmlExportRequirementsSpecificationSelectionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\SimpleParameterValueDialog.xaml.cs">
-      <DependentUpon>SimpleParameterValueDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReqIf\RequirementSpecificationMappingDialog.xaml.cs">
-      <DependentUpon>RequirementSpecificationMappingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReqIf\RelationGroupTypeMappingDialog.xaml.cs">
-      <DependentUpon>RelationGroupTypeMappingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReqIf\SpecRelationTypeMappingDialog.xaml.cs">
-      <DependentUpon>SpecRelationTypeMappingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReqIf\SpecificationTypeMappingDialog.xaml.cs">
-      <DependentUpon>SpecificationTypeMappingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReqIf\SpecObjectTypesMappingDialog.xaml.cs">
-      <DependentUpon>SpecObjectTypesMappingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReqIf\ParameterTypeMappingDialog.xaml.cs">
-      <DependentUpon>ParameterTypeMappingDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReqIf\ReqIfImportDialog.xaml.cs">
-      <DependentUpon>ReqIfImportDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReqIf\ReqIfExportDialog.xaml.cs">
-      <DependentUpon>ReqIfExportDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ReqIfRibbon.xaml.cs">
-      <DependentUpon>ReqIfRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\RequirementsRibbon.xaml.cs">
-      <DependentUpon>RequirementsRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\RequirementBrowserRibbon.xaml.cs">
-      <DependentUpon>RequirementBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\RequirementsBrowser.xaml.cs">
-      <DependentUpon>RequirementsBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\RequirementsSpecificationEditor.xaml.cs">
-      <DependentUpon>RequirementsSpecificationEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UserControls\LoadingControl.xaml.cs">
-      <DependentUpon>LoadingControl.xaml</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
@@ -377,223 +272,52 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\Dialogs\OrExpressionDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\ExclusiveOrExpressionDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\NotExpressionDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\ParametricConstraintDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\AndExpressionDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\RelationalExpressionDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\RequirementsSpecificationDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\RequirementDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\RequirementsGroupDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\RequirementsContainerParameterValueDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\SimpleParameterValueDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\HtmlExportRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\HtmlReport\HtmlExportRequirementsSpecificationSelectionDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ReqIf\RequirementSpecificationMappingDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ReqIf\RelationGroupTypeMappingDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ReqIf\SpecRelationTypeMappingDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ReqIf\SpecificationTypeMappingDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ReqIf\SpecObjectTypesMappingDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ReqIf\ParameterTypeMappingDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ReqIf\ReqIfImportDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ReqIf\ReqIfExportDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ReqIfRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\RequirementsRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\RequirementBrowserRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\RequirementsBrowser.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\RequirementsSpecificationEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\UserControls\LoadingControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\DotLiquidTemplate\RequirementsSpecificationReportTemplate.liquid" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\HtmlExportRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\HtmlExportRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIfRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIfRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RequirementBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RequirementBrowserRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RequirementsBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RequirementsBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RequirementsRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RequirementsRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RequirementsSpecificationEditor.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RequirementsSpecificationEditor.g.i.cs" />
-    <Compile Remove="obj\x64\Release\Views\HtmlExportRibbon.g.cs" />
-    <Compile Remove="obj\x64\Release\Views\ReqIfRibbon.g.cs" />
-    <Compile Remove="obj\x64\Release\Views\RequirementBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\AndExpressionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\AndExpressionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ExclusiveOrExpressionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ExclusiveOrExpressionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\NotExpressionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\NotExpressionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\OrExpressionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\OrExpressionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParametricConstraintDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParametricConstraintDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RelationalExpressionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RelationalExpressionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RequirementDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RequirementDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RequirementsContainerParameterValueDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RequirementsContainerParameterValueDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RequirementsGroupDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RequirementsGroupDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RequirementsSpecificationDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\RequirementsSpecificationDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SimpleParameterValueDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SimpleParameterValueDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\HtmlReport\HtmlExportRequirementsSpecificationSelectionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\HtmlReport\HtmlExportRequirementsSpecificationSelectionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\ParameterTypeMappingDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\ParameterTypeMappingDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\RelationGroupTypeMappingDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\RelationGroupTypeMappingDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\ReqIfExportDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\ReqIfExportDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\ReqIfImportDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\ReqIfImportDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\RequirementSpecificationMappingDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\RequirementSpecificationMappingDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\SpecificationTypeMappingDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\SpecificationTypeMappingDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\SpecObjectTypesMappingDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\SpecObjectTypesMappingDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\SpecRelationTypeMappingDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ReqIf\SpecRelationTypeMappingDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\UserControls\LoadingControl.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\UserControls\LoadingControl.g.i.cs" />
-    <Compile Remove="obj\x64\Release\Views\UserControls\LoadingControl.g.cs" />
+	  <Reference Update="System">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Core">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Core">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Data">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Data">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Drawing">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Drawing">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.IO.Compression.FileSystem">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.IO.Compression.FileSystem">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Numerics">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Numerics">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Runtime.Serialization">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Xml">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Xml">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Xml.Linq">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml.Linq">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
+
 </Project>

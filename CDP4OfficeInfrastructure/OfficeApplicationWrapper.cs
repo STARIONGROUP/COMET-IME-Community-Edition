@@ -1,6 +1,6 @@
 ﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="officeApplicationWrapper.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="officeApplicationWrapper.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -20,30 +20,5 @@ namespace CDP4OfficeInfrastructure
         /// Gets or sets the Excel Application
         /// </summary>
         public NetOffice.ExcelApi.Application Excel { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Word Application
-        /// </summary>
-        public NetOffice.WordApi.Application Word { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Visio Application
-        /// </summary>
-        public NetOffice.VisioApi.Application Visio { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Project Application
-        /// </summary>
-        public NetOffice.MSProjectApi.Application Project { get; set; }
-
-        /// <summary>
-        /// Gets or sets the Outlook Application
-        /// </summary>
-        public NetOffice.OutlookApi.Application Outlook { get; set; }
-
-        /// <summary>
-        /// Gets or sets the PowerPoint Application
-        /// </summary>
-        public NetOffice.PowerPointApi.Application PowerPoint { get; set; }
     }
 }

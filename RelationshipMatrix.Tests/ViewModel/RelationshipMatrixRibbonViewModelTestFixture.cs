@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RelationshipMatrixRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="RelationshipMatrixRibbonViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ namespace CDP4RelationshipMatrix.Tests
 
     using CDP4RelationshipMatrix.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -66,7 +66,7 @@ namespace CDP4RelationshipMatrix.Tests
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPluginSettingsService> pluginSettingsService;
         private Mock<IFilterStringService> filterStringService;
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private Mock<IServiceLocator> serviceLocator;
         private Assembler assembler;
         private SiteDirectory sitedir;
@@ -78,6 +78,7 @@ namespace CDP4RelationshipMatrix.Tests
         private IterationSetup iterationSetup;
         private Iteration iteration;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
@@ -86,6 +87,7 @@ namespace CDP4RelationshipMatrix.Tests
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -93,7 +95,7 @@ namespace CDP4RelationshipMatrix.Tests
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.pluginSettingsService = new Mock<IPluginSettingsService>();
             this.filterStringService = new Mock<IFilterStringService>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 
             this.serviceLocator.Setup(x => x.GetInstance<IPermissionService>()).Returns(this.permissionService.Object);
@@ -112,6 +114,7 @@ namespace CDP4RelationshipMatrix.Tests
             {
                 Person = this.person
             };
+
             this.domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
 
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
@@ -131,6 +134,7 @@ namespace CDP4RelationshipMatrix.Tests
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             var openIterations = new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>();
             openIterations.Add(this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domainOfExpertise, this.participant));
@@ -141,7 +145,7 @@ namespace CDP4RelationshipMatrix.Tests
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            this.pluginSettingsService.Setup(x => 
+            this.pluginSettingsService.Setup(x =>
                 x.Read<RelationshipMatrixPluginSettings>(It.IsAny<bool>())
             ).Returns(new RelationshipMatrixPluginSettings());
 
@@ -151,13 +155,13 @@ namespace CDP4RelationshipMatrix.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void Verify_That_RibbonViewModel_Can_Be_Constructed()
         {
-            Assert.DoesNotThrow(() => new RelationshipMatrixRibbonViewModel());
+            Assert.DoesNotThrow(() => new RelationshipMatrixRibbonViewModel(this.messageBus));
         }
 
         [Test]

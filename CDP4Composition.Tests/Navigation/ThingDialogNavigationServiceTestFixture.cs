@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ThingDialogNavigationServiceTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="ThingDialogNavigationServiceTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // ------------------------------------------------------------------------------------------------
 
@@ -42,7 +42,7 @@ namespace CDP4Composition.Tests.Navigation
         public void SetUp()
         {
             this.session = new Mock<ISession>();
-            var uri = new Uri("http://rheagroup.com");
+            var uri = new Uri("https://www.stariongroup.eu");
             var siteDir = new SiteDirectory(Guid.NewGuid(), null, uri);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(siteDir);
             this.simpleUnit = new SimpleUnit(Guid.NewGuid(), null, uri);

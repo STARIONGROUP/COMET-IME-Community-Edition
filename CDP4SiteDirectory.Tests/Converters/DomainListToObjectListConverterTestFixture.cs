@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DomainListToObjectListConverterTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="DomainListToObjectListConverterTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,6 +10,9 @@ namespace CDP4SiteDirectory.Tests.Converters
     using System.Collections.Generic;
     using System.Linq;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm;
+
     using CDP4SiteDirectory.Converters;
     using NUnit.Framework;
     using ReactiveUI;

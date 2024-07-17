@@ -1,26 +1,25 @@
 // --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FolderDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="FolderDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
-//            Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +30,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -59,7 +60,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     [TestFixture]
     public class FolderDialogViewModelTestFixture
     {
-        private Uri uri = new Uri("http://www.rheagroup.com");
+        private Uri uri = new Uri("https://www.stariongroup.eu");
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private IThingTransaction thingTransaction;
         private Mock<ISession> session;
@@ -72,12 +73,14 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private Folder folder;
         private DomainFileStore domainFileStore;
         private DomainFileStore domainFileStoreClone;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -99,7 +102,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             srdl.DefinedCategory.Add(new Category(Guid.NewGuid(), this.cache, this.uri));
             this.engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri);
             this.engineeringModel.EngineeringModelSetup = engineeringModelSetup;
-            var iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = new IterationSetup()};
+            var iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = new IterationSetup() };
             this.engineeringModel.Iteration.Add(iteration);
             this.folder = new Folder(Guid.NewGuid(), this.cache, this.uri);
             this.domainFileStore = new DomainFileStore(Guid.NewGuid(), this.cache, this.uri);
@@ -122,6 +125,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.session.Setup(x => x.OpenIterations).Returns(openIterations);
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domainOfExpertise);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
@@ -143,8 +147,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.folder.CreatedOn = createdOn;
             this.folder.Owner = this.domainOfExpertise;
 
-            var folderDialogViewModel = 
-                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+            var folderDialogViewModel =
+                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object, this.domainFileStoreClone);
 
             Assert.AreEqual(name, folderDialogViewModel.Name);
@@ -169,7 +173,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
-        public void VerifyOkExecute()
+        public async Task VerifyOkExecute()
         {
             var name = "name";
             var createdOn = DateTime.UtcNow;
@@ -178,11 +182,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.folder.CreatedOn = createdOn;
             this.folder.Owner = this.domainOfExpertise;
 
-            var folderDialogViewModel = 
-                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+            var folderDialogViewModel =
+                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object, this.domainFileStoreClone);
 
-            folderDialogViewModel.OkCommand.Execute(null);
+            await folderDialogViewModel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
@@ -194,8 +198,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var createdOn = DateTime.UtcNow;
             this.folder.Owner = this.domainOfExpertise;
 
-            var folderDialogViewModel = 
-                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create, 
+            var folderDialogViewModel =
+                new FolderDialogViewModel(this.folder, this.thingTransaction, this.session.Object, true, ThingDialogKind.Create,
                     this.thingDialogNavigationService.Object, this.domainFileStoreClone);
 
             Assert.IsFalse(folderDialogViewModel.OkCanExecute);
@@ -208,7 +212,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             folderDialogViewModel.CreatedOn = default;
             Assert.IsFalse(folderDialogViewModel.OkCanExecute);
-            
+
             folderDialogViewModel.SelectedOwner = default;
             Assert.IsFalse(folderDialogViewModel.OkCanExecute);
 

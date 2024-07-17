@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParameterBaseRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ParameterBaseRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -84,12 +84,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private BooleanParameterType boolPt;
 
         private Assembler assembler;
-
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.permissionService = new Mock<IPermissionService>();
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
@@ -271,6 +272,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.participant = new Participant(Guid.NewGuid(), null, null) { Person = this.person, SelectedDomain = this.activeDomain };
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
             var modelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, null);
             modelSetup.Participant.Add(this.participant);
             engineeringModel.EngineeringModelSetup = modelSetup;
@@ -279,7 +282,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -294,6 +297,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.parameter1.ValueSet.Add(valueSet1);
             this.parameter1.ValueSet.Add(valueSet2);
+
             // *******************
 
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
@@ -316,6 +320,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.SetCompoundValueSet(valueSet);
 
             this.parameter1.ValueSet.Add(valueSet);
+
             // *******************
 
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
@@ -338,6 +343,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.SetScalarValueSet(valueSet);
 
             this.parameter1.ValueSet.Add(valueSet);
+
             // *******************
 
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
@@ -367,6 +373,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter1.IsOptionDependent = true;
             this.parameter1.ValueSet.Add(valueSetOption1);
             this.parameter1.ValueSet.Add(valueSetOption2);
+
             // *******************
 
             var row = new ParameterRowViewModel(this.parameter1, this.session.Object, null, false);
@@ -579,7 +586,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.That(row.ScaleName, Is.Null.Or.Empty);
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatParameterComponentRowsUpdateOnParameterType(IViewModelBase<Thing> container, string scenario)
         {
             var row = new ParameterRowViewModel(this.parameterCompound, this.session.Object, container, false);
@@ -590,7 +598,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.cptType.Component.Remove(this.cptType.Component.Last());
             Assert.AreEqual(1, this.cptType.Component.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.cptType, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.cptType, EventKind.Updated);
             Assert.AreEqual(1, row.ContainedRows.Count);
         }
 
@@ -606,7 +614,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.That(row.ValidateProperty("Reference", null), Is.Null.Or.Empty);
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatStateDependentRowAreUpdated(IViewModelBase<Thing> container, string scenario)
         {
             var valueSetState1 = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -630,12 +639,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             Assert.AreEqual(1, row.ContainedRows.Count);
 
             astate1.Kind = ActualFiniteStateKind.FORBIDDEN;
-            CDPMessageBus.Current.SendObjectChangeEvent(astate1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(astate1, EventKind.Updated);
 
             Assert.AreEqual(0, row.ContainedRows.Count);
 
             astate1.Kind = ActualFiniteStateKind.MANDATORY;
-            CDPMessageBus.Current.SendObjectChangeEvent(astate1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(astate1, EventKind.Updated);
             Assert.AreEqual(1, row.ContainedRows.Count);
         }
 

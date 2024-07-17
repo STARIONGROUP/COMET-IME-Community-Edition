@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ConstantDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ConstantDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Constant"/>
@@ -115,12 +116,12 @@ namespace CDP4CommonView
         /// <summary>
         /// Backing field for Value
         /// </summary>
-        public ReactiveList<PrimitiveRow<string>> value;
+        public TrackedReactiveList<PrimitiveRow<string>> value;
 
         /// <summary>
         /// Gets or sets the Value
         /// </summary>
-        public ReactiveList<PrimitiveRow<string>> Value
+        public TrackedReactiveList<PrimitiveRow<string>> Value
         {
             get { return this.value; }
             set { this.RaiseAndSetIfChanged(ref this.value, value); }
@@ -176,12 +177,12 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedParameterType"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedScale"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedScaleCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -190,10 +191,10 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedParameterTypeCommand = this.WhenAny(vm => vm.SelectedParameterType, v => v.Value != null);
-            this.InspectSelectedParameterTypeCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterTypeCommand);
+            this.InspectSelectedParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterTypeCommand);
             this.InspectSelectedParameterTypeCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameterType));
             var canExecuteInspectSelectedScaleCommand = this.WhenAny(vm => vm.SelectedScale, v => v.Value != null);
-            this.InspectSelectedScaleCommand = ReactiveCommand.Create(canExecuteInspectSelectedScaleCommand);
+            this.InspectSelectedScaleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedScaleCommand);
             this.InspectSelectedScaleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedScale));
         }
 
@@ -221,7 +222,7 @@ namespace CDP4CommonView
         protected override void Initialize()
         {
             base.Initialize();
-            this.Value = new ReactiveList<PrimitiveRow<string>>();
+            this.Value = new TrackedReactiveList<PrimitiveRow<string>>();
             this.PossibleParameterType = new ReactiveList<ParameterType>();
             this.PossibleScale = new ReactiveList<MeasurementScale>();
             this.Category = new ReactiveList<Category>();
@@ -268,8 +269,8 @@ namespace CDP4CommonView
         {
             base.UpdateProperties();
             this.IsDeprecated = this.Thing.IsDeprecated;
-            this.PopulateValue();
             this.SelectedParameterType = this.Thing.ParameterType;
+            this.PopulateValue();
             this.PopulatePossibleParameterType();
             this.SelectedScale = this.Thing.Scale;
             this.PopulatePossibleScale();

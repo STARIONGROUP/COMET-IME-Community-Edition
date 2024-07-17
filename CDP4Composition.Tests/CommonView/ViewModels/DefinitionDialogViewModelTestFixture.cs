@@ -1,47 +1,57 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DefinitionDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DefinitionDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView.Tests
 {
     using System;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Common.MetaInfo;    
+    using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
+    using CDP4CommonView.ViewModels;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
-    using CDP4Dal.Operations;
-    using Microsoft.Practices.ServiceLocation;
-    using Moq;
-    using ReactiveUI;
-    using CDP4CommonView.ViewModels;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
+
+    using CommonServiceLocator;
+
+    using Moq;
+
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="DefinitionDialogViewModelTestFixture"/>
@@ -59,6 +69,7 @@ namespace CDP4CommonView.Tests
 
         private Assembler assembler;
         private Uri uri = new Uri("http://test.com");
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
@@ -69,11 +80,13 @@ namespace CDP4CommonView.Tests
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IThingDialogNavigationService>()).Returns(this.navigation.Object);
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.simpleDefinition = new Definition(Guid.NewGuid(), null, null) { LanguageCode = "es-ES", Content = "Definition" };
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), null, null);
-            
+
             this.simpleDefinition.Note.Add("Note0");
             this.simpleDefinition.Example.Add("Note0");
 
@@ -85,6 +98,7 @@ namespace CDP4CommonView.Tests
             this.session.Setup(x => x.Dal).Returns(dal.Object);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         /// <summary>
@@ -94,14 +108,14 @@ namespace CDP4CommonView.Tests
         public void VerifyCreateNewEmptyDefinitionDialogViewModel()
         {
             this.viewmodel = new DefinitionDialogViewModel();
-            Assert.IsNotNull(this.viewmodel);            
+            Assert.IsNotNull(this.viewmodel);
         }
 
         /// <summary>
         /// Basic method to test creating a <see cref="DefinitionDialogViewModel"/>
         /// </summary>
         [Test]
-        public void VerifyCreateNewDefinitionDialogViewModel()
+        public async Task VerifyCreateNewDefinitionDialogViewModel()
         {
             var group = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.assembler.Cache.TryAdd(new CacheKey(group.Iid, null), new Lazy<Thing>(() => group));
@@ -115,21 +129,20 @@ namespace CDP4CommonView.Tests
             Assert.IsNotNull(this.viewmodel);
 
             //Test Note features
-            this.viewmodel.CreateNoteCommand.Execute(null);
-            Assert.AreEqual(this.viewmodel.Note.Count,2);
+            await this.viewmodel.CreateNoteCommand.Execute();
+            Assert.AreEqual(this.viewmodel.Note.Count, 2);
             this.viewmodel.SelectedNote = this.viewmodel.Note[0];
             Assert.IsTrue(this.viewmodel.SelectedNote.Value.Equals(this.simpleDefinition.Note[0]));
-            this.viewmodel.DeleteNoteCommand.Execute(null);
+            await this.viewmodel.DeleteNoteCommand.Execute();
             Assert.AreEqual(this.viewmodel.Note.Count, 1);
 
             //Test Example features
-            this.viewmodel.CreateExampleCommand.Execute(null);
+            await this.viewmodel.CreateExampleCommand.Execute();
             Assert.AreEqual(this.viewmodel.Example.Count, 2);
             this.viewmodel.SelectedExample = this.viewmodel.Example[0];
             Assert.IsTrue(this.viewmodel.SelectedExample.Value.Equals(this.simpleDefinition.Example[0]));
-            this.viewmodel.DeleteExampleCommand.Execute(null);
+            await this.viewmodel.DeleteExampleCommand.Execute();
             Assert.AreEqual(this.viewmodel.Example.Count, 1);
-
         }
 
         [Test]
@@ -140,7 +153,7 @@ namespace CDP4CommonView.Tests
 
             var definition = new Definition() { LanguageCode = languageCode, Content = content };
 
-            var requirement = new Requirement();            
+            var requirement = new Requirement();
             var clone = requirement.Clone(false);
             clone.Definition.Add(definition);
 
@@ -166,12 +179,12 @@ namespace CDP4CommonView.Tests
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
             var transaction = new ThingTransaction(transactionContext, null);
             transaction.CreateOrUpdate(clone);
-            
+
             Assert.DoesNotThrow(() => new DefinitionDialogViewModel(definition, transaction, this.session.Object, true, ThingDialogKind.Create, null, clone, null));
         }
 
         [Test]
-        public void VerifyMoveUpAndMoveDownDefinitionDialogViewModel()
+        public async Task VerifyMoveUpAndMoveDownDefinitionDialogViewModel()
         {
             var group = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.assembler.Cache.TryAdd(new CacheKey(group.Iid, null), new Lazy<Thing>(() => group));
@@ -185,31 +198,31 @@ namespace CDP4CommonView.Tests
             Assert.IsNotNull(this.viewmodel);
 
             //Test Note features
-            this.viewmodel.CreateNoteCommand.Execute(null);
-            this.viewmodel.CreateNoteCommand.Execute(null);
-            this.viewmodel.CreateNoteCommand.Execute(null);
+            await this.viewmodel.CreateNoteCommand.Execute();
+            await this.viewmodel.CreateNoteCommand.Execute();
+            await this.viewmodel.CreateNoteCommand.Execute();
             Assert.AreEqual(this.viewmodel.Note.Count, 4);
             this.viewmodel.SelectedNote = this.viewmodel.Note[1];
             Assert.IsTrue(this.viewmodel.SelectedNote.Value.Equals(this.viewmodel.Note[1].Value));
-            this.viewmodel.MoveUpNoteCommand.Execute(null);
+            await this.viewmodel.MoveUpNoteCommand.Execute();
             Assert.IsTrue(this.viewmodel.SelectedNote.Value.Equals(this.viewmodel.Note[0].Value));
-            this.viewmodel.MoveDownNoteCommand.Execute(null);
-            this.viewmodel.MoveDownNoteCommand.Execute(null);
+            await this.viewmodel.MoveDownNoteCommand.Execute();
+            await this.viewmodel.MoveDownNoteCommand.Execute();
             Assert.IsTrue(this.viewmodel.SelectedNote.Value.Equals(this.viewmodel.Note[2].Value));
-            this.viewmodel.DeleteNoteCommand.Execute(null);
+            await this.viewmodel.DeleteNoteCommand.Execute();
             Assert.AreEqual(this.viewmodel.Note.Count, 3);
 
             //Test Example features
-            this.viewmodel.CreateExampleCommand.Execute(null);
-            this.viewmodel.CreateExampleCommand.Execute(null);
+            await this.viewmodel.CreateExampleCommand.Execute();
+            await this.viewmodel.CreateExampleCommand.Execute();
             Assert.AreEqual(this.viewmodel.Example.Count, 3);
             this.viewmodel.SelectedExample = this.viewmodel.Example[2];
             Assert.IsTrue(this.viewmodel.SelectedExample.Value.Equals(this.viewmodel.Example[2].Value));
-            this.viewmodel.MoveUpExampleCommand.Execute(null);
+            await this.viewmodel.MoveUpExampleCommand.Execute();
             Assert.IsTrue(this.viewmodel.SelectedExample.Value.Equals(this.viewmodel.Example[1].Value));
-            this.viewmodel.MoveDownExampleCommand.Execute(null);
+            await this.viewmodel.MoveDownExampleCommand.Execute();
             Assert.IsTrue(this.viewmodel.SelectedExample.Value.Equals(this.viewmodel.Example[2].Value));
-            this.viewmodel.DeleteExampleCommand.Execute(null);
+            await this.viewmodel.DeleteExampleCommand.Execute();
             Assert.AreEqual(this.viewmodel.Example.Count, 2);
         }
     }

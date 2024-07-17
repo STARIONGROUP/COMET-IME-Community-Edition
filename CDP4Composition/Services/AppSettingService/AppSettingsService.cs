@@ -1,12 +1,13 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="AppSettingsService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="AppSettingsService.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2020 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Services.AppSettingService
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using System.Reflection;
 
@@ -41,7 +42,12 @@ namespace CDP4Composition.Services.AppSettingService
         /// <summary>
         /// Application configuration folder path.
         /// </summary>
-        public const string ConfigurationDirectoryFolder = @"RHEA\CDP4-COMET\";
+        public const string ConfigurationDirectoryFolder = @"STARION\CDP4-COMET\";
+
+        /// <summary>
+        /// A list of old/former config folders to check for data
+        /// </summary>
+        public static readonly List<string> OldConfigFolders = new List<string> { $"RHEA{Path.DirectorySeparatorChar}CDP4-COMET{Path.DirectorySeparatorChar}", $"RHEA{Path.DirectorySeparatorChar}CDP4{Path.DirectorySeparatorChar}" };
 
         /// <summary>
         /// The setting file extension
@@ -113,6 +119,8 @@ namespace CDP4Composition.Services.AppSettingService
             {
                 var fileSettings = $"{path}{SettingFileExtension}";
 
+                this.TryImportOld(assemblyName);
+
                 if (!File.Exists(fileSettings))
                 {
                     this.Save();
@@ -131,6 +139,28 @@ namespace CDP4Composition.Services.AppSettingService
                 logger.Error(ex, "The AppSettings could not be read");
 
                 throw new AppSettingsException("The AppSettings could not be read", ex);
+            }
+        }
+
+        /// <summary>
+        /// Tries to import old config file
+        /// </summary>
+        /// <param name="assemblyName">The assemblyname of the settingsfile</param>
+        private void TryImportOld(string assemblyName)
+        {
+            var path = Path.Combine(this.ApplicationConfigurationDirectory, assemblyName);
+            var fileSettings = $"{path}{SettingFileExtension}";
+
+            if (!File.Exists(fileSettings))
+            {
+                foreach (var folder in OldConfigFolders)
+                {
+                    if (File.Exists(Path.Combine(AppDataFolder, folder, assemblyName, SettingFileExtension)))
+                    {
+                        File.Copy(Path.Combine(AppDataFolder, folder, assemblyName, SettingFileExtension), fileSettings);
+                        return;
+                    }
+                }
             }
         }
 

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportDesignerViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="ReportDesignerViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -34,6 +34,7 @@ namespace CDP4Reporting.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
     using System.Text;
     using System.Threading.Tasks;
     using System.Windows;
@@ -56,11 +57,16 @@ namespace CDP4Reporting.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using CDP4Reporting.DataCollection;
+    using CDP4Reporting.DynamicTableChecker;
+    using CDP4Reporting.Events;
+    using CDP4Reporting.ReportScript;
     using CDP4Reporting.SubmittableParameterValues;
     using CDP4Reporting.Utilities;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
+    using DevExpress.DataAccess.ObjectBinding;
     using DevExpress.Xpf.Printing;
     using DevExpress.Xpf.Reports.UserDesigner;
     using DevExpress.XtraReports.UI;
@@ -70,11 +76,6 @@ namespace CDP4Reporting.ViewModels
     using NLog;
 
     using ReactiveUI;
-
-    using CDP4Reporting.DataCollection;
-    using CDP4Reporting.DynamicTableChecker;
-    using CDP4Reporting.Events;
-    using CDP4Reporting.ReportScript;
 
     using File = System.IO.File;
     using Parameter = DevExpress.XtraReports.Parameters.Parameter;
@@ -245,67 +246,67 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Open code file inside the editor
         /// </summary>
-        public ReactiveCommand<object> ImportScriptCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> ImportScriptCommand { get; set; }
 
         /// <summary>
         /// Saves code that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<object> ExportScriptCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> ExportScriptCommand { get; set; }
 
         /// <summary>
         /// Build code that has been typed in the editor
         /// </summary>
-        public ReactiveCommand<Unit> CompileScriptCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> CompileScriptCommand { get; set; }
 
         /// <summary>
         /// Create a new Report 
         /// </summary>
-        public ReactiveCommand<object> NewReportCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> NewReportCommand { get; set; }
 
         /// <summary>
         /// Open rep4 zip archive which consists in datasource code file and report designer file
         /// </summary>
-        public ReactiveCommand<object> OpenReportCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> OpenReportCommand { get; set; }
 
         /// <summary>
         /// Save editor code and report designer to rep4 zip archive
         /// </summary>
-        public ReactiveCommand<object> SaveReportCommand { get; set; }
+        public ReactiveCommand<bool, Unit> SaveReportCommand { get; set; }
 
         /// <summary>
         /// Save editor code and report designer to rep4 zip archive and force the SaveFile dialog to be shown
         /// </summary>
-        public ReactiveCommand<object> SaveReportAsCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> SaveReportAsCommand { get; set; }
 
         /// <summary>
         /// Fires when the DataSource text was changed
         /// </summary>
-        public ReactiveCommand<object> DataSourceTextChangedCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> DataSourceTextChangedCommand { get; set; }
 
         /// <summary>
         /// Rebuild the DataSource
         /// </summary>
-        public ReactiveCommand<Unit> RebuildDatasourceCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> RebuildDatasourceCommand { get; set; }
 
         /// <summary>
         /// Rebuild the DataSource and refresh the preview panel
         /// </summary>
-        public ReactiveCommand<Unit> RebuildDatasourceAndRefreshPreviewCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> RebuildDatasourceAndRefreshPreviewCommand { get; set; }
 
         /// <summary>
         /// Submit data from a previewed report
         /// </summary>
-        public ReactiveCommand<Unit> SubmitParameterValuesCommand { get; set; }
+        public ReactiveCommand<object, Unit> SubmitParameterValuesCommand { get; set; }
 
         /// <summary>
         /// Fires when the DataSource text needs to be cleared
         /// </summary>
-        public ReactiveCommand<object> ClearOutputCommand { get; set; }
+        public ReactiveCommand<Unit, Unit> ClearOutputCommand { get; set; }
 
         /// <summary>
         /// Fires when the Active Document changes in the Report Designer
         /// </summary>
-        public ReactiveCommand<Unit> ActiveDocumentChangedCommand { get; set; }
+        public ReactiveCommand<DependencyPropertyChangedEventArgs, Unit> ActiveDocumentChangedCommand { get; set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -325,7 +326,7 @@ namespace CDP4Reporting.ViewModels
             : base(thing, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
             var dataSetAssembly = typeof(DataSet).Assembly;
-            DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(dataSetAssembly); 
+            DevExpress.Utils.DeserializationSettings.RegisterTrustedAssembly(dataSetAssembly);
 
             ReportingSettings.OptionSelector = (options, option) =>
             {
@@ -343,46 +344,38 @@ namespace CDP4Reporting.ViewModels
 
             this.openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
 
-            this.ExportScriptCommand = ReactiveCommand.Create();
-            this.ExportScriptCommand.Subscribe(_ => this.ExportScript());
+            this.ExportScriptCommand = ReactiveCommandCreator.Create(this.ExportScript);
 
-            this.ImportScriptCommand = ReactiveCommand.Create();
-            this.ImportScriptCommand.Subscribe(_ => this.ImportScript());
+            this.ImportScriptCommand = ReactiveCommandCreator.Create(this.ImportScript);
 
-            this.CompileScriptCommand = ReactiveCommand.CreateAsyncTask(async _ =>
+            this.CompileScriptCommand = ReactiveCommandCreator.Create(async () =>
             {
                 var source = this.Document.Text;
                 await this.compilationConcurrentActionRunner.RunAction(() => this.ReportScriptHandler.CompileAssembly(source));
             });
 
-            this.NewReportCommand = ReactiveCommand.Create();
-            this.NewReportCommand.Subscribe(_ => this.CreateNewReport());
+            this.NewReportCommand = ReactiveCommandCreator.Create(this.CreateNewReport);
 
-            this.OpenReportCommand = ReactiveCommand.Create();
-            this.OpenReportCommand.Subscribe(_ => this.OpenReportProject());
+            this.OpenReportCommand = ReactiveCommandCreator.Create(this.OpenReportProject);
 
-            this.SaveReportCommand = ReactiveCommand.Create();
-            this.SaveReportCommand.Subscribe(_ => this.SaveReportProject());
+            this.SaveReportCommand = ReactiveCommandCreator.Create<bool>(this.SaveReportProject);
 
-            this.SaveReportAsCommand = ReactiveCommand.Create();
-            this.SaveReportAsCommand.Subscribe(_ => this.SaveReportProject(true));
+            this.SaveReportAsCommand = ReactiveCommandCreator.Create(() => this.SaveReportProject(true));
 
-            this.DataSourceTextChangedCommand = ReactiveCommand.Create();
-            this.DataSourceTextChangedCommand.Subscribe(_ => this.CheckAutoCompileScript());
+            this.DataSourceTextChangedCommand = ReactiveCommandCreator.Create(this.CheckAutoCompileScript);
 
-            this.RebuildDatasourceCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteRebuildDatasourceCommand());
-            this.RebuildDatasourceAndRefreshPreviewCommand = ReactiveCommand.CreateAsyncTask(async _ => await this.ExecuteRebuildDatasourceAndRefreshPreviewCommand());
+            this.RebuildDatasourceCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteRebuildDatasourceCommand);
 
-            this.SubmitParameterValuesCommand = ReactiveCommand.CreateAsyncTask(
-                this.WhenAnyValue(x => x.CanSubmitParameterValues),
-                x => this.SubmitParameterValues(),
-                RxApp.MainThreadScheduler);
+            this.RebuildDatasourceAndRefreshPreviewCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteRebuildDatasourceAndRefreshPreviewCommand);
 
-            this.ClearOutputCommand = ReactiveCommand.Create();
-            this.ClearOutputCommand.Subscribe(_ => { this.Output = string.Empty; });
+            this.SubmitParameterValuesCommand = ReactiveCommandCreator.Create<object>(
+                x => this.SubmitParameterValues().ToObservable(),
+                this.WhenAnyValue(x => x.CanSubmitParameterValues));
 
-            this.ActiveDocumentChangedCommand = ReactiveCommand.CreateAsyncTask(x =>
-                this.SetReportDesigner(((DependencyPropertyChangedEventArgs)x).NewValue), RxApp.MainThreadScheduler);
+            this.ClearOutputCommand = ReactiveCommandCreator.Create(() => { this.Output = string.Empty; });
+
+            this.ActiveDocumentChangedCommand = ReactiveCommandCreator.CreateAsyncTask<DependencyPropertyChangedEventArgs>(x =>
+                this.SetReportDesigner(x.NewValue));
 
             this.WhenAnyValue(x => x.CurrentReport).Subscribe(x =>
             {
@@ -402,12 +395,13 @@ namespace CDP4Reporting.ViewModels
                 });
 
             this.Disposables.Add(
-                CDPMessageBus.Current.Listen<ReportOutputEvent>()
+                this.CDPMessageBus.Listen<ReportOutputEvent>()
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(x => this.AddOutput(x.Output))
             );
 
             this.InitializeDataSetExtensionsUsage();
+            this.InitializeNewReport();
         }
 
         /// <summary>
@@ -496,6 +490,14 @@ namespace CDP4Reporting.ViewModels
                 return;
             }
 
+            this.InitializeNewReport();
+        }
+
+        /// <summary>
+        /// Initializes a new Report
+        /// </summary>
+        private void InitializeNewReport()
+        {
             this.Document = new TextDocument(string.Empty);
             this.lastSavedDataSourceText = "";
 
@@ -745,8 +747,53 @@ namespace CDP4Reporting.ViewModels
         [ExcludeFromCodeCoverage]
         private void TriggerRefreshUI()
         {
-            // null check added for Unit test compatibility
-            this.currentReportDesignerDocument?.ReportModel.UpdateDataSources();
+            this.currentReportDesignerDocument?.MakeChanges(changes =>
+            {
+                var refreshDataSource = new ObjectDataSource
+                {
+                    DataSource = new object(),
+                    Name = "__temporaryDataSource__"
+                };
+
+                var refreshParameter = new Parameter
+                {
+                    Name = "__temporaryParameter__"
+                };
+
+                var triedAddDataSource = false;
+                var triedAddParameter = false;
+
+                try
+                {
+                    changes.AddItem(refreshDataSource);
+                    triedAddDataSource = true;
+                    changes.RemoveItem(refreshDataSource);
+                    changes.AddItem(refreshParameter);
+                    triedAddParameter = true;
+                    changes.RemoveItem(refreshParameter);
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    try
+                    {
+                        if (triedAddDataSource)
+                        {
+                            changes.RemoveItem(refreshDataSource);
+                        }
+
+                        if (triedAddParameter)
+                        {
+                            changes.RemoveItem(refreshParameter);
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+            });
         }
 
         /// <summary>
@@ -810,13 +857,14 @@ namespace CDP4Reporting.ViewModels
 
             if (errorTexts.Any())
             {
-                var okDialogViewModel = new OkDialogViewModel("Warning", $"The following issues were found during updated parameter values lookup:\n\n {string.Join("\n", errorTexts)}");
+                var okDialogViewModel = new OkDialogViewModel("Warning", $"The following errors were found during ValueSet lookup:\n\n {string.Join("\n", errorTexts)}");
                 this.DialogNavigationService.NavigateModal(okDialogViewModel);
             }
 
             if (!processedValueSets.Any())
             {
-                this.messageBoxService.Show("No accessible/updatable parameter values found for the current user/domain.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                var okDialogViewModel = new OkDialogViewModel("Info", "No parameter changes found.");
+                this.DialogNavigationService.NavigateModal(okDialogViewModel);
 
                 return;
             }

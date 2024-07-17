@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDeprecatableBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2019 RHEA System S.A.
+// <copyright file="IDeprecatableBrowserViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2019 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 

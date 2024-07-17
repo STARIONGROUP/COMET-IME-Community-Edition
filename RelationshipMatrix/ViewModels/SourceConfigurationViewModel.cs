@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SourceConfigurationViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="SourceConfigurationViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -34,12 +34,14 @@ namespace CDP4RelationshipMatrix.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using ReactiveUI;
+    using CDP4RelationshipMatrix.Settings;
 
-    using Settings;
+    using ReactiveUI;
 
     /// <summary>
     /// The purpose of the <see cref="SourceConfigurationViewModel"/> is to configure what kind of data
@@ -47,6 +49,11 @@ namespace CDP4RelationshipMatrix.ViewModels
     /// </summary>
     public class SourceConfigurationViewModel : MatrixConfigurationViewModelBase
     {
+        /// <summary>
+        /// Valie indicating that the process of performing a Light Update is suppressed and should not be executed
+        /// </summary>
+        private bool suppressLightUpdate = false;
+
         /// <summary>
         /// The possible choice of type of <see cref="Thing"/> to display in the matrix
         /// </summary>
@@ -128,18 +135,23 @@ namespace CDP4RelationshipMatrix.ViewModels
         public SourceConfigurationViewModel(ISession session, Iteration iteration, Action onUpdateAction, Action onLightUpdateAction,
             RelationshipMatrixPluginSettings settings) : base(session, iteration, onUpdateAction, settings)
         {
-            this.OnLightUpdateAction = onLightUpdateAction;
+            this.OnLightUpdateAction =
+                () =>
+                {
+                    if (!this.suppressLightUpdate)
+                    {
+                        onLightUpdateAction.Invoke();
+                    }
+                };
 
             this.possibleClassKind.AddRange(this.PluginSetting.PossibleClassKinds.OrderBy(x => x.ToString()));
             this.possibleDisplayKinds.AddRange(this.PluginSetting.PossibleDisplayKinds.OrderBy(x => x.ToString()));
 
             this.PossibleCategories = new ReactiveList<Category>();
-            this.PossibleCategories.ChangeTrackingEnabled = true;
             this.SelectedCategories = new List<Category>();
 
             this.PossibleOwners = new ReactiveList<DomainOfExpertise>();
-            this.PossibleOwners.ChangeTrackingEnabled = true;
-            this.SelectedOwners= new List<DomainOfExpertise>();
+            this.SelectedOwners = new List<DomainOfExpertise>();
 
             // default boolean operator is AND
             this.SelectedBooleanOperatorKind = CategoryBooleanOperatorKind.AND;
@@ -147,25 +159,18 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.WhenAnyValue(x => x.SelectedClassKind).Skip(1).Subscribe(_ =>
             {
+                this.suppressLightUpdate = true;
                 this.PopulatePossibleCategories();
                 this.PopulatePossibleOwners();
+                this.suppressLightUpdate = false;
                 this.OnUpdateAction();
             });
 
-            this.WhenAnyValue(x => x.SelectedDisplayKind).Skip(1).Subscribe(_ =>
-            {
-                this.OnLightUpdateAction();
-            });
+            this.WhenAnyValue(x => x.SelectedDisplayKind).Skip(1).Subscribe(_ => { this.OnLightUpdateAction(); });
 
-            this.WhenAnyValue(x => x.SelectedSortKind).Skip(1).Subscribe(_ =>
-            {
-                this.OnLightUpdateAction();
-            });
+            this.WhenAnyValue(x => x.SelectedSortKind).Skip(1).Subscribe(_ => { this.OnLightUpdateAction(); });
 
-            this.WhenAnyValue(x => x.SelectedSortOrder).Skip(1).Subscribe(_ =>
-            {
-                this.OnLightUpdateAction();
-            });
+            this.WhenAnyValue(x => x.SelectedSortOrder).Skip(1).Subscribe(_ => { this.OnLightUpdateAction(); });
 
             this.WhenAnyValue(x => x.SelectedCategories).Skip(1).Subscribe(_ =>
             {
@@ -189,11 +194,12 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.WhenAnyValue(x => x.SelectedCategories).Subscribe(x => this.IsSourceXSelected = x.Any());
             this.WhenAnyValue(x => x.SelectedCategories).Subscribe(x => this.IsSourceYSelected = x.Any());
 
-            var categorySubscription = CDPMessageBus.Current
+            var categorySubscription = this.Session.CDPMessageBus
                 .Listen<ObjectChangedEvent>(typeof(Category))
                 .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => {
+                .Subscribe(_ =>
+                {
                     this.PopulatePossibleCategories();
                     this.OnLightUpdateAction();
                     this.SelectCategoriesThatIncludeSubcategories();
@@ -222,10 +228,9 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.SelectedSortKind = source.SelectedSortKind;
             this.selectedSortOrder = source.SortOrder;
 
-            this.OnLightUpdateAction = onLightUpdateAction;
-
             // populate selected categories
             var categories = new List<Category>();
+
             foreach (var iid in source.SelectedCategories)
             {
                 var category = this.PossibleCategories.FirstOrDefault(c => c.Iid == iid);
@@ -235,18 +240,22 @@ namespace CDP4RelationshipMatrix.ViewModels
                     categories.Add(category);
                 }
             }
+
             this.SelectedCategories = new List<Category>(categories);
 
             // populate selected owners
             var owners = new List<DomainOfExpertise>();
+
             foreach (var iid in source.SelectedOwners)
             {
                 var domainOfExpertise = this.PossibleOwners.FirstOrDefault(d => d.Iid == iid);
+
                 if (domainOfExpertise != null)
                 {
                     owners.Add(domainOfExpertise);
                 }
             }
+
             this.SelectedOwners = new List<DomainOfExpertise>(owners);
         }
 
@@ -260,8 +269,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public ClassKind? SelectedClassKind
         {
-            get { return this.selectedClassKind; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedClassKind, value); }
+            get => this.selectedClassKind;
+            set => this.RaiseAndSetIfChanged(ref this.selectedClassKind, value);
         }
 
         /// <summary>
@@ -269,8 +278,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public DisplayKind SelectedDisplayKind
         {
-            get { return this.selectedDisplayKind; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedDisplayKind, value); }
+            get => this.selectedDisplayKind;
+            set => this.RaiseAndSetIfChanged(ref this.selectedDisplayKind, value);
         }
 
         /// <summary>
@@ -278,8 +287,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public DisplayKind SelectedSortKind
         {
-            get { return this.selectedSortKind; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSortKind, value); }
+            get => this.selectedSortKind;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSortKind, value);
         }
 
         /// <summary>
@@ -287,8 +296,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public SortOrder SelectedSortOrder
         {
-            get { return this.selectedSortOrder; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSortOrder, value); }
+            get => this.selectedSortOrder;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSortOrder, value);
         }
 
         /// <summary>
@@ -296,8 +305,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public List<Category> SelectedCategories
         {
-            get { return this.selectedCategories; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedCategories, value); }
+            get => this.selectedCategories;
+            set => this.RaiseAndSetIfChanged(ref this.selectedCategories, value);
         }
 
         /// <summary>
@@ -336,8 +345,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public List<DomainOfExpertise> SelectedOwners
         {
-            get { return this.selectedOwners; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedOwners, value); }
+            get => this.selectedOwners;
+            set => this.RaiseAndSetIfChanged(ref this.selectedOwners, value);
         }
 
         /// <summary>
@@ -350,8 +359,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public CategoryBooleanOperatorKind SelectedBooleanOperatorKind
         {
-            get { return this.selectedBooleanOperatorKind; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedBooleanOperatorKind, value); }
+            get => this.selectedBooleanOperatorKind;
+            set => this.RaiseAndSetIfChanged(ref this.selectedBooleanOperatorKind, value);
         }
 
         /// <summary>
@@ -359,8 +368,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool IncludeSubcategories
         {
-            get { return this.includeSubcategories; }
-            set { this.RaiseAndSetIfChanged(ref this.includeSubcategories, value); }
+            get => this.includeSubcategories;
+            set => this.RaiseAndSetIfChanged(ref this.includeSubcategories, value);
         }
 
         /// <summary>
@@ -368,8 +377,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool IsSourceXSelected
         {
-            get { return this.isSourceXSelected; }
-            private set { this.RaiseAndSetIfChanged(ref this.isSourceXSelected, value); }
+            get => this.isSourceXSelected;
+            private set => this.RaiseAndSetIfChanged(ref this.isSourceXSelected, value);
         }
 
         /// <summary>
@@ -377,8 +386,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public bool IsSourceYSelected
         {
-            get { return this.isSourceYSelected; }
-            private set { this.RaiseAndSetIfChanged(ref this.isSourceYSelected, value); }
+            get => this.isSourceYSelected;
+            private set => this.RaiseAndSetIfChanged(ref this.isSourceYSelected, value);
         }
 
         /// <summary>
@@ -386,8 +395,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// </summary>
         public string CategoriesString
         {
-            get { return this.categoriesString; }
-            private set { this.RaiseAndSetIfChanged(ref this.categoriesString, value); }
+            get => this.categoriesString;
+            private set => this.RaiseAndSetIfChanged(ref this.categoriesString, value);
         }
 
         /// <summary>
@@ -401,12 +410,14 @@ namespace CDP4RelationshipMatrix.ViewModels
             {
                 var categories = this.ReferenceDataLibraries.SelectMany(x => x.DefinedCategory)
                     .Where(x => x.PermissibleClass.Contains(this.SelectedClassKind.Value)).OrderBy(x => x.Name);
+
                 this.PossibleCategories.AddRange(categories);
             }
             else
             {
                 var categories = this.ReferenceDataLibraries.SelectMany(x => x.DefinedCategory)
                     .Where(x => x.PermissibleClass.Intersect(this.PossibleClassKinds).Any()).OrderBy(x => x.Name);
+
                 this.PossibleCategories.AddRange(categories);
             }
         }
@@ -444,7 +455,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 categories.AddRange(this.SelectedCategories.Select(x => x.Name));
             }
 
-            this.CategoriesString = string.Join($" {this.SelectedBooleanOperatorKind} ", categories);
+            this.CategoriesString = string.Join($" {this.SelectedBooleanOperatorKind} ", categories.OrderBy(x => x).ToList());
         }
     }
 }

@@ -1,29 +1,52 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="BudgetConfigViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="BudgetConfigViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Budget.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reactive.Linq;
+    using System.Reactive;
+
+    using CDP4Budget.Config;
+    using CDP4Budget.ConfigFile;
+    using CDP4Budget.Services;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
-    using Config;
-    using ConfigFile;
+
     using ReactiveUI;
-    using Services;
 
     /// <summary>
     /// The view-model used to setup configuration for the budget view
     /// </summary>
     public class BudgetConfigViewModel : DialogViewModelBase
     {
-        #region backing fields
         /// <summary>
         /// Backing field for <see cref="SelectedElements"/>
         /// </summary>
@@ -78,7 +101,6 @@ namespace CDP4Budget.ViewModels
         /// Backing field for <see cref="CanOk"/>
         /// </summary>
         private bool canOk;
-        #endregion
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BudgetConfigViewModel"/> class
@@ -110,14 +132,13 @@ namespace CDP4Budget.ViewModels
             this.LoadExistingConfiguration(budgetconfig);
         }
 
-        #region view fields
         /// <summary>
         /// Gets or sets the root <see cref="ElementDefinition"/>s to generate the budget for
         /// </summary>
         public ReactiveList<ElementDefinition> SelectedElements
         {
-            get { return this.selectedElements; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedElements, value); }
+            get => this.selectedElements;
+            set => this.RaiseAndSetIfChanged(ref this.selectedElements, value);
         }
 
         /// <summary>
@@ -125,8 +146,8 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         public QuantityKind NumberOfElement
         {
-            get { return this.numberOfElement; }
-            set { this.RaiseAndSetIfChanged(ref this.numberOfElement, value); }
+            get => this.numberOfElement;
+            set => this.RaiseAndSetIfChanged(ref this.numberOfElement, value);
         }
 
         /// <summary>
@@ -134,8 +155,8 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         public BudgetKind SelectedBudgetKind
         {
-            get { return this.selectedBudgetKind; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedBudgetKind, value); }
+            get => this.selectedBudgetKind;
+            set => this.RaiseAndSetIfChanged(ref this.selectedBudgetKind, value);
         }
 
         /// <summary>
@@ -143,8 +164,8 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         public EnumerationParameterType SystemLevel
         {
-            get { return this.systemLevel; }
-            set { this.RaiseAndSetIfChanged(ref this.systemLevel, value); }
+            get => this.systemLevel;
+            set => this.RaiseAndSetIfChanged(ref this.systemLevel, value);
         }
 
         /// <summary>
@@ -152,8 +173,8 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         public EnumerationValueDefinition SelectedSubSystemEnum
         {
-            get { return this.selectedSubSystemEnum; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedSubSystemEnum, value); }
+            get => this.selectedSubSystemEnum;
+            set => this.RaiseAndSetIfChanged(ref this.selectedSubSystemEnum, value);
         }
 
         /// <summary>
@@ -161,8 +182,8 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         public EnumerationValueDefinition SelectedEquipmentEnum
         {
-            get { return this.selectedEquipmentEnum; }
-            set { this.RaiseAndSetIfChanged(ref this.selectedEquipmentEnum, value); }
+            get => this.selectedEquipmentEnum;
+            set => this.RaiseAndSetIfChanged(ref this.selectedEquipmentEnum, value);
         }
 
         /// <summary>
@@ -170,8 +191,8 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         public float OverAllMargin
         {
-            get { return this.overAllMargin; }
-            set { this.RaiseAndSetIfChanged(ref this.overAllMargin, value); }
+            get => this.overAllMargin;
+            set => this.RaiseAndSetIfChanged(ref this.overAllMargin, value);
         }
 
         /// <summary>
@@ -179,8 +200,8 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         public bool CanOk
         {
-            get { return this.canOk; }
-            private set { this.RaiseAndSetIfChanged(ref this.canOk, value); }
+            get => this.canOk;
+            private set => this.RaiseAndSetIfChanged(ref this.canOk, value);
         }
 
         /// <summary>
@@ -198,8 +219,8 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         public List<EnumerationValueDefinition> PossibleSystemLevelEnum
         {
-            get { return this.possibleSystemLevelEnum; }
-            private set { this.RaiseAndSetIfChanged(ref this.possibleSystemLevelEnum, value); }
+            get => this.possibleSystemLevelEnum;
+            private set => this.RaiseAndSetIfChanged(ref this.possibleSystemLevelEnum, value);
         }
 
         /// <summary>
@@ -207,8 +228,8 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         public BudgetParameterConfigViewModelBase BudgetParameterConfig
         {
-            get { return this.budgetParameterConfig; }
-            private set { this.RaiseAndSetIfChanged(ref this.budgetParameterConfig, value); }
+            get => this.budgetParameterConfig;
+            private set => this.RaiseAndSetIfChanged(ref this.budgetParameterConfig, value);
         }
 
         /// <summary>
@@ -224,18 +245,17 @@ namespace CDP4Budget.ViewModels
         /// <summary>
         /// Gets the command that add a new sub-system definition
         /// </summary>
-        public ReactiveCommand<object> AddSubSystemDefinitionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> AddSubSystemDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the OK command
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel command
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
-        #endregion
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Execute the <see cref="AddSubSystemDefinitionCommand"/>
@@ -251,9 +271,11 @@ namespace CDP4Budget.ViewModels
         private void ExecuteOkCommand()
         {
             var subSysDefinitions = new List<SubSystemDefinition>();
+
             foreach (var ssDef in this.SubSystemDefinitions)
             {
                 var subSysCat = new SubSystemDefinition(ssDef.SubSystemDefinitions.SelectedCategories, ssDef.SubSystemElementDefinition.SelectedCategories);
+
                 if (subSysDefinitions.Contains(subSysCat))
                 {
                     continue;
@@ -263,12 +285,14 @@ namespace CDP4Budget.ViewModels
             }
 
             BudgetParameterConfigBase parameterConfig;
+
             switch (this.SelectedBudgetKind)
             {
                 case BudgetKind.Mass:
                     var massBudgetVm = (MassBudgetParameterConfigViewModel)this.BudgetParameterConfig;
                     var drymassConfig = new BudgetParameterMarginPair(massBudgetVm.DryMassConfig.SelectedParameterType, massBudgetVm.DryMassConfig.SelectedMarginParameterType);
                     var extraConf = new List<ExtraMassContributionConfiguration>();
+
                     foreach (var extraMassContributionConfigurationViewModel in massBudgetVm.ExtraMassContributions)
                     {
                         extraConf.Add(new ExtraMassContributionConfiguration(extraMassContributionConfigurationViewModel.SelectedCategories, extraMassContributionConfigurationViewModel.SelectedParameter, extraMassContributionConfigurationViewModel.SelectedMarginParameter));
@@ -305,10 +329,10 @@ namespace CDP4Budget.ViewModels
         private void UpdateCanOk()
         {
             this.CanOk = this.BudgetParameterConfig != null
-                         && this.BudgetParameterConfig.IsFormValid() 
+                         && this.BudgetParameterConfig.IsFormValid()
                          && this.SubSystemDefinitions.All(x => x.IsFormValid())
                          && this.SelectedElements != null && this.SelectedElements.Count > 0
-                         && (this.SystemLevel == null || this.SelectedEquipmentEnum != null && this.SelectedSubSystemEnum != null);
+                         && (this.SystemLevel == null || (this.SelectedEquipmentEnum != null && this.SelectedSubSystemEnum != null));
         }
 
         /// <summary>
@@ -346,6 +370,7 @@ namespace CDP4Budget.ViewModels
             this.SelectedElements = new ReactiveList<ElementDefinition>(this.PossibleElementDefinitions.Where(x => configuration.Elements != null && configuration.Elements.Any(y => y.Iid == x.Iid)));
             this.NumberOfElement = this.PossibleParameterTypes.SingleOrDefault(x => configuration.NumberOfElementParameterType != null && x.Iid == configuration.NumberOfElementParameterType.Iid);
             this.SystemLevel = this.PossibleSystemLevelParameterTypes.SingleOrDefault(x => configuration.SystemLevelToUse != null && x.Iid == configuration.SystemLevelToUse.Iid);
+
             this.SelectedSubSystemEnum = this.PossibleSystemLevelEnum != null && this.PossibleSystemLevelEnum.Count > 0 && configuration.SubSystemLevelEnum != null
                 ? this.PossibleSystemLevelEnum.SingleOrDefault(x => x.Iid == configuration.SubSystemLevelEnum.Iid)
                 : null;
@@ -354,12 +379,12 @@ namespace CDP4Budget.ViewModels
                 ? this.PossibleSystemLevelEnum.SingleOrDefault(x => x.Iid == configuration.EquipmentLevelEnum.Iid)
                 : null;
 
-            var massBudgetConfig = configuration.BudgetParameterConfig as MassBudgetParameterConfig;
-            if (massBudgetConfig != null)
+            if (configuration.BudgetParameterConfig is MassBudgetParameterConfig massBudgetConfig)
             {
                 this.SelectedBudgetKind = BudgetKind.Mass;
                 var vm = new MassBudgetParameterConfigViewModel(this.PossibleParameterTypes, this.UpdateCanOk, this.usedCategories);
                 vm.DryMassConfig.SelectedParameterType = this.PossibleParameterTypes.FirstOrDefault(x => x.Iid == massBudgetConfig.DryMassTuple.MainParameterType.Iid);
+
                 vm.DryMassConfig.SelectedMarginParameterType = massBudgetConfig.DryMassTuple.MarginParameterType != null
                     ? this.PossibleParameterTypes.FirstOrDefault(x => x.Iid == massBudgetConfig.DryMassTuple.MarginParameterType.Iid)
                     : null;
@@ -368,12 +393,12 @@ namespace CDP4Budget.ViewModels
                 this.BudgetParameterConfig = vm;
             }
 
-            var genericBudgetConfig = configuration.BudgetParameterConfig as GenericBudgetParameterConfig;
-            if (genericBudgetConfig != null)
+            if (configuration.BudgetParameterConfig is GenericBudgetParameterConfig genericBudgetConfig)
             {
                 this.SelectedBudgetKind = BudgetKind.Generic;
                 var vm = new GenericBudgetParameterConfigViewModel(this.PossibleParameterTypes, this.UpdateCanOk);
                 vm.GenericConfig.SelectedParameterType = this.PossibleParameterTypes.FirstOrDefault(x => x.Iid == genericBudgetConfig.GenericTuple.MainParameterType.Iid);
+
                 vm.GenericConfig.SelectedMarginParameterType = genericBudgetConfig.GenericTuple.MarginParameterType != null
                     ? this.PossibleParameterTypes.FirstOrDefault(x => x.Iid == genericBudgetConfig.GenericTuple.MarginParameterType.Iid)
                     : null;
@@ -395,14 +420,11 @@ namespace CDP4Budget.ViewModels
         /// </summary>
         private void InitializeCommand()
         {
-            this.AddSubSystemDefinitionCommand = ReactiveCommand.Create();
-            this.AddSubSystemDefinitionCommand.Subscribe(_ => this.ExecuteAddSubSystemDefinition());
+            this.AddSubSystemDefinitionCommand = ReactiveCommandCreator.Create(this.ExecuteAddSubSystemDefinition);
 
-            this.OkCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanOk));
-            this.OkCommand.Subscribe(_ => this.ExecuteOkCommand());
+            this.OkCommand = ReactiveCommandCreator.Create(this.ExecuteOkCommand, this.WhenAnyValue(x => x.CanOk));
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancelCommand());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancelCommand);
 
             this.WhenAnyValue(vm => vm.SelectedBudgetKind).Subscribe(
                 x =>
@@ -415,6 +437,7 @@ namespace CDP4Budget.ViewModels
                         case BudgetKind.Generic:
                             this.BudgetParameterConfig = new GenericBudgetParameterConfigViewModel(this.PossibleParameterTypes, this.UpdateCanOk);
                             break;
+
                         //case BudgetKind.Power:
                         //    this.BudgetParameterConfig = new PowerBudgetParameterConfigViewModel(this.PossibleParameterTypes, this.UpdateCanOk);
                         //    break;
@@ -424,10 +447,7 @@ namespace CDP4Budget.ViewModels
                 });
 
             this.WhenAnyValue(vm => vm.SystemLevel).Subscribe(
-                x =>
-                {
-                    this.PossibleSystemLevelEnum = x == null ? new List<EnumerationValueDefinition>() : new List<EnumerationValueDefinition>(x.ValueDefinition);
-                });
+                x => { this.PossibleSystemLevelEnum = x == null ? new List<EnumerationValueDefinition>() : new List<EnumerationValueDefinition>(x.ValueDefinition); });
 
             this.Subscriptions.Add(this.AddSubSystemDefinitionCommand);
             this.AddValidationConstraintTrigger();

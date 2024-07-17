@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="YesNoDialog.cs" company="RHEA System S.A.">
-//   Copyright (c) 2016 RHEA System S.A.
+// <copyright file="YesNoDialog.cs" company="Starion Group S.A.">
+//   Copyright (c) 2016 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 

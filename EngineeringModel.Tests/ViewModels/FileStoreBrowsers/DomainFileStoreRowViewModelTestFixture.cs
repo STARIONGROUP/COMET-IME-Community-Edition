@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DomainFileStoreRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="DomainFileStoreRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -25,28 +25,28 @@
 
 namespace CDP4EngineeringModel.Tests.ViewModels
 {
-    using System.Linq;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
-
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-    
-    using CDP4Dal;
-    
-    using CDP4EngineeringModel.ViewModels;
-    
-    using Moq;
-
-    using NUnit.Framework;
-
-    using CDP4Composition.DragDrop;
-
     using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.DragDrop;
+    using CDP4Composition.Services;
+
+    using CDP4Dal;
+
+    using CDP4EngineeringModel.ViewModels;
+
+    using CommonServiceLocator;
+    using Moq;
+
+    using NUnit.Framework;
 
     /// <summary>
     /// Suite of tests for the <see cref="DomainFileStoreRowViewModel"/> class
@@ -58,6 +58,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
         private Mock<ISession> session;
+        private Mock<IMessageBoxService> messageBoxService;
         private Iteration iteration;
         private File file;
         private File file1;
@@ -68,12 +69,22 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private Folder folder1;
         private Person person;
         private readonly PropertyInfo rev = typeof(Thing).GetProperty("RevisionNumber");
+        private CDPMessageBus messageBus;
+        private Mock<IServiceLocator> serviceLocator;
 
         [SetUp]
         public void Setup()
         {
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.messageBoxService = new Mock<IMessageBoxService>();
+
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
+
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
@@ -99,33 +110,33 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                 ShortName = "person",
                 GivenName = "person",
             };
-            
+
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Person = this.person,
                 IsActive = true,
             };
-            
+
             this.fileRevision1 = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "1",
                 Creator = this.participant,
                 CreatedOn = new DateTime(1, 1, 1)
             };
-            
+
             this.file1Revision1 = new FileRevision(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "11",
                 Creator = this.participant,
                 CreatedOn = new DateTime(1, 1, 1)
             };
-            
+
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "domain",
                 ShortName = "d"
             };
-            
+
             this.participant.Domain.Add(this.domain);
 
             this.folder1 = new Folder(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -146,13 +157,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                     new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                     {
                         {
-                            this.iteration, 
+                            this.iteration,
                             new Tuple<DomainOfExpertise, Participant>(
-                                this.domain, 
+                                this.domain,
                                 this.participant)
                         }
                     });
 
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [Test]
@@ -165,7 +177,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             var newContainedFolder = new Folder
             {
-                Name = "ContainedFolder", 
+                Name = "ContainedFolder",
                 ContainingFolder = newTopLevelFolder
             };
 
@@ -184,10 +196,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.file.FileRevision.Add(this.fileRevision1);
             this.file1.FileRevision.Add(this.file1Revision1);
             this.file.FileRevision.First().ContainingFolder = this.folder1;
-            
+
             this.store.File.Add(this.file);
             this.store.File.Add(this.file1);
-            
+
             var row = new DomainFileStoreRowViewModel(this.store, this.session.Object, null);
 
             Assert.AreEqual(2, row.ContainedRows.Count);
@@ -226,7 +238,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var dropTarget = new Mock<IDropTarget>();
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(this.file);
-            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
+            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
             dropinfo.Setup(x => x.TargetItem).Returns(dropTarget.Object);
 
             await row.Drop(dropinfo.Object);

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IterationMenuItemViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="IterationMenuItemViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +28,8 @@ namespace CDP4Composition.Tests.Mvvm
     using System;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -41,7 +43,7 @@ namespace CDP4Composition.Tests.Mvvm
     using CDP4Dal;
     using CDP4Dal.Permission;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -64,23 +66,25 @@ namespace CDP4Composition.Tests.Mvvm
         private EngineeringModel model;
         private Participant participant;
         private EngineeringModelSetup modelSetup;
-        private Person perosn;
+        private Person person;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.model = new EngineeringModel(Guid.NewGuid(), null, this.uri);
             this.iteration = new Iteration(Guid.NewGuid(), null, this.uri);
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), null, this.uri) { IterationNumber = 5 };
             this.iteration.IterationSetup = this.iterationSetup;
             this.participant = new Participant(Guid.NewGuid(), null, this.uri);
-            this.perosn = new Person(Guid.NewGuid(), null, this.uri);
+            this.person = new Person(Guid.NewGuid(), null, this.uri);
             this.model.Iteration.Add(this.iteration);
             this.modelSetup = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
             this.modelSetup.Participant.Add(this.participant);
-            this.participant.Person = this.perosn;
+            this.participant.Person = this.person;
             this.model.EngineeringModelSetup = this.modelSetup;
 
             this.panelView = new Mock<IPanelView>();
@@ -90,7 +94,8 @@ namespace CDP4Composition.Tests.Mvvm
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IPanelNavigationService>()).Returns(this.navigation.Object);
 
-            this.session.Setup(x => x.ActivePerson).Returns(this.perosn);
+            this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.permissionService = new Mock<IPermissionService>();
         }
@@ -98,7 +103,7 @@ namespace CDP4Composition.Tests.Mvvm
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -110,34 +115,34 @@ namespace CDP4Composition.Tests.Mvvm
         }
 
         [Test]
-        public void VerifyThatCommandWorks()
+        public async Task VerifyThatCommandWorks()
         {
             var menu = new RibbonMenuItemIterationDependentViewModel(this.iteration, this.session.Object, MockInstantiate);
 
-            menu.ShowPanelCommand.Execute(null);
+            await menu.ShowPanelCommand.Execute();
 
             this.navigation.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
-            menu.ShowPanelCommand.Execute(null);
+            await menu.ShowPanelCommand.Execute();
             this.navigation.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
 
             var modelbrowser = menu.PanelViewModels.First();
-            CDPMessageBus.Current.SendMessage(new NavigationPanelEvent(modelbrowser, this.panelView.Object, PanelStatus.Closed));
+            this.messageBus.SendMessage(new NavigationPanelEvent(modelbrowser, this.panelView.Object, PanelStatus.Closed));
 
             Assert.AreEqual(1, menu.PanelViewModels.Count);
 
-            menu.ShowPanelCommand.Execute(null);
+            await menu.ShowPanelCommand.Execute();
             this.navigation.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(3));
         }
 
         [Test]
-        public void VerifyThatClosePAnelEventHandlerWorks()
+        public async Task VerifyThatClosePanelEventHandlerWorks()
         {
             var menu = new RibbonMenuItemIterationDependentViewModel(this.iteration, this.session.Object, MockInstantiate);
 
             menu.IsChecked = true;
-            menu.ShowPanelCommand.Execute(null);
-            CDPMessageBus.Current.SendMessage(new NavigationPanelEvent(menu.PanelViewModels.First(), this.panelView.Object, PanelStatus.Closed));
+            await menu.ShowPanelCommand.Execute();
+            this.messageBus.SendMessage(new NavigationPanelEvent(menu.PanelViewModels.First(), this.panelView.Object, PanelStatus.Closed));
 
             Assert.IsFalse(menu.IsChecked);
         }

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="CategorySelectionViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="CategorySelectionViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2018 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -9,6 +9,9 @@ namespace CDP4Budget.ViewModels
     using System;
     using System.Collections.Generic;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm;
+
     using ReactiveUI;
 
     /// <summary>

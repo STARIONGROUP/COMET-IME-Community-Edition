@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="EngineeringModelSetupDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="EngineeringModelSetupDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="EngineeringModelSetup"/>
@@ -222,62 +223,62 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Participant
         /// </summary>
-        public ReactiveCommand<object> CreateParticipantCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateParticipantCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Participant
         /// </summary>
-        public ReactiveCommand<object> DeleteParticipantCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteParticipantCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Participant
         /// </summary>
-        public ReactiveCommand<object> EditParticipantCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditParticipantCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Participant
         /// </summary>
-        public ReactiveCommand<object> InspectParticipantCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectParticipantCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ModelReferenceDataLibrary
         /// </summary>
-        public ReactiveCommand<object> CreateRequiredRdlCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateRequiredRdlCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ModelReferenceDataLibrary
         /// </summary>
-        public ReactiveCommand<object> DeleteRequiredRdlCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteRequiredRdlCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ModelReferenceDataLibrary
         /// </summary>
-        public ReactiveCommand<object> EditRequiredRdlCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditRequiredRdlCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ModelReferenceDataLibrary
         /// </summary>
-        public ReactiveCommand<object> InspectRequiredRdlCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectRequiredRdlCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a IterationSetup
         /// </summary>
-        public ReactiveCommand<object> CreateIterationSetupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateIterationSetupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a IterationSetup
         /// </summary>
-        public ReactiveCommand<object> DeleteIterationSetupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteIterationSetupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a IterationSetup
         /// </summary>
-        public ReactiveCommand<object> EditIterationSetupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditIterationSetupCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a IterationSetup
         /// </summary>
-        public ReactiveCommand<object> InspectIterationSetupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectIterationSetupCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -290,48 +291,48 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedParticipantCommand = this.WhenAny(vm => vm.SelectedParticipant, v => v.Value != null);
             var canExecuteEditSelectedParticipantCommand = this.WhenAny(vm => vm.SelectedParticipant, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateParticipantCommand = ReactiveCommand.Create(canExecuteCreateParticipantCommand);
+            this.CreateParticipantCommand = ReactiveCommandCreator.Create(canExecuteCreateParticipantCommand);
             this.CreateParticipantCommand.Subscribe(_ => this.ExecuteCreateCommand<Participant>(this.PopulateParticipant));
 
-            this.DeleteParticipantCommand = ReactiveCommand.Create(canExecuteEditSelectedParticipantCommand);
+            this.DeleteParticipantCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParticipantCommand);
             this.DeleteParticipantCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedParticipant.Thing, this.PopulateParticipant));
 
-            this.EditParticipantCommand = ReactiveCommand.Create(canExecuteEditSelectedParticipantCommand);
+            this.EditParticipantCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParticipantCommand);
             this.EditParticipantCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedParticipant.Thing, this.PopulateParticipant));
 
-            this.InspectParticipantCommand = ReactiveCommand.Create(canExecuteInspectSelectedParticipantCommand);
+            this.InspectParticipantCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParticipantCommand);
             this.InspectParticipantCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParticipant.Thing));
             
             var canExecuteCreateRequiredRdlCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedRequiredRdlCommand = this.WhenAny(vm => vm.SelectedRequiredRdl, v => v.Value != null);
             var canExecuteEditSelectedRequiredRdlCommand = this.WhenAny(vm => vm.SelectedRequiredRdl, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateRequiredRdlCommand = ReactiveCommand.Create(canExecuteCreateRequiredRdlCommand);
+            this.CreateRequiredRdlCommand = ReactiveCommandCreator.Create(canExecuteCreateRequiredRdlCommand);
             this.CreateRequiredRdlCommand.Subscribe(_ => this.ExecuteCreateCommand<ModelReferenceDataLibrary>(this.PopulateRequiredRdl));
 
-            this.DeleteRequiredRdlCommand = ReactiveCommand.Create(canExecuteEditSelectedRequiredRdlCommand);
+            this.DeleteRequiredRdlCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRequiredRdlCommand);
             this.DeleteRequiredRdlCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedRequiredRdl.Thing, this.PopulateRequiredRdl));
 
-            this.EditRequiredRdlCommand = ReactiveCommand.Create(canExecuteEditSelectedRequiredRdlCommand);
+            this.EditRequiredRdlCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRequiredRdlCommand);
             this.EditRequiredRdlCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedRequiredRdl.Thing, this.PopulateRequiredRdl));
 
-            this.InspectRequiredRdlCommand = ReactiveCommand.Create(canExecuteInspectSelectedRequiredRdlCommand);
+            this.InspectRequiredRdlCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRequiredRdlCommand);
             this.InspectRequiredRdlCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRequiredRdl.Thing));
             
             var canExecuteCreateIterationSetupCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedIterationSetupCommand = this.WhenAny(vm => vm.SelectedIterationSetup, v => v.Value != null);
             var canExecuteEditSelectedIterationSetupCommand = this.WhenAny(vm => vm.SelectedIterationSetup, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateIterationSetupCommand = ReactiveCommand.Create(canExecuteCreateIterationSetupCommand);
+            this.CreateIterationSetupCommand = ReactiveCommandCreator.Create(canExecuteCreateIterationSetupCommand);
             this.CreateIterationSetupCommand.Subscribe(_ => this.ExecuteCreateCommand<IterationSetup>(this.PopulateIterationSetup));
 
-            this.DeleteIterationSetupCommand = ReactiveCommand.Create(canExecuteEditSelectedIterationSetupCommand);
+            this.DeleteIterationSetupCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedIterationSetupCommand);
             this.DeleteIterationSetupCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedIterationSetup.Thing, this.PopulateIterationSetup));
 
-            this.EditIterationSetupCommand = ReactiveCommand.Create(canExecuteEditSelectedIterationSetupCommand);
+            this.EditIterationSetupCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedIterationSetupCommand);
             this.EditIterationSetupCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedIterationSetup.Thing, this.PopulateIterationSetup));
 
-            this.InspectIterationSetupCommand = ReactiveCommand.Create(canExecuteInspectSelectedIterationSetupCommand);
+            this.InspectIterationSetupCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedIterationSetupCommand);
             this.InspectIterationSetupCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedIterationSetup.Thing));
         }
 

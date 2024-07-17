@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RequirementDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="RequirementDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -28,6 +28,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Requirement"/>
@@ -163,37 +164,37 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedGroup"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedGroupCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedGroupCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ParametricConstraint
         /// </summary>
-        public ReactiveCommand<object> CreateParametricConstraintCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateParametricConstraintCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ParametricConstraint
         /// </summary>
-        public ReactiveCommand<object> DeleteParametricConstraintCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteParametricConstraintCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ParametricConstraint
         /// </summary>
-        public ReactiveCommand<object> EditParametricConstraintCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditParametricConstraintCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ParametricConstraint
         /// </summary>
-        public ReactiveCommand<object> InspectParametricConstraintCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectParametricConstraintCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a ParametricConstraint 
         /// </summary>
-        public ReactiveCommand<object> MoveUpParametricConstraintCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpParametricConstraintCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a ParametricConstraint
         /// </summary>
-        public ReactiveCommand<object> MoveDownParametricConstraintCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownParametricConstraintCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -206,25 +207,25 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedParametricConstraintCommand = this.WhenAny(vm => vm.SelectedParametricConstraint, v => v.Value != null);
             var canExecuteEditSelectedParametricConstraintCommand = this.WhenAny(vm => vm.SelectedParametricConstraint, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateParametricConstraintCommand = ReactiveCommand.Create(canExecuteCreateParametricConstraintCommand);
+            this.CreateParametricConstraintCommand = ReactiveCommandCreator.Create(canExecuteCreateParametricConstraintCommand);
             this.CreateParametricConstraintCommand.Subscribe(_ => this.ExecuteCreateCommand<ParametricConstraint>(this.PopulateParametricConstraint));
 
-            this.DeleteParametricConstraintCommand = ReactiveCommand.Create(canExecuteEditSelectedParametricConstraintCommand);
+            this.DeleteParametricConstraintCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParametricConstraintCommand);
             this.DeleteParametricConstraintCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedParametricConstraint.Thing, this.PopulateParametricConstraint));
 
-            this.EditParametricConstraintCommand = ReactiveCommand.Create(canExecuteEditSelectedParametricConstraintCommand);
+            this.EditParametricConstraintCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParametricConstraintCommand);
             this.EditParametricConstraintCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedParametricConstraint.Thing, this.PopulateParametricConstraint));
 
-            this.InspectParametricConstraintCommand = ReactiveCommand.Create(canExecuteInspectSelectedParametricConstraintCommand);
+            this.InspectParametricConstraintCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParametricConstraintCommand);
             this.InspectParametricConstraintCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParametricConstraint.Thing));
 
-            this.MoveUpParametricConstraintCommand = ReactiveCommand.Create(canExecuteEditSelectedParametricConstraintCommand);
+            this.MoveUpParametricConstraintCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParametricConstraintCommand);
             this.MoveUpParametricConstraintCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.ParametricConstraint, this.SelectedParametricConstraint));
 
-            this.MoveDownParametricConstraintCommand = ReactiveCommand.Create(canExecuteEditSelectedParametricConstraintCommand);
+            this.MoveDownParametricConstraintCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParametricConstraintCommand);
             this.MoveDownParametricConstraintCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.ParametricConstraint, this.SelectedParametricConstraint));
             var canExecuteInspectSelectedGroupCommand = this.WhenAny(vm => vm.SelectedGroup, v => v.Value != null);
-            this.InspectSelectedGroupCommand = ReactiveCommand.Create(canExecuteInspectSelectedGroupCommand);
+            this.InspectSelectedGroupCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedGroupCommand);
             this.InspectSelectedGroupCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedGroup));
         }
 

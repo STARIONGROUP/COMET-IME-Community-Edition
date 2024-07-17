@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProcessedValueSetGenerator.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ProcessedValueSetGenerator.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -40,6 +40,8 @@ namespace CDP4Reporting.Utilities
 
     using CDP4Reporting.DataCollection;
     using CDP4Reporting.SubmittableParameterValues;
+
+    using CommonServiceLocator;
 
     /// <summary>
     /// Helper class to create <see cref="ProcessedValueSet"/>s using data from an <see cref="IIterationDependentDataCollector"/>.
@@ -101,7 +103,7 @@ namespace CDP4Reporting.Utilities
 
             if (nestedParameters.Count == 0)
             {
-                errorText = $"Path '{path}' was not found in Product Tree for Option '{option.ShortName}'";
+                errorText = $"Path {path} was not found in Product Tree for Option {option.ShortName}";
                 return false;
             }
 
@@ -109,13 +111,13 @@ namespace CDP4Reporting.Utilities
 
             if (nestedParameters.Count == 0)
             {
-                errorText = $"Domain '{this.IterationDependentDataCollector.DomainOfExpertise.Name}' does not have access to Path '{path}'.";
+                errorText = $"Domain {this.IterationDependentDataCollector.DomainOfExpertise.Name} does not have access to Path {path}.";
                 return false;
             }
 
             if (nestedParameters.Count > 1)
             {
-                errorText = $"Multiple parameters found for Path '{path}'. Cannot write the value back to the model.";
+                errorText = $"Multiple parameters found for Path {path}. Cannot write the value back to the model.";
                 return false;
             }
 
@@ -123,13 +125,13 @@ namespace CDP4Reporting.Utilities
 
             if (nestedParameter.AssociatedParameter.ParameterType.NumberOfValues > 1)
             {
-                errorText = $"ParameterType '{nestedParameter.AssociatedParameter.ParameterType.Name}' is of a compound parameter type. Writing back values to the model for Compound parameter types is currently not supported.";
+                errorText = $"ParameterType {nestedParameter.AssociatedParameter.ParameterType.Name} is of a compound parameter type. Writing back values to the model for Compound parameter types is currently not supported.";
                 return false;
             }
 
             if (!this.IterationDependentDataCollector.Session.PermissionService.CanWrite(nestedParameter.AssociatedParameter))
             {
-                errorText = $"Domain '{this.IterationDependentDataCollector.DomainOfExpertise.Name}' does not have write access to Path '{path}'.";
+                errorText = $"Domain {this.IterationDependentDataCollector.DomainOfExpertise.Name} does not have write access to Path {path}.";
                 return false;
             }
 
@@ -145,7 +147,7 @@ namespace CDP4Reporting.Utilities
                 return processedValueSet.ValidationResult == ValidationResultKind.Valid;
             }
 
-            errorText = $"Update Path '{path}' failed due to unexpected valueSet type: '{nestedParameter.ValueSet.GetType()}'";
+            errorText = $"Update Path {path} failed due to unexpected valueSet type: {nestedParameter.ValueSet.GetType()}";
 
             return false;
         }

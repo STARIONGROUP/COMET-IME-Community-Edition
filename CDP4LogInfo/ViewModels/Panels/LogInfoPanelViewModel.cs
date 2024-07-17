@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LogInfoPanelViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="LogInfoPanelViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET-IME Community Edition.
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -30,18 +30,26 @@ namespace CDP4LogInfo.ViewModels
     using System.ComponentModel;
     using System.Globalization;
     using System.IO;
+    using System.Reactive;
     using System.Reactive.Linq;
     using System.Windows;
     using System.Windows.Data;
+
     using CDP4Composition;
     using CDP4Composition.Log;
+    using CDP4Composition.Mvvm;
+    using CDP4Composition.Navigation;
+
+    using CDP4LogInfo.ViewModels.Dialogs;
     using CDP4LogInfo.ViewModels.Panels.LogInfoRows;
     using CDP4LogInfo.Views;
-    using CDP4Composition.Navigation;
-    using CDP4LogInfo.ViewModels.Dialogs;
-    using Microsoft.Practices.ServiceLocation;
+
+    using CommonServiceLocator;
+
     using NLog;
+
     using ReactiveUI;
+
     using LogLevel = NLog.LogLevel;
 
     /// <summary>
@@ -135,26 +143,23 @@ namespace CDP4LogInfo.ViewModels
                 .Subscribe(logLevel => CDP4SimpleConfigurator.ChangeTargetRule(this.logTarget, this.SelectedLogLevel));
 
             var canClear = this.LogEventInfo.CountChanged.Select(count => count > 0);
-            this.ClearCommand = ReactiveCommand.Create(canClear);
-            this.ClearCommand.Subscribe(_ => this.ExecuteClearLog());
+            this.ClearCommand = ReactiveCommandCreator.Create(this.ExecuteClearLog, canClear);
 
             var canExport = this.LogEventInfo.CountChanged.Select(count => count > 0);
-            this.ExportCommand = ReactiveCommand.Create(canExport);
-            this.ExportCommand.Subscribe(_ => this.ExecuteExportCommand());
+            this.ExportCommand = ReactiveCommandCreator.Create(this.ExecuteExportCommand, canExport);
 
-            this.ShowDetailsDialogCommand = ReactiveCommand.Create();
-            this.ShowDetailsDialogCommand.Subscribe(_ => this.ExecuteShowDetailsDialogCommand());
+            this.ShowDetailsDialogCommand = ReactiveCommandCreator.Create(this.ExecuteShowDetailsDialogCommand);
 
             Observable.Merge(
-                this.WhenAnyValue(vm => vm.IsFatalLogelSelected),
-                this.WhenAnyValue(vm => vm.IsErrorLogelSelected),
-                this.WhenAnyValue(vm => vm.IsWarnLogelSelected),
-                this.WhenAnyValue(vm => vm.IsInfoLogelSelected),
-                this.WhenAnyValue(vm => vm.IsDebugLogelSelected),
-                this.WhenAnyValue(vm => vm.IsTraceLogelSelected))
+                    this.WhenAnyValue(vm => vm.IsFatalLogelSelected),
+                    this.WhenAnyValue(vm => vm.IsErrorLogelSelected),
+                    this.WhenAnyValue(vm => vm.IsWarnLogelSelected),
+                    this.WhenAnyValue(vm => vm.IsInfoLogelSelected),
+                    this.WhenAnyValue(vm => vm.IsDebugLogelSelected),
+                    this.WhenAnyValue(vm => vm.IsTraceLogelSelected))
                 .Subscribe(_ => { this.data.Filter = this.LogLevelFilter; });
         }
-        
+
         /// <summary>
         /// Gets a list of possible <see cref="LogLevel"/>
         /// </summary>
@@ -163,18 +168,12 @@ namespace CDP4LogInfo.ViewModels
         /// <summary>
         /// Gets the caption
         /// </summary>
-        public string Caption
-        {
-            get { return "Log Information"; }
-        }
+        public string Caption => "Log Information";
 
         /// <summary>
         /// Gets a value indicating whether this is dirty
         /// </summary>
-        public bool IsDirty
-        {
-            get { return false; }
-        }
+        public bool IsDirty => false;
 
         /// <summary>
         /// Gets the unique identifier of the view-model
@@ -184,18 +183,12 @@ namespace CDP4LogInfo.ViewModels
         /// <summary>
         /// Gets the tooltip
         /// </summary>
-        public string ToolTip
-        {
-            get { return "Display the Log Information of the application."; }
-        }
+        public string ToolTip => "Display the Log Information of the application.";
 
         /// <summary>
         /// Gets the data-source
         /// </summary>
-        public string DataSource
-        {
-            get { return null; }
-        }
+        public string DataSource => null;
 
         /// <summary>
         /// Gets or sets the selected <see cref="LogLevel"/>
@@ -205,15 +198,9 @@ namespace CDP4LogInfo.ViewModels
         /// </remarks>
         public LogLevel SelectedLogLevel
         {
-            get
-            {
-                return this.selectedLogLevel;
-            }
+            get => this.selectedLogLevel;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedLogLevel, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.selectedLogLevel, value);
         }
 
         /// <summary>
@@ -221,15 +208,9 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public bool IsFatalLogelSelected
         {
-            get
-            {
-                return this.isFatalLogelSelected;
-            }
+            get => this.isFatalLogelSelected;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isFatalLogelSelected, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isFatalLogelSelected, value);
         }
 
         /// <summary>
@@ -237,15 +218,9 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public bool IsErrorLogelSelected
         {
-            get
-            {
-                return this.isErrorLogelSelected;
-            }
+            get => this.isErrorLogelSelected;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isErrorLogelSelected, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isErrorLogelSelected, value);
         }
 
         /// <summary>
@@ -253,15 +228,9 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public bool IsWarnLogelSelected
         {
-            get
-            {
-                return this.isWarnLogelSelected;
-            }
+            get => this.isWarnLogelSelected;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isWarnLogelSelected, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isWarnLogelSelected, value);
         }
 
         /// <summary>
@@ -269,15 +238,9 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public bool IsInfoLogelSelected
         {
-            get
-            {
-                return this.isInfoLogelSelected;
-            }
+            get => this.isInfoLogelSelected;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isInfoLogelSelected, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isInfoLogelSelected, value);
         }
 
         /// <summary>
@@ -285,15 +248,9 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public bool IsDebugLogelSelected
         {
-            get
-            {
-                return this.isDebugLogelSelected;
-            }
+            get => this.isDebugLogelSelected;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isDebugLogelSelected, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isDebugLogelSelected, value);
         }
 
         /// <summary>
@@ -301,15 +258,9 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public bool IsTraceLogelSelected
         {
-            get
-            {
-                return this.isTraceLogelSelected;
-            }
+            get => this.isTraceLogelSelected;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.isTraceLogelSelected, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.isTraceLogelSelected, value);
         }
 
         /// <summary>
@@ -322,15 +273,9 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public LogInfoRowViewModel SelectedItem
         {
-            get
-            {
-                return this.selectedItem;
-            }
+            get => this.selectedItem;
 
-            set
-            {
-                this.RaiseAndSetIfChanged(ref this.selectedItem, value);
-            }
+            set => this.RaiseAndSetIfChanged(ref this.selectedItem, value);
         }
 
         /// <summary>
@@ -339,28 +284,22 @@ namespace CDP4LogInfo.ViewModels
         /// <remarks>
         /// The <see cref="Data"/> property shall be used by a view in case custom filtering shall be enabled
         /// </remarks>
-        public ICollectionView Data
-        {
-            get
-            {
-                return this.data;
-            }
-        }
+        public ICollectionView Data => this.data;
 
         /// <summary>
         /// Gets the Clear command
         /// </summary>
-        public ReactiveCommand<object> ClearCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ClearCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to Export the log
         /// </summary>
-        public ReactiveCommand<object> ExportCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ExportCommand { get; private set; }
 
         /// <summary>
         /// Gets the command to show the details of the selected Log item
         /// </summary>
-        public ReactiveCommand<object> ShowDetailsDialogCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ShowDetailsDialogCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
@@ -372,8 +311,8 @@ namespace CDP4LogInfo.ViewModels
         /// </summary>
         public bool IsSelected
         {
-            get { return isSelected; }
-            set { this.RaiseAndSetIfChanged(ref this.isSelected, value); }
+            get => this.isSelected;
+            set => this.RaiseAndSetIfChanged(ref this.isSelected, value);
         }
 
         /// <summary>
@@ -427,7 +366,7 @@ namespace CDP4LogInfo.ViewModels
         private void ExecuteExportCommand()
         {
             var openSaveFileDialogService = ServiceLocator.Current.GetInstance<IOpenSaveFileDialogService>();
-            var result = openSaveFileDialogService.GetSaveFileDialog("Untitled", ".csv", "CSV File (.csv)|*.csv","", 0);
+            var result = openSaveFileDialogService.GetSaveFileDialog("Untitled", ".csv", "CSV File (.csv)|*.csv", "", 0);
 
             if (string.IsNullOrEmpty(result))
             {
@@ -437,6 +376,7 @@ namespace CDP4LogInfo.ViewModels
             using (TextWriter writer = File.CreateText(result))
             {
                 var csv = new CsvHelper.CsvWriter(writer, CultureInfo.InvariantCulture);
+
                 foreach (var logInfoRowViewModel in this.LogEventInfo)
                 {
                     csv.WriteField(logInfoRowViewModel.TimeStamp);
@@ -458,7 +398,7 @@ namespace CDP4LogInfo.ViewModels
                 return;
             }
 
-            var dialogViewModel = new LogItemDialogViewModel(this.SelectedItem.LogEventInfo);            
+            var dialogViewModel = new LogItemDialogViewModel(this.SelectedItem.LogEventInfo);
             this.dialogNavigationService.NavigateModal(dialogViewModel);
         }
 
@@ -474,6 +414,7 @@ namespace CDP4LogInfo.ViewModels
         private bool LogLevelFilter(object item)
         {
             var row = item as LogInfoRowViewModel;
+
             if (row == null)
             {
                 return false;

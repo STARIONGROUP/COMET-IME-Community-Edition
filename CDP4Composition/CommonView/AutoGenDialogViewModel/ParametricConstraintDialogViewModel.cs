@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParametricConstraintDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ParametricConstraintDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ParametricConstraint"/>
@@ -154,27 +155,27 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedTopExpression"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedTopExpressionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedTopExpressionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a BooleanExpression
         /// </summary>
-        public ReactiveCommand<object> CreateExpressionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateExpressionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a BooleanExpression
         /// </summary>
-        public ReactiveCommand<object> DeleteExpressionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteExpressionCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a BooleanExpression
         /// </summary>
-        public ReactiveCommand<object> EditExpressionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditExpressionCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a BooleanExpression
         /// </summary>
-        public ReactiveCommand<object> InspectExpressionCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectExpressionCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -187,19 +188,19 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedExpressionCommand = this.WhenAny(vm => vm.SelectedExpression, v => v.Value != null);
             var canExecuteEditSelectedExpressionCommand = this.WhenAny(vm => vm.SelectedExpression, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateExpressionCommand = ReactiveCommand.Create(canExecuteCreateExpressionCommand);
+            this.CreateExpressionCommand = ReactiveCommandCreator.Create(canExecuteCreateExpressionCommand);
             this.CreateExpressionCommand.Subscribe(_ => this.ExecuteCreateExpressionCommand());
 
-            this.DeleteExpressionCommand = ReactiveCommand.Create(canExecuteEditSelectedExpressionCommand);
+            this.DeleteExpressionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedExpressionCommand);
             this.DeleteExpressionCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedExpression.Thing, this.PopulateExpression));
 
-            this.EditExpressionCommand = ReactiveCommand.Create(canExecuteEditSelectedExpressionCommand);
+            this.EditExpressionCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedExpressionCommand);
             this.EditExpressionCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedExpression.Thing, this.PopulateExpression));
 
-            this.InspectExpressionCommand = ReactiveCommand.Create(canExecuteInspectSelectedExpressionCommand);
+            this.InspectExpressionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedExpressionCommand);
             this.InspectExpressionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedExpression.Thing));
             var canExecuteInspectSelectedTopExpressionCommand = this.WhenAny(vm => vm.SelectedTopExpression, v => v.Value != null);
-            this.InspectSelectedTopExpressionCommand = ReactiveCommand.Create(canExecuteInspectSelectedTopExpressionCommand);
+            this.InspectSelectedTopExpressionCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedTopExpressionCommand);
             this.InspectSelectedTopExpressionCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedTopExpression));
         }
 

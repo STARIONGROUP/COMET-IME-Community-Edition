@@ -23,26 +23,14 @@
         <File Id="_6B87148B" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\VBIDEApi.dll" KeyPath="yes" />
       </Component>
 
-      <Component Id="_F0C36C5B13CD" Guid="{5F07B1E6-6E80-495A-A482-F0C36C5B13CD}" Win64="$(var.Win64)">
-        <File Id="_5F07B1E6" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\MSHTMLApi.dll" KeyPath="yes" />
-      </Component>
+      <!--<Component Id="_5085486E8446" Guid="{BE1911A5-A36C-40B8-B533-5085486E8446}" Win64="$(var.Win64)">
+	      <File Id="_BE1911A5" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\stdole.dll" KeyPath="yes" />
+      </Component>-->
 
-      <Component Id="_8CF9450527DB" Guid="{95578453-84DD-4CCF-8A54-8CF9450527DB}" Win64="$(var.Win64)">
-        <File Id="_95578453" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\MSProjectApi.dll" KeyPath="yes" />
-      </Component>
+      <!--<Component Id="_A6A9627EB7C4" Guid="{7D5C29FF-7DD4-463C-B321-A6A9627EB7C4}" Win64="$(var.Win64)">
+	      <File Id="_7D5C29FF" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\SimpleMapi.dll" KeyPath="yes" />
+      </Component>-->
 
-      <Component Id="_C3B58C20DA7C" Guid="{F073C8C0-DE26-4380-82FB-C3B58C20DA7C}" Win64="$(var.Win64)">
-        <File Id="_F073C8C0" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\OutlookApi.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="_A411E8688276" Guid="{FE42E631-B394-44CA-A4E0-A411E8688276}" Win64="$(var.Win64)">
-        <File Id="_FE42E631" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\PowerPointApi.dll" KeyPath="yes" />
-      </Component>
-
-      <Component Id="_BF80C5D1F86D" Guid="{C4A85607-FCD5-4351-8000-BF80C5D1F86D}" Win64="$(var.Win64)">
-        <File Id="_C4A85607" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\WordApi.dll" KeyPath="yes" />
-      </Component>
-      
       <Component Id="_A6C2914281B1" Guid="{FCED4287-9FDE-4603-8D6E-A6C2914281B1}" Win64="$(var.Win64)">
         <File Id="_FCED4287" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\CDP4AddinCE.tlb" KeyPath="yes" />
       </Component>
@@ -51,7 +39,7 @@
         <File Id="_DE3065F5" Vital="yes" Source="$(var.CDP4Addin.TargetDir)\CDP4OfficeInfrastructure.dll" KeyPath="yes" />
       </Component>
       
-      <Component Id="_1BEE60CACC2D" Guid="{17CAA5BE-28C0-4CB9-8083-1BEE60CACC2D}" Win64="$(var.Win64)">
+       <Component Id="_1BEE60CACC2D" Guid="{17CAA5BE-28C0-4CB9-8083-1BEE60CACC2D}" Win64="$(var.Win64)">
         <File Id="_17CAA5BE" Vital="yes" Source="$(var.CDP4Addin.TargetPath)" KeyPath="yes" />
 
         <!-- register addin with EXCEL-->
@@ -67,11 +55,11 @@
         <RegistryKey Key="SOFTWARE\Classes\CDP4CE.Addin" Root="HKLM" Action="createAndRemoveOnUninstall" ForceDeleteOnUninstall="yes">
           <RegistryValue Type="string" Value="CDP4AddinCE.Addin"></RegistryValue>
           <RegistryKey Key="CLSID">
-            <RegistryValue Type="string" Value="{0CAE241F-E861-4CBF-9636-72555CC33D8E}"></RegistryValue>
+            <RegistryValue Type="string" Value="{FD48B640-1D3F-4922-854B-C69028CA469E}"></RegistryValue>
           </RegistryKey>
         </RegistryKey>
 
-        <RegistryKey Key="Software\Classes\CLSID\{0CAE241F-E861-4CBF-9636-72555CC33D8E}" Root="HKLM" Action="createAndRemoveOnUninstall" ForceDeleteOnUninstall="yes">
+        <RegistryKey Key="Software\Classes\CLSID\{FD48B640-1D3F-4922-854B-C69028CA469E}" Root="HKLM" Action="createAndRemoveOnUninstall" ForceDeleteOnUninstall="yes">
           <RegistryKey Key="Implemented Categories">
             <RegistryValue Type="string" Value=""></RegistryValue>
             <RegistryKey Key="{5BF44957-D93F-4462-A984-385B718C9084}">
@@ -80,15 +68,15 @@
           </RegistryKey>
 
           <RegistryKey Key="InprocServer32">
-            <RegistryKey Key="9.7.0.0">
-              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=9.7.0.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryKey Key="10.0.0.19">
+              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.19, Culture=neutral, PublicKeyToken=null"></RegistryValue>
               <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.Addin"></RegistryValue>
               <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
               <RegistryValue Type="string" Name="CodeBase" Value="file:///[#_17CAA5BE]"></RegistryValue>
             </RegistryKey>
 
             <RegistryValue Type="string" Value="mscoree.dll"></RegistryValue>
-            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=9.7.0.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.19, Culture=neutral, PublicKeyToken=null"></RegistryValue>
             <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.Addin"></RegistryValue>
             <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
             <RegistryValue Type="string" Name="ThreadingModel" Value="Both"></RegistryValue>
@@ -118,15 +106,15 @@
           </RegistryKey>
 
           <RegistryKey Key="InprocServer32">
-            <RegistryKey Key="9.7.0.0">
-              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=9.7.0.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryKey Key="10.0.0.19">
+              <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.19, Culture=neutral, PublicKeyToken=null"></RegistryValue>
               <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
               <RegistryValue Type="string" Name="CodeBase" Value="[#_17CAA5BE]"></RegistryValue>
               <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>
             </RegistryKey>
 
             <RegistryValue Type="string" Value="mscoree.dll"></RegistryValue>
-            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=9.7.0.0, Culture=neutral, PublicKeyToken=null"></RegistryValue>
+            <RegistryValue Type="string" Name="Assembly" Value="CDP4AddinCE, Version=10.0.0.19, Culture=neutral, PublicKeyToken=null"></RegistryValue>
             <RegistryValue Type="string" Name="Class" Value="CDP4AddinCE.TaskPaneWpfHostControl"></RegistryValue>
             <RegistryValue Type="string" Name="CodeBase" Value="[#_17CAA5BE]"></RegistryValue>
             <RegistryValue Type="string" Name="RuntimeVersion" Value="v4.0.30319"></RegistryValue>

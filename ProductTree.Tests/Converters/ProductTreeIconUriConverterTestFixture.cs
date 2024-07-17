@@ -1,38 +1,64 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProductTreeIconUriConverterTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="ProductTreeIconUriConverterTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4ProductTree.Tests.Converters
 {
-    using CDP4Dal;
-    using Moq;
     using System;
-    using System.Threading;
-    using System.Windows.Media.Imaging;
-    using NUnit.Framework;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Windows;
+    using System.Windows.Media.Imaging;
+
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4CommonView;
 
+    using CDP4Composition.Services;
     using CDP4Composition.Services.NestedElementTreeService;
+
+    using CDP4Dal;
 
     using CDP4ProductTree.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
+
+    using Moq;
+
+    using NUnit.Framework;
 
     using ParameterRowViewModel = CDP4ProductTree.ViewModels.ParameterRowViewModel;
-    using Thing = CDP4Common.CommonData.Thing;
 
     /// <summary>
     /// suite of tests for the <see cref="ProductTreeIconUriConverter"/>
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     internal class ProductTreeIconUriConverterTestFixture
     {
         private Mock<ISession> session;
@@ -53,11 +79,13 @@ namespace CDP4ProductTree.Tests.Converters
         private ProductTreeIconUriConverter converter;
         private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<IServiceLocator> serviceLocator;
-
+        private Mock<IIconCacheService> iconCacheService;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
             var ensurePackSchemeIsKnown = System.IO.Packaging.PackUriHelper.UriSchemePack;
             this.session = new Mock<ISession>();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
@@ -90,6 +118,7 @@ namespace CDP4ProductTree.Tests.Converters
             this.elementdef.Parameter.Add(this.parameter);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.parameter.Iid, null), new Lazy<Thing>(() => this.parameter));
 
@@ -97,7 +126,9 @@ namespace CDP4ProductTree.Tests.Converters
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             this.nestedElementTreeService = new Mock<INestedElementTreeService>();
+            this.iconCacheService = new Mock<IIconCacheService>();
             this.serviceLocator.Setup(x => x.GetInstance<INestedElementTreeService>()).Returns(this.nestedElementTreeService.Object);
+            this.serviceLocator.Setup(x => x.GetInstance<IIconCacheService>()).Returns(this.iconCacheService.Object);
         }
 
         [Test]
@@ -133,14 +164,17 @@ namespace CDP4ProductTree.Tests.Converters
             var subscribedByOthersIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/blueball.gif";
             var subscribedIcon = "pack://application:,,,/CDP4Composition;component/Resources/Images/whiteball.jpg";
 
+            this.iconCacheService.Setup(x => x.QueryBitmapImage(new Uri(unusedIcon))).Returns(new BitmapImage(new Uri(unusedIcon)));
             var converterResult = (BitmapImage)this.converter.Convert(new object[] { row.ThingStatus, row.Usage }, null, null, null);
             Assert.AreEqual(unusedIcon, converterResult.UriSource.ToString());
 
             row.Usage = ParameterUsageKind.SubscribedByOthers;
+            this.iconCacheService.Setup(x => x.QueryBitmapImage(new Uri(subscribedByOthersIcon))).Returns(new BitmapImage(new Uri(subscribedByOthersIcon)));
             converterResult = (BitmapImage)this.converter.Convert(new object[] { row.ThingStatus, row.Usage }, null, null, null);
             Assert.AreEqual(subscribedByOthersIcon, converterResult.UriSource.ToString());
 
             row.Usage = ParameterUsageKind.Subscribed;
+            this.iconCacheService.Setup(x => x.QueryBitmapImage(new Uri(subscribedIcon))).Returns(new BitmapImage(new Uri(subscribedIcon)));
             converterResult = (BitmapImage)this.converter.Convert(new object[] { row.ThingStatus, row.Usage }, null, null, null);
             Assert.AreEqual(subscribedIcon, converterResult.UriSource.ToString());
         }

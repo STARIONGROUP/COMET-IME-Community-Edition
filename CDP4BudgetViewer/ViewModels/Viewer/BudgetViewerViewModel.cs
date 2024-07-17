@@ -1,33 +1,34 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BudgetViewerViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="BudgetViewerViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Smiechowski Nathanael
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Budget.ViewModels
 {
     using System;
     using System.IO;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
 
     using Config;
@@ -46,7 +47,7 @@ namespace CDP4Budget.ViewModels
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
@@ -54,6 +55,7 @@ namespace CDP4Budget.ViewModels
     using NLog;
     
     using ReactiveUI;
+    using System.Diagnostics;
 
     /// <summary>
     /// 
@@ -123,18 +125,14 @@ namespace CDP4Budget.ViewModels
             this.OptionOverviewViewModel = new OptionOverviewViewModel();
             this.BudgetViewModels = new ReactiveList<OptionBudgetViewModel>();
 
-            this.OpenConfigCommand = ReactiveCommand.Create();
-            this.OpenConfigCommand.Subscribe(_ => this.ExecuteOpenConfigCommand());
+            this.OpenConfigCommand = ReactiveCommandCreator.Create(this.ExecuteOpenConfigCommand);
 
             var confObs = this.WhenAnyValue(x => x.BudgetConfig).Select(x => x != null);
-            this.RefreshBudgetCommand = ReactiveCommand.Create(confObs);
-            this.RefreshBudgetCommand.CanExecuteObservable.Subscribe(_ => this.ComputeBudgets());
+            this.RefreshBudgetCommand = ReactiveCommandCreator.Create(this.ComputeBudgets, confObs);
 
-            this.SaveConfigCommand = ReactiveCommand.Create(confObs);
-            this.SaveConfigCommand.Subscribe(_ => this.ExecuteSaveConfigCommand());
+            this.SaveConfigCommand = ReactiveCommandCreator.Create(this.ExecuteSaveConfigCommand, confObs);
 
-            this.LoadConfigCommand = ReactiveCommand.Create();
-            this.LoadConfigCommand.Subscribe(_ => this.ExecuteLoadConfigCommand());
+            this.LoadConfigCommand = ReactiveCommandCreator.Create(this.ExecuteLoadConfigCommand);
             this.ComputeBudgets();
         }
 
@@ -186,22 +184,22 @@ namespace CDP4Budget.ViewModels
         /// <summary>
         /// Gets the open-config <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> OpenConfigCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OpenConfigCommand { get; private set; }
 
         /// <summary>
         /// Gets the refresh <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> RefreshBudgetCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> RefreshBudgetCommand { get; private set; }
 
         /// <summary>
         /// Gets the save config <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> SaveConfigCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SaveConfigCommand { get; private set; }
 
         /// <summary>
         /// Gets the load config <see cref="IReactiveCommand"/>
         /// </summary>
-        public ReactiveCommand<object> LoadConfigCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> LoadConfigCommand { get; private set; }
 
         /// <summary>
         /// Gets the computation error message

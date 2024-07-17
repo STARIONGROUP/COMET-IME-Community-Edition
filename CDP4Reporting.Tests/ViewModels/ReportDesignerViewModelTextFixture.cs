@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReportDesignerViewModelTextFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="ReportDesignerViewModelTextFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -31,6 +31,7 @@ namespace CDP4Reporting.Tests.ViewModels
     using System.IO;
     using System.IO.Compression;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -53,14 +54,16 @@ namespace CDP4Reporting.Tests.ViewModels
     using CDP4Dal.Permission;
 
     using CDP4Reporting.DynamicTableChecker;
+    using CDP4Reporting.ReportScript;
     using CDP4Reporting.SubmittableParameterValues;
+    using CDP4Reporting.Utilities;
     using CDP4Reporting.ViewModels;
+
+    using CommonServiceLocator;
 
     using DevExpress.XtraReports.UI;
 
     using ICSharpCode.AvalonEdit.Document;
-
-    using Microsoft.Practices.ServiceLocation;
 
     using Moq;
 
@@ -68,13 +71,11 @@ namespace CDP4Reporting.Tests.ViewModels
 
     using ReactiveUI;
 
-    using CDP4Reporting.ReportScript;
-    using CDP4Reporting.Utilities;
-
     /// <summary>
     /// Suite of tests for the <see cref="ReportDesignerViewModel"/> class
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class ReportDesignerViewModelTextFixture
     {
         private readonly string dsPathOpen = Path.Combine(TestContext.CurrentContext.TestDirectory, "TestDataSourceOpen.cs");
@@ -187,7 +188,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
         private static readonly Application application = new Application();
 
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private Assembler assembler;
         private SiteDirectory sitedir;
         private EngineeringModelSetup modelsetup;
@@ -211,6 +212,7 @@ namespace CDP4Reporting.Tests.ViewModels
         private Parameter parameter2;
         private ActualFiniteState actualState_3;
         private ActualFiniteState actualState_4;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
@@ -219,6 +221,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
@@ -238,7 +241,7 @@ namespace CDP4Reporting.Tests.ViewModels
             this.serviceLocator.Setup(x => x.GetInstance<IDynamicTableChecker<XtraReport>>()).Returns(this.dynamicTableChecker.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
 
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -485,6 +488,7 @@ namespace CDP4Reporting.Tests.ViewModels
             this.session.Setup(x => x.IsVersionSupported(It.IsAny<Version>())).Returns(true);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 
@@ -496,7 +500,7 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             this.CleanupExistingFiles();
 
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         private void CleanupExistingFiles()
@@ -570,11 +574,11 @@ namespace CDP4Reporting.Tests.ViewModels
                 x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(),
                     It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathSave });
 
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.OpenReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute());
 
             await this.reportDesignerViewModel.CurrentReport.CreateDocumentAsync();
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.SubmitParameterValuesCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.SubmitParameterValuesCommand.Execute());
 
             if (!tuple.found)
             {
@@ -583,7 +587,7 @@ namespace CDP4Reporting.Tests.ViewModels
                         It.Is<OkDialogViewModel>(
                             okDialog =>
                                 okDialog.Title == "Warning" &&
-                                okDialog.Message.Contains("The following issues were found during updated parameter values lookup") &&
+                                okDialog.Message.Contains("The following errors were found during ValueSet lookup") &&
                                 okDialog.Message.Contains(tuple.path)
                         )
                     )
@@ -598,7 +602,7 @@ namespace CDP4Reporting.Tests.ViewModels
                         It.Is<OkDialogViewModel>(
                             okDialog =>
                                 okDialog.Title == "Warning" &&
-                                okDialog.Message.Contains("The following issues were found during updated parameter values lookup") &&
+                                okDialog.Message.Contains("The following errors were found during ValueSet lookup") &&
                                 okDialog.Message.Contains(tuple.newValue)
                         )
                     )
@@ -640,12 +644,12 @@ namespace CDP4Reporting.Tests.ViewModels
         public void VerifyThatExportCommandWorksWithoutSavingFile()
         {
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.ExportScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.ExportScriptCommand.Execute());
             Assert.AreEqual(null, this.reportDesignerViewModel.CodeFilePath);
 
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(string.Empty);
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.SaveReportCommand.Execute(null));
-            Assert.AreEqual(null, this.reportDesignerViewModel.CurrentReportProjectFilePath);
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.SaveReportCommand.Execute());
+            Assert.AreEqual(string.Empty, this.reportDesignerViewModel.CurrentReportProjectFilePath);
         }
 
         [Test]
@@ -670,9 +674,9 @@ namespace CDP4Reporting.Tests.ViewModels
             }
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathSave });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.OpenReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute());
 
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.SaveReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.SaveReportCommand.Execute());
             Assert.AreEqual(this.zipPathSave, this.reportDesignerViewModel.CurrentReportProjectFilePath);
         }
 
@@ -700,22 +704,22 @@ namespace CDP4Reporting.Tests.ViewModels
             }
 
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.dsPathSave);
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.ExportScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.ExportScriptCommand.Execute());
 
             this.openSaveFileDialogService.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(this.zipPathSave);
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.SaveReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.SaveReportCommand.Execute());
         }
 
         [Test]
         public void VerifyThatImportCommandWorksWithoutOpeningFile()
         {
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.ImportScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.ImportScriptCommand.Execute());
             Assert.AreEqual(null, this.reportDesignerViewModel.CodeFilePath);
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.OpenReportCommand.Execute(null));
-            Assert.AreEqual(null, this.reportDesignerViewModel.CurrentReportProjectFilePath);
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute());
+            Assert.AreEqual(string.Empty, this.reportDesignerViewModel.CurrentReportProjectFilePath);
         }
 
         [Test]
@@ -742,10 +746,10 @@ namespace CDP4Reporting.Tests.ViewModels
             }
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.dsPathOpen });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.ImportScriptCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.ImportScriptCommand.Execute());
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.OpenReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute());
         }
 
         [Test]
@@ -754,14 +758,11 @@ namespace CDP4Reporting.Tests.ViewModels
             // initialize ReportScriptHandler
             var report = new XtraReport();
 
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
-                , x =>
-                {
-                    this.reportDesignerViewModel.Errors = x;
-                }, 
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
+                , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { });
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.CompileScriptCommand.Execute());
         }
 
         [Test]
@@ -776,15 +777,12 @@ namespace CDP4Reporting.Tests.ViewModels
 
             // initialize ReportScriptHandler
             var report = new XtraReport();
-            
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
-                , x =>
-                {
-                    this.reportDesignerViewModel.Errors = x;
-                }, 
+
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
+                , x => { this.reportDesignerViewModel.Errors = x; },
                 x => { });
-            
-            await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null);
+
+            await this.reportDesignerViewModel.CompileScriptCommand.Execute();
 
             Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Errors);
         }
@@ -798,18 +796,18 @@ namespace CDP4Reporting.Tests.ViewModels
             };
 
             this.reportDesignerViewModel.Document = textDocument;
-            
+
             // initialize ReportScriptHandler
             var report = new XtraReport();
-            
-            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report), new CodeDomCodeCompiler(x => { })
-                , x =>
-            {
-                this.reportDesignerViewModel.Errors = x;
-            }, 
-            x => { });
-            
-            await this.reportDesignerViewModel.CompileScriptCommand.ExecuteAsyncTask(null);
+
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
+                , x => { this.reportDesignerViewModel.Errors = x; },
+                x => { });
+
+            await this.reportDesignerViewModel.CompileScriptCommand.Execute();
+
+            // CompileScriptCommand is not awaitable due to timed threads
+            Thread.Sleep(5000);
 
             Assert.AreNotEqual(string.Empty, this.reportDesignerViewModel.Errors);
         }
@@ -817,7 +815,7 @@ namespace CDP4Reporting.Tests.ViewModels
         [Test]
         public void VerifyThatNewReportCommandWorks()
         {
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.NewReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.NewReportCommand.Execute());
             Assert.AreEqual(string.Empty, this.reportDesignerViewModel.Document.Text);
         }
 
@@ -831,7 +829,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             this.reportDesignerViewModel.Document = textDocument;
 
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.NewReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.NewReportCommand.Execute());
             Assert.AreEqual(DATASOURCE_CODE, this.reportDesignerViewModel.Document.Text);
         }
 
@@ -840,7 +838,7 @@ namespace CDP4Reporting.Tests.ViewModels
         {
             Assert.AreEqual(false, this.reportDesignerViewModel.IsAutoCompileEnabled);
 
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.DataSourceTextChangedCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.DataSourceTextChangedCommand.Execute());
         }
 
         [Test]
@@ -849,7 +847,7 @@ namespace CDP4Reporting.Tests.ViewModels
             this.reportDesignerViewModel.IsAutoCompileEnabled = true;
             Assert.AreEqual(true, this.reportDesignerViewModel.IsAutoCompileEnabled);
 
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.DataSourceTextChangedCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.DataSourceTextChangedCommand.Execute());
         }
 
         [Test]
@@ -876,11 +874,11 @@ namespace CDP4Reporting.Tests.ViewModels
             }
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.OpenReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute());
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("File succesfully compiled"));
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.Execute());
 
             Assert.Zero(this.reportDesignerViewModel.Errors.Length);
         }
@@ -909,11 +907,11 @@ namespace CDP4Reporting.Tests.ViewModels
             }
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.OpenReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute());
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("File succesfully compiled"));
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.Execute());
 
             Assert.Zero(this.reportDesignerViewModel.Errors.Length);
         }
@@ -942,11 +940,11 @@ namespace CDP4Reporting.Tests.ViewModels
             }
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.OpenReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute());
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("File succesfully compiled"));
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceAndRefreshPreviewCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceAndRefreshPreviewCommand.Execute());
 
             Assert.Zero(this.reportDesignerViewModel.Errors.Length);
 
@@ -966,7 +964,7 @@ namespace CDP4Reporting.Tests.ViewModels
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("File succesfully compiled"));
 
-            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceAndRefreshPreviewCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceAndRefreshPreviewCommand.Execute());
 
             Assert.Zero(this.reportDesignerViewModel.Errors.Length);
 
@@ -1004,15 +1002,30 @@ namespace CDP4Reporting.Tests.ViewModels
             }
 
             this.openSaveFileDialogService.Setup(x => x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
-            Assert.DoesNotThrow(() => this.reportDesignerViewModel.OpenReportCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.OpenReportCommand.Execute());
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("File succesfully compiled"));
 
             Assert.NotZero(this.reportDesignerViewModel.Errors.Length);
 
-            await this.reportDesignerViewModel.RebuildDatasourceCommand.ExecuteAsyncTask(null);
+            await this.reportDesignerViewModel.RebuildDatasourceCommand.Execute();
 
             Assert.NotZero(this.reportDesignerViewModel.Errors.Length);
+        }
+
+        [Test]
+        public void VerifyThatRebuildDataSourceCommandWorksWithNoDataSource()
+        {
+            // initialize ReportScriptHandler
+            var report = new XtraReport();
+
+            this.reportDesignerViewModel.ReportScriptHandler = new ReportScriptHandler<XtraReport, DevExpress.XtraReports.Parameters.Parameter>(new XtraReportHandler(report, null), new CodeDomCodeCompiler(x => { })
+                , x => { this.reportDesignerViewModel.Errors = x; },
+                x => { this.reportDesignerViewModel.Output = x; });
+
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.Execute());
+
+            Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("Nothing to compile"));
         }
     }
 }

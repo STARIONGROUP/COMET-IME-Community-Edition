@@ -15,11 +15,10 @@
         <Setter Property="Foreground" Value="#ff000000"/>
         <Setter Property="FontWeight" Value="Light"/>
     </Style>
-    <Style x:Key="CodeStyle" TargetType="{x:Type TextBlock}">
+    <Style x:Key="CodeStyle" TargetType="{x:Type Run}">
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="Foreground" Value="Black"/>
         <Setter Property="Background" Value="#66808080"/>
-        <Setter Property="Padding" Value="4,1"/>
         <Setter Property="FontWeight" Value="Light"/>
     </Style>
     <Style x:Key="H2Style" TargetType="{x:Type Paragraph}">

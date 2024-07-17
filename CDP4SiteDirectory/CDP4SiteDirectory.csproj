@@ -1,16 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{C268DF5F-FB28-46AE-AA9B-08E074E6AEF5}</ProjectGuid>
-    <MinIMEVersion>9.7.0</MinIMEVersion>
+    <MinIMEVersion>10.0.0</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4SiteDirectory</AssemblyTitle>
-    <Company>RHEA System S.A.</Company>
+    <Company>Starion Group S.A.</Company>
     <Product>CDP4SiteDirectory</Product>
     <Description>CDP4-COMET SiteDirectory Plugin</Description>
-    <Copyright>Copyright © RHEA System S.A.</Copyright>
-    <AssemblyVersion>9.7.0.0</AssemblyVersion>
-    <FileVersion>9.7.0.0</FileVersion>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
+    <AssemblyVersion>10.0.0.19</AssemblyVersion>
+    <FileVersion>10.0.0.19</FileVersion>
+	<UseWPF>true</UseWPF>
+	<UseWindowsForms>true</UseWindowsForms>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -34,289 +37,167 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="9.0.0">
+	<PackageReference Include="CDP4Common-CE" Version="27.2.1">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="CDP4Dal-CE" Version="27.2.1">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.1">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+    <PackageReference Include="CommonServiceLocator" Version="2.0.7">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="9.0.0">
+    <PackageReference Include="DevExpress.CodeParser" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="9.0.0">
+    <PackageReference Include="DevExpress.Data" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CommonServiceLocator" Version="1.3">
+    <PackageReference Include="DevExpress.Data.Desktop" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.CodeParser" Version="22.2.6">
+    <PackageReference Include="DevExpress.DataAccess" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data" Version="22.2.6">
+    <PackageReference Include="DevExpress.Diagram.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Data.Desktop" Version="22.2.6">
+    <PackageReference Include="DevExpress.Images" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.DataAccess" Version="22.2.6">
+    <PackageReference Include="DevExpress.Mvvm" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Diagram.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Office.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Images" Version="22.2.6">
+    <PackageReference Include="DevExpress.Pdf.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Mvvm" Version="22.2.6">
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Office.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Printing.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Pdf.Drawing" Version="22.2.6">
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Printing.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.RichEdit.Export" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.SpellChecker.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Diagram" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid" Version="22.2.6">
+	<PackageReference Include="DevExpress.Wpf.Accordion" Version="23.2.5">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.NavBar" Version="23.2.5">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Ribbon" Version="23.2.5">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="DevExpress.Wpf.Docking" Version="23.2.5">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Office" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	  <PackageReference Include="DevExpress.Wpf.Accordion" Version="22.2.6">
-		  <ExcludeAssets>runtime</ExcludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="DevExpress.Wpf.NavBar" Version="22.2.6">
-		  <ExcludeAssets>runtime</ExcludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="DevExpress.Wpf.Ribbon" Version="22.2.6">
-		  <ExcludeAssets>runtime</ExcludeAssets>
-	  </PackageReference>
-	  <PackageReference Include="DevExpress.Wpf.Docking" Version="22.2.6">
-		  <ExcludeAssets>runtime</ExcludeAssets>
-	  </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Office" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Printing" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="22.2.6">
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="22.2.6">
+    <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="22.2.6">
+	<PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="22.2.6">
+    <PackageReference Include="NLog" Version="5.3.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DevExpress.Xpo" Version="22.2.6">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Expression.Blend.Sdk" Version="1.0.2">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="NLog" Version="4.7.10">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="reactiveui-core" Version="6.4.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Core" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Interfaces" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Linq" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-Main" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-PlatformServices" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Rx-XAML" Version="2.2.5">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Splat" Version="1.6.0">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
+	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.11">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="ReactiveUI.WPF" Version="20.1.1">
+		<ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="PresentationCore">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Update="Views\Dialogs\EngineeringModelSetupSelectionDialog.xaml.cs">
-      <DependentUpon>EngineeringModelSetupSelectionDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\SiteReferenceDataLibraryDialog.xaml.cs">
-      <DependentUpon>SiteReferenceDataLibraryDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\ParticipantDialog.xaml.cs">
-      <DependentUpon>ParticipantDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\DomainOfExpertiseDialog.xaml.cs">
-      <DependentUpon>DomainOfExpertiseDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\EmailAddressDialog.xaml.cs">
-      <DependentUpon>EmailAddressDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\NaturalLanguageDialog.xaml.cs">
-      <DependentUpon>NaturalLanguageDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\OrganizationDialog.xaml.cs">
-      <DependentUpon>OrganizationDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\ParticipantRoleDialog.xaml.cs">
-      <DependentUpon>ParticipantRoleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\PersonRoleDialog.xaml.cs">
-      <DependentUpon>PersonRoleDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\PersonDialog.xaml.cs">
-      <DependentUpon>PersonDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\IterationSetupDialog.xaml.cs">
-      <DependentUpon>IterationSetupDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\DomainOfExpertiseBrowser\DomainOfExpertiseBrowser.xaml.cs">
-      <DependentUpon>DomainOfExpertiseBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\DomainOfExpertiseBrowser\DomainOfExpertiseRibbon.xaml.cs">
-      <DependentUpon>DomainOfExpertiseRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\HighlightingRibbon.xaml.cs">
-      <DependentUpon>HighlightingRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ModelBrowser\ModelRibbon.xaml.cs">
-      <DependentUpon>ModelRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ModelBrowser\ModelBrowser.xaml.cs">
-      <DependentUpon>ModelBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\NaturalLanguages\NaturalLanguageBrowser.xaml.cs">
-      <DependentUpon>NaturalLanguageBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\TelephoneNumberDialog.xaml.cs">
-      <DependentUpon>TelephoneNumberDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\NaturalLanguages\NaturalLanguageRibbon.xaml.cs">
-      <DependentUpon>NaturalLanguageRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\Dialogs\UserPreferenceDialog.xaml.cs">
-      <DependentUpon>UserPreferenceDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\OrganizationBrowser\OrganizationBrowser.xaml.cs">
-      <DependentUpon>OrganizationBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\OrganizationBrowser\OrganizationBrowserRibbon.xaml.cs">
-      <DependentUpon>OrganizationBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\PersonBrowser\PersonBrowserRibbon.xaml.cs">
-      <DependentUpon>PersonBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\PersonBrowser\PersonBrowser.xaml.cs">
-      <DependentUpon>PersonBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\RoleBrowser\RoleBrowser.xaml.cs">
-      <DependentUpon>RoleBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\RoleBrowser\RoleBrowserRibbon.xaml.cs">
-      <DependentUpon>RoleBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ShowTooltipRibbon.xaml.cs">
-      <DependentUpon>ShowTooltipRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\ShowDeprecatedRibbon.xaml.cs">
-      <DependentUpon>ShowDeprecatedRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SiteDirectoryRibbon.xaml.cs">
-      <DependentUpon>SiteDirectoryRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SiteRdlBrowser\SiteRdlBrowserRibbon.xaml.cs">
-      <DependentUpon>SiteRdlBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\SiteRdlBrowser\SiteRdlBrowser.xaml.cs">
-      <DependentUpon>SiteRdlBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\TeamComposition\TeamCompositionBrowser.xaml.cs">
-      <DependentUpon>TeamCompositionBrowser.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\TeamComposition\TeamCompositionBrowserRibbon.xaml.cs">
-      <DependentUpon>TeamCompositionBrowserRibbon.xaml</DependentUpon>
-    </Compile>
-    <Compile Update="Views\UserManagementRibbonControls.xaml.cs">
-      <DependentUpon>UserManagementRibbonControls.xaml</DependentUpon>
-    </Compile>
+	  <Reference Include="PresentationCore">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="PresentationFramework">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.ComponentModel.Composition">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.Configuration">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.IO.Compression">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.ServiceModel">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.Transactions">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.Xaml">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.Web">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="System.Data.DataSetExtensions">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="Microsoft.CSharp">
+		  <Private>false</Private>
+	  </Reference>
+	  <Reference Include="WindowsBase">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
@@ -326,262 +207,53 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Views\Dialogs\EngineeringModelSetupSelectionDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\SiteReferenceDataLibraryDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\ParticipantDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\DomainOfExpertiseDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\EmailAddressDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\NaturalLanguageDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\OrganizationDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\ParticipantRoleDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\PersonRoleDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\IterationSetupDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\DomainOfExpertiseBrowser\DomainOfExpertiseBrowser.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\DomainOfExpertiseBrowser\DomainOfExpertiseRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\HighlightingRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ModelBrowser\ModelRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\ModelBrowser\ModelBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\NaturalLanguages\NaturalLanguageBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\NaturalLanguages\NaturalLanguageRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Dialogs\PersonDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\TelephoneNumberDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\Dialogs\UserPreferenceDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\OrganizationBrowser\OrganizationBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\OrganizationBrowser\OrganizationBrowserRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\PersonBrowser\PersonBrowserRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\PersonBrowser\PersonBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\RoleBrowser\RoleBrowser.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\RoleBrowser\RoleBrowserRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ShowTooltipRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\ShowDeprecatedRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\SiteDirectoryRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\SiteRdlBrowser\SiteRdlBrowserRibbon.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\SiteRdlBrowser\SiteRdlBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\TeamComposition\TeamCompositionBrowser.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\TeamComposition\TeamCompositionBrowserRibbon.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\UserManagementRibbonControls.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
+	  <EmbeddedResource Include="Resources\RibbonXml\SiteDirectoryRibbon.xml">
+		  <SubType>Designer</SubType>
+	  </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RibbonXml\SiteDirectoryRibbon.xml">
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
+	  <Reference Update="System">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.cs" />
-    <Compile Remove="obj\x64\Debug\GeneratedInternalTypeHelper.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\HighlightingRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\HighlightingRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ShowDeprecatedRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ShowDeprecatedRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteDirectoryRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteDirectoryRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\UserManagementRibbonControls.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\UserManagementRibbonControls.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DomainOfExpertiseDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\DomainOfExpertiseDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\EmailAddressDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\EmailAddressDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\EngineeringModelSetupSelectionDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\EngineeringModelSetupSelectionDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\IterationSetupDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\IterationSetupDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\NaturalLanguageDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\NaturalLanguageDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\OrganizationDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\OrganizationDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParticipantDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParticipantDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParticipantRoleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\ParticipantRoleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\PersonDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\PersonDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\PersonRoleDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\PersonRoleDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SiteReferenceDataLibraryDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\SiteReferenceDataLibraryDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\TelephoneNumberDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\TelephoneNumberDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\UserPreferenceDialog.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\Dialogs\UserPreferenceDialog.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\DomainOfExpertiseBrowser\DomainOfExpertiseBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\DomainOfExpertiseBrowser\DomainOfExpertiseBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\DomainOfExpertiseBrowser\DomainOfExpertiseRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\DomainOfExpertiseBrowser\DomainOfExpertiseRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelBrowser\ModelBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelBrowser\ModelBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelBrowser\ModelRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\ModelBrowser\ModelRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\NaturalLanguages\NaturalLanguageBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\NaturalLanguages\NaturalLanguageBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\NaturalLanguages\NaturalLanguageRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\NaturalLanguages\NaturalLanguageRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\OrganizationBrowser\OrganizationBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\OrganizationBrowser\OrganizationBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\OrganizationBrowser\OrganizationBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\OrganizationBrowser\OrganizationBrowserRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\PersonBrowser\PersonBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\PersonBrowser\PersonBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\PersonBrowser\PersonBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\PersonBrowser\PersonBrowserRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RoleBrowser\RoleBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RoleBrowser\RoleBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RoleBrowser\RoleBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\RoleBrowser\RoleBrowserRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteRdlBrowser\SiteRdlBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteRdlBrowser\SiteRdlBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteRdlBrowser\SiteRdlBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\SiteRdlBrowser\SiteRdlBrowserRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\TeamComposition\TeamCompositionBrowser.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\TeamComposition\TeamCompositionBrowser.g.i.cs" />
-    <Compile Remove="obj\x64\Debug\Views\TeamComposition\TeamCompositionBrowserRibbon.g.cs" />
-    <Compile Remove="obj\x64\Debug\Views\TeamComposition\TeamCompositionBrowserRibbon.g.i.cs" />
-    <Compile Remove="obj\x64\Release\Views\TeamComposition\TeamCompositionBrowserRibbon.g.cs" />
+	  <Reference Update="System.Core">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Data">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Core">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Drawing">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Data">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.IO.Compression.FileSystem">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Drawing">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Numerics">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.IO.Compression.FileSystem">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Runtime.Serialization">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Numerics">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Xml">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Reference Update="System.Runtime.Serialization">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml">
-      <Private>false</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Update="System.Xml.Linq">
-      <Private>false</Private>
-    </Reference>
+	  <Reference Update="System.Xml.Linq">
+		  <Private>false</Private>
+	  </Reference>
   </ItemGroup>
 </Project>

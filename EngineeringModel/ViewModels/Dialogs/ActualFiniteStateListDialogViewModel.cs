@@ -1,26 +1,50 @@
-// -------------------------------------------------------------------------------------------------
-// <copyright file="ActualFiniteStateListDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ActualFiniteStateListDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
+
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    
+    using CDP4Dal;
+    using CDP4Dal.Operations;
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Dal;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -146,22 +170,22 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the <see cref="ICommand"/> to add a <see cref="PossibleFiniteStateListRow"/>
         /// </summary>
-        public ReactiveCommand<object> AddPossibleFiniteStateListCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> AddPossibleFiniteStateListCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to remove a <see cref="PossibleFiniteStateListRow"/>
         /// </summary>
-        public ReactiveCommand<object> RemovePossibleFiniteStateListCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> RemovePossibleFiniteStateListCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to move up a <see cref="PossibleFiniteStateListRow"/>
         /// </summary>
-        public ReactiveCommand<object> MoveUpPossibleFiniteStateListCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> MoveUpPossibleFiniteStateListCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to move down a <see cref="PossibleFiniteStateListRow"/>
         /// </summary>
-        public ReactiveCommand<object> MoveDownPossibleFiniteStateListCommand { get; private set; } 
+        public ReactiveCommand<Unit, Unit> MoveDownPossibleFiniteStateListCommand { get; private set; } 
 
         /// <summary>
         /// Refresh the <see cref="PossibleFiniteStateListRow"/> rows
@@ -197,7 +221,6 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.Initialize();
             this.PossibleFiniteStateListRow = new DisposableReactiveList<Dialogs.PossibleFiniteStateListRowViewModel>();
-            this.usedPossibleStateList.ChangeTrackingEnabled = true;
         }
 
         /// <summary>
@@ -215,35 +238,36 @@ namespace CDP4EngineeringModel.ViewModels
                 this.CanAddPossibleList = iteration.PossibleFiniteStateList.Count > this.usedPossibleStateList.Count;
             });
 
-            this.AddPossibleFiniteStateListCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanAddPossibleList).Select(x => x && !this.IsReadOnly));
-            this.AddPossibleFiniteStateListCommand.Subscribe(_ => this.ExecuteAddPossibleListCommand());
+            this.AddPossibleFiniteStateListCommand = ReactiveCommandCreator.Create(this.ExecuteAddPossibleListCommand, this.WhenAnyValue(x => x.CanAddPossibleList).Select(x => x && !this.IsReadOnly));
 
             var canExecuteCommand = this.WhenAnyValue(x => x.SelectedPossibleFiniteStateList).Select(x => x != null && !this.IsReadOnly);
-            this.RemovePossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteCommand);
-            this.RemovePossibleFiniteStateListCommand.Subscribe(_ =>
-            {
-                this.PossibleFiniteStateListRow.RemoveAndDispose(this.SelectedPossibleFiniteStateList);
-                this.RefreshPossibleFiniteStateListRows();
-                this.AreActualFiniteStatesValid = false;
-            });
 
-            this.MoveUpPossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteCommand);
-            this.MoveUpPossibleFiniteStateListCommand.Subscribe(
-                _ => 
+            this.RemovePossibleFiniteStateListCommand = ReactiveCommandCreator.Create(
+                () =>
+                {
+                    this.PossibleFiniteStateListRow.RemoveAndDispose(this.SelectedPossibleFiniteStateList);
+                    this.RefreshPossibleFiniteStateListRows();
+                    this.AreActualFiniteStatesValid = false;
+                },
+                canExecuteCommand);
+
+            this.MoveUpPossibleFiniteStateListCommand = ReactiveCommandCreator.Create(
+                () => 
                 {
                     this.ExecuteMoveUpCommand(this.PossibleFiniteStateListRow, this.SelectedPossibleFiniteStateList);
                     this.PossibleFiniteStateList = new ReactiveList<PossibleFiniteStateList>(this.PossibleFiniteStateListRow.Select(x => x.PossibleFiniteStateList));
                     this.AreActualFiniteStatesValid = false;
-                });
+                },
+                canExecuteCommand);
 
-            this.MoveDownPossibleFiniteStateListCommand = ReactiveCommand.Create(canExecuteCommand);
-            this.MoveDownPossibleFiniteStateListCommand.Subscribe(
-                _ =>
+            this.MoveDownPossibleFiniteStateListCommand = ReactiveCommandCreator.Create(
+                () =>
                 {
                     this.ExecuteMoveDownCommand(this.PossibleFiniteStateListRow, this.SelectedPossibleFiniteStateList);
                     this.PossibleFiniteStateList = new ReactiveList<PossibleFiniteStateList>(this.PossibleFiniteStateListRow.Select(x => x.PossibleFiniteStateList));
                     this.AreActualFiniteStatesValid = false;
-                });
+                },
+                canExecuteCommand);
         }
 
         /// <summary>

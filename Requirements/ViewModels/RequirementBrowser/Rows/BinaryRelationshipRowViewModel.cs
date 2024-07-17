@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BinaryRelationshipRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="BinaryRelationshipRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,13 +29,17 @@ namespace CDP4Requirements.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
-    using ReactiveUI;
     using CDP4Dal.Events;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The view-model for the <see cref="BinaryRelationshipRowViewModel"/> row
@@ -47,7 +70,7 @@ namespace CDP4Requirements.ViewModels
         /// Source thing subscription
         /// </summary>
         private IDisposable sourceSubscription;
-        
+
         /// <summary>
         /// Target thing before any update
         /// </summary>
@@ -82,8 +105,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public List<Category> CategoryList
         {
-            get { return this.categoryList; }
-            set { this.RaiseAndSetIfChanged(ref this.categoryList, value); }
+            get => this.categoryList;
+            set => this.RaiseAndSetIfChanged(ref this.categoryList, value);
         }
 
         /// <summary>
@@ -91,8 +114,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string Name
         {
-            get { return this.name; }
-            set { this.RaiseAndSetIfChanged(ref this.name, value); }
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         /// <summary>
@@ -100,8 +123,8 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         public string ShortName
         {
-            get { return this.shortName; }
-            set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
+            get => this.shortName;
+            set => this.RaiseAndSetIfChanged(ref this.shortName, value);
         }
 
         /// <summary>
@@ -127,11 +150,11 @@ namespace CDP4Requirements.ViewModels
                     this.Disposables.Remove(this.sourceSubscription);
                     this.sourceSubscription.Dispose();
                 }
-                
+
                 this.oldSource = this.Thing.Source;
 
-                this.sourceSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Source)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated )
+                this.sourceSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Source)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateName());
 
@@ -145,16 +168,16 @@ namespace CDP4Requirements.ViewModels
                     this.Disposables.Remove(this.targetSubscription);
                     this.targetSubscription.Dispose();
                 }
-                
+
                 this.oldTarget = this.Thing.Target;
 
-                this.targetSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Target)
-                    .Where(objectChange => objectChange.EventKind == EventKind.Updated )
+                this.targetSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Target)
+                    .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.UpdateName());
 
                 this.Disposables.Add(this.targetSubscription);
-            }            
+            }
 
             this.UpdateName();
             this.CategoryList = new List<Category>(this.Thing.Category.OrderBy(x => x.Name));
@@ -209,6 +232,7 @@ namespace CDP4Requirements.ViewModels
         private void RemoveValue(RelationshipParameterValue value)
         {
             var row = this.simpleParameters.ContainedRows.SingleOrDefault(x => x.Thing == value);
+
             if (row != null)
             {
                 this.simpleParameters.ContainedRows.RemoveAndDispose(row);

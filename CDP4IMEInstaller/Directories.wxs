@@ -6,7 +6,7 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="$(var.ProgramFilesPlatformSpecific)">
-        <Directory Id="RHEAFOLDER" Name="RHEA">
+        <Directory Id="STARIONFOLDER" Name="STARION">
           <Directory Id="CDP4INSTALLFOLDER" Name="CDP4-COMET-CE">
             <Directory Id="BIN" Name="Bin">
               <Directory Id="PLUGINS" Name="plugins">
@@ -17,7 +17,6 @@
                 <Directory Id="ENGINEERINGMODEL" Name="CDP4EngineeringModel"/>
                 <Directory Id="LOGINFO" Name="CDP4LogInfo"/>
                 <Directory Id="OBJECTBROWSER" Name="CDP4ObjectBrowser"/>
-                <Directory Id="PROPERTYGRID" Name="CDP4PropertyGrid"/>
                 <Directory Id="REQUIREMENTS" Name="CDP4Requirements"/>
                 <Directory Id="DASHBOARD" Name="CDP4Dashboard"/>
                 <Directory Id="CROSSVIEWEDITOR" Name="CDP4CrossViewEditor"/>
@@ -50,16 +49,16 @@
 
       <Directory Id="DesktopFolder"/>
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsRHEAFolder" Name="RHEA">
-          <Component Id="ProgramMenuRHEADir" Guid="{04558BC1-0B94-4DD7-A4D1-DF354EAE015D}" >
+        <Directory Id="ApplicationProgramsSTARIONFolder" Name="STARION">
+          <Component Id="ProgramMenuSTARIONDir" Guid="{04558BC1-0B94-4DD7-A4D1-DF354EAE015D}" >
             <RemoveFolder Id="_04558BC1" On="uninstall"/>
-            <RegistryValue Root="HKCU" Key="Software\RHEA\RHEADIR" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            <RegistryValue Root="HKCU" Key="Software\STARION\STARIONDIR" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
           </Component>
           
           <Directory Id="ApplicationProgramsFolder" Name="CDP4-COMET-CE">
             <Component Id="ProgramMenuCDP4Dir" Guid="{7E4C4699-5B84-469F-B404-3959844292B5}" >
               <RemoveFolder Id="_7E4C4699" On="uninstall"/>
-              <RegistryValue Root="HKCU" Key="Software\RHEA\CDP4DIR" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+              <RegistryValue Root="HKCU" Key="Software\STARION\CDP4DIR" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
             </Component>  
           </Directory>
         </Directory>

@@ -1,12 +1,14 @@
 ﻿// -----------------------------------------------------------------------
-// <copyright file="IIterationTrackParameterViewModel.cs" company="RHEA">
-// Copyright (c) 2020 RHEA Group. All rights reserved.
+// <copyright file="IIterationTrackParameterViewModel.cs" company="Starion Group S.A.">
+// Copyright (c) 2020 Starion Group S.A. All rights reserved.
 // </copyright>
 // -----------------------------------------------------------------------
 
 namespace CDP4Dashboard.ViewModels.Widget
 {
     using System.Windows;
+
+    using CDP4Composition.Mvvm;
 
     using CDP4Dashboard.ViewModels.Charts;
 

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ChangeProposalDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ChangeProposalDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ChangeProposal"/>
@@ -109,7 +110,7 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedChangeRequest"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedChangeRequestCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedChangeRequestCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -118,7 +119,7 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedChangeRequestCommand = this.WhenAny(vm => vm.SelectedChangeRequest, v => v.Value != null);
-            this.InspectSelectedChangeRequestCommand = ReactiveCommand.Create(canExecuteInspectSelectedChangeRequestCommand);
+            this.InspectSelectedChangeRequestCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedChangeRequestCommand);
             this.InspectSelectedChangeRequestCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedChangeRequest));
         }
 

@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="OptionDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="OptionDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="Option"/>
@@ -129,22 +130,22 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a NestedElement
         /// </summary>
-        public ReactiveCommand<object> CreateNestedElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateNestedElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a NestedElement
         /// </summary>
-        public ReactiveCommand<object> DeleteNestedElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteNestedElementCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a NestedElement
         /// </summary>
-        public ReactiveCommand<object> EditNestedElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditNestedElementCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a NestedElement
         /// </summary>
-        public ReactiveCommand<object> InspectNestedElementCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectNestedElementCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -157,16 +158,16 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedNestedElementCommand = this.WhenAny(vm => vm.SelectedNestedElement, v => v.Value != null);
             var canExecuteEditSelectedNestedElementCommand = this.WhenAny(vm => vm.SelectedNestedElement, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateNestedElementCommand = ReactiveCommand.Create(canExecuteCreateNestedElementCommand);
+            this.CreateNestedElementCommand = ReactiveCommandCreator.Create(canExecuteCreateNestedElementCommand);
             this.CreateNestedElementCommand.Subscribe(_ => this.ExecuteCreateCommand<NestedElement>(this.PopulateNestedElement));
 
-            this.DeleteNestedElementCommand = ReactiveCommand.Create(canExecuteEditSelectedNestedElementCommand);
+            this.DeleteNestedElementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedNestedElementCommand);
             this.DeleteNestedElementCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedNestedElement.Thing, this.PopulateNestedElement));
 
-            this.EditNestedElementCommand = ReactiveCommand.Create(canExecuteEditSelectedNestedElementCommand);
+            this.EditNestedElementCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedNestedElementCommand);
             this.EditNestedElementCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedNestedElement.Thing, this.PopulateNestedElement));
 
-            this.InspectNestedElementCommand = ReactiveCommand.Create(canExecuteInspectSelectedNestedElementCommand);
+            this.InspectNestedElementCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedNestedElementCommand);
             this.InspectNestedElementCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedNestedElement.Thing));
         }
 

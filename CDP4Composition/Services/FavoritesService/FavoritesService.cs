@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="FavoritesService.cs" company="RHEA System S.A.">
-//   Copyright (c) 2018 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="FavoritesService.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Services.FavoritesService
 {
@@ -12,12 +31,16 @@ namespace CDP4Composition.Services.FavoritesService
     using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
+
     using NLog;
+
     using ReactiveUI;
 
     /// <summary>
@@ -75,13 +98,15 @@ namespace CDP4Composition.Services.FavoritesService
         public IDisposable SubscribeToChanges(ISession session, Type type, Action<HashSet<Guid>> subscriberAction)
         {
             return
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(UserPreference))
-                    .Where(objectChange =>
-                    {
-                        var userPreference = (UserPreference)objectChange.ChangedThing;
-                        return userPreference.Container == session.ActivePerson &&
-                               userPreference.ShortName == this.GetPreferenceShortname(type);
-                    })
+                session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(UserPreference))
+                    .Where(
+                        objectChange =>
+                        {
+                            var userPreference = (UserPreference)objectChange.ChangedThing;
+
+                            return userPreference.Container == session.ActivePerson &&
+                                   userPreference.ShortName == this.GetPreferenceShortname(type);
+                        })
                     .Select(o => this.GetIidsFromUserPreference((UserPreference)o.ChangedThing))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(subscriberAction);
@@ -94,10 +119,10 @@ namespace CDP4Composition.Services.FavoritesService
         /// <param name="thing">The thing to persist/remove from persistence</param>
         /// <param name="session">The session in which to persist.</param>
         /// <returns>The empty task.</returns>
-        public async Task ToggleFavorite<T>(ISession session, T thing) where T: Thing
+        public async Task ToggleFavorite<T>(ISession session, T thing) where T : Thing
         {
             var transaction = new ThingTransaction(TransactionContextResolver.ResolveContext(session.ActivePerson));
-            
+
             var preferenceShortname = this.GetPreferenceShortname(typeof(T));
             var preference = this.GetFavoritePreference(session, preferenceShortname);
 
@@ -162,6 +187,7 @@ namespace CDP4Composition.Services.FavoritesService
         {
             var favoritePreference =
                 session.ActivePerson.UserPreference.FirstOrDefault(userPreference => userPreference.ShortName == shortName);
+
             return favoritePreference;
         }
 

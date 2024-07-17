@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RuleViolationRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="RuleViolationRowViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2018 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -82,7 +82,7 @@ namespace CDP4CommonView
             base.InitializeSubscriptions();
 
             this.name = this.WhenAnyValue(x => x.Description)
-                            .ToProperty(this, x => x.Name);
+                            .ToProperty(this, x => x.Name, scheduler: RxApp.MainThreadScheduler);
 
             this.Disposables.Add(this.name);
         }

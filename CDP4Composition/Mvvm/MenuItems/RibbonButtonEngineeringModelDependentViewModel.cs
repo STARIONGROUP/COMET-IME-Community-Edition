@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RibbonButtonEngineeringModelDependentViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+// <copyright file="RibbonButtonEngineeringModelDependentViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -29,6 +29,7 @@ namespace CDP4Composition.Mvvm
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Windows.Input;
 
     using CDP4Common.EngineeringModelData;
 
@@ -62,24 +63,24 @@ namespace CDP4Composition.Mvvm
         /// <param name="instantiatePanelViewModelFunction">
         /// The instantiate Panel View Model Function.
         /// </param>
-        protected RibbonButtonEngineeringModelDependentViewModel(Func<EngineeringModel, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModelFunction)
+        /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
+        protected RibbonButtonEngineeringModelDependentViewModel(Func<EngineeringModel, ISession, IThingDialogNavigationService, IPanelNavigationService, IDialogNavigationService, IPluginSettingsService, IPanelViewModel> instantiatePanelViewModelFunction, ICDPMessageBus messageBus)
         {
             this.InstantiatePanelViewModelFunction = instantiatePanelViewModelFunction;
 
             this.EngineeringModels = new ReactiveList<SessionEngineeringModelMenuGroupViewModel>();
             this.Sessions = new List<ISession>();
-            this.EngineeringModels.ChangeTrackingEnabled = true;
-            this.EngineeringModels.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSessions, out this.hasSessions);
+            this.EngineeringModels.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSessions, out this.hasSessions, scheduler: RxApp.MainThreadScheduler);
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
+            messageBus.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
                 .Where(x => x.EventKind == EventKind.Added)
                 .Select(x => x.ChangedThing as EngineeringModel)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.EngineeringModelAddedEventHandler);
 
-            CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
+            messageBus.Listen<ObjectChangedEvent>(typeof(EngineeringModel))
                 .Where(x => x.EventKind == EventKind.Removed)
                 .Select(x => x.ChangedThing as EngineeringModel)
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -152,7 +153,7 @@ namespace CDP4Composition.Mvvm
                 this.EngineeringModels.Remove(sessionEngineeringModelSetupMenuGroupViewModel);
             }
 
-            menuItemToRemove.ClosePanelsCommand.Execute(null);
+            ((ICommand)menuItemToRemove.ClosePanelsCommand).Execute(default);
         }
 
         /// <summary>
@@ -161,24 +162,28 @@ namespace CDP4Composition.Mvvm
         /// <param name="session">the session that has been removed</param>
         protected virtual void SessionRemoveGroup(ISession session)
         {
-            var sessionEngineeringModelSetupMenuGroupViewModel = this.EngineeringModels.SingleOrDefault(x => x.Session == session);
+            var sessionEngineeringModelSetupMenuGroupViewModels = 
+                this.EngineeringModels.Where(x => x.Session == session).ToArray();
 
-            if (sessionEngineeringModelSetupMenuGroupViewModel == null)
+            if (!sessionEngineeringModelSetupMenuGroupViewModels.Any())
             {
                 return;
             }
 
-            foreach (var menuItemToRemove in sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.ToList())
+            foreach (var sessionEngineeringModelSetupMenuGroupViewModel in sessionEngineeringModelSetupMenuGroupViewModels)
             {
-                sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.Remove(menuItemToRemove);
-
-                // removes the group if there are no more of its iterations opened
-                if (sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.Count == 0)
+                foreach (var menuItemToRemove in sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.ToList())
                 {
-                    this.EngineeringModels.Remove(sessionEngineeringModelSetupMenuGroupViewModel);
-                }
+                    sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.Remove(menuItemToRemove);
 
-                menuItemToRemove.ClosePanelsCommand.Execute(null);
+                    // removes the group if there are no more of its iterations opened
+                    if (sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModels.Count == 0)
+                    {
+                        this.EngineeringModels.Remove(sessionEngineeringModelSetupMenuGroupViewModel);
+                    }
+
+                    ((ICommand)menuItemToRemove.ClosePanelsCommand).Execute(default);
+                }
             }
         }
 

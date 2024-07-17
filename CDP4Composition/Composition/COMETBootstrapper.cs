@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="COMETBootstrapper.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="COMETBootstrapper.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,14 +31,18 @@ namespace CDP4Composition.Composition
     using System.Diagnostics;
     using System.IO;
     using System.Reflection;
+    using System.Windows;
 
     using CDP4Composition.Exceptions;
     using CDP4Composition.Modularity;
+    using CDP4Composition.Services;
     using CDP4Composition.Services.AppSettingService;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using NLog;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Base class that provides basic bootstrapping using MEF
@@ -55,6 +59,11 @@ namespace CDP4Composition.Composition
         /// Represents the state of the <see cref="COMETBootstrapper"/>
         /// </summary>
         protected string status;
+
+        /// <summary>
+        /// The [INJECTED] <see cref="IMessageBoxService"/>
+        /// </summary>
+        private IMessageBoxService messageBoxService;
 
         /// <summary>
         /// Runs the bootstrapper
@@ -89,6 +98,8 @@ namespace CDP4Composition.Composition
             this.UpdateBootstrapperStatus("Initializing modules");
             this.InitializeModules(container);
 
+            RxApp.DefaultExceptionHandler = new RxAppObservableExceptionHandler();
+
             this.OnComposed(container);
         }
 
@@ -105,7 +116,7 @@ namespace CDP4Composition.Composition
                 throw new InvalidOperationException($"Cannot find directory path for {Assembly.GetExecutingAssembly().FullName}");
             }
 
-            var dllCatalog = new DirectoryCatalog(path: currentAssemblyPath, searchPattern: "CDP4*.dll");
+            var dllCatalog = new DirectoryCatalog(currentAssemblyPath, "CDP4*.dll");
 
             catalog.Catalogs.Add(dllCatalog);
         }
@@ -115,9 +126,11 @@ namespace CDP4Composition.Composition
         /// </summary>
         /// <param name="container">The <see cref="CompositionContainer"/></param>
         private void ConfigureServiceLocator(CompositionContainer container)
-        {            
+        {
             var serviceLocator = new MefServiceLocator(container);
             ServiceLocator.SetLocatorProvider(() => serviceLocator);
+
+            this.messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
         }
 
         /// <summary>
@@ -127,7 +140,7 @@ namespace CDP4Composition.Composition
         private void AddPluginCatalogs(AggregateCatalog catalog)
         {
             this.UpdateBootstrapperStatus("Loading CDP4-COMET Plugins");
-            
+
             var pluginLoader = new PluginLoader<T>();
             this.ResetStatusProgress();
             var counter = 1;
@@ -141,12 +154,22 @@ namespace CDP4Composition.Composition
 
                     catalog.Catalogs.Add(directoryCatalog);
                     this.UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
-                                        
+
                     counter++;
                 }
                 catch (ReflectionTypeLoadException reflectionTypeLoadException)
                 {
-                    throw new CometReflectionTypeLoadException(reflectionTypeLoadException);
+                    var newError = new CometReflectionTypeLoadException(reflectionTypeLoadException);
+                    var messageText = $"Plugin {directoryCatalog} had a loading error:\n\n{newError.Message}\n\nContinue loading plugins?";
+
+                    if (this.messageBoxService.ShowAlwaysOnTop(messageText, "Continue loading plugins?", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.No)
+                    {
+                        throw newError;
+                    }
+                    else
+                    {
+                        this.logger.Error(newError);
+                    }
                 }
             }
 

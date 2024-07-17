@@ -51,10 +51,7 @@
                                                 UpdateSourceTrigger=PropertyChanged}"
                          SelectionMode="Row">
                 <dxmvvm:Interaction.Behaviors>
-                    <dxmvvm:EventToCommand PassEventArgsToCommand="True" Command="{Binding SelectActiveIterationCommand}" EventName="MouseDoubleClick">
-                        <dxmvvm:EventToCommand.EventArgsConverter>
-                            <dx:EventArgsToDataRowConverter />
-                        </dxmvvm:EventToCommand.EventArgsConverter>
+                    <dxmvvm:EventToCommand PassEventArgsToCommand="False" Command="{Binding SelectActiveIterationCommand}" EventName="MouseDoubleClick">
                     </dxmvvm:EventToCommand>
                 </dxmvvm:Interaction.Behaviors>
                 <dxg:GridControl.View>
@@ -93,10 +90,7 @@
                              SelectionMode="Row"
                              DefaultSorting="FrozenOnDate">
                 <dxmvvm:Interaction.Behaviors>
-                    <dxmvvm:EventToCommand PassEventArgsToCommand="True" Command="{Binding SelectCommand}" EventName="MouseDoubleClick">
-                        <dxmvvm:EventToCommand.EventArgsConverter>
-                            <dx:EventArgsToDataRowConverter />
-                        </dxmvvm:EventToCommand.EventArgsConverter>
+                    <dxmvvm:EventToCommand PassEventArgsToCommand="False" Command="{Binding SelectCommand}" EventName="MouseDoubleClick">
                     </dxmvvm:EventToCommand>
                 </dxmvvm:Interaction.Behaviors>
                 <dxg:GridControl.View>

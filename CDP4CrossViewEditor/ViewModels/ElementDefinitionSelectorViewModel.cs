@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionSelectorViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="ElementDefinitionSelectorViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Adrian Chivu, Cozmin Velciu, Alex Vorobiev
 //
@@ -33,6 +33,8 @@ namespace CDP4CrossViewEditor.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
+
+    using CDP4Composition.Mvvm;
 
     using CDP4CrossViewEditor.RowModels;
 
@@ -76,25 +78,13 @@ namespace CDP4CrossViewEditor.ViewModels
         public ElementDefinitionSelectorViewModel(Iteration iteration, ISession session, List<Guid> preservedIids)
             : base(iteration, session, ClassKind.ElementDefinition, preservedIids)
         {
-            this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.ElementDefinitionSourceList = new ReactiveList<ElementDefinitionRowViewModel>();
 
-            this.ElementDefinitionTargetList = new ReactiveList<ElementDefinitionRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.ElementDefinitionTargetList = new ReactiveList<ElementDefinitionRowViewModel>();
 
-            this.SelectedSourceList = new ReactiveList<ElementDefinitionRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.SelectedSourceList = new ReactiveList<ElementDefinitionRowViewModel>();
 
-            this.SelectedTargetList = new ReactiveList<ElementDefinitionRowViewModel>
-            {
-                ChangeTrackingEnabled = true
-            };
+            this.SelectedTargetList = new ReactiveList<ElementDefinitionRowViewModel>();
 
             this.Categories = new List<Category>();
         }

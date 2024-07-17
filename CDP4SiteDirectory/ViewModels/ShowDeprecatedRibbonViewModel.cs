@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ShowDeprecatedBrowserRibbonViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="ShowDeprecatedBrowserRibbonViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2021 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -31,12 +31,13 @@ namespace CDP4SiteDirectory.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.Events;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.Events;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -45,6 +46,11 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     public class ShowDeprecatedBrowserRibbonViewModel : ReactiveObject, IDeprecatableToggleViewModel
     {
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
         /// <summary>
         /// The (injected) <see cref="IFilterStringService"/>
         /// </summary>
@@ -68,14 +74,18 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Initializes a new instance of the <see cref="ShowDeprecatedBrowserRibbonViewModel"/> class
         /// </summary>
-        public ShowDeprecatedBrowserRibbonViewModel()
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public ShowDeprecatedBrowserRibbonViewModel(ICDPMessageBus messageBus)
         {
+            this.messageBus = messageBus;
             this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
-            
-            this.openSessions = new ReactiveList<ISession> { ChangeTrackingEnabled = true };
-            this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession);
 
-            CDPMessageBus.Current.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
+            this.openSessions = new ReactiveList<ISession>();
+            this.openSessions.CountChanged.Select(x => x != 0).ToProperty(this, x => x.HasSession, out this.hasSession, scheduler: RxApp.MainThreadScheduler);
+
+            this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.WhenAnyValue(vm => vm.ShowDeprecatedThings)
                 .Subscribe(_ => this.RefreshAndSendShowDeprecatedThingsEvent());
@@ -84,18 +94,15 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets a value indicating whether there are open <see cref="ISession"/>s
         /// </summary>
-        public bool HasSession
-        {
-            get { return this.hasSession.Value; }
-        }
+        public bool HasSession => this.hasSession.Value;
 
         /// <summary>
         /// Gets or sets a value indicating whether to display deprecated items.
         /// </summary>
         public bool ShowDeprecatedThings
         {
-            get { return this.showDeprecatedThings; }
-            set { this.RaiseAndSetIfChanged(ref this.showDeprecatedThings, value); }
+            get => this.showDeprecatedThings;
+            set => this.RaiseAndSetIfChanged(ref this.showDeprecatedThings, value);
         }
 
         /// <summary>
@@ -113,13 +120,14 @@ namespace CDP4SiteDirectory.ViewModels
                     this.openSessions.Add(sessionChange.Session);
                     break;
                 case SessionStatus.Closed:
+                {
+                    var sessionToRemove = this.openSessions.SingleOrDefault(x => x == sessionChange.Session);
+
+                    if (sessionToRemove != null)
                     {
-                        var sessionToRemove = this.openSessions.SingleOrDefault(x => x == sessionChange.Session);
-                        if (sessionToRemove != null)
-                        {
-                            this.openSessions.Remove(sessionToRemove);
-                        }
+                        this.openSessions.Remove(sessionToRemove);
                     }
+                }
 
                     break;
             }
@@ -134,7 +142,7 @@ namespace CDP4SiteDirectory.ViewModels
             this.filterStringService.ShowDeprecatedThings = this.ShowDeprecatedThings;
             this.filterStringService.RefreshDeprecatableFilterAll();
 
-            CDPMessageBus.Current.SendMessage(new ToggleDeprecatedThingEvent(this.ShowDeprecatedThings));
+            this.messageBus.SendMessage(new ToggleDeprecatedThingEvent(this.ShowDeprecatedThings));
         }
     }
 }

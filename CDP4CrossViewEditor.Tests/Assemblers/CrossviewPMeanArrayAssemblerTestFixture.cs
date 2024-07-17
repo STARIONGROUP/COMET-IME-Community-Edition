@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CrossviewPMeanArrayAssemblerTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CrossviewPMeanArrayAssemblerTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
 //
 //    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -75,15 +75,17 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         private readonly Credentials credentials = new Credentials(
             "John",
             "Doe",
-            new Uri("http://www.rheagroup.com/"));
+            new Uri("https://www.stariongroup.eu/"));
 
         private Assembler assembler;
         private Mock<ISession> session;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
-            this.assembler = new Assembler(this.credentials.Uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.credentials.Uri, this.messageBus);
 
             this.SetUpThings();
             this.SetUpMethods();
@@ -93,6 +95,7 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         private void SetUpThings()
         {
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri);
+
             this.siteReferenceDataLibrary = new SiteReferenceDataLibrary(
                 Guid.NewGuid(),
                 this.assembler.Cache,
@@ -423,6 +426,8 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
             this.session
                 .Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>()))
                 .Returns(this.domain);
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         private void SetUpRows()
@@ -589,11 +594,11 @@ namespace CDP4CrossViewEditor.Tests.Assemblers
         public void VerifyPMeanIsNotCalculatedIfRedundancyIsNotCompound()
         {
             this.elementDefinition.Parameter.Single(p => p.ParameterType.ShortName == "redundancy")
-                .ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri) 
-                {
-                    Name = "redundancy",
-                    ShortName = "redundancy"
-                };
+                .ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.credentials.Uri)
+            {
+                Name = "redundancy",
+                ShortName = "redundancy"
+            };
 
             var arrayAssembler = new CrossviewArrayAssembler(
                 this.excelRows,

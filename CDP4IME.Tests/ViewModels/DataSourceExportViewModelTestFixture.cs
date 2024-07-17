@@ -1,37 +1,40 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataSourceExportViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="DataSourceExportViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.Tests.ViewModels
+namespace COMET.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.DTO;
+    using CDP4Common.ExceptionHandlerService;
 
     using CDP4Composition.Navigation;
 
@@ -39,9 +42,9 @@ namespace CDP4IME.Tests.ViewModels
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
 
-    using CDP4IME.ViewModels;
+    using COMET.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -83,15 +86,19 @@ namespace CDP4IME.Tests.ViewModels
         private List<Thing> dalOutputs;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IOpenSaveFileDialogService> fileDialogService;
+        private Mock<IExceptionHandlerService> exceptionHandlerService;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            this.messageBus = new CDPMessageBus();
             this.tokenSource = new CancellationTokenSource();
             this.session = new Mock<ISession>();
             this.mockedDal = new Mock<IDal>();
             this.fileDialogService = new Mock<IOpenSaveFileDialogService>();
+            this.exceptionHandlerService = new Mock<IExceptionHandlerService>();
             var openTaskCompletionSource = new TaskCompletionSource<IEnumerable<Thing>>();
             openTaskCompletionSource.SetResult(this.dalOutputs);
             this.mockedDal.Setup(x => x.IsValidUri(It.IsAny<string>())).Returns(true);
@@ -102,6 +109,7 @@ namespace CDP4IME.Tests.ViewModels
             this.mockedMetaData.Setup(x => x.DalType).Returns(DalType.File);
 
             this.session.Setup(x => x.DalVersion).Returns(new Version("1.0.0"));
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             var dataAccessLayerKinds = new List<Lazy<IDal, IDalMetaData>>();
             dataAccessLayerKinds.Add(new Lazy<IDal, IDalMetaData>(() => this.mockedDal.Object, this.mockedMetaData.Object));
@@ -112,11 +120,11 @@ namespace CDP4IME.Tests.ViewModels
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>())
                 .Returns(new AvailableDals(dataAccessLayerKinds));
 
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
         }
 
         [Test]
-        public void VerifyOkCommand()
+        public async Task VerifyOkCommand()
         {
             this.viewModel.Path = @"C:\test\somerandom\no\existant\path\doubletest.zip";
             this.viewModel.Password = "pass";
@@ -129,18 +137,18 @@ namespace CDP4IME.Tests.ViewModels
             Assert.IsNotNull(this.viewModel.SelectedSession);
             Assert.IsNotNull(this.viewModel.SelectedVersion.Key);
 
-            Assert.IsTrue(this.viewModel.OkCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewModel.OkCommand).CanExecute(null));
 
-            this.viewModel.OkCommand.Execute(null);
+            await this.viewModel.OkCommand.Execute();
 
             Assert.AreEqual("The output directory does not exist.", this.viewModel.ErrorMessage);
         }
 
         [Test]
-        public void VerifyCancelCommand()
+        public async Task VerifyCancelCommand()
         {
-            Assert.IsTrue(this.viewModel.CancelCommand.CanExecute(null));
-            this.viewModel.CancelCommand.Execute(null);
+            Assert.IsTrue(((ICommand)this.viewModel.CancelCommand).CanExecute(null));
+            await this.viewModel.CancelCommand.Execute();
 
             Assert.IsFalse(this.viewModel.DialogResult.Result.Value);
         }
@@ -148,22 +156,22 @@ namespace CDP4IME.Tests.ViewModels
         [Test]
         public void VerifyVersionChecks()
         {
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.AreEqual(1, this.viewModel.Versions.Count);
 
             this.session.Setup(x => x.DalVersion).Returns(new Version("1.1.0"));
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.AreEqual(2, this.viewModel.Versions.Count);
 
             this.session.Setup(x => x.DalVersion).Returns(new Version("1.2.0"));
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
             Assert.AreEqual(3, this.viewModel.Versions.Count);
         }
 
         [Test]
         public void VerifyBrowseCommand()
         {
-            Assert.IsTrue(this.viewModel.BrowseCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.viewModel.BrowseCommand).CanExecute(null));
         }
     }
 }

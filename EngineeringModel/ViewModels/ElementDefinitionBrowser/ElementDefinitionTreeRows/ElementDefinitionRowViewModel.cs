@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ElementDefinitionRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -47,13 +47,11 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Events;
 
     using CDP4EngineeringModel.Services;
+    using CDP4EngineeringModel.Utilities;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
-    using Utilities;
-
-    using IDropTarget = CDP4Composition.DragDrop.IDropTarget;
 
     /// <summary>
     /// The row representing an <see cref="ElementDefinition"/>
@@ -83,7 +81,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="session">The associated <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container view-model</param>
         /// <param name="obfuscationService">The obfuscation service</param>
-        public ElementDefinitionRowViewModel(ElementDefinition elementDefinition, DomainOfExpertise currentDomain, ISession session, IViewModelBase<Thing> containerViewModel,
+        public ElementDefinitionRowViewModel(
+            ElementDefinition elementDefinition,
+            DomainOfExpertise currentDomain,
+            ISession session,
+            IViewModelBase<Thing> containerViewModel,
             IObfuscationService obfuscationService)
             : base(elementDefinition, currentDomain, session, containerViewModel, obfuscationService)
         {
@@ -95,8 +97,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public override bool IsTopElement
         {
-            get { return this.isTopElement; }
-            set { this.RaiseAndSetIfChanged(ref this.isTopElement, value); }
+            get => this.isTopElement;
+            set => this.RaiseAndSetIfChanged(ref this.isTopElement, value);
         }
 
         /// <summary>
@@ -124,10 +126,20 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeSubscriptions();
 
-            Func<ObjectChangedEvent, bool> optionDiscriminator = 
-                objectChange => 
-                    objectChange.EventKind == EventKind.Updated 
-                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache 
+            this.IntializeOptionSubscription();
+
+            this.InitializeCategorySubscription();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="Option"/> subscription
+        /// </summary>
+        private void IntializeOptionSubscription()
+        {
+            Func<ObjectChangedEvent, bool> optionDiscriminator =
+                objectChange =>
+                    objectChange.EventKind == EventKind.Updated
+                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache
                     && objectChange.ChangedThing.TopContainer == this.Thing.TopContainer;
 
             Action<ObjectChangedEvent> optionAction = x => this.UpdateModelCode();
@@ -135,7 +147,7 @@ namespace CDP4EngineeringModel.ViewModels
             if (this.AllowMessageBusSubscriptions)
             {
                 var optionRemoveListener =
-                    CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
+                    this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Option))
                         .Where(optionDiscriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(optionAction);
@@ -144,10 +156,40 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var optionObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option));
+                var optionObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Option));
 
-                this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Option), optionDiscriminator, optionAction)));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Option), optionDiscriminator, optionAction)));
+            }
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="Category"/> subscription
+        /// </summary>
+        private void InitializeCategorySubscription()
+        {
+            Func<ObjectChangedEvent, bool> categoryDiscriminator =
+                objectChange =>
+                    objectChange.EventKind == EventKind.Updated
+                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache
+                    && this.Category.Contains(objectChange.ChangedThing);
+
+            Action<ObjectChangedEvent> categoryAction = x => this.UpdateCategories();
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var categoryRemoveListener =
+                    this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category))
+                        .Where(categoryDiscriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(categoryAction);
+
+                this.Disposables.Add(categoryRemoveListener);
+            }
+            else
+            {
+                var categoryObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category));
+
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(categoryObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Category), categoryDiscriminator, categoryAction)));
             }
         }
 
@@ -263,7 +305,7 @@ namespace CDP4EngineeringModel.ViewModels
                 await this.Drop(dropInfo, category);
             }
         }
-        
+
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property
         /// </summary>
@@ -281,7 +323,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.ObjectChangeEventHandler(objectChange);
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Update this row and its children
         /// </summary>
@@ -299,9 +341,9 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void UpdateCategories()
         {
-            DisplayCategory = new CategoryStringBuilder()
-                        .AddCategories("ED", this.Thing.Category)
-                        .Build();
+            this.DisplayCategory = new CategoryStringBuilder()
+                .AddCategories("ED", this.Thing.Category)
+                .Build();
         }
 
         /// <summary>
@@ -326,7 +368,7 @@ namespace CDP4EngineeringModel.ViewModels
             // DELETED Parameter Subscription
             var deletedSubscription = currentSubscription.Except(definedSubscription).ToList();
             this.RemoveParameterBase(deletedSubscription);
-            
+
             // ADDED Parameter Subscription
             var addedSubscription = definedSubscription.Except(currentSubscription).ToList();
             this.AddParameterBase(addedSubscription);
@@ -383,9 +425,11 @@ namespace CDP4EngineeringModel.ViewModels
             var currentUsages = this.ContainedRows.OfType<ElementUsageRowViewModel>().Select(x => x.Thing).ToList();
 
             var deletedUsages = currentUsages.Except(this.Thing.ContainedElement).ToList();
+
             foreach (var deletedUsage in deletedUsages)
             {
                 var row = this.ContainedRows.OfType<ElementUsageRowViewModel>().SingleOrDefault(x => x.Thing == deletedUsage);
+
                 if (row == null)
                 {
                     continue;
@@ -395,13 +439,14 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var addedUsages = this.Thing.ContainedElement.Except(currentUsages).ToList();
+
             foreach (var elementUsage in addedUsages)
             {
                 var row = new ElementUsageRowViewModel(elementUsage, this.currentDomain, this.Session, this, this.ObfuscationService);
                 this.ContainedRows.SortedInsert(row, ChildRowComparer);
             }
         }
-        
+
         /// <summary>
         /// Update the children rows of the current row
         /// </summary>
@@ -409,7 +454,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateProperties();
         }
-        
+
         /// <summary>
         /// Set the <see cref="IDropInfo.Effects"/> when the payload is an <see cref="ElementDefinition"/>
         /// </summary>
@@ -417,7 +462,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="elementDefinition">The <see cref="ElementDefinition"/> in the payload</param>
         private void DragOver(IDropInfo dropinfo, ElementDefinition elementDefinition)
         {
-            var iteration = (Iteration) this.Thing.Container;
+            var iteration = (Iteration)this.Thing.Container;
+
             if (!this.PermissionService.CanWrite(ClassKind.ElementDefinition, iteration))
             {
                 dropinfo.Effects = DragDropEffects.None;
@@ -461,7 +507,7 @@ namespace CDP4EngineeringModel.ViewModels
             // check if parameter type is in the chain of rdls
             var model = (EngineeringModel)this.Thing.TopContainer;
             var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
-            var rdlChains = new List<ReferenceDataLibrary> {mrdl};
+            var rdlChains = new List<ReferenceDataLibrary> { mrdl };
             rdlChains.AddRange(mrdl.RequiredRdls);
 
             if (!rdlChains.Contains(tuple.Item1.Container))
@@ -522,7 +568,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             dropinfo.Effects = DragDropEffects.Move;
         }
-        
+
         /// <summary>
         /// Handle the drop of a <see cref="Tuple{ParameterType, MeasurementScale}"/>
         /// </summary>
@@ -567,7 +613,7 @@ namespace CDP4EngineeringModel.ViewModels
                     await ElementDefinitionService.CreateElementDefinitionFromTemplate(this.Session, iteration, elementDefinition);
                     return;
                 }
-                
+
                 if (elementDefinition.TopContainer == this.Thing.TopContainer)
                 {
                     await this.ThingCreator.CreateElementUsage(this.Thing, elementDefinition, this.currentDomain, this.Session);

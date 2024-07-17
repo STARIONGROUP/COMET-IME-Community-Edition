@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WorkbookSessionDalTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="WorkbookSessionDalTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -10,7 +10,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeDal
     using System.IO;
     using CDP4Common.MetaInfo;
     using CDP4OfficeInfrastructure.OfficeDal;
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
     using Moq;
     using NetOffice.ExcelApi;
     using NUnit.Framework;

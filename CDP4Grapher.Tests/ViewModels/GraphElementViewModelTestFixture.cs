@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GraphElementViewModelTestFxture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="GraphElementViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -39,16 +39,19 @@ namespace CDP4Grapher.Tests.ViewModels
     [TestFixture]
     public class GraphElementViewModelTestFixture : GrapherBaseTestData
     {
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public override void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             base.Setup();
         }
 
         [Test]
         public void VerifyProperties()
         {
-            var vm = new GraphElementViewModel(this.NestedElement);
+            var vm = new GraphElementViewModel(this.NestedElement, this.messageBus);
             Assert.AreSame(vm.Thing, this.NestedElement);
             Assert.AreSame(vm.NestedElementElement, this.ElementUsage1);
             Assert.AreEqual(vm.Name, this.ElementUsage1.Name);
@@ -59,19 +62,19 @@ namespace CDP4Grapher.Tests.ViewModels
             Assert.IsNotNull(vm.NestedElementElementListener);
 
             this.NestedElement.ElementUsage.Clear();
-            var vmWithElementDefinition = new GraphElementViewModel(this.NestedElement);
+            var vmWithElementDefinition = new GraphElementViewModel(this.NestedElement, this.messageBus);
             Assert.IsNotNull(vm.ModelCode);
             Assert.AreNotEqual(vm.ModelCode, vmWithElementDefinition.ModelCode);
         }
-        
+
         [Test]
         public void VerifyObjectChanged()
         {
-            var vm = new GraphElementViewModel(this.NestedElement);
+            var vm = new GraphElementViewModel(this.NestedElement, this.messageBus);
             Assert.AreEqual(vm.Name, this.ElementUsage1.Name);
             this.ElementUsage1.Name = "ItHasNewNameNow";
             vm.RevisionNumber = -1;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.ElementUsage1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.ElementUsage1, EventKind.Updated);
             Assert.AreEqual(vm.Name, this.ElementUsage1.Name);
         }
     }

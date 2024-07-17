@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="MappingToReferenceScaleDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="MappingToReferenceScaleDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -26,6 +26,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="MappingToReferenceScale"/>
@@ -128,12 +129,12 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedReferenceScaleValue"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedReferenceScaleValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedReferenceScaleValueCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedDependentScaleValue"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedDependentScaleValueCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedDependentScaleValueCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -142,10 +143,10 @@ namespace CDP4CommonView
         {
             base.InitializeCommands();
             var canExecuteInspectSelectedReferenceScaleValueCommand = this.WhenAny(vm => vm.SelectedReferenceScaleValue, v => v.Value != null);
-            this.InspectSelectedReferenceScaleValueCommand = ReactiveCommand.Create(canExecuteInspectSelectedReferenceScaleValueCommand);
+            this.InspectSelectedReferenceScaleValueCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedReferenceScaleValueCommand);
             this.InspectSelectedReferenceScaleValueCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedReferenceScaleValue));
             var canExecuteInspectSelectedDependentScaleValueCommand = this.WhenAny(vm => vm.SelectedDependentScaleValue, v => v.Value != null);
-            this.InspectSelectedDependentScaleValueCommand = ReactiveCommand.Create(canExecuteInspectSelectedDependentScaleValueCommand);
+            this.InspectSelectedDependentScaleValueCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDependentScaleValueCommand);
             this.InspectSelectedDependentScaleValueCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDependentScaleValue));
         }
 

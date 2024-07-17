@@ -1,26 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ScriptingProxyTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2023 RHEA System S.A.
+// <copyright file="ScriptingProxyTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
-//            Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -33,31 +32,31 @@ namespace CDP4Scripting.Tests.Helpers
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Documents;
-    
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    
-    using CDP4Dal;
-    
-    using CDP4Scripting.Helpers;
 
-    using Interfaces;
-    
+    using CDP4Dal;
+
+    using CDP4Scripting.Helpers;
+    using CDP4Scripting.Interfaces;
+
     using Moq;
 
     using NUnit.Framework;
-    
+
     using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="ScriptingProxy"/> class
     /// </summary>
-    [TestFixture, Apartment(ApartmentState.STA)]
+    [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class ScriptingProxyTestFixture : DispatcherTestFixture
     {
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
@@ -65,7 +64,7 @@ namespace CDP4Scripting.Tests.Helpers
         private Mock<IDialogNavigationService> dialogNavigationService;
 
         private Assembler assembler;
-        private Uri uri = new Uri("http://www.rheagroup.com");
+        private Uri uri = new Uri("https://www.stariongroup.eu");
         private Mock<IScriptPanelViewModel> scriptViewModel;
         private ScriptingProxy scriptingProxy;
         private Mock<ISession> session;
@@ -91,13 +90,18 @@ namespace CDP4Scripting.Tests.Helpers
         private IEnumerable<Iteration> iterations;
 
         private List<ElementDefinition> myElementDefinitions;
+
         public IEnumerable<ElementDefinition> ElementDefinitions { get; private set; }
 
         private List<Parameter> myParameters;
+
         public IEnumerable<Parameter> Parameters { get; private set; }
 
         private List<ParameterValueSet> myParameterValueSets;
+
         public IEnumerable<ParameterValueSet> ParameterValueSets { get; private set; }
+
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public async Task SetUp()
@@ -108,16 +112,18 @@ namespace CDP4Scripting.Tests.Helpers
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
 
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session = new Mock<ISession>();
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.outputTerminal = new OutputTerminal();
 
             this.scriptViewModel = new Mock<IScriptPanelViewModel>();
             this.scriptViewModel.SetupGet(x => x.OutputTerminal).Returns(() => this.outputTerminal);
-            this.scriptViewModel.SetupProperty(x => x.SelectedSession, session.Object);
-            
+            this.scriptViewModel.SetupProperty(x => x.SelectedSession, this.session.Object);
+
             this.scriptingProxy = new ScriptingProxy(this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object);
             this.scriptingProxy.ScriptingPanelViewModel = this.scriptViewModel.Object;
 
@@ -130,12 +136,13 @@ namespace CDP4Scripting.Tests.Helpers
 
             this.engineerModel = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, null)
             {
-                EngineeringModelSetup = engineeringModelSetup
+                EngineeringModelSetup = this.engineeringModelSetup
             };
+
             this.engineerModel.EngineeringModelSetup = this.engineeringModelSetup;
 
             this.iterationSetup = new IterationSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, null) {IterationSetup = this.iterationSetup};
+            this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, null) { IterationSetup = this.iterationSetup };
             this.iteration.IterationSetup = this.iterationSetup;
 
             this.elementDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -157,9 +164,9 @@ namespace CDP4Scripting.Tests.Helpers
 
             this.parameterValueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, null)
             {
-                Reference = new ValueArray<string>(new List<string> {"100"}),
-                Computed = new ValueArray<string>(new List<string> {"-"}),
-                Formula = new ValueArray<string>(new List<string> {"-"}),
+                Reference = new ValueArray<string>(new List<string> { "100" }),
+                Computed = new ValueArray<string>(new List<string> { "-" }),
+                Formula = new ValueArray<string>(new List<string> { "-" }),
                 ValueSwitch = ParameterSwitchKind.REFERENCE
             };
 
@@ -227,7 +234,7 @@ namespace CDP4Scripting.Tests.Helpers
         [Test]
         public void VerifyThatIterationNumberReturns()
         {
-            this.myIterations = new List<Iteration>() {this.iteration};
+            this.myIterations = new List<Iteration>() { this.iteration };
             this.iterations = this.myIterations;
 
             var getIteration = this.scriptingProxy.FindIterationNumber(this.iterations, "0");
@@ -237,7 +244,7 @@ namespace CDP4Scripting.Tests.Helpers
         [Test]
         public void VerifyThatElementShortNameReturns()
         {
-            this.myElementDefinitions = new List<ElementDefinition>() {this.elementDefinition};
+            this.myElementDefinitions = new List<ElementDefinition>() { this.elementDefinition };
             this.ElementDefinitions = this.myElementDefinitions;
 
             var getElement = this.scriptingProxy.FindElement(this.myElementDefinitions, "Transformator");
@@ -247,17 +254,17 @@ namespace CDP4Scripting.Tests.Helpers
         [Test]
         public void VerifyThatParameterShortNameReturns()
         {
-            this.myParameters = new List<Parameter>() {this.parameter};
+            this.myParameters = new List<Parameter>() { this.parameter };
             this.Parameters = this.myParameters;
 
-            var getParameter = scriptingProxy.FindParameter(this.myParameters, "Transformator.mass");
+            var getParameter = this.scriptingProxy.FindParameter(this.myParameters, "Transformator.mass");
             Assert.AreEqual(this.parameter, getParameter);
         }
 
         [Test]
         public void VerifyThatElementValueReturns()
         {
-            this.myParameterValueSets = new List<ParameterValueSet>() {this.parameterValueSet};
+            this.myParameterValueSets = new List<ParameterValueSet>() { this.parameterValueSet };
             this.ParameterValueSets = this.myParameterValueSets;
 
             var getParameterValue = this.scriptingProxy.FindValue(this.myParameterValueSets, "reference");
@@ -283,12 +290,12 @@ namespace CDP4Scripting.Tests.Helpers
         public void VerifyThatInitCommandCompletionData()
         {
             this.scriptingProxy.InitCommandCompletionData();
-            var commandCompletionData = this.scriptingProxy.CommandCompletionData.Single(x => ((string) x.Content) == "GetSiteDirectory()");
+            var commandCompletionData = this.scriptingProxy.CommandCompletionData.Single(x => (string)x.Content == "GetSiteDirectory()");
             Assert.AreEqual("GetSiteDirectory()", commandCompletionData.Content);
             Assert.AreEqual("Gets the site directory associated to the selected session.", commandCompletionData.Description);
 
             this.scriptingProxy.InitCommandCompletionData();
-            commandCompletionData = this.scriptingProxy.CommandCompletionData.Single(x => ((string)x.Content) == "NestedElementTreeGenerator");
+            commandCompletionData = this.scriptingProxy.CommandCompletionData.Single(x => (string)x.Content == "NestedElementTreeGenerator");
             Assert.AreEqual("NestedElementTreeGenerator", commandCompletionData.Content);
             Assert.AreEqual("Allows the usage of the methods of this class.", commandCompletionData.Description);
         }

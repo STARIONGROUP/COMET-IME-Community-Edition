@@ -1,38 +1,43 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DataSourceExportViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="DataSourceExportViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4IME.ViewModels
+namespace COMET.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Reactive;
     using System.Windows;
+
+    using CDP4Common.ExceptionHandlerService;
+    using CDP4Common.MetaInfo;
 
     using CDP4Composition.Exceptions;
     using CDP4Composition.Extensions;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services;
 
@@ -41,7 +46,7 @@ namespace CDP4IME.ViewModels
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -80,6 +85,11 @@ namespace CDP4IME.ViewModels
         /// Backing field for the <see cref="Uri"/> property.
         /// </summary>
         private string path;
+
+        /// <summary>
+        /// Backing field for the <see cref="ExportPublications"/> property
+        /// </summary>
+        private bool exportPublications = true;
 
         /// <summary>
         /// Backing field for the <see cref="Versions"/> property.
@@ -121,6 +131,16 @@ namespace CDP4IME.ViewModels
         /// </summary>
         private readonly Dictionary<string, Version> availableVersions;
 
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </summary>
+        private readonly ICDPMessageBus messageBus;
+
+        /// <summary>
+        /// The <see cref="IExceptionHandlerService"/>
+        /// </summary>
+        private readonly IExceptionHandlerService exceptionHandlerService;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceExportViewModel"/> class.
         /// </summary>
@@ -130,31 +150,41 @@ namespace CDP4IME.ViewModels
         /// <param name="openSaveFileDialogService">
         /// The file Dialog Service.
         /// </param>
-        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
+        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService)
         {
             if (openSaveFileDialogService == null)
             {
                 throw new ArgumentNullException(nameof(openSaveFileDialogService), "The openSaveFileDialogService may not be null.");
             }
 
+            this.messageBus = messageBus;
+            this.exceptionHandlerService = exceptionHandlerService;
+
             this.openSaveFileDialogService = openSaveFileDialogService;
             this.AvailableDals = new List<IDalMetaData>();
             this.OpenSessions = new ReactiveList<ISession>(sessions);
             this.DialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
 
-            this.availableVersions = new Dictionary<string, Version>
-            {
-                { "ECSS-E-TM-10-25 (Version 2.4.1)", new Version("1.0.0") },
-                { "COMET 1.1.0", new Version("1.1.0") },
-                { "COMET 1.2.0", new Version("1.2.0") }
-            };
+            var versions = new MetaDataProvider().QuerySupportedModelVersions();
+
+            this.availableVersions = versions
+                .Select(
+                    x =>
+                        new KeyValuePair<string, Version>(
+                            x.Major == 1 && x.Minor == 0
+                                ? "ECSS-E-TM-10-25 (Version 2.4.1)"
+                                : $"CDP4-COMET {x.ToString(3)}",
+                            x))
+                .OrderBy(x => x.Value)
+                .ToDictionary(x => x.Key, x => x.Value);
 
             this.IsBusy = false;
 
-            this.OpenSessions.ChangeTrackingEnabled = true;
-
-            this.WhenAnyValue(
-                vm => vm.SelectedSession).Subscribe(
+            this.WhenAnyValue(vm => vm.SelectedSession).Subscribe(
                 x =>
                 {
                     if (x == null)
@@ -163,7 +193,7 @@ namespace CDP4IME.ViewModels
                     }
                     else
                     {
-                        this.Versions = 
+                        this.Versions =
                             this.availableVersions
                                 .Where(y => y.Value <= x.DalVersion)
                                 .ToDictionary(k => k.Key, v => v.Value);
@@ -182,22 +212,19 @@ namespace CDP4IME.ViewModels
                 vm => vm.SelectedSession,
                 vm => vm.Path,
                 vm => vm.SelectedVersion,
-                (passwordRetype, password, selecteddal, selectedsession, path, selectedVersion) 
-                    => selecteddal != null && 
-                       selectedsession != null && 
-                       !string.IsNullOrEmpty(path) && 
-                       !string.IsNullOrEmpty(password) && 
+                (passwordRetype, password, selecteddal, selectedsession, path, selectedVersion)
+                    => selecteddal != null &&
+                       selectedsession != null &&
+                       !string.IsNullOrEmpty(path) &&
+                       !string.IsNullOrEmpty(password) &&
                        password == passwordRetype &&
                        selectedVersion.Key != default);
 
-            this.OkCommand = ReactiveCommand.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+            this.OkCommand = ReactiveCommandCreator.Create(this.ExecuteOk, canOk);
 
-            this.BrowseCommand = ReactiveCommand.Create();
-            this.BrowseCommand.Subscribe(_ => this.ExecuteBrowse());
+            this.BrowseCommand = ReactiveCommandCreator.Create(this.ExecuteBrowse);
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
 
             this.ResetProperties();
         }
@@ -284,19 +311,28 @@ namespace CDP4IME.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets a value indicating that <see cref="CDP4Common.EngineeringModelData.Publication"/>s should be exported if present
+        /// </summary>
+        public bool ExportPublications
+        {
+            get => this.exportPublications;
+            set => this.RaiseAndSetIfChanged(ref this.exportPublications, value);
+        }
+
+        /// <summary>
         /// Gets the Ok Command
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel Command
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// Gets the Browse Command
         /// </summary>
-        public ReactiveCommand<object> BrowseCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> BrowseCommand { get; private set; }
 
         /// <summary>
         /// Executes the Ok Command
@@ -339,7 +375,7 @@ namespace CDP4IME.ViewModels
                 var dal = this.dals.Single(x => x.Metadata == this.SelectedDal);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType(), this.SelectedVersion.Value);
 
-                var fileExportSession = dalInstance.CreateSession(creds);
+                var fileExportSession = dalInstance.CreateSession(creds, this.messageBus, this.exceptionHandlerService);
 
                 // create write
                 var operationContainers = new List<OperationContainer>();
@@ -357,6 +393,12 @@ namespace CDP4IME.ViewModels
                     var transactionContext = TransactionContextResolver.ResolveContext(iteration);
                     var operationContainer = new OperationContainer(transactionContext.ContextRoute());
                     var dto = iteration.ToDto();
+
+                    if (!this.ExportPublications)
+                    {
+                        iteration.Publication.Clear();
+                    }
+
                     var operation = new Operation(null, dto, OperationKind.Create);
                     operationContainer.AddOperation(operation);
                     operationContainers.Add(operationContainer);
@@ -368,6 +410,8 @@ namespace CDP4IME.ViewModels
             catch (Exception ex)
             {
                 this.ErrorMessage = ex.Message;
+                this.messageBoxService.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                this.DialogResult = new BaseDialogResult(false);
             }
             finally
             {

@@ -126,11 +126,7 @@
                 <dxg:GridColumn FieldName="Logger" />
             </dxg:GridControl.Columns>
             <dxmvvm:Interaction.Behaviors>
-                <dxmvvm:EventToCommand PassEventArgsToCommand="True" Command="{Binding ShowDetailsDialogCommand}" EventName="MouseDoubleClick">
-                    <dxmvvm:EventToCommand.EventArgsConverter>
-                        <dx:EventArgsToDataRowConverter />
-                    </dxmvvm:EventToCommand.EventArgsConverter>
-                </dxmvvm:EventToCommand>
+                <dxmvvm:EventToCommand Command="{Binding ShowDetailsDialogCommand}" EventName="MouseDoubleClick" />
             </dxmvvm:Interaction.Behaviors>
         </dxg:GridControl>
     </Grid>

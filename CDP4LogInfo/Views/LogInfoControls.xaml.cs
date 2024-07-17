@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="LogInfoControls.xaml.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="LogInfoControls.xaml.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2021 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -31,22 +31,31 @@ namespace CDP4LogInfo.Views
     using CDP4Composition.Ribbon;
     using CDP4Composition.Mvvm;
 
-    using CDP4LogInfo.ViewModels;    
-    
+    using CDP4Dal;
+
+    using CDP4LogInfo.ViewModels;
+
     /// <summary>
     /// Interaction logic for LogInfoControls.xaml
     /// </summary>
     [Export(typeof(ExtendedRibbonPageGroup))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public partial class LogInfoControls : ExtendedRibbonPageGroup, IView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="LogInfoControls"/> class
         /// </summary>
+        /// <param name="dialogNavigationService">
+        /// The injected <see cref="IDialogNavigationService"/>
+        /// </param>
+        /// <param name="messageBus">
+        /// The injected <see cref="ICDPMessageBus"/>
+        /// </param>
         [ImportingConstructor]
-        public LogInfoControls(IDialogNavigationService dialogNavigationService)
+        public LogInfoControls(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            this.DataContext = new LogInfoControlsViewModel(dialogNavigationService);
+            this.DataContext = new LogInfoControlsViewModel(dialogNavigationService, messageBus);
         }
     }
 }

@@ -1,8 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="BuiltInRuleVerificationDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="BuiltInRuleVerificationDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4EngineeringModel.Tests.Dialogs
 {
@@ -11,25 +30,30 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
-    using CDP4Common.Types;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.DAL;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
+
     using NUnit.Framework;
+
     using ReactiveUI;
 
     /// <summary>
@@ -38,7 +62,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     [TestFixture]
     public class BuiltInRuleVerificationDialogViewModelTestFixture
     {
-        private Uri uri = new Uri("http://www.rheagroup.com");
+        private Uri uri = new Uri("https://www.stariongroup.eu");
         private Assembler assembler;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private IThingTransaction thingTransaction;
@@ -46,7 +70,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private Mock<IPermissionService> permissionService;
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IServiceLocator> serviceLocator;
-        
+        private CDPMessageBus messageBus;
+
         private Mock<IRuleVerificationService> ruleVerificationService;
         private List<Lazy<IBuiltInRule, IBuiltInRuleMetaData>> builtInRules;
         private string builtInRuleName;
@@ -66,7 +91,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.assembler = new Assembler(this.uri);
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 
             this.serviceLocator = new Mock<IServiceLocator>();
@@ -75,7 +101,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
-            
+
             this.SetupIRuleVerificationService();
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -102,6 +128,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
             this.session.Setup(x => x.Dal).Returns(dal.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
 
@@ -114,7 +141,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.builtInRuleName = "shortnamerule";
             this.iBuiltInRuleMetaData = new Mock<IBuiltInRuleMetaData>();
-            this.iBuiltInRuleMetaData.Setup(x => x.Author).Returns("RHEA");
+            this.iBuiltInRuleMetaData.Setup(x => x.Author).Returns("STARION");
             this.iBuiltInRuleMetaData.Setup(x => x.Name).Returns(this.builtInRuleName);
             this.iBuiltInRuleMetaData.Setup(x => x.Description).Returns("verifies that the shortnames are correct");
 
@@ -151,7 +178,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             Assert.AreEqual(2, viewModel.AvailableBuiltInRules.Count());
 
             Assert.AreEqual("-", viewModel.SelectedBuiltInRuleMetaData.Name);
-            
+
             Assert.IsFalse(viewModel.IsNameReadOnly);
         }
 

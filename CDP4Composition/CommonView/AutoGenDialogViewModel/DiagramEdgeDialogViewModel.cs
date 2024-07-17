@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DiagramEdgeDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="DiagramEdgeDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="DiagramEdge"/>
@@ -148,42 +149,42 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedSource"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedSourceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedSourceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedTarget"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedTargetCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedTargetCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Point
         /// </summary>
-        public ReactiveCommand<object> CreatePointCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreatePointCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Point
         /// </summary>
-        public ReactiveCommand<object> DeletePointCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeletePointCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Point
         /// </summary>
-        public ReactiveCommand<object> EditPointCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditPointCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Point
         /// </summary>
-        public ReactiveCommand<object> InspectPointCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectPointCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a Point 
         /// </summary>
-        public ReactiveCommand<object> MoveUpPointCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpPointCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a Point
         /// </summary>
-        public ReactiveCommand<object> MoveDownPointCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownPointCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -196,28 +197,28 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedPointCommand = this.WhenAny(vm => vm.SelectedPoint, v => v.Value != null);
             var canExecuteEditSelectedPointCommand = this.WhenAny(vm => vm.SelectedPoint, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreatePointCommand = ReactiveCommand.Create(canExecuteCreatePointCommand);
+            this.CreatePointCommand = ReactiveCommandCreator.Create(canExecuteCreatePointCommand);
             this.CreatePointCommand.Subscribe(_ => this.ExecuteCreateCommand<Point>(this.PopulatePoint));
 
-            this.DeletePointCommand = ReactiveCommand.Create(canExecuteEditSelectedPointCommand);
+            this.DeletePointCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPointCommand);
             this.DeletePointCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedPoint.Thing, this.PopulatePoint));
 
-            this.EditPointCommand = ReactiveCommand.Create(canExecuteEditSelectedPointCommand);
+            this.EditPointCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPointCommand);
             this.EditPointCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedPoint.Thing, this.PopulatePoint));
 
-            this.InspectPointCommand = ReactiveCommand.Create(canExecuteInspectSelectedPointCommand);
+            this.InspectPointCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedPointCommand);
             this.InspectPointCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedPoint.Thing));
 
-            this.MoveUpPointCommand = ReactiveCommand.Create(canExecuteEditSelectedPointCommand);
+            this.MoveUpPointCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPointCommand);
             this.MoveUpPointCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Point, this.SelectedPoint));
 
-            this.MoveDownPointCommand = ReactiveCommand.Create(canExecuteEditSelectedPointCommand);
+            this.MoveDownPointCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedPointCommand);
             this.MoveDownPointCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Point, this.SelectedPoint));
             var canExecuteInspectSelectedSourceCommand = this.WhenAny(vm => vm.SelectedSource, v => v.Value != null);
-            this.InspectSelectedSourceCommand = ReactiveCommand.Create(canExecuteInspectSelectedSourceCommand);
+            this.InspectSelectedSourceCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedSourceCommand);
             this.InspectSelectedSourceCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedSource));
             var canExecuteInspectSelectedTargetCommand = this.WhenAny(vm => vm.SelectedTarget, v => v.Value != null);
-            this.InspectSelectedTargetCommand = ReactiveCommand.Create(canExecuteInspectSelectedTargetCommand);
+            this.InspectSelectedTargetCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedTargetCommand);
             this.InspectSelectedTargetCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedTarget));
         }
 

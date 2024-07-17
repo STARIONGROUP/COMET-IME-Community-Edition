@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Utils.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="Utils.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2018 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@ namespace CDP4ShellDialogs.Tests
         [Test]
         public void Verify_that_a_valid_hostname_returns_true()
         {
-            Assert.IsTrue(Utils.IsValidHostName("cdp4.rheagroup.com"));
+            Assert.IsTrue(Utils.IsValidHostName("cdp4.stariongroup.eu"));
         }
 
         [Test]

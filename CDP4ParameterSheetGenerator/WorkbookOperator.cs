@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WorkbookOperator.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="WorkbookOperator.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -33,6 +33,7 @@ namespace CDP4ParameterSheetGenerator
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.ExceptionHandlerService;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Extensions;
@@ -43,19 +44,19 @@ namespace CDP4ParameterSheetGenerator
     using CDP4Dal;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
-    
+
     using CDP4OfficeInfrastructure.OfficeDal;
-    
+
     using CDP4ParameterSheetGenerator.Generator;
     using CDP4ParameterSheetGenerator.OptionSheet;
     using CDP4ParameterSheetGenerator.ParameterSheet;
     using CDP4ParameterSheetGenerator.ViewModels;
-    
+
     using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Enums;
-    
+
     using NLog;
-    
+
     using RebuildKind = CDP4ParameterSheetGenerator.ViewModels.RebuildKind;
 
     /// <summary>
@@ -68,12 +69,12 @@ namespace CDP4ParameterSheetGenerator
         /// A selection of class kinds that are contained by the engineering model.
         /// </summary>
         private static readonly ClassKind[] EngineeringModelKinds = new[]
-                                    {
-                                        ClassKind.EngineeringModel, 
-                                        ClassKind.Iteration, 
-                                        ClassKind.CommonFileStore,
-                                        ClassKind.ModelLogEntry
-                                    };
+        {
+            ClassKind.EngineeringModel,
+            ClassKind.Iteration,
+            ClassKind.CommonFileStore,
+            ClassKind.ModelLogEntry
+        };
 
         /// <summary>
         /// The NLog Logger
@@ -102,7 +103,10 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="dialogNavigationService">
         /// The instance of <see cref="IDialogNavigationService"/> that orchestrates navigation to dialogs
         /// </param>
-        public WorkbookOperator(Application application, Workbook workbook, IDialogNavigationService dialogNavigationService)
+        /// <param name="messageBus">
+        /// The <see cref="ICDPMessageBus"/>
+        /// </param>
+        public WorkbookOperator(Application application, Workbook workbook, IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus)
         {
             if (application == null)
             {
@@ -119,7 +123,13 @@ namespace CDP4ParameterSheetGenerator
             this.workbook = workbook;
             this.application = application;
             this.DialogNavigationService = dialogNavigationService;
+            this.CDPMessageBus = messageBus;
         }
+
+        /// <summary>
+        /// Gets the <see cref="ICDPMessageBus"/>
+        /// </summary>
+        public ICDPMessageBus CDPMessageBus { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="IDialogNavigationService"/> used to navigate to dialogs
@@ -133,7 +143,7 @@ namespace CDP4ParameterSheetGenerator
         /// The current <see cref="ISession"/> that is rebuilding the parameter sheet
         /// </param>
         /// <param name="iteration">
-        /// The <see cref="Iteration"/> that contains the <see cref="ElementDefinition"/>s, <see cref="ElementUsage"/>s and <see cref="Parameter"/>s that
+        /// The <see cref="Iteration"/> that contains the <see cref="ElementDefinition"/>s, <see cref="ElementUsage"/>s and <see cref="NetOffice.ExcelApi.Parameter"/>s that
         /// are being written to the workbook
         /// </param>
         /// <param name="participant">
@@ -143,7 +153,7 @@ namespace CDP4ParameterSheetGenerator
         {
             this.application.StatusBar = string.Empty;
 
-            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials);
+            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials, session.ExceptionHandlerService);
 
             try
             {
@@ -151,18 +161,19 @@ namespace CDP4ParameterSheetGenerator
                 sw.Start();
 
                 IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets;
-                
+
                 var parameterSheetProcessor = new ParameterSheetProcessor(workbookSession, iteration);
                 parameterSheetProcessor.ValidateValuesAndCheckForChanges(this.application, this.workbook, out processedValueSets);
-                
+
                 if (processedValueSets.Any())
-                {    
+                {
                     var workbookRebuildViewModel = new WorkbookRebuildViewModel(processedValueSets, ValueSetKind.All);
                     var dialogResult = this.DialogNavigationService.NavigateModal(workbookRebuildViewModel);
 
                     if (dialogResult.Result.HasValue && dialogResult.Result.Value)
                     {
                         var rebuildKind = ((WorkbookRebuildDialogResult)dialogResult).RebuildKind;
+
                         switch (rebuildKind)
                         {
                             case RebuildKind.Overwrite:
@@ -219,9 +230,9 @@ namespace CDP4ParameterSheetGenerator
 
             this.application.Cursor = XlMousePointer.xlWait;
             this.application.StatusBar = $"CDP4: refreshing data from the data source {session.DataSourceUri}";
-            
+
             await session.Refresh();
-            
+
             this.application.StatusBar = $"CD4: data refreshed in {sw.ElapsedMilliseconds} [ms]";
             this.application.Cursor = XlMousePointer.xlDefault;
         }
@@ -239,7 +250,7 @@ namespace CDP4ParameterSheetGenerator
         {
             this.application.StatusBar = string.Empty;
 
-            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials);
+            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials, session.ExceptionHandlerService);
 
             try
             {
@@ -256,8 +267,9 @@ namespace CDP4ParameterSheetGenerator
                     this.application.StatusBar = "CDP4: Submit cancelled, No values changed";
                     return;
                 }
-                
+
                 var parameterValueSetBaseProcessedValueSets = new Dictionary<Guid, ProcessedValueSet>();
+
                 foreach (var processedValueSet in processedValueSets)
                 {
                     if (processedValueSet.Value.ClonedThing is ParameterValueSetBase)
@@ -265,7 +277,7 @@ namespace CDP4ParameterSheetGenerator
                         parameterValueSetBaseProcessedValueSets.Add(processedValueSet.Value.ClonedThing.Iid, processedValueSet.Value);
                     }
                 }
-                
+
                 if (parameterValueSetBaseProcessedValueSets.Any())
                 {
                     var submitConfirmationViewModel = new SubmitConfirmationViewModel(parameterValueSetBaseProcessedValueSets, ValueSetKind.ParameterAndOrverride);
@@ -349,7 +361,7 @@ namespace CDP4ParameterSheetGenerator
         {
             this.application.StatusBar = string.Empty;
 
-            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials);
+            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials, session.ExceptionHandlerService);
 
             try
             {
@@ -357,7 +369,7 @@ namespace CDP4ParameterSheetGenerator
 
                 var parameterSheetProcessor = new ParameterSheetProcessor(workbookSession, iteration);
                 parameterSheetProcessor.ValidateValuesAndCheckForChanges(this.application, this.workbook, out processedValueSets);
-                
+
                 if (!processedValueSets.Any())
                 {
                     this.application.StatusBar = "Submit cancelled: no values changed";
@@ -365,6 +377,7 @@ namespace CDP4ParameterSheetGenerator
                 }
 
                 var parameterSubscriptionValueSetProcessedValueSets = new Dictionary<Guid, ProcessedValueSet>();
+
                 foreach (var processedValueSet in processedValueSets)
                 {
                     if (processedValueSet.Value.ClonedThing is ParameterSubscriptionValueSet)
@@ -372,7 +385,7 @@ namespace CDP4ParameterSheetGenerator
                         parameterSubscriptionValueSetProcessedValueSets.Add(processedValueSet.Value.ClonedThing.Iid, processedValueSet.Value);
                     }
                 }
-                
+
                 if (parameterSubscriptionValueSetProcessedValueSets.Any())
                 {
                     var submitConfirmationViewModel = new SubmitConfirmationViewModel(parameterSubscriptionValueSetProcessedValueSets, ValueSetKind.ParameterSubscription);
@@ -457,20 +470,20 @@ namespace CDP4ParameterSheetGenerator
         {
             this.application.StatusBar = string.Empty;
 
-            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials);
+            var workbookSession = await this.CreateWorkbookSession(session.Dal, session.Credentials, session.ExceptionHandlerService);
 
             try
             {
                 IReadOnlyDictionary<Guid, ProcessedValueSet> processedValueSets;
                 var parameterSheetProcessor = new ParameterSheetProcessor(workbookSession, iteration);
                 parameterSheetProcessor.ValidateValuesAndCheckForChanges(this.application, this.workbook, out processedValueSets);
-                
+
                 if (!processedValueSets.Any())
                 {
                     this.application.StatusBar = "Submit cancelled: no values changed";
                     return;
                 }
-                
+
                 var submitConfirmationViewModel = new SubmitConfirmationViewModel(processedValueSets, ValueSetKind.All);
                 var dialogResult = this.DialogNavigationService.NavigateModal(submitConfirmationViewModel);
 
@@ -523,7 +536,6 @@ namespace CDP4ParameterSheetGenerator
                     var parameterSheetRowHighligter = new ParameterSheetRowHighligter();
                     parameterSheetRowHighligter.HighlightRows(this.application, this.workbook, processedValueSets);
                 }
-                
             }
             catch (Exception ex)
             {
@@ -549,12 +561,12 @@ namespace CDP4ParameterSheetGenerator
         /// <returns>
         /// An instance of <see cref="ISession"/> that is specific to the <see cref="Workbook"/>
         /// </returns>
-        private async Task<ISession> CreateWorkbookSession(IDal dal, Credentials credentials)
+        private async Task<ISession> CreateWorkbookSession(IDal dal, Credentials credentials, IExceptionHandlerService exceptionHandlerService)
         {
             var workbookDataDal = new WorkbookDataDal(this.workbook);
             var workbookData = workbookDataDal.Read();
 
-            var workbookSession = dal.CreateSession(credentials);
+            var workbookSession = dal.CreateSession(credentials, this.CDPMessageBus, exceptionHandlerService);
 
             if (workbookData != null)
             {
@@ -590,7 +602,7 @@ namespace CDP4ParameterSheetGenerator
             {
                 // all the returned thing are iteration contained
                 thing.IterationContainerId = iteration.Iid;
-            }   
+            }
         }
 
         /// <summary>
@@ -636,7 +648,7 @@ namespace CDP4ParameterSheetGenerator
         /// The <see cref="ISession"/> related with the the workbook.
         /// </param>
         /// <param name="iteration">
-        /// The <see cref="Iteration"/> that contains the <see cref="ElementDefinition"/>s, <see cref="ElementUsage"/>s and <see cref="Parameter"/>s that
+        /// The <see cref="Iteration"/> that contains the <see cref="ElementDefinition"/>s, <see cref="ElementUsage"/>s and <see cref="NetOffice.ExcelApi.Parameter"/>s that
         /// are being written to the workbook
         /// </param>
         /// <param name="participant">

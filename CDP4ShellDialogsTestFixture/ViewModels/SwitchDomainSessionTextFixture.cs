@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="SwitchDomainSessionTextFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
-// 
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski, Ahmed Ahmed, Omar Elebiary
-// 
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+// <copyright file="SwitchDomainSessionTextFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
-//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-//    Lesser General Public License for more details.
-// 
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -48,11 +48,36 @@ namespace CDP4ShellDialogs.Tests.ViewModels
     [TestFixture]
     internal class SwitchDomainSessionTextFixture
     {
+        private Mock<ISession> session;
+        private Mock<IPermissionService> permissionService;
+
+        private SiteDirectory siteDirectory;
+        private EngineeringModelSetup modelSetup1;
+        private EngineeringModelSetup modelSetup2;
+        private IterationSetup iterationSetup11;
+        private IterationSetup iterationSetup21;
+        private IterationSetup iterationSetup22;
+        private EngineeringModel model;
+        private Iteration iteration11;
+        private Iteration iteration21;
+        private Person person;
+        private Participant participant;
+        private DomainOfExpertise domain;
+        private DomainOfExpertise domain2;
+        private string frozenOnDate;
+
+        private Assembler assembler;
+        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
+
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
+        private CDPMessageBus messageBus;
+
         [SetUp]
         public void Setup()
         {
-            this.session = new Mock<ISession> { Name = "http://www.rheagroup.com/" };
-            this.assembler = new Assembler(this.uri);
+            this.session = new Mock<ISession> { Name = "https://www.stariongroup.eu/" };
+            this.messageBus = new CDPMessageBus();
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 
             this.permissionService = new Mock<IPermissionService>();
@@ -103,36 +128,14 @@ namespace CDP4ShellDialogs.Tests.ViewModels
             openIterations.Add(this.iteration11, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant));
             openIterations.Add(this.iteration21, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant));
             this.session.Setup(x => x.OpenIterations).Returns(openIterations);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
-
-        private Mock<ISession> session;
-        private Mock<IPermissionService> permissionService;
-
-        private SiteDirectory siteDirectory;
-        private EngineeringModelSetup modelSetup1;
-        private EngineeringModelSetup modelSetup2;
-        private IterationSetup iterationSetup11;
-        private IterationSetup iterationSetup21;
-        private IterationSetup iterationSetup22;
-        private EngineeringModel model;
-        private Iteration iteration11;
-        private Iteration iteration21;
-        private Person person;
-        private Participant participant;
-        private DomainOfExpertise domain;
-        private DomainOfExpertise domain2;
-        private string frozenOnDate;
-
-        private Assembler assembler;
-        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
-
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
 
         [Test]
         public void VerifyThatPropertiesAreSetAndAdded()

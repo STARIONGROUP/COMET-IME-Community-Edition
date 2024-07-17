@@ -1,7 +1,7 @@
 ﻿name: CommonServiceLocator
-version: 1.3.0 
-project url: http://exceptionreporter.codeplex.com/
-license url: http://commonservicelocator.codeplex.com/license
+version: 2.0.5 
+project url: https://github.com/unitycontainer/commonservicelocator
+license url: https://opensource.org/license/ms-pl-html/
 
 Microsoft Public License (Ms-PL)
 

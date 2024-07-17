@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="HeaderArrayAssemblerTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="HeaderArrayAssemblerTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ namespace CDP4ParameterSheetGenerator.Tests.ArrayAssemblers.OptionSheet
         {
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.uri = new Uri("https://www.stariongroup.eu");
 
             this.session = new Mock<ISession>();
 

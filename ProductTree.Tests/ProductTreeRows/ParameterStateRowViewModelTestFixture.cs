@@ -1,9 +1,27 @@
-﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="ParameterStateRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ParameterStateRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace ProductTree.Tests.ProductTreeRows
 {
@@ -15,17 +33,17 @@ namespace ProductTree.Tests.ProductTreeRows
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Composition.Services.NestedElementTreeService;
 
     using CDP4Dal;
-    using CDP4Dal.Permission;
+
     using CDP4ProductTree.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
+
     using NUnit.Framework;
 
     [TestFixture]
@@ -35,7 +53,7 @@ namespace ProductTree.Tests.ProductTreeRows
         private Mock<INestedElementTreeService> nestedElementTreeService;
         private Mock<ISession> session;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
-        private readonly Uri uri = new Uri("http://www.rheagroup.com");
+        private readonly Uri uri = new Uri("https://www.stariongroup.eu");
         private Parameter parameter1;
         private ParameterType parameterType1;
         private ActualFiniteStateList stateList;
@@ -53,6 +71,7 @@ namespace ProductTree.Tests.ProductTreeRows
         private DomainOfExpertise domain;
         private ParameterRowViewModel parameterRowViewModel;
         private readonly string nestedParameterPath = "PATH";
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
@@ -60,6 +79,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
+            this.messageBus = new CDPMessageBus();
             this.nestedElementTreeService = new Mock<INestedElementTreeService>();
             this.nestedElementTreeService.Setup(x => x.GetNestedParameterPath(It.IsAny<ParameterBase>(), It.IsAny<Option>(), It.IsAny<ActualFiniteState>())).Returns(this.nestedParameterPath);
 
@@ -99,6 +119,7 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementdef1.Parameter.Add(this.parameter1);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.parameter1.Iid, null), new Lazy<Thing>(() => this.parameter1));
         }
@@ -106,14 +127,14 @@ namespace ProductTree.Tests.ProductTreeRows
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatPropertiesAreSet()
         {
             this.parameterRowViewModel = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null);
-            var row = new ParameterStateRowViewModel(this.parameter1, this.state1 , this.session.Object, this.parameterRowViewModel);
+            var row = new ParameterStateRowViewModel(this.parameter1, this.state1, this.session.Object, this.parameterRowViewModel);
 
             Assert.AreEqual(row.ActualState, this.state1);
             Assert.AreEqual(row.IsDefault, row.ActualState.IsDefault);

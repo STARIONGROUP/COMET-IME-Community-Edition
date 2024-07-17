@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementBaseRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ElementBaseRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -38,9 +38,9 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
-    using CDP4Composition.Extensions;
     using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Services;
 
     using CDP4Dal;
@@ -128,7 +128,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.currentDomain = currentDomain;
             this.UpdateOwnerProperties();
             this.UpdateObfuscationProperties();
-            
+
             this.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName == nameof(this.Owner))
@@ -145,7 +145,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public virtual bool? HasExcludes
         {
-            get { return null; }
+            get => null;
             set
             {
                 /*does nothing, for binding purposes only*/
@@ -157,7 +157,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public virtual bool IsTopElement
         {
-            get { return false; }
+            get => false;
             set
             {
                 /*does nothing, for binding purposes only*/
@@ -167,26 +167,20 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the active <see cref="DomainOfExpertise" />
         /// </summary>
-        public virtual DomainOfExpertise CurrentDomain
-        {
-            get { return this.currentDomain; }
-        }
+        public virtual DomainOfExpertise CurrentDomain => this.currentDomain;
 
         /// <summary>
         /// Gets a value indicating whether the value set editors are active
         /// </summary>
-        public bool IsValueSetEditorActive
-        {
-            get { return false; }
-        }
+        public bool IsValueSetEditorActive => false;
 
         /// <summary>
         /// Gets the mode-code
         /// </summary>
         public string ModelCode
         {
-            get { return this.modelCode; }
-            private set { this.RaiseAndSetIfChanged(ref this.modelCode, value); }
+            get => this.modelCode;
+            private set => this.RaiseAndSetIfChanged(ref this.modelCode, value);
         }
 
         /// <summary>
@@ -211,10 +205,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the applied categories as an <see cref="IEnumerable{Category}" />.
         /// </summary>
-        public IEnumerable<Category> Category
-        {
-            get { return this.Thing?.Category; }
-        }
+        public IEnumerable<Category> Category => this.Thing?.Category;
 
         /// <summary>
         /// Update the row containment associated to a <see cref="ParameterBase" />
@@ -259,6 +250,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="parameterGroup">The <see cref="ParameterGroup" /></param>
         public void UpdateParameterGroupPosition(ParameterGroup parameterGroup)
         {
+            this.UpdateParameterGroupPosition(parameterGroup, false, null);
+        }
+
+        /// <summary>
+        /// Update the row containment associated to a <see cref="ParameterGroup" />
+        /// </summary>
+        /// <param name="parameterGroup">The <see cref="ParameterGroup" /></param>
+        private void UpdateParameterGroupPosition(ParameterGroup parameterGroup, bool delaySort, HashSet<DisposableReactiveList<IRowViewModelBase<Thing>>> toBeSorted)
+        {
             try
             {
                 var oldContainer = this.parameterGroupContainment[parameterGroup];
@@ -268,7 +268,17 @@ namespace CDP4EngineeringModel.ViewModels
                 if (newContainer != null && oldContainer == null)
                 {
                     this.ContainedRows.RemoveWithoutDispose(associatedRow);
-                    this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+
+                    if (delaySort)
+                    {
+                        toBeSorted.Add(this.parameterGroupCache[newContainer].ContainedRows);
+                        this.parameterGroupCache[newContainer].ContainedRows.Add(associatedRow);
+                    }
+                    else
+                    {
+                        this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
+                    }
+
                     this.parameterGroupContainment[parameterGroup] = newContainer;
                 }
                 else if (newContainer == null && oldContainer != null)
@@ -332,7 +342,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var ownerListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.Owner)
+                var ownerListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Owner)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
@@ -341,9 +351,8 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var ownerObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise));
-                this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.Owner, discriminator, action)));
+                var ownerObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.Owner, discriminator, action)));
             }
         }
 
@@ -426,25 +435,42 @@ namespace CDP4EngineeringModel.ViewModels
                     this.parameterGroupContainment.Add(group, group.ContainingGroup);
                 }
 
+                var containers = new HashSet<ParameterGroupRowViewModel>();
+
                 // add the new group in the right position in the tree
                 foreach (var group in newgroup)
                 {
                     if (group.ContainingGroup == null)
                     {
-                        this.ContainedRows.SortedInsert(this.parameterGroupCache[group], ChildRowComparer);
+                        this.ContainedRows.Add(this.parameterGroupCache[group]);
                     }
                     else
                     {
                         var container = this.parameterGroupCache[group.ContainingGroup];
-                        container.ContainedRows.SortedInsert(this.parameterGroupCache[group], ParameterGroupRowViewModel.ChildRowComparer);
+                        containers.Add(container);
+                        container.ContainedRows.Add(this.parameterGroupCache[group]);
                     }
                 }
 
                 // Check if ContainingGroup for existing group might have been updated
+                var containedRowLists = new HashSet<DisposableReactiveList<IRowViewModelBase<Thing>>>();
+
                 foreach (var group in updatedGroups)
                 {
-                    this.UpdateParameterGroupPosition(group);
+                    this.UpdateParameterGroupPosition(group, true, containedRowLists);
                 }
+
+                foreach (var containedRowList in containedRowLists)
+                {
+                    containedRowList.Sort(ParameterGroupRowViewModel.ChildRowComparer);
+                }
+
+                foreach (var container in containers)
+                {
+                    container.ContainedRows.Sort(ParameterGroupRowViewModel.ChildRowComparer);
+                }
+
+                this.ContainedRows.Sort(ChildRowComparer);
             }
             catch (Exception exception)
             {
@@ -505,6 +531,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="addedParameterBase">The <see cref="ParameterBase" />s to add</param>
         protected void AddParameterBase(IEnumerable<ParameterBase> addedParameterBase)
         {
+            var groupContainers = new HashSet<DisposableReactiveList<IRowViewModelBase<Thing>>>();
+
             foreach (var parameterBase in addedParameterBase)
             {
                 IRowViewModelBase<ParameterBase> row = null;
@@ -557,7 +585,7 @@ namespace CDP4EngineeringModel.ViewModels
 
                 if (group == null)
                 {
-                    this.ContainedRows.SortedInsert(row, ChildRowComparer);
+                    this.ContainedRows.Add(row);
                 }
                 else
                 {
@@ -565,10 +593,18 @@ namespace CDP4EngineeringModel.ViewModels
 
                     if (this.parameterGroupCache.TryGetValue(group, out parameterGroupRowViewModel))
                     {
-                        parameterGroupRowViewModel.ContainedRows.SortedInsert(row, ParameterGroupRowViewModel.ChildRowComparer);
+                        groupContainers.Add(parameterGroupRowViewModel.ContainedRows);
+                        parameterGroupRowViewModel.ContainedRows.Add(row);
                     }
                 }
             }
+
+            foreach (var groupContainer in groupContainers)
+            {
+                groupContainer.Sort(ParameterGroupRowViewModel.ChildRowComparer);
+            }
+
+            this.ContainedRows.Sort(ChildRowComparer);
         }
 
         /// <summary>
@@ -594,15 +630,15 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
-            Func<ObjectChangedEvent, bool> discriminator = 
-                objectChange => objectChange.EventKind == EventKind.Updated 
-                && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
+            Func<ObjectChangedEvent, bool> discriminator =
+                objectChange => objectChange.EventKind == EventKind.Updated
+                                && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
 
             Action<ObjectChangedEvent> action = x => this.PopulateParameters();
 
             if (this.AllowMessageBusSubscriptions)
             {
-               var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterOrOverride)
+                var listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(parameterOrOverride)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
@@ -611,8 +647,10 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var parameterOrOverrideObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase));
-                this.ParameterBaseListener.Add(parameterOrOverride, 
+                var parameterOrOverrideObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOrOverrideBase));
+
+                this.ParameterBaseListener.Add(
+                    parameterOrOverride,
                     this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterOrOverrideObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterOrOverride, discriminator, action)));
             }
         }
@@ -633,7 +671,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(parameterSubscription)
+                var listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(parameterSubscription)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(action);
@@ -642,8 +680,10 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var parameterOrOverrideObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ParameterSubscription));
-                this.ParameterBaseListener.Add(parameterSubscription, 
+                var parameterOrOverrideObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterSubscription));
+
+                this.ParameterBaseListener.Add(
+                    parameterSubscription,
                     this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(parameterOrOverrideObserver, new ObjectChangedMessageBusEventHandlerSubscription(parameterSubscription, discriminator, action)));
             }
         }

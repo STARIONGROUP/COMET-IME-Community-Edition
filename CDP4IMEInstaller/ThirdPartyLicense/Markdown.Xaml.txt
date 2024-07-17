@@ -1,7 +1,7 @@
 ﻿name: Markdown.Xaml
 version: 1.0.0
-project url: http://github.com/theunrepentantgeek/Markdown.XAML
-license url: http://github.com/theunrepentantgeek/Markdown.XAML/blob/master/License.txt
+project url: https://github.com/theunrepentantgeek/Markdown.XAML
+license url: https://github.com/theunrepentantgeek/Markdown.XAML/blob/master/License.txt
 
 The MIT License (MIT)
 

@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DiagramContentItemParameterRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="DiagramContentItemParameterRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2021 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -48,7 +48,7 @@ namespace CDP4Composition.Tests.Diagram
     {
         private Parameter parameter1;
         private Parameter parameter2;
-        private ISession session;
+        private Mock<ISession> session;
 
         [SetUp]
         public void SetUp()
@@ -129,13 +129,14 @@ namespace CDP4Composition.Tests.Diagram
                     })
                 });
 
-            this.session = Mock.Of<ISession>();
+            this.session = new Mock<ISession>();
+            this.session.Setup(x => x.CDPMessageBus).Returns(new CDPMessageBus());
         }
 
         [Test]
         public void VerifyThatDiagramContentItemChildStringContainsExpectedParts1()
         {
-            var rowViewModel = new DiagramContentItemParameterRowViewModel(this.parameter1, this.session, null);
+            var rowViewModel = new DiagramContentItemParameterRowViewModel(this.parameter1, this.session.Object, null);
 
             Assert.IsTrue(rowViewModel.DiagramContentItemChildString.Contains("value1"));
             Assert.IsTrue(rowViewModel.DiagramContentItemChildString.Contains("value2"));
@@ -148,7 +149,7 @@ namespace CDP4Composition.Tests.Diagram
         [Test]
         public void VerifyThatDiagramContentItemChildStringContainsExpectedParts2()
         {
-            var rowViewModel = new DiagramContentItemParameterRowViewModel(this.parameter2, this.session, null);
+            var rowViewModel = new DiagramContentItemParameterRowViewModel(this.parameter2, this.session.Object, null);
 
             Assert.IsTrue(rowViewModel.DiagramContentItemChildString.Contains("c1"));
             Assert.IsTrue(rowViewModel.DiagramContentItemChildString.Contains("c2"));

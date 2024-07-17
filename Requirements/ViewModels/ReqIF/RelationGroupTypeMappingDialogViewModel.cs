@@ -1,23 +1,48 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RelationGroupTypeMappingDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="RelationGroupTypeMappingDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Windows.Input;
+
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    
     using CDP4Dal;
+    using CDP4Dal.Operations;
+    
     using ReactiveUI;
+
     using ReqIFSharp;
 
     [DialogViewModelExport("RelationGroupTypeMappingDialogViewModel", "The dialog used to map the Reqif RelationGroupType to categories and rules.")]
@@ -47,19 +72,15 @@ namespace CDP4Requirements.ViewModels
         public RelationGroupTypeMappingDialogViewModel(IEnumerable<RelationGroupType> relationGroupTypes, IReadOnlyDictionary<RelationGroupType, RelationGroupTypeMap> specRelationTypeMap, IReadOnlyDictionary<DatatypeDefinition, DatatypeDefinitionMap> datatypeDefMap, Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, string lang)
             : base(iteration, session, thingDialogNavigationService, lang)
         {
-            this.BackCommand = ReactiveCommand.Create();
-            this.BackCommand.Subscribe(_ => this.ExecuteBackCommand());
+            this.BackCommand = ReactiveCommandCreator.Create(this.ExecuteBackCommand);
 
             var canExecuteOk = this.WhenAnyValue(x => x.CanOk);
 
-            this.NextCommand = ReactiveCommand.Create(canExecuteOk);
-            this.NextCommand.Subscribe(_ => this.ExecuteOkCommand());
+            this.NextCommand = ReactiveCommandCreator.Create(this.ExecuteOkCommand, canExecuteOk);
 
-            this.CreateCategoryCommand = ReactiveCommand.Create();
-            this.CreateCategoryCommand.Subscribe(_ => this.ExecuteCreateCategoryCommand());
+            this.CreateCategoryCommand = ReactiveCommandCreator.Create(this.ExecuteCreateCategoryCommand);
 
-            this.CreateBinaryRealationshipRuleCommand = ReactiveCommand.Create();
-            this.CreateBinaryRealationshipRuleCommand.Subscribe(_ => this.ExecuteCreateBinaryRelationshipRuleCommand()); 
+            this.CreateBinaryRealationshipRuleCommand = ReactiveCommandCreator.Create(this.ExecuteCreateBinaryRelationshipRuleCommand);
 
             this.SpecTypes = new ReactiveList<RelationGroupMappingRowViewModel>();
 
@@ -110,22 +131,22 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets the back <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> BackCommand { get; private set; } 
+        public ReactiveCommand<Unit, Unit> BackCommand { get; private set; } 
 
         /// <summary>
         /// Gets the "next" <see cref="ICommand"/>
         /// </summary>
-        public ReactiveCommand<object> NextCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> NextCommand { get; private set; }
 
         /// <summary>
         /// Gets the create <see cref="Category"/> command
         /// </summary>
-        public ReactiveCommand<object> CreateCategoryCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateCategoryCommand { get; private set; }
 
         /// <summary>
         /// Gets the create <see cref="BinaryRelationshipRule"/> command
         /// </summary>
-        public ReactiveCommand<object> CreateBinaryRealationshipRuleCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateBinaryRealationshipRuleCommand { get; private set; }
 
         /// <summary>
         /// Executes the <see cref="BackCommand"/>

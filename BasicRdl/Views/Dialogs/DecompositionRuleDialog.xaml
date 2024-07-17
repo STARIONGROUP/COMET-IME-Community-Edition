@@ -9,7 +9,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              Width="500"
              Height="500"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -18,6 +17,7 @@
         <ResourceDictionary>
             <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/ErrorTemplate.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -55,6 +55,8 @@
                                   />
                     </lc:LayoutItem>
                 </lc:LayoutGroup>
+                <TextBlock Text ="{Binding Test}"></TextBlock>
+
                 <lc:LayoutItem Label="Containing Category: "
                                ToolTip="Select the Category for the Element-Definitions to which this rule applies">
                     <Grid>
@@ -70,6 +72,7 @@
                                           IsEnabled="{Binding HasLibrary}"
                                           IsReadOnly="{Binding IsReadOnly}"
                                           IsTextEditable="False"
+                                          ItemContainerStyle="{StaticResource ComboBoxEditItemStyleDeprecated}" 
                                           ItemsSource="{Binding Path=PossibleContainingCategory}"
                                           ShowCustomItems="False" />
                         <Button Grid.Column="1"
@@ -111,7 +114,7 @@
                                     ItemsSource="{Binding PossibleContainedCategory}"
                                     SelectionMode="Multiple">
                         <dxe:ListBoxEdit.StyleSettings>
-                            <dxe:CheckedListBoxEditStyleSettings />
+                            <dxe:CheckedListBoxEditStyleSettings ItemContainerStyle="{StaticResource ListBoxEditItemStyleDeprecated}" />
                         </dxe:ListBoxEdit.StyleSettings>
                     </dxe:ListBoxEdit>
                 </lc:LayoutItem>

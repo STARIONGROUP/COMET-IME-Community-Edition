@@ -1,27 +1,27 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DefinitionDialogViewModel.cs" company="RHEA S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="DefinitionDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4CommonView.ViewModels
 {
@@ -40,6 +40,7 @@ namespace CDP4CommonView.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Utilities;
     using CDP4Dal;
+    using System.Reactive;
 
     [ThingDialogViewModelExport(ClassKind.Definition)]
     public class DefinitionDialogViewModel : CDP4CommonView.DefinitionDialogViewModel, IThingDialogViewModel
@@ -110,42 +111,42 @@ namespace CDP4CommonView.ViewModels
         /// <summary>
         /// Gets the create note command.
         /// </summary>
-        public ReactiveCommand<object> CreateNoteCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateNoteCommand { get; private set; }
 
         /// <summary>
         /// Gets the delete note command.
         /// </summary>
-        public ReactiveCommand<object> DeleteNoteCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteNoteCommand { get; private set; }
 
         /// <summary>
         /// Gets the move up note command.
         /// </summary>
-        public ReactiveCommand<object> MoveUpNoteCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> MoveUpNoteCommand { get; private set; }
 
         /// <summary>
         /// Gets the move down note command.
         /// </summary>
-        public ReactiveCommand<object> MoveDownNoteCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> MoveDownNoteCommand { get; private set; }
 
         /// <summary>
         /// Gets the create example command.
         /// </summary>
-        public ReactiveCommand<object> CreateExampleCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateExampleCommand { get; private set; }
 
         /// <summary>
         /// Gets the delete example command.
         /// </summary>
-        public ReactiveCommand<object> DeleteExampleCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> DeleteExampleCommand { get; private set; }
 
         /// <summary>
         /// Gets the move up example command.
         /// </summary>
-        public ReactiveCommand<object> MoveUpExampleCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> MoveUpExampleCommand { get; private set; }
 
         /// <summary>
         /// Gets the move down example command.
         /// </summary>
-        public ReactiveCommand<object> MoveDownExampleCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> MoveDownExampleCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets the <see cref="CultureInfo"/> for this definition
@@ -172,7 +173,7 @@ namespace CDP4CommonView.ViewModels
         }
 
         /// <summary>
-        /// Initializes the <see cref="ReactiveCommand"/>s of this dialog
+        /// Initializes the <see cref="ReactiveCommandCreator"/>s of this dialog
         /// </summary>
         protected override void InitializeCommands()
         {
@@ -181,27 +182,14 @@ namespace CDP4CommonView.ViewModels
             var canExecuteSelectedMoveNoteCommand = this.WhenAny(vm => vm.SelectedNote, v => v.Value != null && !this.IsReadOnly);
             var canExecuteSelectedMoveExampleCommand = this.WhenAny(vm => vm.SelectedExample, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateNoteCommand = ReactiveCommand.Create();
-            this.CreateNoteCommand.Subscribe(_ => this.ExecuteCreateNoteCommand());
-
-            this.DeleteNoteCommand = ReactiveCommand.Create();
-            this.DeleteNoteCommand.Subscribe(_ => this.ExecuteDeleteNoteCommand());
-
-            this.MoveUpNoteCommand = ReactiveCommand.Create(canExecuteSelectedMoveNoteCommand);
-            this.MoveUpNoteCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Note, this.SelectedNote));
-            this.MoveDownNoteCommand = ReactiveCommand.Create(canExecuteSelectedMoveNoteCommand);
-            this.MoveDownNoteCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Note, this.SelectedNote));
-
-            this.MoveUpExampleCommand = ReactiveCommand.Create(canExecuteSelectedMoveExampleCommand);
-            this.MoveUpExampleCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.Example, this.SelectedExample));
-            this.MoveDownExampleCommand = ReactiveCommand.Create(canExecuteSelectedMoveExampleCommand);
-            this.MoveDownExampleCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.Example, this.SelectedExample));
-
-            this.CreateExampleCommand = ReactiveCommand.Create();
-            this.CreateExampleCommand.Subscribe(_ => this.ExecuteCreateExampleCommand());
-
-            this.DeleteExampleCommand = ReactiveCommand.Create();
-            this.DeleteExampleCommand.Subscribe(_ => this.ExecuteDeleteExampleCommand());
+            this.CreateNoteCommand = ReactiveCommandCreator.Create(this.ExecuteCreateNoteCommand);
+            this.DeleteNoteCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteNoteCommand);
+            this.MoveUpNoteCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveUpCommand(this.Note, this.SelectedNote), canExecuteSelectedMoveNoteCommand);
+            this.MoveDownNoteCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveDownCommand(this.Note, this.SelectedNote), canExecuteSelectedMoveNoteCommand);
+            this.MoveUpExampleCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveUpCommand(this.Example, this.SelectedExample), canExecuteSelectedMoveExampleCommand);
+            this.MoveDownExampleCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveDownCommand(this.Example, this.SelectedExample), canExecuteSelectedMoveExampleCommand);
+            this.CreateExampleCommand = ReactiveCommandCreator.Create(this.ExecuteCreateExampleCommand);
+            this.DeleteExampleCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteExampleCommand);
 
             this.WhenAnyValue(x => x.SelectedLanguageCode).Where(x => x != null).Subscribe(culture => this.LanguageCode = culture.Name);
         }

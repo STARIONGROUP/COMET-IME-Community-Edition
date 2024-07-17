@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UnitPrefixBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="UnitPrefixBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -76,8 +76,6 @@ namespace BasicRdl.ViewModels
             this.Caption = $"{PanelCaption}, {this.Thing.Name}";
             this.ToolTip = $"{this.Thing.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
-            this.UnitPrefixes.ChangeTrackingEnabled = true;
-
             this.AddSubscriptions();
         }
         
@@ -107,8 +105,7 @@ namespace BasicRdl.ViewModels
         protected override void InitializeCommands()
         {
             base.InitializeCommands();
-            this.CreateCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRdlElement));
-            this.CreateCommand.Subscribe(_ => this.ExecuteCreateCommand<UnitPrefix>());
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<UnitPrefix>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
         }
 
         /// <summary>
@@ -171,7 +168,7 @@ namespace BasicRdl.ViewModels
         private void AddSubscriptions()
         {
             var addListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(UnitPrefix))
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(UnitPrefix))
                     .Where(objectChange => objectChange.EventKind == EventKind.Added && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as UnitPrefix)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -179,7 +176,7 @@ namespace BasicRdl.ViewModels
             this.Disposables.Add(addListener);
 
             var removeListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(UnitPrefix))
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(UnitPrefix))
                     .Where(objectChange => objectChange.EventKind == EventKind.Removed && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as UnitPrefix)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -187,7 +184,7 @@ namespace BasicRdl.ViewModels
             this.Disposables.Add(removeListener);
 
             var rdlUpdateListener =
-                CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
+                this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ReferenceDataLibrary))
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
                     .Select(x => x.ChangedThing as ReferenceDataLibrary)
                     .ObserveOn(RxApp.MainThreadScheduler)

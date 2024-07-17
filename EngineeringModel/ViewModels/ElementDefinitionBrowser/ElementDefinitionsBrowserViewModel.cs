@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionsBrowserViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ElementDefinitionsBrowserViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -28,7 +28,6 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.Linq;
     using System.Reactive;
@@ -40,7 +39,9 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4CommonView.ViewModels;
+
     using CDP4Composition;
     using CDP4Composition.DragDrop;
     using CDP4Composition.Events;
@@ -56,19 +57,16 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels.Dialogs;
 
-    using DevExpress.Xpf.Core;
-
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using NLog;
 
     using ReactiveUI;
-
-    using IDropTarget = CDP4Composition.DragDrop.IDropTarget;
 
     /// <summary>
     /// Represent the view-model of the browser that displays all the <see cref="ElementDefinition"/>s in one <see cref="Iteration"/>
@@ -189,8 +187,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.ElementDefinitionRowViewModels = new DisposableReactiveList<IRowViewModelBase<Thing>>();
 
             this.ExecuteLongRunningDispatcherAction(
-                () => 
-                { 
+                () =>
+                {
                     this.UpdateElementDefinition(true);
                     this.AddSubscriptions();
                     this.UpdateProperties();
@@ -203,18 +201,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
         /// </summary>
-        public EngineeringModelSetup CurrentEngineeringModelSetup
-        {
-            get { return this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>(); }
-        }
+        public EngineeringModelSetup CurrentEngineeringModelSetup => this.Thing.IterationSetup.GetContainerOfType<EngineeringModelSetup>();
 
         /// <summary>
         /// Gets the current model caption to be displayed in the browser
         /// </summary>
         public string CurrentModel
         {
-            get { return this.currentModel; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentModel, value); }
+            get => this.currentModel;
+            private set => this.RaiseAndSetIfChanged(ref this.currentModel, value);
         }
 
         /// <summary>
@@ -222,8 +217,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public int CurrentIteration
         {
-            get { return this.currentIteration; }
-            private set { this.RaiseAndSetIfChanged(ref this.currentIteration, value); }
+            get => this.currentIteration;
+            private set => this.RaiseAndSetIfChanged(ref this.currentIteration, value);
         }
 
         /// <summary>
@@ -231,8 +226,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreateParameterGroup
         {
-            get { return this.canCreateParameterGroup; }
-            set { this.RaiseAndSetIfChanged(ref this.canCreateParameterGroup, value); }
+            get => this.canCreateParameterGroup;
+            set => this.RaiseAndSetIfChanged(ref this.canCreateParameterGroup, value);
         }
 
         /// <summary>
@@ -240,8 +235,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreateElementDefinition
         {
-            get { return this.canCreateElementDefinition; }
-            set { this.RaiseAndSetIfChanged(ref this.canCreateElementDefinition, value); }
+            get => this.canCreateElementDefinition;
+            set => this.RaiseAndSetIfChanged(ref this.canCreateElementDefinition, value);
         }
 
         /// <summary>
@@ -249,8 +244,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreateSubscription
         {
-            get { return this.canCreateSubscription; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateSubscription, value); }
+            get => this.canCreateSubscription;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateSubscription, value);
         }
 
         /// <summary>
@@ -258,8 +253,8 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanCreateBatchSubscriptions
         {
-            get { return this.canCreateBatchSubscriptions; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateBatchSubscriptions, value); }
+            get => this.canCreateBatchSubscriptions;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateBatchSubscriptions, value);
         }
 
         /// <summary>
@@ -267,78 +262,78 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         public bool CanDeleteBatchSubscriptions
         {
-            get { return this.canDeleteBatchSubscriptions; }
-            private set { this.RaiseAndSetIfChanged(ref this.canDeleteBatchSubscriptions, value); }
+            get => this.canDeleteBatchSubscriptions;
+            private set => this.RaiseAndSetIfChanged(ref this.canDeleteBatchSubscriptions, value);
         }
-       
+
         /// <summary>
         /// Gets a value indicating whether the create override command shall be enabled
         /// </summary>
         public bool CanCreateOverride
         {
-            get { return this.canCreateOverride; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreateOverride, value); }
+            get => this.canCreateOverride;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateOverride, value);
         }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to Copy Model Code to clipboard <see cref="ParameterRowViewModel"/>
         /// </summary>
-        public ReactiveCommand<object> CopyModelCodeToClipboardCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CopyModelCodeToClipboardCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to show the usages of specified element definition
         /// </summary>
-        public ReactiveCommand<object> HighlightElementUsagesCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> HighlightElementUsagesCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ParameterGroup"/>
         /// </summary>
-        public ReactiveCommand<object> CreateParameterGroup { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterGroup { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="ElementDefinition"/>
         /// </summary>
-        public ReactiveCommand<object> CreateElementDefinition { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateElementDefinition { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to copy a <see cref="ElementDefinition"/>
         /// </summary>
-        public ReactiveCommand<object> CopyElementDefinitionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CopyElementDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterOverride"/>
         /// </summary>
-        public ReactiveCommand<object> CreateOverrideCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateOverrideCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterSubscription"/>
         /// </summary>
-        public ReactiveCommand<object> CreateSubscriptionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateSubscriptionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create multiple <see cref="ParameterSubscription"/>s in batch operation mode
         /// </summary>
-        public ReactiveCommand<object> BatchCreateSubscriptionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> BatchCreateSubscriptionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to delete multiple <see cref="ParameterSubscription"/>s in batch operation mode
         /// </summary>
-        public ReactiveCommand<object> BatchDeleteSubscriptionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> BatchDeleteSubscriptionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to change the ownership of an <see cref="IOwnedThing"/> and its contained items
         /// </summary>
-        public ReactiveCommand<object> ChangeOwnershipCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> ChangeOwnershipCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to set an <see cref="ElementDefinition"/> as the top element of the selected iteration
         /// </summary>
-        public ReactiveCommand<Unit> SetAsTopElementDefinitionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> SetAsTopElementDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to unset an <see cref="ElementDefinition"/> as the top element of the selected iteration
         /// </summary>
-        public ReactiveCommand<Unit> UnsetAsTopElementDefinitionCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> UnsetAsTopElementDefinitionCommand { get; private set; }
 
         /// <summary>
         /// Gets the list of rows representing a <see cref="ElementDefinition"/>
@@ -373,6 +368,7 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 logger.Trace("drag over {0}", dropInfo.TargetItem);
                 var droptarget = dropInfo.TargetItem as IDropTarget;
+
                 if (droptarget != null)
                 {
                     droptarget.DragOver(dropInfo);
@@ -380,6 +376,7 @@ namespace CDP4EngineeringModel.ViewModels
                 }
 
                 var elementDefinition = dropInfo.Payload as ElementDefinition;
+
                 if (elementDefinition != null)
                 {
                     if (elementDefinition.Iid == Guid.Empty)
@@ -394,17 +391,20 @@ namespace CDP4EngineeringModel.ViewModels
                         dropInfo.Effects = elementDefinition.TopContainer == this.Thing.TopContainer
                             ? DragDropEffects.None
                             : DragDropEffects.Copy;
+
                         return;
                     }
                 }
 
                 var list = dropInfo.Payload as List<ElementDefinition>;
+
                 if (list != null && list.Any())
                 {
                     dropInfo.Effects = list.First().TopContainer == this.Thing.TopContainer
-                            ? DragDropEffects.None
-                            : DragDropEffects.Copy;
-                        return;
+                        ? DragDropEffects.None
+                        : DragDropEffects.Copy;
+
+                    return;
                 }
 
                 dropInfo.Effects = DragDropEffects.None;
@@ -430,6 +430,7 @@ namespace CDP4EngineeringModel.ViewModels
         public override void StartDrag(IDragInfo dragInfo)
         {
             var dragSource = dragInfo.Payload as IDragSource;
+
             if (dragSource != null)
             {
                 dragSource.StartDrag(dragInfo);
@@ -455,6 +456,7 @@ namespace CDP4EngineeringModel.ViewModels
         public async Task Drop(IDropInfo dropInfo)
         {
             var droptarget = dropInfo.TargetItem as IDropTarget;
+
             if (droptarget != null)
             {
                 try
@@ -476,6 +478,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var elementDefinition = dropInfo.Payload as ElementDefinition;
+
             if (elementDefinition != null)
             {
                 if (elementDefinition.Iid == Guid.Empty)
@@ -574,7 +577,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Initializes the create <see cref="ReactiveCommand"/> that allow a user to create the different kinds of <see cref="ParameterType"/>s
+        /// Initializes the create <see cref="ReactiveCommandCreator"/> that allow a user to create the different kinds of <see cref="ParameterType"/>s
         /// </summary>
         protected override void InitializeCommands()
         {
@@ -582,39 +585,18 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.ComputeNotContextDependentPermission();
 
-            this.CreateParameterGroup = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
-            this.CreateParameterGroup.Subscribe(_ => this.ExecuteCreateParameterGroup());
-
-            this.CreateElementDefinition = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
-            this.CreateElementDefinition.Subscribe(_ => this.ExecuteCreateCommand<ElementDefinition>(this.Thing));
-
-            this.CopyElementDefinitionCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
-            this.CopyElementDefinitionCommand.Subscribe(_ => this.ExecuteCopyElementDefinition());
-
-            this.CreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateSubscription));
-            this.CreateSubscriptionCommand.Subscribe(_ => this.ExecuteCreateSubscriptionCommand());
-
-            this.BatchCreateSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
-            this.BatchCreateSubscriptionCommand.Subscribe(_ => this.ExecuteBatchCreateSubscriptionCommand());
-
-            this.BatchDeleteSubscriptionCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanDeleteBatchSubscriptions));
-            this.BatchDeleteSubscriptionCommand.Subscribe(_ => this.ExecuteBatchDeleteSubscriptionCommand());
-
-            this.ChangeOwnershipCommand = ReactiveCommand.Create();
-            this.ChangeOwnershipCommand.Subscribe(_ => this.ExecuteChangeOwnershipCommand());
-
-            this.SetAsTopElementDefinitionCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteSetAsTopElementDefinitionCommandAsync());
-
-            this.UnsetAsTopElementDefinitionCommand = ReactiveCommand.CreateAsyncTask(_ => this.ExecuteUnsetAsTopElementDefinitionCommandAsync());
-
-            this.CreateOverrideCommand = ReactiveCommand.Create(this.WhenAnyValue(vm => vm.CanCreateOverride));
-            this.CreateOverrideCommand.Subscribe(_ => this.ExecuteCreateParameterOverride());
-
-            this.HighlightElementUsagesCommand = ReactiveCommand.Create();
-            this.HighlightElementUsagesCommand.Subscribe(_ => this.ExecuteHighlightElementUsagesCommand());
-
-            this.CopyModelCodeToClipboardCommand = ReactiveCommand.Create();
-            this.CopyModelCodeToClipboardCommand.Subscribe(_ => this.ExecuteCopyModelCodeToClipboardCommand());
+            this.CreateParameterGroup = ReactiveCommandCreator.Create(this.ExecuteCreateParameterGroup, this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
+            this.CreateElementDefinition = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ElementDefinition>(this.Thing), this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
+            this.CopyElementDefinitionCommand = ReactiveCommandCreator.Create(this.ExecuteCopyElementDefinition, this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
+            this.CreateSubscriptionCommand = ReactiveCommandCreator.Create(this.ExecuteCreateSubscriptionCommand, this.WhenAnyValue(x => x.CanCreateSubscription));
+            this.BatchCreateSubscriptionCommand = ReactiveCommandCreator.Create(this.ExecuteBatchCreateSubscriptionCommand, this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
+            this.BatchDeleteSubscriptionCommand = ReactiveCommandCreator.Create(this.ExecuteBatchDeleteSubscriptionCommand, this.WhenAnyValue(x => x.CanDeleteBatchSubscriptions));
+            this.ChangeOwnershipCommand = ReactiveCommandCreator.Create(this.ExecuteChangeOwnershipCommand);
+            this.SetAsTopElementDefinitionCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteSetAsTopElementDefinitionCommandAsync);
+            this.UnsetAsTopElementDefinitionCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteUnsetAsTopElementDefinitionCommandAsync);
+            this.CreateOverrideCommand = ReactiveCommandCreator.Create(this.ExecuteCreateParameterOverride, this.WhenAnyValue(vm => vm.CanCreateOverride));
+            this.HighlightElementUsagesCommand = ReactiveCommandCreator.Create(this.ExecuteHighlightElementUsagesCommand);
+            this.CopyModelCodeToClipboardCommand = ReactiveCommandCreator.Create(this.ExecuteCopyModelCodeToClipboardCommand);
         }
 
         /// <summary>
@@ -630,6 +612,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var parameterRow = this.SelectedThing as ParameterOrOverrideBaseRowViewModel;
+
             if (parameterRow == null)
             {
                 return;
@@ -638,16 +621,17 @@ namespace CDP4EngineeringModel.ViewModels
             this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
 
             var parameter = parameterRow.Thing as Parameter;
+
             if (parameter != null)
             {
                 if (tuple != null)
                 {
                     this.CanCreateOverride = this.SelectedThing.ContainerViewModel is ElementUsageRowViewModel
-                                             && ((parameter.Owner == tuple.Item1) || parameter.AllowDifferentOwnerOfOverride)
+                                             && (parameter.Owner == tuple.Item1 || parameter.AllowDifferentOwnerOfOverride)
                                              && this.PermissionService.CanWrite(ClassKind.ParameterOverride, this.SelectedThing.ContainerViewModel.Thing);
 
                     this.CanCreateSubscription = this.SelectedThing.ContainerViewModel is ElementDefinitionRowViewModel
-                                                 && (parameter.Owner != tuple.Item1)
+                                                 && parameter.Owner != tuple.Item1
                                                  && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.SelectedThing.Thing);
                 }
 
@@ -657,7 +641,7 @@ namespace CDP4EngineeringModel.ViewModels
             if (tuple != null)
             {
                 this.CanCreateSubscription = this.SelectedThing.ContainerViewModel is ElementUsageRowViewModel
-                                             && (((ParameterOverride)parameterRow.Thing).Owner != tuple.Item1)
+                                             && ((ParameterOverride)parameterRow.Thing).Owner != tuple.Item1
                                              && this.PermissionService.CanWrite(ClassKind.ParameterSubscription, this.SelectedThing.Thing);
             }
         }
@@ -678,17 +662,13 @@ namespace CDP4EngineeringModel.ViewModels
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Subscriptions", "", this.BatchCreateSubscriptionCommand, MenuItemKind.Create, ClassKind.NotThing));
             this.ContextMenu.Add(new ContextMenuItemViewModel("Delete Multiple Subscriptions", "", this.BatchDeleteSubscriptionCommand, MenuItemKind.Delete, ClassKind.NotThing));
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Deviation", "", this.CreateRequestForDeviationCommand, MenuItemKind.Create, ClassKind.RequestForDeviation));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Request For Waiver", "", this.CreateRequestForWaiverCommand, MenuItemKind.Create, ClassKind.RequestForWaiver));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
-
             if (this.SelectedThing is IHaveModelCode)
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Copy Model Code to Clipboard", "", this.CopyModelCodeToClipboardCommand, MenuItemKind.None, ClassKind.NotThing));
             }
 
             var elementDefRow = this.SelectedThing as ElementDefinitionRowViewModel;
+
             if (elementDefRow != null)
             {
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Create an Element Definition", "", this.CreateElementDefinition, MenuItemKind.Create, ClassKind.ElementDefinition));
@@ -710,6 +690,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var usageRow = this.SelectedThing as ElementUsageRowViewModel;
+
             if (usageRow != null)
             {
                 // clear generic menu
@@ -732,17 +713,12 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Add(editMenu);
                 this.ContextMenu.Add(inspectMenu);
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Delete", "", this.DeleteCommand, MenuItemKind.Delete, ClassKind.ElementUsage));
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Change Request", "", this.CreateChangeRequestCommand, MenuItemKind.Create, ClassKind.ChangeRequest));
-                this.ContextMenu.Add(new ContextMenuItemViewModel("Review Item Discrepancy", "", this.CreateReviewItemDiscrepancyCommand, MenuItemKind.Create, ClassKind.ReviewItemDiscrepancy));
 
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Navigate to Element Definition", "", this.ChangeFocusCommand, MenuItemKind.Navigate, ClassKind.ElementDefinition));
 
                 if (this.SelectedThing.ContainedRows.Count > 0)
                 {
-                    this.ContextMenu.Add(
-                        this.SelectedThing.IsExpanded ?
-                        new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) :
-                        new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+                    this.ContextMenu.Add(this.SelectedThing.IsExpanded ? new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) : new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
                 }
 
                 if (this.SelectedThing is IHaveModelCode)
@@ -754,6 +730,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var parameterGroupRow = this.SelectedThing as ParameterGroupRowViewModel;
+
             if (parameterGroupRow != null)
             {
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
@@ -761,6 +738,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var parameterRow = this.SelectedThing as ParameterRowViewModel;
+
             if (parameterRow != null)
             {
                 if (parameterRow.ContainerViewModel is ElementUsageRowViewModel)
@@ -776,6 +754,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var overrideRow = this.SelectedThing as ParameterOverrideRowViewModel;
+
             if (overrideRow != null)
             {
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Subscribe to this Override", "", this.CreateSubscriptionCommand, MenuItemKind.Create, ClassKind.ParameterSubscription));
@@ -811,6 +790,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             var usage = (ElementUsage)this.SelectedThing.Thing;
             var definitionRow = this.ElementDefinitionRowViewModels.SingleOrDefault(x => x.Thing == usage.ElementDefinition);
+
             if (definitionRow != null)
             {
                 this.SelectedThing = definitionRow;
@@ -1003,6 +983,7 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var elementDef in this.ElementDefinitionRowViewModels)
             {
                 elementDef.Dispose();
@@ -1085,8 +1066,8 @@ namespace CDP4EngineeringModel.ViewModels
                 topElementDefinitionNew.IsTopElement = true;
 
                 // clear old top element.
-                if ((topElementDefinitionOld != null) &&
-                    (topElementDefinitionOld != topElementDefinitionNew))
+                if (topElementDefinitionOld != null &&
+                    topElementDefinitionOld != topElementDefinitionNew)
                 {
                     ((ElementDefinitionRowViewModel)topElementDefinitionOld).IsTopElement = false;
                 }
@@ -1099,11 +1080,11 @@ namespace CDP4EngineeringModel.ViewModels
         protected virtual void ExecuteHighlightElementUsagesCommand()
         {
             // clear all highlights
-            CDPMessageBus.Current.SendMessage(new CancelHighlightEvent());
+            this.Session.CDPMessageBus.SendMessage(new CancelHighlightEvent());
 
             // highlight the selected thing
-            CDPMessageBus.Current.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), this.SelectedThing.Thing);
-            CDPMessageBus.Current.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), null);
+            this.Session.CDPMessageBus.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), this.SelectedThing.Thing);
+            this.Session.CDPMessageBus.SendMessage(new ElementUsageHighlightEvent((ElementDefinition)this.SelectedThing.Thing), null);
         }
 
         /// <summary>
@@ -1132,6 +1113,7 @@ namespace CDP4EngineeringModel.ViewModels
             if (tuple != null)
             {
                 var rows = new List<ElementDefinitionRowViewModel>();
+
                 foreach (var elementDef in elementDefs)
                 {
                     rows.Add(new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this, this.obfuscationService));
@@ -1149,6 +1131,7 @@ namespace CDP4EngineeringModel.ViewModels
         private void RemoveElementDefinitionRow(ElementDefinition elementDef)
         {
             var row = this.ElementDefinitionRowViewModels.SingleOrDefault(x => x.Thing == elementDef);
+
             if (row != null)
             {
                 this.ElementDefinitionRowViewModels.RemoveAndDispose(row);
@@ -1170,7 +1153,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Executes the <see cref="CreateSubscriptionCommand"/>
         /// </summary>
-        private async Task ExecuteCreateSubscriptionCommand()
+        private async void ExecuteCreateSubscriptionCommand()
         {
             if (this.SelectedThing == null)
             {
@@ -1178,6 +1161,7 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var parameterOrOverride = this.SelectedThing.Thing as ParameterOrOverrideBase;
+
             if (parameterOrOverride == null)
             {
                 return;
@@ -1208,7 +1192,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Execute the <see cref="CreateCommand"/>
         /// </summary>
-        private async Task ExecuteCreateParameterOverride()
+        private async void ExecuteCreateParameterOverride()
         {
             if (this.SelectedThing == null)
             {
@@ -1216,12 +1200,14 @@ namespace CDP4EngineeringModel.ViewModels
             }
 
             var elementUsage = this.SelectedThing.ContainerViewModel.Thing as ElementUsage;
+
             if (elementUsage == null)
             {
                 return;
             }
 
             var parameter = this.SelectedThing.Thing as Parameter;
+
             if (parameter == null)
             {
                 return;
@@ -1253,12 +1239,12 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Execute the <see cref="CopyElementDefinitionCommand"/>
         /// </summary>
-        private async Task ExecuteCopyElementDefinition()
+        private async void ExecuteCopyElementDefinition()
         {
             var elementDef = this.SelectedThing.Thing as ElementDefinition;
             var copyUsage = true;
 
-            if ((elementDef != null) && elementDef.ContainedElement.Any())
+            if (elementDef != null && elementDef.ContainedElement.Any())
             {
                 var yesNoDialogViewModel = new YesNoDialogViewModel("Confirmation", "Would you like to copy the Element Usages?");
                 var result = this.DialogNavigationService.NavigateModal(yesNoDialogViewModel);
@@ -1288,7 +1274,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>
         /// an awaitable <see cref="Task"/>
         /// </returns>
-        private async Task ExecuteBatchCreateSubscriptionCommand()
+        private async void ExecuteBatchCreateSubscriptionCommand()
         {
             var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
             var model = (EngineeringModel)this.Thing.Container;
@@ -1299,6 +1285,9 @@ namespace CDP4EngineeringModel.ViewModels
             var allowedParameterTypes = requiredRls.SelectMany(rdl => rdl.ParameterType);
 
             var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(allowedParameterTypes, allowedCategories, allowedDomainOfExpertises);
+
+            categoryDomainParameterTypeSelectorDialogViewModel.DialogTitle = "Create Parameter Subscriptions";
+
             var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
@@ -1328,14 +1317,15 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>
         /// an awaitable <see cref="Task"/>
         /// </returns>
-        private async Task ExecuteBatchDeleteSubscriptionCommand()
+        private async void ExecuteBatchDeleteSubscriptionCommand()
         {
-            var owner = Session.QuerySelectedDomainOfExpertise(this.Thing);
-            var filteredParameterTypes = this.Thing.Element.SelectMany(e => e.Parameter)
-                                                           .Where(p => p.Owner != owner && p.ParameterSubscription.Any())
-                                                           .Select(p => p.ParameterType).Distinct();
+            var owner = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
 
-            if(!filteredParameterTypes.Any())
+            var filteredParameterTypes = this.Thing.Element.SelectMany(e => e.Parameter)
+                .Where(p => p.Owner != owner && p.ParameterSubscription.Any())
+                .Select(p => p.ParameterType).Distinct();
+
+            if (!filteredParameterTypes.Any())
             {
                 this.messageBoxService.Show("No parameters have been subscribed to", "Delete Subscriptions", MessageBoxButton.OK, MessageBoxImage.Information);
                 return;
@@ -1343,11 +1333,15 @@ namespace CDP4EngineeringModel.ViewModels
 
             var subscribedElements = this.Thing.Element.Where(e => e.Parameter.Any(p => p.Owner != owner && p.ParameterSubscription.Any()));
             var filteredCategories = subscribedElements.SelectMany(e => e.Category).Distinct();
+
             var filteredDomainOfExpertises = this.Thing.Element.SelectMany(e => e.Parameter)
-                                               .Where(p => p.Owner != owner && p.ParameterSubscription.Any())
-                                               .Select(p => p.Owner).Distinct();
+                .Where(p => p.Owner != owner && p.ParameterSubscription.Any())
+                .Select(p => p.Owner).Distinct();
 
             var categoryDomainParameterTypeSelectorDialogViewModel = new CategoryDomainParameterTypeSelectorDialogViewModel(filteredParameterTypes, filteredCategories, filteredDomainOfExpertises);
+
+            categoryDomainParameterTypeSelectorDialogViewModel.DialogTitle = "Remove Parameter Subscriptions";
+
             var result = this.DialogNavigationService.NavigateModal(categoryDomainParameterTypeSelectorDialogViewModel) as CategoryDomainParameterTypeSelectorResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
@@ -1359,19 +1353,21 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 this.IsBusy = true;
 
-                Func<IEnumerable<Parameter>, bool> confirmationCallBack = p =>                                                
-                                                    this.messageBoxService.Show($"{p.Count()} Parameter Subscriptions will be deleted. Are you sure?",
-                                                                                "Delete Subscriptions",
-                                                                                MessageBoxButton.OKCancel,
-                                                                                MessageBoxImage.Information) == MessageBoxResult.OK;
-                                                
-                await this.parameterSubscriptionBatchService.Delete(this.Session,
-                                                                    this.Thing,
-                                                                    result.IsUncategorizedIncluded,
-                                                                    result.Categories,
-                                                                    result.DomainOfExpertises,
-                                                                    result.ParameterTypes,
-                                                                    confirmationCallBack);
+                Func<IEnumerable<Parameter>, bool> confirmationCallBack = p =>
+                    this.messageBoxService.Show(
+                        $"{p.Count()} Parameter Subscriptions will be deleted. Are you sure?",
+                        "Delete Subscriptions",
+                        MessageBoxButton.OKCancel,
+                        MessageBoxImage.Information) == MessageBoxResult.OK;
+
+                await this.parameterSubscriptionBatchService.Delete(
+                    this.Session,
+                    this.Thing,
+                    result.IsUncategorizedIncluded,
+                    result.Categories,
+                    result.DomainOfExpertises,
+                    result.ParameterTypes,
+                    confirmationCallBack);
             }
             catch (Exception exception)
             {
@@ -1383,7 +1379,6 @@ namespace CDP4EngineeringModel.ViewModels
             }
         }
 
-
         /// <summary>
         /// Executes the <see cref="SetAsTopElementDefinitionCommand"/>
         /// </summary>
@@ -1393,6 +1388,7 @@ namespace CDP4EngineeringModel.ViewModels
         private async Task ExecuteSetAsTopElementDefinitionCommandAsync()
         {
             var elementDefRow = this.SelectedThing as ElementDefinitionRowViewModel;
+
             if (elementDefRow?.Thing != null && (this.Thing.TopElement == null || this.Thing.TopElement != elementDefRow.Thing))
             {
                 var iterationClone = this.Thing.Clone(false);
@@ -1436,7 +1432,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// <returns>
         /// an awaitable <see cref="Task"/>
         /// </returns>
-        private async Task ExecuteChangeOwnershipCommand()
+        private async void ExecuteChangeOwnershipCommand()
         {
             var model = (EngineeringModel)this.Thing.Container;
             var allowedDomainOfExpertises = model.EngineeringModelSetup.ActiveDomain;
@@ -1475,22 +1471,25 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
-            var engineeringModelSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var engineeringModelSetupSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.CurrentEngineeringModelSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(engineeringModelSetupSubscription);
 
-            var domainOfExpertiseSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber) && (objectChange.ChangedThing.Cache == this.Session.Assembler.Cache))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var domainOfExpertiseSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(DomainOfExpertise))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(domainOfExpertiseSubscription);
 
-            var iterationSetupSubscription = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
-                    .Where(objectChange => (objectChange.EventKind == EventKind.Updated) && (objectChange.ChangedThing.RevisionNumber > this.RevisionNumber))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateProperties());
+            var iterationSetupSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.IterationSetup)
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
             this.Disposables.Add(iterationSetupSubscription);
         }
 
@@ -1516,6 +1515,7 @@ namespace CDP4EngineeringModel.ViewModels
             var group = new ParameterGroup();
 
             var containingParameterGroup = this.SelectedThing.Thing as ParameterGroup;
+
             if (containingParameterGroup != null)
             {
                 containerElementDefinition = containingParameterGroup.GetContainerOfType<ElementDefinition>();

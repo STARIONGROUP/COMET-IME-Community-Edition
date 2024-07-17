@@ -1,27 +1,52 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RelationalExpressionDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="RelationalExpressionDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Exceptions;
     using CDP4Common.Helpers;
-
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
     using CDP4Dal;
+    using CDP4Dal.Operations;
+
+    using CommonServiceLocator;
+
+    using DynamicData;
+
     using ReactiveUI;
 
     /// <summary>
@@ -68,27 +93,25 @@ namespace CDP4Requirements.ViewModels
         /// <param name="chainOfContainers">
         /// The optional chain of containers that contains the <paramref name="container"/> argument
         /// </param>
-        public RelationalExpressionDialogViewModel(RelationalExpression relationalExpression, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null) 
+        public RelationalExpressionDialogViewModel(RelationalExpression relationalExpression, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(relationalExpression, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
             this.WhenAnyValue(vm => vm.SelectedScale).Subscribe(_ => this.UpdateOkCanExecute());
-            this.Value.ChangeTrackingEnabled = true;
-            this.Value.ItemChanged.Subscribe(_ => this.UpdateOkCanExecute());
-            this.WhenAnyValue(vm => vm.SelectedParameterType).Subscribe(_ =>
-            {
-                this.PopulatePossibleScale();
-                this.PopulateValue();
-                this.UpdateOkCanExecute();
-            });
+            this.Value.ItemChanged.WhenAnyPropertyChanged().Subscribe(_ => this.UpdateOkCanExecute());
+
+            this.WhenAnyValue(vm => vm.SelectedParameterType).Subscribe(
+                _ =>
+                {
+                    this.PopulatePossibleScale();
+                    this.PopulateValue();
+                    this.UpdateOkCanExecute();
+                });
         }
 
         /// <summary>
         /// Gets a value indicating whether the ParameterType property is ReadOnly.
         /// </summary>
-        public bool IsParameterTypeReadOnly
-        {
-            get { return this.IsReadOnly || this.dialogKind == ThingDialogKind.Update;  }
-        }
+        public bool IsParameterTypeReadOnly => this.IsReadOnly || this.dialogKind == ThingDialogKind.Update;
 
         /// <summary>
         /// Populates the <see cref="PossibleParameterType"/> property
@@ -106,6 +129,7 @@ namespace CDP4Requirements.ViewModels
             {
                 var model = this.ChainOfContainer.First().TopContainer as EngineeringModel;
                 var containerRdl = model.EngineeringModelSetup.RequiredRdl.Single();
+
                 if (containerRdl != null)
                 {
                     var allTypes = new List<ParameterType>(containerRdl.ParameterType);
@@ -128,6 +152,7 @@ namespace CDP4Requirements.ViewModels
             base.PopulatePossibleScale();
 
             var quantityKind = this.SelectedParameterType as QuantityKind;
+
             if (quantityKind == null)
             {
                 return;
@@ -156,9 +181,10 @@ namespace CDP4Requirements.ViewModels
             }
 
             this.Value.Clear();
+
             for (var i = 0; i < this.SelectedParameterType.NumberOfValues; i++)
             {
-                var thingValue = (this.Thing.Value.Count() > i) ? this.Thing.Value[i] : string.Empty;
+                var thingValue = this.Thing.Value.Count() > i ? this.Thing.Value[i] : string.Empty;
                 this.Value.Add(new RelationalExpressionValueRowViewModel(this.SelectedParameterType) { Index = i, Value = thingValue });
             }
         }

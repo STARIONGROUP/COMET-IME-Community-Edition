@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CategoryDomainParameterTypeSelectorDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CategoryDomainParameterTypeSelectorDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2020 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Ahmed Abulwafa Ahmed
 //
 //    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -28,12 +28,16 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
 
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
 
     using ReactiveUI;
+
+    using ReactiveCommand = ReactiveUI.ReactiveCommand;
 
     /// <summary>
     /// The purpose of the <see cref="CategoryDomainParameterTypeSelectorDialogViewModel"/> is to provide selection criteria
@@ -61,6 +65,11 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// Backing field for <see cref="IsUncategorizedIncluded"/> property
         /// </summary>
         private bool isUncategorizedIncluded;
+
+        /// <summary>
+        /// Backing field for <see cref="DialogTitle"/> property
+        /// </summary>
+        private string dialogTitle;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CategoryDomainParameterTypeSelectorDialogViewModel"/> class
@@ -96,7 +105,16 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// </summary>
 
         public IEnumerable<ParameterType> PossibleParameterTypes { get; private set; }
-        
+
+        /// <summary>
+        /// Gets or sets the Title of the dialog window
+        /// </summary>
+        public string DialogTitle
+        {
+            get => this.dialogTitle;
+            set => this.RaiseAndSetIfChanged(ref this.dialogTitle, value);
+        }
+
         /// <summary>
         /// Gets or sets the list of selected <see cref="Category"/>s
         /// </summary>
@@ -137,12 +155,12 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
         /// <summary>
         /// Gets the Ok Command
         /// </summary>
-        public ReactiveCommand<object> OkCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> OkCommand { get; private set; }
 
         /// <summary>
         /// Gets the Cancel Command
         /// </summary>
-        public ReactiveCommand<object> CancelCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
         /// The initialize reactive commands.
@@ -155,11 +173,9 @@ namespace CDP4EngineeringModel.ViewModels.Dialogs
                 (category, owner, parameterType) => 
                     category != 0 && owner != 0 && parameterType != 0);
 
-            this.OkCommand = ReactiveCommand.Create(canOk);
-            this.OkCommand.Subscribe(_ => this.ExecuteOk());
+            this.OkCommand = ReactiveCommand.Create(this.ExecuteOk, canOk);
 
-            this.CancelCommand = ReactiveCommand.Create();
-            this.CancelCommand.Subscribe(_ => this.ExecuteCancel());
+            this.CancelCommand = ReactiveCommand.Create(this.ExecuteCancel);
         }
 
         /// <summary>

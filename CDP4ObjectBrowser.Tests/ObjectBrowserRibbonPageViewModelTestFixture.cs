@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ObjectBrowserRibbonPageViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="ObjectBrowserRibbonPageViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,6 +27,8 @@ namespace CDP4ObjectBrowser.Tests
 {
     using System;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -42,7 +44,7 @@ namespace CDP4ObjectBrowser.Tests
 
     using CDP4ObjectBrowser.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -63,13 +65,15 @@ namespace CDP4ObjectBrowser.Tests
         private Uri uri;
         private Person person;
         private SiteDirectory siteDirectory;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.messageBus = new CDPMessageBus();
+            this.uri = new Uri("https://www.stariongroup.eu");
 
             this.person = new Person { GivenName = "John", Surname = "Doe" };
             this.siteDirectory = new SiteDirectory();
@@ -79,6 +83,7 @@ namespace CDP4ObjectBrowser.Tests
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.navigationService = new Mock<IPanelNavigationService>();
             this.thingNavigationService = new Mock<IThingDialogNavigationService>();
@@ -102,31 +107,31 @@ namespace CDP4ObjectBrowser.Tests
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
-        public void VerifyThatCommandWorks()
+        public async Task VerifyThatCommandWorks()
         {
-            var vm = new ObjectBrowserRibbonPageViewModel();
+            var vm = new ObjectBrowserRibbonPageViewModel(this.messageBus);
             Assert.IsEmpty(vm.OpenSessions);
 
-            CDPMessageBus.Current.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
 
             Assert.AreEqual(1, vm.OpenSessions.Count);
 
-            vm.OpenSingleBrowserCommand.Execute(null);
+            await vm.OpenSingleBrowserCommand.Execute();
 
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(1));
 
-            vm.OpenSingleBrowserCommand.Execute(null);
+            await vm.OpenSingleBrowserCommand.Execute();
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()), Times.Exactly(2));
         }
 
         [Test]
         public void Verify_That_RibbonViewModel_Can_Be_Constructed()
         {
-            var vm = new ObjectBrowserRibbonPageViewModel();
+            var vm = new ObjectBrowserRibbonPageViewModel(this.messageBus);
             Assert.IsNotNull(vm);
         }
 
@@ -139,6 +144,7 @@ namespace CDP4ObjectBrowser.Tests
                 this.navigationService.Object,
                 this.dialogNavigationService.Object,
                 this.pluginSettingService.Object);
+
             Assert.IsInstanceOf<ObjectBrowserViewModel>(viewModel);
         }
     }

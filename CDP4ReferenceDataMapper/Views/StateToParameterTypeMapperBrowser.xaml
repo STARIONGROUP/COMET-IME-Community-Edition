@@ -9,12 +9,12 @@
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
-             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
              xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
              xmlns:behaviors="clr-namespace:CDP4ReferenceDataMapper.Behaviors"
              xmlns:converters1="clr-namespace:CDP4ReferenceDataMapper.Converters"
              xmlns:dataTemplateSelectors="clr-namespace:CDP4ReferenceDataMapper.DataTemplateSelectors"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
              d:DesignHeight="650"
              d:DesignWidth="400"
              dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
@@ -269,10 +269,10 @@
                                                 MinHeight ="150"
                                                 MaxHeight ="150"
                                                 DisplayMember="Name">
-                            <i:Interaction.Behaviors>
+                            <b:Interaction.Behaviors>
                                 <dragDrop:FrameworkElementDragBehavior />
                                 <dragDrop:FrameworkElementDropBehavior />
-                            </i:Interaction.Behaviors>
+                            </b:Interaction.Behaviors>
                         </dxe:ListBoxEdit>
                         <Button Grid.Column="1"
                                 Width="25"

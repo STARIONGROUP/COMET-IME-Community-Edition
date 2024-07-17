@@ -17,6 +17,9 @@
         <ResourceDictionary>
             <converters:ReactiveClassKindToObjectListConverter x:Key="ReactiveClassKindToObjectListConverter" />
             <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </dx:DXWindow.Resources>
     <lc:LayoutControl Margin="5"
@@ -71,7 +74,7 @@
                                      ItemsSource="{Binding PossibleSuperCategories}"
                                      SelectionMode="Multiple">
                         <dxe:ListBoxEdit.StyleSettings>
-                            <dxe:CheckedListBoxEditStyleSettings />
+                            <dxe:CheckedListBoxEditStyleSettings ItemContainerStyle="{StaticResource ListBoxEditItemStyleDeprecated}" />
                         </dxe:ListBoxEdit.StyleSettings>
                     </dxe:ListBoxEdit>
                 </lc:LayoutItem>

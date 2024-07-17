@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FiniteStateBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="FiniteStateBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Jaime Bernar
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-// 
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-// 
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,25 +29,34 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
+
     using CDP4EngineeringModel.Services;
     using CDP4EngineeringModel.ViewModels;
-    using Microsoft.Practices.ServiceLocation;
-    using Moq;    
+
+    using CommonServiceLocator;
+
+    using Moq;
+
     using NUnit.Framework;
 
     /// <summary>
@@ -68,6 +77,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         private Mock<IParameterActualFiniteStateListApplicationBatchService> parameterActualFiniteStateListApplicationBatchService;
         private readonly Uri uri = new Uri("http://test.com");
         private Assembler assembler;
+        private CDPMessageBus messageBus;
 
         private SiteDirectory sitedir;
         private EngineeringModelSetup modelsetup;
@@ -93,15 +103,15 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         private PossibleFiniteStateList possibleFiniteStateList2;
         private ActualFiniteStateList actualFiniteStateList;
 
-
         [SetUp]
         public void Setup()
         {
-            this.rev = typeof (Thing).GetProperty("RevisionNumber");
+            this.rev = typeof(Thing).GetProperty("RevisionNumber");
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.serviceLocator = new Mock<IServiceLocator>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.permissionService = new Mock<IPermissionService>();
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
@@ -111,6 +121,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.messageBoxService = new Mock<IMessageBoxService>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>())
                 .Returns(this.messageBoxService.Object);
 
@@ -134,6 +145,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 
@@ -143,7 +155,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -167,7 +179,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.iteration.PossibleFiniteStateList.Add(possibleList);
 
             this.rev.SetValue(this.iteration, 1);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
             var possibleListRow = viewmodel.FiniteStateList.FirstOrDefault();
             Assert.IsNotNull(possibleListRow);
@@ -176,13 +188,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             this.iteration.PossibleFiniteStateList.Clear();
             this.rev.SetValue(this.iteration, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
             Assert.IsNotEmpty(viewmodel.FiniteStateList);
 
             var actualList = new ActualFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
             this.rev.SetValue(this.iteration, 3);
             this.iteration.ActualFiniteStateList.Add(actualList);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
             var actualListRow = viewmodel.FiniteStateList.Last();
             Assert.IsNotNull(actualListRow);
@@ -192,7 +204,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             this.iteration.PossibleFiniteStateList.Add(possibleList);
             this.iteration.ActualFiniteStateList.Remove(actualList);
             this.rev.SetValue(this.iteration, 4);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
             Assert.AreEqual(2, viewmodel.FiniteStateList.Count);
             Assert.AreSame(possibleListRow, viewmodel.FiniteStateList.First());
@@ -203,7 +215,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         {
             var testDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain" };
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(testDomain);
-            
+
             var vm = new FiniteStateBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null);
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
@@ -215,7 +227,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         }
 
         [Test]
-        public void VerifyThatContextMenuPopulated()
+        public async Task VerifyThatContextMenuPopulated()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -256,7 +268,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             Assert.AreEqual(2, viewmodel.ContextMenu.Count);
 
             var menuKindActual = viewmodel.ContextMenu[1].thingKind;
-            Assert.True (menuKindActual.ToString() == "ActualFiniteStateList");
+            Assert.True(menuKindActual.ToString() == "ActualFiniteStateList");
 
             // posible state row selected
             var pslFolder = viewmodel.FiniteStateList.First();
@@ -268,13 +280,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             // execute set default
             Assert.IsTrue(viewmodel.CanSetAsDefault);
-            viewmodel.SetDefaultStateCommand.Execute(null);
+            await viewmodel.SetDefaultStateCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
 
         [Test]
-        public void VerifyThatCanSetDefaultCommandWorks()
+        public async Task VerifyThatCanSetDefaultCommandWorks()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -299,7 +311,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
             Assert.IsFalse(viewmodel.CanSetAsDefault);
-            viewmodel.SetDefaultStateCommand.Execute(null);
+            await viewmodel.SetDefaultStateCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
 
             // posible state row selected
@@ -310,7 +322,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             viewmodel.PopulateContextMenu();
 
             Assert.IsTrue(viewmodel.CanSetAsDefault);
-            viewmodel.SetDefaultStateCommand.Execute(null);
+            await viewmodel.SetDefaultStateCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
         }
@@ -325,7 +337,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         }
 
         [Test]
-        public void Verify_that_ExecuteBatchUpdateParameterCommand_works_as_expected()
+        public async Task Verify_that_ExecuteBatchUpdateParameterCommand_works_as_expected()
         {
             var possibleList = new PossibleFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
             var ps = new PossibleFiniteState(Guid.NewGuid(), this.cache, this.uri);
@@ -348,7 +360,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             vm.SelectedThing = new ActualFiniteStateListRowViewModel(actualList, this.session.Object, null);
 
-            vm.BatchUpdateParameterCommand.Execute(null);
+            await vm.BatchUpdateParameterCommand.Execute();
 
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Exactly(1));
 
@@ -357,7 +369,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
         [Test]
         public void AssertThatDeleteCommandWorks()
-        {            
+        {
             var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
             var rowViewModelBase = new Mock<IRowViewModelBase<Thing>>();
             rowViewModelBase.SetupGet(x => x.ContainedRows).Returns(new CDP4Composition.Mvvm.Types.DisposableReactiveList<IRowViewModelBase<Thing>>());
@@ -365,7 +377,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             browser.IsDeleteCommandOverrideAllowed = true;
             browser.SelectedThing = rowViewModelBase.Object;
 
-            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
         }
 
@@ -388,6 +400,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
 
             this.actualFiniteStateList = new ActualFiniteStateList(Guid.NewGuid(), this.cache, this.uri);
             this.actualFiniteStateList.PossibleFiniteStateList.Add(this.possibleFiniteStateList1);
+
             this.actualFiniteStateList.ActualState.Add(new ActualFiniteState(Guid.NewGuid(), this.cache, this.uri)
             {
                 PossibleState = new List<PossibleFiniteState> { this.possibleStateA },
@@ -431,36 +444,38 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [Test]
         public void AssertThatDeleteCommandChecksForActualFiniteStateListDependencies()
         {
-            InitializeStateListsImportandData();
+            this.InitializeStateListsImportandData();
             var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
             var rowViewModelBase = new ActualFiniteStateListRowViewModel(this.actualFiniteStateList, this.session.Object, browser);
 
             browser.IsDeleteCommandOverrideAllowed = false;
             browser.SelectedThing = rowViewModelBase;
 
-            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
             this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
         }
 
         [Test]
         public void AssertThatDeleteCommandChecksForPossibleFiniteStateList1Dependencies()
         {
-            InitializeStateListsImportandData();
+            this.InitializeStateListsImportandData();
+
             //Try to delete a list that have dependencies
             var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
-            var rowViewModelBase = new PossibleFiniteStateListRowViewModel(this.possibleFiniteStateList1,this.session.Object,browser);
+            var rowViewModelBase = new PossibleFiniteStateListRowViewModel(this.possibleFiniteStateList1, this.session.Object, browser);
 
             browser.IsDeleteCommandOverrideAllowed = false;
             browser.SelectedThing = rowViewModelBase;
 
-            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
             this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
         }
 
         [Test]
         public void AssertThatDeleteCommandChecksForPossibleFiniteStateList2Dependencies()
         {
-            InitializeStateListsImportandData();
+            this.InitializeStateListsImportandData();
+
             //Try to delete a list that don't have dependencies
             var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
             var rowViewModelBase = new PossibleFiniteStateListRowViewModel(this.possibleFiniteStateList2, this.session.Object, browser);
@@ -468,35 +483,35 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             browser.IsDeleteCommandOverrideAllowed = false;
             browser.SelectedThing = rowViewModelBase;
 
-            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
             this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Never);
         }
 
         [Test]
         public void AssertThatDeleteCommandChecksForPossibleFiniteStateDependencies()
         {
-            InitializeStateListsImportandData();
+            this.InitializeStateListsImportandData();
             var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
             var rowViewModelBase = new PossibleFiniteStateRowViewModel(this.possibleStateA, this.session.Object, browser);
 
             browser.IsDeleteCommandOverrideAllowed = false;
             browser.SelectedThing = rowViewModelBase;
 
-            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
             this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
         }
 
         [Test]
         public void AssertThatDeleteCommandShowDialogTextIsCorrect1()
         {
-            InitializeStateListsImportandData();
+            this.InitializeStateListsImportandData();
             var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
             var rowViewModelBase = new ActualFiniteStateListRowViewModel(this.actualFiniteStateList, this.session.Object, browser);
 
             browser.IsDeleteCommandOverrideAllowed = false;
             browser.SelectedThing = rowViewModelBase;
 
-            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
 
             var textToContain = "3 parameter(s) will be affected by this deletion";
             this.messageBoxService.Verify(x => x.Show(It.Is<string>(s => s.Contains(textToContain)), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
@@ -505,7 +520,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         [Test]
         public void AssertThatDeleteCommandShowDialogTextIsCorrect2()
         {
-            InitializeStateListsImportandData();
+            this.InitializeStateListsImportandData();
+
             //Try to delete a list that have dependencies
             var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
             var rowViewModelBase = new PossibleFiniteStateListRowViewModel(this.possibleFiniteStateList1, this.session.Object, browser);
@@ -513,23 +529,23 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
             browser.IsDeleteCommandOverrideAllowed = false;
             browser.SelectedThing = rowViewModelBase;
 
-            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
 
             var textToContain = "3 parameter(s) will be affected by this deletion";
-            this.messageBoxService.Verify(x => x.Show(It.Is<string>(s=>s.Contains(textToContain)), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
+            this.messageBoxService.Verify(x => x.Show(It.Is<string>(s => s.Contains(textToContain)), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
         }
 
         [Test]
         public void AssertThatDeleteCommandShowDialogTextIsCorrect3()
         {
-            InitializeStateListsImportandData();
+            this.InitializeStateListsImportandData();
             var browser = new FiniteStateBrowserDeleteCommandTestClass(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null, null);
             var rowViewModelBase = new PossibleFiniteStateRowViewModel(this.possibleStateA, this.session.Object, browser);
 
             browser.IsDeleteCommandOverrideAllowed = false;
             browser.SelectedThing = rowViewModelBase;
 
-            Assert.DoesNotThrow(() => browser.DeleteCommand.Execute(null));
+            Assert.DoesNotThrowAsync(async () => await browser.DeleteCommand.Execute());
 
             var textToContain = "3 parameter(s) will be affected by this deletion";
             this.messageBoxService.Verify(x => x.Show(It.Is<string>(s => s.Contains(textToContain)), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
@@ -538,9 +554,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.FiniteStateBrowser
         internal class FiniteStateBrowserDeleteCommandTestClass : FiniteStateBrowserViewModel
         {
             internal FiniteStateBrowserDeleteCommandTestClass(Iteration iteration, ISession session, IThingDialogNavigationService dialogNav, IPanelNavigationService panelNav, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IParameterActualFiniteStateListApplicationBatchService parameterActualFiniteStateListApplicationBatchService)
-            : base(iteration, session, dialogNav, panelNav, dialogNavigationService, pluginSettingsService, parameterActualFiniteStateListApplicationBatchService)
+                : base(iteration, session, dialogNav, panelNav, dialogNavigationService, pluginSettingsService, parameterActualFiniteStateListApplicationBatchService)
             {
-
             }
 
             public bool? IsDeleteCommandOverrideAllowed { get; set; }

@@ -1,12 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RequirementsBrowser.xaml.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="RequirementsBrowser.xaml.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2019 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -16,7 +17,7 @@ namespace CDP4Requirements.Views
     /// Interaction logic for RequirementsBrowser.xaml
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class RequirementsBrowser : IPanelView
+    public partial class RequirementsBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// The NLog logger

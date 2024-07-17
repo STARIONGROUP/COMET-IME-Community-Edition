@@ -11,7 +11,6 @@
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
-             xmlns:system="clr-namespace:System;assembly=mscorlib"
              d:DesignHeight="475"
              d:DesignWidth="395"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"

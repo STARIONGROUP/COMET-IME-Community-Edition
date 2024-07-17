@@ -1,37 +1,42 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="NaturalLanguageRibbonViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="NaturalLanguageRibbonViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Tests.ViewModels
 {
+    using System;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.PluginSettingService;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -39,16 +44,11 @@ namespace CDP4SiteDirectory.Tests.ViewModels
 
     using CDP4SiteDirectory.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
     using NUnit.Framework;
-
-    using System;
-
-    using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.PluginSettingService;
 
     using ReactiveUI;
 
@@ -67,6 +67,7 @@ namespace CDP4SiteDirectory.Tests.ViewModels
         private Mock<IPanelViewModel> panelViewModel;
         private Assembler assembler;
         private Mock<IPermissionService> permissionService;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
@@ -77,6 +78,7 @@ namespace CDP4SiteDirectory.Tests.ViewModels
             this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.uri = new Uri("http://www.reahroup.com");
 
@@ -106,6 +108,7 @@ namespace CDP4SiteDirectory.Tests.ViewModels
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             ServiceLocator.SetLocatorProvider(new ServiceLocatorProvider(() => this.serviceLocator.Object));
 
@@ -120,15 +123,15 @@ namespace CDP4SiteDirectory.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatPropertiesArePopulated()
         {
-            var viewmodel = new NaturalLanguageRibbonViewModel();
+            var viewmodel = new NaturalLanguageRibbonViewModel(this.messageBus);
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
 
             Assert.AreEqual(1, viewmodel.OpenSessions.Count);
         }
@@ -136,31 +139,31 @@ namespace CDP4SiteDirectory.Tests.ViewModels
         [Test]
         public void VerifyThatSessionCloseRemoveFromList()
         {
-            var viewmodel = new NaturalLanguageRibbonViewModel();
+            var viewmodel = new NaturalLanguageRibbonViewModel(this.messageBus);
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             var sessionClose = new SessionEvent(this.session.Object, SessionStatus.Closed);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
-            CDPMessageBus.Current.SendMessage(sessionClose);
+            this.messageBus.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionClose);
 
             Assert.AreEqual(0, viewmodel.OpenSessions.Count);
         }
 
         [Test]
-        public void VerifyThatOpenSinglePanelCommandWorks()
+        public async Task VerifyThatOpenSinglePanelCommandWorks()
         {
-            var viewmodel = new NaturalLanguageRibbonViewModel();
+            var viewmodel = new NaturalLanguageRibbonViewModel(this.messageBus);
             var sessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
-            CDPMessageBus.Current.SendMessage(sessionEvent);
+            this.messageBus.SendMessage(sessionEvent);
 
             // Simulate a click on the button open when theres a unique session open
-            viewmodel.OpenSingleBrowserCommand.Execute(null);
+            await viewmodel.OpenSingleBrowserCommand.Execute();
             this.navigationService.Verify(x => x.OpenInDock(It.IsAny<IPanelViewModel>()));
         }
 
         [Test]
         public void VerifyThatRibbonViewModelCanBeConstructed()
         {
-            Assert.DoesNotThrow(() => new DomainOfExpertiseRibbonViewModel());
+            Assert.DoesNotThrow(() => new DomainOfExpertiseRibbonViewModel(this.messageBus));
         }
 
         [Test]

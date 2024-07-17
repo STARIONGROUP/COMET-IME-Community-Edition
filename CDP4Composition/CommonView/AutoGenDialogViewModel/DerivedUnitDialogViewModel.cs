@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DerivedUnitDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="DerivedUnitDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="DerivedUnit"/>
@@ -110,32 +111,32 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a UnitFactor
         /// </summary>
-        public ReactiveCommand<object> CreateUnitFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateUnitFactorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a UnitFactor
         /// </summary>
-        public ReactiveCommand<object> DeleteUnitFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteUnitFactorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a UnitFactor
         /// </summary>
-        public ReactiveCommand<object> EditUnitFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditUnitFactorCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a UnitFactor
         /// </summary>
-        public ReactiveCommand<object> InspectUnitFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectUnitFactorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a UnitFactor 
         /// </summary>
-        public ReactiveCommand<object> MoveUpUnitFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpUnitFactorCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a UnitFactor
         /// </summary>
-        public ReactiveCommand<object> MoveDownUnitFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownUnitFactorCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -148,22 +149,21 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedUnitFactorCommand = this.WhenAny(vm => vm.SelectedUnitFactor, v => v.Value != null);
             var canExecuteEditSelectedUnitFactorCommand = this.WhenAny(vm => vm.SelectedUnitFactor, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateUnitFactorCommand = ReactiveCommand.Create(canExecuteCreateUnitFactorCommand);
-            this.CreateUnitFactorCommand.Subscribe(_ => this.ExecuteCreateCommand<UnitFactor>(this.PopulateUnitFactor));
+            this.CreateUnitFactorCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<UnitFactor>(this.PopulateUnitFactor), canExecuteCreateUnitFactorCommand);
 
-            this.DeleteUnitFactorCommand = ReactiveCommand.Create(canExecuteEditSelectedUnitFactorCommand);
+            this.DeleteUnitFactorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUnitFactorCommand);
             this.DeleteUnitFactorCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedUnitFactor.Thing, this.PopulateUnitFactor));
 
-            this.EditUnitFactorCommand = ReactiveCommand.Create(canExecuteEditSelectedUnitFactorCommand);
+            this.EditUnitFactorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUnitFactorCommand);
             this.EditUnitFactorCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedUnitFactor.Thing, this.PopulateUnitFactor));
 
-            this.InspectUnitFactorCommand = ReactiveCommand.Create(canExecuteInspectSelectedUnitFactorCommand);
+            this.InspectUnitFactorCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedUnitFactorCommand);
             this.InspectUnitFactorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedUnitFactor.Thing));
 
-            this.MoveUpUnitFactorCommand = ReactiveCommand.Create(canExecuteEditSelectedUnitFactorCommand);
+            this.MoveUpUnitFactorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUnitFactorCommand);
             this.MoveUpUnitFactorCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.UnitFactor, this.SelectedUnitFactor));
 
-            this.MoveDownUnitFactorCommand = ReactiveCommand.Create(canExecuteEditSelectedUnitFactorCommand);
+            this.MoveDownUnitFactorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUnitFactorCommand);
             this.MoveDownUnitFactorCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.UnitFactor, this.SelectedUnitFactor));
         }
 

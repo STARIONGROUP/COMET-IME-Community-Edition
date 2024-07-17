@@ -1,11 +1,11 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ThingFactory.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="ThingFactory.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2021 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
 //    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -553,7 +553,7 @@ namespace CDP4Requirements.ReqIFDal
             var definition = new Definition
             {
                 Content = theValue,
-                LanguageCode = this.LanguageCode
+                LanguageCode = this.LanguageCode ?? "en"
             };
 
             definedThing.Definition.Add(definition);

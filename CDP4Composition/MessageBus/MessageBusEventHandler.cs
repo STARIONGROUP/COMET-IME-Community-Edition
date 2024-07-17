@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="MessageBusEventHandler.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="MessageBusEventHandler.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -56,10 +56,10 @@ namespace CDP4Composition.MessageBus
         /// that holds all <see cref="IMessageBusEventHandlerSubscription"/> classes per <see cref="IObservable{T}"/>.
         /// </summary>
         protected Dictionary<IObservable<T>, Dictionary<object, HashSet<IMessageBusEventHandlerSubscription>>> MessageBusHandlerDataList { get; } 
-            = new Dictionary<IObservable<T>, Dictionary<object, HashSet<IMessageBusEventHandlerSubscription>>>();
+            = new();
 
         /// <summary>
-        /// Creates a new instance of the <see cref="MessageBusEventHandler"/> class
+        /// Creates a new instance of the <see cref="MessageBusEventHandler{T}"/> class
         /// </summary>
         protected MessageBusEventHandler() : base()
         {
@@ -73,9 +73,9 @@ namespace CDP4Composition.MessageBus
         /// <returns>A <see cref="MessageBusEventHandlerDisposer"/> as an <see cref="IDisposable"/></returns>
         public IDisposable RegisterEventHandler(IObservable<T> listener, IMessageBusEventHandlerSubscription messageBusEventHandlerSubscription)
         {
-            return Task.Run
-                (() =>
-                    { 
+            return Task.Run(
+                () =>
+                    {
                         if (!this.MessageBusHandlerDataList.TryGetValue(listener, out var messageBusEventHandlerSubscriptionDictionary))
                         {
                             messageBusEventHandlerSubscriptionDictionary = new Dictionary<object, HashSet<IMessageBusEventHandlerSubscription>>();
@@ -91,9 +91,10 @@ namespace CDP4Composition.MessageBus
                         }
 
                         var subscriptionObject = this.GetSubscriptionObject(messageBusEventHandlerSubscription);
+
                         if (subscriptionObject == null)
                         {
-                            return new MessageBusEventHandlerDisposer(new Action(() => { })); 
+                            return new MessageBusEventHandlerDisposer(() => { }); 
                         }
 
                         if (!messageBusEventHandlerSubscriptionDictionary.TryGetValue(subscriptionObject, out var messageBusEventHandlerSubscriptionHashSet))
@@ -104,7 +105,7 @@ namespace CDP4Composition.MessageBus
 
                         messageBusEventHandlerSubscriptionHashSet.Add(messageBusEventHandlerSubscription);
 
-                        Action cleanUpAction = () =>
+                        void CleanUpAction()
                         {
                             if (messageBusEventHandlerSubscriptionHashSet.Contains(messageBusEventHandlerSubscription))
                             {
@@ -117,11 +118,10 @@ namespace CDP4Composition.MessageBus
                             }
 
                             messageBusEventHandlerSubscription.Dispose();
-                        };
+                        }
 
-                        return new MessageBusEventHandlerDisposer(cleanUpAction);
-                    }
-                ).Result;
+                        return new MessageBusEventHandlerDisposer(CleanUpAction);
+                    }).Result;
         }
 
         /// <summary>

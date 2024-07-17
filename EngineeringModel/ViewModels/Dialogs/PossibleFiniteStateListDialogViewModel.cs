@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="PossibleFiniteStateListDialogViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="PossibleFiniteStateListDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski, Jaime Bernar
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 // 
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -17,9 +17,9 @@
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-// 
+//
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -27,27 +27,42 @@ namespace CDP4EngineeringModel.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel.Composition;
     using System.Linq;
+    using System.Reactive;
     using System.Reactive.Linq;
+
     using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    
+    using CDP4Dal;
     using CDP4Dal.Operations;
+
     using CDP4Composition.Attributes;
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-    using CDP4Dal;
+    
     using ReactiveUI;
+
     using CDP4Composition.Services;
-    using Microsoft.Practices.ServiceLocation;
+
     using System.Windows;
+
+    using CommonServiceLocator;
 
     /// <summary>
     /// The dialog-view model to create, edit or inspect a <see cref="PossibleFiniteStateList"/>
     /// </summary>
     [ThingDialogViewModelExport(ClassKind.PossibleFiniteStateList)]
     public class PossibleFiniteStateListDialogViewModel : CDP4CommonView.PossibleFiniteStateListDialogViewModel, IThingDialogViewModel
-    {        
+    {
+        /// <summary>
+        /// The <see cref="IMessageBoxService"/> used to show user messages.
+        /// </summary>
+        private IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="PossibleFiniteStateListDialogViewModel"/> class.
         /// </summary>
@@ -84,22 +99,19 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="chainOfContainers">
         /// The optional chain of containers that contains the <paramref name="container"/> argument
         /// </param>
+        /// <param name="messageBoxService">
+        /// The <see cref="IMessageBoxService"/>.
+        /// </param>
         public PossibleFiniteStateListDialogViewModel(PossibleFiniteStateList possibleFiniteStateList, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(possibleFiniteStateList, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
         }
-
-
-        /// <summary>
-        /// The <see cref="IMessageBoxService"/> used to show user messages.
-        /// </summary>
-        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
-
+        
         /// <summary>
         /// Gets the <see cref="ICommand"/> to set the default <see cref="PossibleFiniteState"/>
         /// </summary>
-        public ReactiveCommand<object> SetDefaultStateCommand { get; private set; } 
-        
+        public ReactiveCommand<Unit, Unit> SetDefaultStateCommand { get; private set; } 
+
         /// <summary>
         /// Initialize the <see cref="ICommand"/>s and listeners
         /// </summary>
@@ -107,11 +119,11 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeCommands();
             this.WhenAnyValue(x => x.SelectedOwner).Subscribe(_ => this.UpdateOkCanExecute());
-            this.PossibleState.ChangeTrackingEnabled = true;
             this.PossibleState.CountChanged.Subscribe(_ => this.UpdateOkCanExecute());
-            this.SetDefaultStateCommand =
-                ReactiveCommand.Create(this.WhenAnyValue(x => x.SelectedPossibleState).Select(x => x != null && !this.IsReadOnly));
-            this.SetDefaultStateCommand.Subscribe(_ => this.ExecuteSetDefaultCommand());
+
+            this.SetDefaultStateCommand = ReactiveCommandCreator.Create(
+                this.ExecuteSetDefaultCommand,
+                this.WhenAnyValue(x => x.SelectedPossibleState).Select(x => x != null && !this.IsReadOnly));
         }
 
         /// <summary>

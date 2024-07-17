@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionTreeListNodeImageSelector.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ElementDefinitionTreeListNodeImageSelector.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
 //    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 // 
 //    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
@@ -28,9 +28,7 @@ namespace CDP4EngineeringModel.Selectors
     using System;
     using System.Globalization;
     using System.Linq;
-    using System.Windows.Data;
     using System.Windows.Media;
-    using System.Windows.Media.Imaging;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -41,8 +39,9 @@ namespace CDP4EngineeringModel.Selectors
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
-    using CDP4EngineeringModel.Converters;
     using CDP4EngineeringModel.ViewModels;
+
+    using CommonServiceLocator;
 
     using DevExpress.Xpf.Grid;
     using DevExpress.Xpf.Grid.TreeList;
@@ -52,6 +51,11 @@ namespace CDP4EngineeringModel.Selectors
     /// </summary>
     public class ElementDefinitionTreeListNodeImageSelector : TreeListNodeImageSelector
     {
+        /// <summary>
+        /// The <see cref="IIconCacheService" />
+        /// </summary>
+        private IIconCacheService iconCacheService;
+
         /// <summary>
         /// Select node and adds icon to it
         /// </summary>
@@ -77,7 +81,7 @@ namespace CDP4EngineeringModel.Selectors
             {
                 classKindOverride = ClassKind.ParameterTypeComponent;
             }
-            
+
             var image = this.Convert(new object[] { thingStatus }, null, classKindOverride, CultureInfo.InvariantCulture);
 
             return image as ImageSource;
@@ -95,52 +99,72 @@ namespace CDP4EngineeringModel.Selectors
         /// </returns>
         public object Convert(object[] value, Type targetType, object parameter, CultureInfo culture)
         {
-            var genericConverter = new ThingToIconUriConverter();
-            var thingStatus = value.SingleOrDefault() as ThingStatus;
-
-            var parameterBase = thingStatus?.Thing as ParameterBase;
-
-            ClassKind valuesetRowType;
-
-            if (parameterBase == null || parameter == null || !Enum.TryParse(parameter.ToString(), out valuesetRowType))
+            try
             {
-                return genericConverter.Convert(value, targetType, parameter, culture);
-            }
+                var genericConverter = new ThingToIconUriConverter();
+                var thingStatus = value.SingleOrDefault() as ThingStatus;
 
-            var isCompound = parameterBase.ParameterType is CompoundParameterType;
+                var parameterBase = thingStatus?.Thing as ParameterBase;
 
-            // Value set row
-            // row representing an option
-            if (valuesetRowType == ClassKind.Option)
-            {
-                var optionUri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
+                ClassKind valuesetRowType;
 
-                if (parameterBase.StateDependence != null || isCompound)
+                if (parameterBase == null || parameter == null || !Enum.TryParse(parameter.ToString(), out valuesetRowType))
                 {
-                    return new BitmapImage(optionUri);
+                    return genericConverter.Convert(value, targetType, parameter, culture);
                 }
 
-                var uri = new Uri(IconUtilities.ImageUri(parameterBase.ClassKind).ToString());
-                return IconUtilities.WithOverlay(uri, optionUri);
-            }
+                var isCompound = parameterBase.ParameterType is CompoundParameterType;
 
-            // row representing a component
-            if (valuesetRowType == ClassKind.ParameterTypeComponent)
+                // Value set row
+                // row representing an option
+                if (valuesetRowType == ClassKind.Option)
+                {
+                    var optionUri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
+
+                    if (parameterBase.StateDependence != null || isCompound)
+                    {
+                        return this.QueryIIconCacheService().QueryBitmapImage(optionUri);
+                    }
+
+                    var uri = new Uri(IconUtilities.ImageUri(parameterBase.ClassKind).ToString());
+                    return this.QueryIIconCacheService().QueryOverlayBitmapSource(uri, optionUri, OverlayPositionKind.TopRight);
+                }
+
+                // row representing a component
+                if (valuesetRowType == ClassKind.ParameterTypeComponent)
+                {
+                    var componentUri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
+                    return this.QueryIIconCacheService().QueryBitmapImage(componentUri);
+                }
+
+                // Row representing state
+                var stateUri = new Uri(IconUtilities.ImageUri(ClassKind.ActualFiniteState).ToString());
+
+                if (isCompound)
+                {
+                    return this.QueryIIconCacheService().QueryBitmapImage(stateUri);
+                }
+
+                var baseUri = new Uri(IconUtilities.ImageUri(parameterBase.ClassKind).ToString());
+                return this.QueryIIconCacheService().QueryOverlayBitmapSource(baseUri, stateUri, OverlayPositionKind.TopRight);
+            }
+            catch (Exception ex)
             {
-                var componentUri = new Uri(IconUtilities.ImageUri(valuesetRowType).ToString());
-                return new BitmapImage(componentUri);
+                // Do nothing, just return null for this edge case. Otherwise the app will crash.
             }
 
-            // Row representing state
-            var stateUri = new Uri(IconUtilities.ImageUri(ClassKind.ActualFiniteState).ToString());
+            return null;
+        }
 
-            if (isCompound)
-            {
-                return new BitmapImage(stateUri);
-            }
-
-            var baseUri = new Uri(IconUtilities.ImageUri(parameterBase.ClassKind).ToString());
-            return IconUtilities.WithOverlay(baseUri, stateUri);
+        /// <summary>
+        /// Queries the instance of the <see cref="IIconCacheService" /> that is to be used
+        /// </summary>
+        /// <returns>
+        /// An instance of <see cref="IIconCacheService" />
+        /// </returns>
+        private IIconCacheService QueryIIconCacheService()
+        {
+            return this.iconCacheService ??= ServiceLocator.Current.GetInstance<IIconCacheService>();
         }
     }
 }

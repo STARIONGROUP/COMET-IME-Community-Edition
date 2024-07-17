@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RoleBrowserViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="RoleBrowserViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2020 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,6 +8,7 @@ namespace CDP4SiteDirectory.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
     using System.Windows.Controls;
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -100,12 +101,12 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CDP4Common.SiteDirectoryData.PersonRole"/>
         /// </summary>
-        public ReactiveCommand<object> CreatePersonRoleCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreatePersonRoleCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="CDP4Common.SiteDirectoryData.ParticipantRole"/>
         /// </summary>
-        public ReactiveCommand<object> CreateParticipantRoleCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateParticipantRoleCommand { get; private set; }
 
         /// <summary>
         /// Initialize the browser
@@ -156,12 +157,10 @@ namespace CDP4SiteDirectory.ViewModels
             base.InitializeCommands();
 
             var isCreatePersonRoleAllowed = this.WhenAnyValue(vm => vm.CanCreatePersonRole);
-            this.CreatePersonRoleCommand = ReactiveCommand.Create(isCreatePersonRoleAllowed);
-            this.CreatePersonRoleCommand.Subscribe(_ => this.ExecuteCreateCommand<PersonRole>(this.Thing));
+            this.CreatePersonRoleCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<PersonRole>(this.Thing), isCreatePersonRoleAllowed);
 
             var isCreateParticipantRoleAllowed = this.WhenAnyValue(vm => vm.CanCreateParticipantRole);
-            this.CreateParticipantRoleCommand = ReactiveCommand.Create(isCreateParticipantRoleAllowed);
-            this.CreateParticipantRoleCommand.Subscribe(_ => this.ExecuteCreateCommand<ParticipantRole>(this.Thing));
+            this.CreateParticipantRoleCommand = ReactiveCommand.Create(() => this.ExecuteCreateCommand<ParticipantRole>(this.Thing), isCreateParticipantRoleAllowed);
         }
 
         /// <summary>

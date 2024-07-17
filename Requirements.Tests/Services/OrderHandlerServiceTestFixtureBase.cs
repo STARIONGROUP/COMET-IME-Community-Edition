@@ -1,28 +1,49 @@
-﻿// ------------------------------------------------------------------------------------------------
-// <copyright file="OrderHandlerServiceTestFixtureBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="OrderHandlerServiceTestFixtureBase.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// ------------------------------------------------------------------------------------------------
-
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Permission;
+
     using Moq;
+
     using NUnit.Framework;
-    using Utils;
 
     [TestFixture]
     public class OrderHandlerServiceTestFixtureBase
@@ -45,7 +66,7 @@ namespace CDP4Requirements.Tests
         protected SiteReferenceDataLibrary srdl;
 
         protected Participant participant;
-        protected Uri uri = new Uri("http://rhea.test.com");
+        protected Uri uri = new Uri("http://starion.test.com");
         protected DomainOfExpertise domain;
         protected Category catEd1;
         protected Category catEd2;
@@ -76,16 +97,18 @@ namespace CDP4Requirements.Tests
         protected SimpleParameterValue value4;
 
         protected PropertyInfo rev = typeof(Thing).GetProperty("RevisionNumber");
+        protected CDPMessageBus messageBus;
 
         public virtual void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.permissionService = new Mock<IPermissionService>();
             this.pluginService = new Mock<IPluginSettingsService>();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.sitedir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
             this.engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -128,10 +151,10 @@ namespace CDP4Requirements.Tests
             this.spec2 = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "spec2", ShortName = "spec2" };
             this.spec3 = new RequirementsSpecification(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "spec3", ShortName = "spec3" };
 
-            this.grp1 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "gr1", ShortName = "gr1", Owner = this.domain};
-            this.grp2 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "gr2", ShortName = "gr2"};
-            this.grp3 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "gr3", ShortName = "gr3"};
-            this.grp4 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) {Name = "gr4", ShortName = "gr4"};
+            this.grp1 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "gr1", ShortName = "gr1", Owner = this.domain };
+            this.grp2 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "gr2", ShortName = "gr2" };
+            this.grp3 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "gr3", ShortName = "gr3" };
+            this.grp4 = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "gr4", ShortName = "gr4" };
 
             this.req1 = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "req1", ShortName = "req1" };
             this.req2 = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "req2", ShortName = "req2" };
@@ -141,10 +164,10 @@ namespace CDP4Requirements.Tests
             this.req22 = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "req22", ShortName = "req22", Group = this.grp1 };
             this.req23 = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "req23", ShortName = "req23", Group = this.grp1 };
 
-            this.value1 = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.orderType, Value = new ValueArray<string>(new [] { "10000" })};
-            this.value2 = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.orderType, Value = new ValueArray<string>(new [] { "20000" })};
-            this.value3 = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.orderType, Value = new ValueArray<string>(new [] { "30000" })};
-            this.value4 = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.orderType, Value = new ValueArray<string>(new [] { "40000" })};
+            this.value1 = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.orderType, Value = new ValueArray<string>(new[] { "10000" }) };
+            this.value2 = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.orderType, Value = new ValueArray<string>(new[] { "20000" }) };
+            this.value3 = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.orderType, Value = new ValueArray<string>(new[] { "30000" }) };
+            this.value4 = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.orderType, Value = new ValueArray<string>(new[] { "40000" }) };
 
             this.model.Iteration.Add(this.iteration);
             this.iteration.RequirementsSpecification.Add(this.spec1);
@@ -208,8 +231,11 @@ namespace CDP4Requirements.Tests
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
+
             this.session.Setup(x => x.OpenIterations).Returns(
                 new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { this.iteration, new Tuple<DomainOfExpertise, Participant>(this.domain, this.participant) } });
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             RequirementsModule.PluginSettings = new RequirementsModuleSettings();
             RequirementsModule.PluginSettings.OrderSettings = new OrderSettings();

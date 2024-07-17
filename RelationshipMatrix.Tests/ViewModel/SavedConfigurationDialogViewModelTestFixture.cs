@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="SavedConfigurationDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="SavedConfigurationDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2019 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -30,7 +30,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
             vm.Name = "adda";
             vm.Description = "dde";
 
-            Assert.DoesNotThrowAsync(() => vm.OkCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => vm.OkCommand.Execute());
         }
     }
 }

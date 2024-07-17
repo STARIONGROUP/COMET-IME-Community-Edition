@@ -6,7 +6,7 @@
         xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
         xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
         xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
-        x:Class="CDP4IME.Views.LogDetails"
+        x:Class="COMET.Views.LogDetails"
         mc:Ignorable="d"
         SizeToContent="Height"
         Width="300"

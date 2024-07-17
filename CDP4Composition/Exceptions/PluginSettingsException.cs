@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="PluginSettingsException.cs" company="RHEA System S.A.">
-//   Copyright (c) 2018-2020 RHEA System S.A.
+// <copyright file="PluginSettingsException.cs" company="Starion Group S.A.">
+//   Copyright (c) 2018-2020 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 

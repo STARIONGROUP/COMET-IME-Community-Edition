@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementUsageRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ElementUsageRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -50,7 +50,7 @@ namespace CDP4ProductTree.ViewModels
 
     using CDP4ProductTree.Comparers;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -190,6 +190,7 @@ namespace CDP4ProductTree.ViewModels
         public void UpdateModelCode()
         {
             this.ModelCode = this.Thing.ModelCode();
+
             foreach (var containedRow in this.ContainedRows)
             {
                 var modelCodeRow = containedRow as IHavePath;
@@ -221,19 +222,19 @@ namespace CDP4ProductTree.ViewModels
             var newContainer = parameterBase.Group;
             var associatedRow = this.parameterOrOverrideBaseCache[parameterBase];
 
-            if ((newContainer != null) && (oldContainer == null))
+            if (newContainer != null && oldContainer == null)
             {
                 this.ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                 this.parameterOrOverrideContainerMap[parameterBase] = newContainer;
             }
-            else if ((newContainer == null) && (oldContainer != null))
+            else if (newContainer == null && oldContainer != null)
             {
                 this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
                 this.parameterOrOverrideContainerMap[parameterBase] = null;
             }
-            else if ((newContainer != null) && (oldContainer != null) && (newContainer != oldContainer))
+            else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
             {
                 this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
@@ -251,19 +252,19 @@ namespace CDP4ProductTree.ViewModels
             var newContainer = parameterGroup.ContainingGroup;
             var associatedRow = this.parameterGroupCache[parameterGroup];
 
-            if ((newContainer != null) && (oldContainer == null))
+            if (newContainer != null && oldContainer == null)
             {
                 this.ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
                 this.parameterGroupContainment[parameterGroup] = newContainer;
             }
-            else if ((newContainer == null) && (oldContainer != null))
+            else if (newContainer == null && oldContainer != null)
             {
                 this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.ContainedRows.SortedInsert(associatedRow, ChildRowComparer);
                 this.parameterGroupContainment[parameterGroup] = null;
             }
-            else if ((newContainer != null) && (oldContainer != null) && (newContainer != oldContainer))
+            else if (newContainer != null && oldContainer != null && newContainer != oldContainer)
             {
                 this.parameterGroupCache[oldContainer].ContainedRows.RemoveWithoutDispose(associatedRow);
                 this.parameterGroupCache[newContainer].ContainedRows.SortedInsert(associatedRow, ParameterGroupRowViewModel.ChildRowComparer);
@@ -321,7 +322,7 @@ namespace CDP4ProductTree.ViewModels
         protected override void InitializeSubscriptions()
         {
             base.InitializeSubscriptions();
-            
+
             Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated;
 
             Action<ObjectChangedEvent> elementDefAction = _ =>
@@ -334,14 +335,14 @@ namespace CDP4ProductTree.ViewModels
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var elementDefListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
+                var elementDefListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
                     .Where(discriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(elementDefAction);
 
                 this.Disposables.Add(elementDefListener);
 
-                var highlightUsageListener = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
+                var highlightUsageListener = this.CDPMessageBus.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(highlightUsageAction);
 
@@ -349,15 +350,50 @@ namespace CDP4ProductTree.ViewModels
             }
             else
             {
-                var elementDefObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementDefinition));
+                var elementDefObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ElementDefinition));
+
                 this.Disposables.Add(
                     this.MessageBusHandler.GetHandler<ObjectChangedEvent>()
-                    .RegisterEventHandler(elementDefObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ElementDefinition, discriminator, elementDefAction)));
+                        .RegisterEventHandler(elementDefObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ElementDefinition, discriminator, elementDefAction)));
 
-                var highlightUsageObserver = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>();
+                var highlightUsageObserver = this.CDPMessageBus.Listen<ElementUsageHighlightEvent>();
+
                 this.Disposables.Add(
                     this.MessageBusHandler.GetHandler<ElementUsageHighlightEvent>()
-                    .RegisterEventHandler(highlightUsageObserver, new MessageBusEventHandlerSubscription<ElementUsageHighlightEvent>(x => x.ElementDefinition.Equals(this.Thing.ElementDefinition), highlightUsageAction)));
+                        .RegisterEventHandler(highlightUsageObserver, new MessageBusEventHandlerSubscription<ElementUsageHighlightEvent>(x => x.ElementDefinition.Equals(this.Thing.ElementDefinition), highlightUsageAction)));
+            }
+
+            this.InitializeCategorySubscription();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="Category"/> subscription
+        /// </summary>
+        private void InitializeCategorySubscription()
+        {
+            Func<ObjectChangedEvent, bool> categoryDiscriminator =
+                objectChange =>
+                    objectChange.EventKind == EventKind.Updated
+                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache
+                    && this.Category.Contains(objectChange.ChangedThing);
+
+            Action<ObjectChangedEvent> categoryAction = x => this.UpdateCategories();
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var categoryRemoveListener =
+                    this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category))
+                        .Where(categoryDiscriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(categoryAction);
+
+                this.Disposables.Add(categoryRemoveListener);
+            }
+            else
+            {
+                var categoryObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category));
+
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(categoryObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Category), categoryDiscriminator, categoryAction)));
             }
         }
 
@@ -392,7 +428,7 @@ namespace CDP4ProductTree.ViewModels
 
             var elementDefCategories = this.Thing.ElementDefinition.Category.OrderBy(x => x.ShortName).Select(x => x.ShortName);
             var elementDefCategoriesText = this.Thing.ElementDefinition.Category.Any() ? string.Join(" ", elementDefCategories) : "-";
-            sb.AppendLine($"ED Category: {elementDefCategoriesText }");
+            sb.AppendLine($"ED Category: {elementDefCategoriesText}");
 
             sb.AppendLine($"Model Code: {this.Path()}");
 
@@ -473,16 +509,24 @@ namespace CDP4ProductTree.ViewModels
             this.Name = this.Thing.Name + " : " + this.ElementDefinition.Name;
             this.ShortName = this.Thing.ShortName + " : " + this.ElementDefinition.ShortName;
 
-            var builder = new CategoryStringBuilder()
-                                .AddCategories("EU", this.Thing.Category)
-                                .AddCategories("ED", this.Thing.ElementDefinition.Category);
-
-            this.Category = builder.GetCategories().Distinct();
-            this.DisplayCategory = builder.Build();
+            this.UpdateCategories();
 
             this.UpdateOwnerNameAndShortName();
 
             this.PopulateParameterOrOverride();
+        }
+
+        /// <summary>
+        /// Updates the Category display value
+        /// </summary>
+        private void UpdateCategories()
+        {
+            var builder = new CategoryStringBuilder()
+                .AddCategories("EU", this.Thing.Category)
+                .AddCategories("ED", this.Thing.ElementDefinition.Category);
+
+            this.Category = builder.GetCategories().Distinct();
+            this.DisplayCategory = builder.Build();
         }
 
         /// <summary>
@@ -540,29 +584,28 @@ namespace CDP4ProductTree.ViewModels
             if (!this.elementUsageListenerCache.ContainsKey(elementUsage))
             {
                 IDisposable listener;
-                
-                Func<ObjectChangedEvent, bool> discriminator = 
-                    objectChange => 
-                    objectChange.EventKind == EventKind.Updated 
-                    && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
+
+                Func<ObjectChangedEvent, bool> discriminator =
+                    objectChange =>
+                        objectChange.EventKind == EventKind.Updated
+                        && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
 
                 Action<ObjectChangedEvent> action = x => this.UpdateOptionDependentElementUsage((ElementUsage)x.ChangedThing);
 
                 if (this.AllowMessageBusSubscriptions)
                 {
-                    listener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(elementUsage)
+                    listener = this.CDPMessageBus.Listen<ObjectChangedEvent>(elementUsage)
                         .Where(discriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(action);
                 }
                 else
                 {
-                    var elementUsageObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementUsage));
+                    var elementUsageObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ElementUsage));
                     listener = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(elementUsageObserver, new ObjectChangedMessageBusEventHandlerSubscription(elementUsage, discriminator, action));
                 }
 
                 this.elementUsageListenerCache.Add(elementUsage, listener);
-
             }
 
             // avoid duplicate and filter on Option

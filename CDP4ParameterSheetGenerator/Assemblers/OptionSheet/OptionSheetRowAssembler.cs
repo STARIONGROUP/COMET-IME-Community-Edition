@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OptionSheetRowAssembler.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="OptionSheetRowAssembler.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2023 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,11 +28,15 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4ParameterSheetGenerator.RowModels;
+
+    using CommonServiceLocator;
 
     /// <summary>
     /// The purpose of the <see cref="OptionSheetRowAssembler"/> is to assemble a list of <see cref="IExcelRow{Thing}"/>s
@@ -81,13 +104,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
         /// <summary>
         /// Gets the <see cref="IExcelRow{Thing}"/>s that have been assembled
         /// </summary>
-        public IEnumerable<IExcelRow<Thing>> ExcelRows
-        {
-            get
-            {
-                return this.excelRows;
-            }
-        }
+        public IEnumerable<IExcelRow<Thing>> ExcelRows => this.excelRows;
 
         /// <summary>
         /// Assemble the <see cref="IExcelRow{Thing}"/>s
@@ -97,6 +114,7 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
             var nestedElementExcelRows = new List<NestedElementExcelRow>();
 
             IEnumerable<NestedElement> nestedElements;
+
             if (this.iteration.TopElement == null)
             {
                 nestedElements = Enumerable.Empty<NestedElement>();
@@ -106,11 +124,11 @@ namespace CDP4ParameterSheetGenerator.OptionSheet
                 var nestedElementTreeGenerator = new NestedElementTreeGenerator();
                 nestedElements = nestedElementTreeGenerator.Generate(this.option, this.owner, false);
             }
-            
+
             // Order the nestedElements by shortname. The Shortname of an NestedElement 
             // is related to the path of a NestedElement
             nestedElements = nestedElements.OrderBy(ne => ne.ShortName);
-            
+
             foreach (var nestedElement in nestedElements)
             {
                 var nestedElementExcelRow = new NestedElementExcelRow(nestedElement, this.owner);

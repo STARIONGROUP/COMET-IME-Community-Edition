@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementUsageRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ElementUsageRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -49,8 +49,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using Moq;
 
     using NUnit.Framework;
-
-    using ReactiveUI;
 
     [TestFixture]
     internal class ElementUsageRowViewModelTestFixture
@@ -101,14 +99,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private PossibleFiniteState state1;
         private PossibleFiniteState state2;
         private PossibleFiniteStateList posStateList;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
             this.permissionService = new Mock<IPermissionService>();
             this.obfuscationService = new Mock<IObfuscationService>();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.option1 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "1" };
             this.option2 = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "2" };
@@ -195,6 +195,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session.Setup(x => x.ActivePerson).Returns(person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.iteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
@@ -202,6 +203,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.iteration.Option.Add(this.option1);
             this.iteration.Option.Add(this.option2);
             engModel.Iteration.Add(this.iteration);
+
             this.elementDefinitionForUsage1 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Owner = this.someotherDomain
@@ -320,9 +322,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.elementDefinitionForUsage2.ParameterGroup.Add(this.parameterGroup2ForUsage2);
 
-
-            this.iteration.Element.Add(elementDefinitionForUsage1);
-            this.iteration.Element.Add(elementDefinitionForUsage2);
+            this.iteration.Element.Add(this.elementDefinitionForUsage1);
+            this.iteration.Element.Add(this.elementDefinitionForUsage2);
 
             this.parameterGroup3.ContainingGroup = this.parameterGroup1;
             this.parameterGroup3ForUsage1.ContainingGroup = this.parameterGroup1ForUsage1;
@@ -333,13 +334,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
-        [Test, TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
+        [Test]
+        [TestCaseSource(typeof(MessageBusContainerCases), "GetCases")]
         public void VerifyThatParameterBaseElementAreHandledCorrectly(IViewModelBase<Thing> container, string scenario)
         {
-            var revision = typeof (Thing).GetProperty("RevisionNumber");
+            var revision = typeof(Thing).GetProperty("RevisionNumber");
 
             // Test input
             var valueSet = new ParameterValueSet(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -371,6 +373,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementUsage1.ParameterOverride.Add(this.parameter6Override);
 
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
+
             // ***************************************
 
             var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, container, this.obfuscationService.Object);
@@ -381,6 +384,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var parameterRow = row.ContainedRows.SingleOrDefault(x => x.Thing == this.parameter1);
             Assert.IsNotNull(overrideRow);
             Assert.IsNotNull(parameterRow);
+
             // **********************************
 
             // Add a subscription to parameter and see that its replaced.
@@ -389,7 +393,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter1.ParameterSubscription.Add(subscription);
 
             revision.SetValue(this.elementDefinitionForUsage1, 1);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinitionForUsage1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinitionForUsage1, EventKind.Updated);
 
             Assert.AreEqual(2, row.ContainedRows.Count);
             var subscriptionRow = row.ContainedRows.SingleOrDefault(x => x.Thing == subscription);
@@ -404,7 +408,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter6Override.ParameterSubscription.Add(subscriptionOverride);
 
             revision.SetValue(this.elementUsage1, 1);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementUsage1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementUsage1, EventKind.Updated);
 
             Assert.AreEqual(2, row.ContainedRows.Count);
             var subscriptionOverrideRow = row.ContainedRows.SingleOrDefault(x => x.Thing == subscriptionOverride);
@@ -416,16 +420,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             // removes the subscriptions
             this.parameter6Override.ParameterSubscription.Clear();
             revision.SetValue(this.elementUsage1, 2);
-            
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementUsage1, EventKind.Updated);
+
+            this.messageBus.SendObjectChangeEvent(this.elementUsage1, EventKind.Updated);
             Assert.AreEqual(2, row.ContainedRows.Count);
             overrideRow = row.ContainedRows.SingleOrDefault(x => x.Thing == this.parameter6Override);
 
             Assert.IsNotNull(overrideRow);
-            
+
             this.parameter1.ParameterSubscription.Clear();
             revision.SetValue(this.elementDefinitionForUsage1, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinitionForUsage1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinitionForUsage1, EventKind.Updated);
             Assert.AreEqual(2, row.ContainedRows.Count);
             parameterRow = row.ContainedRows.SingleOrDefault(x => x.Thing == this.parameter1);
             Assert.IsNotNull(parameterRow);
@@ -435,6 +439,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         public void VerifyThatExcludingOptionsPopulatesWorks()
         {
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
+
             // ***************************************
 
             var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
@@ -451,13 +456,13 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var newOption = new Option(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "3" };
             this.iteration.Option.Add(newOption);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(newOption, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(newOption, EventKind.Added);
             Assert.AreEqual(3, row.AllOptions.Count);
             Assert.AreEqual(3, row2.AllOptions.Count);
 
-            row.SelectedOptions = new ReactiveList<Option> {this.option1, newOption};
+            row.SelectedOptions = new ReactiveList<Option> { this.option1, newOption };
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
-            row.Thing.ExcludeOption = new List<Option>{this.option2};
+            row.Thing.ExcludeOption = new List<Option> { this.option2 };
 
             Assert.AreEqual(1, row.ExcludedOptions.Count);
             Assert.IsTrue(row.HasExcludes.HasValue);
@@ -468,14 +473,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(2));
             row.Thing.ExcludeOption = new List<Option> { this.option2, this.option1, newOption };
 
-            row.SelectedOptions = new ReactiveList<Option> {newOption};
+            row.SelectedOptions = new ReactiveList<Option> { newOption };
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(3));
             row.Thing.ExcludeOption = new List<Option> { this.option1, this.option2 };
 
             // re-ordering
-            row.AllOptions = new ReactiveList<Option>{this.option2, newOption, this.option1};
+            row.AllOptions = new ReactiveList<Option> { this.option2, newOption, this.option1 };
 
-            row.SelectedOptions = new ReactiveList<Option> {newOption};
+            row.SelectedOptions = new ReactiveList<Option> { newOption };
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(3));
 
             Assert.AreEqual(2, row.ExcludedOptions.Count);
@@ -487,6 +492,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
             this.elementDefinitionForUsage1.ParameterGroup.Add(this.parameterGroup1ForUsage1);
+
             // ***************************************
 
             var row = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
@@ -510,14 +516,15 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
             this.elementDefinitionForUsage1.ParameterGroup.Add(this.parameterGroup1ForUsage1);
+
             // ***************************************
 
-            option1.Name = "Option1";
-            option2.Name = "Option2";
+            this.option1.Name = "Option1";
+            this.option2.Name = "Option2";
 
             var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
-            Assert.IsTrue(elementUsageRow.Details.Contains(option1.Name));
-            Assert.IsTrue(elementUsageRow.Details.Contains(option2.Name));
+            Assert.IsTrue(elementUsageRow.Details.Contains(this.option1.Name));
+            Assert.IsTrue(elementUsageRow.Details.Contains(this.option2.Name));
         }
 
         [Test]
@@ -525,16 +532,17 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
             this.elementDefinitionForUsage1.ParameterGroup.Add(this.parameterGroup1ForUsage1);
+
             // ***************************************
 
-            option1.Name = "Option1";
-            option2.Name = "Option2";
-            this.elementUsage1.ExcludeOption.Add(option1);
-            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);           
+            this.option1.Name = "Option1";
+            this.option2.Name = "Option2";
+            this.elementUsage1.ExcludeOption.Add(this.option1);
+            var elementUsageRow = new ElementUsageRowViewModel(this.elementUsage1, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             Assert.IsTrue(elementUsageRow.ExcludedOptions.Count() > 0);
-            Assert.IsTrue(elementUsageRow.Details.Contains(option1.Name));
-            Assert.IsTrue(elementUsageRow.Details.Contains(option2.Name));
+            Assert.IsTrue(elementUsageRow.Details.Contains(this.option1.Name));
+            Assert.IsTrue(elementUsageRow.Details.Contains(this.option2.Name));
         }
     }
 }

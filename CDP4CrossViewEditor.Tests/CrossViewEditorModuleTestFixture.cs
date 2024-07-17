@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CrossViewEditorModuleTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="CrossViewEditorModuleTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Cozmin Velciu, Adrian Chivu
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -28,6 +28,8 @@ namespace CDP4CrossViewEditor.Tests
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+
+    using CDP4Dal;
 
     using CDP4OfficeInfrastructure;
 
@@ -46,6 +48,7 @@ namespace CDP4CrossViewEditor.Tests
         private Mock<IThingDialogNavigationService> thingDialogNavigationService;
         private Mock<IOfficeApplicationWrapper> officeApplicationWrapper;
         private Mock<IDialogNavigationService> dialogNavigationService;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
@@ -55,6 +58,7 @@ namespace CDP4CrossViewEditor.Tests
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.officeApplicationWrapper = new Mock<IOfficeApplicationWrapper>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
+            this.messageBus = new CDPMessageBus();
         }
 
         [TearDown]
@@ -70,15 +74,17 @@ namespace CDP4CrossViewEditor.Tests
                 this.panelNavigationService.Object,
                 this.thingDialogNavigationService.Object,
                 this.dialogNavigationService.Object,
-                this.officeApplicationWrapper.Object);
+                this.officeApplicationWrapper.Object,
+                this.messageBus);
 
             module.Initialize();
 
-            Assert.AreEqual(this.fluentRibbonManager.Object, module.RibbonManager);
-            Assert.AreEqual(this.panelNavigationService.Object, module.PanelNavigationService);
-            Assert.AreEqual(this.thingDialogNavigationService.Object, module.ThingDialogNavigationService);
-            Assert.AreEqual(this.dialogNavigationService.Object, module.DialogNavigationService);
-            Assert.AreEqual(this.officeApplicationWrapper.Object, module.OfficeApplicationWrapper);
+            Assert.That(this.fluentRibbonManager.Object, Is.EqualTo(module.RibbonManager));
+            Assert.That(this.panelNavigationService.Object, Is.EqualTo(module.PanelNavigationService));
+            Assert.That(this.thingDialogNavigationService.Object, Is.EqualTo(module.ThingDialogNavigationService));
+            Assert.That(this.dialogNavigationService.Object, Is.EqualTo(module.DialogNavigationService));
+            Assert.That(this.officeApplicationWrapper.Object, Is.EqualTo(module.OfficeApplicationWrapper));
+            Assert.That(this.messageBus, Is.EqualTo(module.MessageBus));
         }
     }
 }

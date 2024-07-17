@@ -1,11 +1,14 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ManageConfigurationsDialogViewModelTestFixture.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="ManageConfigurationsDialogViewModelTestFixture.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2019 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4RelationshipMatrix.Tests.ViewModel
 {
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
+
     using CDP4Composition.ViewModels;
 
     using CDP4RelationshipMatrix.Settings;
@@ -21,7 +24,7 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
         }
         
         [Test]
-        public void AssertViewModelWorks()
+        public async Task AssertViewModelWorks()
         {
             var savedConfig1 = new SavedConfiguration
             {
@@ -44,10 +47,10 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             vm.SelectedConfiguration = savedConfig1;
 
-            vm.DeleteSelectedCommand.Execute(null);
+            await vm.DeleteSelectedCommand.Execute();
 
             Assert.AreEqual(1, vm.SavedConfigurations.Count);
-            Assert.DoesNotThrowAsync(() => vm.OkCommand.ExecuteAsyncTask(null));
+            Assert.DoesNotThrow(() => vm.OkCommand.Execute());
         }
     }
 }

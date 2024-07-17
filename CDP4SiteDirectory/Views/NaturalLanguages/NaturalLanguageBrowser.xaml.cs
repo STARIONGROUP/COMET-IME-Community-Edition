@@ -1,12 +1,13 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="NaturalLanguageBrowser.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="NaturalLanguageBrowser.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.Views
 {
     using System.ComponentModel.Composition;
+    using System.Windows.Controls;
 
     using CDP4Composition;
 
@@ -14,7 +15,7 @@ namespace CDP4SiteDirectory.Views
     /// Interaction logic for NaturalLanguageBrowser
     /// </summary>
     [Export(typeof(IPanelView))]
-    public partial class NaturalLanguageBrowser : IPanelView
+    public partial class NaturalLanguageBrowser : UserControl, IPanelView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="NaturalLanguageBrowser"/> class.

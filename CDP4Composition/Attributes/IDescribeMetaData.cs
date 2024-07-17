@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDescribeMetaData.cs" company="RHEA System S.A.">
-//   Copyright (c) 2017 RHEA RHEA System S.A.
+// <copyright file="IDescribeMetaData.cs" company="Starion Group S.A.">
+//   Copyright (c) 2017 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 

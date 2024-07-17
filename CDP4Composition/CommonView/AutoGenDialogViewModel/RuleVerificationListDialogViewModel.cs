@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="RuleVerificationListDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="RuleVerificationListDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -28,6 +28,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="RuleVerificationList"/>
@@ -153,37 +154,37 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedOwner"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedOwnerCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedOwnerCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a RuleVerification
         /// </summary>
-        public ReactiveCommand<object> CreateRuleVerificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateRuleVerificationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a RuleVerification
         /// </summary>
-        public ReactiveCommand<object> DeleteRuleVerificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteRuleVerificationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a RuleVerification
         /// </summary>
-        public ReactiveCommand<object> EditRuleVerificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditRuleVerificationCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a RuleVerification
         /// </summary>
-        public ReactiveCommand<object> InspectRuleVerificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectRuleVerificationCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a RuleVerification 
         /// </summary>
-        public ReactiveCommand<object> MoveUpRuleVerificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpRuleVerificationCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a RuleVerification
         /// </summary>
-        public ReactiveCommand<object> MoveDownRuleVerificationCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownRuleVerificationCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -196,25 +197,25 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedRuleVerificationCommand = this.WhenAny(vm => vm.SelectedRuleVerification, v => v.Value != null);
             var canExecuteEditSelectedRuleVerificationCommand = this.WhenAny(vm => vm.SelectedRuleVerification, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateRuleVerificationCommand = ReactiveCommand.Create(canExecuteCreateRuleVerificationCommand);
+            this.CreateRuleVerificationCommand = ReactiveCommandCreator.Create(canExecuteCreateRuleVerificationCommand);
             this.CreateRuleVerificationCommand.Subscribe(_ => this.ExecuteCreateRuleVerificationCommand());
 
-            this.DeleteRuleVerificationCommand = ReactiveCommand.Create(canExecuteEditSelectedRuleVerificationCommand);
+            this.DeleteRuleVerificationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRuleVerificationCommand);
             this.DeleteRuleVerificationCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedRuleVerification.Thing, this.PopulateRuleVerification));
 
-            this.EditRuleVerificationCommand = ReactiveCommand.Create(canExecuteEditSelectedRuleVerificationCommand);
+            this.EditRuleVerificationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRuleVerificationCommand);
             this.EditRuleVerificationCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedRuleVerification.Thing, this.PopulateRuleVerification));
 
-            this.InspectRuleVerificationCommand = ReactiveCommand.Create(canExecuteInspectSelectedRuleVerificationCommand);
+            this.InspectRuleVerificationCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRuleVerificationCommand);
             this.InspectRuleVerificationCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRuleVerification.Thing));
 
-            this.MoveUpRuleVerificationCommand = ReactiveCommand.Create(canExecuteEditSelectedRuleVerificationCommand);
+            this.MoveUpRuleVerificationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRuleVerificationCommand);
             this.MoveUpRuleVerificationCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.RuleVerification, this.SelectedRuleVerification));
 
-            this.MoveDownRuleVerificationCommand = ReactiveCommand.Create(canExecuteEditSelectedRuleVerificationCommand);
+            this.MoveDownRuleVerificationCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRuleVerificationCommand);
             this.MoveDownRuleVerificationCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.RuleVerification, this.SelectedRuleVerification));
             var canExecuteInspectSelectedOwnerCommand = this.WhenAny(vm => vm.SelectedOwner, v => v.Value != null);
-            this.InspectSelectedOwnerCommand = ReactiveCommand.Create(canExecuteInspectSelectedOwnerCommand);
+            this.InspectSelectedOwnerCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedOwnerCommand);
             this.InspectSelectedOwnerCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedOwner));
         }
 

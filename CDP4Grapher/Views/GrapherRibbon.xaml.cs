@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="GrapherRibbon.xaml.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2021 RHEA System S.A.
+// <copyright file="GrapherRibbon.xaml.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2021 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Simon Wood
 //
 //    This file is part of CDP4-IME Community Edition.
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-IME Community Edition is free software; you can redistribute it and/or
@@ -27,10 +27,14 @@ namespace CDP4Grapher.Views
 {
     using System.ComponentModel.Composition;
 
-    using CDP4Composition.Ribbon;
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Ribbon;
 
-    using ViewModels;
+    using CDP4Dal;
+
+    using CDP4Grapher.ViewModels;
+
+    using CommonServiceLocator;
 
     /// <summary>
     /// Interaction logic for GrapherRibbon.xaml
@@ -45,7 +49,8 @@ namespace CDP4Grapher.Views
         public GrapherRibbon()
         {
             this.InitializeComponent();
-            this.DataContext = new GrapherRibbonViewModel();
+            var messageBus = ServiceLocator.Current.GetInstance<ICDPMessageBus>();
+            this.DataContext = new GrapherRibbonViewModel(messageBus);
         }
     }
 }

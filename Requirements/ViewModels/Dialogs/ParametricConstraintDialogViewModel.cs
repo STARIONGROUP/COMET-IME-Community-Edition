@@ -1,15 +1,36 @@
-﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ParametricConstraintDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2020 RHEA System S.A.
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="ParametricConstraintDialogViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Requirements.ViewModels
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
     using System.Windows.Controls;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -79,27 +100,27 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> to create an  <see cref="AndExpression"/>
         /// </summary>
-        public ReactiveCommand<object> CreateAndExpression { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateAndExpression { get; protected set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> to create an  <see cref="ExclusiveOrExpression"/>
         /// </summary>
-        public ReactiveCommand<object> CreateExclusiveOrExpression { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateExclusiveOrExpression { get; protected set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> to create an  <see cref="NotExpression"/>
         /// </summary>
-        public ReactiveCommand<object> CreateNotExpression { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateNotExpression { get; protected set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> to create an  <see cref="OrExpression"/>
         /// </summary>
-        public ReactiveCommand<object> CreateOrExpression { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateOrExpression { get; protected set; }
 
         /// <summary>
         /// Gets or sets the <see cref="ICommand"/> to create an  <see cref="RelationalExpression"/>
         /// </summary>
-        public ReactiveCommand<object> CreateRelationalExpression { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateRelationalExpression { get; protected set; }
 
         /// <summary>
         /// Gets the "create" <see cref="ContextMenuItemViewModel"/>
@@ -131,20 +152,15 @@ namespace CDP4Requirements.ViewModels
             var canExecuteCreateNotExpressionCommand = this.WhenAnyValue(vm => vm.BooleanExpression.Count, (count) => !this.IsReadOnly && (count > 0));
             var canExecuteCreateAndExpressionCommand = this.WhenAnyValue(vm => vm.BooleanExpression.Count, (count) => !this.IsReadOnly && (count > 1));
 
-            this.CreateAndExpression = ReactiveCommand.Create(canExecuteCreateAndExpressionCommand);
-            this.CreateAndExpression.Subscribe(_ => this.ExecuteCreateCommand<AndExpression>(this.PopulateExpression));
+            this.CreateAndExpression = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<AndExpression>(this.PopulateExpression), canExecuteCreateAndExpressionCommand);
 
-            this.CreateExclusiveOrExpression = ReactiveCommand.Create(canExecuteCreateAndExpressionCommand);
-            this.CreateExclusiveOrExpression.Subscribe(_ => this.ExecuteCreateCommand<ExclusiveOrExpression>(this.PopulateExpression));
+            this.CreateExclusiveOrExpression = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ExclusiveOrExpression>(this.PopulateExpression), canExecuteCreateAndExpressionCommand);
 
-            this.CreateNotExpression = ReactiveCommand.Create(canExecuteCreateNotExpressionCommand);
-            this.CreateNotExpression.Subscribe(_ => this.ExecuteCreateCommand<NotExpression>(this.PopulateExpression));
+            this.CreateNotExpression = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<NotExpression>(this.PopulateExpression), canExecuteCreateNotExpressionCommand);
 
-            this.CreateOrExpression = ReactiveCommand.Create(canExecuteCreateAndExpressionCommand);
-            this.CreateOrExpression.Subscribe(_ => this.ExecuteCreateCommand<OrExpression>(this.PopulateExpression));
+            this.CreateOrExpression = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<OrExpression>(this.PopulateExpression), canExecuteCreateAndExpressionCommand);
 
-            this.CreateRelationalExpression = ReactiveCommand.Create(canExecuteCreateRelationalExpressionCommand);
-            this.CreateRelationalExpression.Subscribe(_ => this.ExecuteCreateCommand<RelationalExpression>(this.PopulateExpression));
+            this.CreateRelationalExpression = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<RelationalExpression>(this.PopulateExpression), canExecuteCreateRelationalExpressionCommand);
         }
 
         /// <summary>

@@ -1,22 +1,46 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ModellingThingBrowserViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2018 RHEA System S.A.
+// <copyright file="ModellingThingBrowserViewModelBase.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2022 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4Composition.Mvvm
 {
     using System;
     using System.Linq;
+    using System.Reactive;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
     using CDP4Common.SiteDirectoryData;
+    
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    
     using CDP4Dal;
     using CDP4Dal.Operations;
+    
     using ReactiveUI;
 
     /// <summary>
@@ -118,27 +142,27 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the Command to create a Change Request
         /// </summary>
-        public ReactiveCommand<object> CreateChangeRequestCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateChangeRequestCommand { get; private set; }
 
         /// <summary>
         /// Gets the Command to create a Change Request
         /// </summary>
-        public ReactiveCommand<object> CreateRequestForWaiverCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateRequestForWaiverCommand { get; private set; }
 
         /// <summary>
         /// Gets the Command to create a Change Request
         /// </summary>
-        public ReactiveCommand<object> CreateRequestForDeviationCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateRequestForDeviationCommand { get; private set; }
 
         /// <summary>
         /// Gets the Command to create a RID
         /// </summary>
-        public ReactiveCommand<object> CreateReviewItemDiscrepancyCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateReviewItemDiscrepancyCommand { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a new <see cref="EngineeringModelDataNote"/>
         /// </summary>
-        public ReactiveCommand<object> CreateEngineeringModelDataNoteCommand { get; private set; }
+        public ReactiveCommand<Unit, Unit> CreateEngineeringModelDataNoteCommand { get; private set; }
 
         /// <summary>
         /// Initialize the <see cref="ICommand"/>
@@ -149,20 +173,25 @@ namespace CDP4Composition.Mvvm
 
             var currentParticipantAndDomain = this.Session.OpenIterations[this.Thing];
 
-            this.CreateChangeRequestCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateChangeRequest));
-            this.CreateChangeRequestCommand.Subscribe(_ => this.ExecuteCreateModellingAnnotation(new ChangeRequest(), currentParticipantAndDomain.Item2, currentParticipantAndDomain.Item1));
+            this.CreateChangeRequestCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateModellingAnnotation(new ChangeRequest(), currentParticipantAndDomain.Item2, currentParticipantAndDomain.Item1), 
+                this.WhenAnyValue(x => x.CanCreateChangeRequest));
 
-            this.CreateReviewItemDiscrepancyCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateReviewItemDiscrepancy));
-            this.CreateReviewItemDiscrepancyCommand.Subscribe(_ => this.ExecuteCreateModellingAnnotation(new ReviewItemDiscrepancy(), currentParticipantAndDomain.Item2, currentParticipantAndDomain.Item1));
+            this.CreateReviewItemDiscrepancyCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateModellingAnnotation(new ReviewItemDiscrepancy(), currentParticipantAndDomain.Item2, currentParticipantAndDomain.Item1), 
+                this.WhenAnyValue(x => x.CanCreateReviewItemDiscrepancy));
 
-            this.CreateRequestForWaiverCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequestForWaiver));
-            this.CreateRequestForWaiverCommand.Subscribe(_ => this.ExecuteCreateModellingAnnotation(new RequestForWaiver(), currentParticipantAndDomain.Item2, currentParticipantAndDomain.Item1));
+            this.CreateRequestForWaiverCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateModellingAnnotation(new RequestForWaiver(), currentParticipantAndDomain.Item2, currentParticipantAndDomain.Item1), 
+                this.WhenAnyValue(x => x.CanCreateRequestForWaiver));
 
-            this.CreateRequestForDeviationCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.CanCreateRequestForDeviation));
-            this.CreateRequestForDeviationCommand.Subscribe(_ => this.ExecuteCreateModellingAnnotation(new RequestForDeviation(), currentParticipantAndDomain.Item2, currentParticipantAndDomain.Item1));
+            this.CreateRequestForDeviationCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateModellingAnnotation(new RequestForDeviation(), currentParticipantAndDomain.Item2, currentParticipantAndDomain.Item1), 
+                this.WhenAnyValue(x => x.CanCreateRequestForDeviation));
 
-            this.CreateEngineeringModelDataNoteCommand = ReactiveCommand.Create(this.WhenAnyValue(x => x.canCreateEngineeringModelDataNote));
-            this.CreateEngineeringModelDataNoteCommand.Subscribe(_ => this.ExecuteCreateEngineeringModelDataNote(new EngineeringModelDataNote(), currentParticipantAndDomain.Item2));
+            this.CreateEngineeringModelDataNoteCommand = ReactiveCommandCreator.Create(
+                () => this.ExecuteCreateEngineeringModelDataNote(new EngineeringModelDataNote(), currentParticipantAndDomain.Item2), 
+                this.WhenAnyValue(x => x.canCreateEngineeringModelDataNote));
         }
 
         /// <summary>

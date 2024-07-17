@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="UnitPrefixBrowserViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2020 RHEA System S.A.
+// <copyright file="UnitPrefixBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Naron Phou, Alexander van Delft, Nathanael Smiechowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +29,7 @@ namespace BasicRDL.Tests.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Windows.Input;
 
     using BasicRdl.ViewModels;
 
@@ -47,7 +48,7 @@ namespace BasicRDL.Tests.ViewModels
     using NUnit.Framework;
 
     using ReactiveUI;
-    
+
     /// <summary>
     /// Suite of tests for the <see cref="UnitPrefixBrowserViewModel"/>
     /// </summary>
@@ -65,12 +66,14 @@ namespace BasicRDL.Tests.ViewModels
         private Person person;
         private Assembler assembler;
         private SiteReferenceDataLibrary siteRdl;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
 
+            this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.dialogNavigation = new Mock<IThingDialogNavigationService>();
             this.navigation = new Mock<IPanelNavigationService>();
@@ -79,10 +82,10 @@ namespace BasicRDL.Tests.ViewModels
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
-            this.uri = new Uri("http://www.rheagroup.com");
-            this.assembler = new Assembler(this.uri);
+            this.uri = new Uri("https://www.stariongroup.eu");
+            this.assembler = new Assembler(this.uri, this.messageBus);
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
-            this.siteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test RDL", Container = this.siteDirectory};
+            this.siteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test RDL", Container = this.siteDirectory };
             this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteRdl);
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
 
@@ -90,6 +93,7 @@ namespace BasicRDL.Tests.ViewModels
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
             this.browser = new UnitPrefixBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigation.Object, this.navigation.Object, null, null);
         }
@@ -97,7 +101,7 @@ namespace BasicRDL.Tests.ViewModels
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
@@ -113,16 +117,16 @@ namespace BasicRDL.Tests.ViewModels
             Assert.IsEmpty(this.browser.UnitPrefixes);
 
             var unitPrefix = new UnitPrefix(Guid.NewGuid(), this.assembler.Cache, this.uri)
-                               {
-                                   Name = "unitPrefix name",
-                                   ShortName = "unitPrefixshortname",
-                                   Container = this.siteRdl
-                               };
+            {
+                Name = "unitPrefix name",
+                ShortName = "unitPrefixshortname",
+                Container = this.siteRdl
+            };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(unitPrefix, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(unitPrefix, EventKind.Added);
             Assert.AreEqual(1, this.browser.UnitPrefixes.Count);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(unitPrefix, EventKind.Removed);
+            this.messageBus.SendObjectChangeEvent(unitPrefix, EventKind.Removed);
             Assert.AreEqual(0, this.browser.UnitPrefixes.Count);
         }
 
@@ -138,17 +142,17 @@ namespace BasicRDL.Tests.ViewModels
                 Container = this.siteRdl
             };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(unitPrefix, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(unitPrefix, EventKind.Added);
             Assert.AreEqual(1, this.browser.UnitPrefixes.Count);
 
-            Assert.IsFalse(this.browser.InspectCommand.CanExecute(null));
-            Assert.IsFalse(this.browser.UpdateCommand.CanExecute(null));
+            Assert.IsFalse(((ICommand)this.browser.InspectCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)this.browser.UpdateCommand).CanExecute(null));
 
             this.browser.SelectedThing = this.browser.UnitPrefixes.First();
             this.browser.ComputePermission();
 
-            Assert.IsTrue(this.browser.InspectCommand.CanExecute(null));
-            Assert.IsTrue(this.browser.UpdateCommand.CanExecute(null));
+            Assert.IsTrue(((ICommand)this.browser.InspectCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)this.browser.UpdateCommand).CanExecute(null));
         }
 
         [Test]
@@ -186,14 +190,14 @@ namespace BasicRDL.Tests.ViewModels
             var cat = new UnitPrefix(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new UnitPrefix(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
 
-            CDPMessageBus.Current.SendObjectChangeEvent(cat, EventKind.Added);
-            CDPMessageBus.Current.SendObjectChangeEvent(cat2, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(cat, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(cat2, EventKind.Added);
 
             var rev = typeof(Thing).GetProperty("RevisionNumber");
             rev.SetValue(sRdl, 3);
             sRdl.ShortName = "test";
 
-            CDPMessageBus.Current.SendObjectChangeEvent(sRdl, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.UnitPrefixes.Count(x => x.ContainerRdl == "test") == 2);
         }
     }

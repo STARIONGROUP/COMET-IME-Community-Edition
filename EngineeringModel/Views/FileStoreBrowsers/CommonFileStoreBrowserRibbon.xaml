@@ -24,7 +24,7 @@
                             ActAsDropDown="True"
                             Content="Common File Store"
                             RibbonStyle="Large"
-                            IsEnabled="{Binding HasModels, UpdateSourceTrigger=PropertyChanged}"
+                            IsEnabled="{Binding HasSessions, UpdateSourceTrigger=PropertyChanged}"
                             LargeGlyph="{dx:DXImage Image=Project_32x32.png}"
                             Hint="Open a Common File Store Browser for a Model"
                             IsVisible="True">

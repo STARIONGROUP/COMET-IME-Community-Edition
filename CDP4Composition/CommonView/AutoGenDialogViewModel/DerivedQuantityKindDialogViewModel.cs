@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DerivedQuantityKindDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="DerivedQuantityKindDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="DerivedQuantityKind"/>
@@ -110,32 +111,32 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a QuantityKindFactor
         /// </summary>
-        public ReactiveCommand<object> CreateQuantityKindFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateQuantityKindFactorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a QuantityKindFactor
         /// </summary>
-        public ReactiveCommand<object> DeleteQuantityKindFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteQuantityKindFactorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a QuantityKindFactor
         /// </summary>
-        public ReactiveCommand<object> EditQuantityKindFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditQuantityKindFactorCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a QuantityKindFactor
         /// </summary>
-        public ReactiveCommand<object> InspectQuantityKindFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectQuantityKindFactorCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Move-Up <see cref="ICommand"/> to move up the order of a QuantityKindFactor 
         /// </summary>
-        public ReactiveCommand<object> MoveUpQuantityKindFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveUpQuantityKindFactorCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Move-Down <see cref="ICommand"/> to move down the order of a QuantityKindFactor
         /// </summary>
-        public ReactiveCommand<object> MoveDownQuantityKindFactorCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> MoveDownQuantityKindFactorCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -148,22 +149,22 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedQuantityKindFactorCommand = this.WhenAny(vm => vm.SelectedQuantityKindFactor, v => v.Value != null);
             var canExecuteEditSelectedQuantityKindFactorCommand = this.WhenAny(vm => vm.SelectedQuantityKindFactor, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateQuantityKindFactorCommand = ReactiveCommand.Create(canExecuteCreateQuantityKindFactorCommand);
+            this.CreateQuantityKindFactorCommand = ReactiveCommandCreator.Create(canExecuteCreateQuantityKindFactorCommand);
             this.CreateQuantityKindFactorCommand.Subscribe(_ => this.ExecuteCreateCommand<QuantityKindFactor>(this.PopulateQuantityKindFactor));
 
-            this.DeleteQuantityKindFactorCommand = ReactiveCommand.Create(canExecuteEditSelectedQuantityKindFactorCommand);
+            this.DeleteQuantityKindFactorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedQuantityKindFactorCommand);
             this.DeleteQuantityKindFactorCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedQuantityKindFactor.Thing, this.PopulateQuantityKindFactor));
 
-            this.EditQuantityKindFactorCommand = ReactiveCommand.Create(canExecuteEditSelectedQuantityKindFactorCommand);
+            this.EditQuantityKindFactorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedQuantityKindFactorCommand);
             this.EditQuantityKindFactorCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedQuantityKindFactor.Thing, this.PopulateQuantityKindFactor));
 
-            this.InspectQuantityKindFactorCommand = ReactiveCommand.Create(canExecuteInspectSelectedQuantityKindFactorCommand);
+            this.InspectQuantityKindFactorCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedQuantityKindFactorCommand);
             this.InspectQuantityKindFactorCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedQuantityKindFactor.Thing));
 
-            this.MoveUpQuantityKindFactorCommand = ReactiveCommand.Create(canExecuteEditSelectedQuantityKindFactorCommand);
+            this.MoveUpQuantityKindFactorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedQuantityKindFactorCommand);
             this.MoveUpQuantityKindFactorCommand.Subscribe(_ => this.ExecuteMoveUpCommand(this.QuantityKindFactor, this.SelectedQuantityKindFactor));
 
-            this.MoveDownQuantityKindFactorCommand = ReactiveCommand.Create(canExecuteEditSelectedQuantityKindFactorCommand);
+            this.MoveDownQuantityKindFactorCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedQuantityKindFactorCommand);
             this.MoveDownQuantityKindFactorCommand.Subscribe(_ => this.ExecuteMoveDownCommand(this.QuantityKindFactor, this.SelectedQuantityKindFactor));
         }
 

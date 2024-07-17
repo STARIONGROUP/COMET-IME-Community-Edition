@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementDefinitionRowViewModelsTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+// <copyright file="ElementDefinitionRowViewModelsTestFixtureBis.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -31,23 +31,24 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
     using System.Linq;
     using System.Threading.Tasks;
     using System.Windows;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
-    using CDP4Dal.Operations;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
+
     using CDP4Composition.DragDrop;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.Services;
-    using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -120,10 +121,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         private IterationSetup iterationsetup;
         private SiteReferenceDataLibrary srdl;
         private ModelReferenceDataLibrary mrdl;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void SetUp()
         {
+            this.messageBus = new CDPMessageBus();
             this.permissionService = new Mock<IPermissionService>();
             this.thingDialognavigationService = new Mock<IThingDialogNavigationService>();
             this.thingCreator = new Mock<IThingCreator>();
@@ -133,6 +136,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.serviceLocator = new Mock<IServiceLocator>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
             this.serviceLocator.Setup(x => x.GetInstance<IThingCreator>())
                 .Returns(this.thingCreator.Object);
 
@@ -140,7 +144,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.modelsetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
             this.iterationsetup = new IterationSetup(Guid.NewGuid(), this.cache, this.uri);
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri);
-            this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri) {RequiredRdl = this.srdl};
+            this.mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri) { RequiredRdl = this.srdl };
 
             this.modelsetup.RequiredRdl.Add(this.mrdl);
             this.modelsetup.IterationSetup.Add(this.iterationsetup);
@@ -174,6 +178,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.activeDomain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
             this.someotherDomain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri);
             this.session = new Mock<ISession>();
+
             this.qqParamType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri)
             {
                 Name = "PTName",
@@ -223,8 +228,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
                 Owner = this.activeDomain
             };
 
-            this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) {EngineeringModelSetup = this.modelsetup};
-            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) {IterationSetup = this.iterationsetup};
+            this.model = new EngineeringModel(Guid.NewGuid(), this.cache, this.uri) { EngineeringModelSetup = this.modelsetup };
+            this.iteration = new Iteration(Guid.NewGuid(), this.cache, this.uri) { IterationSetup = this.iterationsetup };
             var person = new Person(Guid.NewGuid(), null, null) { GivenName = "test", Surname = "test" };
             var participant = new Participant(Guid.NewGuid(), null, null) { Person = person, SelectedDomain = this.activeDomain };
             this.session.Setup(x => x.ActivePerson).Returns(person);
@@ -355,8 +360,8 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinitionForUsage2.ParameterGroup.Add(this.parameterGroup2ForUsage2);
             this.elementDefinitionForUsage1.ParameterGroup.Add(this.parameterGroup3ForUsage1);
 
-            this.iteration.Element.Add(elementDefinitionForUsage1);
-            this.iteration.Element.Add(elementDefinitionForUsage2);
+            this.iteration.Element.Add(this.elementDefinitionForUsage1);
+            this.iteration.Element.Add(this.elementDefinitionForUsage2);
 
             this.parameterGroup3.ContainingGroup = this.parameterGroup1;
             this.parameterGroup3ForUsage1.ContainingGroup = this.parameterGroup1ForUsage1;
@@ -364,18 +369,19 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter4.Group = this.parameterGroup3;
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
 
         [TearDown]
         public void TearDown()
         {
-            CDPMessageBus.Current.ClearSubscriptions();
+            this.messageBus.ClearSubscriptions();
         }
 
         [Test]
         public void VerifyThatGroupAreCorrectlyHandled()
         {
-            var revision = typeof (ElementDefinition).GetProperty("RevisionNumber");
+            var revision = typeof(ElementDefinition).GetProperty("RevisionNumber");
 
             var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
@@ -389,7 +395,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             // move group3 to group2
             this.parameterGroup3.ContainingGroup = this.parameterGroup2;
             revision.SetValue(this.elementDefinition, 1);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
 
             groups = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().ToList();
             Assert.AreEqual(2, groups.Count);
@@ -399,7 +405,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             // move group3 to root
             this.parameterGroup3.ContainingGroup = null;
             revision.SetValue(this.elementDefinition, 2);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
 
             groups = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().ToList();
             var group3Row = groups.Single(x => x.Thing == this.parameterGroup3);
@@ -411,7 +417,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             // move group1 to group3
             this.parameterGroup1.ContainingGroup = this.parameterGroup3;
             revision.SetValue(this.elementDefinition, 3);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
 
             groups = vm.ContainedRows.OfType<ParameterGroupRowViewModel>().ToList();
             Assert.AreEqual(2, groups.Count);
@@ -436,6 +442,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.parameter1.ValueSet.Add(valueSet);
             this.elementDefinition.Parameter.Add(this.parameter1);
+
             // **********
 
             var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
@@ -447,14 +454,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             // move parameter to group1
             revision.SetValue(this.parameter1, 1);
             this.parameter1.Group = this.parameterGroup1;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.Count);
             Assert.AreEqual(2, group1Row.ContainedRows.Count);
 
             // move parameter to group3
             revision.SetValue(this.parameter1, 2);
             this.parameter1.Group = this.parameterGroup3;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
             Assert.AreEqual(2, vm.ContainedRows.Count);
             Assert.AreEqual(1, group1Row.ContainedRows.Count);
             Assert.AreEqual(1, group3Row.ContainedRows.Count);
@@ -462,7 +469,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             // move parameter to root
             revision.SetValue(this.parameter1, 3);
             this.parameter1.Group = null;
-            CDPMessageBus.Current.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
             Assert.AreEqual(3, vm.ContainedRows.Count);
             Assert.AreEqual(1, group1Row.ContainedRows.Count);
             Assert.AreEqual(0, group3Row.ContainedRows.Count);
@@ -478,7 +485,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinition.ContainedElement.Add(this.elementUsage1);
             revision.SetValue(this.elementDefinition, 1);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
             var usagesRow = vm.ContainedRows.OfType<ElementUsageRowViewModel>().ToList();
 
             Assert.IsNotEmpty(usagesRow);
@@ -486,7 +493,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.elementDefinition.ContainedElement.Clear();
             revision.SetValue(this.elementDefinition, 2);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
             usagesRow = vm.ContainedRows.OfType<ElementUsageRowViewModel>().ToList();
             Assert.IsEmpty(usagesRow);
         }
@@ -509,13 +516,14 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
 
             this.parameter5ForSubscription.ValueSet.Add(valueSet);
 
-            var subscription = new ParameterSubscription(Guid.NewGuid(), this.cache, this.uri) {Owner = this.activeDomain};
-            subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), this.cache, this.uri){SubscribedValueSet = valueSet});
+            var subscription = new ParameterSubscription(Guid.NewGuid(), this.cache, this.uri) { Owner = this.activeDomain };
+            subscription.ValueSet.Add(new ParameterSubscriptionValueSet(Guid.NewGuid(), this.cache, this.uri) { SubscribedValueSet = valueSet });
 
             this.parameter5ForSubscription.ParameterSubscription.Add(subscription);
 
             this.elementDefinition.Parameter.Add(this.parameter5ForSubscription);
             this.elementDefinition.ParameterGroup.Clear();
+
             // **********
 
             // init the tested class
@@ -529,7 +537,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.parameter5ForSubscription.ParameterSubscription.Clear();
             revision.SetValue(this.elementDefinition, 1);
 
-            CDPMessageBus.Current.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
             Assert.AreEqual(1, vm.ContainedRows.Count);
 
             var paramRow = vm.ContainedRows.Single();
@@ -541,9 +549,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
 
-            elementDefinition.Owner = domainOfExpertise;
+            this.elementDefinition.Owner = domainOfExpertise;
             var parameterGroup = new ParameterGroup(Guid.NewGuid(), null, null);
-            elementDefinition.ParameterGroup.Add(parameterGroup);
+            this.elementDefinition.ParameterGroup.Add(parameterGroup);
 
             var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
@@ -569,9 +577,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
 
-            elementDefinition.Owner = domainOfExpertise;
+            this.elementDefinition.Owner = domainOfExpertise;
             var parameterGroup = new ParameterGroup(Guid.NewGuid(), null, null);
-            elementDefinition.ParameterGroup.Add(parameterGroup);
+            this.elementDefinition.ParameterGroup.Add(parameterGroup);
 
             var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
@@ -586,7 +594,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             parameter.ParameterType = simpleQuantityKind;
             parameter.Scale = ratioScale;
             parameter.Owner = domainOfExpertise;
-            elementDefinition.Parameter.Add(parameter);
+            this.elementDefinition.Parameter.Add(parameter);
 
             var valueset = new ParameterValueSet(Guid.NewGuid(), null, null);
             parameter.ValueSet.Add(valueset);
@@ -607,9 +615,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
-            elementDefinition.Owner = domainOfExpertise;
+            this.elementDefinition.Owner = domainOfExpertise;
             var parameterGroup = new ParameterGroup(Guid.NewGuid(), null, null);
-            elementDefinition.ParameterGroup.Add(parameterGroup);
+            this.elementDefinition.ParameterGroup.Add(parameterGroup);
 
             var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
@@ -665,7 +673,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
             var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
-            
+
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(this.elementDefinitionForUsage1);
 
@@ -681,7 +689,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 
             var payloadElementDefenition = new ElementDefinition(Guid.Empty, null, null);
-            
+
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(payloadElementDefenition);
 
@@ -723,9 +731,9 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
 
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), null, null);
-            elementDefinition.Owner = domainOfExpertise;
+            this.elementDefinition.Owner = domainOfExpertise;
             var parameterGroup = new ParameterGroup(Guid.NewGuid(), null, null);
-            elementDefinition.ParameterGroup.Add(parameterGroup);
+            this.elementDefinition.ParameterGroup.Add(parameterGroup);
 
             var row = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
 

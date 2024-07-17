@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ReqIfImportDialog.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="ReqIfImportDialog.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,7 +14,7 @@ namespace CDP4Requirements.Views
     /// <summary>
     /// Interaction logic for ReqIfImportDialog.xaml
     /// </summary>
-    [DialogViewExport("ReqIfImportDialog", "The ReqIF import dialog")]
+    [CDP4Composition.Attributes.DialogViewExport("ReqIfImportDialog", "The ReqIF import dialog")]
     public partial class ReqIfImportDialog : DXWindow, IDialogView
     {
         [ImportingConstructor]

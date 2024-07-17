@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParametricConstraintsFolderRowViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2019 RHEA System S.A.
+// <copyright file="ParametricConstraintsFolderRowViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2019 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 namespace CDP4Requirements.ViewModels.RequirementBrowser.Rows

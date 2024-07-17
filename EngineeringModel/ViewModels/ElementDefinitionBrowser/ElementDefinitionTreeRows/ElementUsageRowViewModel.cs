@@ -1,19 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ElementUsageRowViewModel.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2022 RHEA System S.A.
+
+// <copyright file="ElementUsageRowViewModel.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of CDP4-COMET-IME Community Edition.
-//    The CDP4-COMET-IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -94,7 +95,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="session">The associated <see cref="ISession"/></param>
         /// <param name="containerViewModel">The container view-model</param>
         /// <param name="obfuscationService">The obfuscation service</param>
-        public ElementUsageRowViewModel(ElementUsage elementUsage, DomainOfExpertise currentExpertise, ISession session, IViewModelBase<Thing> containerViewModel,
+        public ElementUsageRowViewModel(
+            ElementUsage elementUsage,
+            DomainOfExpertise currentExpertise,
+            ISession session,
+            IViewModelBase<Thing> containerViewModel,
             IObfuscationService obfuscationService)
             : base(elementUsage, currentExpertise, session, containerViewModel, obfuscationService)
         {
@@ -228,18 +233,20 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeSubscriptions();
 
-            Func<ObjectChangedEvent, bool> optionAddDiscriminator = 
-                objectChange => 
-                objectChange.EventKind == EventKind.Added 
-                && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache 
-                && objectChange.ChangedThing.TopContainer == this.Thing.TopContainer;
+            Func<ObjectChangedEvent, bool> optionAddDiscriminator =
+                objectChange =>
+                    objectChange.EventKind == EventKind.Added
+                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache
+                    && objectChange.ChangedThing.TopContainer == this.Thing.TopContainer;
+
             Action<ObjectChangedEvent> optionAddAction = x => this.UpdateOptionLists();
 
-            Func<ObjectChangedEvent, bool> optionRemoveDiscriminator = 
-                objectChange => 
-                objectChange.EventKind == EventKind.Removed 
-                && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache 
-                && objectChange.ChangedThing.TopContainer == this.Thing.Container;
+            Func<ObjectChangedEvent, bool> optionRemoveDiscriminator =
+                objectChange =>
+                    objectChange.EventKind == EventKind.Removed
+                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache
+                    && objectChange.ChangedThing.TopContainer == this.Thing.Container;
+
             Action<ObjectChangedEvent> optionRemoveAction = x => this.UpdateOptionLists();
 
             Func<ObjectChangedEvent, bool> elementDefinitionDiscriminator = objectChange => objectChange.EventKind == EventKind.Updated;
@@ -247,25 +254,25 @@ namespace CDP4EngineeringModel.ViewModels
 
             if (this.AllowMessageBusSubscriptions)
             {
-                var elementDefListener = CDPMessageBus.Current.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
+                var elementDefListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.ElementDefinition)
                     .Where(elementDefinitionDiscriminator)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(elementDefinitionAction);
 
-                var highlightSubscription = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
+                var highlightSubscription = this.CDPMessageBus.Listen<ElementUsageHighlightEvent>(this.Thing.ElementDefinition)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.HighlightEventHandler());
 
                 this.Disposables.Add(highlightSubscription);
 
                 var optionAddListener =
-                    CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
+                    this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Option))
                         .Where(optionAddDiscriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(optionAddAction);
 
                 var optionRemoveListener =
-                    CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option))
+                    this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Option))
                         .Where(optionRemoveDiscriminator)
                         .ObserveOn(RxApp.MainThreadScheduler)
                         .Subscribe(optionRemoveAction);
@@ -276,27 +283,56 @@ namespace CDP4EngineeringModel.ViewModels
             }
             else
             {
-                var highlightObserver = CDPMessageBus.Current.Listen<ElementUsageHighlightEvent>();
+                var highlightObserver = this.CDPMessageBus.Listen<ElementUsageHighlightEvent>();
 
                 this.Disposables.Add(
                     this.MessageBusHandler.GetHandler<ElementUsageHighlightEvent>()
-                    .RegisterEventHandler(highlightObserver, new MessageBusEventHandlerSubscription<ElementUsageHighlightEvent>(
-                        x => x.ElementDefinition.Equals(this.Thing.ElementDefinition), _ => this.HighlightEventHandler())));
+                        .RegisterEventHandler(highlightObserver, new MessageBusEventHandlerSubscription<ElementUsageHighlightEvent>(x => x.ElementDefinition.Equals(this.Thing.ElementDefinition), _ => this.HighlightEventHandler())));
 
-                var optionObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(Option));
-                this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Option), optionAddDiscriminator, optionAddAction)));
+                var optionObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Option));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Option), optionAddDiscriminator, optionAddAction)));
 
-                this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Option), optionRemoveDiscriminator, optionRemoveAction)));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(optionObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Option), optionRemoveDiscriminator, optionRemoveAction)));
 
-                var elementDefinitionObserver = CDPMessageBus.Current.Listen<ObjectChangedEvent>(typeof(ElementDefinition));
+                var elementDefinitionObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ElementDefinition));
 
-                this.Disposables.Add(
-                    this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(elementDefinitionObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ElementDefinition, elementDefinitionDiscriminator, elementDefinitionAction)));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(elementDefinitionObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.ElementDefinition, elementDefinitionDiscriminator, elementDefinitionAction)));
             }
 
             this.WhenAnyValue(x => x.ExcludedOptions).Subscribe(_ => this.UpdateDetails());
+
+            this.InitializeCategorySubscription();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="Category"/> subscription
+        /// </summary>
+        private void InitializeCategorySubscription()
+        {
+            Func<ObjectChangedEvent, bool> categoryDiscriminator =
+                objectChange =>
+                    objectChange.EventKind == EventKind.Updated
+                    && objectChange.ChangedThing.Cache == this.Session.Assembler.Cache 
+                    && this.Category.Contains(objectChange.ChangedThing);
+
+            Action<ObjectChangedEvent> categoryAction = x => this.UpdateCategories();
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var categoryRemoveListener =
+                    this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category))
+                        .Where(categoryDiscriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(categoryAction);
+
+                this.Disposables.Add(categoryRemoveListener);
+            }
+            else
+            {
+                var categoryObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Category));
+
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(categoryObserver, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Category), categoryDiscriminator, categoryAction)));
+            }
         }
 
         /// <summary>
@@ -397,9 +433,10 @@ namespace CDP4EngineeringModel.ViewModels
 
             var sb = new StringBuilder(this.Details);
 
-            if(this.ExcludedOptions != null)
+            if (this.ExcludedOptions != null)
             {
                 sb.AppendLine();
+
                 if (this.ExcludedOptions.Count == 0)
                 {
                     sb.AppendLine($"Excluded Options: -");
@@ -410,7 +447,7 @@ namespace CDP4EngineeringModel.ViewModels
                 }
             }
 
-            if(this.AllOptions != null)
+            if (this.AllOptions != null)
             {
                 if (this.AllOptions.Count == 0)
                 {
@@ -424,7 +461,6 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.Details = sb.ToString();
         }
-
 
         /// <summary>
         /// Update the <see cref="ThingStatus"/> property

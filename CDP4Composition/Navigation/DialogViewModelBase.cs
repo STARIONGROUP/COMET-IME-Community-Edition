@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="DialogViewModelBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="DialogViewModelBase.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // -------------------------------------------------------------------------------------------------
 
@@ -70,7 +70,7 @@ namespace CDP4Composition.Navigation
                 Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), CdpLogoAnimationPath);
 
             // error message handling
-            this.WhenAnyValue(x => x.ErrorMessage).Select(x => !string.IsNullOrWhiteSpace(x)).ToProperty(this, x => x.HasError, out this.hasError);
+            this.WhenAnyValue(x => x.ErrorMessage).Select(x => !string.IsNullOrWhiteSpace(x)).ToProperty(this, x => x.HasError, out this.hasError, scheduler: RxApp.MainThreadScheduler);
         }
 
         /// <summary>

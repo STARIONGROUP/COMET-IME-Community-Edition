@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
-// <copyright file="ReferenceDataLibraryDialogViewModel.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015-2017 RHEA S.A.
+// <copyright file="ReferenceDataLibraryDialogViewModel.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015-2017 Starion Group S.A.
 // </copyright>
 // <summary>
 //   This is an auto-generated class. Any manual changes on this file will be overwritten!
@@ -27,6 +27,7 @@ namespace CDP4CommonView
 	using CDP4Dal.Operations;
     using CDP4Dal.Permission;
     using ReactiveUI;
+    using System.Reactive;
 
     /// <summary>
     /// dialog-view-model class representing a <see cref="ReferenceDataLibrary"/>
@@ -435,207 +436,207 @@ namespace CDP4CommonView
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedRequiredRdl"/>
         /// </summary>
-        public ReactiveCommand<object> InspectSelectedRequiredRdlCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectSelectedRequiredRdlCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Category
         /// </summary>
-        public ReactiveCommand<object> CreateDefinedCategoryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateDefinedCategoryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Category
         /// </summary>
-        public ReactiveCommand<object> DeleteDefinedCategoryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteDefinedCategoryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Category
         /// </summary>
-        public ReactiveCommand<object> EditDefinedCategoryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditDefinedCategoryCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Category
         /// </summary>
-        public ReactiveCommand<object> InspectDefinedCategoryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectDefinedCategoryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ParameterType
         /// </summary>
-        public ReactiveCommand<object> CreateParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ParameterType
         /// </summary>
-        public ReactiveCommand<object> DeleteParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ParameterType
         /// </summary>
-        public ReactiveCommand<object> EditParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditParameterTypeCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ParameterType
         /// </summary>
-        public ReactiveCommand<object> InspectParameterTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectParameterTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a MeasurementScale
         /// </summary>
-        public ReactiveCommand<object> CreateScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateScaleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a MeasurementScale
         /// </summary>
-        public ReactiveCommand<object> DeleteScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteScaleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a MeasurementScale
         /// </summary>
-        public ReactiveCommand<object> EditScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditScaleCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a MeasurementScale
         /// </summary>
-        public ReactiveCommand<object> InspectScaleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectScaleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a UnitPrefix
         /// </summary>
-        public ReactiveCommand<object> CreateUnitPrefixCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateUnitPrefixCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a UnitPrefix
         /// </summary>
-        public ReactiveCommand<object> DeleteUnitPrefixCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteUnitPrefixCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a UnitPrefix
         /// </summary>
-        public ReactiveCommand<object> EditUnitPrefixCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditUnitPrefixCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a UnitPrefix
         /// </summary>
-        public ReactiveCommand<object> InspectUnitPrefixCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectUnitPrefixCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a MeasurementUnit
         /// </summary>
-        public ReactiveCommand<object> CreateUnitCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateUnitCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a MeasurementUnit
         /// </summary>
-        public ReactiveCommand<object> DeleteUnitCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteUnitCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a MeasurementUnit
         /// </summary>
-        public ReactiveCommand<object> EditUnitCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditUnitCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a MeasurementUnit
         /// </summary>
-        public ReactiveCommand<object> InspectUnitCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectUnitCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a FileType
         /// </summary>
-        public ReactiveCommand<object> CreateFileTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateFileTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a FileType
         /// </summary>
-        public ReactiveCommand<object> DeleteFileTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteFileTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a FileType
         /// </summary>
-        public ReactiveCommand<object> EditFileTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditFileTypeCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a FileType
         /// </summary>
-        public ReactiveCommand<object> InspectFileTypeCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectFileTypeCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Glossary
         /// </summary>
-        public ReactiveCommand<object> CreateGlossaryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateGlossaryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Glossary
         /// </summary>
-        public ReactiveCommand<object> DeleteGlossaryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteGlossaryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Glossary
         /// </summary>
-        public ReactiveCommand<object> EditGlossaryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditGlossaryCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Glossary
         /// </summary>
-        public ReactiveCommand<object> InspectGlossaryCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectGlossaryCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a ReferenceSource
         /// </summary>
-        public ReactiveCommand<object> CreateReferenceSourceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateReferenceSourceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a ReferenceSource
         /// </summary>
-        public ReactiveCommand<object> DeleteReferenceSourceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteReferenceSourceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a ReferenceSource
         /// </summary>
-        public ReactiveCommand<object> EditReferenceSourceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditReferenceSourceCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a ReferenceSource
         /// </summary>
-        public ReactiveCommand<object> InspectReferenceSourceCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectReferenceSourceCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Rule
         /// </summary>
-        public ReactiveCommand<object> CreateRuleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateRuleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Rule
         /// </summary>
-        public ReactiveCommand<object> DeleteRuleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteRuleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Rule
         /// </summary>
-        public ReactiveCommand<object> EditRuleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditRuleCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Rule
         /// </summary>
-        public ReactiveCommand<object> InspectRuleCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectRuleCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Create <see cref="ICommand"/> to create a Constant
         /// </summary>
-        public ReactiveCommand<object> CreateConstantCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> CreateConstantCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Delete <see cref="ICommand"/> to delete a Constant
         /// </summary>
-        public ReactiveCommand<object> DeleteConstantCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> DeleteConstantCommand { get; protected set; }
 
         /// <summary>
         /// Gets or sets the Edit <see cref="ICommand"/> to edit a Constant
         /// </summary>
-        public ReactiveCommand<object> EditConstantCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> EditConstantCommand { get; protected set; }
         
         /// <summary>
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect a Constant
         /// </summary>
-        public ReactiveCommand<object> InspectConstantCommand { get; protected set; }
+        public ReactiveCommand<Unit, Unit> InspectConstantCommand { get; protected set; }
 
         /// <summary>
         /// Initializes the <see cref="ICommand"/>s of this dialog
@@ -648,163 +649,163 @@ namespace CDP4CommonView
             var canExecuteInspectSelectedDefinedCategoryCommand = this.WhenAny(vm => vm.SelectedDefinedCategory, v => v.Value != null);
             var canExecuteEditSelectedDefinedCategoryCommand = this.WhenAny(vm => vm.SelectedDefinedCategory, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateDefinedCategoryCommand = ReactiveCommand.Create(canExecuteCreateDefinedCategoryCommand);
+            this.CreateDefinedCategoryCommand = ReactiveCommandCreator.Create(canExecuteCreateDefinedCategoryCommand);
             this.CreateDefinedCategoryCommand.Subscribe(_ => this.ExecuteCreateCommand<Category>(this.PopulateDefinedCategory));
 
-            this.DeleteDefinedCategoryCommand = ReactiveCommand.Create(canExecuteEditSelectedDefinedCategoryCommand);
+            this.DeleteDefinedCategoryCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDefinedCategoryCommand);
             this.DeleteDefinedCategoryCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedDefinedCategory.Thing, this.PopulateDefinedCategory));
 
-            this.EditDefinedCategoryCommand = ReactiveCommand.Create(canExecuteEditSelectedDefinedCategoryCommand);
+            this.EditDefinedCategoryCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedDefinedCategoryCommand);
             this.EditDefinedCategoryCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedDefinedCategory.Thing, this.PopulateDefinedCategory));
 
-            this.InspectDefinedCategoryCommand = ReactiveCommand.Create(canExecuteInspectSelectedDefinedCategoryCommand);
+            this.InspectDefinedCategoryCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedDefinedCategoryCommand);
             this.InspectDefinedCategoryCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedDefinedCategory.Thing));
             
             var canExecuteCreateParameterTypeCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedParameterTypeCommand = this.WhenAny(vm => vm.SelectedParameterType, v => v.Value != null);
             var canExecuteEditSelectedParameterTypeCommand = this.WhenAny(vm => vm.SelectedParameterType, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateParameterTypeCommand = ReactiveCommand.Create(canExecuteCreateParameterTypeCommand);
+            this.CreateParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteCreateParameterTypeCommand);
             this.CreateParameterTypeCommand.Subscribe(_ => this.ExecuteCreateParameterTypeCommand());
 
-            this.DeleteParameterTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterTypeCommand);
+            this.DeleteParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterTypeCommand);
             this.DeleteParameterTypeCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedParameterType.Thing, this.PopulateParameterType));
 
-            this.EditParameterTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedParameterTypeCommand);
+            this.EditParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedParameterTypeCommand);
             this.EditParameterTypeCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedParameterType.Thing, this.PopulateParameterType));
 
-            this.InspectParameterTypeCommand = ReactiveCommand.Create(canExecuteInspectSelectedParameterTypeCommand);
+            this.InspectParameterTypeCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedParameterTypeCommand);
             this.InspectParameterTypeCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedParameterType.Thing));
             
             var canExecuteCreateScaleCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedScaleCommand = this.WhenAny(vm => vm.SelectedScale, v => v.Value != null);
             var canExecuteEditSelectedScaleCommand = this.WhenAny(vm => vm.SelectedScale, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateScaleCommand = ReactiveCommand.Create(canExecuteCreateScaleCommand);
+            this.CreateScaleCommand = ReactiveCommandCreator.Create(canExecuteCreateScaleCommand);
             this.CreateScaleCommand.Subscribe(_ => this.ExecuteCreateScaleCommand());
 
-            this.DeleteScaleCommand = ReactiveCommand.Create(canExecuteEditSelectedScaleCommand);
+            this.DeleteScaleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedScaleCommand);
             this.DeleteScaleCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedScale.Thing, this.PopulateScale));
 
-            this.EditScaleCommand = ReactiveCommand.Create(canExecuteEditSelectedScaleCommand);
+            this.EditScaleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedScaleCommand);
             this.EditScaleCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedScale.Thing, this.PopulateScale));
 
-            this.InspectScaleCommand = ReactiveCommand.Create(canExecuteInspectSelectedScaleCommand);
+            this.InspectScaleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedScaleCommand);
             this.InspectScaleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedScale.Thing));
             
             var canExecuteCreateUnitPrefixCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedUnitPrefixCommand = this.WhenAny(vm => vm.SelectedUnitPrefix, v => v.Value != null);
             var canExecuteEditSelectedUnitPrefixCommand = this.WhenAny(vm => vm.SelectedUnitPrefix, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateUnitPrefixCommand = ReactiveCommand.Create(canExecuteCreateUnitPrefixCommand);
+            this.CreateUnitPrefixCommand = ReactiveCommandCreator.Create(canExecuteCreateUnitPrefixCommand);
             this.CreateUnitPrefixCommand.Subscribe(_ => this.ExecuteCreateCommand<UnitPrefix>(this.PopulateUnitPrefix));
 
-            this.DeleteUnitPrefixCommand = ReactiveCommand.Create(canExecuteEditSelectedUnitPrefixCommand);
+            this.DeleteUnitPrefixCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUnitPrefixCommand);
             this.DeleteUnitPrefixCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedUnitPrefix.Thing, this.PopulateUnitPrefix));
 
-            this.EditUnitPrefixCommand = ReactiveCommand.Create(canExecuteEditSelectedUnitPrefixCommand);
+            this.EditUnitPrefixCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUnitPrefixCommand);
             this.EditUnitPrefixCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedUnitPrefix.Thing, this.PopulateUnitPrefix));
 
-            this.InspectUnitPrefixCommand = ReactiveCommand.Create(canExecuteInspectSelectedUnitPrefixCommand);
+            this.InspectUnitPrefixCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedUnitPrefixCommand);
             this.InspectUnitPrefixCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedUnitPrefix.Thing));
             
             var canExecuteCreateUnitCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedUnitCommand = this.WhenAny(vm => vm.SelectedUnit, v => v.Value != null);
             var canExecuteEditSelectedUnitCommand = this.WhenAny(vm => vm.SelectedUnit, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateUnitCommand = ReactiveCommand.Create(canExecuteCreateUnitCommand);
+            this.CreateUnitCommand = ReactiveCommandCreator.Create(canExecuteCreateUnitCommand);
             this.CreateUnitCommand.Subscribe(_ => this.ExecuteCreateUnitCommand());
 
-            this.DeleteUnitCommand = ReactiveCommand.Create(canExecuteEditSelectedUnitCommand);
+            this.DeleteUnitCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUnitCommand);
             this.DeleteUnitCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedUnit.Thing, this.PopulateUnit));
 
-            this.EditUnitCommand = ReactiveCommand.Create(canExecuteEditSelectedUnitCommand);
+            this.EditUnitCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedUnitCommand);
             this.EditUnitCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedUnit.Thing, this.PopulateUnit));
 
-            this.InspectUnitCommand = ReactiveCommand.Create(canExecuteInspectSelectedUnitCommand);
+            this.InspectUnitCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedUnitCommand);
             this.InspectUnitCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedUnit.Thing));
             
             var canExecuteCreateFileTypeCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedFileTypeCommand = this.WhenAny(vm => vm.SelectedFileType, v => v.Value != null);
             var canExecuteEditSelectedFileTypeCommand = this.WhenAny(vm => vm.SelectedFileType, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateFileTypeCommand = ReactiveCommand.Create(canExecuteCreateFileTypeCommand);
+            this.CreateFileTypeCommand = ReactiveCommandCreator.Create(canExecuteCreateFileTypeCommand);
             this.CreateFileTypeCommand.Subscribe(_ => this.ExecuteCreateCommand<FileType>(this.PopulateFileType));
 
-            this.DeleteFileTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedFileTypeCommand);
+            this.DeleteFileTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedFileTypeCommand);
             this.DeleteFileTypeCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedFileType.Thing, this.PopulateFileType));
 
-            this.EditFileTypeCommand = ReactiveCommand.Create(canExecuteEditSelectedFileTypeCommand);
+            this.EditFileTypeCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedFileTypeCommand);
             this.EditFileTypeCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedFileType.Thing, this.PopulateFileType));
 
-            this.InspectFileTypeCommand = ReactiveCommand.Create(canExecuteInspectSelectedFileTypeCommand);
+            this.InspectFileTypeCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedFileTypeCommand);
             this.InspectFileTypeCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedFileType.Thing));
             
             var canExecuteCreateGlossaryCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedGlossaryCommand = this.WhenAny(vm => vm.SelectedGlossary, v => v.Value != null);
             var canExecuteEditSelectedGlossaryCommand = this.WhenAny(vm => vm.SelectedGlossary, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateGlossaryCommand = ReactiveCommand.Create(canExecuteCreateGlossaryCommand);
+            this.CreateGlossaryCommand = ReactiveCommandCreator.Create(canExecuteCreateGlossaryCommand);
             this.CreateGlossaryCommand.Subscribe(_ => this.ExecuteCreateCommand<Glossary>(this.PopulateGlossary));
 
-            this.DeleteGlossaryCommand = ReactiveCommand.Create(canExecuteEditSelectedGlossaryCommand);
+            this.DeleteGlossaryCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedGlossaryCommand);
             this.DeleteGlossaryCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedGlossary.Thing, this.PopulateGlossary));
 
-            this.EditGlossaryCommand = ReactiveCommand.Create(canExecuteEditSelectedGlossaryCommand);
+            this.EditGlossaryCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedGlossaryCommand);
             this.EditGlossaryCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedGlossary.Thing, this.PopulateGlossary));
 
-            this.InspectGlossaryCommand = ReactiveCommand.Create(canExecuteInspectSelectedGlossaryCommand);
+            this.InspectGlossaryCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedGlossaryCommand);
             this.InspectGlossaryCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedGlossary.Thing));
             
             var canExecuteCreateReferenceSourceCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedReferenceSourceCommand = this.WhenAny(vm => vm.SelectedReferenceSource, v => v.Value != null);
             var canExecuteEditSelectedReferenceSourceCommand = this.WhenAny(vm => vm.SelectedReferenceSource, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateReferenceSourceCommand = ReactiveCommand.Create(canExecuteCreateReferenceSourceCommand);
+            this.CreateReferenceSourceCommand = ReactiveCommandCreator.Create(canExecuteCreateReferenceSourceCommand);
             this.CreateReferenceSourceCommand.Subscribe(_ => this.ExecuteCreateCommand<ReferenceSource>(this.PopulateReferenceSource));
 
-            this.DeleteReferenceSourceCommand = ReactiveCommand.Create(canExecuteEditSelectedReferenceSourceCommand);
+            this.DeleteReferenceSourceCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedReferenceSourceCommand);
             this.DeleteReferenceSourceCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedReferenceSource.Thing, this.PopulateReferenceSource));
 
-            this.EditReferenceSourceCommand = ReactiveCommand.Create(canExecuteEditSelectedReferenceSourceCommand);
+            this.EditReferenceSourceCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedReferenceSourceCommand);
             this.EditReferenceSourceCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedReferenceSource.Thing, this.PopulateReferenceSource));
 
-            this.InspectReferenceSourceCommand = ReactiveCommand.Create(canExecuteInspectSelectedReferenceSourceCommand);
+            this.InspectReferenceSourceCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedReferenceSourceCommand);
             this.InspectReferenceSourceCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedReferenceSource.Thing));
             
             var canExecuteCreateRuleCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedRuleCommand = this.WhenAny(vm => vm.SelectedRule, v => v.Value != null);
             var canExecuteEditSelectedRuleCommand = this.WhenAny(vm => vm.SelectedRule, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateRuleCommand = ReactiveCommand.Create(canExecuteCreateRuleCommand);
+            this.CreateRuleCommand = ReactiveCommandCreator.Create(canExecuteCreateRuleCommand);
             this.CreateRuleCommand.Subscribe(_ => this.ExecuteCreateRuleCommand());
 
-            this.DeleteRuleCommand = ReactiveCommand.Create(canExecuteEditSelectedRuleCommand);
+            this.DeleteRuleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRuleCommand);
             this.DeleteRuleCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedRule.Thing, this.PopulateRule));
 
-            this.EditRuleCommand = ReactiveCommand.Create(canExecuteEditSelectedRuleCommand);
+            this.EditRuleCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedRuleCommand);
             this.EditRuleCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedRule.Thing, this.PopulateRule));
 
-            this.InspectRuleCommand = ReactiveCommand.Create(canExecuteInspectSelectedRuleCommand);
+            this.InspectRuleCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRuleCommand);
             this.InspectRuleCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRule.Thing));
             
             var canExecuteCreateConstantCommand = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
             var canExecuteInspectSelectedConstantCommand = this.WhenAny(vm => vm.SelectedConstant, v => v.Value != null);
             var canExecuteEditSelectedConstantCommand = this.WhenAny(vm => vm.SelectedConstant, v => v.Value != null && !this.IsReadOnly);
 
-            this.CreateConstantCommand = ReactiveCommand.Create(canExecuteCreateConstantCommand);
+            this.CreateConstantCommand = ReactiveCommandCreator.Create(canExecuteCreateConstantCommand);
             this.CreateConstantCommand.Subscribe(_ => this.ExecuteCreateCommand<Constant>(this.PopulateConstant));
 
-            this.DeleteConstantCommand = ReactiveCommand.Create(canExecuteEditSelectedConstantCommand);
+            this.DeleteConstantCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedConstantCommand);
             this.DeleteConstantCommand.Subscribe(_ => this.ExecuteDeleteCommand(this.SelectedConstant.Thing, this.PopulateConstant));
 
-            this.EditConstantCommand = ReactiveCommand.Create(canExecuteEditSelectedConstantCommand);
+            this.EditConstantCommand = ReactiveCommandCreator.Create(canExecuteEditSelectedConstantCommand);
             this.EditConstantCommand.Subscribe(_ => this.ExecuteEditCommand(this.SelectedConstant.Thing, this.PopulateConstant));
 
-            this.InspectConstantCommand = ReactiveCommand.Create(canExecuteInspectSelectedConstantCommand);
+            this.InspectConstantCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedConstantCommand);
             this.InspectConstantCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedConstant.Thing));
             var canExecuteInspectSelectedRequiredRdlCommand = this.WhenAny(vm => vm.SelectedRequiredRdl, v => v.Value != null);
-            this.InspectSelectedRequiredRdlCommand = ReactiveCommand.Create(canExecuteInspectSelectedRequiredRdlCommand);
+            this.InspectSelectedRequiredRdlCommand = ReactiveCommandCreator.Create(canExecuteInspectSelectedRequiredRdlCommand);
             this.InspectSelectedRequiredRdlCommand.Subscribe(_ => this.ExecuteInspectCommand(this.SelectedRequiredRdl));
         }
 

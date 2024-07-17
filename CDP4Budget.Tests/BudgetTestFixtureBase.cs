@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="BudgetTestFixtureBase.cs" company="RHEA System S.A.">
-//   Copyright (c) 2015 RHEA System S.A.
+// <copyright file="BudgetTestFixtureBase.cs" company="Starion Group S.A.">
+//   Copyright (c) 2015 Starion Group S.A.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ namespace CDP4Budget.Tests
         public virtual void Setup()
         {
             this.session = new Mock<ISession>();
-            this.uri = new Uri("http://www.rheagroup.com");
+            this.uri = new Uri("https://www.stariongroup.eu");
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
 
             this.InitializeRefData();

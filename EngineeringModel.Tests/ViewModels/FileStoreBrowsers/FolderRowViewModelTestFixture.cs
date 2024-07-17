@@ -1,11 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="FolderRowViewModelTestFixture.cs" company="RHEA System S.A.">
-//    Copyright (c) 2015-2024 RHEA System S.A.
+// <copyright file="FolderRowViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the RHEA Concurrent Design Desktop Application and Excel Integration
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
 //    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
@@ -28,30 +28,26 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Reflection;
-
-    using CDP4Common.EngineeringModelData;
-    using CDP4Common.SiteDirectoryData;
-    
-    using CDP4Dal;
-    
-    using CDP4EngineeringModel.ViewModels;
-    
-    using Moq;
-
-    using NUnit.Framework;
-
-    using CDP4Composition.DragDrop;
-
     using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.DragDrop;
     using CDP4Composition.Services;
 
+    using CDP4Dal;
     using CDP4Dal.Events;
 
-    using Microsoft.Practices.ServiceLocation;
+    using CDP4EngineeringModel.ViewModels;
+
+    using CommonServiceLocator;
+
+    using Moq;
+
+    using NUnit.Framework;
 
     /// <summary>
     /// Suite of tests for the <see cref="DomainFileStoreRowViewModel"/> class
@@ -75,10 +71,12 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private Mock<IFileStoreFileAndFolderHandler> fileStoreFileAndFolderHandler;
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IMessageBoxService> messageBoxService;
+        private CDPMessageBus messageBus;
 
         [SetUp]
         public void Setup()
         {
+            this.messageBus = new CDPMessageBus();
             this.messageBoxService = new Mock<IMessageBoxService>();
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -86,7 +84,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
             this.fileStoreFileAndFolderHandler = new Mock<IFileStoreFileAndFolderHandler>();
             this.session = new Mock<ISession>();
-            this.assembler = new Assembler(this.uri);
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
@@ -116,19 +114,19 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                 ShortName = "person",
                 GivenName = "person",
             };
-            
+
             this.participant = new Participant(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Person = this.person,
                 IsActive = true,
             };
-            
+
             this.domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "domain",
                 ShortName = "d"
             };
-            
+
             this.participant.Domain.Add(this.domain);
 
             this.folder1 = new Folder(Guid.NewGuid(), this.assembler.Cache, this.uri)
@@ -150,14 +148,16 @@ namespace CDP4EngineeringModel.Tests.ViewModels
                     new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
                     {
                         {
-                            this.iteration, 
+                            this.iteration,
                             new Tuple<DomainOfExpertise, Participant>(
-                                this.domain, 
+                                this.domain,
                                 this.participant)
                         }
                     });
+
+            this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
         }
-        
+
         [Test]
         public void VerifyThatDragOverWorks()
         {
@@ -183,7 +183,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             var dropTarget = new Mock<IDropTarget>();
             var dropinfo = new Mock<IDropInfo>();
             dropinfo.Setup(x => x.Payload).Returns(this.file);
-            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Copy);
+            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
             dropinfo.Setup(x => x.TargetItem).Returns(dropTarget.Object);
 
             await row.Drop(dropinfo.Object);
@@ -202,7 +202,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.fileStoreFileAndFolderHandler.Verify(x => x.UpdateFolderRowPosition(this.folder1), Times.Never);
 
             this.revisionNumberPropertyInfo.SetValue(this.folder1, 999999);
-            CDPMessageBus.Current.SendObjectChangeEvent(this.folder1, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.folder1, EventKind.Updated);
             this.fileStoreFileAndFolderHandler.Verify(x => x.UpdateFolderRowPosition(this.folder1), Times.Once);
         }
     }
