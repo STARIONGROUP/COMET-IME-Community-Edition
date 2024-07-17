@@ -107,7 +107,6 @@ namespace CDP4Composition.Services
                         treeListControl.View.CancelRowEdit();
 
                         treeListControl.View.BeginDataUpdate(true);
-                        Mouse.OverrideCursor = Cursors.Wait;
                     }
                     else if (grid is GridControl gridControl)
                     {
@@ -132,8 +131,6 @@ namespace CDP4Composition.Services
                     {
                         grid.EndDataUpdate();
                     }
-
-                    Mouse.OverrideCursor = null;
                 }
             }
             catch (Exception exception)
