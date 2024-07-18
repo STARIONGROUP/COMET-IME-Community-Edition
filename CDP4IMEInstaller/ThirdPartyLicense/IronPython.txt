@@ -1,7 +1,7 @@
 ﻿name: IronPython
-version: 3.4.0
+version: 3.4.1
 project url: http://ironpython.net/
-license url: https://raw.githubusercontent.com/IronLanguages/ironpython2/master/LICENSE
+license url: https://licenses.nuget.org/Apache-2.0
 
 Copyright (c) .NET Foundation and Contributors
            All Rights Reserved

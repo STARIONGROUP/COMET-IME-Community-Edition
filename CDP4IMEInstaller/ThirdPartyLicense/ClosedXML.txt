@@ -1,5 +1,5 @@
 ﻿name: ClosedXml
-version: 0.96.0 
+version: 0.102.2 
 project url: https://github.com/ClosedXML/ClosedXML
 license url: https://github.com/ClosedXML/ClosedXML/blob/develop/LICENSE
 

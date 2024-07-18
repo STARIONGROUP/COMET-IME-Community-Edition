@@ -111,7 +111,6 @@ namespace CDP4PluginPackager
         { 
             this.Deserialize();
             this.Serialize();
-            this.WriteLicense();
 
             if (this.ShouldPluginGetPacked)
             {
@@ -119,14 +118,6 @@ namespace CDP4PluginPackager
                 this.Pack();
                 Console.WriteLine("---- Packing done ----");
             }
-        }
-
-        /// <summary>
-        /// Write the license file in the output folder
-        /// </summary>
-        protected void WriteLicense()
-        {
-            File.WriteAllText($"{System.IO.Path.Combine(this.OutputPath, this.Manifest.Name)}.license.txt", this.GetLicense());
         }
 
         /// <summary>
@@ -140,25 +131,6 @@ namespace CDP4PluginPackager
                 Website = "https://store.cdp4.org",
                 ReleaseNote = this.GetReleaseNote()
             };
-        }
-
-        /// <summary>
-        /// Retrieve the license and set its property
-        /// </summary>
-        /// <returns>license as <see cref="string"/></returns>
-        public string GetLicense()
-        {
-            var licensePath = Directory.GetParent(this.Path).EnumerateFiles().FirstOrDefault(f => f.Name == "PluginLicense.txt")?.FullName;
-
-            if (string.IsNullOrWhiteSpace(licensePath))
-            {
-                Console.WriteLine("---- Warning no license file has been found ----");
-                return null;
-            }
-
-            return File.ReadAllText(licensePath)
-                .Replace("$PLUGIN_NAME", this.PluginName)
-                .Replace("$YEAR", DateTime.Now.Year.ToString());
         }
 
         /// <summary>

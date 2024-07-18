@@ -1,5 +1,5 @@
 ﻿name: System.Reactive
-version: 5.0.0
+version: 6.0.1
 project url: https://github.com/dotnet/reactive
 license url: https://github.com/dotnet/reactive/blob/main/LICENSE
 

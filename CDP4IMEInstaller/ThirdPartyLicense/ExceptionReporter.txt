@@ -1,5 +1,5 @@
 ﻿name: ExceptionReporter coding ideas
-version: 4.0.2
+version: 5.0.0
 project url: https://github.com/PandaWood/ExceptionReporter.NET
 license url: https://github.com/PandaWood/ExceptionReporter.NET/blob/master/LICENSE.txt
 

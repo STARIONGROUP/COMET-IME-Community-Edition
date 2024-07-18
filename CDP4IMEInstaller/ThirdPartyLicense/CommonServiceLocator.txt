@@ -1,5 +1,5 @@
 ﻿name: CommonServiceLocator
-version: 2.0.5 
+version: 2.0.7 
 project url: https://github.com/unitycontainer/commonservicelocator
 license url: https://opensource.org/license/ms-pl-html/
 

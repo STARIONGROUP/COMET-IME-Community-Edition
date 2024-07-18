@@ -1,9 +1,9 @@
 ﻿name: Castle.Core
-version: 4.4.0
+version: 5.1.1
 project url: http://www.castleproject.org/
-license url: http://www.apache.org/licenses/LICENSE-2.0.html
+license url: https://licenses.nuget.org/Apache-2.0
 
-Copyright 2004-2021 Castle Project - http://www.castleproject.org/
+Copyright 2004-2024 Castle Project - http://www.castleproject.org/
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

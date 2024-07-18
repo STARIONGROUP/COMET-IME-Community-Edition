@@ -1,5 +1,5 @@
 ﻿name: Hardcodet.NotifyIcon.Wpf
-version: 1.0.8
+version: 1.1.0
 project url: http://www.hardcodet.net/wpf-notifyicon
 license url: https://www.codeproject.com/info/cpol10.aspx
 

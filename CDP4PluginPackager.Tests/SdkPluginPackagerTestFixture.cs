@@ -105,17 +105,6 @@ namespace CDP4PluginPackager.Tests
         }
 
         [Test]
-        public void VerifyLicense()
-        {
-            var license = this.sdkPluginPackager.GetLicense();
-
-            Assert.IsNotNull(license);
-            Assert.IsNotEmpty(license);
-            Assert.IsFalse(license.Contains("$YEAR"));
-            Assert.IsFalse(license.Contains("$PLUGIN_NAME"));
-        }
-
-        [Test]
         public void VerifyThatPropertiesAreTheSameOnManifestClasses()
         {
             var pluginPackagerManifestProperties = typeof(Manifest).GetProperties();

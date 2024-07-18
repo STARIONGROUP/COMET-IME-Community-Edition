@@ -1,5 +1,5 @@
 ﻿name: CDP4ServicesDal-CE
-version: 26.6.2
+version: 27.2.1
 project url: https://github.com/STARIONGROUP/COMET-SDK-Community-Edition
 license url: https://licenses.nuget.org/LGPL-3.0-only
 

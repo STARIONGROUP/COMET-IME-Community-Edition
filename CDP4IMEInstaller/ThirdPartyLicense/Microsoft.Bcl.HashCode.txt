@@ -1,5 +1,5 @@
 ﻿name: Microsoft.Bcl.HashCode
-version: 1.0.0
+version: 8.0.0
 project url: https://github.com/dotnet/runtime
 license url: https://github.com/dotnet/runtime/blob/main/LICENSE.TXT
 

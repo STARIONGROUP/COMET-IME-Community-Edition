@@ -1,5 +1,5 @@
 ﻿name: Splat
-version: 14.4.1
+version: 15.1.1
 project url: https://github.com/reactiveui/splat/
 license url: https://github.com/reactiveui/splat/blob/main/LICENSE
 

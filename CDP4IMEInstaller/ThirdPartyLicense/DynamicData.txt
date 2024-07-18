@@ -1,5 +1,5 @@
 ﻿name: DynamicData
-version: 7.9.5
+version: 8.4.1
 project url: https://github.com/reactivemarbles/DynamicData
 license url: https://github.com/reactivemarbles/DynamicData/blob/main/LICENSE
 

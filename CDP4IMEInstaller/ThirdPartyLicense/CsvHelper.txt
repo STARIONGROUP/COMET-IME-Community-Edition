@@ -1,5 +1,5 @@
 ﻿name: CsvHelper
-version: 27.1.1
+version: 33.0.1
 project url: https://github.com/JoshClose/CsvHelper
 license url: https://raw.githubusercontent.com/JoshClose/CsvHelper/master/LICENSE.txt
 

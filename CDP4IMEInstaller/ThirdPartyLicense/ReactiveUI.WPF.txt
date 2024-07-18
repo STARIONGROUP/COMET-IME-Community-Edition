@@ -1,5 +1,5 @@
 ﻿name: reactiveui.wpf
-version: 18.3.1
+version: 20.1.1
 project url: http://reactiveui.net/
 license url: https://github.com/reactiveui/ReactiveUI/blob/main/LICENSE
 

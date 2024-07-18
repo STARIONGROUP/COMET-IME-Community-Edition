@@ -1,5 +1,5 @@
 ﻿name: NLog.Extensions.Logging
-version: 5.2.2
+version: 5.3.11
 project url: https://github.com/NLog/NLog.Extensions.Logging
 license url: https://github.com/NLog/NLog.Extensions.Logging/blob/master/LICENSE
 

@@ -1,5 +1,5 @@
 ﻿name: DynamicLanguageRuntime
-version: 1.3.0
+version: 1.3.4
 project url: https://ironpython.net/
 license url: https://raw.githubusercontent.com/IronLanguages/dlr/master/LICENSE
 

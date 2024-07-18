@@ -58,10 +58,6 @@
         <File Id="fil_license_CsvHelper" Vital="yes" Source="ThirdPartyLicense\CsvHelper.txt" KeyPath="yes"></File>
       </Component>
 
-	  <Component Id="comp_license_DocumentFormatOpenXml" Guid="{A76F54EA-30DA-4066-B2AC-399E2FA175BC}" Location="local" Win64="$(var.Win64)">
-		<File Id="fil_license_DocumentFormatOpenXml" Vital="yes" Source="ThirdPartyLicense\DocumentFormat.OpenXml.txt" KeyPath="yes"></File>
-	  </Component>
-
       <Component Id="comp_license_dotliquid" Guid="{2D19A3AF-8E09-45F6-A42B-D055CDD3B6E8}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_license_dotliquid" Vital="yes" Source="ThirdPartyLicense\dotliquid.txt" KeyPath="yes"></File>
       </Component>
@@ -121,10 +117,6 @@
 	  <Component Id="comp_license_Microsoft_Xaml_Behaviors" Guid="{89E51110-3BA3-41E2-B1CB-464AB1729DAC}" Location="local" Win64="$(var.Win64)">
 		<File Id="fil_license_Microsoft_Xaml_Behaviors" Vital="yes" Source="ThirdPartyLicense\Microsoft.Xaml.Behaviors.Wpf.txt" KeyPath="yes"></File>
 	  </Component>
-
-      <Component Id="comp_license_MoonSharp" Guid="{232D81F7-4871-4F44-95CE-0060BDBF266D}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_license_MoonSharp" Vital="yes" Source="ThirdPartyLicense\MoonSharp.txt" KeyPath="yes"></File>
-      </Component>
 
       <Component Id="comp_license_NetOfficeFw" Guid="{C5467549-76C0-4BA2-813A-EE2F3E56CF95}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_license_NetOfficeFw" Vital="yes" Source="ThirdPartyLicense\NetOfficeFw.txt" KeyPath="yes"></File>

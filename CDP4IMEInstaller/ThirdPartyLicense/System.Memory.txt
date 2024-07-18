@@ -1,5 +1,5 @@
 ﻿name: System.Memory
-version: 4.6.2
+version: 4.5.5
 project url: http://dot.net/
 license url: https://github.com/dotnet/corefx/blob/master/LICENSE.TXT
 
