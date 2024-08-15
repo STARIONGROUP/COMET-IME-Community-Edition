@@ -129,7 +129,7 @@ namespace CDP4Composition.Services
         {
             try
             {
-                var key = (uri, uri, overlayPosition);
+                var key = (uri, overlayUri, overlayPosition);
                 this.bitmapWithOverlay.TryGetValue(key, out var bitmapSource);
 
                 if (bitmapSource == null)

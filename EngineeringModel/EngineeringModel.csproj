@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
 	<ProjectGuid>{7B0F3699-960F-4A9C-BC32-6A5B73A5B895}</ProjectGuid>
-	<MinIMEVersion>10.0.0</MinIMEVersion>
+	<MinIMEVersion>10.0.1</MinIMEVersion>
 	<RootNamespace>CDP4EngineeringModel</RootNamespace>
 	<AssemblyName>CDP4EngineeringModel</AssemblyName>
 	<TargetFramework>net48</TargetFramework>
@@ -11,8 +11,8 @@
 	<Product>CDP4EngineeringModel</Product>
 	<Description>CDP4-COMET Engineering Model Plugin</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>10.0.0.20</AssemblyVersion>
-	<FileVersion>10.0.0.20</FileVersion>
+	<AssemblyVersion>10.0.1.1</AssemblyVersion>
+	<FileVersion>10.0.1.1</FileVersion>
   <LangVersion>latest</LangVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
@@ -40,13 +40,13 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.2.1">
+    <PackageReference Include="CDP4Common-CE" Version="27.2.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.2.1">
+    <PackageReference Include="CDP4Dal-CE" Version="27.2.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.1">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
@@ -151,10 +151,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="5.3.2">
+    <PackageReference Include="NLog" Version="5.3.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.11">
+	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.12">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReactiveUI.WPF" Version="20.1.1">
