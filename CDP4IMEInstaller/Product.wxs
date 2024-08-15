@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi" xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
 
-  <Product Id="*" Name="CDP4-COMET-CE" Language="1033" Version="10.0.0.20" Manufacturer="Starion Group S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
+  <Product Id="*" Name="CDP4-COMET-CE" Language="1033" Version="10.0.1.1" Manufacturer="Starion Group S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4">
 
     <?include variables.wxi ?>
    
