@@ -1,8 +1,8 @@
-<img src="https://github.com/STARION/COMET-IME-Community-Edition/raw/development/COMET-Community-Edition.jpg" width="250">
+<img src="https://raw.githubusercontent.com/STARIONGROUP/COMET-IME-Community-Edition/development/COMET-Community-Edition.jpg" width="250">
 
-The CDP4-COMET Integrated Modelling Environment (IME) Community Editition (CE) is the Starion Group open source Concurrent Design desktop application and Microsoft Excel integration compliant with ECSS-E-TM-10-25 Annex A and Annex C. CDP4-COMET IME makes use of a plugin framework, the end-user functionality is implemented in CDP4-COMET IME plugins that are loaded at run-time. This makes it straightforward to package, distribute and update the environment.
+The CDP4-COMET Integrated Modelling Environment (IME) is the Desktop application, including Microsoft Excel integration, that is used in combination with the CDP4-COMET webservices to model according to ECSS-E-TM-10-25. The **IME** makes use of a plugin framework, the end-user functionality is implemented in CDP4-COMET IME plugins that are loaded at run-time. This makes it straightforward to package, distribute and update the environment.
 
-The user manual for the CDP4-COMET IME is available [online](https://www.stariongroup.eu/document/cdp4-comet-manual/)
+The user manual for the CDP4-COMET IME is available [online](https://www.stariongroup.eu/wp-content/uploads/2024/04/CDP4-COMET-User-Manual-2024.pdf)
 
 ## Build status
 
