@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+	<TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>CDP4OrganizationBrowser.Tests</AssemblyTitle>
+    <AssemblyTitle>CDP4Composition.Tests</AssemblyTitle>
     <Company>Starion Group S.A.</Company>
-    <Product>CDP4OrganizationBrowser.Tests</Product>
-    <Description>CDP4OrganizationBrowser Unit Tests</Description>
+    <Product>CDP4Composition.Tests</Product>
+    <Description>CDP4-COMET Composition and Infrastructure library unit tests</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
+    <LangVersion>latest</LangVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -30,23 +31,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Castle.Core" Version="5.1.1" />
 	  <PackageReference Include="CDP4Common-CE" Version="27.3.4" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.3.4" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.3.4" />
-    <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
-    <PackageReference Include="ReactiveUI.WPF" Version="20.1.63" />
-    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+	  <PackageReference Include="CDP4Dal-CE" Version="27.3.4" />
+	  <PackageReference Include="CDP4JsonSerializer-CE" Version="27.3.4" />
+	  <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.3.4" />
+	  <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
+	  <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.122" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  <PackageReference Include="NLog" Version="5.3.3" />
+	  <PackageReference Include="NLog.Extensions.Logging" Version="5.3.12" />
+	  <PackageReference Include="ReactiveUI.WPF" Version="20.1.1" />
+	  <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+	  <PackageReference Include="Castle.Core" Version="5.1.1" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit.Console" Version="3.18.3" />
+    <PackageReference Include="NUnit.Console" Version="3.18.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -58,8 +61,30 @@
     </PackageReference>
   </ItemGroup>
 
-	<ItemGroup>
-    <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
-    <ProjectReference Include="..\CDP4SiteDirectory\CDP4SiteDirectory.csproj" />
+  <ItemGroup>
+    <None Include="Modularity\AppSettingsTest.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <EmbeddedResource Include="Resources\RibbonXml\customui14.xsd">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <None Include="PluginSettingService\expectedSettings.settings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SpellingChecker\en_US.aff">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SpellingChecker\en_US.dic">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RibbonXml\testribbon.xml" />
+  </ItemGroup>
+
 </Project>

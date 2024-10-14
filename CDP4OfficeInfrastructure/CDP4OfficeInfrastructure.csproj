@@ -7,8 +7,8 @@
     <Product>CDP4OfficeInfrastructure</Product>
     <Description>CDP4-COMET Office Infrastucture library</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
-    <AssemblyVersion>10.0.1.1</AssemblyVersion>
-    <FileVersion>10.0.1.1</FileVersion>
+    <AssemblyVersion>10.0.2.0</AssemblyVersion>
+    <FileVersion>10.0.2.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -28,15 +28,15 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.2.3" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.2.3" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.2.3" />
+    <PackageReference Include="CDP4Common-CE" Version="27.3.4" />
+    <PackageReference Include="CDP4Dal-CE" Version="27.3.4" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.3.4" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.9.7" />
     <PackageReference Include="NetOfficeFw.Excel" Version="1.9.7" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NLog" Version="5.3.3" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.12" />
+    <PackageReference Include="NLog" Version="5.3.4" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
