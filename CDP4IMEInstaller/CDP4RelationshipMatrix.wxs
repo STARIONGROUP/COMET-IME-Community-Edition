@@ -28,8 +28,20 @@
 
 	    <Component Id="comp_OpenXml" Guid="{E30AA0D1-9521-43CF-8BE0-658330C84A8E}" Location="local" Win64="$(var.Win64)">
 		    <File Id="fil_RelationshipMatrix_OpenXml" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)DocumentFormat.OpenXml.dll" KeyPath="yes" />
-	    </Component>		
+	    </Component>
 
-	</ComponentGroup>
+      <Component Id="comp_OpenXml_Framework" Guid="{139DEC10-E397-422D-8F12-6DE386406BB7}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_RelationshipMatrix_OpenXml_Framework" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)DocumentFormat.OpenXml.Framework.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_ClosedXml_Parser" Guid="{2F723F60-EBF6-42B7-B857-5BCB2BBDF9F5}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_RelationshipMatrix_ClosedXml_Parser" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)ClosedXML.Parser.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="comp_RBush" Guid="{3A5942F5-EC76-4E7B-AA1B-A92C59BF4116}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_RelationshipMatrix_RBush" Vital="yes" Source="$(var.CDP4RelationshipMatrix.TargetDir)RBush.dll" KeyPath="yes" />
+      </Component>
+
+    </ComponentGroup>
 	</Fragment>
 </Wix>
