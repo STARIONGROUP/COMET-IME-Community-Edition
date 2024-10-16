@@ -24,7 +24,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reactive.Concurrency;
@@ -45,6 +44,7 @@ using DevExpress.Xpf.Core;
 using NLog;
 
 using ReactiveUI;
+
 using Splat;
 using Splat.NLog;
 

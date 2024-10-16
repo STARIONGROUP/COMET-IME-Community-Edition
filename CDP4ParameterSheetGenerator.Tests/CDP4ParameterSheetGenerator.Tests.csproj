@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ParameterSheetGenerator.Tests</AssemblyTitle>
     <Company>Starion Group S.A.</Company>
@@ -34,8 +34,8 @@
     <PackageReference Include="CDP4Dal-CE" Version="27.3.4" />
     <PackageReference Include="CDP4JsonSerializer-CE" Version="27.3.4" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.9.7" />
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.7" />
+    <PackageReference Include="NetOfficeFw.Core" Version="2.0.0-preview20" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="2.0.0-preview20" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />

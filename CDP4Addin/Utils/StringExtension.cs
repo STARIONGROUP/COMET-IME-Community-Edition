@@ -25,6 +25,8 @@
 
 namespace CDP4AddinCE.Utils
 {
+    using System.Runtime.InteropServices;
+
     using CDP4Composition;
 
     using NetOffice.OfficeApi.Enums;
@@ -32,6 +34,7 @@ namespace CDP4AddinCE.Utils
     /// <summary>
     /// Static extension class to convert a string to a <see cref="MsoCTPDockPosition"/>
     /// </summary>
+    [ComVisible(false)]
     public static class StringExtension
     {
         /// <summary>

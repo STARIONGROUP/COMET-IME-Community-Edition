@@ -26,6 +26,7 @@
 namespace BasicRdl
 {
     using System.ComponentModel.Composition;
+    using System.Runtime.InteropServices;
 
     using CDP4Composition;
     using CDP4Composition.Modularity;
@@ -40,6 +41,7 @@ namespace BasicRdl
     /// The <see cref="IModule"/> implementation for the <see cref="BasicRdlModule"/> Component
     /// </summary>
     [Export(typeof(IModule))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class BasicRdlModule : IModule
     {
         /// <summary>

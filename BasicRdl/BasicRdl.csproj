@@ -3,7 +3,7 @@
 	<ProjectGuid>{BEDCC5C5-83B2-41ED-AC9F-895757553BF2}</ProjectGuid>
 	<MinIMEVersion>10.0.2</MinIMEVersion>
 	<AssemblyName>CDP4BasicRdl</AssemblyName>
-	<TargetFramework>net48</TargetFramework>
+	<TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
 	<SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
 	<AssemblyTitle>CDP4BasicRdl</AssemblyTitle>
 	<Company>Starion Group S.A.</Company>
@@ -37,13 +37,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.3.4">
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.3.4">
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.3.4">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
@@ -189,75 +189,7 @@
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Windows.Forms">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <Private>false</Private>
-    </Reference>
-	<Reference Include="System.Web">
-	  <Private>false</Private>
-	</Reference>
-    <Reference Include="System.Data.DataSetExtensions">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <Private>false</Private>
-    </Reference>
-	<Reference Update="System">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Update="System.Core">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Update="System.Data">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Update="System.Drawing">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Update="System.IO.Compression.FileSystem">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Update="System.Numerics">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Update="System.Runtime.Serialization">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Update="System.Xml">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Update="System.Xml.Linq">
-	  <Private>false</Private>
-	</Reference>
-  </ItemGroup> 
-  <ItemGroup>
+ <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>

@@ -15,8 +15,8 @@ namespace CDP4AddinCE
     /// The purpose of the <see cref="TaskPaneWpfHostControl"/> is to act as container or host for
     /// the WPF controls of the CDP4 plugins
     /// </summary>
-    [Guid("76CD03FA-0532-45A4-A222-5A14669D805C")]
-    [ProgId("CDP4AddinCE.TaskPaneWpfHostControl")]
+    [Guid("029DF98D-39FB-4DD7-A562-E2D49261E97B")]
+    [ProgId("CDP4-COMETCE.TaskPaneWpfHostControl")]
     [ComVisible(true)]
     public partial class TaskPaneWpfHostControl : UserControl
     {

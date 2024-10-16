@@ -58,7 +58,7 @@ namespace CDP4PluginPackager
         protected string BuildConfiguration;
 
         /// <summary>
-        /// The target framework version (net48)
+        /// The target framework version (net8)
         /// </summary>
         protected string BuildTargetFramework;
 
@@ -93,7 +93,7 @@ namespace CDP4PluginPackager
         /// <param name="path">the working directory</param>
         /// <param name="shouldPluginGetPacked">state if a plugin needs to be packed in a zip</param>
         /// <param name="buildConfiguration">the current build configuration (Debug/Release)</param>
-        /// <param name="buildTargetFramework">The target framework version (net48)</param>
+        /// <param name="buildTargetFramework">The target framework version (net8)</param>
         /// <param name="buildPlatform">The build platform (AnyCpu/x64)</param>
         protected BasePluginPackager(string path, bool shouldPluginGetPacked, string buildConfiguration = "", string buildTargetFramework = "", string buildPlatform = "")
         {

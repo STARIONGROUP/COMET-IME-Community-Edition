@@ -41,8 +41,6 @@ namespace CDP4ShellDialogs.ViewModels
 
     using NLog;
 
-    using Splat;
-
     using LogLevel = NLog.LogLevel;
 
     /// <summary>

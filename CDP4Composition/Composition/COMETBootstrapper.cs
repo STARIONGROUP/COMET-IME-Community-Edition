@@ -30,6 +30,7 @@ namespace CDP4Composition.Composition
     using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Windows;
 
@@ -39,6 +40,8 @@ namespace CDP4Composition.Composition
     using CDP4Composition.Services.AppSettingService;
 
     using CommonServiceLocator;
+
+    using DynamicData;
 
     using NLog;
 
@@ -73,7 +76,7 @@ namespace CDP4Composition.Composition
             this.UpdateBootstrapperStatus("Configuring catalogs");
 
             var catalog = new AggregateCatalog();
-            var container = new CompositionContainer(catalog);
+            var container = new CompositionContainer(catalog, CompositionOptions.DisableSilentRejection);
 
             var sw = Stopwatch.StartNew();
             this.UpdateBootstrapperStatus("Loading CDP4-COMET Catalogs");
@@ -84,8 +87,12 @@ namespace CDP4Composition.Composition
 
             this.UpdateBootstrapperStatus($"CDP4-COMET Catalogs loaded in: {sw.ElapsedMilliseconds} [ms]");
 
-            this.ConfigureServiceLocator(container);
+            this.messageBoxService = new MessageBoxService();
+
             this.ShowStatusMessage("Loading CDP4-COMET IME Plugins...");
+
+
+            this.ConfigureServiceLocator(container);
 
             this.AddPluginCatalogs(catalog);
 
@@ -116,9 +123,21 @@ namespace CDP4Composition.Composition
                 throw new InvalidOperationException($"Cannot find directory path for {Assembly.GetExecutingAssembly().FullName}");
             }
 
-            var dllCatalog = new DirectoryCatalog(currentAssemblyPath, "CDP4*.dll");
+            var excludeAssemblies = new [] { "System.Data.SqlClient.dll", "CDP4-COMETAddinCE.comhost.dll" };
 
-            catalog.Catalogs.Add(dllCatalog);
+            var files = Directory.GetFiles(currentAssemblyPath, "*.dll");
+
+            foreach (var excludeAssembly in excludeAssemblies)
+            {
+                files = files
+                    .Where(f => !f.EndsWith(excludeAssembly)).ToArray();
+            }
+
+            // Create a new catalog with the remaining assemblies
+            foreach (var file in files)
+            {
+                catalog.Catalogs.Add(new AssemblyCatalog(file));
+            }
         }
 
         /// <summary>
@@ -129,8 +148,6 @@ namespace CDP4Composition.Composition
         {
             var serviceLocator = new MefServiceLocator(container);
             ServiceLocator.SetLocatorProvider(() => serviceLocator);
-
-            this.messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
         }
 
         /// <summary>

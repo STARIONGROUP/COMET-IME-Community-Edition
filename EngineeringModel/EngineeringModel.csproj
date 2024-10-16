@@ -4,7 +4,7 @@
 	<MinIMEVersion>10.0.2</MinIMEVersion>
 	<RootNamespace>CDP4EngineeringModel</RootNamespace>
 	<AssemblyName>CDP4EngineeringModel</AssemblyName>
-	<TargetFramework>net48</TargetFramework>
+	<TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
 	<SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
 	<AssemblyTitle>CDP4EngineeringModel</AssemblyTitle>
 	<Company>Starion Group S.A.</Company>
@@ -163,62 +163,6 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Accessibility">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationCore">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="ReachFramework">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Configuration">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Deployment">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.IO.Compression">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Printing">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.ServiceModel">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Transactions">
-      <Private>false</Private>
-    </Reference>
-	<Reference Include="System.Web">
-	  <Private>false</Private>
-	</Reference>
-    <Reference Include="System.Windows.Forms">
-	    <Private>false</Private>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UIAutomationProvider">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="UIAutomationTypes">
-      <Private>false</Private>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <Private>false</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">

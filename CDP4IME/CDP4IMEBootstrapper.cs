@@ -45,7 +45,8 @@ namespace COMET
         /// <param name="catalog">The <see cref="AggregateCatalog"/></param>
         protected override void AddCustomCatalogs(AggregateCatalog catalog)
         {
-            catalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4IMEBootstrapper).Assembly));
+            //IN Net8 the files are already there!
+            //catalog.Catalogs.Add(new AssemblyCatalog(typeof(CDP4IMEBootstrapper).Assembly));
         }
 
         /// <summary>

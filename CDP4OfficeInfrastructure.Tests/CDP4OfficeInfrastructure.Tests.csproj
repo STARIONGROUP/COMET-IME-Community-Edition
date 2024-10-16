@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-	<TargetFramework>net48</TargetFramework>
+	<TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4OfficeInfrastructure.Tests</AssemblyTitle>
     <Company>Starion Group S.A.</Company>
@@ -41,8 +41,8 @@
 	  <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
 	  <PackageReference Include="ReactiveUI" Version="20.1.63" />
 	  <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.9.7" />
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.7" />
+    <PackageReference Include="NetOfficeFw.Core" Version="2.0.0-preview20" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="2.0.0-preview20" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{28BED1F3-D9FD-476C-AFF9-6A8AB666D245}</ProjectGuid>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4DiagramEditor.Tests</AssemblyTitle>
     <Company>Starion Group S.A.</Company>

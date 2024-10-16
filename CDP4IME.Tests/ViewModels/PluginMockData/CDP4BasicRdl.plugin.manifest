@@ -4,7 +4,7 @@
   "Description": "CDP4-COMET test plugin",
   "Version": "5.5.5.5",
   "CompatibleIMEVersion": null,
-  "TargetFramework": "net48",
+  "TargetFramework": "net8",
   "ReleaseNote": null,
   "Author": "Starion Group S.A.",
   "Website": "https://store.cdp4.org"

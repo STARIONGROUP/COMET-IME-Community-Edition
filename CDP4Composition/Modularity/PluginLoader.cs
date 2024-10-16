@@ -30,6 +30,7 @@ namespace CDP4Composition.Modularity
     using System.ComponentModel.Composition.Hosting;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using CDP4Composition.Services.AppSettingService;
 
@@ -107,7 +108,23 @@ namespace CDP4Composition.Modularity
         /// </param>
         private void LoadPlugins(string path)
         {
-            var dllCatalog = new DirectoryCatalog(path, "*.dll");
+            // Load first and then aad to DirectoryCatalogue
+            foreach (var file in Directory.GetFiles(path, "*.dll"))
+            {
+                try
+                {
+                    var assemblyCatalogue3 = new AssemblyCatalog(file);
+                    Assembly.LoadFrom(file);
+                    //var assemblyCatalogue2 = new AssemblyCatalog(file);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    //throw;
+                }
+            }
+
+            var dllCatalog = new DirectoryCatalog(path);
             this.DirectoryCatalogues.Add(dllCatalog);
         }
     }

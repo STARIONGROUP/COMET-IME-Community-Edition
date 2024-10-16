@@ -26,6 +26,7 @@
 namespace CDP4AddinCE
 {
     using System;
+    using System.Runtime.InteropServices;
 
     using NetOffice.OfficeApi;
 
@@ -33,6 +34,7 @@ namespace CDP4AddinCE
     /// The purpose of the <see cref="IdentifiableCustomTaskPane"/> is to Decorate the <see cref="_CustomTaskPane"/>
     /// with extra properties
     /// </summary>
+    [ComVisible(false)]
     public class IdentifiableCustomTaskPane : IDisposable
     {
         /// <summary>

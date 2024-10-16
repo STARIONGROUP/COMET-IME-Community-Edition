@@ -78,10 +78,9 @@ namespace CDP4AddinCE
     /// The <see cref="Addin"/> provides CDP4 integration with the Office Suite. It self-registers in the registry and
     /// provides the Fluent XML Ribbon and call-back implementations for the Fluent XML Ribbon controls
     /// </summary>
-    [COMAddin("CDP4-COMET-CE Office Add-in", "The CDP4-COMET-CE Office Add-in provides COMET application integration with Microsoft Office Suite", 3)]
-    [Guid("FD48B640-1D3F-4922-854B-C69028CA469E")]
-    [ProgId("CDP4CE.Addin")]
-    [RegistryLocation(RegistrySaveLocation.LocalMachine)]
+    [ComVisible(true)]
+    [Guid("0901A3E4-6F4A-4572-86C5-A20C286E4010")]
+    [ProgId("CDP4-COMETCE.Addin")]
     public class Addin : COMAddin
     {
         /// <summary>
@@ -340,10 +339,10 @@ namespace CDP4AddinCE
         {
             //These assemblies are present in the main folder (bin), but are not used (yet) bij the Addin itself
             logger.Trace("Pre-register Addin Assemblies");
-            Assembly.Load("Markdown.Xaml");
-            Assembly.Load("System.Net.Http.Formatting");
-            Assembly.Load("System.Threading.Tasks.Extensions");
-            Assembly.Load("System.Runtime.CompilerServices.Unsafe");
+            //Assembly.Load("Markdown.Xaml");
+            //Assembly.Load("System.Net.Http.Formatting");
+            //Assembly.Load("System.Threading.Tasks.Extensions");
+            //Assembly.Load("System.Runtime.CompilerServices.Unsafe");
         }
 
         /// <summary>
@@ -351,25 +350,25 @@ namespace CDP4AddinCE
         /// </summary>
         private void RedirectAssemblies()
         {
-            logger.Trace("System.Buffers");
-            var systemBuffers = new Version("4.0.3.0");
-            this.RedirectAssembly("System.Buffers", systemBuffers, "cc7b13ffcd2ddd51");
+            //logger.Trace("System.Buffers");
+            //var systemBuffers = new Version("4.0.3.0");
+            //this.RedirectAssembly("System.Buffers", systemBuffers, "cc7b13ffcd2ddd51");
 
-            logger.Trace("System.Memory");
-            var systemMemory = new Version("4.0.1.2");
-            this.RedirectAssembly("System.Memory", systemMemory, "cc7b13ffcd2ddd51");
+            //logger.Trace("System.Memory");
+            //var systemMemory = new Version("4.0.1.2");
+            //this.RedirectAssembly("System.Memory", systemMemory, "cc7b13ffcd2ddd51");
 
-            logger.Trace("System.Numerics.Vectors");
-            var systemVectors = new Version("4.1.4.0");
-            this.RedirectAssembly("System.Numerics.Vectors", systemMemory, "b03f5f7f11d50a3a");
+            //logger.Trace("System.Numerics.Vectors");
+            //var systemVectors = new Version("4.1.4.0");
+            //this.RedirectAssembly("System.Numerics.Vectors", systemMemory, "b03f5f7f11d50a3a");
 
-            logger.Trace("Microsoft.Bcl.AsyncInterfaces");
-            var asyncInterfaces = new Version("8.0.0.0");
-            this.RedirectAssembly("Microsoft.Bcl.AsyncInterfaces", asyncInterfaces, "cc7b13ffcd2ddd51");
+            //logger.Trace("Microsoft.Bcl.AsyncInterfaces");
+            //var asyncInterfaces = new Version("8.0.0.0");
+            //this.RedirectAssembly("Microsoft.Bcl.AsyncInterfaces", asyncInterfaces, "cc7b13ffcd2ddd51");
 
-            logger.Trace("System.Runtime.CompilerServices.Unsafe");
-            var compilerServices = new Version("6.0.0.0");
-            this.RedirectAssembly("System.Runtime.CompilerServices.Unsafe", compilerServices, "b03f5f7f11d50a3a");
+            //logger.Trace("System.Runtime.CompilerServices.Unsafe");
+            //var compilerServices = new Version("6.0.0.0");
+            //this.RedirectAssembly("System.Runtime.CompilerServices.Unsafe", compilerServices, "b03f5f7f11d50a3a");
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <ProjectGuid>{A9EF51F8-4F27-4F50-8EE3-33BC2F69DF12}</ProjectGuid>
     <MinIMEVersion>10.0.2</MinIMEVersion>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4RelationshipMatrix</AssemblyTitle>
     <Company>Starion Group S.A.</Company>
@@ -171,50 +171,6 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-	<Reference Include="PresentationCore">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="PresentationFramework">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="System.ComponentModel.Composition">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="System.Configuration">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="System.Data.Linq">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="System.IO.Compression">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="System.ServiceModel">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="System.Transactions">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="System.Xaml">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="System.Web">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="System.Data.DataSetExtensions">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="UIAutomationProvider">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="UIAutomationTypes">
-	  <Private>false</Private>
-	</Reference>
-	<Reference Include="WindowsBase">
-	  <Private>false</Private>
-	</Reference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
       <Private>false</Private>
       <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
@@ -226,50 +182,5 @@
     <Resource Include="Resources\Images\nodir.png" />
     <Resource Include="Resources\Images\xtoy.png" />
     <Resource Include="Resources\Images\ytox.png" />
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Update="System">
-		  <Private>false</Private>
-	  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Update="System.Core">
-		  <Private>false</Private>
-	  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Update="System.Data">
-		  <Private>false</Private>
-	  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Update="System.Drawing">
-		  <Private>false</Private>
-	  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Update="System.IO.Compression.FileSystem">
-		  <Private>false</Private>
-	  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Update="System.Numerics">
-		  <Private>false</Private>
-	  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Update="System.Runtime.Serialization">
-		  <Private>false</Private>
-	  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Update="System.Xml">
-		  <Private>false</Private>
-	  </Reference>
-  </ItemGroup>
-  <ItemGroup>
-	  <Reference Update="System.Xml.Linq">
-		  <Private>false</Private>
-	  </Reference>
   </ItemGroup>
 </Project>

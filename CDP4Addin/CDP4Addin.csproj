@@ -1,18 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{161E536A-DB05-4BFD-BADD-A5B9EF605DA5}</ProjectGuid>
-    <RootNamespace>CDP4AddinCE</RootNamespace>
-    <AssemblyName>CDP4AddinCE</AssemblyName>
-    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>CDP4-COMETAddinCE</RootNamespace>
+    <AssemblyName>CDP4-COMETAddinCE</AssemblyName>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <AssemblyTitle>CDP4AddinCE</AssemblyTitle>
+    <AssemblyTitle>CDP4-COMETAddinCE</AssemblyTitle>
     <Company>Starion Group S.A.</Company>
-    <Product>CDP4AddinCE</Product>
+    <Product>CDP4-COMETAddinCE</Product>
     <Description>CDP4-COMET-CE Office Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
     <AssemblyVersion>10.0.2.0</AssemblyVersion>
     <FileVersion>10.0.2.0</FileVersion>
-    <RegisterForComInterop>true</RegisterForComInterop>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableComHosting>true</EnableComHosting>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
@@ -33,9 +35,9 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.3.4" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.3.4" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.3.4" />
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc1" />
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc1" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc1" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.5" />
     <PackageReference Include="DevExpress.Data" Version="23.2.5" />
@@ -71,8 +73,8 @@
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5" />
     <PackageReference Include="ExceptionReporter" Version="5.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageReference Include="NetOfficeFw.Core" Version="1.9.7" />
-    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.7" />
+    <PackageReference Include="NetOfficeFw.Core" Version="2.0.0-preview20" />
+    <PackageReference Include="NetOfficeFw.Excel" Version="2.0.0-preview20" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
@@ -80,24 +82,7 @@
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Windows" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="UIAutomationProvider" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="WindowsFormsIntegration" />
-  </ItemGroup>
-  <ItemGroup>
+ <ItemGroup>
     <Compile Update="TaskPaneWpfHostControl.cs" />
     <Compile Update="TaskPaneWpfHostControl.Designer.cs">
       <DependentUpon>TaskPaneWpfHostControl.cs</DependentUpon>

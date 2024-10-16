@@ -3,9 +3,9 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>COMET</RootNamespace>
     <AssemblyName>CDP4-COMET</AssemblyName>
-	  <TargetFramework>net48</TargetFramework>
+	  <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <OutputPath>bin\$(Configuration)\net48\</OutputPath>
+    <OutputPath>bin\$(Configuration)\net8\</OutputPath>
     <AssemblyTitle>CDP4-COMET</AssemblyTitle>
     <Company>Starion Group S.A</Company>
     <Product>CDP4-COMET</Product>
@@ -40,10 +40,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.3.4" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.3.4" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.3.4" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.3.4" />
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc1" />
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc1" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc1" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.0.0-rc1" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DevExpress.Charts" Version="23.2.5" />
     <PackageReference Include="DevExpress.Charts.Core" Version="23.2.5" />
@@ -106,26 +106,7 @@
     <PackageReference Include="Splat.NLog" Version="15.2.22" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Printing" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Xaml" />
-    <Reference Include="UIAutomationProvider" />
-    <Reference Include="UIAutomationTypes" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="PresentationCore" />
-    <Reference Include="PresentationFramework" />
-  </ItemGroup>
-  <ItemGroup>
+ <ItemGroup>
     <None Include="NLog.dll.nlog">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
