@@ -91,7 +91,6 @@ namespace CDP4Composition.Composition
 
             this.ShowStatusMessage("Loading CDP4-COMET IME Plugins...");
 
-
             this.ConfigureServiceLocator(container);
 
             this.AddPluginCatalogs(catalog);
@@ -123,9 +122,9 @@ namespace CDP4Composition.Composition
                 throw new InvalidOperationException($"Cannot find directory path for {Assembly.GetExecutingAssembly().FullName}");
             }
 
-            var excludeAssemblies = new [] { "System.Data.SqlClient.dll", "CDP4-COMETAddinCE.comhost.dll" };
+            var excludeAssemblies = new [] { "CDP4-COMET.dll", "System.Data.SqlClient.dll", "CDP4-COMETAddinCE.comhost.dll" };
 
-            var files = Directory.GetFiles(currentAssemblyPath, "*.dll");
+            var files = Directory.GetFiles(currentAssemblyPath, "CDP4*.dll");
 
             foreach (var excludeAssembly in excludeAssemblies)
             {
@@ -156,6 +155,8 @@ namespace CDP4Composition.Composition
         /// <param name="catalog">The <see cref="AggregateCatalog"/></param>
         private void AddPluginCatalogs(AggregateCatalog catalog)
         {
+            return;
+
             this.UpdateBootstrapperStatus("Loading CDP4-COMET Plugins");
 
             var pluginLoader = new PluginLoader<T>();

@@ -106,7 +106,8 @@ namespace CDP4Composition.Services
 
                         treeListControl.View.CancelRowEdit();
 
-                        treeListControl.View.BeginDataUpdate(true);
+                        //TODO RESTORE
+                        //treeListControl.View.BeginDataUpdate(true);
                     }
                     else if (grid is GridControl gridControl)
                     {
@@ -125,7 +126,8 @@ namespace CDP4Composition.Services
                 {
                     if (grid is TreeListControl treeListControl)
                     {
-                        treeListControl.View.EndDataUpdate();
+                        //TODO RESTORE
+                        //treeListControl.View.EndDataUpdate();
                     }
                     else if (grid is GridControl gridControl && gridControl.DataController.IsUpdateLocked)
                     {
