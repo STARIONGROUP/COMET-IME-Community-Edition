@@ -45,6 +45,7 @@ namespace CDP4AddinCE
     using CDP4Common.ExceptionHandlerService;
 
     using CDP4Composition;
+    using CDP4Composition.ErrorReporting.Views;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
@@ -59,8 +60,6 @@ namespace CDP4AddinCE
     using CommonServiceLocator;
 
     using DevExpress.Xpf.Core;
-
-    using ExceptionReporting;
 
     using NetOffice.ExcelApi;
     using NetOffice.ExcelApi.Tools;
@@ -659,8 +658,7 @@ namespace CDP4AddinCE
             var thread = new Thread(
                 () =>
                 {
-                    var exceptionReporter = new ExceptionReporter();
-                    exceptionReporter.Show(ex);
+                    ErrorReporter.ShowDialog(ex);
                 });
 
             thread.SetApartmentState(ApartmentState.STA);

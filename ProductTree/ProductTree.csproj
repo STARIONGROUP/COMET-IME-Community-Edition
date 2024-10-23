@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{2FFF0B74-7E29-41A2-A1FF-5004CE27D22A}</ProjectGuid>
-    <MinIMEVersion>10.0.2</MinIMEVersion>
+    <MinIMEVersion>10.0.3</MinIMEVersion>
     <RootNamespace>CDP4ProductTree</RootNamespace>
     <AssemblyName>CDP4ProductTree</AssemblyName>
     <TargetFramework>net48</TargetFramework>
@@ -12,8 +12,8 @@
     <Description>CDP4-COMET Product Tree Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
     <LangVersion>latest</LangVersion>
-    <AssemblyVersion>10.0.2.0</AssemblyVersion>
-    <FileVersion>10.0.2.0</FileVersion>
+    <AssemblyVersion>10.0.3.0</AssemblyVersion>
+    <FileVersion>10.0.3.0</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -135,13 +135,13 @@
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="CDP4Common-CE" Version="27.3.4">
+	<PackageReference Include="CDP4Common-CE" Version="27.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.3.4">
+    <PackageReference Include="CDP4Dal-CE" Version="27.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.3.4">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">

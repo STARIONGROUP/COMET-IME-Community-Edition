@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
 	  <ProjectGuid>{7C432D61-867C-4DD2-8B14-EE8AEFD0B3A4}</ProjectGuid>
-	  <MinIMEVersion>10.0.2</MinIMEVersion>
+	  <MinIMEVersion>10.0.3</MinIMEVersion>
 	  <RootNamespace>CDP4JsonFileDalPlugin</RootNamespace>
 	  <AssemblyName>CDP4JsonFileDalPlugin</AssemblyName>
 	  <TargetFramework>net48</TargetFramework>
@@ -11,8 +11,8 @@
 	  <Product>CDP4JsonFileDalPlugin</Product>
 	  <Description>CDP4-COMET Json File Dal Plugin</Description>
 	  <Copyright>Copyright © Starion Group S.A.</Copyright>
-	  <AssemblyVersion>10.0.2.0</AssemblyVersion>
-	  <FileVersion>10.0.2.0</FileVersion>
+	  <AssemblyVersion>10.0.3.0</AssemblyVersion>
+	  <FileVersion>10.0.3.0</FileVersion>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
 	  <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -39,16 +39,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.3.4">
+    <PackageReference Include="CDP4Common-CE" Version="27.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.3.4">
+    <PackageReference Include="CDP4Dal-CE" Version="27.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.3.4">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="CDP4JsonFileDal-CE" Version="27.3.4" />
+	<PackageReference Include="CDP4JsonFileDal-CE" Version="27.4.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>

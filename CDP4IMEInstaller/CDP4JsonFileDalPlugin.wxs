@@ -14,10 +14,10 @@
         <File Id="fil_Manifest_CDP4JsonFileDal"  Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)CDP4JsonFileDal.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_ionicZip" Guid="{B3614A66-1BFF-47D9-A8E4-1B440172D18E}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_IonicZip" Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)DotNetZip.dll" KeyPath="yes" />
+      <Component Id="comp_SharpZipLib" Guid="{6125D6A2-DA33-4FFE-916A-CADB3EFEC567}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_SharpZibLib" Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)ICSharpCode.SharpZipLib.dll" KeyPath="yes" />
       </Component>
-      
+     
     </ComponentGroup>
   </Fragment>
 </Wix>

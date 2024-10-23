@@ -97,13 +97,9 @@
     <Content Include="ThirdPartyLicense\CDP4ServicesDal-CE.txt" />
     <Content Include="ThirdPartyLicense\CDP4WspDal-CE.txt" />
     <Content Include="ThirdPartyLicense\CsvHelper.txt" />
-    <Content Include="ThirdPartyLicense\DocumentFormat.OpenXml.txt" />
     <Content Include="ThirdPartyLicense\dotliquid.txt" />
-    <Content Include="ThirdPartyLicense\DotNetZip.txt" />
     <Content Include="ThirdPartyLicense\DynamicData.txt" />
     <Content Include="ThirdPartyLicense\DynamicLanguageRuntime.txt" />
-    <Content Include="ThirdPartyLicense\ExceptionReporter.txt" />
-    <Content Include="ThirdPartyLicense\HandleBars.txt" />
     <Content Include="ThirdPartyLicense\Hardcodet.Wpf.TaskbarNotification.txt" />
     <Content Include="ThirdPartyLicense\IronPython.txt" />
     <Content Include="ThirdPartyLicense\Markdown.Xaml.txt" />
@@ -113,7 +109,6 @@
     <Content Include="ThirdPartyLicense\Microsoft.CSharp.txt" />
     <Content Include="ThirdPartyLicense\Microsoft.Net.Extensions.txt" />
     <Content Include="ThirdPartyLicense\Microsoft.Xaml.Behaviors.Wpf.txt" />
-    <Content Include="ThirdPartyLicense\MoonSharp.txt" />
     <Content Include="ThirdPartyLicense\NetOfficeFw.txt" />
     <Content Include="ThirdPartyLicense\Newtonsoft.Json.txt" />
     <Content Include="ThirdPartyLicense\NLog.Extensions.Logging.txt" />
@@ -121,7 +116,6 @@
     <Content Include="ThirdPartyLicense\ReactiveUI.txt" />
     <Content Include="ThirdPartyLicense\ReactiveUI.WPF.txt" />
     <Content Include="ThirdPartyLicense\ReqIFSharp.txt" />
-    <Content Include="ThirdPartyLicense\Simple-Mapi.txt" />
     <Content Include="ThirdPartyLicense\Splat.txt" />
     <Content Include="ThirdPartyLicense\System.Buffers.txt" />
     <Content Include="ThirdPartyLicense\System.ComponentModel.Composition.txt" />

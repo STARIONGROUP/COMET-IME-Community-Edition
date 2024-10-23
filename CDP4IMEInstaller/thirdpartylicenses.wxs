@@ -62,8 +62,8 @@
         <File Id="fil_license_dotliquid" Vital="yes" Source="ThirdPartyLicense\dotliquid.txt" KeyPath="yes"></File>
       </Component>
       
-      <Component Id="comp_license_DotNetZip" Guid="{F85033D5-14C5-4714-9367-F1D65848B30A}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_license_DotNetZip" Vital="yes" Source="ThirdPartyLicense\DotNetZip.txt" KeyPath="yes"></File>
+      <Component Id="comp_license_SharpZipLib" Guid="{8B371FB5-BA3A-49FF-B612-EA1CF7A94D3E}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_license_SharpZipLib" Vital="yes" Source="ThirdPartyLicense\SharpZipLib.txt" KeyPath="yes"></File>
       </Component>
 
 	  <Component Id="comp_license_DynamicData" Guid="{1C5AE12D-1831-4EE3-AA76-6EF0A6CABBEA}" Location="local" Win64="$(var.Win64)">
@@ -74,14 +74,6 @@
         <File Id="fil_license_DynamicLanguageRuntime" Vital="yes" Source="ThirdPartyLicense\DynamicLanguageRuntime.txt" KeyPath="yes"></File>
       </Component>
       
-      <Component Id="comp_license_ExceptionReporter" Guid="{70CAF16C-E5A1-4928-8772-88BD944054F8}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_license_ExceptionReporter" Vital="yes" Source="ThirdPartyLicense\ExceptionReporter.txt" KeyPath="yes"></File>
-      </Component>
-
-      <Component Id="comp_license_HandleBars" Guid="{B900E317-2774-4582-863F-5C29AABCE2F2}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_license_HandleBars" Vital="yes" Source="ThirdPartyLicense\HandleBars.txt" KeyPath="yes"></File>
-      </Component>
-		
       <Component Id="comp_license_Hardcodet_Wpf_TaskbarNotification" Guid="{DB9EFD5A-CDD1-48E7-8D36-E38A0F7AB60E}" Location="local" Win64="$(var.Win64)">
         <File Id="fil_license_Hardcodet_Wpf_TaskbarNotification" Vital="yes" Source="ThirdPartyLicense\Hardcodet.Wpf.TaskbarNotification.txt" KeyPath="yes"></File>
       </Component>
@@ -146,13 +138,9 @@
 		<File Id="fil_license_ReqIFSharp" Vital="yes" Source="ThirdPartyLicense\ReqIFSharp.txt" KeyPath="yes"></File>
 	  </Component>
 
-      <Component Id="comp_license_Simple_Mapi" Guid="{B7473ED5-4604-4CB9-A795-72F9D6A42E38}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_license_Simple_Mapi" Vital="yes" Source="ThirdPartyLicense\Simple-Mapi.txt" KeyPath="yes"></File>
-      </Component>
-		
-      <Component Id="comp_license_Splat" Guid="{6C702C45-B36D-4105-92FC-E1FF3B03A911}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_license_Splat" Vital="yes" Source="ThirdPartyLicense\Splat.txt" KeyPath="yes"></File>
-      </Component>
+    <Component Id="comp_license_Splat" Guid="{6C702C45-B36D-4105-92FC-E1FF3B03A911}" Location="local" Win64="$(var.Win64)">
+      <File Id="fil_license_Splat" Vital="yes" Source="ThirdPartyLicense\Splat.txt" KeyPath="yes"></File>
+    </Component>
 
 	  <Component Id="comp_license_System_Buffers" Guid="{6CC659BC-8B5A-4F6E-9995-1D156942061B}" Location="local" Win64="$(var.Win64)">
 		<File Id="fil_license_System_Buffers" Vital="yes" Source="ThirdPartyLicense\System.Buffers.txt" KeyPath="yes"></File>
