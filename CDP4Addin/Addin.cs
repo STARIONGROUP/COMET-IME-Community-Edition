@@ -369,6 +369,10 @@ namespace CDP4AddinCE
             logger.Trace("System.Runtime.CompilerServices.Unsafe");
             var compilerServices = new Version("6.0.0.0");
             this.RedirectAssembly("System.Runtime.CompilerServices.Unsafe", compilerServices, "b03f5f7f11d50a3a");
+
+            logger.Trace("System.Threading.Tasks.Extensions");
+            var taskExtensions = new Version("4.2.0.1");
+            this.RedirectAssembly("System.Threading.Tasks.Extensions", taskExtensions, "cc7b13ffcd2ddd51");
         }
 
         /// <summary>

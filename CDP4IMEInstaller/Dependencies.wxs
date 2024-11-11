@@ -100,6 +100,14 @@
         <File Id="fil_SplatNlog" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Splat.Nlog.dll" KeyPath="yes" />
       </Component>
 
+      <Component Id="comp_SharpZipLib" Guid="{6125D6A2-DA33-4FFE-916A-CADB3EFEC568}" Location="local" Win64="$(var.Win64)">
+        <File Id="fil_SharpZibLib" Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)ICSharpCode.SharpZipLib.dll" KeyPath="yes" />
+      </Component>
+
+      <Component Id="_7605D4E3" Guid="{7605D4E3-FE6E-4366-B37B-ADA9F0B76B66}" Win64="$(var.Win64)">
+        <File Id="_ADA9F0B76B66" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Buffers.dll" KeyPath="yes"></File>
+      </Component>
+
       <Component Id="_7805D4E3" Guid="{7805D4E3-FE6E-4366-B37B-ADA9F0B76B88}" Win64="$(var.Win64)">
         <File Id="_ADA9F0B76B88" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.ComponentModel.Annotations.dll" KeyPath="yes"></File>
       </Component>
