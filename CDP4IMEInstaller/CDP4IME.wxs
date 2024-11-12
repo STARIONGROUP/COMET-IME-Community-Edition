@@ -37,10 +37,6 @@
 
       <!-- CDP4-IME and CDP4-AddIn dependencies -->
 
-      <Component Id="_FF0D0F7D" Guid="{FF0D0F7D-98CD-456F-8299-3F08C72F64DD}" Win64="$(var.Win64)">
-	      <File Id="_3F08C72F64DD" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)ExceptionReporter.NET.dll" KeyPath="yes"></File>
-      </Component>
-
       <Component Id="_F6C7CAE5" Guid="{F6C7CAE5-8637-48A7-BFD9-CBB32F240021}" Win64="$(var.Win64)">
 			<File Id="_CBB32F240021" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)Hardcodet.NotifyIcon.Wpf.dll" KeyPath="yes" ></File>
 	  </Component>
