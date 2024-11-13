@@ -6,18 +6,22 @@
 
 namespace CDP4SiteDirectory.ViewModels
 {
-    using System;
+    using System.Collections.Generic;
     using System.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
@@ -52,18 +56,31 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="pluginSettingsService">
         /// The <see cref="IPluginSettingsService"/> used to read and write plugin setting files.
         /// </param>
-        public PersonBrowserViewModel(ISession session, SiteDirectory siteDir,
-            IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService,
-            IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
-            : base(siteDir, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService,
+        public PersonBrowserViewModel(
+            ISession session,
+            SiteDirectory siteDir,
+            IThingDialogNavigationService thingDialogNavigationService,
+            IPanelNavigationService panelNavigationService,
+            IDialogNavigationService dialogNavigationService,
+            IPluginSettingsService pluginSettingsService)
+            : base(
+                siteDir,
+                session,
+                thingDialogNavigationService,
+                panelNavigationService,
+                dialogNavigationService,
                 pluginSettingsService)
         {
             this.Caption = string.Format("{0}, {1}", PanelCaption, this.Thing.Name);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", this.Thing.Name, this.Thing.IDalUri,
+
+            this.ToolTip = string.Format(
+                "{0}\n{1}\n{2}",
+                this.Thing.Name,
+                this.Thing.IDalUri,
                 this.Session.ActivePerson.Name);
 
             this.PersonRowViewModels = new DisposableReactiveList<PersonRowViewModel>();
-            this.UpdatePersonRows();
+            this.ExecuteLongRunningDispatcherAction(this.AddPersons);
         }
 
         /// <summary>
@@ -76,8 +93,8 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public bool CanCreatePerson
         {
-            get { return this.canCreatePerson; }
-            private set { this.RaiseAndSetIfChanged(ref this.canCreatePerson, value); }
+            get => this.canCreatePerson;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreatePerson, value);
         }
 
         /// <summary>
@@ -94,12 +111,14 @@ namespace CDP4SiteDirectory.ViewModels
             var definedPersons = this.Thing.Person.ToList();
 
             var removedPersons = currentPersons.Except(definedPersons).ToList();
+
             foreach (var person in removedPersons)
             {
                 this.RemovePerson(person);
             }
 
             var addedPersons = definedPersons.Except(currentPersons).ToList();
+
             foreach (var addedPerson in addedPersons)
             {
                 this.AddPerson(addedPerson);
@@ -124,6 +143,26 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
+        /// Add the <see cref="Person"/> to the contained <see cref="PersonRowViewModel"/>s
+        /// </summary>
+        /// <param name="person">
+        /// the <see cref="Person"/> that is to be added
+        /// </param>
+        private void AddPersons()
+        {
+            var definedPersons = this.Thing.Person.ToList();
+
+            var rows = new List<PersonRowViewModel>();
+
+            foreach (var person in definedPersons)
+            {
+                rows.Add(new PersonRowViewModel(person, this.Session, this));
+            }
+
+            this.PersonRowViewModels.AddRange(rows);
+        }
+
+        /// <summary>
         /// Remove the <see cref="Person"/> from the contained <see cref="PersonRowViewModel"/>s
         /// </summary>
         /// <param name="person">
@@ -132,6 +171,7 @@ namespace CDP4SiteDirectory.ViewModels
         private void RemovePerson(Person person)
         {
             var row = this.PersonRowViewModels.SingleOrDefault(x => x.Thing == person);
+
             if (row != null)
             {
                 this.PersonRowViewModels.RemoveAndDispose(row);
@@ -167,6 +207,7 @@ namespace CDP4SiteDirectory.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+
             foreach (var person in this.PersonRowViewModels)
             {
                 person.Dispose();
@@ -189,8 +230,13 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.PopulateContextMenu();
 
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Person", "", this.CreateCommand,
-                MenuItemKind.Create, ClassKind.Person));
+            this.ContextMenu.Add(
+                new ContextMenuItemViewModel(
+                    "Create a Person",
+                    "",
+                    this.CreateCommand,
+                    MenuItemKind.Create,
+                    ClassKind.Person));
         }
     }
 }

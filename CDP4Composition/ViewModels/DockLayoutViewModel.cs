@@ -29,6 +29,7 @@ namespace CDP4Composition.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Threading.Tasks;
+    using System.Windows.Threading;
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Mvvm;
@@ -129,8 +130,12 @@ namespace CDP4Composition.ViewModels
         /// <param name="panelViewModel">The <see cref="IPanelViewModel"/> to add to the dock</param>
         public void AddDockPanelViewModel(IPanelViewModel panelViewModel)
         {
-            this.DockPanelViewModels.Add(panelViewModel);
-            panelViewModel.IsSelected = true;
+            Dispatcher.CurrentDispatcher.Invoke(() =>
+            {
+                this.DockPanelViewModels.Add(panelViewModel);
+                panelViewModel.IsSelected = true;
+            },
+            DispatcherPriority.Input);
         }
     }
 }

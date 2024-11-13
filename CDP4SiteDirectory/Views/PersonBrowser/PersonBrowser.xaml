@@ -24,7 +24,7 @@
             </ResourceDictionary.MergedDictionaries>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
 
-            <HierarchicalDataTemplate DataType="{x:Type viewModels:PersonRowViewModel}" ItemsSource="{Binding ContainedRows}">
+            <HierarchicalDataTemplate DataType="{x:Type viewModels:PersonRowViewModel}" ItemsSource="{Binding ContainedRows, UpdateSourceTrigger=PropertyChanged}">
                 <dx:MeasurePixelSnapper>
                     <StackPanel Orientation="Horizontal">
                         <dx:PixelSnapper>
@@ -144,7 +144,7 @@
                                   TreeLineStyle="Solid"
                                   VerticalScrollbarVisibility="Auto"
                                   ShowFilterPanelMode="Never">
-                    <dxg:TreeListView.FocusedRow>
+                        <dxg:TreeListView.FocusedRow>
                         <dynamic:ExpandoObject />
                     </dxg:TreeListView.FocusedRow>
                     <dxg:TreeListView.ContextMenu>
@@ -160,5 +160,6 @@
         </dxg:TreeListControl>
 
         <views:SelectedThingGroupControl Grid.Row="3"/>
+        <views:LoadingControl Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Visibility="{Binding IsBusy, Converter={dx:BooleanToVisibilityConverter}}"/>
     </Grid>
 </UserControl>
