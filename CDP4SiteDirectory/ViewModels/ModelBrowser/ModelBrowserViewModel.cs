@@ -27,6 +27,7 @@ namespace CDP4SiteDirectory.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Reactive;
@@ -155,7 +156,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.Initialize();
             this.ModelSetup = new DisposableReactiveList<EngineeringModelSetupRowViewModel>();
-            this.ExecuteLongRunningDispatcherAction(this.UpdateModels);
+            this.UpdateModels();
         }
 
         /// <summary>
@@ -317,15 +318,21 @@ namespace CDP4SiteDirectory.ViewModels
             }
         }
 
-        /// <summary>
-        /// Update the list of <see cref="EngineeringModelSetupRowViewModel" />
-        /// </summary>
-        private void UpdateModels()
+        private BackgroundWorker BackgroundWorker { get; set; }
+
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             this.HasUpdateStarted = true;
-            var newmodels = this.Thing.Model.Except(this.ModelSetup.Select(x => x.Thing)).ToList();
-            var oldmodels = this.ModelSetup.Select(x => x.Thing).Except(this.Thing.Model).ToList();
+            this.ModelSetup.AddRange(e.Result as List<EngineeringModelSetupRowViewModel>);
+            this.HasUpdateStarted = false;
+            this.IsBusy = false;
+        }
 
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            this.IsBusy = true;
+
+            var newmodels = this.Thing.Model.Except(this.ModelSetup.Select(x => x.Thing)).ToList();
             var toBeAdded = new List<EngineeringModelSetupRowViewModel>();
 
             foreach (var engineeringModelSetup in newmodels.OrderBy(m => m.Name))
@@ -334,7 +341,21 @@ namespace CDP4SiteDirectory.ViewModels
                 toBeAdded.Add(row);
             }
 
-            this.ModelSetup.AddRange(toBeAdded);
+            e.Result = toBeAdded;
+        }
+
+        /// <summary>
+        /// Update the list of <see cref="EngineeringModelSetupRowViewModel" />
+        /// </summary>
+        private void UpdateModels()
+        {
+            this.HasUpdateStarted = true;
+            var oldmodels = this.ModelSetup.Select(x => x.Thing).Except(this.Thing.Model).ToList();
+
+            this.BackgroundWorker = new BackgroundWorker();
+            this.BackgroundWorker.DoWork += BackgroundWorker_DoWork;
+            this.BackgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+            this.BackgroundWorker.RunWorkerAsync();
 
             foreach (var engineeringModelSetup in oldmodels)
             {
