@@ -33,6 +33,7 @@ namespace CDP4SiteDirectory.ViewModels
 
     using CDP4CommonView;
 
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -61,19 +62,38 @@ namespace CDP4SiteDirectory.ViewModels
         {
             this.OrganizationalParticipation = organizationalParticipation;
 
-            var thingSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.OrganizationalParticipation)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties());
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
+            Action<ObjectChangedEvent> action = x => this.UpdateProperties();
 
-            this.Disposables.Add(thingSubscription);
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var thingSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.OrganizationalParticipation)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
 
-            var containerSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.OrganizationalParticipation.Container)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties());
+                this.Disposables.Add(thingSubscription);
+            }
+            else
+            {
+                var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(OrganizationalParticipant));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(this.OrganizationalParticipation, discriminator, action)));
+            }
 
-            this.Disposables.Add(containerSubscription);
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var containerSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.OrganizationalParticipation.Container)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => this.UpdateProperties());
+
+                this.Disposables.Add(containerSubscription);
+            }
+            else
+            {
+                var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(EngineeringModelSetup));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(this.OrganizationalParticipation.Container, discriminator, action)));
+            }
 
             this.UpdateProperties();
         }

@@ -81,8 +81,8 @@ namespace CDP4SiteDirectory.ViewModels
             }
             else
             {
-                var ownerObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(SiteDirectory));
-                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.TopContainer, discriminator, action)));
+                var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(SiteDirectory));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.TopContainer, discriminator, action)));
             }
         }
 

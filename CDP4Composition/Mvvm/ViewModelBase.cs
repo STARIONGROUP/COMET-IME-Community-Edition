@@ -97,7 +97,19 @@ namespace CDP4Composition.Mvvm
         /// </summary>
         protected ViewModelBase()
         {
+            this.InitializeMessageBusHandler();
             this.InitializeLogger();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="MessageBusHandler"/>
+        /// </summary>
+        private void InitializeMessageBusHandler()
+        {
+            if (this is IHaveMessageBusHandler)
+            {
+                this.MessageBusHandler = new MessageBusHandler();
+            }
         }
 
         /// <summary>
@@ -111,6 +123,7 @@ namespace CDP4Composition.Mvvm
         /// </param>
         protected ViewModelBase(T thing, ISession session)
         {
+            this.InitializeMessageBusHandler();
             this.InitializeLogger();
             this.Initialize(thing, session);
         }
@@ -129,6 +142,7 @@ namespace CDP4Composition.Mvvm
         /// </param>
         protected ViewModelBase(T thing, ISession session, IViewModelBase<Thing> containerViewModel)
         {
+            this.InitializeMessageBusHandler();
             this.InitializeLogger();
             this.ContainerViewModel = containerViewModel;
             this.Initialize(thing, session);
@@ -292,7 +306,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets or sets the <see cref="MessageBusHandler"/>.
         /// </summary>
-        public MessageBusHandler MessageBusHandler { get; private set; }
+        public MessageBusHandler MessageBusHandler { get; private set; } 
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -312,6 +326,11 @@ namespace CDP4Composition.Mvvm
         {
             if (this.isDisposed)
             {
+                if (this.MessageBusHandler is { } messageBusHandler)
+                {
+                    messageBusHandler.Dispose();
+                }
+
                 return;
             }
 
@@ -332,6 +351,11 @@ namespace CDP4Composition.Mvvm
                 else
                 {
                     logger.Trace("The Disposables collection of the {0} is null", this.GetType().Name);
+                }
+
+                if (this is IHaveMessageBusHandler && this.MessageBusHandler is { } messageBusHandler)
+                {
+                    messageBusHandler.Dispose();
                 }
             }
 

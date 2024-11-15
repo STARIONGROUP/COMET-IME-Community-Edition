@@ -31,6 +31,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -139,12 +140,23 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.InitializeSubscriptions();
 
-            var thingSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Person)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(_ => this.UpdateProperties());
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
+            Action<ObjectChangedEvent> action = x => this.UpdateProperties();
 
-            this.Disposables.Add(thingSubscription);
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var thingSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Person)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
+
+                this.Disposables.Add(thingSubscription);
+            }
+            else
+            {
+                var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Person));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.Person, discriminator, action)));
+            }
         }
 
         /// <summary>

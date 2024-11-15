@@ -289,11 +289,6 @@ namespace CDP4ProductTree.ViewModels
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
-        /// Gets the <see cref="MessageBusHandler"/>
-        /// </summary>
-        public new MessageBusHandler MessageBusHandler { get; } = new MessageBusHandler();
-
-        /// <summary>
         /// Updates the current drag state.
         /// </summary>
         /// <param name="dropInfo">
@@ -511,8 +506,6 @@ namespace CDP4ProductTree.ViewModels
             }
 
             topElement.Dispose();
-
-            this.MessageBusHandler.Dispose();
         }
 
         /// <summary>

@@ -26,6 +26,7 @@
 namespace CDP4SiteDirectory.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Reactive;
@@ -35,6 +36,7 @@ namespace CDP4SiteDirectory.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.Attributes;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -51,7 +53,7 @@ namespace CDP4SiteDirectory.ViewModels
     /// </summary>
     [PanelViewModelExport("Model Browser", "The browser which displays the engineering models.")]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class ModelBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel
+    public class ModelBrowserViewModel : BrowserViewModelBase<SiteDirectory>, IPanelViewModel, IHaveMessageBusHandler
     {
         /// <summary>
         /// The Panel Caption
@@ -153,7 +155,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.Initialize();
             this.ModelSetup = new DisposableReactiveList<EngineeringModelSetupRowViewModel>();
-            this.UpdateModels();
+            this.ExecuteLongRunningDispatcherAction(this.UpdateModels);
         }
 
         /// <summary>
@@ -320,14 +322,19 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         private void UpdateModels()
         {
+            this.HasUpdateStarted = true;
             var newmodels = this.Thing.Model.Except(this.ModelSetup.Select(x => x.Thing)).ToList();
             var oldmodels = this.ModelSetup.Select(x => x.Thing).Except(this.Thing.Model).ToList();
+
+            var toBeAdded = new List<EngineeringModelSetupRowViewModel>();
 
             foreach (var engineeringModelSetup in newmodels.OrderBy(m => m.Name))
             {
                 var row = new EngineeringModelSetupRowViewModel(engineeringModelSetup, this.Session, this);
-                this.ModelSetup.Add(row);
+                toBeAdded.Add(row);
             }
+
+            this.ModelSetup.AddRange(toBeAdded);
 
             foreach (var engineeringModelSetup in oldmodels)
             {
@@ -340,6 +347,8 @@ namespace CDP4SiteDirectory.ViewModels
 
                 this.ModelSetup.RemoveAndDispose(row);
             }
+
+            this.HasUpdateStarted = false;
         }
 
         /// <summary>

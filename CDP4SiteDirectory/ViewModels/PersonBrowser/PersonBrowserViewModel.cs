@@ -25,6 +25,7 @@
 
 namespace CDP4SiteDirectory.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -60,11 +61,6 @@ namespace CDP4SiteDirectory.ViewModels
         /// The Panel Caption
         /// </summary>
         private const string PanelCaption = "Persons";
-
-        /// <summary>
-        /// Gets the <see cref="MessageBusHandler"/>
-        /// </summary>
-        public new MessageBusHandler MessageBusHandler { get; } = new MessageBusHandler();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PersonBrowserViewModel"/> class.
@@ -236,8 +232,6 @@ namespace CDP4SiteDirectory.ViewModels
             {
                 person.Dispose();
             }
-
-            this.MessageBusHandler.Dispose();
         }
 
         /// <summary>

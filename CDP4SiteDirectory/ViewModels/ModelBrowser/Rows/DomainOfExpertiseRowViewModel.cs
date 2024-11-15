@@ -72,10 +72,14 @@ namespace CDP4SiteDirectory.ViewModels.ModelBrowser.Rows
                 }
             }
 
+            var toBeAdded = new List<ModelParticipantRowViewModel>();
+
             foreach (var participant in newParticipants)
             {
-                this.ContainedRows.Add(new ModelParticipantRowViewModel(participant, this.Session, this, showDomains: false));
+                toBeAdded.Add(new ModelParticipantRowViewModel(participant, this.Session, this, showDomains: false));
             }
+
+            this.ContainedRows.AddRange(toBeAdded);
         }
 
         /// <summary>
