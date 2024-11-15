@@ -52,8 +52,7 @@ namespace CDP4Composition.MessageBus
         {
             var messageBusEventHandler = this.messageBusEventHandlers.GetOrAdd(typeof(T), _ => MessageBusEventHandler<T>.CreateHandler<T>());
 
-                return messageBusEventHandler as MessageBusEventHandler<T>;
-            }
+            return messageBusEventHandler as MessageBusEventHandler<T>;
         }
 
         /// <summary>
