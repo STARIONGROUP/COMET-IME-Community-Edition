@@ -166,6 +166,8 @@ namespace CDP4SiteDirectory.ViewModels
             this.PersonRowViewModels.Add(row);
         }
 
+        private BackgroundWorker BackgroundWorker { get; set; }
+
         /// <summary>
         /// Add all <see cref="Person"/>s to the contained <see cref="PersonRowViewModel"/>s
         /// </summary>
