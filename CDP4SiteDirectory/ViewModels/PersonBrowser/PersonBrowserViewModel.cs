@@ -27,6 +27,7 @@ namespace CDP4SiteDirectory.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -101,7 +102,8 @@ namespace CDP4SiteDirectory.ViewModels
                 this.Session.ActivePerson.Name);
 
             this.PersonRowViewModels = new DisposableReactiveList<PersonRowViewModel>();
-            this.ExecuteLongRunningDispatcherAction(this.AddPersons);
+            //this.ExecuteLongRunningDispatcherAction(this.AddPersons);
+            this.AddPersons();
         }
 
         /// <summary>
@@ -163,12 +165,31 @@ namespace CDP4SiteDirectory.ViewModels
             this.PersonRowViewModels.Add(row);
         }
 
+        private BackgroundWorker BackgroundWorker { get; set; }
+
         /// <summary>
         /// Add all <see cref="Person"/>s to the contained <see cref="PersonRowViewModel"/>s
         /// </summary>
         private void AddPersons()
         {
+            this.BackgroundWorker = new BackgroundWorker();
+            this.BackgroundWorker.DoWork += BackgroundWorker_DoWork;
+            this.BackgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
+            this.BackgroundWorker.RunWorkerAsync();
+        }
+
+        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
             this.HasUpdateStarted = true;
+            this.PersonRowViewModels.AddRange(e.Result as List<PersonRowViewModel>);
+            this.HasUpdateStarted = false;
+            this.IsBusy = false;
+        }
+
+        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            this.IsBusy = true;
+
             var definedPersons = this.Thing.Person.OrderBy(x => x.GivenName).ToList();
 
             var rows = new List<PersonRowViewModel>();
@@ -178,8 +199,7 @@ namespace CDP4SiteDirectory.ViewModels
                 rows.Add(new PersonRowViewModel(person, this.Session, this));
             }
 
-            this.PersonRowViewModels.AddRange(rows);
-            this.HasUpdateStarted = false;
+            e.Result = rows;
         }
 
         /// <summary>

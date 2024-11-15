@@ -50,13 +50,16 @@ namespace CDP4Composition.MessageBus
         /// <returns>The existin, or newly created <see cref="MessageBusEventHandler{T}"/></returns>
         public MessageBusEventHandler<T> GetHandler<T>()
         {
-            if (!this.messageBusEventHandlers.TryGetValue(typeof(T), out var messageBusEventHandler))
+            lock (this.messageBusEventHandlers)
             {
-                messageBusEventHandler = MessageBusEventHandler<T>.CreateHandler<T>();
-                this.messageBusEventHandlers.Add(typeof(T), messageBusEventHandler);
-            }
+                if (!this.messageBusEventHandlers.TryGetValue(typeof(T), out var messageBusEventHandler))
+                {
+                    messageBusEventHandler = MessageBusEventHandler<T>.CreateHandler<T>();
+                    this.messageBusEventHandlers.Add(typeof(T), messageBusEventHandler);
+                }
 
-            return messageBusEventHandler as MessageBusEventHandler<T>;
+                return messageBusEventHandler as MessageBusEventHandler<T>;
+            }
         }
 
         /// <summary>
