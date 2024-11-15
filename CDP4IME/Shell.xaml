@@ -32,23 +32,6 @@
                                    Glyph="{dxc:DXImage Image=DeleteDataSource_16x16.png}" />
             </ContentControl>
         </DataTemplate>
-        <converters:PanelViewConverter x:Key="PanelViewConverter"/>
-        <Style x:Key="LayoutPanelStyle"
-               TargetType="dxdo:LayoutPanel">
-            <Setter Property="Caption" Value="{Binding Caption}" />
-            <Setter Property="ToolTip" Value="{Binding ToolTip}" />
-            <Setter Property="IsSelectedItem" Value="{Binding IsSelected, Mode=TwoWay}" />
-            <Setter Property="ContentTemplate">
-                <Setter.Value>
-                    <DataTemplate>
-                        <ContentControl Content="{Binding Path=., Converter={StaticResource PanelViewConverter}}"/>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="LayoutGroupStyle" TargetType="dxdo:LayoutGroup">
-            <Setter Property="ItemStyle" Value="{StaticResource LayoutPanelStyle}"/>
-        </Style>
     </dxr:DXRibbonWindow.Resources>
 
     <dxmvvm:Interaction.Behaviors>  
@@ -331,6 +314,25 @@
                                 ClosingBehavior="ImmediatelyRemove"
                                 MDIMergeStyle="Always"
                                 FloatingMode="Desktop">
+            <dxdo:DockLayoutManager.Resources>
+                <converters:PanelViewConverter x:Key="PanelViewConverter"/>
+                <Style x:Key="LayoutPanelStyle"
+                       TargetType="dxdo:LayoutPanel">
+                    <Setter Property="Caption" Value="{Binding Caption}" />
+                    <Setter Property="ToolTip" Value="{Binding ToolTip}" />
+                    <Setter Property="IsSelectedItem" Value="{Binding IsSelected, Mode=TwoWay}" />
+                    <Setter Property="ContentTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <ContentControl Content="{Binding Path=., Converter={StaticResource PanelViewConverter}}"/>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+                <Style x:Key="LayoutGroupStyle" TargetType="dxdo:LayoutGroup">
+                    <Setter Property="ItemStyle" Value="{StaticResource LayoutPanelStyle}"/>
+                </Style>
+            </dxdo:DockLayoutManager.Resources>
             <dxmvvm:Interaction.Behaviors>
                 <dxmvvm:EventToCommand EventName="DockItemClosing" PassEventArgsToCommand="True" Command="{Binding DockPanelClosingCommand}"/>
                 <dxmvvm:EventToCommand EventName="DockItemClosed" PassEventArgsToCommand="True" Command="{Binding DockPanelClosedCommand}"/>

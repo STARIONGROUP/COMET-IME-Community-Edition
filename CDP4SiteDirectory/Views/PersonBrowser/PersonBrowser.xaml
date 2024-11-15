@@ -111,8 +111,6 @@
                              Grid.Row="2"
                              ItemsSource="{Binding Path=PersonRowViewModels}"
                              SelectedItem="{Binding SelectedThing}"
-                             FilterString="{Binding FilterString, Mode=TwoWay}"
-                             IsFilterEnabled="{Binding IsFilterEnabled, Mode=TwoWay}"                                                      
                              services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted}">
             <i:Interaction.Behaviors>
                 <dragDrop:FrameworkElementDragBehavior />
@@ -122,7 +120,7 @@
                 <cdp4Composition:ContextMenuBehavior />
             </dxmvvm:Interaction.Behaviors>
             <dxg:TreeListControl.Columns>
-                <dxg:TreeListColumn FieldName="GivenName" Header="First Name" SortIndex="0" />
+                <dxg:TreeListColumn FieldName="GivenName" Header="First Name"/>
                 <dxg:TreeListColumn FieldName="Surname" Header="Last Name" />
                 <dxg:TreeListColumn FieldName="Organization.ShortName" Header="Organization" />
                 <dxg:TreeListColumn FieldName="DefaultDomain.Name" Header="Default Domain"></dxg:TreeListColumn>

@@ -33,6 +33,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -55,7 +56,7 @@ namespace CDP4SiteDirectory.ViewModels
             : base(person, session, containerViewModel)
         {
             var sitedir = (SiteDirectory)this.Thing.TopContainer;
-            this.UpdateParticipants(sitedir);
+            this.UpdateParticipants();
             this.UpdateProperties();
         }
 
@@ -66,15 +67,23 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.InitializeSubscriptions();
 
-            var sitedir = (SiteDirectory)this.Thing.TopContainer;
+            Func<ObjectChangedEvent, bool> discriminator = objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
+            Action<ObjectChangedEvent> action = x => this.UpdateParticipants();
 
-            var siteDirSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(sitedir)
-                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Select(x => (SiteDirectory)x.ChangedThing)
-                .Subscribe(this.UpdateParticipants);
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var siteDirSubscription = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.TopContainer)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
 
-            this.Disposables.Add(siteDirSubscription);
+                this.Disposables.Add(siteDirSubscription);
+            }
+            else
+            {
+                var ownerObserver = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(SiteDirectory));
+                this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(ownerObserver, new ObjectChangedMessageBusEventHandlerSubscription(this.Thing.TopContainer, discriminator, action)));
+            }
         }
 
         /// <summary>
@@ -148,9 +157,10 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Update the <see cref="Participant"/> row contained in a <see cref="SiteDirectory"/> for the current <see cref="Person"/> 
         /// </summary>
-        /// <param name="siteDir">The <see cref="SiteDirectory"/></param>
-        private void UpdateParticipants(SiteDirectory siteDir)
+        private void UpdateParticipants()
         {
+            var siteDir = (SiteDirectory)this.Thing.TopContainer;
+
             var currentParticipants = this.ContainedRows.Select(x => (Participant)x.Thing).ToList();
             var updatedParticipants = siteDir.Model.SelectMany(x => x.Participant).Where(x => x.Person == this.Thing).ToList();
 

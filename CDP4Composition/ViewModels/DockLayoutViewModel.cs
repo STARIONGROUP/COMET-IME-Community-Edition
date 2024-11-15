@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DockLayoutViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2024 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -131,11 +131,11 @@ namespace CDP4Composition.ViewModels
         public void AddDockPanelViewModel(IPanelViewModel panelViewModel)
         {
             Dispatcher.CurrentDispatcher.Invoke(() =>
-            {
-                this.DockPanelViewModels.Add(panelViewModel);
-                panelViewModel.IsSelected = true;
-            },
-            DispatcherPriority.Input);
+                {
+                    this.DockPanelViewModels.Add(panelViewModel);
+                    panelViewModel.IsSelected = true;
+                },
+                DispatcherPriority.Input);
         }
     }
 }

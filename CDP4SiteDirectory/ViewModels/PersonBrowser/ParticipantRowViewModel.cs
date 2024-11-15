@@ -1,6 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParticipantRowViewModel.cs" company="Starion Group S.A.">
-//   Copyright (c) 2015 Starion Group S.A.
+//    Copyright (c) 2015-2024 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//
+//    This file is part of COMET-IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -9,11 +28,15 @@ namespace CDP4SiteDirectory.ViewModels
     using System;
     using System.Linq;
     using System.Reactive.Linq;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition.Mvvm;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+
     using ReactiveUI;
 
     /// <summary>
@@ -66,15 +89,19 @@ namespace CDP4SiteDirectory.ViewModels
         /// The session.
         /// </param>
         /// <param name="containerViewModel">The container <see cref="IViewModelBase{T}"/></param>
-        public ParticipantRowViewModel(Participant participant, ISession session,
+        public ParticipantRowViewModel(
+            Participant participant,
+            ISession session,
             IViewModelBase<Thing> containerViewModel)
             : base(participant, session, containerViewModel)
         {
             this.Domains = new ReactiveList<DomainOfExpertise>();
 
             this.WhenAnyValue(row => row.Domains)
-                .Select(domains => domains.Aggregate(string.Empty,
-                    (current, domainOfExpertise) => string.Format("{0} {1}", current, domainOfExpertise.ShortName)))
+                .Select(
+                    domains => domains.Aggregate(
+                        string.Empty,
+                        (current, domainOfExpertise) => $"{current} {domainOfExpertise.ShortName}"))
                 .ToProperty(this, row => row.DomainShortnames, out this.domainShortnames, scheduler: RxApp.MainThreadScheduler);
 
             this.WhenAnyValue(row => row.EngineeringModelSetup)
@@ -96,26 +123,20 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets the <see cref="DomainShortnames"/> of the row-view-model
         /// </summary>
-        public string DomainShortnames
-        {
-            get { return this.domainShortnames.Value; }
-        }
+        public string DomainShortnames => this.domainShortnames.Value;
 
         /// <summary>
         /// Gets the name of the containing <see cref="EngineeringModelSetup"/>
         /// </summary>
-        public string ModelName
-        {
-            get { return this.modelName.Value; }
-        }
+        public string ModelName => this.modelName.Value;
 
         /// <summary>
         /// Gets the <see cref="DomainOfExpertise"/> list that is referenced by the <see cref="Participant"/>
         /// </summary>
         public ReactiveList<DomainOfExpertise> Domains
         {
-            get { return this.domains; }
-            private set { this.RaiseAndSetIfChanged(ref this.domains, value); }
+            get => this.domains;
+            private set => this.RaiseAndSetIfChanged(ref this.domains, value);
         }
 
         /// <summary>
@@ -123,8 +144,8 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public bool IsDeprecated
         {
-            get { return this.isDeprecated; }
-            set { this.RaiseAndSetIfChanged(ref this.isDeprecated, value); }
+            get => this.isDeprecated;
+            set => this.RaiseAndSetIfChanged(ref this.isDeprecated, value);
         }
 
         /// <summary>
@@ -132,8 +153,8 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public ParticipantRole ParticipantRole
         {
-            get { return this.participantRole; }
-            set { this.RaiseAndSetIfChanged(ref this.participantRole, value); }
+            get => this.participantRole;
+            set => this.RaiseAndSetIfChanged(ref this.participantRole, value);
         }
 
         /// <summary>
@@ -141,9 +162,9 @@ namespace CDP4SiteDirectory.ViewModels
         /// </summary>
         public EngineeringModelSetup EngineeringModelSetup
         {
-            get { return this.engineeringModelSetup; }
+            get => this.engineeringModelSetup;
 
-            set { this.RaiseAndSetIfChanged(ref this.engineeringModelSetup, value); }
+            set => this.RaiseAndSetIfChanged(ref this.engineeringModelSetup, value);
         }
 
         /// <summary>
@@ -153,15 +174,16 @@ namespace CDP4SiteDirectory.ViewModels
         {
             this.Domains = new ReactiveList<DomainOfExpertise>(this.Thing.Domain);
             this.ParticipantRole = this.Thing.Role;
-            this.EngineeringModelSetup = (EngineeringModelSetup) this.Thing.Container;
+            this.EngineeringModelSetup = (EngineeringModelSetup)this.Thing.Container;
 
             var person = this.Thing.Person;
+
             if (person == null)
             {
                 return;
             }
 
-            this.RowStatus = (this.Thing.IsActive && person.IsActive && !person.IsDeprecated)
+            this.RowStatus = this.Thing.IsActive && person.IsActive && !person.IsDeprecated
                 ? RowStatusKind.Active
                 : RowStatusKind.Inactive;
 
