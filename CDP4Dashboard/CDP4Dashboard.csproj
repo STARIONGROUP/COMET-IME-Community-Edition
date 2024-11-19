@@ -9,8 +9,8 @@
 	<Product>Dashboard</Product>
 	<Description>CDP4-COMET Dashboard Plugin</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>10.0.3.2</AssemblyVersion>
-	<FileVersion>10.0.3.2</FileVersion>
+	<AssemblyVersion>10.0.3.3</AssemblyVersion>
+	<FileVersion>10.0.3.3</FileVersion>
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
