@@ -26,7 +26,6 @@
 namespace CDP4SiteDirectory.ViewModels
 {
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Reactive;
