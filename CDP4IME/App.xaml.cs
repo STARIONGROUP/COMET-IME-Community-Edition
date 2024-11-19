@@ -76,7 +76,7 @@ namespace CDP4IME
 
             Locator.CurrentMutable.UseNLogWithWrappingFullLogger();
 
-            //RxApp.MainThreadScheduler = DispatcherScheduler.Current;
+            RxApp.MainThreadScheduler = DispatcherScheduler.Current;
             base.OnStartup(e);
 
             this.ShutdownMode = ShutdownMode.OnExplicitShutdown;
