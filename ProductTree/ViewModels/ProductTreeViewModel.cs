@@ -160,6 +160,7 @@ namespace CDP4ProductTree.ViewModels
 
             this.SetTopElement(
                 iteration, 
+                true,
                 () =>
                 {
                     this.AddSubscriptions();
@@ -540,8 +541,9 @@ namespace CDP4ProductTree.ViewModels
         /// Sets the top element for this product tree
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/> associated to this <see cref="Option"/></param>
+        /// <param name="runOnBackgroundThread">INdicates if this methid should perform actions on a background thread</param>
         /// <param name="afterUpdateAction">The action to perform after all updates are made</param>
-        private void SetTopElement(Iteration iteration, Action afterUpdateAction = null)
+        private void SetTopElement(Iteration iteration, bool runOnBackgroundThread = false, Action afterUpdateAction = null)
         {
             if (iteration == null)
             {
@@ -562,27 +564,40 @@ namespace CDP4ProductTree.ViewModels
                     this.TopElement.ClearAndDispose();
                 }
 
-                this.IsBusy = true;
+                if (runOnBackgroundThread)
+                {
+                    this.IsBusy = true;
 
-                this.SingleRunBackgroundWorker = new SingleRunBackgroundDataLoader<Option>(this,
-                    e =>
-                    {
-                        var row = new ElementDefinitionRowViewModel(iteration.TopElement, this.Thing, this.Session, this);
-                        e.Result = row;
-                    },
-                    e =>
-                    {
-                        if (e.Result is ElementDefinitionRowViewModel row)
+                    this.SingleRunBackgroundWorker = new SingleRunBackgroundDataLoader<Option>(this,
+                        e =>
                         {
-                            this.TopElement.Add(row);
+                            var row = new ElementDefinitionRowViewModel(iteration.TopElement, this.Thing, this.Session, this);
+                            e.Result = row;
+                        },
+                        e =>
+                        {
+                            if (e.Result is ElementDefinitionRowViewModel row)
+                            {
+                                this.HasUpdateStarted = true;
+                                this.TopElement.Add(row);
+                                this.HasUpdateStarted = false;
 
-                            afterUpdateAction?.Invoke();
-                        }
+                                afterUpdateAction?.Invoke();
+                            }
 
-                        this.IsBusy = false;
-                    });
-     
-                this.SingleRunBackgroundWorker.RunWorkerAsync();
+                            this.IsBusy = false;
+                        });
+
+                    this.SingleRunBackgroundWorker.RunWorkerAsync();
+                }
+                else
+                {
+                    var row = new ElementDefinitionRowViewModel(iteration.TopElement, this.Thing, this.Session, this);
+                    
+                    this.HasUpdateStarted = true;
+                    this.TopElement.Add(row);
+                    this.HasUpdateStarted = false;
+                }
             }
         }
 

@@ -64,6 +64,8 @@ namespace CDP4Composition.Utilities
                 onCompleted.Invoke(args);
                 this.worker.Dispose();
                 this.worker = null;
+
+                // Forces the disposal of the SingleBackgroundWorker and also implemnted as a triggers in Unit tests that the BackgroundWorker has finished
                 owningBrowser.SingleRunBackgroundWorker = null;
             };
         }

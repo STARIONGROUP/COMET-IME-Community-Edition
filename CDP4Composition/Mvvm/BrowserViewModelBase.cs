@@ -172,7 +172,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// The <see cref="SingleRunBackgroundDataLoader{T}"/> 
         /// </summary>
-        public SingleRunBackgroundDataLoader<T> SingleRunBackgroundWorker;
+        public SingleRunBackgroundDataLoader<T> SingleRunBackgroundWorker { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModelBase{T}"/> class.
