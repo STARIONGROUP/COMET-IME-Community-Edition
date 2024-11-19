@@ -48,6 +48,7 @@ namespace CDP4Composition.Mvvm
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Utilities;
     using CDP4Composition.ViewModels;
 
     using CDP4Dal;
@@ -167,6 +168,11 @@ namespace CDP4Composition.Mvvm
         /// Backing field for <see cref="LoadingMessage"/>
         /// </summary>
         private string loadingMessage = string.Empty;
+
+        /// <summary>
+        /// The <see cref="SingleRunBackgroundDataLoader{T}"/> 
+        /// </summary>
+        public SingleRunBackgroundDataLoader<T> SingleRunBackgroundWorker;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BrowserViewModelBase{T}"/> class.

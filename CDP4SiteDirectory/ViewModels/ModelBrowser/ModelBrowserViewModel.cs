@@ -25,9 +25,7 @@
 
 namespace CDP4SiteDirectory.ViewModels
 {
-    using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Reactive;
@@ -43,6 +41,7 @@ namespace CDP4SiteDirectory.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Utilities;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -156,7 +155,7 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.Initialize();
             this.ModelSetup = new DisposableReactiveList<EngineeringModelSetupRowViewModel>();
-            this.UpdateModels();
+            this.UpdateModels(true);
         }
 
         /// <summary>
@@ -318,22 +317,57 @@ namespace CDP4SiteDirectory.ViewModels
             }
         }
 
-        private BackgroundWorker BackgroundWorker { get; set; }
-
-        private void BackgroundWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        /// <summary>
+        /// Update the list of <see cref="EngineeringModelSetupRowViewModel" />
+        /// </summary>
+        /// <param name="initialLoad">A value indicating if this is the initial loading of the browser</param>
+        private void UpdateModels(bool initialLoad = false)
         {
-            this.HasUpdateStarted = true;
-            this.ModelSetup.AddRange(e.Result as List<EngineeringModelSetupRowViewModel>);
-            this.HasUpdateStarted = false;
-            this.IsBusy = false;
+            if (initialLoad)
+            {
+                this.SingleRunBackgroundWorker = new SingleRunBackgroundDataLoader<SiteDirectory>(
+                    this,
+                    e =>
+                    {
+                        this.GetModelChanges(out var toBeAdded, out var toBeRemoved);
+
+                        e.Result = new KeyValuePair<IEnumerable<EngineeringModelSetupRowViewModel>, IEnumerable<EngineeringModelSetupRowViewModel>>(toBeAdded, toBeRemoved);
+                    },
+                    e =>
+                    {
+                        // ReSharper disable once UsePatternMatching
+                        var result = e.Result as KeyValuePair<IEnumerable<EngineeringModelSetupRowViewModel>, IEnumerable<EngineeringModelSetupRowViewModel>>?;
+
+                        if (result.HasValue)
+                        {
+                            this.SetModelChanges(result.Value.Key, result.Value.Value);
+                        }
+
+                        this.IsBusy = false;
+                    });
+
+                this.SingleRunBackgroundWorker.RunWorkerAsync();
+            }
+            else
+            {
+                this.GetModelChanges(out var toBeAdded, out var toBeRemoved);
+                this.SetModelChanges(toBeAdded, toBeRemoved);
+                this.IsBusy = false;
+            }
         }
 
-        private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
+        /// <summary>
+        /// Pre calculates to be added and to be removed row viewmodels
+        /// </summary>
+        /// <param name="toBeAdded">The to be added row viewmodels</param>
+        /// <param name="toBeRemoved">The to be removed row viewmodels</param>
+        private void GetModelChanges(out List<EngineeringModelSetupRowViewModel> toBeAdded, out List<EngineeringModelSetupRowViewModel> toBeRemoved)
         {
             this.IsBusy = true;
 
             var newmodels = this.Thing.Model.Except(this.ModelSetup.Select(x => x.Thing)).ToList();
-            var toBeAdded = new List<EngineeringModelSetupRowViewModel>();
+
+            toBeAdded = new List<EngineeringModelSetupRowViewModel>();
 
             foreach (var engineeringModelSetup in newmodels.OrderBy(m => m.Name))
             {
@@ -341,21 +375,8 @@ namespace CDP4SiteDirectory.ViewModels
                 toBeAdded.Add(row);
             }
 
-            e.Result = toBeAdded;
-        }
-
-        /// <summary>
-        /// Update the list of <see cref="EngineeringModelSetupRowViewModel" />
-        /// </summary>
-        private void UpdateModels()
-        {
-            this.HasUpdateStarted = true;
             var oldmodels = this.ModelSetup.Select(x => x.Thing).Except(this.Thing.Model).ToList();
-
-            this.BackgroundWorker = new BackgroundWorker();
-            this.BackgroundWorker.DoWork += BackgroundWorker_DoWork;
-            this.BackgroundWorker.RunWorkerCompleted += BackgroundWorker_RunWorkerCompleted;
-            this.BackgroundWorker.RunWorkerAsync();
+            toBeRemoved = new List<EngineeringModelSetupRowViewModel>();
 
             foreach (var engineeringModelSetup in oldmodels)
             {
@@ -366,7 +387,24 @@ namespace CDP4SiteDirectory.ViewModels
                     continue;
                 }
 
-                this.ModelSetup.RemoveAndDispose(row);
+                toBeRemoved.Add(row);
+            }
+        }
+
+        /// <summary>
+        /// Sets pre calculated model changes
+        /// </summary>
+        /// <param name="toBeAdded">The to be added row viewmodels</param>
+        /// <param name="toBeRemoved">The to be removed row viewmodels</param>
+        private void SetModelChanges(IEnumerable<EngineeringModelSetupRowViewModel> toBeAdded, IEnumerable<EngineeringModelSetupRowViewModel> toBeRemoved)
+        {
+            this.HasUpdateStarted = true;
+
+            this.ModelSetup.AddRange(toBeAdded);
+
+            foreach (var item in toBeRemoved)
+            {
+                this.ModelSetup.RemoveAndDispose(item);
             }
 
             this.HasUpdateStarted = false;
