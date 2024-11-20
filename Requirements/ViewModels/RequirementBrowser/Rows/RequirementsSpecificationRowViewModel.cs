@@ -37,6 +37,7 @@ namespace CDP4Requirements.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.DragDrop;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
 
     using CDP4Dal;
@@ -271,12 +272,32 @@ namespace CDP4Requirements.ViewModels
                 }
             }
 
-            var updateListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(req)
-                .Where(
-                    objectChange => objectChange.EventKind == EventKind.Updated &&
-                                    objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(x => this.UpdateRequirementRow((Requirement)x.ChangedThing, false));
+            Func<ObjectChangedEvent, bool> discriminator =
+                objectChange =>
+                    objectChange.EventKind == EventKind.Updated &&
+                    objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
+
+            Action<ObjectChangedEvent> action = x => this.UpdateRequirementRow((Requirement)x.ChangedThing, false);
+
+            if (this.AllowMessageBusSubscriptions)
+            {
+                var updateListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(req)
+                    .Where(discriminator)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(action);
+
+                this.Disposables.Add(updateListener);
+                this.listenerCache[req] = updateListener;
+            }
+            else
+            {
+                var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Requirement));
+
+                var handler = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Requirement), discriminator, action));
+                this.Disposables.Add(handler);
+
+                this.listenerCache[req] = handler;
+            }
 
             var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
 
@@ -292,9 +313,6 @@ namespace CDP4Requirements.ViewModels
 
                 this.Disposables.Add(orderListener);
             }
-
-            this.Disposables.Add(updateListener);
-            this.listenerCache[req] = updateListener;
         }
 
         /// <summary>

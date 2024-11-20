@@ -44,12 +44,14 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
+    using CDP4Composition.Utilities;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -74,7 +76,7 @@ namespace CDP4Requirements.ViewModels
     /// The View-Model for the <see cref="RequirementsBrowser"/>
     /// </summary>
     public class RequirementsBrowserViewModel : ModellingThingBrowserViewModelBase, IPanelViewModel, IDropTarget,
-        IRequirementBrowserDisplaySettings, IDeprecatableBrowserViewModel
+        IRequirementBrowserDisplaySettings, IDeprecatableBrowserViewModel, IHaveMessageBusHandler
     {
         /// <summary>
         /// The logger for the current class
@@ -185,20 +187,16 @@ namespace CDP4Requirements.ViewModels
             this.openRequirementsSpecificationEditorViewModels = new List<RequirementsSpecificationEditorViewModel>();
             this.messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
-            this.ExecuteLongRunningDispatcherAction(
+            this.ComputeUserDependentPermission();
+
+            this.AddRequirementSpecificationsRows(
                 () =>
                 {
-                    this.ComputeUserDependentPermission();
-
-                    this.UpdateRequirementSpecificationsRows();
-
                     this.AddSubscriptions();
                     this.UpdateProperties();
-
                     stopWatch.Stop();
                     logger.Info("The Requirements browser loaded in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
-                },
-                $"Loading {this.Caption}");
+                });
         }
 
         /// <summary>
@@ -306,7 +304,12 @@ namespace CDP4Requirements.ViewModels
         public bool IsSimpleParameterValuesDisplayed
         {
             get => this.isSimpleParameterValuesDisplayed;
-            set => this.RaiseAndSetIfChanged(ref this.isSimpleParameterValuesDisplayed, value);
+            set
+            {
+                this.HasUpdateStarted = true;
+                this.RaiseAndSetIfChanged(ref this.isSimpleParameterValuesDisplayed, value);
+                this.HasUpdateStarted = false;
+            }
         }
 
         /// <summary>
@@ -315,7 +318,12 @@ namespace CDP4Requirements.ViewModels
         public bool IsParametricConstraintDisplayed
         {
             get => this.isParametricConstraintDisplayed;
-            set => this.RaiseAndSetIfChanged(ref this.isParametricConstraintDisplayed, value);
+            set
+            {
+                this.HasUpdateStarted = true;
+                this.RaiseAndSetIfChanged(ref this.isParametricConstraintDisplayed, value);
+                this.HasUpdateStarted = false;
+            }
         }
 
         /// <summary>
@@ -380,6 +388,50 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Adds rows the current <see cref="RequirementsSpecification"/>s in this <see cref="Iteration"/>
+        /// </summary>
+        /// <param name="afterUpdateAction">The action to perform after all updates are made</param>
+        private void AddRequirementSpecificationsRows(Action afterUpdateAction = null)
+        {
+            this.SingleRunBackgroundWorker = new SingleRunBackgroundDataLoader<Iteration>(
+                this,
+                e =>
+                {
+                    this.IsBusy = true;
+
+                    var toBeAdded = new List<RequirementsSpecificationRowViewModel>();
+
+                    foreach (var requirementsSpecification in this.Thing.RequirementsSpecification)
+                    {
+                        if (!this.ReqSpecificationRows.Select(x => x.Thing).Contains(requirementsSpecification))
+                        {
+                            var specRow = this.GetSpecificationRow(requirementsSpecification);
+                            toBeAdded.Add(specRow);
+                        }
+                    }
+
+                    toBeAdded.Sort(SpecComparer);
+
+                    e.Result = toBeAdded;
+                },
+                e =>
+                {
+                    if (e.Result is List<RequirementsSpecificationRowViewModel> rows)
+                    {
+                        this.HasUpdateStarted = true;
+                        this.ReqSpecificationRows.AddRange(rows);
+                        this.HasUpdateStarted = false;
+                    }
+
+                    afterUpdateAction?.Invoke();
+
+                    this.IsBusy = false;
+                });
+
+            this.SingleRunBackgroundWorker.RunWorkerAsync();
+        }
+
+        /// <summary>
         /// Updates the browser with the current <see cref="RequirementsSpecification"/>s in this <see cref="Iteration"/>
         /// </summary>
         private void UpdateRequirementSpecificationsRows()
@@ -387,13 +439,21 @@ namespace CDP4Requirements.ViewModels
             var currentReqSpec = this.ReqSpecificationRows.Select(x => x.Thing).ToList();
             var updatedReqSpec = this.Thing.RequirementsSpecification;
 
-            var added = updatedReqSpec.Except(currentReqSpec).Cast<RequirementsSpecification>().ToList();
-            var removed = currentReqSpec.Except(updatedReqSpec).Cast<RequirementsSpecification>().ToList();
+            var added = updatedReqSpec.Except(currentReqSpec).ToList();
+            var removed = currentReqSpec.Except(updatedReqSpec).ToList();
+
+            var toBeAdded = new ReactiveList<RequirementsSpecificationRowViewModel>();
 
             foreach (var requirementsSpecification in added)
             {
-                this.AddSpecificationRow(requirementsSpecification);
+                if (!this.ReqSpecificationRows.Select(x => x.Thing).Contains(requirementsSpecification))
+                {
+                    var specRow = this.GetSpecificationRow(requirementsSpecification);
+                    toBeAdded.SortedInsert(specRow, SpecComparer);
+                }
             }
+
+            this.ReqSpecificationRows.AddRange(toBeAdded);
 
             foreach (var requirementsSpecification in removed)
             {
@@ -405,28 +465,26 @@ namespace CDP4Requirements.ViewModels
         /// Add a row representing a <see cref="RequirementsSpecification"/>
         /// </summary>
         /// <param name="spec">The <see cref="RequirementsSpecification"/></param>
-        private void AddSpecificationRow(RequirementsSpecification spec)
+        private RequirementsSpecificationRowViewModel GetSpecificationRow(RequirementsSpecification spec)
         {
-            if (!this.ReqSpecificationRows.Select(x => x.Thing).Contains(spec))
+            var row = new RequirementsSpecificationRowViewModel(spec, this.Session, this);
+
+            var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
+
+            if (orderPt != null)
             {
-                var row = new RequirementsSpecificationRowViewModel(spec, this.Session, this);
-                this.ReqSpecificationRows.SortedInsert(row, SpecComparer);
+                var orderListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue))
+                    .Where(
+                        objectChange =>
+                            ((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType ==
+                            orderPt && spec.ParameterValue.Contains(objectChange.ChangedThing))
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(x => this.UpdateSpecRowPosition((RequirementsSpecification)x.ChangedThing.Container));
 
-                var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
-
-                if (orderPt != null)
-                {
-                    var orderListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(RequirementsContainerParameterValue))
-                        .Where(
-                            objectChange =>
-                                ((RequirementsContainerParameterValue)objectChange.ChangedThing).ParameterType ==
-                                orderPt && spec.ParameterValue.Contains(objectChange.ChangedThing))
-                        .ObserveOn(RxApp.MainThreadScheduler)
-                        .Subscribe(x => this.UpdateSpecRowPosition((RequirementsSpecification)x.ChangedThing.Container));
-
-                    this.Disposables.Add(orderListener);
-                }
+                this.Disposables.Add(orderListener);
             }
+
+            return row;
         }
 
         /// <summary>

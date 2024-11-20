@@ -39,6 +39,7 @@ namespace CDP4Requirements.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Services;
 
@@ -641,9 +642,25 @@ namespace CDP4Requirements.ViewModels
                     return;
                 }
 
-                this.definitionSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.definitionThing)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(this.OnDefinitionUpdate);
+                Func<ObjectChangedEvent, bool> discriminator =
+                    objectChange =>
+                        objectChange.EventKind == EventKind.Updated;
+
+                Action<ObjectChangedEvent> optionAction = this.OnDefinitionUpdate;
+
+                if (this.AllowMessageBusSubscriptions)
+                {
+                    this.definitionSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.definitionThing)
+                        .Where(discriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(this.OnDefinitionUpdate);
+                }
+                else
+                {
+                    var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Definition));
+
+                    this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Definition), discriminator, optionAction)));
+                }
             }
 
             this.Definition = this.TrunctateRequirementsDefinitionText(this.definitionThing.Content);

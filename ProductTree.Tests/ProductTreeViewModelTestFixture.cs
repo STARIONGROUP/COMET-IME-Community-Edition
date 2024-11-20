@@ -177,9 +177,10 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatPropertiesAreSet()
+        public async Task VerifyThatPropertiesAreSet()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             Assert.That(vm.Caption, Is.Not.Null.Or.Empty);
             Assert.That(vm.ToolTip, Is.Not.Null.Or.Empty);
@@ -195,9 +196,10 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatUpdateOptionEventWorks()
+        public async Task VerifyThatUpdateOptionEventWorks()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             Assert.AreEqual("option name", vm.CurrentOption);
 
@@ -210,9 +212,10 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatUpdateIterationSetupEventIsHandled()
+        public async Task VerifyThatUpdateIterationSetupEventIsHandled()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             Assert.AreEqual(0, vm.CurrentIteration);
 
@@ -227,9 +230,10 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatUpdateDomainEventIsHandled()
+        public async Task VerifyThatUpdateDomainEventIsHandled()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var revisionNumber = typeof(DomainOfExpertise).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.domain, 50);
@@ -242,9 +246,10 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatUpdatePersonEventIsHandled()
+        public async Task VerifyThatUpdatePersonEventIsHandled()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var revisionNumber = typeof(Person).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.person, 50);
@@ -256,9 +261,10 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatTopElementIsRemovedUponIterationUpdateWithNoTop()
+        public async Task VerifyThatTopElementIsRemovedUponIterationUpdateWithNoTop()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
@@ -269,9 +275,10 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatTopElementIsModifiedUponNewTopElement()
+        public async Task VerifyThatTopElementIsModifiedUponNewTopElement()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
@@ -287,6 +294,7 @@ namespace ProductTree.Tests
         public async Task VerifyExecuteCreateSubscriptionCommand()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
@@ -336,6 +344,7 @@ namespace ProductTree.Tests
         public async Task VerifyExecuteDeleteSubscriptionCommand()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
@@ -396,6 +405,7 @@ namespace ProductTree.Tests
             this.iteration.TopElement = elementdef;
 
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var paramRow = vm.TopElement.Single().ContainedRows.First() as ParameterOrOverrideBaseRowViewModel;
             Assert.NotNull(paramRow);
@@ -412,15 +422,18 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatActiveDomainIsDisplayed()
+        public async Task VerifyThatActiveDomainIsDisplayed()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             Assert.AreEqual("domain [domainshortname]", vm.DomainOfExpertise);
 
             this.domain = null;
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(this.domain);
 
             vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
@@ -428,6 +441,8 @@ namespace ProductTree.Tests
         public async Task VerifyCreateParameterOverride()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
             var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
@@ -478,9 +493,11 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyCreateParameterOverrideIsDisabledForTopElement()
+        public async Task VerifyCreateParameterOverrideIsDisabledForTopElement()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var revisionNumber = typeof(Iteration).GetProperty("RevisionNumber");
             revisionNumber.SetValue(this.iteration, 50);
             var elementdef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.iteration };
@@ -496,6 +513,8 @@ namespace ProductTree.Tests
         public async Task VerifyToggleNamesAndShortNames()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             Assert.IsFalse(vm.IsDisplayShortNamesOn);
             Assert.IsTrue(((ICommand)vm.ToggleUsageNamesCommand).CanExecute(null));
 
@@ -507,9 +526,11 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyContextMenuPopulation()
+        public async Task VerifyContextMenuPopulation()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             Assert.AreEqual(0, vm.ContextMenu.Count);
             Assert.IsNull(vm.SelectedThing);
             vm.PopulateContextMenu();
@@ -522,9 +543,11 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatDragWorks()
+        public async Task VerifyThatDragWorks()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, null, this.panelNavigationService.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var draginfo = new Mock<IDragInfo>();
             var dragSource = new Mock<IDragSource>();
 
@@ -535,9 +558,11 @@ namespace ProductTree.Tests
         }
 
         [Test]
-        public void VerifyThatDropsWorkDomain()
+        public async Task VerifyThatDropsWorkDomain()
         {
             var vm = new ProductTreeViewModel(this.option, this.session.Object, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var dropinfo = new Mock<IDropInfo>();
             var droptarget = new Mock<IDropTarget>();
 
@@ -548,6 +573,26 @@ namespace ProductTree.Tests
             droptarget.Verify(x => x.Drop(dropinfo.Object));
 
             Assert.AreEqual("ex", vm.Feedback);
+        }
+
+        /// <summary>
+        /// Checks for <see cref="BackgroundWorker"/>s to finish
+        /// </summary>
+        /// <param name="check">Action to check</param>
+        /// <param name="maxNumberOfChecks">Number of checks (100ms per check)</param>
+        /// <returns>an awaitable <see cref="Task"/></returns>
+        private async Task DelayedCheck(Func<bool> check, int maxNumberOfChecks = 10)
+        {
+            // wait 1000ms for background worker to be finished
+            for (var i = 0; i < maxNumberOfChecks; i++)
+            {
+                await Task.Delay(100);
+
+                if (check.Invoke())
+                {
+                    break;
+                }
+            }
         }
     }
 }

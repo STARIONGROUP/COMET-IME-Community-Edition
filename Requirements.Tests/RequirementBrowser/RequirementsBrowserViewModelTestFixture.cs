@@ -158,10 +158,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
-        public void VerifyThatRequirementSpecificationMayBeAddedOrRemoved()
+        public async Task VerifyThatRequirementSpecificationMayBeAddedOrRemoved()
         {
             var revision = typeof(Thing).GetProperty("RevisionNumber");
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             Assert.AreEqual(1, vm.ReqSpecificationRows.Count);
 
@@ -180,9 +181,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
-        public void VerifyThatPropertiesAreSet()
+        public async Task VerifyThatPropertiesAreSet()
         {
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             Assert.AreEqual(1, vm.ReqSpecificationRows.Count);
             Assert.AreEqual(this.participant, vm.ActiveParticipant);
             Assert.AreEqual("Requirements, iteration_0", vm.Caption);
@@ -192,7 +195,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
-        public void VerifyThatActiveDomainIsDisplayed()
+        public async Task VerifyThatActiveDomainIsDisplayed()
         {
             this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
             {
@@ -200,12 +203,16 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             });
 
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             Assert.AreEqual("test [test]", vm.DomainOfExpertise);
 
             DomainOfExpertise domainOfExpertise = null;
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
             vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+            
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
@@ -218,6 +225,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             });
 
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var reqSpecRow = vm.ReqSpecificationRows.Single();
 
             vm.SelectedThing = reqSpecRow;
@@ -234,9 +243,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
-        public void VerifyThatRequirementVerificationWorks()
+        public async Task VerifyThatRequirementVerificationWorks()
         {
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var reqSpecRow = vm.ReqSpecificationRows.Single();
 
             Assert.IsTrue(vm.CanVerifyRequirements);
@@ -245,9 +256,11 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
-        public void VerifyThatDeprecatedRequirementSpecificationsAreNotVerified()
+        public async Task VerifyThatDeprecatedRequirementSpecificationsAreNotVerified()
         {
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var reqSpecRow = vm.ReqSpecificationRows.Single();
 
             Assert.IsTrue(vm.CanVerifyRequirements);
@@ -259,11 +272,13 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
-        public void VerifyThatNoTopElementSetResultsInMessageBox()
+        public async Task VerifyThatNoTopElementSetResultsInMessageBox()
         {
             this.iteration.TopElement = null;
 
             var vm = new RequirementsBrowserViewModel(this.iteration, this.session.Object, this.dialogNavigation.Object, this.panelNavigation.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var reqSpecRow = vm.ReqSpecificationRows.Single();
 
             Assert.IsTrue(vm.CanVerifyRequirements);
@@ -279,6 +294,26 @@ namespace CDP4Requirements.Tests.RequirementBrowser
                     MessageBoxImage.Warning
                 )
             );
+        }
+
+        /// <summary>
+        /// Checks for <see cref="BackgroundWorker"/>s to finish
+        /// </summary>
+        /// <param name="check">Action to check</param>
+        /// <param name="maxNumberOfChecks">Number of checks (100ms per check)</param>
+        /// <returns>an awaitable <see cref="Task"/></returns>
+        private async Task DelayedCheck(Func<bool> check, int maxNumberOfChecks = 10)
+        {
+            // wait 1000ms for background worker to be finished
+            for (var i = 0; i < maxNumberOfChecks; i++)
+            {
+                await Task.Delay(100);
+
+                if (check.Invoke())
+                {
+                    break;
+                }
+            }
         }
     }
 }

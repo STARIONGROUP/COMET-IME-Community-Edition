@@ -27,6 +27,7 @@ namespace CDP4SiteDirectory.Tests
 {
     using System;
     using System.Collections.Concurrent;
+    using System.ComponentModel;
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
@@ -103,9 +104,12 @@ namespace CDP4SiteDirectory.Tests
         }
 
         [Test]
-        public void VerifyPanelProperties()
+        public async Task VerifyPanelProperties()
         {
             var browser = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
+
+            await this.DelayedCheck(() => browser.SingleRunBackgroundWorker == null);
+
             Assert.AreEqual("Persons, site directory", browser.Caption);
             Assert.AreEqual("site directory\nhttps://www.stariongroup.eu/\n ", browser.ToolTip);
             Assert.AreEqual(1, browser.PersonRowViewModels.Count);
@@ -113,9 +117,11 @@ namespace CDP4SiteDirectory.Tests
         }
 
         [Test]
-        public void VerifyThatEventAreCaught()
+        public async Task VerifyThatEventAreCaught()
         {
             var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var pers = new Person(Guid.NewGuid(), this.cache, this.uri) { ShortName = "new" };
             this.siteDir.Person.Add(pers);
 
@@ -135,6 +141,8 @@ namespace CDP4SiteDirectory.Tests
         public async Task VerifyThatExecuteCreateWorks()
         {
             var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             await vm.CreateCommand.Execute();
 
             this.navigation.Verify(x => x.Navigate(It.IsAny<Person>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.navigation.Object, It.IsAny<Thing>(), null));
@@ -144,11 +152,34 @@ namespace CDP4SiteDirectory.Tests
         public async Task VerifyThatEditCommandWorks()
         {
             var vm = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
+
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             vm.SelectedThing = vm.PersonRowViewModels.First();
 
             await vm.UpdateCommand.Execute();
 
             this.navigation.Verify(x => x.Navigate(It.IsAny<Person>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, It.IsAny<Thing>(), null));
+        }
+
+        /// <summary>
+        /// Checks for <see cref="BackgroundWorker"/>s to finish
+        /// </summary>
+        /// <param name="check">Action to check</param>
+        /// <param name="maxNumberOfChecks">Number of checks (100ms per check)</param>
+        /// <returns>an awaitable <see cref="Task"/></returns>
+        private async Task DelayedCheck(Func<bool> check, int maxNumberOfChecks = 20)
+        {
+            // wait 1000ms for background worker to be finished
+            for (var i = 0; i < maxNumberOfChecks; i++)
+            {
+                await Task.Delay(100);
+
+                if (check.Invoke())
+                {
+                    break;
+                }
+            }
         }
     }
 }
