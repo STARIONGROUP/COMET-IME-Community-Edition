@@ -30,9 +30,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="5.1.1" />
-    <PackageReference Include="CDP4Common-CE" Version="27.4.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.4.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.0" />
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc24" />
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc24" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc24" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DevExpress.Reporting.Core" Version="23.2.5" />
     <PackageReference Include="DevExpress.Wpf.Reporting" Version="23.2.5" />
@@ -45,7 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="NUnit.Console" Version="3.18.3" />

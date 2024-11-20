@@ -42,16 +42,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.4.0">
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc24">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.4.0">
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc24">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.0">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc24">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.4.0">
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.0.0-rc24">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
@@ -180,7 +180,7 @@
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="DotLiquid" Version="2.2.692" />
+	<PackageReference Include="DotLiquid" Version="2.2.717" />
 	<PackageReference Include="NetOfficeFw.Core" Version="1.9.7">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
@@ -202,7 +202,7 @@
 	<PackageReference Include="ReactiveUI" Version="20.1.63">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="System.ComponentModel.Composition" Version="8.0.0">
+	<PackageReference Include="System.ComponentModel.Composition" Version="9.0.0">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135">
