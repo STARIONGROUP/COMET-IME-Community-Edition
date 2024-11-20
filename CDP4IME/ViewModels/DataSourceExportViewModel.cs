@@ -46,6 +46,8 @@ namespace COMET.ViewModels
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
 
+    using CDP4DalCommon.Protocol.Operations;
+
     using CommonServiceLocator;
 
     using ReactiveUI;

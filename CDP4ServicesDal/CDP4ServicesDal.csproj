@@ -11,8 +11,8 @@
     <Product>CDP4ServicesDal</Product>
     <Description>CDP4-COMET Services DAL to be used exclusively with CDP4-COMET Services</Description>
     <Copyright>Copyright © Starion Group S.A</Copyright>
-    <AssemblyVersion>10.0.3.11</AssemblyVersion>
-    <FileVersion>10.0.3.11</FileVersion>
+    <AssemblyVersion>10.0.3.2</AssemblyVersion>
+    <FileVersion>10.0.3.2</FileVersion>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -39,16 +39,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.4.1">
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc24">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.4.1">
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc24">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.1">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc24">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4ServicesDal-CE" Version="27.4.1" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="28.0.0-rc24" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -70,7 +70,7 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4">
+    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.0">
 	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>

@@ -36,6 +36,8 @@ namespace CDP4EngineeringModel.Tests.Utilities
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using CDP4DalCommon.Protocol.Operations;
+
     using CDP4EngineeringModel.Utilities;
 
     using Moq;
