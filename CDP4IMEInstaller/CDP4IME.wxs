@@ -31,6 +31,10 @@
         <File Id="_F78B2EE0" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)CDP4JsonSerializer.dll" KeyPath="yes" />
       </Component>
 
+      <Component Id="_22787F583F4B" Guid="{2FD4934E-5BF3-490C-A372-22787F583F4B}" Location="local" Win64="$(var.Win64)">
+        <File Id="_2FD4934E" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)CDP4DalJsonSerializer.dll" KeyPath="yes" />
+      </Component>
+
       <Component Id="_A50B23D361AB" Guid="{01D00026-4359-44BE-9B07-A50B23D361AB}" Location="local" Win64="$(var.Win64)">
         <File Id="_01D00026" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)CDP4RequirementsVerification.dll" KeyPath="yes" />
       </Component>
