@@ -373,6 +373,10 @@ namespace CDP4AddinCE
             logger.Trace("System.Threading.Tasks.Extensions");
             var taskExtensions = new Version("4.2.0.1");
             this.RedirectAssembly("System.Threading.Tasks.Extensions", taskExtensions, "cc7b13ffcd2ddd51");
+
+            logger.Trace("System.Net.Http.Formatting");
+            var netHttpExtensions = new Version("6.0.0.0");
+            this.RedirectAssembly("System.Net.Http.Formatting", netHttpExtensions, "31bf3856ad364e35");
         }
 
         /// <summary>

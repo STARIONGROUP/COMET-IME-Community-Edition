@@ -116,6 +116,10 @@
         <File Id="_ADA9F0B76B77" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Collections.Immutable.dll" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="_26026CD9" Guid="{26026CD9-51B2-4C27-9D11-6F466D536C3F}" Win64="$(var.Win64)">
+        <File Id="_6F466D536C3F" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.IO.Pipelines.dll" KeyPath="yes"></File>
+      </Component>
+
       <Component Id="_A36A3ED6" Guid="{A36A3ED6-8B87-4D6A-960E-68E6F17B4205}" Win64="$(var.Win64)">
 	    <File Id="_68E6F17B4205" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)System.Memory.dll" KeyPath="yes"></File>
       </Component>
