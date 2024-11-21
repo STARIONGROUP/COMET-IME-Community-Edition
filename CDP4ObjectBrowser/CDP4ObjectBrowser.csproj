@@ -36,13 +36,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc24">
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc25">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc24">
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc25">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc24">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc25">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.5">
@@ -150,7 +150,7 @@
     <PackageReference Include="NLog" Version="5.3.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.14">
+	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.15">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReactiveUI.WPF" Version="20.1.63">
