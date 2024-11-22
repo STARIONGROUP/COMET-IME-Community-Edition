@@ -18,9 +18,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="5.1.1" />
-	<PackageReference Include="CDP4Common-CE" Version="27.4.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.4.0" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.4.0" />
+	<PackageReference Include="CDP4Common-CE" Version="27.4.1-rc1" />
+    <PackageReference Include="CDP4Dal-CE" Version="27.4.1-rc1" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.4.1-rc1" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
     <PackageReference Include="ReactiveUI" Version="20.1.63" />
