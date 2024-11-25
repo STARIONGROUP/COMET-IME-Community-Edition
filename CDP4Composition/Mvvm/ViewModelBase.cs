@@ -326,7 +326,8 @@ namespace CDP4Composition.Mvvm
         {
             if (this.isDisposed)
             {
-                if (this.MessageBusHandler is { } messageBusHandler)
+                // Only IHaveMessageBusHandler is allowed to dispose the MessageBusHandler
+                if (this is IHaveMessageBusHandler && this.MessageBusHandler is { } messageBusHandler)
                 {
                     messageBusHandler.Dispose();
                 }
