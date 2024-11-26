@@ -95,6 +95,8 @@ namespace CDP4EngineeringModel.ViewModels
             {
                 if (this.folderCache.TryGetValue(removedFolder, out var row))
                 {
+                    this.UpdateRowPositions(row);
+
                     this.folderCache.Remove(removedFolder);
                     ((IHaveContainedRows)row.ContainerViewModel).ContainedRows.RemoveAndDispose(row);
                 }
@@ -118,6 +120,27 @@ namespace CDP4EngineeringModel.ViewModels
                     var containerViewModel = this.folderCache[addedFolder.ContainingFolder];
                     containerViewModel.ContainedRows.Add(row);
                     row.UpdateContainerViewModel(containerViewModel);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates all row positions for a <see cref="FolderRowViewModel"/>'s child rows and its recursive rows
+        /// </summary>
+        /// <param name="parentRowViewModel">the parent <see cref="FolderRowViewModel"/></param>
+        private void UpdateRowPositions(FolderRowViewModel parentRowViewModel)
+        {
+            foreach (var subRow in parentRowViewModel.ContainedRows.ToList())
+            {
+                if (subRow is FolderRowViewModel folderRowViewModel)
+                {
+                    this.UpdateFolderRowPositionInternal(folderRowViewModel.Thing);
+                    this.UpdateRowPositions(folderRowViewModel);
+                }
+
+                if (subRow is FileRowViewModel fileRowViewModel)
+                {
+                    this.UpdateFileRowPositionInternal(fileRowViewModel.Thing, fileRowViewModel.FileRevision);
                 }
             }
         }
@@ -171,6 +194,15 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateFolderRows();
 
+            this.UpdateFolderRowPositionInternal(updatedFolder);
+        }
+
+        /// <summary>
+        /// Update ONLY the position of a <see cref="Folder"/>
+        /// </summary>
+        /// <param name="updatedFolder">The updated <see cref="Folder"/></param>
+        private void UpdateFolderRowPositionInternal(Folder updatedFolder)
+        {
             var row = this.folderCache[updatedFolder];
 
             if (updatedFolder.ContainingFolder == null)
@@ -204,6 +236,16 @@ namespace CDP4EngineeringModel.ViewModels
         {
             this.UpdateFileRows();
 
+            this.UpdateFileRowPositionInternal(file, fileRevision);
+        }
+
+        /// <summary>
+        /// Update only the <see cref="File"/> row position
+        /// </summary>
+        /// <param name="file">The <see cref="File"/></param>
+        /// <param name="fileRevision">The latest <see cref="FileRevision"/></param>
+        private void UpdateFileRowPositionInternal(File file, FileRevision fileRevision)
+        {
             var row = this.fileCache[file];
 
             if (fileRevision.ContainingFolder == null)
