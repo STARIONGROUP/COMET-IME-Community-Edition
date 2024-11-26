@@ -201,9 +201,10 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatElementDefArePopulatedFromEvent()
+        public async Task VerifyThatElementDefArePopulatedFromEvent()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             this.rev.SetValue(this.iteration, 50);
             this.iteration.Element.Add(this.elementDef);
@@ -218,10 +219,12 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatElementDefArePopulated()
+        public async Task VerifyThatElementDefArePopulated()
         {
             this.iteration.Element.Add(this.elementDef);
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             Assert.AreEqual(1, vm.ElementDefinitionRowViewModels.Count);
 
@@ -268,9 +271,10 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatParticipantWithoutDomainSelectedCannotDropOnElementDefBrowser()
+        public async Task VerifyThatParticipantWithoutDomainSelectedCannotDropOnElementDefBrowser()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var simpleQuantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri);
             var ratioScale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
@@ -286,9 +290,11 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatDragWorks()
+        public async Task VerifyThatDragWorks()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, this.panelNavigationService.Object, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var draginfo = new Mock<IDragInfo>();
             var dragSource = new Mock<IDragSource>();
 
@@ -302,6 +308,8 @@ namespace CDP4EngineeringModel.Tests
         public async Task VerifyThatDropsWorkDomain()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var dropinfo = new Mock<IDropInfo>();
             var droptarget = new Mock<IDropTarget>();
 
@@ -318,6 +326,8 @@ namespace CDP4EngineeringModel.Tests
         public async Task VerifyThatDropsWorkIfNoDomain()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var dropinfo = new Mock<IDropInfo>();
             var droptarget = new Mock<IDropTarget>();
 
@@ -331,6 +341,8 @@ namespace CDP4EngineeringModel.Tests
         public async Task VerifyCreateParameterOverride()
         {
             var browser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, this.panelNavigationService.Object, null, null, null, null);
+            await this.DelayedCheck(() => browser.SingleRunBackgroundWorker == null);
+
             var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.elementDef.Owner, ElementDefinition = this.elementDef, Container = this.elementDef };
             var usageRow = new ElementUsageRowViewModel(elementUsage, this.elementDef.Owner, this.session.Object, null, this.obfuscationService.Object);
             var qk = new SimpleQuantityKind();
@@ -372,28 +384,36 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatActiveDomainIsDisplayed()
+        public async Task VerifyThatActiveDomainIsDisplayed()
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain" };
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             Assert.AreEqual("domain []", vm.DomainOfExpertise);
 
             domainOfExpertise = null;
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
             vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+
+            await this.DelayedCheck(() => false, 5);
+
             Assert.AreEqual("None", vm.DomainOfExpertise);
         }
 
         [Test]
-        public void VerifThatIfDomainIsRenamedBrowserIsUpdated()
+        public async Task VerifThatIfDomainIsRenamedBrowserIsUpdated()
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             Assert.AreEqual("System [SYS]", vm.DomainOfExpertise);
 
             domainOfExpertise.Name = "Systems";
@@ -404,12 +424,14 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatIfEngineeringModelSetupIsChangedBrowserIsUpdated()
+        public async Task VerifyThatIfEngineeringModelSetupIsChangedBrowserIsUpdated()
         {
             var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "System", ShortName = "SYS" };
             this.session.Setup(x => x.QuerySelectedDomainOfExpertise(this.iteration)).Returns(domainOfExpertise);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             Assert.AreEqual("ModelSetup", vm.CurrentModel);
 
             this.engineeringModelSetup.Name = "testing";
@@ -420,9 +442,10 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatDragOverWorksWithDropTarget()
+        public async Task VerifyThatDragOverWorksWithDropTarget()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var dropinfo = new Mock<IDropInfo>();
 
@@ -436,9 +459,10 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatDragOverWorksWithoutDropTarget()
+        public async Task VerifyThatDragOverWorksWithoutDropTarget()
         {
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var dropinfo = new Mock<IDropInfo>();
 
@@ -484,6 +508,7 @@ namespace CDP4EngineeringModel.Tests
             this.assembler.Cache.TryAdd(new CacheKey(def.Iid, model2Iteration.Iid), new Lazy<Thing>(() => def));
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var dropinfo = new Mock<IDropInfo>();
 
@@ -540,6 +565,7 @@ namespace CDP4EngineeringModel.Tests
             this.assembler.Cache.TryAdd(new CacheKey(def.Iid, model2Iteration.Iid), new Lazy<Thing>(() => def));
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var dropinfo = new Mock<IDropInfo>();
 
@@ -565,7 +591,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatContextMenuIsPopulated()
+        public async Task VerifyThatContextMenuIsPopulated()
         {
             var group = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
@@ -603,6 +629,8 @@ namespace CDP4EngineeringModel.Tests
             this.iteration.Element.Add(def2);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             vm.PopulateContextMenu();
 
             Assert.AreEqual(2, vm.ContextMenu.Count);
@@ -639,7 +667,7 @@ namespace CDP4EngineeringModel.Tests
         }
 
         [Test]
-        public void VerifyThatSetTopElementWorks()
+        public async Task VerifyThatSetTopElementWorks()
         {
             var def2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
@@ -649,6 +677,9 @@ namespace CDP4EngineeringModel.Tests
             this.iteration.TopElement = this.elementDef;
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             var defRow = (ElementDefinitionRowViewModel)vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid);
             var def2Row = (ElementDefinitionRowViewModel)vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid);
             Assert.IsTrue(defRow.IsTopElement);
@@ -684,6 +715,8 @@ namespace CDP4EngineeringModel.Tests
             this.iteration.Element.Add(this.elementDef);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             Assert.IsFalse(((ICommand)vm.CreateSubscriptionCommand).CanExecute(null));
 
             var defRow = vm.ElementDefinitionRowViewModels.First();
@@ -727,6 +760,7 @@ namespace CDP4EngineeringModel.Tests
             this.iteration.Element.Add(this.elementDef);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var defRow = vm.ElementDefinitionRowViewModels.Single();
             vm.SelectedThing = defRow.ContainedRows.Single(x => x.Thing is ParameterGroup);
@@ -740,6 +774,7 @@ namespace CDP4EngineeringModel.Tests
         {
             this.iteration.Element.Add(this.elementDef);
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             vm.SelectedThing = vm.ElementDefinitionRowViewModels.First();
 
@@ -787,6 +822,7 @@ namespace CDP4EngineeringModel.Tests
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
             vm.PopulateContextMenu();
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             Assert.AreEqual(2, vm.ContextMenu.Count);
 
@@ -809,6 +845,8 @@ namespace CDP4EngineeringModel.Tests
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             vm.PopulateContextMenu();
 
             Assert.AreEqual(2, vm.ContextMenu.Count);
@@ -839,6 +877,8 @@ namespace CDP4EngineeringModel.Tests
             this.iteration.Element.Add(this.elementDef);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             vm.PopulateContextMenu();
 
             Assert.AreEqual(2, vm.ContextMenu.Count);
@@ -857,6 +897,8 @@ namespace CDP4EngineeringModel.Tests
             this.dialogNavigationService.Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>())).Returns(dialogResult);
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null, this.parameterSubscriptionBatchService.Object, this.changeOwnershipBatchService.Object);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
             vm.SelectedThing = new ElementDefinitionRowViewModel(this.elementDef, this.domain, this.session.Object, null, this.obfuscationService.Object);
 
             vm.PopulateContextMenu();
@@ -879,6 +921,7 @@ namespace CDP4EngineeringModel.Tests
             this.iteration.TopElement = this.elementDef;
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var defRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid) as ElementDefinitionRowViewModel;
             var def2Row = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid) as ElementDefinitionRowViewModel;
@@ -907,6 +950,7 @@ namespace CDP4EngineeringModel.Tests
             this.iteration.TopElement = this.elementDef;
 
             var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
 
             var defRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == this.elementDef.Iid) as ElementDefinitionRowViewModel;
             var def2Row = vm.ElementDefinitionRowViewModels.Single(x => x.Thing.Iid == def2.Iid) as ElementDefinitionRowViewModel;
@@ -922,6 +966,26 @@ namespace CDP4EngineeringModel.Tests
             vm.SelectedThing = defRow;
             await vm.UnsetAsTopElementDefinitionCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+        }
+
+        /// <summary>
+        /// Checks for <see cref="BackgroundWorker"/>s to finish
+        /// </summary>
+        /// <param name="check">Action to check</param>
+        /// <param name="maxNumberOfChecks">Number of checks (100ms per check)</param>
+        /// <returns>an awaitable <see cref="Task"/></returns>
+        private async Task DelayedCheck(Func<bool> check, int maxNumberOfChecks = 10)
+        {
+            // wait 1000ms for background worker to be finished
+            for (var i = 0; i < maxNumberOfChecks; i++)
+            {
+                await Task.Delay(100);
+
+                if (check.Invoke())
+                {
+                    break;
+                }
+            }
         }
     }
 }

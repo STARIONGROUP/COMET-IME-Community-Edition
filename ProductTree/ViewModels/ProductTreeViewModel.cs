@@ -45,6 +45,8 @@ namespace CDP4ProductTree.ViewModels
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
+    using CDP4Composition.Utilities;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -152,20 +154,20 @@ namespace CDP4ProductTree.ViewModels
                         objectChange.ChangedThing.RevisionNumber > this.RevisionNumber)
                 .Select(x => x.ChangedThing as Iteration)
                 .ObserveOn(RxApp.MainThreadScheduler)
-                .Subscribe(this.SetTopElement);
+                .Subscribe(iteration1 => this.SetTopElement(iteration1));
 
             this.Disposables.Add(iterationSubscription);
 
-            this.ExecuteLongRunningDispatcherAction(
+            this.SetTopElement(
+                iteration, 
+                true,
                 () =>
                 {
                     this.AddSubscriptions();
-                    this.SetTopElement(iteration);
                     this.UpdateProperties();
                     stopWatch.Stop();
                     logger.Info("The Product Tree loaded in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
-                },
-                $"Loading {this.Caption}");
+                });
         }
 
         /// <summary>
@@ -539,7 +541,9 @@ namespace CDP4ProductTree.ViewModels
         /// Sets the top element for this product tree
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/> associated to this <see cref="Option"/></param>
-        private void SetTopElement(Iteration iteration)
+        /// <param name="runOnBackgroundThread">INdicates if this methid should perform actions on a background thread</param>
+        /// <param name="afterUpdateAction">The action to perform after all updates are made</param>
+        private void SetTopElement(Iteration iteration, bool runOnBackgroundThread = false, Action afterUpdateAction = null)
         {
             if (iteration == null)
             {
@@ -560,8 +564,40 @@ namespace CDP4ProductTree.ViewModels
                     this.TopElement.ClearAndDispose();
                 }
 
-                var row = new ElementDefinitionRowViewModel(iteration.TopElement, this.Thing, this.Session, this);
-                this.TopElement.Add(row);
+                if (runOnBackgroundThread)
+                {
+                    this.IsBusy = true;
+
+                    this.SingleRunBackgroundWorker = new SingleRunBackgroundDataLoader<Option>(this,
+                        e =>
+                        {
+                            var row = new ElementDefinitionRowViewModel(iteration.TopElement, this.Thing, this.Session, this);
+                            e.Result = row;
+                        },
+                        e =>
+                        {
+                            if (e.Result is ElementDefinitionRowViewModel row)
+                            {
+                                this.HasUpdateStarted = true;
+                                this.TopElement.Add(row);
+                                this.HasUpdateStarted = false;
+
+                                afterUpdateAction?.Invoke();
+                            }
+
+                            this.IsBusy = false;
+                        });
+
+                    this.SingleRunBackgroundWorker.RunWorkerAsync();
+                }
+                else
+                {
+                    var row = new ElementDefinitionRowViewModel(iteration.TopElement, this.Thing, this.Session, this);
+                    
+                    this.HasUpdateStarted = true;
+                    this.TopElement.Add(row);
+                    this.HasUpdateStarted = false;
+                }
             }
         }
 

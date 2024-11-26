@@ -476,6 +476,112 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
+        public void VerifyThatParametersAndGroupsArePlacedCorrectlyWhenGroupMainIsRemoved()
+        {
+            var revision = typeof(ElementDefinition).GetProperty("RevisionNumber");
+
+            // Test input
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
+            var manualSet = new ValueArray<string>(new List<string> { "manual" });
+            var referenceSet = new ValueArray<string>(new List<string> { "ref" });
+            var computedSet = new ValueArray<string>(new List<string> { "computed" });
+            var publishedSet = new ValueArray<string>(new List<string> { "published" });
+            valueSet.Manual = manualSet;
+            valueSet.Reference = referenceSet;
+            valueSet.Computed = computedSet;
+            valueSet.Published = publishedSet;
+
+            this.parameter1.ValueSet.Add(valueSet);
+            this.elementDefinition.Parameter.Add(this.parameter1);
+
+            // **********
+
+            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var group1Row = vm.ContainedRows.Single(x => x.Thing == this.parameterGroup1);
+            var group3Row = group1Row.ContainedRows.Single();
+
+            Assert.AreEqual(3, vm.ContainedRows.Count);
+
+            // move parameter to group1
+            revision.SetValue(this.parameter1, 1);
+            this.parameter1.Group = this.parameterGroup1;
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+            Assert.AreEqual(2, vm.ContainedRows.Count);
+            Assert.AreEqual(2, group1Row.ContainedRows.Count);
+
+            // move parameter to group3
+            revision.SetValue(this.parameter1, 2);
+            this.parameter1.Group = this.parameterGroup3;
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+            Assert.AreEqual(2, vm.ContainedRows.Count);
+            Assert.AreEqual(1, group1Row.ContainedRows.Count);
+            Assert.AreEqual(1, group3Row.ContainedRows.Count);
+
+            // remove group1
+            revision.SetValue(this.elementDefinition, 3);
+            this.parameter1.Group = null;
+            this.elementDefinition.ParameterGroup.Remove(this.parameterGroup1);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+
+            Assert.AreEqual(1, vm.ContainedRows.Count);
+            Assert.AreEqual(1, group3Row.ContainedRows.Count);
+        }
+
+        [Test]
+        public void VerifyThatParametersAndGroupsArePlacedCorrectlyWhenGroupNestedIsRemoved()
+        {
+            var revision = typeof(ElementDefinition).GetProperty("RevisionNumber");
+
+            // Test input
+            var valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
+            var manualSet = new ValueArray<string>(new List<string> { "manual" });
+            var referenceSet = new ValueArray<string>(new List<string> { "ref" });
+            var computedSet = new ValueArray<string>(new List<string> { "computed" });
+            var publishedSet = new ValueArray<string>(new List<string> { "published" });
+            valueSet.Manual = manualSet;
+            valueSet.Reference = referenceSet;
+            valueSet.Computed = computedSet;
+            valueSet.Published = publishedSet;
+
+            this.parameter1.ValueSet.Add(valueSet);
+            this.elementDefinition.Parameter.Add(this.parameter1);
+
+            // **********
+
+            var vm = new ElementDefinitionRowViewModel(this.elementDefinition, this.activeDomain, this.session.Object, null, this.obfuscationService.Object);
+            var group1Row = vm.ContainedRows.Single(x => x.Thing == this.parameterGroup1);
+            var group3Row = group1Row.ContainedRows.Single();
+
+            Assert.AreEqual(3, vm.ContainedRows.Count);
+
+            // move parameter to group1
+            revision.SetValue(this.parameter1, 1);
+            this.parameter1.Group = this.parameterGroup1;
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+            Assert.AreEqual(2, vm.ContainedRows.Count);
+            Assert.AreEqual(2, group1Row.ContainedRows.Count);
+
+            // move parameter to group3
+            revision.SetValue(this.parameter1, 2);
+            this.parameter1.Group = this.parameterGroup3;
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+            Assert.AreEqual(2, vm.ContainedRows.Count);
+            Assert.AreEqual(1, group1Row.ContainedRows.Count);
+            Assert.AreEqual(1, group3Row.ContainedRows.Count);
+
+            // remove group1
+            revision.SetValue(this.elementDefinition, 3);
+            this.parameter1.Group = null;
+            this.elementDefinition.ParameterGroup.Remove(this.parameterGroup3);
+            this.messageBus.SendObjectChangeEvent(this.elementDefinition, EventKind.Updated);
+            this.messageBus.SendObjectChangeEvent(this.parameter1, EventKind.Updated);
+
+            Assert.AreEqual(3, vm.ContainedRows.Count);
+            Assert.AreEqual(0, group1Row.ContainedRows.Count);
+        }
+
+        [Test]
         public void VerifyThatElementUsagesCanBeAddedOrRemoved()
         {
             var revision = typeof(ElementDefinition).GetProperty("RevisionNumber");

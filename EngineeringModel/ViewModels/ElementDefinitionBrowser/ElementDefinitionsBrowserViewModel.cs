@@ -52,6 +52,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
     using CDP4Composition.Services;
+    using CDP4Composition.Utilities;
 
     using CDP4Dal;
     using CDP4Dal.Events;
@@ -186,16 +187,14 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.ElementDefinitionRowViewModels = new DisposableReactiveList<IRowViewModelBase<Thing>>();
 
-            this.ExecuteLongRunningDispatcherAction(
+            this.AddElementDefinitions(
                 () =>
                 {
-                    this.UpdateElementDefinition(true);
                     this.AddSubscriptions();
                     this.UpdateProperties();
                     stopWatch.Stop();
                     logger.Info("The Element Definition browser loaded in {0}", stopWatch.Elapsed.ToString("hh':'mm':'ss'.'fff"));
-                },
-                $"Loading {this.Caption}");
+                });
         }
 
         /// <summary>
@@ -764,7 +763,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.UpdateDomain(domainChangeEvent);
             this.ElementDefinitionRowViewModels.ClearAndDispose();
-            this.UpdateElementDefinition(true);
+            this.AddElementDefinitions();
         }
 
         /// <summary>
@@ -1014,33 +1013,31 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Update the rows to display
         /// </summary>
-        /// <param name="initial">
-        /// A boolean indicating if this is the first load
-        /// </param>
-        private void UpdateElementDefinition(bool initial = false)
+        private void UpdateElementDefinition()
         {
             var currentDef = this.ElementDefinitionRowViewModels.Select(x => (ElementDefinition)x.Thing).ToList();
             var addedDef = this.Thing.Element.Except(currentDef).ToList();
 
-            if (initial)
+            foreach (var elementDefinition in addedDef)
             {
-                this.AddElementDefinitionRows(addedDef);
-            }
-            else
-            {
-                foreach (var elementDefinition in addedDef)
-                {
-                    this.AddElementDefinitionRow(elementDefinition);
-                }
-
-                var removedDef = currentDef.Except(this.Thing.Element).ToList();
-
-                foreach (var elementDefinition in removedDef)
-                {
-                    this.RemoveElementDefinitionRow(elementDefinition);
-                }
+                this.AddElementDefinitionRow(elementDefinition);
             }
 
+            var removedDef = currentDef.Except(this.Thing.Element).ToList();
+
+            foreach (var elementDefinition in removedDef)
+            {
+                this.RemoveElementDefinitionRow(elementDefinition);
+            }
+
+            this.AfterUpdateElementDefinitions();
+        }
+
+        /// <summary>
+        /// Code to tun after the ElementDefinitionRowViewModels are updated
+        /// </summary>
+        private void AfterUpdateElementDefinitions()
+        {
             var topElementDefinitionOld = this.ElementDefinitionRowViewModels.FirstOrDefault(vm => ((ElementDefinitionRowViewModel)vm).IsTopElement);
 
             if (this.Thing.TopElement == null)
@@ -1098,22 +1095,46 @@ namespace CDP4EngineeringModel.ViewModels
         /// <summary>
         /// Add rows of the associated <see cref="ElementDefinition"/>s
         /// </summary>
-        /// <param name="elementDefs">The <see cref="ElementDefinition"/>s to add</param>
-        private void AddElementDefinitionRows(IEnumerable<ElementDefinition> elementDefs)
+        /// <param name="afterUpdateAction">The action to perform after all updates are made</param>
+        private void AddElementDefinitions(Action afterUpdateAction = null)
         {
             this.Session.OpenIterations.TryGetValue(this.Thing, out var tuple);
 
             if (tuple != null)
             {
-                var rows = new List<ElementDefinitionRowViewModel>();
+                this.SingleRunBackgroundWorker = new SingleRunBackgroundDataLoader<Iteration>(
+                    this,
+                    e =>
+                    {
+                        this.IsBusy = true;
 
-                foreach (var elementDef in elementDefs)
-                {
-                    rows.Add(new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this, this.obfuscationService));
-                }
+                        var rows = new List<ElementDefinitionRowViewModel>();
 
-                rows.Sort(rowComparer);
-                this.ElementDefinitionRowViewModels.AddRange(rows);
+                        foreach (var elementDef in this.Thing.Element)
+                        {
+                            rows.Add(new ElementDefinitionRowViewModel(elementDef, tuple.Item1, this.Session, this, this.obfuscationService));
+                        }
+
+                        rows.Sort(rowComparer);
+
+                        e.Result = rows;
+                    },
+                    e =>
+                    {
+                        if (e.Result is List<ElementDefinitionRowViewModel> rows)
+                        {
+                            this.HasUpdateStarted = true;
+                            this.ElementDefinitionRowViewModels.AddRange(rows);
+                            this.AfterUpdateElementDefinitions();
+                            this.HasUpdateStarted = false;
+                        }
+
+                        afterUpdateAction?.Invoke();
+
+                        this.IsBusy = false;
+                    });
+
+                this.SingleRunBackgroundWorker.RunWorkerAsync();
             }
         }
 

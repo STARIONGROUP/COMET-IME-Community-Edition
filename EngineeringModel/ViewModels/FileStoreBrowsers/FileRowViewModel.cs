@@ -51,11 +51,6 @@ namespace CDP4EngineeringModel.ViewModels
         private readonly IFileStoreFileAndFolderHandler parentFileStoreFileAndFolderHandler;
 
         /// <summary>
-        /// The current <see cref="FileRevision"/>
-        /// </summary>
-        private FileRevision fileRevision;
-
-        /// <summary>
         /// Backing field for <see cref="Name"/>
         /// </summary>
         private string name;
@@ -123,7 +118,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets the creator of the <see cref="FileRevision"/>
+        /// Gets the creator of the <see cref="CDP4Common.EngineeringModelData.FileRevision"/>
         /// </summary>
         public string CreatorValue
         {
@@ -149,6 +144,11 @@ namespace CDP4EngineeringModel.ViewModels
             private set => this.RaiseAndSetIfChanged(ref this.locker, value);
         }
 
+        /// <summary>
+        /// The current <see cref="CDP4Common.EngineeringModelData.FileRevision"/>
+        /// </summary>
+        public FileRevision FileRevision { get; set; }
+        
         /// <summary>
         /// Update the <see cref="ContainerViewModel"/>
         /// </summary>
@@ -184,16 +184,16 @@ namespace CDP4EngineeringModel.ViewModels
             // check if there is a new file revision
             var lastCreatedDate = this.Thing.FileRevision.Select(x => x.CreatedOn).Max();
 
-            if (this.fileRevision == null)
+            if (this.FileRevision == null)
             {
-                this.fileRevision = this.Thing.FileRevision.First(x => x.CreatedOn == lastCreatedDate);
+                this.FileRevision = this.Thing.FileRevision.First(x => x.CreatedOn == lastCreatedDate);
                 this.UpdateFileRevisionProperties();
             }
 
-            if (this.fileRevision.CreatedOn != lastCreatedDate)
+            if (this.FileRevision.CreatedOn != lastCreatedDate)
             {
-                this.fileRevision = this.Thing.FileRevision.First(x => x.CreatedOn == lastCreatedDate);
-                this.parentFileStoreFileAndFolderHandler?.UpdateFileRowPosition(this.Thing, this.fileRevision);
+                this.FileRevision = this.Thing.FileRevision.First(x => x.CreatedOn == lastCreatedDate);
+                this.parentFileStoreFileAndFolderHandler?.UpdateFileRowPosition(this.Thing, this.FileRevision);
                 this.UpdateFileRevisionProperties();
             }
 
@@ -221,13 +221,13 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Update the properties related to the <see cref="FileRevision"/> information
+        /// Update the properties related to the <see cref="CDP4Common.EngineeringModelData.FileRevision"/> information
         /// </summary>
         private void UpdateFileRevisionProperties()
         {
-            this.Name = this.fileRevision.Name;
-            this.CreationDate = this.fileRevision.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture);
-            this.CreatorValue = this.fileRevision.Creator.Person.Name;
+            this.Name = this.FileRevision.Name;
+            this.CreationDate = this.FileRevision.CreatedOn.ToString("yyyy-MM-dd hh:mm:ss", CultureInfo.InvariantCulture);
+            this.CreatorValue = this.FileRevision.Creator.Person.Name;
         }
     }
 }

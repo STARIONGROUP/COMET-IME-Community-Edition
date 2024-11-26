@@ -30,6 +30,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reflection;
+    using System.Threading.Tasks;
     using System.Windows;
 
     using CDP4Common.CommonData;
@@ -37,11 +38,14 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Services;
 
     using CDP4Dal.Events;
     using CDP4Dal.Operations;
 
     using CDP4Requirements.ViewModels;
+
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -56,6 +60,8 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
         private RequirementsBrowserViewModel requirementBrowserViewModel;
         private List<Category> categories;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IMessageBoxService> messageBoxService;
 
         [SetUp]
         public override void Setup()
@@ -66,7 +72,15 @@ namespace CDP4Requirements.Tests.RequirementBrowser
             this.spec1.Category = this.categories;
 
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            this.serviceLocator = new Mock<IServiceLocator>();
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
+
+            this.messageBoxService = new Mock<IMessageBoxService>();
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
+
             this.requirementBrowserViewModel = new RequirementsBrowserViewModel(this.iteration, this.session.Object, null, null, null, this.pluginService.Object);
+            this.DelayedCheck(() => this.requirementBrowserViewModel.SingleRunBackgroundWorker == null).Wait();
         }
 
         [TearDown]
@@ -298,6 +312,26 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             containerRow.Drop(dropinfo.Object);
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
+        }
+
+        /// <summary>
+        /// Checks for <see cref="BackgroundWorker"/>s to finish
+        /// </summary>
+        /// <param name="check">Action to check</param>
+        /// <param name="maxNumberOfChecks">Number of checks (100ms per check)</param>
+        /// <returns>an awaitable <see cref="Task"/></returns>
+        private async Task DelayedCheck(Func<bool> check, int maxNumberOfChecks = 10)
+        {
+            // wait 1000ms for background worker to be finished
+            for (var i = 0; i < maxNumberOfChecks; i++)
+            {
+                await Task.Delay(100);
+
+                if (check.Invoke())
+                {
+                    break;
+                }
+            }
         }
     }
 }
