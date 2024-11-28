@@ -252,6 +252,18 @@ namespace CDP4Requirements.ViewModels
 
                 this.Disposables.Add(orderListener);
             }
+
+            var reqSpecRowViewModel = this as RequirementsSpecificationRowViewModel ?? this.TopParentRow;
+
+            var reqSpec = reqSpecRowViewModel.Thing;
+
+            foreach (var req in reqSpec.Requirement)
+            {
+                if (req.Group == group)
+                {
+                    reqSpecRowViewModel.TryAddRequirementRow(req);
+                }
+            }
         }
 
         /// <summary>

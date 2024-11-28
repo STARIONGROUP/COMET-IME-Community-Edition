@@ -121,7 +121,8 @@ namespace CDP4Requirements.ViewModels
 
             var group = dropInfo.Payload as RequirementsGroup;
 
-            if (group != null)
+            // Only allow groups to be moved to the same RequirementsSpecification
+            if (group != null && !this.Thing.Group.Contains(group) && this.Thing.GetContainerOfType<RequirementsSpecification>() == group.GetContainerOfType<RequirementsSpecification>())
             {
                 var canDropRequirementGroup = this.PermissionService.CanWrite(ClassKind.RequirementsGroup, this.Thing);
 
@@ -163,7 +164,8 @@ namespace CDP4Requirements.ViewModels
 
             var requirementGroupPayload = dropInfo.Payload as RequirementsGroup;
 
-            if (requirementGroupPayload != null)
+            // Only allow groups to be moved to the same RequirementsSpecification
+            if (requirementGroupPayload != null && !this.Thing.Group.Contains(requirementGroupPayload) && this.Thing.GetContainerOfType<RequirementsSpecification>() == requirementGroupPayload.GetContainerOfType<RequirementsSpecification>())
             {
                 await this.OnRequirementGroupDrop(requirementGroupPayload, dropInfo);
             }
