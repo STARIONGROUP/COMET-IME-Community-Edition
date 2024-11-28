@@ -152,7 +152,8 @@ namespace CDP4Requirements.ViewModels
 
             var group = dropInfo.Payload as RequirementsGroup;
 
-            if (group != null)
+            // Only allow groups to be moved to the same RequirementsSpecification
+            if (group != null && this.Thing == group.GetContainerOfType<RequirementsSpecification>())
             {
                 var canDropRequirementGroup = this.PermissionService.CanWrite(ClassKind.RequirementsGroup, this.Thing);
 
@@ -165,19 +166,23 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            var spec = dropInfo.Payload as RequirementsSpecification;
+            //----------------------------------------------------------------------------------------------------------
+            // Drag a RequirementsSpecification onto another RequirementsSpecification??? What is the purpose of this?
+            //----------------------------------------------------------------------------------------------------------
+            //var spec = dropInfo.Payload as RequirementsSpecification;
 
-            if (spec != null)
-            {
-                var canDropSpec = this.PermissionService.CanWrite(ClassKind.RequirementsSpecification, this.Thing);
+            //if (spec != null)
+            //{
+            //    var canDropSpec = this.PermissionService.CanWrite(ClassKind.RequirementsSpecification, this.Thing);
 
-                if (canDropSpec && spec.Container.Iid == this.Thing.Container.Iid)
-                {
-                    dropInfo.Effects = DragDropEffects.Move;
-                }
+            //    if (canDropSpec && spec.Container.Iid == this.Thing.Container.Iid)
+            //    {
+            //        dropInfo.Effects = DragDropEffects.Move;
+            //    }
 
-                return;
-            }
+            //    return;
+            //}
+            //----------------------------------------------------------------------------------------------------------
 
             dropInfo.Effects = DragDropEffects.None;
         }
@@ -200,7 +205,8 @@ namespace CDP4Requirements.ViewModels
 
             var requirementGroupPayload = dropInfo.Payload as RequirementsGroup;
 
-            if (requirementGroupPayload != null)
+            // Only allow groups to be moved to the same RequirementsSpecification
+            if (requirementGroupPayload != null && this.Thing == requirementGroupPayload.GetContainerOfType<RequirementsSpecification>())
             {
                 await this.OnRequirementGroupDrop(requirementGroupPayload);
                 return;
@@ -213,12 +219,16 @@ namespace CDP4Requirements.ViewModels
                 await this.OnRequirementDrop(requirementPayload);
             }
 
-            var reqSpec = dropInfo.Payload as RequirementsSpecification;
+            //----------------------------------------------------------------------------------------------------------
+            // Drag a RequirementsSpecification onto another RequirementsSpecification??? What is the purpose of this?
+            //----------------------------------------------------------------------------------------------------------
+            //var reqSpec = dropInfo.Payload as RequirementsSpecification;
 
-            if (reqSpec != null)
-            {
-                await this.OnRequirementSpecificationDrop(reqSpec, dropInfo);
-            }
+            //if (reqSpec != null)
+            //{
+            //    await this.OnRequirementSpecificationDrop(reqSpec, dropInfo);
+            //}
+            //----------------------------------------------------------------------------------------------------------
         }
 
         /// <summary>
@@ -234,7 +244,7 @@ namespace CDP4Requirements.ViewModels
 
             foreach (var requirement in added)
             {
-                this.AddRequirementRow(requirement);
+                this.TryAddRequirementRow(requirement);
             }
 
             foreach (var requirement in removed)
@@ -247,72 +257,87 @@ namespace CDP4Requirements.ViewModels
         /// Add a requirement rows
         /// </summary>
         /// <param name="req">The <see cref="Requirement" /> to add</param>
-        private void AddRequirementRow(Requirement req)
+        public bool TryAddRequirementRow(Requirement req)
         {
             var row = new RequirementRowViewModel(req, this.Session, this);
             this.requirementCache[req] = row;
             this.requirementContainerGroupCache[req] = req.Group;
 
+            var wasAdded = false;
+
             if (req.Group == null)
             {
                 this.ContainedRows.SortedInsert(row, ChildRowComparer);
+                wasAdded = true;
             }
             else
             {
-                IRowViewModelBase<Thing> groupRow;
-
-                if (this.GroupCache.TryGetValue(req.Group, out groupRow))
+                if (this.GroupCache.TryGetValue(req.Group, out var groupRow))
                 {
-                    groupRow.ContainedRows.SortedInsert(row, ChildRowComparer);
+                    if (groupRow.ContainedRows.All(x => x.Thing != req))
+                    {
+                        groupRow.ContainedRows.SortedInsert(row, ChildRowComparer);
+                        wasAdded = true;
+                    }
                 }
                 else
                 {
                     logger.Error("The requirement group with iid {0} could not be found", req.Group.Iid);
-                    this.ContainedRows.SortedInsert(row, ChildRowComparer);
+
+                    if (this.ContainedRows.All(x => x.Thing != req))
+                    {
+                        this.ContainedRows.SortedInsert(row, ChildRowComparer);
+                        wasAdded = true;
+                    }
                 }
             }
 
-            Func<ObjectChangedEvent, bool> discriminator =
-                objectChange =>
-                    objectChange.EventKind == EventKind.Updated &&
-                    objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
-
-            Action<ObjectChangedEvent> action = x => this.UpdateRequirementRow((Requirement)x.ChangedThing, false);
-
-            if (this.AllowMessageBusSubscriptions)
+            if (wasAdded)
             {
-                var updateListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(req)
-                    .Where(discriminator)
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(action);
+                Func<ObjectChangedEvent, bool> discriminator =
+                    objectChange =>
+                        objectChange.EventKind == EventKind.Updated &&
+                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
 
-                this.Disposables.Add(updateListener);
-                this.listenerCache[req] = updateListener;
+                Action<ObjectChangedEvent> action = x => this.UpdateRequirementRow((Requirement)x.ChangedThing, false);
+
+                if (this.AllowMessageBusSubscriptions)
+                {
+                    var updateListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(req)
+                        .Where(discriminator)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(action);
+
+                    this.Disposables.Add(updateListener);
+                    this.listenerCache[req] = updateListener;
+                }
+                else
+                {
+                    var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Requirement));
+
+                    var handler = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Requirement), discriminator, action));
+                    this.Disposables.Add(handler);
+
+                    this.listenerCache[req] = handler;
+                }
+
+                var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
+
+                if (orderPt != null)
+                {
+                    var orderListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(SimpleParameterValue))
+                        .Where(
+                            objectChange =>
+                                ((SimpleParameterValue)objectChange.ChangedThing).ParameterType == orderPt &&
+                                this.Thing.Requirement.Any(r => r.ParameterValue.Contains(objectChange.ChangedThing)))
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(x => this.UpdateRequirementRow((Requirement)x.ChangedThing.Container, true));
+
+                    this.Disposables.Add(orderListener);
+                }
             }
-            else
-            {
-                var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Requirement));
 
-                var handler = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Requirement), discriminator, action));
-                this.Disposables.Add(handler);
-
-                this.listenerCache[req] = handler;
-            }
-
-            var orderPt = OrderHandlerService.GetOrderParameterType((EngineeringModel)this.Thing.TopContainer);
-
-            if (orderPt != null)
-            {
-                var orderListener = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(SimpleParameterValue))
-                    .Where(
-                        objectChange =>
-                            ((SimpleParameterValue)objectChange.ChangedThing).ParameterType == orderPt &&
-                            this.Thing.Requirement.Any(r => r.ParameterValue.Contains(objectChange.ChangedThing)))
-                    .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(x => this.UpdateRequirementRow((Requirement)x.ChangedThing.Container, true));
-
-                this.Disposables.Add(orderListener);
-            }
+            return wasAdded;
         }
 
         /// <summary>
@@ -493,48 +518,17 @@ namespace CDP4Requirements.ViewModels
 
             if (firstRow == null)
             {
-                var context = TransactionContextResolver.ResolveContext(this.Thing);
-                var transaction = new ThingTransaction(context);
-                var previousRequirementSpec = requirementGroupPayload.GetContainerOfType<RequirementsSpecification>();
-
-                // Add the RequirementGroup to the RequirementsSpecification represented by this RowViewModel
-                var requirementsSpecificationClone = this.Thing.Clone(false);
-                requirementsSpecificationClone.Group.Add(requirementGroupPayload);
-                transaction.CreateOrUpdate(requirementsSpecificationClone);
-
-                if (previousRequirementSpec != this.Thing)
-                {
-                    // Update the requirements that were inside any of the groups that have been dropped
-                    var previousRequirementSpecRow =
-                        ((RequirementsBrowserViewModel)this.ContainerViewModel)
-                        .ReqSpecificationRows.Single(x => x.Thing == previousRequirementSpec);
-
-                    var droppedRequirementGroups = requirementGroupPayload.ContainedGroup().ToList();
-                    droppedRequirementGroups.Add(requirementGroupPayload);
-
-                    foreach (var keyValuePair in previousRequirementSpecRow.requirementContainerGroupCache)
-                    {
-                        if (!droppedRequirementGroups.Contains(keyValuePair.Value))
-                        {
-                            continue;
-                        }
-
-                        var requirementClone = keyValuePair.Key.Clone(false);
-                        requirementClone.Group = null;
-                        transaction.CreateOrUpdate(requirementClone);
-                    }
-                }
-
-                await this.DalWrite(transaction);
+                await this.MoveGroup(requirementGroupPayload);
             }
             else
             {
-                // insert before first
+                // insert before first ???
                 var model = (EngineeringModel)this.Thing.TopContainer;
                 var orderPt = OrderHandlerService.GetOrderParameterType(model);
 
                 if (orderPt == null)
                 {
+                    await this.MoveGroup(requirementGroupPayload);
                     return;
                 }
 
@@ -542,6 +536,48 @@ namespace CDP4Requirements.ViewModels
                 var transaction = orderService.Insert(requirementGroupPayload, firstRow.Thing, InsertKind.InsertBefore);
                 await this.Session.Write(transaction.FinalizeTransaction());
             }
+        }
+
+        /// <summary>
+        /// Move a group to a <see cref="RequirementsSpecification"/>
+        /// </summary>
+        /// <param name="requirementGroup"></param>
+        /// <returns></returns>
+        private async Task MoveGroup(RequirementsGroup requirementGroup)
+        {
+            var context = TransactionContextResolver.ResolveContext(this.Thing);
+            var transaction = new ThingTransaction(context);
+            var previousRequirementSpec = requirementGroup.GetContainerOfType<RequirementsSpecification>();
+
+            // Add the RequirementGroup to the RequirementsSpecification represented by this RowViewModel
+            var requirementsSpecificationClone = this.Thing.Clone(false);
+            requirementsSpecificationClone.Group.Add(requirementGroup);
+            transaction.CreateOrUpdate(requirementsSpecificationClone);
+
+            if (previousRequirementSpec != this.Thing)
+            {
+                // Update the requirements that were inside any of the groups that have been dropped
+                var previousRequirementSpecRow =
+                    ((RequirementsBrowserViewModel)this.ContainerViewModel)
+                    .ReqSpecificationRows.Single(x => x.Thing == previousRequirementSpec);
+
+                var droppedRequirementGroups = requirementGroup.ContainedGroup().ToList();
+                droppedRequirementGroups.Add(requirementGroup);
+
+                foreach (var keyValuePair in previousRequirementSpecRow.requirementContainerGroupCache)
+                {
+                    if (!droppedRequirementGroups.Contains(keyValuePair.Value))
+                    {
+                        continue;
+                    }
+
+                    var requirementClone = keyValuePair.Key.Clone(false);
+                    requirementClone.Group = null;
+                    transaction.CreateOrUpdate(requirementClone);
+                }
+            }
+
+            await this.DalWrite(transaction);
         }
 
         /// <summary>

@@ -249,7 +249,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         }
 
         [Test]
-        public void VerifyRequirementGroupDrop()
+        public void VerifyRequirementGroupDropFails()
         {
             var dropInfo = new Mock<IDropInfo>();
             dropInfo.Setup(x => x.Payload).Returns(this.grp1);
@@ -265,8 +265,31 @@ namespace CDP4Requirements.Tests.RequirementBrowser
 
             row.Drop(dropInfo.Object);
 
+            // Drop group on another RequirementsSpecification is NOT allowed anumore since 10.0.3-rc6
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(0));
+        }
+
+        [Test]
+        public void VerifyRequirementGroupDrop()
+        {
+            //Drop grp4 on another RequirementsSpecification
+            var dropInfo = new Mock<IDropInfo>();
+            dropInfo.Setup(x => x.Payload).Returns(this.grp4);
+            dropInfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
+            dropInfo.Setup(x => x.KeyStates).Returns(DragDropKeyStates.LeftMouseButton);
+
+            this.spec1.Group.Add(this.grp1);
+            this.spec1.Group.Add(this.grp2);
+            this.spec1.Group.Add(this.grp3);
+            this.spec1.Group.Add(this.grp4);
+            var row = new RequirementsSpecificationRowViewModel(this.spec1, this.session.Object, this.requirementBrowserViewModel);
+
+            row.Drop(dropInfo.Object);
+
+            // Drop group on another RequirementsSpecification is NOT allowed anumore since 10.0.3-rc6
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Exactly(1));
         }
+
 
         [Test]
         public void VerifyThatWhenSpecIsDeprecatedTheRowIsDeprecatedAsWell()
