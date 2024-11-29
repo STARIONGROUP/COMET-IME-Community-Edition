@@ -26,7 +26,7 @@
 namespace CDP4Composition.MessageBus
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
 
     /// <summary>
     /// Handles the creation and usage of <see cref="MessageBusEventHandler{T}"/> classes as an alternative to the creation of many many message bus subscriptions
@@ -39,9 +39,9 @@ namespace CDP4Composition.MessageBus
         private bool isDisposed;
 
         /// <summary>
-        /// A <see cref="Dictionary{TKey, TValue}"/> of type <see cref="Type"/> and <see cref="IMessageBusEventHandlerBase"/>
+        /// A <see cref="ConcurrentDictionary{TKey, TValue}"/> of type <see cref="Type"/> and <see cref="IMessageBusEventHandlerBase"/>
         /// </summary>
-        private readonly Dictionary<Type, IMessageBusEventHandlerBase> messageBusEventHandlers = new Dictionary<Type, IMessageBusEventHandlerBase>();
+        private readonly ConcurrentDictionary<Type, IMessageBusEventHandlerBase> messageBusEventHandlers = new();
 
         /// <summary>
         /// Gets, and if not yet present, also adds a <see cref="MessageBusEventHandler{T}"/>.
@@ -50,11 +50,7 @@ namespace CDP4Composition.MessageBus
         /// <returns>The existin, or newly created <see cref="MessageBusEventHandler{T}"/></returns>
         public MessageBusEventHandler<T> GetHandler<T>()
         {
-            if (!this.messageBusEventHandlers.TryGetValue(typeof(T), out var messageBusEventHandler))
-            {
-                messageBusEventHandler = MessageBusEventHandler<T>.CreateHandler<T>();
-                this.messageBusEventHandlers.Add(typeof(T), messageBusEventHandler);
-            }
+            var messageBusEventHandler = this.messageBusEventHandlers.GetOrAdd(typeof(T), _ => MessageBusEventHandler<T>.CreateHandler<T>());
 
             return messageBusEventHandler as MessageBusEventHandler<T>;
         }
@@ -65,10 +61,9 @@ namespace CDP4Composition.MessageBus
         /// <typeparam name="T">The type of message bus event</typeparam>
         public void RemoveHandlerIfExists<T>()
         {
-            if (this.messageBusEventHandlers.TryGetValue(typeof(T), out var messageBusEventHandler))
+            if (this.messageBusEventHandlers.TryRemove(typeof(T), out var messageBusEventHandler))
             {
                 messageBusEventHandler.Dispose();
-                this.messageBusEventHandlers.Remove(typeof(T));
             }
         }
 
