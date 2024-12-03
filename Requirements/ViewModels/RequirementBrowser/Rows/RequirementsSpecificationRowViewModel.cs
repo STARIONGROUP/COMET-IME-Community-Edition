@@ -166,24 +166,6 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            //----------------------------------------------------------------------------------------------------------
-            // Drag a RequirementsSpecification onto another RequirementsSpecification??? What is the purpose of this?
-            //----------------------------------------------------------------------------------------------------------
-            //var spec = dropInfo.Payload as RequirementsSpecification;
-
-            //if (spec != null)
-            //{
-            //    var canDropSpec = this.PermissionService.CanWrite(ClassKind.RequirementsSpecification, this.Thing);
-
-            //    if (canDropSpec && spec.Container.Iid == this.Thing.Container.Iid)
-            //    {
-            //        dropInfo.Effects = DragDropEffects.Move;
-            //    }
-
-            //    return;
-            //}
-            //----------------------------------------------------------------------------------------------------------
-
             dropInfo.Effects = DragDropEffects.None;
         }
 
@@ -218,17 +200,6 @@ namespace CDP4Requirements.ViewModels
             {
                 await this.OnRequirementDrop(requirementPayload);
             }
-
-            //----------------------------------------------------------------------------------------------------------
-            // Drag a RequirementsSpecification onto another RequirementsSpecification??? What is the purpose of this?
-            //----------------------------------------------------------------------------------------------------------
-            //var reqSpec = dropInfo.Payload as RequirementsSpecification;
-
-            //if (reqSpec != null)
-            //{
-            //    await this.OnRequirementSpecificationDrop(reqSpec, dropInfo);
-            //}
-            //----------------------------------------------------------------------------------------------------------
         }
 
         /// <summary>
