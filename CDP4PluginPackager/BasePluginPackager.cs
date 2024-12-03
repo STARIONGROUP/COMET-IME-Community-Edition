@@ -35,7 +35,7 @@ namespace CDP4PluginPackager
 
     using CDP4PluginPackager.Models;
 
-    using Newtonsoft.Json;
+    using System.Text.Json;
 
     /// <summary>
     /// BasePluginPackager class handles plugin manifest generation and packing
@@ -175,7 +175,7 @@ namespace CDP4PluginPackager
         /// </summary>
         protected void Serialize()
         {
-            var output = JsonConvert.SerializeObject(this.Manifest);
+            var output = JsonSerializer.Serialize(this.Manifest);
             File.WriteAllText($"{System.IO.Path.Combine(this.OutputPath, this.Manifest.Name)}.plugin.manifest", output);
         }
 
