@@ -31,10 +31,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc26" />
-	  <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc26" />
-	  <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc26" />
-	  <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.0.0-rc26" />
+	  <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc30" />
+	  <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc30" />
+	  <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc30" />
+	  <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.0.0-rc30" />
 	  <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
 	  <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />

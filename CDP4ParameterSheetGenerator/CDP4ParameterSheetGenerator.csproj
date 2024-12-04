@@ -9,8 +9,8 @@
 	<Product>CDP4ParameterSheetGenerator</Product>
 	<Description>CDP4-COMET Excel Addin Parameter Sheet Generator</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>10.0.3.3</AssemblyVersion>
-	<FileVersion>10.0.3.3</FileVersion>
+	<AssemblyVersion>11.0.0.2</AssemblyVersion>
+	<FileVersion>11.0.0.2</FileVersion>
 	<UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -36,13 +36,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc26">
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc30">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc26">
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc30">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc26">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc30">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.5">

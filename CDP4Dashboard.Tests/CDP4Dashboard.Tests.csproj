@@ -20,9 +20,9 @@
 
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="5.1.1" />
-    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc26" />
-    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc26" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.0.0-rc26" />
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc30" />
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc30" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.0.0-rc30" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.15" />
