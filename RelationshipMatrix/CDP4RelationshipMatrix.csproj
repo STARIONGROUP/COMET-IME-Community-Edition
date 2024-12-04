@@ -9,8 +9,8 @@
     <Product>RelationshipMatrix</Product>
     <Description>CDP4-COMET Relationship Matrix Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
-    <AssemblyVersion>10.0.3.7</AssemblyVersion>
-    <FileVersion>10.0.3.7</FileVersion>
+    <AssemblyVersion>10.0.3.8</AssemblyVersion>
+    <FileVersion>10.0.3.8</FileVersion>
 	  <UseWPF>true</UseWPF>
 	  <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -36,16 +36,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.4.1-rc1">
+    <PackageReference Include="CDP4Common-CE" Version="27.4.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.4.1-rc1">
+    <PackageReference Include="CDP4Dal-CE" Version="27.4.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.1-rc1">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="ClosedXML" Version="0.104.1" />
+    <PackageReference Include="ClosedXML" Version="0.104.2" />
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.5">
 	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
@@ -154,7 +154,7 @@
     <PackageReference Include="NLog" Version="5.3.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference> 
-  	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.14">
+  	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.15">
 	    <ExcludeAssets>runtime</ExcludeAssets>
   	</PackageReference>
     <PackageReference Include="ReactiveUI.WPF" Version="20.1.63">

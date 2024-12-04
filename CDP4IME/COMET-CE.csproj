@@ -11,8 +11,8 @@
     <Product>CDP4-COMET</Product>
     <Description>The CDP4-COMET Integrated Modelling Environment</Description>
     <Copyright>Copyright © Starion Group S.A</Copyright>
-    <AssemblyVersion>10.0.3.7</AssemblyVersion>
-    <FileVersion>10.0.3.7</FileVersion>
+    <AssemblyVersion>10.0.3.8</AssemblyVersion>
+    <FileVersion>10.0.3.8</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <UseWPF>true</UseWPF>
@@ -40,10 +40,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.4.1-rc1" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.4.1-rc1" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.1-rc1" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.4.1-rc1" />
+    <PackageReference Include="CDP4Common-CE" Version="27.4.1" />
+    <PackageReference Include="CDP4Dal-CE" Version="27.4.1" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.1" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="27.4.1" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DevExpress.Charts" Version="23.2.5" />
     <PackageReference Include="DevExpress.Charts.Core" Version="23.2.5" />
@@ -100,7 +100,7 @@
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.15" />
     <PackageReference Include="ReactiveUI.WPF" Version="20.1.63" />
     <PackageReference Include="Splat.NLog" Version="15.2.22" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
