@@ -259,10 +259,7 @@ namespace CDP4Requirements.ViewModels
 
             foreach (var req in reqSpec.Requirement)
             {
-                if (req.Group == group)
-                {
-                    reqSpecRowViewModel.TryAddRequirementRow(req);
-                }
+                reqSpecRowViewModel.UpdateRequirementRow(req, true);
             }
         }
 
@@ -274,7 +271,11 @@ namespace CDP4Requirements.ViewModels
         {
             if (this.ContainedRows.SingleOrDefault(x => x.Thing == @group) is RequirementsGroupRowViewModel row)
             {
-                this.TopParentRow.GroupCache.Remove(group);
+                if (this.TopParentRow.GroupCache[group] == this) //Otherwise could already be moved
+                {
+                    this.TopParentRow.GroupCache.Remove(group);
+                }
+
                 this.RemoveRequirementRowsBeforeRequirementsGroupDisposal(row);
                 this.ContainedRows.RemoveAndDispose(row);
             }
