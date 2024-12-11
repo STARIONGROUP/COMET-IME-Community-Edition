@@ -29,6 +29,7 @@ namespace COMET.ViewModels
     using System.Globalization;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Input;
     using System.Windows.Threading;
 
@@ -36,6 +37,7 @@ namespace COMET.ViewModels
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Utilities;
 
     using CDP4Dal;
 
@@ -302,7 +304,9 @@ namespace COMET.ViewModels
 
                 this.timer = new DispatcherTimer();
                 this.timer.Interval = TimeSpan.FromSeconds(1);
-                this.timer.Tick += this.OntTimerElapsed;
+
+                this.timer.Tick += new EventHandler(this.OntTimerElapsed);
+
                 this.timer.Start();
             }
             else
@@ -316,17 +320,25 @@ namespace COMET.ViewModels
         /// </summary>
         /// <param name="sender">The sender</param>
         /// <param name="e">The event arguments.</param>
-        private void OntTimerElapsed(object sender, EventArgs e)
+        private async void OntTimerElapsed(object sender, EventArgs e)
         {
             this.AutoRefreshSecondsLeft -= 1;
 
             if (this.AutoRefreshSecondsLeft == 0)
             {
                 this.timer.Stop();
-                this.Session.Refresh();
 
-                this.AutoRefreshSecondsLeft = this.AutoRefreshInterval;
-                this.timer.Start();
+                try
+                {
+                    LockProvider.EnterLock(LockType.SesionRefresh);
+                    await this.Session.Refresh();
+                }
+                finally
+                {
+                    LockProvider.ExitLock(LockType.SesionRefresh);
+                    this.AutoRefreshSecondsLeft = this.AutoRefreshInterval;
+                    this.timer.Start();
+                }
             }
         }
 
