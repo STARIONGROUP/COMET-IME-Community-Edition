@@ -29,7 +29,6 @@ namespace COMET.ViewModels
     using System.Globalization;
     using System.Reactive;
     using System.Reactive.Linq;
-    using System.Threading.Tasks;
     using System.Windows.Input;
     using System.Windows.Threading;
 
@@ -48,7 +47,7 @@ namespace COMET.ViewModels
     /// <summary>
     /// The <see cref="SessionViewModel"/> is a view-model for the <see cref="Session"/> object.
     /// </summary>
-    public class SessionViewModel : ReactiveObject
+    public class SessionViewModel : ReactiveObject, IDisposable
     {
         /// <summary>
         /// Out property for the <see cref="LastUpdateDateTimeHint"/> property
@@ -349,6 +348,19 @@ namespace COMET.ViewModels
         {
             var navigation = ServiceLocator.Current.GetInstance<IPanelNavigationService>();
             navigation.CloseInDock(this.Session.DataSourceUri);
+        }
+
+        public void Dispose()
+        {
+            try
+            {
+                LockProvider.EnterLock(LockType.SesionRefresh);
+                this.timer.Stop();
+            }
+            finally
+            {
+                LockProvider.ExitLock(LockType.SesionRefresh);
+            }
         }
     }
 }
