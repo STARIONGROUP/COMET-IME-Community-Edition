@@ -8,8 +8,8 @@
     <Product>CDP4Scripting</Product>
     <Description>CDP4-COMET Scripting Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
-    <AssemblyVersion>10.0.3.8</AssemblyVersion>
-    <FileVersion>10.0.3.8</FileVersion>
+    <AssemblyVersion>10.0.3.11</AssemblyVersion>
+    <FileVersion>10.0.3.11</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -152,7 +152,7 @@
     <PackageReference Include="NLog" Version="5.3.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.15">
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14">
 	  <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="ReactiveUI.WPF" Version="20.1.63">
@@ -164,13 +164,13 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Buffers" Version="4.6.0">
+    <PackageReference Include="System.Buffers" Version="4.5.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Memory" Version="4.6.0">
+    <PackageReference Include="System.Memory" Version="4.5.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0">
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0">
 	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>

@@ -659,7 +659,7 @@ namespace CDP4Requirements.ViewModels
                 {
                     var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Definition));
 
-                    this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Definition), discriminator, optionAction)));
+                    this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(this.definitionThing, discriminator, optionAction)));
                 }
             }
 

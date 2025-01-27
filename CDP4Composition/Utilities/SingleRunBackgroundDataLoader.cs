@@ -31,6 +31,7 @@ namespace CDP4Composition.Utilities
     using CDP4Common.CommonData;
 
     using CDP4Composition.Mvvm;
+    using DevExpress.Mvvm.Native;
 
     /// <summary>
     /// The main purpose of this class is to be able to create an initial loading mechanism for browsers on a <see cref="BackgroundWorker"/>
@@ -57,7 +58,19 @@ namespace CDP4Composition.Utilities
         public SingleRunBackgroundDataLoader(BrowserViewModelBase<T> owningBrowser, Action<DoWorkEventArgs> doWork, Action<RunWorkerCompletedEventArgs> onCompleted)
         {
             this.worker = new BackgroundWorker();
-            this.worker.DoWork += (sender, args) => doWork.Invoke(args);
+
+            this.worker.DoWork += (sender, args) =>
+            {
+                try
+                {
+                    LockProvider.EnterLock(LockType.SesionRefresh);
+                    doWork.Invoke(args);
+                }
+                finally
+                {
+                    LockProvider.ExitLock(LockType.SesionRefresh);
+                }
+            };
 
             this.worker.RunWorkerCompleted += (sender, args) =>
             {

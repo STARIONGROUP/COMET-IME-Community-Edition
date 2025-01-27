@@ -11,8 +11,8 @@
 	<Product>Requirements</Product>
 	<Description>CDP4-COMET Requirements Plugin</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>10.0.3.8</AssemblyVersion>
-	<FileVersion>10.0.3.8</FileVersion>
+	<AssemblyVersion>10.0.3.11</AssemblyVersion>
+	<FileVersion>10.0.3.11</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -180,7 +180,7 @@
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="DotLiquid" Version="2.2.737" />
+	<PackageReference Include="DotLiquid" Version="2.2.692" />
 	<PackageReference Include="NetOfficeFw.Core" Version="1.9.7">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
@@ -193,13 +193,16 @@
 	<PackageReference Include="NLog" Version="5.3.4">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.15">
+	<PackageReference Include="NLog.Extensions.Logging" Version="5.3.14">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReactiveUI.WPF" Version="20.1.63">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReactiveUI" Version="20.1.63">
+	  <ExcludeAssets>runtime</ExcludeAssets>
+	</PackageReference>
+	<PackageReference Include="System.ComponentModel.Composition" Version="8.0.0">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135">

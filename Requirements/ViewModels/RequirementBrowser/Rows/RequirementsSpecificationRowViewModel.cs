@@ -228,7 +228,7 @@ namespace CDP4Requirements.ViewModels
         /// Add a requirement rows
         /// </summary>
         /// <param name="req">The <see cref="Requirement" /> to add</param>
-        public bool TryAddRequirementRow(Requirement req)
+        private bool TryAddRequirementRow(Requirement req)
         {
             var row = new RequirementRowViewModel(req, this.Session, this);
             this.requirementCache[req] = row;
@@ -268,7 +268,7 @@ namespace CDP4Requirements.ViewModels
                 Func<ObjectChangedEvent, bool> discriminator =
                     objectChange =>
                         objectChange.EventKind == EventKind.Updated &&
-                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber;
+                        objectChange.ChangedThing.RevisionNumber > this.RevisionNumber; 
 
                 Action<ObjectChangedEvent> action = x => this.UpdateRequirementRow((Requirement)x.ChangedThing, false);
 
@@ -286,7 +286,7 @@ namespace CDP4Requirements.ViewModels
                 {
                     var observer = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Requirement));
 
-                    var handler = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(typeof(Requirement), discriminator, action));
+                    var handler = this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(observer, new ObjectChangedMessageBusEventHandlerSubscription(req, discriminator, action));
                     this.Disposables.Add(handler);
 
                     this.listenerCache[req] = handler;
@@ -349,7 +349,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         /// <param name="req">The <see cref="Requirement" /></param>
         /// <param name="newOrder">A value indicating whether the order may have changed</param>
-        private void UpdateRequirementRow(Requirement req, bool newOrder)
+        public void UpdateRequirementRow(Requirement req, bool newOrder)
         {
             if (req.Container != this.Thing || !this.requirementContainerGroupCache.ContainsKey(req) ||
                 !this.requirementCache.ContainsKey(req))

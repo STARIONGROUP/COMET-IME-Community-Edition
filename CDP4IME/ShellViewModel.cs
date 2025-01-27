@@ -187,6 +187,7 @@ namespace COMET
                     {
                         this.Sessions.Remove(x.Sender);
                         this.CheckIfItIsSelectedSession(x.Sender);
+                        x.Sender.Dispose();
                     });
 
             this.Sessions.CountChanged.Subscribe(x => this.HasSessions = x != 0);
