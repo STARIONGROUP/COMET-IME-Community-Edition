@@ -11,8 +11,8 @@
     <Product>CDP4ServicesDal</Product>
     <Description>CDP4-COMET Services DAL to be used exclusively with CDP4-COMET Services</Description>
     <Copyright>Copyright © Starion Group S.A</Copyright>
-    <AssemblyVersion>10.0.3.11</AssemblyVersion>
-    <FileVersion>10.0.3.11</FileVersion>
+    <AssemblyVersion>11.0.0.3</AssemblyVersion>
+    <FileVersion>11.0.0.3</FileVersion>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -39,20 +39,28 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.4.1">
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc31">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="27.4.1">
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc31">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.1">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc31">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4ServicesDal-CE" Version="27.4.1" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="28.0.0-rc31" />
+
+    <!--This extra reference to Microsoft.Bcl.AsyncInterfaces is necessary, as version 8.0.0 is references by MessagePack 3.1.1
+    Transitive references/versions are sometimes preferred over AssemblyRedirects by default. Adding this reference to a specific version of Microsoft.Bcl.AsyncInterfaces
+    here results in the correct version being used by the CDPServices plugin at runtime.
+    Please notice that this "problem" with importancy of assembly references is different in COMET-IME.exe and the Excel addin.
+    Problems in the Excel Addin might not be present in the COMET-IME.exe (and maybe even vice versa).
+    -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.1" >
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
@@ -61,10 +69,10 @@
     <PackageReference Include="NLog" Version="5.3.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14">
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.15">
 	  <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="System.Reactive" Version="6.0.1">
+    <PackageReference Include="System.Reactive" Version="6.0.1">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">

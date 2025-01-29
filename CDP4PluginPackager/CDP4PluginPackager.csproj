@@ -21,8 +21,9 @@
 	</PropertyGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" />
 	<ItemGroup>
-		<PackageReference Include="CDP4Common-CE" Version="27.4.1" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="CDP4Common-CE" Version="28.0.0-rc31" />
+		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.1" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
 	</ItemGroup>
 	<ItemGroup>
 		<Reference Include="PresentationFramework" />
