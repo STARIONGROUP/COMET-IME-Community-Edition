@@ -7,8 +7,8 @@
 	<Product>CDP4Composition</Product>
 	<Description>CDP4-COMET Composition and Infrastructure library</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>11.0.0.2</AssemblyVersion>
-	<FileVersion>11.0.0.2</FileVersion>
+	<AssemblyVersion>11.0.0.3</AssemblyVersion>
+	<FileVersion>11.0.0.3</FileVersion>
 	<OutputPath>bin\$(Configuration)\</OutputPath>
 	<LangVersion>latest</LangVersion>
 	<UseWPF>true</UseWPF>
@@ -29,10 +29,10 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc30" />
-    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc30" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc30" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.0.0-rc30" />
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc31" />
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc31" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc31" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.0.0-rc31" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.5" />
@@ -67,17 +67,17 @@
     <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="23.2.5" />
     <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.5" />
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.1" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
     <PackageReference Include="Markdown.Xaml" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.15" />
     <PackageReference Include="ReactiveUI.WPF" Version="20.1.63" />
-    <PackageReference Include="System.Buffers" Version="4.6.0" />
-    <PackageReference Include="System.Memory" Version="4.6.0" />
-    <PackageReference Include="System.Numerics.Vectors" Version="4.6.0" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.1.0" />
+    <PackageReference Include="System.Buffers" Version="4.5.1" />
+    <PackageReference Include="System.Memory" Version="4.5.5" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.5.0" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>

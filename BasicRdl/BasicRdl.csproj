@@ -10,8 +10,8 @@
 	<Product>BasicRdl</Product>
 	<Description>CDP4-COMET Basic Reference Data Library Plugin</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>11.0.0.2</AssemblyVersion>
-	<FileVersion>11.0.0.2</FileVersion>
+	<AssemblyVersion>11.0.0.3</AssemblyVersion>
+	<FileVersion>11.0.0.3</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -37,13 +37,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc30">
+    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc31">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc30">
+    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc31">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc30">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc31">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
@@ -172,7 +172,7 @@
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="DotLiquid" Version="2.2.717" />
+    <PackageReference Include="DotLiquid" Version="2.3.18" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
