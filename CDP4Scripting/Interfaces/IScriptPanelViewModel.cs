@@ -25,8 +25,6 @@
 
 namespace CDP4Scripting.Interfaces
 {
-    using System.Windows.Controls;
-
     using CDP4Composition;
 
     using CDP4Dal;

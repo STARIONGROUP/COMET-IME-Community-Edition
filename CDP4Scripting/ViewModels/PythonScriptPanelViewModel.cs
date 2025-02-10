@@ -74,6 +74,8 @@ namespace CDP4Scripting.ViewModels
             this.Runtime.LoadAssembly(typeof(string).Assembly);
             this.Runtime.LoadAssembly(typeof(Uri).Assembly);
 
+            this.Runtime.LoadAssembly(typeof(CDP4Common.EngineeringModelData.ActualFiniteState).Assembly);
+
             var streamWriter = new EventingMemoryStream();
             streamWriter.OnNewText += this.StreamWriter_OnNewText;
 
@@ -132,11 +134,17 @@ namespace CDP4Scripting.ViewModels
             {
                 throw new OperationCanceledException(this.CancellationToken);
             }
+            catch (Microsoft.Scripting.SyntaxErrorException ex)
+            {
+                Application.Current.Dispatcher.Invoke(
+                    DispatcherPriority.Input,
+                    new Action(() => this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {ex.Message} : {ex.ErrorCode} : {ex.RawSpan}\n")));
+            }
             catch (Exception ex)
             {
                 Application.Current.Dispatcher.Invoke(
                     DispatcherPriority.Input,
-                    new Action(() => this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {ex.Message}\n")));
+                    new Action(() => this.OutputTerminal.AppendText($"\nAn error occured during the execution of the script !\nError: {ex.Message} : {ex}\n")));
             }
             finally
             {
