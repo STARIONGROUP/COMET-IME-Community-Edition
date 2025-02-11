@@ -32,6 +32,7 @@
             <converters:OrderedDomainOfExpertiseListConverter x:Key="OrderedDomainOfExpertiseListConverter" />
             <converters:ColumnFixedConverter x:Key="ColumnFixedConverter" />
             <converters:ColumnWidthConverter x:Key="ColumnWidthConverter" />
+            <converters:NameBackgroundConverter x:Key="NameBackgroundConverter" />
             <converters:NameContentConverter x:Key="NameContentConverter" />
             <converters:BooleanToHighlightConverter x:Key="BooleanToHighlightConverter"/>
             <converters1:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -100,7 +101,13 @@
             </DataTemplate>
 
             <DataTemplate x:Key="None">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource NameBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
                 </Grid>
             </DataTemplate>
 
@@ -184,7 +191,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <dxg:GridControl Grid.Row="0"  Name="MatrixGridControl"
+                    <dxg:GridControl Grid.Row="0"  Name="MatrixGridControl" 
                                              ItemsSource="{Binding Matrix.Records, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                              ColumnsSource="{Binding Matrix.Columns, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                              ColumnGeneratorTemplate="{StaticResource DefaultColumnTemplate}"
@@ -623,6 +630,19 @@
                                                             Content="Show Related Only"
                                                             ToolTip="Only includes objects that have the specified relationships into the view." />
                                                 </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <dxe:CheckEdit
+                                                            EditValue="{Binding ShowNonRelatedBackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            Content="Show Not-Related background color"
+                                                            ToolTip="Show a background color on Not-Related cells" />
+                                                        <Rectangle
+                                                            Margin="5, 0, 0, 0"
+                                                            Width="20"
+                                                            Height="20"
+                                                            Fill="Coral"/>
+                                                    </StackPanel>
+                                                </dxlc:LayoutItem>
                                             </dxlc:LayoutGroup>
                                         </dxlc:LayoutGroup>
                                     </dxlc:LayoutControl>
@@ -648,7 +668,6 @@
                                                                      Glyph="{dx:DXImage Image=Action_Export_ToExcel.png}" />
                                                 </dxlc:LayoutItem>
                                             </dxlc:LayoutGroup>
-
                                         </dxlc:LayoutGroup>
                                     </dxlc:LayoutControl>
                                 </dxn:NavBarGroup.Content>

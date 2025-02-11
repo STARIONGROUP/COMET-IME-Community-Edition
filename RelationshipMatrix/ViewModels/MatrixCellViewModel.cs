@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipDirectionKind.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2021 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET-IME Community Edition. 
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -86,6 +86,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         private bool isHighlighted;
 
         /// <summary>
+        /// Backing field for <see cref="ShowNonRelatedBackgroundColor"/>
+        /// </summary>
+        private bool showNonRelatedBackgroundColor;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="MatrixCellViewModel"/> class
         /// </summary>
         /// <param name="sourceY">The row that represents the <see cref="Thing"/></param>
@@ -93,7 +98,8 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="binaryRelationship">The current set of <see cref="BinaryRelationship"/></param>
         /// <param name="rule">The current <see cref="BinaryRelationshipRule"/></param>
         /// <param name="displayKind">The <see cref="DisplayKind"/> of the item.</param>
-        public MatrixCellViewModel(Thing sourceY, Thing sourceX, IReadOnlyList<BinaryRelationship> binaryRelationship, BinaryRelationshipRule rule, DisplayKind? displayKind = null)
+        /// <param name="showNonRelatedBackgroundColor">Indicates that a red-ish background color should be set if the cell does not contain related things</param>
+        public MatrixCellViewModel(Thing sourceY, Thing sourceX, IReadOnlyList<BinaryRelationship> binaryRelationship, BinaryRelationshipRule rule, DisplayKind? displayKind = null, bool showNonRelatedBackgroundColor = false)
         {
             this.SourceY = sourceY;
             this.SourceX = sourceX;
@@ -101,6 +107,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.Relationships = binaryRelationship ?? new List<BinaryRelationship>();
             this.DisplayKind = displayKind;
             this.IsHighlighted = false;
+            this.ShowNonRelatedBackgroundColor = showNonRelatedBackgroundColor;
 
             if (binaryRelationship == null || binaryRelationship.Count == 0)
             {
@@ -167,6 +174,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             get { return this.isHighlighted; }
             private set { this.RaiseAndSetIfChanged(ref this.isHighlighted, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating that a red-ish background color should be set if the cell does not contain related things
+        /// </summary>
+        public bool ShowNonRelatedBackgroundColor
+        {
+            get { return this.showNonRelatedBackgroundColor; }
+            set { this.RaiseAndSetIfChanged(ref this.showNonRelatedBackgroundColor, value); }
         }
 
         /// <summary>

@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MatrixViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2023 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -170,7 +170,6 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="settings">The module settings</param>
         public MatrixViewModel(ISession session, Iteration iteration, RelationshipMatrixPluginSettings settings)
         {
-
             this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
             this.IsDeprecatedDisplayed = this.filterStringService.ShowDeprecatedThings;
 
@@ -437,8 +436,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="sourceX">The <see cref="SourceConfigurationViewModel" /> of the X axis.</param>
         /// <param name="relationshipRule">The <see cref="BinaryRelationshipRule" /></param>
         /// <param name="showRelatedOnly">Show only the related rows and columns.</param>
+        /// <param name="showNonRelatedBackgroundColor">Indicates whether a background color should be shown for cells containing non related things</param>
         public void RebuildMatrix(SourceConfigurationViewModel sourceY, SourceConfigurationViewModel sourceX,
-            BinaryRelationshipRule relationshipRule, bool showRelatedOnly)
+            BinaryRelationshipRule relationshipRule, bool showRelatedOnly, bool showNonRelatedBackgroundColor)
         {
             this.Columns.Clear();
             this.Records.Clear();
@@ -500,15 +500,17 @@ namespace CDP4RelationshipMatrix.ViewModels
             // create rows
             foreach (var definedThing in sourceYToUse)
             {
-                if (showRelatedOnly && !relationships.Any(x =>
-                        x.Source.Iid.Equals(definedThing.Iid) || x.Target.Iid.Equals(definedThing.Iid)))
+                var hasRelationShips = relationships.Any(x =>
+                    x.Source.Iid.Equals(definedThing.Iid) || x.Target.Iid.Equals(definedThing.Iid));
+
+                if (showRelatedOnly && !hasRelationShips)
                 {
                     // if thing is ont in any relationships, skip
                     continue;
                 }
 
                 unfilteredRecords.Add(this.ComputeRow(definedThing, sourceXToUse, relationships, relationshipRule,
-                    sourceY.SelectedDisplayKind, unfilteredColumns));
+                    sourceY.SelectedDisplayKind, unfilteredColumns, showNonRelatedBackgroundColor));
             }
 
             // secondary filter remove unwanted rows and columns
@@ -529,7 +531,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <summary>
         /// Refresh the content of the cells
         /// </summary>
-        public void RefreshMatrix(BinaryRelationshipRule relationshipRule)
+        /// <param name="relationshipRule">The <see cref="BinaryRelationshipRule"/></param>
+        /// <param name="showNonRelatedBackgroundColor">Indicates whether a background color should be shown for cells containing non related things</param>
+        public void RefreshMatrix(BinaryRelationshipRule relationshipRule, bool showNonRelatedBackgroundColor)
         {
             var updatedRelationships = this.QueryBinaryRelationshipInContext(relationshipRule).ToList();
             var displayedRelationships = this.currentCells.Values.SelectMany(x => x.Relationships).ToList();
@@ -553,7 +557,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 if (sourceRow != null)
                 {
                     var cellValue = this.ComputeCell(definedSource, definedTarget, updatedRelationships,
-                        relationshipRule);
+                        relationshipRule, showNonRelatedBackgroundColor);
 
                     sourceRow[definedTarget.ShortName] = cellValue;
                     this.UpdateCurrentCell(definedSource, definedTarget, cellValue);
@@ -562,7 +566,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 if (targetRow != null)
                 {
                     var cellValue = this.ComputeCell(definedTarget, definedSource, updatedRelationships,
-                        relationshipRule);
+                        relationshipRule, showNonRelatedBackgroundColor);
 
                     targetRow[definedSource.ShortName] = cellValue;
 
@@ -641,11 +645,12 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="relationshipRule">The current <see cref="BinaryRelationshipRule" /></param>
         /// <param name="displayKind">The <see cref="DisplayKind" /> of the current Row.</param>
         /// <param name="columnDefinitions">The defined columns.</param>
+        /// <param name="showNonRelatedBackgroundColor">Indicates whether a background color should be shown for cells containing non related things</param>
         /// <returns>The <see cref="IDictionary{TKey,TValue}" /> that corresponds to a row</returns>
         private IDictionary<string, MatrixCellViewModel> ComputeRow(DefinedThing rowThing,
             IReadOnlyList<DefinedThing> columnThings,
             IReadOnlyList<BinaryRelationship> relationships, BinaryRelationshipRule relationshipRule,
-            DisplayKind displayKind, IList<ColumnDefinition> columnDefinitions)
+            DisplayKind displayKind, IList<ColumnDefinition> columnDefinitions, bool showNonRelatedBackgroundColor)
         {
             var record = new Dictionary<string, MatrixCellViewModel>
             {
@@ -659,7 +664,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                     continue;
                 }
 
-                var cellValue = this.ComputeCell(rowThing, definedThing, relationships, relationshipRule);
+                var cellValue = this.ComputeCell(rowThing, definedThing, relationships, relationshipRule, showNonRelatedBackgroundColor);
                 record.Add(definedThing.ShortName, cellValue);
 
                 this.UpdateCurrentCell(rowThing, definedThing, cellValue);
@@ -683,14 +688,7 @@ namespace CDP4RelationshipMatrix.ViewModels
         {
             var cellRef = $"{row.Iid}_{col.Iid}";
 
-            if (this.currentCells.ContainsKey(cellRef))
-            {
-                this.currentCells[cellRef] = cellValue;
-            }
-            else
-            {
-                this.currentCells.Add(cellRef, cellValue);
-            }
+            this.currentCells[cellRef] = cellValue;
         }
 
         /// <summary>
@@ -700,17 +698,23 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="columnThing">The <see cref="Thing" /> of the current column</param>
         /// <param name="relationships">The current sets of <see cref="BinaryRelationship" /></param>
         /// <param name="relationshipRule">The current <see cref="BinaryRelationshipRule" /></param>
+        /// <param name="showNonRelatedBackgroundColor">Indicates whether a background color should be shown for cells containing non related things</param>
         /// <returns>The <see cref="MatrixCellViewModel" /></returns>
         private MatrixCellViewModel ComputeCell(DefinedThing rowThing, DefinedThing columnThing,
-            IReadOnlyList<BinaryRelationship> relationships, BinaryRelationshipRule relationshipRule)
+            IReadOnlyList<BinaryRelationship> relationships, BinaryRelationshipRule relationshipRule, bool showNonRelatedBackgroundColor)
         {
+            if (showNonRelatedBackgroundColor)
+            {
+                showNonRelatedBackgroundColor = relationships.Count(x => x.Source.Iid == rowThing.Iid || x.Target.Iid == rowThing.Iid) == 0;
+            }
+
             var relationship = relationships.Where(x =>
                 (x.Source?.Iid == rowThing.Iid || x.Source?.Iid == columnThing.Iid) &&
                 (x.Target?.Iid == rowThing.Iid || x.Target?.Iid == columnThing.Iid)).ToList();
 
             var cellValue = relationship.Count > 0
-                ? new MatrixCellViewModel(rowThing, columnThing, relationship, relationshipRule)
-                : new MatrixCellViewModel(rowThing, columnThing, null, relationshipRule);
+                ? new MatrixCellViewModel(rowThing, columnThing, relationship, relationshipRule, null, showNonRelatedBackgroundColor)
+                : new MatrixCellViewModel(rowThing, columnThing, null, relationshipRule, null, showNonRelatedBackgroundColor);
 
             return cellValue;
         }
