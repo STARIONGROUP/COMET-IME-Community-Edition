@@ -557,7 +557,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 if (sourceRow != null)
                 {
                     var cellValue = this.ComputeCell(definedSource, definedTarget, updatedRelationships,
-                        relationshipRule, showNonRelatedBackgroundColor);
+                        relationshipRule, false);
 
                     sourceRow[definedTarget.ShortName] = cellValue;
                     this.UpdateCurrentCell(definedSource, definedTarget, cellValue);
@@ -566,7 +566,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 if (targetRow != null)
                 {
                     var cellValue = this.ComputeCell(definedTarget, definedSource, updatedRelationships,
-                        relationshipRule, showNonRelatedBackgroundColor);
+                        relationshipRule, false);
 
                     targetRow[definedSource.ShortName] = cellValue;
 
@@ -652,9 +652,29 @@ namespace CDP4RelationshipMatrix.ViewModels
             IReadOnlyList<BinaryRelationship> relationships, BinaryRelationshipRule relationshipRule,
             DisplayKind displayKind, IList<ColumnDefinition> columnDefinitions, bool showNonRelatedBackgroundColor)
         {
+            if (showNonRelatedBackgroundColor)
+            {
+                var currentColumnThingIids = columnThings.Select(x => x.Iid).ToHashSet();
+
+                var rowThingRelationShips = 
+                    relationships
+                        .Where(x => x.Source.Iid == rowThing.Iid || x.Target.Iid == rowThing.Iid).ToList();
+
+                //DefinedThing not found in any relationship
+                showNonRelatedBackgroundColor = !rowThingRelationShips.Any();
+
+                showNonRelatedBackgroundColor = showNonRelatedBackgroundColor ||
+                                                !rowThingRelationShips
+                                                    .Any(x => 
+                                                        (x.Source.Iid == rowThing.Iid && currentColumnThingIids.Contains(x.Target.Iid)) 
+                                                        || 
+                                                        (x.Target.Iid == rowThing.Iid && currentColumnThingIids.Contains(x.Source.Iid))
+                                                    );
+            }
+
             var record = new Dictionary<string, MatrixCellViewModel>
             {
-                { ROW_NAME_COLUMN, new MatrixCellViewModel(rowThing, null, null, relationshipRule, displayKind) }
+                { ROW_NAME_COLUMN, new MatrixCellViewModel(rowThing, null, null, relationshipRule, displayKind, showNonRelatedBackgroundColor) }
             };
 
             foreach (var definedThing in columnThings)
@@ -664,7 +684,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                     continue;
                 }
 
-                var cellValue = this.ComputeCell(rowThing, definedThing, relationships, relationshipRule, showNonRelatedBackgroundColor);
+                var cellValue = this.ComputeCell(rowThing, definedThing, relationships, relationshipRule, false);
                 record.Add(definedThing.ShortName, cellValue);
 
                 this.UpdateCurrentCell(rowThing, definedThing, cellValue);
@@ -703,11 +723,6 @@ namespace CDP4RelationshipMatrix.ViewModels
         private MatrixCellViewModel ComputeCell(DefinedThing rowThing, DefinedThing columnThing,
             IReadOnlyList<BinaryRelationship> relationships, BinaryRelationshipRule relationshipRule, bool showNonRelatedBackgroundColor)
         {
-            if (showNonRelatedBackgroundColor)
-            {
-                showNonRelatedBackgroundColor = relationships.Count(x => x.Source.Iid == rowThing.Iid || x.Target.Iid == rowThing.Iid) == 0;
-            }
-
             var relationship = relationships.Where(x =>
                 (x.Source?.Iid == rowThing.Iid || x.Source?.Iid == columnThing.Iid) &&
                 (x.Target?.Iid == rowThing.Iid || x.Target?.Iid == columnThing.Iid)).ToList();

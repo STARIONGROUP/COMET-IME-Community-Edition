@@ -70,7 +70,14 @@
             </DataTemplate>
 
             <DataTemplate x:Key="NameTemplate">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource NameBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+
                     <TextBlock x:Name="PART_Editor"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
@@ -101,13 +108,7 @@
             </DataTemplate>
 
             <DataTemplate x:Key="None">
-                <Grid>
-                    <Grid.Background>
-                        <MultiBinding Converter="{StaticResource NameBackgroundConverter}">
-                            <Binding />
-                            <Binding Path="RowData.Row" />
-                        </MultiBinding>
-                    </Grid.Background>
+                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
                 </Grid>
             </DataTemplate>
 

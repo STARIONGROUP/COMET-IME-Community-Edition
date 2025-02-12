@@ -42,6 +42,11 @@ namespace CDP4RelationshipMatrix.Converters
     public class NameBackgroundConverter : IMultiValueConverter
     {
         /// <summary>
+        /// <see cref="SolidColorBrush"/> representing the notmal backcolor of a name cell
+        /// </summary>
+        private static SolidColorBrush NormalBackgroundBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#EEEEEE");
+
+        /// <summary>
         /// The conversion method returns the object associated to the row's first column, which in the Source Name/ShortName column
         /// </summary>
         /// <param name="values">
@@ -94,7 +99,7 @@ namespace CDP4RelationshipMatrix.Converters
         {
             var matrixCellViewModel = row[fieldName];
 
-            return matrixCellViewModel?.ShowNonRelatedBackgroundColor ?? false ? Brushes.Coral : Brushes.Transparent;
+            return matrixCellViewModel?.ShowNonRelatedBackgroundColor ?? false ? Brushes.Coral : NormalBackgroundBrush;
         }
 
         /// <summary>
