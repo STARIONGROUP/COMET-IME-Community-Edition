@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ScriptPanelViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -103,6 +103,16 @@ namespace CDP4Scripting.ViewModels
         /// Backing field for <see cref="IsClearOutputButtonVisible"/>.
         /// </summary>
         private bool isClearOutputButtonVisible = true;
+
+        /// <summary>
+        /// Backing field for <see cref="IsShowWhitespacesButtonVisible"/>.
+        /// </summary>
+        private bool isShowWhitespacesButtonVisible = true;
+
+        /// <summary>
+        /// Backing field for <see cref="ShowWhitespaces"/>.
+        /// </summary>
+        private bool showWhitespaces = false;
 
         /// <summary>
         /// Backing field for <see cref="IsStopScriptButtonVisible"/>.
@@ -226,6 +236,20 @@ namespace CDP4Scripting.ViewModels
 
             this.ClearOutputCommand = ReactiveCommandCreator.Create(this.ClearOutput, this.WhenAnyValue(x => x.CanClearOutput));
 
+            this.WhenAnyValue(vm => vm.IsShowWhitespacesButtonVisible)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(x =>
+                {
+                    if (!x)
+                    {
+                        this.ShowWhitespaces = false;
+                    }
+                });
+
+            this.WhenAnyValue(vm => vm.ShowWhitespaces)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.ReactOnShowWhiteSpacesChange());
+            
             this.WhenAnyValue(vm => vm.OpenSessions.Count)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ => this.ReactOnOpenSessionsChange());
@@ -315,6 +339,24 @@ namespace CDP4Scripting.ViewModels
         {
             get => this.isClearOutputButtonVisible;
             set => this.RaiseAndSetIfChanged(ref this.isClearOutputButtonVisible, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the visibility of the show whitespaces button.
+        /// </summary>
+        public bool IsShowWhitespacesButtonVisible
+        {
+            get => this.isShowWhitespacesButtonVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isShowWhitespacesButtonVisible, value);
+        }
+
+        /// <summary>
+        /// Gets or sets state of the show whitespaces button.
+        /// </summary>
+        public bool ShowWhitespaces
+        {
+            get => this.showWhitespaces;
+            set => this.RaiseAndSetIfChanged(ref this.showWhitespaces, value);
         }
 
         /// <summary>
@@ -562,6 +604,15 @@ namespace CDP4Scripting.ViewModels
         /// </param>
         public virtual void Execute(string script)
         {
+        }
+
+        /// <summary>
+        /// Enable / disable show whitespaces in script editor
+        /// </summary>
+        public void ReactOnShowWhiteSpacesChange()
+        {
+            this.AvalonEditor.Options.ShowSpaces = this.ShowWhitespaces;
+            this.AvalonEditor.Options.ShowTabs = this.ShowWhitespaces;
         }
 
         /// <summary>

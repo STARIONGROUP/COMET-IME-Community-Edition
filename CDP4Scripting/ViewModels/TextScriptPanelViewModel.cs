@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TextScriptPanelViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -49,6 +49,8 @@ namespace CDP4Scripting.ViewModels
             this.IsRunButtonVisible = false;
             this.IsSelectSessionVisible = false;
             this.IsClearOutputButtonVisible = false;
+            this.IsShowWhitespacesButtonVisible = true;
+            this.ShowWhitespaces = false;
             this.IsStopScriptButtonVisible = false;
             this.IsScriptVariablesPanelVisible = false;
         }

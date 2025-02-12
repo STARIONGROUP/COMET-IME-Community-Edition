@@ -53,6 +53,13 @@
                                               AllowDefaultButton="{Binding IsComboBoxSessionsEnable}" />
                 </dxb:BarEditItem.EditSettings>
             </dxb:BarEditItem>
+            <dxb:BarCheckItem x:Name="ShowWhitespaces" 
+                              Content="Show Whitespaces" 
+                              Glyph="../Resources/Images/ShowWhitespace_16x.png"
+                              Hint="Show indenting (Tabs and Spaces)"
+                              RibbonStyle="Large"
+                              IsVisible="{Binding IsShowWhitespacesButtonVisible}" 
+                              IsChecked="{Binding ShowWhitespaces, Mode=TwoWay}" />
 
             <dxb:BarButtonItem Name="ClearOutput"
                                Glyph="../Resources/Images/ClearWindowContent_16x.png"

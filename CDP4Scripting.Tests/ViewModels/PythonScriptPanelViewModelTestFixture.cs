@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="PythonScriptPanelViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -31,6 +31,7 @@ namespace CDP4Scripting.Tests.ViewModels
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Documents;
+    using System.Xml.Xsl;
 
     using CDP4Composition.Mvvm;
 
@@ -38,6 +39,8 @@ namespace CDP4Scripting.Tests.ViewModels
 
     using CDP4Scripting.Interfaces;
     using CDP4Scripting.ViewModels;
+
+    using ICSharpCode.AvalonEdit;
 
     using IronPython.Hosting;
 
@@ -139,6 +142,28 @@ def PrintHello(name):
 
             this.pythonScriptPanelViewModel.ClearScopeVariables();
             Assert.AreEqual(0, this.pythonScriptPanelViewModel.ScriptVariables.Count);
+        }
+
+        [Test]
+        public void VerfifyThatShowWhitespacesWorks()
+        {
+            Assert.That(this.pythonScriptPanelViewModel.IsShowWhitespacesButtonVisible, Is.True);
+            Assert.That(this.pythonScriptPanelViewModel.ShowWhitespaces, Is.False);
+
+            Assert.That(this.pythonScriptPanelViewModel.AvalonEditor.Options.ShowTabs, Is.False);
+            Assert.That(this.pythonScriptPanelViewModel.AvalonEditor.Options.ShowSpaces, Is.False);
+
+            this.pythonScriptPanelViewModel.ShowWhitespaces = true;
+
+            Assert.That(this.pythonScriptPanelViewModel.AvalonEditor.Options.ShowTabs, Is.True);
+            Assert.That(this.pythonScriptPanelViewModel.AvalonEditor.Options.ShowSpaces, Is.True);
+
+            this.pythonScriptPanelViewModel.IsShowWhitespacesButtonVisible = false;
+
+            Assert.That(this.pythonScriptPanelViewModel.ShowWhitespaces, Is.False);
+
+            Assert.That(this.pythonScriptPanelViewModel.AvalonEditor.Options.ShowTabs, Is.False);
+            Assert.That(this.pythonScriptPanelViewModel.AvalonEditor.Options.ShowSpaces, Is.False);
         }
     }
 }

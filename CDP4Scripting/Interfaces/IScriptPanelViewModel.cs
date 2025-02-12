@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IScriptPanelViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2023 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
@@ -63,6 +63,16 @@ namespace CDP4Scripting.Interfaces
         /// Gets or sets the visibility of the clear output button.
         /// </summary>
         bool IsClearOutputButtonVisible { get; set; }
+
+        /// <summary>
+        /// Gets or sets the visibility of the Show Whitespaces toggle button.
+        /// </summary>
+        bool IsShowWhitespacesButtonVisible { get; set; }
+
+        /// <summary>
+        /// Gets or sets the state of the Show Whitespaces toggle button.
+        /// </summary>
+        bool ShowWhitespaces { get; set; }
 
         /// <summary>
         /// Gets or sets the visibility of the stop button.
