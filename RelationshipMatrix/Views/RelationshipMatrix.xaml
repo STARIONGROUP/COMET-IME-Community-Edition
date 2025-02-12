@@ -41,31 +41,103 @@
             <converters:DeprecatedOpacityConverter x:Key="DeprecatedOpacityConverter" />
 
             <DataTemplate x:Key="SourceYToSourceX">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                     <Image Width="24" Height="24" x:Name="PART_Editor"
-                       Source="/CDP4RelationshipMatrix;component/Resources/Images/ytox.png"
-                       ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/ytox.png">
+                        <Image.ToolTip>
+                            <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                <Binding />
+                                <Binding Path="RowData.Row" />
+                            </MultiBinding>
+                        </Image.ToolTip>
+                    </Image>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="SourceXToSourceY">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                     <Image Width="24" Height="24" x:Name="PART_Editor"
-                           Source="/CDP4RelationshipMatrix;component/Resources/Images/xtoy.png"
-                           ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/xtoy.png">
+                        <Image.ToolTip>
+                            <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                <Binding />
+                                <Binding Path="RowData.Row" />
+                            </MultiBinding>
+                        </Image.ToolTip>
+                    </Image>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="BidirectionalRelationship">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                     <Image Width="24" Height="24" x:Name="PART_Editor"
-                           Source="/CDP4RelationshipMatrix;component/Resources/Images/bidir.png"
-                           ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/bidir.png">
+                        <Image.ToolTip>
+                            <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                <Binding />
+                                <Binding Path="RowData.Row" />
+                            </MultiBinding>
+                        </Image.ToolTip>
+                    </Image>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="NodirectionalRelationship">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                     <Image Width="24" Height="24" x:Name="PART_Editor"
-                           Source="/CDP4RelationshipMatrix;component/Resources/Images/nodir.png"
-                           ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/nodir.png">
+                        <Image.ToolTip>
+                            <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                <Binding />
+                                <Binding Path="RowData.Row" />
+                            </MultiBinding>
+                        </Image.ToolTip>
+                    </Image>
                 </Grid>
             </DataTemplate>
 
@@ -97,18 +169,36 @@
                             </Style>
                         </TextBlock.Resources>
                         <TextBlock.ToolTip>
-                            <ToolTip Content="{Binding Converter={StaticResource TooltipConverter}}"
-                                     Style="{StaticResource RowToolTipStyle}"
+                            <ToolTip Style="{StaticResource RowToolTipStyle}"
                                      FontWeight="Normal"
                                      HorizontalContentAlignment="Left"
-                                     HorizontalAlignment="Left" />
+                                     HorizontalAlignment="Left" >
+                                <ToolTip.Content>
+                                    <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                        <Binding />
+                                        <Binding Path="RowData.Row" />
+                                    </MultiBinding>
+                                </ToolTip.Content>
+                            </ToolTip>
                         </TextBlock.ToolTip>
                     </TextBlock>
                 </Grid>
             </DataTemplate>
 
             <DataTemplate x:Key="None">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                 </Grid>
             </DataTemplate>
 
