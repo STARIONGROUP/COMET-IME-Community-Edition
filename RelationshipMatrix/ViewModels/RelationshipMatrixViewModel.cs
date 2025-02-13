@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipMatrixViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate
 //
 //    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -137,6 +137,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// Backing field for <see cref="ShowRelatedOnly" />
         /// </summary>
         private bool showRelatedOnly;
+
+        /// <summary>
+        /// Backing field for <see cref="showNonRelatedBackgroundColor" />
+        /// </summary>
+        private bool showNonRelatedBackgroundColor;
 
         /// <summary>
         /// Backing field for <see cref="SourceYConfiguration" />
@@ -464,6 +469,15 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets whether non related objects should have a red-ish background color.
+        /// </summary>
+        public bool ShowNonRelatedBackgroundColor
+        {
+            get => this.showNonRelatedBackgroundColor;
+            set => this.RaiseAndSetIfChanged(ref this.showNonRelatedBackgroundColor, value);
+        }
+        
+        /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
@@ -481,6 +495,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 Name = "(Clear)",
                 RelationshipConfiguration = new RelationshipConfiguration(),
                 ShowRelatedOnly = false,
+                ShowNonRelatedBackgroundColor = false,
                 ShowDirectionality = true,
                 SourceConfigurationX = new SourceConfiguration(),
                 SourceConfigurationY = new SourceConfiguration()
@@ -501,7 +516,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.IsBusy = true;
 
             this.Matrix.RebuildMatrix(this.SourceYConfiguration, this.SourceXConfiguration,
-                this.RelationshipConfiguration.SelectedRule, this.ShowRelatedOnly);
+                this.RelationshipConfiguration.SelectedRule, this.ShowRelatedOnly, this.ShowNonRelatedBackgroundColor);
 
             this.IsBusy = false;
         }
@@ -539,7 +554,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             if (this.RelationshipConfiguration.SelectedRule != null)
             {
-                this.Matrix.RefreshMatrix(this.RelationshipConfiguration.SelectedRule);
+                this.Matrix.RefreshMatrix(this.RelationshipConfiguration.SelectedRule, this.ShowNonRelatedBackgroundColor);
             }
         }
 
@@ -606,6 +621,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.WhenAnyValue(x => x.ShowDirectionality).Subscribe(_ => this.BuildRelationshipMatrix());
             this.WhenAnyValue(x => x.ShowRelatedOnly).Subscribe(_ => this.BuildRelationshipMatrix());
+            this.WhenAnyValue(x => x.ShowNonRelatedBackgroundColor).Subscribe(_ => this.BuildRelationshipMatrix());
 
             this.WhenAny(x => x.SelectedSavedConfiguration, vm => vm.Value != null)
                 .Subscribe(_ => this.LoadSavedConfiguration());
@@ -705,6 +721,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
             this.ShowDirectionality = this.SelectedSavedConfiguration.ShowDirectionality;
             this.ShowRelatedOnly = this.SelectedSavedConfiguration.ShowRelatedOnly;
+            this.ShowNonRelatedBackgroundColor = this.SelectedSavedConfiguration.ShowNonRelatedBackgroundColor;
 
             this.EnableRebuild(true);
         }
@@ -982,7 +999,8 @@ namespace CDP4RelationshipMatrix.ViewModels
                 ShowDirectionality = this.ShowDirectionality,
                 SourceConfigurationX = new SourceConfiguration(this.SourceXConfiguration),
                 SourceConfigurationY = new SourceConfiguration(this.SourceYConfiguration),
-                ShowRelatedOnly = this.ShowRelatedOnly
+                ShowRelatedOnly = this.ShowRelatedOnly,
+                ShowNonRelatedBackgroundColor = this.ShowNonRelatedBackgroundColor
             };
 
             var vm = new SavedConfigurationDialogViewModel<RelationshipMatrixPluginSettings>(this.PluginSettingsService, savedConfiguration);

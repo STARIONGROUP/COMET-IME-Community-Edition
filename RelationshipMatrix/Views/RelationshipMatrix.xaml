@@ -32,6 +32,7 @@
             <converters:OrderedDomainOfExpertiseListConverter x:Key="OrderedDomainOfExpertiseListConverter" />
             <converters:ColumnFixedConverter x:Key="ColumnFixedConverter" />
             <converters:ColumnWidthConverter x:Key="ColumnWidthConverter" />
+            <converters:NameBackgroundConverter x:Key="NameBackgroundConverter" />
             <converters:NameContentConverter x:Key="NameContentConverter" />
             <converters:BooleanToHighlightConverter x:Key="BooleanToHighlightConverter"/>
             <converters1:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
@@ -40,36 +41,115 @@
             <converters:DeprecatedOpacityConverter x:Key="DeprecatedOpacityConverter" />
 
             <DataTemplate x:Key="SourceYToSourceX">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                     <Image Width="24" Height="24" x:Name="PART_Editor"
-                       Source="/CDP4RelationshipMatrix;component/Resources/Images/ytox.png"
-                       ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/ytox.png">
+                        <Image.ToolTip>
+                            <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                <Binding />
+                                <Binding Path="RowData.Row" />
+                            </MultiBinding>
+                        </Image.ToolTip>
+                    </Image>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="SourceXToSourceY">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                     <Image Width="24" Height="24" x:Name="PART_Editor"
-                           Source="/CDP4RelationshipMatrix;component/Resources/Images/xtoy.png"
-                           ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/xtoy.png">
+                        <Image.ToolTip>
+                            <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                <Binding />
+                                <Binding Path="RowData.Row" />
+                            </MultiBinding>
+                        </Image.ToolTip>
+                    </Image>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="BidirectionalRelationship">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                     <Image Width="24" Height="24" x:Name="PART_Editor"
-                           Source="/CDP4RelationshipMatrix;component/Resources/Images/bidir.png"
-                           ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/bidir.png">
+                        <Image.ToolTip>
+                            <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                <Binding />
+                                <Binding Path="RowData.Row" />
+                            </MultiBinding>
+                        </Image.ToolTip>
+                    </Image>
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="NodirectionalRelationship">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                     <Image Width="24" Height="24" x:Name="PART_Editor"
-                           Source="/CDP4RelationshipMatrix;component/Resources/Images/nodir.png"
-                           ToolTip="{Binding Converter={StaticResource TooltipConverter}}" />
+                           Source="/CDP4RelationshipMatrix;component/Resources/Images/nodir.png">
+                        <Image.ToolTip>
+                            <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                <Binding />
+                                <Binding Path="RowData.Row" />
+                            </MultiBinding>
+                        </Image.ToolTip>
+                    </Image>
                 </Grid>
             </DataTemplate>
 
             <DataTemplate x:Key="NameTemplate">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource NameBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+
                     <TextBlock x:Name="PART_Editor"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
@@ -89,18 +169,36 @@
                             </Style>
                         </TextBlock.Resources>
                         <TextBlock.ToolTip>
-                            <ToolTip Content="{Binding Converter={StaticResource TooltipConverter}}"
-                                     Style="{StaticResource RowToolTipStyle}"
+                            <ToolTip Style="{StaticResource RowToolTipStyle}"
                                      FontWeight="Normal"
                                      HorizontalContentAlignment="Left"
-                                     HorizontalAlignment="Left" />
+                                     HorizontalAlignment="Left" >
+                                <ToolTip.Content>
+                                    <MultiBinding Converter="{StaticResource TooltipConverter}">
+                                        <Binding />
+                                        <Binding Path="RowData.Row" />
+                                    </MultiBinding>
+                                </ToolTip.Content>
+                            </ToolTip>
                         </TextBlock.ToolTip>
                     </TextBlock>
                 </Grid>
             </DataTemplate>
 
             <DataTemplate x:Key="None">
-                <Grid Background="{Binding Converter={StaticResource DeprecatedBackgroundConverter}}" Opacity="{Binding Converter={StaticResource DeprecatedOpacityConverter}}">
+                <Grid>
+                    <Grid.Background>
+                        <MultiBinding Converter="{StaticResource DeprecatedBackgroundConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Background>
+                    <Grid.Opacity>
+                        <MultiBinding Converter="{StaticResource DeprecatedOpacityConverter}">
+                            <Binding />
+                            <Binding Path="RowData.Row" />
+                        </MultiBinding>
+                    </Grid.Opacity>
                 </Grid>
             </DataTemplate>
 
@@ -184,7 +282,7 @@
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
-                    <dxg:GridControl Grid.Row="0"  Name="MatrixGridControl"
+                    <dxg:GridControl Grid.Row="0"  Name="MatrixGridControl" 
                                              ItemsSource="{Binding Matrix.Records, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                              ColumnsSource="{Binding Matrix.Columns, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                              ColumnGeneratorTemplate="{StaticResource DefaultColumnTemplate}"
@@ -623,6 +721,19 @@
                                                             Content="Show Related Only"
                                                             ToolTip="Only includes objects that have the specified relationships into the view." />
                                                 </dxlc:LayoutItem>
+                                                <dxlc:LayoutItem>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <dxe:CheckEdit
+                                                            EditValue="{Binding ShowNonRelatedBackgroundColor, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                            Content="Show Not-Related background color"
+                                                            ToolTip="Show a background color on Not-Related cells" />
+                                                        <Rectangle
+                                                            Margin="5, 0, 0, 0"
+                                                            Width="20"
+                                                            Height="20"
+                                                            Fill="Coral"/>
+                                                    </StackPanel>
+                                                </dxlc:LayoutItem>
                                             </dxlc:LayoutGroup>
                                         </dxlc:LayoutGroup>
                                     </dxlc:LayoutControl>
@@ -648,7 +759,6 @@
                                                                      Glyph="{dx:DXImage Image=Action_Export_ToExcel.png}" />
                                                 </dxlc:LayoutItem>
                                             </dxlc:LayoutGroup>
-
                                         </dxlc:LayoutGroup>
                                     </dxlc:LayoutControl>
                                 </dxn:NavBarGroup.Content>

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DeprecatedOpacityConverter.cs" company="Starion Group S.A.">
+// <copyright file="NameBackgroundConverter.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate
@@ -25,25 +25,37 @@
 
 namespace CDP4RelationshipMatrix.Converters
 {
+    using System;
     using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Windows.Media;
 
-    using ViewModels;
+    using CDP4RelationshipMatrix.ViewModels;
+
+    using DevExpress.Xpf.Grid;
 
     /// <summary>
-    /// The converter to retrieve the opacity for the cell to be used for deprecated things.
+    /// The converter to retrieve the name to display for a row based on the <see cref="EditGridCellData"/>
     /// </summary>
-    public class DeprecatedOpacityConverter : BaseMatrixCellViewModelConverter<double>
+    public class NameBackgroundConverter : BaseMatrixCellViewModelConverter<Brush>
     {
         /// <summary>
-        /// Converts the Row object contents into useable double
+        /// <see cref="SolidColorBrush"/> representing the notmal backcolor of a name cell
+        /// </summary>
+        private static SolidColorBrush NormalBackgroundBrush = (SolidColorBrush)new BrushConverter().ConvertFrom("#EEEEEE");
+
+        /// <summary>
+        /// Converts the Row object contents into useable <see cref="Brush"/>
         /// </summary>
         /// <param name="row">The row data object.</param>
         /// <param name="fieldName">The field name to be used as key in the row object</param>
         /// <returns>The required display name of the row.</returns>
-        protected override double ConvertRowObject(IDictionary<string, MatrixCellViewModel> row, string fieldName)
+        protected override Brush ConvertRowObject(IDictionary<string, MatrixCellViewModel> row, string fieldName)
         {
             var matrixCellViewModel = row[fieldName];
-            return matrixCellViewModel.IsDeprecated ? 0.5D : double.PositiveInfinity;
+
+            return matrixCellViewModel?.ShowNonRelatedBackgroundColor ?? false ? Brushes.Coral : NormalBackgroundBrush;
         }
     }
 }
