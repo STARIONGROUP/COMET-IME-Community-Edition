@@ -23,7 +23,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Requirements.Tests.ViewModels.Rows
+namespace CDP4Dashboard.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;

@@ -27,11 +27,13 @@ namespace CDP4Composition.Utilities
 {
     using System;
     using System.ComponentModel;
+    using System.Threading;
+    using System.Windows;
+    using System.Windows.Threading;
 
     using CDP4Common.CommonData;
 
     using CDP4Composition.Mvvm;
-    using DevExpress.Mvvm.Native;
 
     /// <summary>
     /// The main purpose of this class is to be able to create an initial loading mechanism for browsers on a <see cref="BackgroundWorker"/>
@@ -48,6 +50,11 @@ namespace CDP4Composition.Utilities
         /// The Actual <see cref="BackgroundWorker"/>
         /// </summary>
         private BackgroundWorker worker;
+
+        /// <summary>
+        /// The <see cref="Dispatcher"/> to use for OnCompleted execution
+        /// </summary>
+        private Dispatcher dispatcher;
 
         /// <summary>
         /// Create s new instance of the <see cref="SingleRunBackgroundDataLoader{T}"/> class
@@ -74,11 +81,15 @@ namespace CDP4Composition.Utilities
 
             this.worker.RunWorkerCompleted += (sender, args) =>
             {
-                onCompleted.Invoke(args);
+                //Execure using dispatcher on the correct thread
+                this.dispatcher?.Invoke(
+                        () => onCompleted(args),
+                        DispatcherPriority.Background);
+                
                 this.worker.Dispose();
                 this.worker = null;
 
-                // Forces the disposal of the SingleBackgroundWorker and also implemnted as a triggers in Unit tests that the BackgroundWorker has finished
+                // Forces the disposal of the SingleBackgroundWorker and also implemented as a trigger in Unit tests that the BackgroundWorker has finished
                 owningBrowser.SingleRunBackgroundWorker = null;
             };
         }
@@ -88,6 +99,8 @@ namespace CDP4Composition.Utilities
         /// </summary>
         public void RunWorkerAsync()
         {
+            this.dispatcher = Application.Current?.MainWindow == null ? Dispatcher.CurrentDispatcher : Application.Current.Dispatcher;
+
             this.worker?.RunWorkerAsync();
         }
     }

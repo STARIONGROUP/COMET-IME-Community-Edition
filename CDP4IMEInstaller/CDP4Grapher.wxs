@@ -14,19 +14,6 @@
         <File Id="fil_Manifest_CDP4Grapher"  Vital="yes" Source="$(var.CDP4Grapher.TargetDir)CDP4Grapher.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
-      <!-- scripting -->
-      <Component Id="comp_MicrosoftDynamic_CDP4Grapher" Guid="{6E127668-804D-4CDE-9F5E-D831DDA8F3C4}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_MicrosoftDynamic_CDP4Dashboard"  Vital="yes" Source="$(var.CDP4Grapher.TargetDir)Microsoft.Dynamic.dll" KeyPath="yes"></File>
-      </Component>
-
-      <Component Id="comp_MicrosoftScriptin_CDP4Grapher" Guid="{354BDF7E-68A4-4A02-83B8-54C09480E4CC}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_MicrosoftScripting_CDP4Dashboard"  Vital="yes" Source="$(var.CDP4Grapher.TargetDir)Microsoft.Scripting.dll" KeyPath="yes"></File>
-      </Component>
-
-      <Component Id="comp_MicrosoftScriptingMetadata_CDP4Grapher" Guid="{AB788A03-02E9-4A64-A428-9F502405A24C}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_MicrosoftScriptingMetadata_CDP4Dashboard"  Vital="yes" Source="$(var.CDP4Grapher.TargetDir)Microsoft.Scripting.Metadata.dll" KeyPath="yes"></File>
-      </Component>
-
     </ComponentGroup>
   </Fragment>
 </Wix>

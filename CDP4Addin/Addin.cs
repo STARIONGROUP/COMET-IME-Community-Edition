@@ -360,7 +360,7 @@ namespace CDP4AddinCE
 
             logger.Trace("System.Numerics.Vectors");
             var systemVectors = new Version("4.1.4.0");
-            this.RedirectAssembly("System.Numerics.Vectors", systemMemory, "b03f5f7f11d50a3a");
+            this.RedirectAssembly("System.Numerics.Vectors", systemVectors, "b03f5f7f11d50a3a");
 
             logger.Trace("Microsoft.Bcl.AsyncInterfaces");
             var asyncInterfaces = new Version("8.0.0.0");

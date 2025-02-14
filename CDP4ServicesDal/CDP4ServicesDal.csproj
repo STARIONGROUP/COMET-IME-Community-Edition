@@ -11,8 +11,8 @@
     <Product>CDP4ServicesDal</Product>
     <Description>CDP4-COMET Services DAL to be used exclusively with CDP4-COMET Services</Description>
     <Copyright>Copyright © Starion Group S.A</Copyright>
-    <AssemblyVersion>10.0.3.11</AssemblyVersion>
-    <FileVersion>10.0.3.11</FileVersion>
+    <AssemblyVersion>10.0.3.12</AssemblyVersion>
+    <FileVersion>10.0.3.12</FileVersion>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -50,9 +50,6 @@
     </PackageReference>
     <PackageReference Include="CDP4ServicesDal-CE" Version="27.4.1" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
-      <ExcludeAssets>runtime</ExcludeAssets>
-    </PackageReference>
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="6.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3">
