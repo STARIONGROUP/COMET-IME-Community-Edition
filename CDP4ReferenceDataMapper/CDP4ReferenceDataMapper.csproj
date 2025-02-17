@@ -9,8 +9,8 @@
 	<Product>CDP4ReferenceDataMapper</Product>
 	<Description>CDP4-COMET ReferenceData Mapper Plugin</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>11.0.0.3</AssemblyVersion>
-	<FileVersion>11.0.0.3</FileVersion>
+	<AssemblyVersion>11.0.0.4</AssemblyVersion>
+	<FileVersion>11.0.0.4</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>

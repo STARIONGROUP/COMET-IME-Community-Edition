@@ -10,8 +10,8 @@
     <Product>CDP4Reporting</Product>
     <Description>CDP4-COMET Reporting Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
-    <AssemblyVersion>11.0.0.3</AssemblyVersion>
-    <FileVersion>11.0.0.3</FileVersion>
+    <AssemblyVersion>11.0.0.4</AssemblyVersion>
+    <FileVersion>11.0.0.4</FileVersion>
     <LangVersion>latest</LangVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
