@@ -31,6 +31,7 @@ namespace CDP4EngineeringModel.Tests
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
@@ -67,6 +68,7 @@ namespace CDP4EngineeringModel.Tests
     /// Suite of tests for the <see cref="ElementDefinitionBrowserViewModel"/> class.
     /// </summary>
     [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class ElementDefinitionBrowserViewModelTestFixture
     {
         private Mock<IPanelNavigationService> panelNavigationService;
@@ -97,6 +99,7 @@ namespace CDP4EngineeringModel.Tests
         private TextParameterType pt;
         private readonly PropertyInfo rev = typeof(Thing).GetProperty("RevisionNumber");
         private CDPMessageBus messageBus;
+        private static readonly Application application = new Application();
 
         [SetUp]
         public void Setup()
@@ -192,6 +195,11 @@ namespace CDP4EngineeringModel.Tests
             this.messageBoxService = new Mock<IMessageBoxService>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
+
+            if (Application.Current == null)
+            {
+                new Application();
+            }
         }
 
         [TearDown]

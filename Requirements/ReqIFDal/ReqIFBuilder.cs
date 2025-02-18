@@ -446,10 +446,11 @@ namespace CDP4Requirements.ReqIFDal
 
             foreach (var relationship in relationships)
             {
-                var source = this.requirementMap[(Requirement)relationship.Source];
-                var target = this.requirementMap[(Requirement)relationship.Target];
-
-                this.specRelationMap.Add(relationship, this.mapper.ToReqIfSpecRelation(relationship, (SpecRelationType)this.specType[relationship], source, target));
+                if (this.requirementMap.TryGetValue((Requirement)relationship.Source, out var source)
+                    && this.requirementMap.TryGetValue((Requirement)relationship.Target, out var target))
+                {
+                    this.specRelationMap.Add(relationship, this.mapper.ToReqIfSpecRelation(relationship, (SpecRelationType)this.specType[relationship], source, target));
+                }
             }
         }
 

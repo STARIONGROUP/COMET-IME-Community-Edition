@@ -32,7 +32,9 @@ namespace CDP4SiteDirectory.Tests
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -58,6 +60,7 @@ namespace CDP4SiteDirectory.Tests
     /// Suite of tests for the <see cref="PersonBrowserViewModel"/>
     /// </summary>
     [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class PersonBrowserViewModelTestFixture
     {
         private PropertyInfo revision = typeof(Thing).GetProperty("RevisionNumber");
@@ -70,6 +73,7 @@ namespace CDP4SiteDirectory.Tests
         private Mock<IPermissionService> permissionService;
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private CDPMessageBus messageBus;
+        private static readonly Application application = new Application();
 
         [SetUp]
         public void Setup()

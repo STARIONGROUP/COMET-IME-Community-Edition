@@ -31,6 +31,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
 
@@ -64,6 +65,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
     /// Suite of tests for the <see cref="RequirementsBrowserViewModel"/> class.
     /// </summary>
     [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public class RequirementBrowserViewModelTestFixture
     {
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
@@ -87,6 +89,7 @@ namespace CDP4Requirements.Tests.RequirementBrowser
         private Person person;
         private Option option;
         private CDPMessageBus messageBus;
+        private static readonly Application application = new Application();
 
         [SetUp]
         public void Setup()
