@@ -488,7 +488,7 @@ namespace CDP4ShellDialogs.ViewModels
         public AuthenticationSchemeResponse AvailableAuthenticationScheme
         {
             get => this.availableAuthenticationScheme;
-            private set => this.RaiseAndSetIfChanged(ref this.availableAuthenticationScheme, value);
+            internal set => this.RaiseAndSetIfChanged(ref this.availableAuthenticationScheme, value);
         }
 
         /// <summary>
@@ -497,7 +497,7 @@ namespace CDP4ShellDialogs.ViewModels
         public bool IsAuthenticatedViaExternalProvider
         {
             get => this.isAuthenticatedViaExternalProvider;
-            set => this.RaiseAndSetIfChanged(ref this.isAuthenticatedViaExternalProvider, value);
+            private set => this.RaiseAndSetIfChanged(ref this.isAuthenticatedViaExternalProvider, value);
         }
 
         /// <summary>
