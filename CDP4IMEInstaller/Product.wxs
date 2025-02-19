@@ -44,10 +44,6 @@
       <ComponentRef Id="DesktopShortcutCDP4CE"/>
     </Feature>
 
-    <Feature Id="CDP4WSPDALPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no" Title="CDP4-COMET Wsp Dal Plugin" Level="1" >
-      <ComponentGroupRef Id="WSPDAL_CG" />
-    </Feature>
-
     <Feature Id="CDP4SERVICESDAL" TypicalDefault="install" InstallDefault="local" Absent="disallow" AllowAdvertise="no" Title="CDP4-COMET Services Dal Plugin" Level="1" >
       <ComponentGroupRef Id="CDP4SERVICESDAL_CG" />
     </Feature>
