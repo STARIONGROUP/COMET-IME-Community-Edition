@@ -28,9 +28,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="27.4.1" />
-    <PackageReference Include="CDP4Dal-CE" Version="27.4.1" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="27.4.1" />
+    <PackageReference Include="CDP4Common-CE" Version="28.1.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="28.1.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.1.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.5" />
     <PackageReference Include="DevExpress.Data" Version="23.2.5" />
@@ -64,6 +64,7 @@
     <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="23.2.5" />
     <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.5" />
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3065.39" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="NLog" Version="5.3.4" />
     <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
@@ -76,6 +77,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Security" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />

@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceSelectionViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
-//
+//    Copyright (c) 2015-2025 Starion Group S.A.
+// 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
-//
-//    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+// 
+//    This file is part of CDP4-COMET-IME Community Edition.
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
-//
-//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+// 
+//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
-//
-//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+// 
+//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
-//
+// 
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see http://www.gnu.org/licenses/.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -44,97 +44,42 @@ namespace CDP4ShellDialogs.ViewModels
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
 
+    using CDP4DalCommon.Authentication;
+
     using CDP4ShellDialogs.Proxy;
 
     using CommonServiceLocator;
 
+    using Microsoft.Win32;
+
     using ReactiveUI;
 
     /// <summary>
-    /// The purpose of the <see cref="DataSourceSelectionViewModel"/> is to allow a user to select an <see cref="IDal"/> implementation
+    /// The purpose of the <see cref="DataSourceSelectionViewModel" /> is to allow a user to select an <see cref="IDal" />
+    /// implementation
     /// and provide Credentials to login to a data source.
     /// </summary>
     public class DataSourceSelectionViewModel : DialogViewModelBase
     {
         /// <summary>
-        /// The available <see cref="IDal"/> combined with <see cref="IDalMetaData"/>
+        /// Provides all <see cref="AuthenticationSchemeKind" /> that requires to provides credentials
         /// </summary>
-        private List<Lazy<IDal, IDalMetaData>> dals;
+        private static readonly AuthenticationSchemeKind[] SchemesWithCredentials = { AuthenticationSchemeKind.Basic, AuthenticationSchemeKind.LocalJwtBearer };
 
         /// <summary>
-        /// Backing field for the <see cref="SelectedDataSourceKind"/> property.
+        /// The dialog navigation service.
         /// </summary>
-        private IDalMetaData selectedDataSourceKind;
+        private readonly IDialogNavigationService dialogNavigationService;
 
         /// <summary>
-        /// Backing field for the <see cref="Uri"/> property.
+        /// The <see cref="IExceptionHandlerService" />
         /// </summary>
-        private string uri;
+        private readonly IExceptionHandlerService exceptionHandlerService;
 
-        /// <summary>
-        /// Backing field for the <see cref="isFullTrustAllowed"/> property.
+        /// <summary name="messageBus">
+        /// The <see cref="ICDPMessageBus" />
         /// </summary>
-        private bool isFullTrustAllowed;
-
-        /// <summary>
-        /// Backing field for the <see cref="isFullTrustCheckBoxEnabled"/> property.
-        /// </summary>
-        private bool isFullTrustCheckBoxEnabled = false;
-
-        /// <summary>
-        /// Backing field for the <see cref="IsProxyEnabled"/> property.
-        /// </summary>
-        private bool isProxyEnabled;
-
-        /// <summary>
-        /// Backing field for the <see cref="ProxyUri"/> property.
-        /// </summary>
-        private string proxyUri;
-
-        /// <summary>
-        /// Backing field for the <see cref="ProxyPort"/> property.
-        /// </summary>
-        private string proxyPort;
-
-        /// <summary>
-        /// Backing field for the <see cref="SelectedUri"/> property.
-        /// </summary>
-        private UriRowViewModel selectedUri;
-
-        /// <summary>
-        /// Backing field for the <see cref="SelectedUriText"/> property.
-        /// </summary>
-        private string selectedUriText;
-
-        /// <summary>
-        /// Backing field for the <see cref="UserName"/> property.
-        /// </summary>
-        private string userName;
-
-        /// <summary>
-        /// Backing field for the <see cref="Password"/> property.
-        /// </summary>
-        private string password;
-
-        /// <summary>
-        /// Backing field for the <see cref="ShowBrowseButton"/> property.
-        /// </summary>
-        private bool showBrowseButton;
-
-        /// <summary>
-        /// Backing field for the <see cref="AvailableDataSourceKinds"/> property.
-        /// </summary>
-        private ReactiveList<IDalMetaData> availableDataSourceKinds;
-
-        /// <summary>
-        /// Backing field for the <see cref="AvailableUris"/> property.
-        /// </summary>
-        private ReactiveList<UriRowViewModel> availableUris;
-
-        /// <summary>
-        /// The session.
-        /// </summary>
-        private ISession session;
+        private readonly ICDPMessageBus messageBus;
 
         /// <summary>
         /// The existing correctly opened openSessions
@@ -142,38 +87,123 @@ namespace CDP4ShellDialogs.ViewModels
         private readonly IEnumerable<ISession> openSessions;
 
         /// <summary>
-        /// The <see cref="IExceptionHandlerService"/>
+        /// Backinf field for <see cref="AvailableAuthenticationScheme" /> property.
         /// </summary>
-        private readonly IExceptionHandlerService exceptionHandlerService;
+        private AuthenticationSchemeResponse availableAuthenticationScheme;
 
         /// <summary>
-        /// The dialog navigation service.
+        /// Backing field for the <see cref="AvailableDataSourceKinds" /> property.
         /// </summary>
-        private IDialogNavigationService dialogNavigationService;
+        private ReactiveList<IDalMetaData> availableDataSourceKinds;
 
         /// <summary>
-        /// Backing field for the <see cref="IsPasswordVisible"/> property
+        /// Backing field for the <see cref="AvailableUris" /> property.
+        /// </summary>
+        private ReactiveList<UriRowViewModel> availableUris;
+
+        /// <summary>
+        /// Backing field for <see cref="CanShowExecuteButton" /> property.
+        /// </summary>
+        private bool canShowExecuteButton;
+
+        /// <summary>
+        /// The available <see cref="IDal" /> combined with <see cref="IDalMetaData" />
+        /// </summary>
+        private List<Lazy<IDal, IDalMetaData>> dals;
+
+        /// <summary>
+        /// Backing field for <see cref="IsAuthenticatedViaExternalProvider" /> property.
+        /// </summary>
+        private bool isAuthenticatedViaExternalProvider;
+
+        /// <summary>
+        /// Backing field for the <see cref="isFullTrustAllowed" /> property.
+        /// </summary>
+        private bool isFullTrustAllowed;
+
+        /// <summary>
+        /// Backing field for the <see cref="isFullTrustCheckBoxEnabled" /> property.
+        /// </summary>
+        private bool isFullTrustCheckBoxEnabled;
+
+        /// <summary>
+        /// Backing field for the <see cref="IsPasswordVisible" /> property
         /// </summary>
         private bool isPasswordVisible;
 
         /// <summary>
-        /// Backing field for the <see cref="ShowPasswordButtonText"/> property
+        /// Backing field for the <see cref="IsProxyEnabled" /> property.
+        /// </summary>
+        private bool isProxyEnabled;
+
+        /// <summary>
+        /// Backing field for the <see cref="Password" /> property.
+        /// </summary>
+        private string password;
+
+        /// <summary>
+        /// Backing field for the <see cref="ProxyPort" /> property.
+        /// </summary>
+        private string proxyPort;
+
+        /// <summary>
+        /// Backing field for the <see cref="ProxyUri" /> property.
+        /// </summary>
+        private string proxyUri;
+
+        /// <summary>
+        /// Backing field for the <see cref="SelectedDataSourceKind" /> property.
+        /// </summary>
+        private IDalMetaData selectedDataSourceKind;
+
+        /// <summary>
+        /// Backing field for the <see cref="SelectedUri" /> property.
+        /// </summary>
+        private UriRowViewModel selectedUri;
+
+        /// <summary>
+        /// Backing field for the <see cref="SelectedUriText" /> property.
+        /// </summary>
+        private string selectedUriText;
+
+        /// <summary>
+        /// The session.
+        /// </summary>
+        private ISession session;
+
+        /// <summary>
+        /// Backing field for the <see cref="ShouldProvideCredentialsInformation" /> property
+        /// </summary>
+        private bool shouldProvideCredentialsInformation;
+
+        /// <summary>
+        /// Backing field for the <see cref="ShowBrowseButton" /> property.
+        /// </summary>
+        private bool showBrowseButton;
+
+        /// <summary>
+        /// Backing field for the <see cref="ShowPasswordButtonText" /> property
         /// </summary>
         private string showPasswordButtonText;
 
-        /// <summary name="messageBus">
-        /// The <see cref="ICDPMessageBus"/>
+        /// <summary>
+        /// Backing field for the <see cref="Uri" /> property.
         /// </summary>
-        private readonly ICDPMessageBus messageBus;
+        private string uri;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataSourceSelectionViewModel"/> class.
+        /// Backing field for the <see cref="UserName" /> property.
         /// </summary>
-        /// <param name="dialogNavigationService">An instance of <see cref="IDialogNavigationService"/>.</param>
+        private string userName;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataSourceSelectionViewModel" /> class.
+        /// </summary>
+        /// <param name="dialogNavigationService">An instance of <see cref="IDialogNavigationService" />.</param>
         /// <param name="messageBus">
-        /// The <see cref="ICDPMessageBus"/>
+        /// The <see cref="ICDPMessageBus" />
         /// </param>
-        /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
+        /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService" /></param>
         /// <param name="openSessions">
         /// The openSessions.
         /// </param>
@@ -200,9 +230,13 @@ namespace CDP4ShellDialogs.ViewModels
                 vm => vm.SelectedDataSourceKind,
                 vm => vm.Uri,
                 vm => vm.IsProxyEnabled,
-                (username, password, datasource, uri, isproxyenabled) =>
-                    datasource != null && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password) &&
-                    !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource));
+                vm => vm.AvailableAuthenticationScheme,
+                vm => vm.IsAuthenticatedViaExternalProvider,
+                (username, password, datasource, uri, isproxyenabled, authenticationSchemeResponse, authenticatedViaExternalProvider) =>
+                    datasource != null &&
+                    !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource)
+                    && authenticationSchemeResponse != null
+                    && ((!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password)) || authenticatedViaExternalProvider));
 
             this.OkCommand = ReactiveCommandCreator.CreateAsyncTask(() => this.ExecuteOk(false), canOk, RxApp.MainThreadScheduler);
             this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; });
@@ -211,6 +245,8 @@ namespace CDP4ShellDialogs.ViewModels
             this.OkAndOpenCommand.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; });
 
             this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
+            this.SelectDataSource = ReactiveCommandCreator.CreateAsyncTask(this.SelectDataSourceAndRequestAuthenticationScheme, RxApp.MainThreadScheduler);
+            this.Subscriptions.Add(this.SelectDataSource.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; }));
 
             var canBrowse = this.WhenAny(vm => vm.SelectedDataSourceKind, sd => sd.Value != null && sd.Value.DalType == DalType.File);
 
@@ -231,7 +267,18 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.WhenAnyValue(vm => vm.SelectedUri, vm => vm.SelectedUriText).Subscribe(_ => this.UpdateUri());
 
+            this.Subscriptions.Add(this.WhenAnyValue(x => x.SelectedUri).Subscribe(_ => this.OnSelectedUriChanges()));
+            this.Subscriptions.Add(this.WhenAnyValue(x => x.AvailableAuthenticationScheme).Subscribe(_ => this.OnAuthenticationSchemeReponseChanges()));
             this.ResetProperties();
+        }
+
+        /// <summary>
+        /// Asserts that the execute button can be shown
+        /// </summary>
+        public bool CanShowExecuteButton
+        {
+            get => this.canShowExecuteButton;
+            set => this.RaiseAndSetIfChanged(ref this.canShowExecuteButton, value);
         }
 
         /// <summary>
@@ -422,11 +469,43 @@ namespace CDP4ShellDialogs.ViewModels
         public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
+        /// Gets the Command that allow the selection of the data source and request available authentication scheme against the selected data source
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> SelectDataSource { get; private set; }
+
+        /// <summary>
+        /// Asserts that the user should provide credentials information at the current state
+        /// </summary>
+        public bool ShouldProvideCredentialsInformation
+        {
+            get => this.shouldProvideCredentialsInformation;
+            set => this.RaiseAndSetIfChanged(ref this.shouldProvideCredentialsInformation, value);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="AuthenticationSchemeResponse" /> that has been replied from the server
+        /// </summary>
+        public AuthenticationSchemeResponse AvailableAuthenticationScheme
+        {
+            get => this.availableAuthenticationScheme;
+            private set => this.RaiseAndSetIfChanged(ref this.availableAuthenticationScheme, value);
+        }
+
+        /// <summary>
+        /// Provides the asserts that the session could be initialized with an external authentication provider
+        /// </summary>
+        public bool IsAuthenticatedViaExternalProvider
+        {
+            get => this.isAuthenticatedViaExternalProvider;
+            set => this.RaiseAndSetIfChanged(ref this.isAuthenticatedViaExternalProvider, value);
+        }
+
+        /// <summary>
         /// Executes the Ok Command
         /// </summary>
         /// <param name="openModel">Indicates whether to proceed to opening model</param>
         /// <returns>
-        /// The <see cref="Task"/>.
+        /// The <see cref="Task" />.
         /// </returns>
         private async Task ExecuteOk(bool openModel)
         {
@@ -438,35 +517,32 @@ namespace CDP4ShellDialogs.ViewModels
                 this.Uri += "/";
             }
 
-            var providedUri = new Uri(this.Uri);
-
             if (this.IsSessionOpen(this.Uri, this.UserName))
             {
                 this.ErrorMessage = $"A session with the username {this.UserName} already exists";
             }
             else
             {
-                ProxySettings proxySettings = null;
-
-                if (this.isProxyEnabled)
-                {
-                    var proxyServerConfiguration = ProxyServerConfigurationManager.Read();
-                    var proxyUri = new Uri($"http://{proxyServerConfiguration.Address}:{proxyServerConfiguration.Port}");
-                    proxySettings = new ProxySettings(proxyUri, proxyServerConfiguration.UserName, proxyServerConfiguration.Password);
-                }
-
-                var credentials = new Credentials(this.UserName, this.Password, providedUri, this.IsFullTrustAllowed, proxySettings);
-                var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
-                var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
-
                 this.IsBusy = true;
-
-                this.session = dalInstance.CreateSession(credentials, this.messageBus, this.exceptionHandlerService);
 
                 try
                 {
                     this.LoadingMessage = "Opening Session...";
-                    await this.session.Open();
+
+                    if (this.ShouldProvideCredentialsInformation)
+                    {
+                        var authenticationInformation = new AuthenticationInformation(this.UserName, this.Password);
+
+                        var authenticationScheme = this.AvailableAuthenticationScheme.Schemes.Contains(AuthenticationSchemeKind.LocalJwtBearer)
+                            ? AuthenticationSchemeKind.LocalJwtBearer
+                            : AuthenticationSchemeKind.Basic;
+
+                        await this.session.AuthenticateAndOpen(authenticationScheme, authenticationInformation);
+                    }
+                    else
+                    {
+                        await this.session.Open();
+                    }
 
                     this.DialogResult = new DataSourceSelectionResult(true, this.session, openModel);
                 }
@@ -500,7 +576,7 @@ namespace CDP4ShellDialogs.ViewModels
         private void ExecuteBrowse()
         {
             // Configure save file dialog box
-            var dlg = new Microsoft.Win32.OpenFileDialog();
+            var dlg = new OpenFileDialog();
             dlg.FileName = "Untitled"; // Default file name
             dlg.DefaultExt = ".zip"; // Default file extension
             dlg.Filter = "ZIP Archives (.zip)|*.zip"; // Filter files by extension
@@ -594,8 +670,8 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Resets all the properties and populates the <see cref="AvailableDataSourceKinds"/> List
-        /// and sets the <see cref="SelectedDataSourceKind"/> to the first in the <see cref="AvailableDataSourceKinds"/>
+        /// Resets all the properties and populates the <see cref="AvailableDataSourceKinds" /> List
+        /// and sets the <see cref="SelectedDataSourceKind" /> to the first in the <see cref="AvailableDataSourceKinds" />
         /// </summary>
         private void ResetProperties()
         {
@@ -678,7 +754,7 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Executes the <see cref="OpenProxyConfigurationCommand"/> to load and save the web-proxy configuration
+        /// Executes the <see cref="OpenProxyConfigurationCommand" /> to load and save the web-proxy configuration
         /// </summary>
         private void ExecuteOpenProxyConfigurationCommand()
         {
@@ -746,6 +822,111 @@ namespace CDP4ShellDialogs.ViewModels
             {
                 this.ShowPasswordButtonText = "Show";
             }
+        }
+
+        /// <summary>
+        /// Handles the changes of the <see cref="SelectedUri" /> and resets the <see cref="AvailableAuthenticationScheme" />
+        /// property
+        /// </summary>
+        private void OnSelectedUriChanges()
+        {
+            this.AvailableAuthenticationScheme = null;
+            this.IsAuthenticatedViaExternalProvider = false;
+            this.CanShowExecuteButton = false;
+        }
+
+        /// <summary>
+        /// Handles the changes of the <see cref="AvailableAuthenticationScheme" />
+        /// </summary>
+        private void OnAuthenticationSchemeReponseChanges()
+        {
+            var previousValue = this.ShouldProvideCredentialsInformation;
+
+            this.ShouldProvideCredentialsInformation = this.AvailableAuthenticationScheme != null
+                                                       && this.AvailableAuthenticationScheme.Schemes.Intersect(SchemesWithCredentials).Any();
+
+            if (this.ShouldProvideCredentialsInformation)
+            {
+                this.CanShowExecuteButton = true;
+            }
+
+            if (previousValue != this.ShouldProvideCredentialsInformation)
+            {
+                this.UserName = string.Empty;
+                this.Password = string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Selects data source and reuqest available authentication scheme
+        /// </summary>
+        /// <returns>An awaitable <see cref="Task" /></returns>
+        private async Task SelectDataSourceAndRequestAuthenticationScheme()
+        {
+            if (this.SelectedDataSourceKind.DalType == DalType.Web && !this.Uri.EndsWith("/"))
+            {
+                this.Uri += "/";
+            }
+
+            var temporaryCredentials = new Credentials(new Uri(this.Uri), this.IsFullTrustCheckBoxEnabled, this.CreateProxySettings());
+            var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
+            var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
+
+            this.IsBusy = true;
+
+            try
+            {
+                this.session = dalInstance.CreateSession(temporaryCredentials, this.messageBus, this.exceptionHandlerService);
+                this.AvailableAuthenticationScheme = await this.session.QueryAvailableAuthenticationScheme();
+            }
+            catch (Exception ex)
+            {
+                this.ErrorMessage = ex.Message;
+            }
+            finally
+            {
+                this.IsBusy = false;
+
+                if (this.AvailableAuthenticationScheme != null && this.AvailableAuthenticationScheme.Schemes.Contains(AuthenticationSchemeKind.ExternalJwtBearer))
+                {
+                    var openIdConnectViewModel = new OpenIdAuthenticationDialogViewModel(this.AvailableAuthenticationScheme.Authority, this.AvailableAuthenticationScheme.ClientId);
+                    openIdConnectViewModel.Initializes();
+                    var openIdAuthenticationResult = this.dialogNavigationService.NavigateModal(openIdConnectViewModel) as OpenIdAuthenticationResult;
+                    openIdConnectViewModel.Stop();
+
+                    if (openIdAuthenticationResult?.Result == true)
+                    {
+                        this.session.Credentials.ProvideUserToken(openIdAuthenticationResult.OpenIdAuthenticationDto.AccessToken, AuthenticationSchemeKind.ExternalJwtBearer);
+
+                        try
+                        {
+                            this.UserName = await this.session.QueryAuthenticatedUserName();
+                            this.IsAuthenticatedViaExternalProvider = true;
+                            this.CanShowExecuteButton = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            this.ErrorMessage = ex.Message;
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Create an instance of a <see cref="ProxySettings" /> if enabled, null otherwise
+        /// </summary>
+        /// <returns>The created <see cref="ProxySettings" /></returns>
+        private ProxySettings CreateProxySettings()
+        {
+            if (!this.isProxyEnabled)
+            {
+                return null;
+            }
+
+            var proxyServerConfiguration = ProxyServerConfigurationManager.Read();
+            var proxyUri = new Uri($"http://{proxyServerConfiguration.Address}:{proxyServerConfiguration.Port}");
+            return new ProxySettings(proxyUri, proxyServerConfiguration.UserName, proxyServerConfiguration.Password);
         }
     }
 }

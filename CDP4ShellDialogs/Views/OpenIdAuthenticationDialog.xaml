@@ -1,0 +1,21 @@
+﻿<dx:DXWindow x:Class="CDP4ShellDialogs.Views.OpenIdAuthenticationDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             Title="OpenID Authentication"
+             SizeToContent="Width"
+             dx:ThemeManager.ThemeName="Seven"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
+             ShowTitle="True"
+             mc:Ignorable="d" MinWidth="450" Width="450" MaxWidth="1000" MaxHeight="800" d:DesignHeight="474">
+    <Grid>
+        <wpf:WebView2 MinHeight="500"
+                      MinWidth="600"
+                      Source="{Binding OpenIdUri}"/>
+    </Grid>
+</dx:DXWindow>

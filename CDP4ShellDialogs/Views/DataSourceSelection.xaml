@@ -91,7 +91,9 @@
                                     <!---->
                                 </Grid>
                             </dxlc:LayoutItem>
-                            <dxlc:LayoutItem Label="Username">
+                            <dxlc:LayoutItem Label="Username" Visibility="{Binding Path=ShouldProvideCredentialsInformation,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <dxe:TextEdit x:Name="UserName"
                                               MinWidth="150"
                                               Margin="10,0,0,0"
@@ -99,7 +101,9 @@
                                         UpdateSourceTrigger=PropertyChanged,
                                         Mode=TwoWay}" />
                             </dxlc:LayoutItem>
-                            <dxlc:LayoutItem Label="Password">
+                            <dxlc:LayoutItem Label="Password" Visibility="{Binding Path=ShouldProvideCredentialsInformation,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <Grid Margin="10,0,0,0">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
@@ -125,7 +129,9 @@
                                               ButtonKind="Toggle"/>
                                 </Grid>
                             </dxlc:LayoutItem>
-                            <dxlc:LayoutItem Label="Full Trust">
+                            <dxlc:LayoutItem Label="Full Trust" Visibility="{Binding Path=CanShowExecuteButton,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={dx:BooleanToVisibilityConverter Invert=True}}">
                                 <dxe:CheckEdit x:Name="FullTrustCheckBox"
                                                IsChecked="{Binding IsFullTrustAllowed, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                                IsEnabled ="{Binding IsFullTrustCheckBoxEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -133,7 +139,9 @@
                                                HorizontalAlignment="Left"
                                                ToolTip="Connect to a server using Full Trust policy" />
                             </dxlc:LayoutItem>
-                            <dxlc:LayoutItem Label="Use Proxy">
+                            <dxlc:LayoutItem Label="Use Proxy" Visibility="{Binding Path=CanShowExecuteButton,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={dx:BooleanToVisibilityConverter Invert=True}}">
                                 <dxe:CheckEdit x:Name="ProxyCheckBox"
                                           IsChecked="{Binding IsProxyEnabled, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                           Margin="10,0,0,0"
@@ -177,6 +185,15 @@
                             </dxlc:LayoutItem>
                             <dxlc:LayoutItem>
                                 <TextBlock
+                                    Text="{Binding Path=UserName, StringFormat=Authenticated as {0},
+                                        Mode=OneWay}"
+                                    Padding="10"
+                                    Visibility="{Binding Path=IsAuthenticatedViaExternalProvider,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </dxlc:LayoutItem>
+                            <dxlc:LayoutItem>
+                                <TextBlock
                                     Text="{Binding Path=ErrorMessage,
                                         Mode=OneWay}"
                                     Padding="10"
@@ -188,7 +205,22 @@
                         </dxlc:LayoutGroup>
                         <dxlc:LayoutGroup Margin="0,10,0,0" Orientation="Horizontal">
                             
-                            <dx:SplitButton MinWidth="75"
+                            <dx:SimpleButton Visibility="{Binding Path=CanShowExecuteButton,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={dx:BooleanToVisibilityConverter Invert=True}}"
+                                             MinWidth="75"
+                                             MinHeight="25"
+                                             MaxWidth="300"
+                                             MaxHeight="25"
+                                             HorizontalAlignment="Right"
+                                             ToolTip="Selects Data Source"
+                                             Command="{Binding Path=SelectDataSource}"
+                                             Content="Select" IsDefault="True" ButtonKind="Simple"/>
+                            <dx:SplitButton
+                                Visibility="{Binding Path=CanShowExecuteButton,
+                                              UpdateSourceTrigger=PropertyChanged,
+                                              Converter={StaticResource BooleanToVisibilityConverter}}"
+                                MinWidth="75"
                                              MinHeight="25"
                                              MaxWidth="300"
                                              MaxHeight="25"
