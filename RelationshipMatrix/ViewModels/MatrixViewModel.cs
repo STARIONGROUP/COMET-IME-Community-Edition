@@ -773,9 +773,11 @@ namespace CDP4RelationshipMatrix.ViewModels
                 return sourceXCatThing;
             }
 
+            var displayAllowedSource = source
+                .Where(this.IsDefinedThingDisplayAllowed).ToList();
+
             var applicableThings =
-                source
-                    .Where(this.IsDefinedThingDisplayAllowed)
+                displayAllowedSource
                     .OfType<ICategorizableThing>()
                     .ToList();
 
@@ -801,7 +803,7 @@ namespace CDP4RelationshipMatrix.ViewModels
                 }
             }
 
-            foreach (var definedThing in source)
+            foreach (var definedThing in displayAllowedSource)
             {
                 var thing = (ICategorizableThing)definedThing;
 
