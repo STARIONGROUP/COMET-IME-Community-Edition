@@ -263,7 +263,8 @@ namespace CDP4ShellDialogs.ViewModels
             this.Subscriptions.Add(this.WhenAnyValue(x => x.AvailableAuthenticationScheme).Subscribe(_ => this.OnAuthenticationSchemeReponseChanges()));
             this.ResetProperties();
             
-            this.Subscriptions.Add(this.WhenAnyValue(x => x.SelectedUri, x => x.IsFullTrustAllowed,
+            this.Subscriptions.Add(this.WhenAnyValue(x => x.SelectedUri, 
+                    x => x.IsFullTrustAllowed,
                     x => x.IsProxyEnabled)
                 .Subscribe(_ => this.RequestAuthenticationScheme().ConfigureAwait(false)));
         }
@@ -817,7 +818,8 @@ namespace CDP4ShellDialogs.ViewModels
         private async Task RequestAuthenticationScheme()
         {
             this.ErrorMessage = string.Empty;
-            
+            this.IsAuthenticatedViaExternalProvider = false;
+
             if (this.SelectedUri == null)
             {
                 return;
