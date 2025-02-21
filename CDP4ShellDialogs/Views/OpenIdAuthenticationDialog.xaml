@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
-             xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
+             xmlns:wpf="clr-namespace:CefSharp.Wpf;assembly=CefSharp.Wpf"
              Title="OpenID Authentication"
              SizeToContent="Width"
              dx:ThemeManager.ThemeName="Seven"
@@ -14,8 +14,6 @@
              ShowTitle="True"
              mc:Ignorable="d" MinWidth="450" Width="450" MaxWidth="1000" MaxHeight="800" d:DesignHeight="474">
     <Grid>
-        <wpf:WebView2 MinHeight="500"
-                      MinWidth="600"
-                      Source="{Binding OpenIdUri}"/>
+        <wpf:ChromiumWebBrowser Address="{Binding Path=OpenIdUri}" Name="Browser"/>
     </Grid>
 </dx:DXWindow>

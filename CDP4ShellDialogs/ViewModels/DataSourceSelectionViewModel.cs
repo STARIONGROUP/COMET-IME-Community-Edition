@@ -102,11 +102,6 @@ namespace CDP4ShellDialogs.ViewModels
         private ReactiveList<UriRowViewModel> availableUris;
 
         /// <summary>
-        /// Backing field for <see cref="CanShowExecuteButton" /> property.
-        /// </summary>
-        private bool canShowExecuteButton;
-
-        /// <summary>
         /// The available <see cref="IDal" /> combined with <see cref="IDalMetaData" />
         /// </summary>
         private List<Lazy<IDal, IDalMetaData>> dals;
@@ -245,9 +240,6 @@ namespace CDP4ShellDialogs.ViewModels
             this.OkAndOpenCommand.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; });
 
             this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
-            this.SelectDataSource = ReactiveCommandCreator.CreateAsyncTask(this.SelectDataSourceAndRequestAuthenticationScheme, RxApp.MainThreadScheduler);
-            this.Subscriptions.Add(this.SelectDataSource.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; }));
-
             var canBrowse = this.WhenAny(vm => vm.SelectedDataSourceKind, sd => sd.Value != null && sd.Value.DalType == DalType.File);
 
             this.BrowseSourceCommand = ReactiveCommandCreator.Create(this.ExecuteBrowse, canBrowse);
@@ -270,15 +262,10 @@ namespace CDP4ShellDialogs.ViewModels
             this.Subscriptions.Add(this.WhenAnyValue(x => x.SelectedUri).Subscribe(_ => this.OnSelectedUriChanges()));
             this.Subscriptions.Add(this.WhenAnyValue(x => x.AvailableAuthenticationScheme).Subscribe(_ => this.OnAuthenticationSchemeReponseChanges()));
             this.ResetProperties();
-        }
-
-        /// <summary>
-        /// Asserts that the execute button can be shown
-        /// </summary>
-        public bool CanShowExecuteButton
-        {
-            get => this.canShowExecuteButton;
-            set => this.RaiseAndSetIfChanged(ref this.canShowExecuteButton, value);
+            
+            this.Subscriptions.Add(this.WhenAnyValue(x => x.SelectedUri, x => x.IsFullTrustAllowed,
+                    x => x.IsProxyEnabled)
+                .Subscribe(_ => this.RequestAuthenticationScheme().ConfigureAwait(false)));
         }
 
         /// <summary>
@@ -469,11 +456,6 @@ namespace CDP4ShellDialogs.ViewModels
         public ReactiveCommand<Unit, Unit> CancelCommand { get; private set; }
 
         /// <summary>
-        /// Gets the Command that allow the selection of the data source and request available authentication scheme against the selected data source
-        /// </summary>
-        public ReactiveCommand<Unit, Unit> SelectDataSource { get; private set; }
-
-        /// <summary>
         /// Asserts that the user should provide credentials information at the current state
         /// </summary>
         public bool ShouldProvideCredentialsInformation
@@ -631,15 +613,6 @@ namespace CDP4ShellDialogs.ViewModels
             if (this.SelectedDataSourceKind != null)
             {
                 this.AvailableUris = new ReactiveList<UriRowViewModel>(this.AllDefinedUris.Where(x => x.DalType == this.SelectedDataSourceKind.DalType));
-
-                if (this.AvailableUris.Count > 0)
-                {
-                    this.SelectedUri = this.AvailableUris.Last();
-                }
-                else
-                {
-                    this.SelectedUri = null;
-                }
             }
         }
 
@@ -689,16 +662,9 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.RefreshSavedSources();
 
-#if DEBUG
-            this.UserName = "admin";
-            this.Password = "pass";
-            var debugUri = new UriRowViewModel { Uri = "http://localhost:1234", DalType = DalType.Web };
-            this.AllDefinedUris.Add(debugUri);
-#else
             this.UserName = string.Empty;
             this.Password = string.Empty;
             this.Uri = string.Empty;
-#endif
             this.IsProxyEnabled = false;
             this.ProxyUri = string.Empty;
             this.ProxyPort = string.Empty;
@@ -814,14 +780,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         private void ChangeShowPasswordButtonText()
         {
-            if (this.IsPasswordVisible)
-            {
-                this.ShowPasswordButtonText = "Hide";
-            }
-            else
-            {
-                this.ShowPasswordButtonText = "Show";
-            }
+            this.ShowPasswordButtonText = this.IsPasswordVisible ? "Hide" : "Show";
         }
 
         /// <summary>
@@ -832,7 +791,6 @@ namespace CDP4ShellDialogs.ViewModels
         {
             this.AvailableAuthenticationScheme = null;
             this.IsAuthenticatedViaExternalProvider = false;
-            this.CanShowExecuteButton = false;
         }
 
         /// <summary>
@@ -845,11 +803,6 @@ namespace CDP4ShellDialogs.ViewModels
             this.ShouldProvideCredentialsInformation = this.AvailableAuthenticationScheme != null
                                                        && this.AvailableAuthenticationScheme.Schemes.Intersect(SchemesWithCredentials).Any();
 
-            if (this.ShouldProvideCredentialsInformation)
-            {
-                this.CanShowExecuteButton = true;
-            }
-
             if (previousValue != this.ShouldProvideCredentialsInformation)
             {
                 this.UserName = string.Empty;
@@ -858,12 +811,19 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
-        /// Selects data source and reuqest available authentication scheme
+        /// Requests supported shemes based on the currently selected DataSource
         /// </summary>
         /// <returns>An awaitable <see cref="Task" /></returns>
-        private async Task SelectDataSourceAndRequestAuthenticationScheme()
+        private async Task RequestAuthenticationScheme()
         {
-            if (this.SelectedDataSourceKind.DalType == DalType.Web && !this.Uri.EndsWith("/"))
+            this.ErrorMessage = string.Empty;
+            
+            if (this.SelectedUri == null)
+            {
+                return;
+            }
+
+            if (this.SelectedDataSourceKind.DalType == DalType.Web && !this.SelectedUri.Uri.EndsWith("/") && !this.Uri.EndsWith("/"))
             {
                 this.Uri += "/";
             }
@@ -874,6 +834,9 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.IsBusy = true;
 
+            // Required to display Loading spinner
+            await Task.Delay(1);
+            
             try
             {
                 this.session = dalInstance.CreateSession(temporaryCredentials, this.messageBus, this.exceptionHandlerService);
@@ -902,7 +865,6 @@ namespace CDP4ShellDialogs.ViewModels
                         {
                             this.UserName = await this.session.QueryAuthenticatedUserName();
                             this.IsAuthenticatedViaExternalProvider = true;
-                            this.CanShowExecuteButton = true;
                         }
                         catch (Exception ex)
                         {

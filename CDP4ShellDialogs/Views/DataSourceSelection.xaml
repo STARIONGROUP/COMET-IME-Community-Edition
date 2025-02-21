@@ -205,21 +205,7 @@
                         </dxlc:LayoutGroup>
                         <dxlc:LayoutGroup Margin="0,10,0,0" Orientation="Horizontal">
                             
-                            <dx:SimpleButton Visibility="{Binding Path=CanShowExecuteButton,
-                                              UpdateSourceTrigger=PropertyChanged,
-                                              Converter={dx:BooleanToVisibilityConverter Invert=True}}"
-                                             MinWidth="75"
-                                             MinHeight="25"
-                                             MaxWidth="300"
-                                             MaxHeight="25"
-                                             HorizontalAlignment="Right"
-                                             ToolTip="Selects Data Source"
-                                             Command="{Binding Path=SelectDataSource}"
-                                             Content="Select" IsDefault="True" ButtonKind="Simple"/>
                             <dx:SplitButton
-                                Visibility="{Binding Path=CanShowExecuteButton,
-                                              UpdateSourceTrigger=PropertyChanged,
-                                              Converter={StaticResource BooleanToVisibilityConverter}}"
                                 MinWidth="75"
                                              MinHeight="25"
                                              MaxWidth="300"

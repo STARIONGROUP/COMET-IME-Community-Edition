@@ -26,30 +26,34 @@
 namespace CDP4ShellDialogs.Views
 {
     using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
 
-    using Microsoft.Web.WebView2.Core;
-    using Microsoft.Web.WebView2.Wpf;
+    using CefSharp;
+    using CefSharp.Wpf;
 
     /// <summary>
     /// Interaction logic for OpenIdAuthenticationDialog.xaml
     /// </summary>
     [ExcludeFromCodeCoverage]
     [DialogViewExport("OpenIdAuthenticationDialogViewModel", "The OpenId authentication browser support")]
-    public partial class OpenIdAuthenticationDialog: IDialogView
+    public partial class OpenIdAuthenticationDialog : IDialogView
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="OpenIdAuthenticationDialog"/>
+        /// Asserts that the subscription to resolve assembly has been done once
+        /// </summary>
+        private static bool subscribedOnce;
+        
+        /// <summary>
+        /// Initializes a new instance of <see cref="OpenIdAuthenticationDialog" />
         /// </summary>
         public OpenIdAuthenticationDialog()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="OpenIdAuthenticationDialog"/>
+        /// Initializes a new instance of <see cref="OpenIdAuthenticationDialog" />
         /// </summary>
         /// <param name="initializeComponent">
         /// a value indicating whether the contained Components shall be loaded
@@ -62,8 +66,18 @@ namespace CDP4ShellDialogs.Views
             if (initializeComponent)
             {
                 this.InitializeComponent();
+
+                if (!subscribedOnce)
+                {
+                    CefRuntime.SubscribeAnyCpuAssemblyResolver();
+                    subscribedOnce = true;
+                }
+
+                if (Cef.IsInitialized == null)
+                {
+                    Cef.Initialize(new CefSettings(), performDependencyCheck: true, browserProcessHandler: null);
+                }
             }
         }
     }
 }
-

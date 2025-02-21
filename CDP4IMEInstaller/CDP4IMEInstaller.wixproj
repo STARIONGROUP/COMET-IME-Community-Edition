@@ -81,6 +81,7 @@
   <ItemGroup>
     <Content Include="background.bmp" />
     <Content Include="banner.bmp" />
+    <Compile Include="CefRuntime.wxs" />
     <Content Include="ThirdPartyLicense\AvalonEdit.txt" />
     <Content Include="ThirdPartyLicense\CastleCore.txt" />
     <Content Include="ThirdPartyLicense\CDP4Common-CE.txt" />

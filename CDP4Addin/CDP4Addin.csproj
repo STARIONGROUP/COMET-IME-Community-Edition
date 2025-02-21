@@ -13,6 +13,7 @@
     <AssemblyVersion>10.0.3.14</AssemblyVersion>
     <FileVersion>10.0.3.14</FileVersion>
     <RegisterForComInterop>true</RegisterForComInterop>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>

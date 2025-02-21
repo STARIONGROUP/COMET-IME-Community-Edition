@@ -127,5 +127,12 @@
     <Feature Id="GRAPHERPLUGIN" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CDP4-COMET Grapher Plugin" Level="1">
       <ComponentGroupRef Id="CDP4GRAPHER_CG" />
     </Feature>
+
+    <Feature Id="CEFRUNTIMEFILES" TypicalDefault="install" InstallDefault="local" Absent="allow" AllowAdvertise="no"  Title="CEF Runtime" Level="1">
+      <ComponentGroupRef Id="CEFTRUNTIME64" />
+      <ComponentGroupRef Id="CEFTRUNTIME32" />
+      <ComponentGroupRef Id="LOCALEFILES64" />
+      <ComponentGroupRef Id="LOCALEFILES32" />
+    </Feature>
   </Product>
 </Wix>
