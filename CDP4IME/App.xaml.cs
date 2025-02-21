@@ -99,9 +99,30 @@ namespace CDP4IME
             this.ShutdownMode = ShutdownMode.OnMainWindowClose;
             
             DXSplashScreen.SetState("Preparing Main Window");
-            
+            AppDomain.CurrentDomain.AssemblyResolve += this.CurrentDomainOnAssemblyResolve;
+
             Current.MainWindow.Show();
             DXSplashScreen.Close();
+        }
+
+        /// <summary>
+        /// Occures when <see cref="AppDomain.AssemblyResolve" /> event is called
+        /// </summary>
+        /// <param name="sender">The event sender</param>
+        /// <param name="args">The event args</param>
+        /// <returns>The assembly</returns>
+        private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var folderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            if (string.IsNullOrEmpty(folderPath))
+            {
+                return null;
+            }
+
+            var assemblyPath = Path.Combine(folderPath, new AssemblyName(args.Name).Name + ".dll");
+
+            return !File.Exists(assemblyPath) ? null : Assembly.LoadFrom(assemblyPath);
         }
 
         /// <summary>

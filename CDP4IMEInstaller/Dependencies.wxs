@@ -8,7 +8,23 @@
 	<Fragment>
     <ComponentGroup Id="DEPENDENCIES" Directory="BIN">
 
-	  <Component Id="_03B104AF18B2" Guid="{168E2EB4-2585-487D-B110-03B104AF18B2}" Location="local" Win64="$(var.Win64)">
+        <Component Id="_45BC7C9B" Guid="{45BC7C9B-2C1D-4418-8611-B296565209C5}" Location="local" Win64="$(var.Win64)">
+            <File Id="_B296565209C5"  Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)app.manifest" KeyPath="yes"></File>
+        </Component>
+
+        <Component Id="_C73F3BD2" Guid="{C73F3BD2-5894-4FB5-930D-A6E998A5BEE4}" Location="local" Win64="$(var.Win64)">
+            <File Id="_A6E998A5BEE4"  Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)CefSharp.Core.dll" KeyPath="yes"></File>
+        </Component>
+
+        <Component Id="_7FEE313A" Guid="{7FEE313A-5AEA-4ECA-AA14-D361D8D78B46}" Location="local" Win64="$(var.Win64)">
+            <File Id="_D361D8D78B46"  Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)CefSharp.dll" KeyPath="yes"></File>
+        </Component>
+
+        <Component Id="_6B30D756" Guid="{6B30D756-C1F8-4D1D-886E-3E416058D793}" Location="local" Win64="$(var.Win64)">
+            <File Id="_3E416058D793"  Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)CefSharp.Wpf.dll" KeyPath="yes"></File>
+        </Component>
+
+        <Component Id="_03B104AF18B2" Guid="{168E2EB4-2585-487D-B110-03B104AF18B2}" Location="local" Win64="$(var.Win64)">
 		<File Id="_168E2EB4"  Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)CommonServiceLocator.dll" KeyPath="yes"></File>
 	  </Component>
 

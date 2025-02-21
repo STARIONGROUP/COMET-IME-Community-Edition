@@ -1,0 +1,139 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+
+    <?include variables.wxi ?>
+
+    <Fragment>
+        <ComponentGroup Id="CEFTRUNTIME64" Directory="RUNTIME64">
+            <Component Id="_749F7BF1" Guid="{749F7BF1-F647-499E-8F75-45E158199CD6}" Location="local" Win64="$(var.Win64)">
+                <File Id="_45E158199CD6" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/CefSharp.BrowserSubprocess.Core.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_3634E2BA" Guid="{3634E2BA-9760-4370-9B83-4D48677257F2}" Location="local" Win64="$(var.Win64)">
+                <File Id="_4D48677257F2" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/CefSharp.BrowserSubprocess.exe" KeyPath="yes" />
+            </Component>
+            <Component Id="_C6211E01" Guid="{C6211E01-4305-406D-A0C9-F419B0A0FBAA}" Location="local" Win64="$(var.Win64)">
+                <File Id="_F419B0A0FBAA" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/CefSharp.Core.Runtime.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_1D3D696F" Guid="{1D3D696F-6E79-4C62-8D41-2CDB1182B293}" Location="local" Win64="$(var.Win64)">
+                <File Id="_2CDB1182B293" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/CefSharp.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_FD6BCF11" Guid="{FD6BCF11-4964-4140-B1C4-4F00309656A8}" Location="local" Win64="$(var.Win64)">
+                <File Id="_4F00309656A8" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/chrome_100_percent.pak" KeyPath="yes" />
+            </Component>
+            <Component Id="_CDCB9DCE" Guid="{CDCB9DCE-8332-438A-BFCA-2F630D995E27}" Location="local" Win64="$(var.Win64)">
+                <File Id="_2F630D995E27" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/chrome_200_percent.pak" KeyPath="yes" />
+            </Component>
+            <Component Id="_C316EB65" Guid="{C316EB65-E4E0-4BE0-88C8-824D7DC74FAF}" Location="local" Win64="$(var.Win64)">
+                <File Id="_824D7DC74FAF" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/chrome_elf.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_F768C9A9" Guid="{F768C9A9-68A4-468D-9229-C6550264816A}" Location="local" Win64="$(var.Win64)">
+                <File Id="_C6550264816A" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/d3dcompiler_47.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_9C6D006B" Guid="{9C6D006B-7113-4C13-B0B3-4E8643ED87A2}" Location="local" Win64="$(var.Win64)">
+                <File Id="_4E8643ED87A2" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/icudtl.dat" KeyPath="yes" />
+            </Component>
+            <Component Id="_D820F7F3" Guid="{D820F7F3-1D3E-4B53-83E3-FBE2EFE8A879}" Location="local" Win64="$(var.Win64)">
+                <File Id="_FBE2EFE8A879" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/libcef.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_6EF3A7E4" Guid="{6EF3A7E4-0D1C-4209-A902-A416CD3E5924}" Location="local" Win64="$(var.Win64)">
+                <File Id="_A416CD3E5924" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/libEGL.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_A4646DCB" Guid="{A4646DCB-4D49-483A-8DBC-45096E2E9E73}" Location="local" Win64="$(var.Win64)">
+                <File Id="_45096E2E9E73" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/libGLESv2.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_1D68BCFF" Guid="{1D68BCFF-3995-4D4D-BAC2-1021B95C0A07}" Location="local" Win64="$(var.Win64)">
+                <File Id="_1021B95C0A07" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/resources.pak" KeyPath="yes" />
+            </Component>
+            <Component Id="_BFE82EFC" Guid="{BFE82EFC-BBEF-422A-AA38-7D9B036440CC}" Location="local" Win64="$(var.Win64)">
+                <File Id="_7D9B036440CC" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/snapshot_blob.bin" KeyPath="yes" />
+            </Component>
+            <Component Id="_C5EDE0D6" Guid="{C5EDE0D6-F19D-48B1-9A5D-5277D05C0B94}" Location="local" Win64="$(var.Win64)">
+                <File Id="_5277D05C0B94" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/v8_context_snapshot.bin" KeyPath="yes" />
+            </Component>
+            <Component Id="_4523D227" Guid="{4523D227-5885-40DE-B9F9-8E1102CB4686}" Location="local" Win64="$(var.Win64)">
+                <File Id="_8E1102CB4686" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/vk_swiftshader.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_79407A02" Guid="{79407A02-F54D-43A2-A2FD-A4F8F39BDB9E}" Location="local" Win64="$(var.Win64)">
+                <File Id="_A4F8F39BDB9E" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/vk_swiftshader_icd.json" KeyPath="yes" />
+            </Component>
+            <Component Id="_344A848B" Guid="{344A848B-4DDB-4608-BD29-E43FA2EE54DD}" Location="local" Win64="$(var.Win64)">
+                <File Id="_E43FA2EE54DD" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/vulkan-1.dll" KeyPath="yes" />
+            </Component>
+        </ComponentGroup>
+        
+        <ComponentGroup Id="CEFTRUNTIME32" Directory="RUNTIME32">
+            <Component Id="_258899CD" Guid="{258899CD-CCDF-495C-95FB-C4EB6DFF3021}" Location="local" Win64="no">
+                <File Id="_C4EB6DFF3021" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/CefSharp.BrowserSubprocess.Core.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_D053C265" Guid="{D053C265-6DDA-4B76-A513-1DC3052CE4BD}" Location="local" Win64="no">
+                <File Id="_1DC3052CE4BD" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/CefSharp.BrowserSubprocess.exe" KeyPath="yes" />
+            </Component>
+            <Component Id="_CA6C8DA4" Guid="{CA6C8DA4-AD40-47D9-B6D8-2701D4BF07EA}" Location="local" Win64="no">
+                <File Id="_2701D4BF07EA" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/CefSharp.Core.Runtime.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_DE066772" Guid="{DE066772-05A7-4582-89C9-4D0FD0ACDBD2}" Location="local" Win64="no">
+                <File Id="_4D0FD0ACDBD2" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/CefSharp.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_C70F0FBF" Guid="{C70F0FBF-3CA3-433B-BE50-836B1AF2F429}" Location="local" Win64="no">
+                <File Id="_836B1AF2F429" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/chrome_100_percent.pak" KeyPath="yes" />
+            </Component>
+            <Component Id="_F6A2A2FA" Guid="{F6A2A2FA-5782-4B56-896A-47AA428ABBD3}" Location="local" Win64="no">
+                <File Id="_47AA428ABBD3" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/chrome_200_percent.pak" KeyPath="yes" />
+            </Component>
+            <Component Id="_2A2CF8F3" Guid="{2A2CF8F3-D142-4C70-A6D9-1B69B5EFE330}" Location="local" Win64="no">
+                <File Id="_1B69B5EFE330" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/chrome_elf.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_EAAF032A" Guid="{EAAF032A-76F6-424B-B9EE-F58BAB0F6E71}" Location="local" Win64="no">
+                <File Id="_F58BAB0F6E71" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/d3dcompiler_47.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_FFC37130" Guid="{FFC37130-C4EB-4E7F-A05D-C23A417F2A65}" Location="local" Win64="no">
+                <File Id="_C23A417F2A65" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/icudtl.dat" KeyPath="yes" />
+            </Component>
+            <Component Id="_9838AF58" Guid="{9838AF58-38D4-4A44-8DE1-7B295A946792}" Location="local" Win64="no">
+                <File Id="_7B295A946792" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/libcef.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_E1D087B7" Guid="{E1D087B7-0F3D-490C-BDDA-8047F120B9F6}" Location="local" Win64="no">
+                <File Id="_8047F120B9F6" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/libEGL.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_6B73F35D" Guid="{6B73F35D-21EB-4085-98C7-EA456ABA28CC}" Location="local" Win64="no">
+                <File Id="_EA456ABA28CC" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/libGLESv2.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_70981C97" Guid="{70981C97-2133-4116-957B-B9FF2A5A23B2}" Location="local" Win64="no">
+                <File Id="_B9FF2A5A23B2" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/resources.pak" KeyPath="yes" />
+            </Component>
+            <Component Id="_9A662EF1" Guid="{9A662EF1-5F87-4576-B938-61E7F7B13382}" Location="local" Win64="no">
+                <File Id="_61E7F7B13382" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/snapshot_blob.bin" KeyPath="yes" />
+            </Component>
+            <Component Id="_61D7F842" Guid="{61D7F842-4DF1-4D06-A962-7CD8FD497E3C}" Location="local" Win64="no">
+                <File Id="_7CD8FD497E3C" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/v8_context_snapshot.bin" KeyPath="yes" />
+            </Component>
+            <Component Id="_798BBA51" Guid="{798BBA51-76CD-4BB0-8237-429710078A32}" Location="local" Win64="no">
+                <File Id="_429710078A32" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/vk_swiftshader.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_BD30175C" Guid="{BD30175C-C409-4604-9CDD-AEB5479D90B7}" Location="local" Win64="no">
+                <File Id="AEB5479D90B7" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/vk_swiftshader_icd.json" KeyPath="yes" />
+            </Component>
+            <Component Id="_6F330FD6" Guid="{6F330FD6-28D3-4810-808C-E33A40097E88}" Location="local" Win64="no">
+                <File Id="_E33A40097E88" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/vulkan-1.dll" KeyPath="yes" />
+            </Component>
+        </ComponentGroup>
+        
+        <ComponentGroup Id="LOCALEFILES64" Directory="LOCALE64">
+            <Component Id="_EFCD800F" Guid="{EFCD800F-4B1E-4737-BB6B-ED4DDD35AB29}" Location="local" Win64="$(var.Win64)">
+                <File Id="_ED4DDD35AB29" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/locales/en-GB.pak" KeyPath="yes" />
+            </Component>
+            <Component Id="_BCB1498E" Guid="{BCB1498E-6399-432E-A583-A9F30EE98987}" Location="local" Win64="$(var.Win64)">
+                <File Id="_A9F30EE98987" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x64/locales/en-US.pak" KeyPath="yes" />
+            </Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="LOCALEFILES32" Directory="LOCALE32">
+            <Component Id="_B78D6E27" Guid="{B78D6E27-8F19-4883-B551-B11EB80F4291}" Location="local" Win64="no">
+                <File Id="_B11EB80F4291" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/locales/en-GB.pak" KeyPath="yes" />
+            </Component>
+            <Component Id="_B9F05DD4" Guid="{B9F05DD4-A018-4A90-9E4F-E5AB69D8D9BA}" Location="local" Win64="no">
+                <File Id="_E5AB69D8D9BA" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir)/x86/locales/en-US.pak" KeyPath="yes" />
+            </Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

@@ -47,7 +47,6 @@
     <Compile Include="CDP4RelationshipMatrix.wxs" />
     <Compile Include="CDP4Scripting.wxs" />
     <Compile Include="CDP4SiteDirectoryPlugin.wxs" />
-    <Compile Include="CDP4WspDalPlugin.wxs" />
     <Compile Include="CDP4JsonFileDalPlugin.wxs" />
     <Compile Include="CDP4ServicesDal.wxs" />
     <Compile Include="CDP4Dashboard.wxs" />
@@ -82,6 +81,7 @@
   <ItemGroup>
     <Content Include="background.bmp" />
     <Content Include="banner.bmp" />
+    <Compile Include="CefRuntime.wxs" />
     <Content Include="ThirdPartyLicense\AvalonEdit.txt" />
     <Content Include="ThirdPartyLicense\CastleCore.txt" />
     <Content Include="ThirdPartyLicense\CDP4Common-CE.txt" />

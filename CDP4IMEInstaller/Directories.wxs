@@ -9,6 +9,12 @@
         <Directory Id="STARIONFOLDER" Name="STARION">
           <Directory Id="CDP4INSTALLFOLDER" Name="CDP4-COMET-CE">
             <Directory Id="BIN" Name="Bin">
+              <Directory Id="RUNTIME64" Name="x64">
+                <Directory Id="LOCALE64" Name="locales"/>
+              </Directory>
+              <Directory Id="RUNTIME32" Name="x86">
+                <Directory Id="LOCALE32" Name="locales"/>
+              </Directory>
               <Directory Id="PLUGINS" Name="plugins">
                 <Directory Id="BASICRDL" Name="CDP4BasicRdl"/>
                 <Directory Id="BUDGET" Name="CDP4Budget"/>
