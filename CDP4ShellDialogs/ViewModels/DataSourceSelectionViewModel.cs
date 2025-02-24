@@ -822,6 +822,7 @@ namespace CDP4ShellDialogs.ViewModels
 
             if (this.SelectedUri == null)
             {
+                this.AvailableAuthenticationScheme = null;
                 return;
             }
 
@@ -836,7 +837,7 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.IsBusy = true;
 
-            // Required to display Loading spinner
+            // Required to display Loading spinner corectly
             await Task.Delay(1);
             
             try
@@ -846,6 +847,7 @@ namespace CDP4ShellDialogs.ViewModels
             }
             catch (Exception ex)
             {
+                this.AvailableAuthenticationScheme = null;
                 this.ErrorMessage = ex.Message;
             }
             finally
