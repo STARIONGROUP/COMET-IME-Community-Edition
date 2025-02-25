@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<Include>
+﻿<Include xmlns="http://wixtoolset.org/schemas/v4/wxs">
   <?if $(sys.BUILDARCH)="x86"?>
     <?define Win64 = "no" ?>
     <?define ProgramFilesPlatformSpecific="ProgramFilesFolder"?>

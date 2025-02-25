@@ -1,17 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
   <?include variables.wxi ?>
 
   <Fragment>
     <ComponentGroup Id="OBJECTBROWSER_CG" Directory="OBJECTBROWSER">
 
-      <Component Id="comp_ObjectBrowser" Guid="{719F4DCB-3ED3-4E6D-99FC-3FAC87742536}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_ObjectBrowser"  Vital="yes" Source="$(var.CDP4ObjectBrowser.TargetPath)" KeyPath="yes"></File>
+      <Component Id="comp_ObjectBrowser" Guid="{719F4DCB-3ED3-4E6D-99FC-3FAC87742536}" Location="local" >
+        <File Id="fil_ObjectBrowser" Vital="yes" Source="$(var.CDP4ObjectBrowser.TargetPath)" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_Manifest_CDP4ObjectBrowser" Guid="{54F6E002-F46C-4378-BD3D-C5B59F95E2E1}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_Manifest_CDP4ObjectBrowser"  Vital="yes" Source="$(var.CDP4ObjectBrowser.TargetDir)CDP4ObjectBrowser.plugin.manifest" KeyPath="yes"></File>
+      <Component Id="comp_Manifest_CDP4ObjectBrowser" Guid="{54F6E002-F46C-4378-BD3D-C5B59F95E2E1}" Location="local" >
+        <File Id="fil_Manifest_CDP4ObjectBrowser" Vital="yes" Source="$(var.CDP4ObjectBrowser.TargetDir)CDP4ObjectBrowser.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
     </ComponentGroup>

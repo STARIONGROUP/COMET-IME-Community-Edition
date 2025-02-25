@@ -1,24 +1,23 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
   <?include variables.wxi ?>
 
   <Fragment>
     <ComponentGroup Id="CDP4REPORTING_CG" Directory="REPORTING">
 
-      <Component Id="comp_CDP4Reporting_plugin" Guid="{B020E124-E9AE-4EEC-B37B-50A06CD4337D}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_CDP4Reporting_plugin"  Vital="yes" Source="$(var.CDP4Reporting.TargetPath)" KeyPath="yes"></File>
+      <Component Id="comp_CDP4Reporting_plugin" Guid="{B020E124-E9AE-4EEC-B37B-50A06CD4337D}" Location="local" >
+        <File Id="fil_CDP4Reporting_plugin" Vital="yes" Source="$(var.CDP4Reporting.TargetPath)" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_Manifest_CDP4Reporting" Guid="{BBDF2759-2A50-47B2-BE2A-2CE5A8F6BF45}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_Manifest_CDP4Reporting"  Vital="yes" Source="$(var.CDP4Reporting.TargetDir)CDP4Reporting.plugin.manifest" KeyPath="yes"></File>
+      <Component Id="comp_Manifest_CDP4Reporting" Guid="{BBDF2759-2A50-47B2-BE2A-2CE5A8F6BF45}" Location="local" >
+        <File Id="fil_Manifest_CDP4Reporting" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)CDP4Reporting.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
-	    <Component Id="comp_avalonedit_CDP4Reporting" Guid="{EDDA5952-9111-491A-9AAC-A781D60B062F}" Location="local" Win64="$(var.Win64)">
+	    <Component Id="comp_avalonedit_CDP4Reporting" Guid="{EDDA5952-9111-491A-9AAC-A781D60B062F}" Location="local" >
 		    <File Id="fil_avalonedit_CDP4Reporting" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)ICSharpCode.AvalonEdit.dll" KeyPath="yes" />
 	    </Component>
 
-	    <Component Id="comp_CDP4Reporting_sdk" Guid="{6F5ED405-6B7B-4169-ADFD-0983A9D2D599}" Location="local" Win64="$(var.Win64)">
+	    <Component Id="comp_CDP4Reporting_sdk" Guid="{6F5ED405-6B7B-4169-ADFD-0983A9D2D599}" Location="local" >
 		    <File Id="fil_CDP4Reporting_sdk" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)CDP4Reporting.dll" KeyPath="yes" />
 	    </Component>
 

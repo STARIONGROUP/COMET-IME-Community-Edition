@@ -1,5 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
   <!--Components are listed in alphabetical order using the name of the dll-->
 
@@ -13,8 +12,8 @@
       {%- assign specialChar2 = "}" -%}
 
       {%- for wxsObject in KnownAssemblies.WxsObjects -%}
-      <Component Id="{{wxsObject.ComponentId}}" Guid="{{specialChar1}}{{wxsObject.Guid}}{{specialChar2}}" Win64="$(var.Win64)">
-        <File Id="{{wxsObject.FileId}}" Vital="yes" Source="$(var.CDP4-COMET-CE.TargetDir){{wxsObject.AssemblyName}}" KeyPath="yes" Assembly=".net"></File>
+      <Component Id="{{wxsObject.ComponentId}}" Guid="{{specialChar1}}{{wxsObject.Guid}}{{specialChar2}}" >
+        <File Id="{{wxsObject.FileId}}" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir){{wxsObject.AssemblyName}}" KeyPath="yes" Assembly=".net"></File>
       </Component>
 
       {%- endfor -%}
