@@ -65,13 +65,13 @@ namespace CDP4ShellDialogs.Views
         {
             if (initializeComponent)
             {
-                this.InitializeComponent();
-
                 if (!subscribedOnce)
                 {
                     CefRuntime.SubscribeAnyCpuAssemblyResolver();
                     subscribedOnce = true;
                 }
+                
+                this.InitializeComponent();
 
                 if (Cef.IsInitialized == null)
                 {

@@ -113,6 +113,8 @@ namespace CDP4IME
         /// <returns>The assembly</returns>
         private Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
         {
+            var assemblyName = new AssemblyName(args.Name);
+
             var folderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
             if (string.IsNullOrEmpty(folderPath))
@@ -120,8 +122,7 @@ namespace CDP4IME
                 return null;
             }
 
-            var assemblyPath = Path.Combine(folderPath, new AssemblyName(args.Name).Name + ".dll");
-
+            var assemblyPath = Path.Combine(folderPath, $"{assemblyName.Name}.dll");
             return !File.Exists(assemblyPath) ? null : Assembly.LoadFrom(assemblyPath);
         }
 

@@ -744,11 +744,6 @@ namespace CDP4AddinCE
                 return null;
             }
 
-            if (assemblyName.Name == "CefSharp.Core.Runtime")
-            {
-                folderPath = Path.Combine(folderPath, System.Environment.Is64BitProcess ? "x64" : "x86");
-            }
-
             var assemblyPath = Path.Combine(folderPath, $"{assemblyName.Name}.dll");
 
             if (File.Exists(assemblyPath))
