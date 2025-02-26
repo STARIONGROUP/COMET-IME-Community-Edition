@@ -26,6 +26,8 @@
 namespace CDP4ShellDialogs.Views
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Reflection;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
@@ -67,7 +69,8 @@ namespace CDP4ShellDialogs.Views
             {
                 if (!subscribedOnce)
                 {
-                    CefRuntime.SubscribeAnyCpuAssemblyResolver();
+                    var location = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    CefRuntime.SubscribeAnyCpuAssemblyResolver(location);
                     subscribedOnce = true;
                 }
                 
