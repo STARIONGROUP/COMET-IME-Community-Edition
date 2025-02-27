@@ -31,6 +31,7 @@ namespace CDP4AddinCE
     using System.Diagnostics.CodeAnalysis;
     using System.Drawing;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Reflection;
@@ -134,9 +135,8 @@ namespace CDP4AddinCE
         public Addin()
         {
             logger.Debug("starting CDP4-COMET-CE addin");
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomainOnAssemblyResolve;
 
-            this.PreloadAssemblies();
-            this.RedirectAssemblies();
             this.SetupIdtExtensibility2Events();
 
             // Set the Theme of the application
@@ -704,6 +704,8 @@ namespace CDP4AddinCE
         /// </summary>
         private void DestructApplication()
         {
+            AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomainOnAssemblyResolve;
+
             if (this.excelApplication == null)
             {
                 return;
@@ -716,6 +718,44 @@ namespace CDP4AddinCE
             // set excel instance to null
             this.officeApplicationWrapper.Excel = null;
             this.excelApplication = null;
+        }
+
+        /// <summary>
+        /// Occures when <see cref="AppDomain.AssemblyResolve" /> event is called
+        /// </summary>
+        /// <param name="sender">The event sender</param>
+        /// <param name="args">The event args</param>
+        /// <returns>The assembly</returns>
+        private static Assembly CurrentDomainOnAssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var assemblyName = new AssemblyName(args.Name);
+
+            if (assemblyName.Name.EndsWith(".resources"))
+            {
+                return null;
+            }
+
+            logger.Debug($"requesting {assemblyName} ({args.Name})");
+
+            var folderPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+            if (string.IsNullOrEmpty(folderPath))
+            {
+                return null;
+            }
+
+            var assemblyPath = Path.Combine(folderPath, $"{assemblyName.Name}.dll");
+
+            if (File.Exists(assemblyPath))
+            {
+                logger.Debug($"Found assembly {args.Name} at location {assemblyPath}");
+            }
+            else
+            {
+                logger.Warn($"File not found for assembly {args.Name} at location {assemblyPath}");
+            }
+
+            return !File.Exists(assemblyPath) ? null : Assembly.LoadFrom(assemblyPath);
         }
 
         /// <summary>

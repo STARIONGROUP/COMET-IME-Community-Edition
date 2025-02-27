@@ -45,6 +45,8 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
 
+    using CDP4DalCommon.Authentication;
+
     using CDP4ShellDialogs.ViewModels;
 
     using CommonServiceLocator;
@@ -137,11 +139,11 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             Assert.That(viewmodel.ErrorMessage, Is.Null.Or.Empty);
 
             Assert.IsNotEmpty(viewmodel.AvailableDataSourceKinds);
-
+            viewmodel.AvailableAuthenticationScheme = new AuthenticationSchemeResponse() { Schemes = new List<AuthenticationSchemeKind>() { AuthenticationSchemeKind.Basic } };
             viewmodel.UserName = "John";
             viewmodel.Password = "Dow";
             viewmodel.Uri = "https://www.stariongroup.eu";
-
+            
             Assert.IsTrue(((ICommand)viewmodel.OkCommand).CanExecute(null));
             await viewmodel.OkCommand.Execute().Catch(Observable.Return(Unit.Default));
             Assert.NotNull(viewmodel.SelectedDataSourceKind);
@@ -200,7 +202,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             viewmodel.SelectedDataSourceKind = daltype0;
             viewmodel.SelectedUri = viewmodel.AvailableUris.Last();
-            Assert.IsTrue(((ICommand)viewmodel.OkCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)viewmodel.OkCommand).CanExecute(null));
             Assert.IsTrue(viewmodel.AvailableUris.Count == 2);
 
             viewmodel.SelectedDataSourceKind = daltype1;

@@ -1,41 +1,45 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
   
   <?include variables.wxi ?>
 
   <Fragment>
-    <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="$(var.ProgramFilesPlatformSpecific)">
         <Directory Id="STARIONFOLDER" Name="STARION">
           <Directory Id="CDP4INSTALLFOLDER" Name="CDP4-COMET-CE">
             <Directory Id="BIN" Name="Bin">
+              <Directory Id="RUNTIME64" Name="x64">
+                <Directory Id="LOCALE64" Name="locales" />
+              </Directory>
+              <Directory Id="RUNTIME32" Name="x86" >
+                <Directory Id="LOCALE32" Name="locales" />
+              </Directory>
               <Directory Id="PLUGINS" Name="plugins">
-                <Directory Id="BASICRDL" Name="CDP4BasicRdl"/>
-                <Directory Id="BUDGET" Name="CDP4Budget"/>
-                <Directory Id="BUILTINRULES" Name="CDP4BuiltInRules"/>
-                <Directory Id="EXTENDEDRDL" Name="CDP4ExtendedRdl"/>
-                <Directory Id="ENGINEERINGMODEL" Name="CDP4EngineeringModel"/>
-                <Directory Id="LOGINFO" Name="CDP4LogInfo"/>
-                <Directory Id="OBJECTBROWSER" Name="CDP4ObjectBrowser"/>
-                <Directory Id="REQUIREMENTS" Name="CDP4Requirements"/>
-                <Directory Id="DASHBOARD" Name="CDP4Dashboard"/>
-                <Directory Id="CROSSVIEWEDITOR" Name="CDP4CrossViewEditor"/>
-                <Directory Id="REFERENCEDATAMAPPER" Name="CDP4ReferenceDataMapper"/>
-                <Directory Id="GRAPHER" Name="CDP4Grapher"/>
-                <Directory Id="SITEDIRECTORY" Name="CDP4SiteDirectory"/>
-                <Directory Id="PRODUCTTREE" Name="CDP4ProductTree"/>                
-                <Directory Id="RELATIONSHIPEDITOR" Name="CDP4RelationshipEditor"/>
-                <Directory Id="RELATIONSHIPMATRIX" Name="CDP4RelationshipMatrix"/>
-                <Directory Id="NOTES" Name="CDP4Notes"/>
-                <Directory Id="ANNOTATIONS" Name="CDP4ANNOTATIONS"/>
-                <Directory Id="STAKEHOLDERVALUEMAPPER" Name="CDP4StakeholderValueMapper"/>                
-                <Directory Id="PARAMETERSHEETGENERATOR" Name="CDP4ParameterSheetGenerator"/>
-                <Directory Id="SCRIPTING" Name="CDP4Scripting"/>
-                <Directory Id="CATEGORIZEDPARAMETERSHEETGENERATOR" Name="CDP4CategorizedParameterSheetGenerator"/>
-                <Directory Id="WSPDAL" Name ="CDP4WspDal"/>
-                <Directory Id="CDP4SERVICESDAL" Name ="CDP4ServicesDal"/>                
-                <Directory Id="JSONFILEDAL" Name ="CDP4JsonFileDal"/>
-                <Directory Id="REPORTING" Name ="CDP4Reporting"/>
+                <Directory Id="BASICRDL" Name="CDP4BasicRdl" />
+                <Directory Id="BUDGET" Name="CDP4Budget" />
+                <Directory Id="BUILTINRULES" Name="CDP4BuiltInRules" />
+                <Directory Id="EXTENDEDRDL" Name="CDP4ExtendedRdl" />
+                <Directory Id="ENGINEERINGMODEL" Name="CDP4EngineeringModel" />
+                <Directory Id="LOGINFO" Name="CDP4LogInfo" />
+                <Directory Id="OBJECTBROWSER" Name="CDP4ObjectBrowser" />
+                <Directory Id="REQUIREMENTS" Name="CDP4Requirements" />
+                <Directory Id="DASHBOARD" Name="CDP4Dashboard" />
+                <Directory Id="CROSSVIEWEDITOR" Name="CDP4CrossViewEditor" />
+                <Directory Id="REFERENCEDATAMAPPER" Name="CDP4ReferenceDataMapper" />
+                <Directory Id="GRAPHER" Name="CDP4Grapher" />
+                <Directory Id="SITEDIRECTORY" Name="CDP4SiteDirectory" />
+                <Directory Id="PRODUCTTREE" Name="CDP4ProductTree" />                
+                <Directory Id="RELATIONSHIPEDITOR" Name="CDP4RelationshipEditor" />
+                <Directory Id="RELATIONSHIPMATRIX" Name="CDP4RelationshipMatrix" />
+                <Directory Id="NOTES" Name="CDP4Notes" />
+                <Directory Id="ANNOTATIONS" Name="CDP4ANNOTATIONS" />
+                <Directory Id="STAKEHOLDERVALUEMAPPER" Name="CDP4StakeholderValueMapper" />                
+                <Directory Id="PARAMETERSHEETGENERATOR" Name="CDP4ParameterSheetGenerator" />
+                <Directory Id="SCRIPTING" Name="CDP4Scripting" />
+                <Directory Id="CATEGORIZEDPARAMETERSHEETGENERATOR" Name="CDP4CategorizedParameterSheetGenerator" />
+                <Directory Id="WSPDAL" Name="CDP4WspDal" />
+                <Directory Id="CDP4SERVICESDAL" Name="CDP4ServicesDal" />                
+                <Directory Id="JSONFILEDAL" Name="CDP4JsonFileDal" />
+                <Directory Id="REPORTING" Name="CDP4Reporting" />
               </Directory>
               <Directory Id="RESOURCES" Name="Resources">
                 <Directory Id="IMAGES" Name="Images" />
@@ -47,22 +51,21 @@
         </Directory>
       </Directory>
 
-      <Directory Id="DesktopFolder"/>
-      <Directory Id="ProgramMenuFolder">
+      <StandardDirectory Id="DesktopFolder" />
+      <StandardDirectory Id="ProgramMenuFolder">
         <Directory Id="ApplicationProgramsSTARIONFolder" Name="STARION">
-          <Component Id="ProgramMenuSTARIONDir" Guid="{04558BC1-0B94-4DD7-A4D1-DF354EAE015D}" >
-            <RemoveFolder Id="_04558BC1" On="uninstall"/>
-            <RegistryValue Root="HKCU" Key="Software\STARION\STARIONDIR" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+          <Component Id="ProgramMenuSTARIONDir" Guid="{04558BC1-0B94-4DD7-A4D1-DF354EAE015D}">
+            <RemoveFolder Id="_04558BC1" On="uninstall" />
+            <RegistryValue Root="HKCU" Key="Software\STARION\STARIONDIR" Name="installed" Type="integer" Value="1" KeyPath="yes" />
           </Component>
           
           <Directory Id="ApplicationProgramsFolder" Name="CDP4-COMET-CE">
-            <Component Id="ProgramMenuCDP4Dir" Guid="{7E4C4699-5B84-469F-B404-3959844292B5}" >
-              <RemoveFolder Id="_7E4C4699" On="uninstall"/>
-              <RegistryValue Root="HKCU" Key="Software\STARION\CDP4DIR" Name="installed" Type="integer" Value="1" KeyPath="yes"/>
+            <Component Id="ProgramMenuCDP4Dir" Guid="{7E4C4699-5B84-469F-B404-3959844292B5}">
+              <RemoveFolder Id="_7E4C4699" On="uninstall" />
+              <RegistryValue Root="HKCU" Key="Software\STARION\CDP4DIR" Name="installed" Type="integer" Value="1" KeyPath="yes" />
             </Component>  
           </Directory>
         </Directory>
-      </Directory>
-    </Directory>
-  </Fragment>
+      </StandardDirectory>
+    </Fragment>
 </Wix>

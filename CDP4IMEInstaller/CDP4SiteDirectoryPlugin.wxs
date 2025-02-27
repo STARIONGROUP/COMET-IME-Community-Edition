@@ -1,17 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
   <?include variables.wxi ?>
 
   <Fragment>
     <ComponentGroup Id="SITEDIRECTORY_CG" Directory="SITEDIRECTORY">
 
-      <Component Id="comp_SiteDirectory" Guid="{AD413BF5-39B6-47F2-A61D-D3C7F7A673BA}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_SiteDirectory"  Vital="yes" Source="$(var.CDP4SiteDirectory.TargetPath)" KeyPath="yes"></File>
+      <Component Id="comp_SiteDirectory" Guid="{AD413BF5-39B6-47F2-A61D-D3C7F7A673BA}" Location="local" >
+        <File Id="fil_SiteDirectory" Vital="yes" Source="$(var.CDP4SiteDirectory.TargetPath)" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_Manifest_CDP4SiteDirectory" Guid="{550CCEC3-E0B2-4D50-BA4E-63F5454593F6}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_Manifest_CDP4SiteDirectory"  Vital="yes" Source="$(var.CDP4SiteDirectory.TargetDir)CDP4SiteDirectory.plugin.manifest" KeyPath="yes"></File>
+      <Component Id="comp_Manifest_CDP4SiteDirectory" Guid="{550CCEC3-E0B2-4D50-BA4E-63F5454593F6}" Location="local" >
+        <File Id="fil_Manifest_CDP4SiteDirectory" Vital="yes" Source="$(var.CDP4SiteDirectory.TargetDir)CDP4SiteDirectory.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
     </ComponentGroup>

@@ -1,17 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
   <?include variables.wxi ?>
 
   <Fragment>
     <ComponentGroup Id="JSONFILEDAL_CG" Directory="JSONFILEDAL">
       
-      <Component Id="comp_CDP4JsonFileDal" Guid="{F334064B-9494-4CC2-9FC8-A3FC999C038C}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_CDP4JsonFileDal"  Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)CDP4JsonFileDal.dll" KeyPath="yes"></File>
+      <Component Id="comp_CDP4JsonFileDal" Guid="{F334064B-9494-4CC2-9FC8-A3FC999C038C}" Location="local" >
+        <File Id="fil_CDP4JsonFileDal" Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)CDP4JsonFileDal.dll" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_Manifest_CDP4JsonFileDal" Guid="{B392D068-7870-427E-A186-468731AAF7CC}" Location="local" Win64="$(var.Win64)">
-        <File Id="fil_Manifest_CDP4JsonFileDal"  Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)CDP4JsonFileDal.plugin.manifest" KeyPath="yes"></File>
+      <Component Id="comp_Manifest_CDP4JsonFileDal" Guid="{B392D068-7870-427E-A186-468731AAF7CC}" Location="local" >
+        <File Id="fil_Manifest_CDP4JsonFileDal" Vital="yes" Source="$(var.CDP4JsonFileDal.TargetDir)CDP4JsonFileDal.plugin.manifest" KeyPath="yes"></File>
       </Component>
 
     </ComponentGroup>

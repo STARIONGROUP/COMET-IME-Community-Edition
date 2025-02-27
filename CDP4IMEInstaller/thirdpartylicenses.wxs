@@ -1,180 +1,179 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
   <?include variables.wxi ?>
 
 	<Fragment>
     <ComponentGroup Id="THIRDPARTYLICENSES" Directory="LICENSE">
 
-      <Component Id="comp_license_AvalonEdit" Guid="{570E6062-84F8-47E9-AAEE-A59344FB9CB6}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_AvalonEdit" Guid="{570E6062-84F8-47E9-AAEE-A59344FB9CB6}" Location="local" >
         <File Id="fil_license_AvalonEdit" Vital="yes" Source="ThirdPartyLicense\AvalonEdit.txt" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_license_CastleCore" Guid="{FB517D4F-9D25-40F8-993C-06D69A612777}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_CastleCore" Guid="{FB517D4F-9D25-40F8-993C-06D69A612777}" Location="local" >
         <File Id="fil_license_CastleCore" Vital="yes" Source="ThirdPartyLicense\CastleCore.txt" KeyPath="yes"></File>
       </Component>
 
-	  <Component Id="comp_license_CDP4Common_CE" Guid="{9216BF8C-78A1-417D-8FFF-805CA2EE43F3}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_CDP4Common_CE" Guid="{9216BF8C-78A1-417D-8FFF-805CA2EE43F3}" Location="local" >
 		<File Id="fil_license_CDP4Common_CE" Vital="yes" Source="ThirdPartyLicense\CDP4Common-CE.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_CDP4Dal_CE" Guid="{31C55927-DBD2-4419-B712-F057FE8EBBF7}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_CDP4Dal_CE" Guid="{31C55927-DBD2-4419-B712-F057FE8EBBF7}" Location="local" >
 		<File Id="fil_license_CDP4Dal_CE" Vital="yes" Source="ThirdPartyLicense\CDP4Dal-CE.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_CDP4JsonFileDal_CE" Guid="{517EF7FB-6924-45EF-BEF8-431B0C8F6459}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_CDP4JsonFileDal_CE" Guid="{517EF7FB-6924-45EF-BEF8-431B0C8F6459}" Location="local" >
 		<File Id="fil_license_CDP4JsonFileDal_CE" Vital="yes" Source="ThirdPartyLicense\CDP4JsonFileDal-CE.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_CDP4JsonSerializer_CE" Guid="{8AB977E1-7E6B-45A8-BFA2-E934D9641A86}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_CDP4JsonSerializer_CE" Guid="{8AB977E1-7E6B-45A8-BFA2-E934D9641A86}" Location="local" >
 		<File Id="fil_license_CDP4JsonSerializer_CE" Vital="yes" Source="ThirdPartyLicense\CDP4JsonSerializer-CE.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_CDP4Reporting_CE" Guid="{1EAB3D2D-9178-483A-96D6-9453CE5619FA}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_CDP4Reporting_CE" Guid="{1EAB3D2D-9178-483A-96D6-9453CE5619FA}" Location="local" >
 		<File Id="fil_license_CDP4Reporting_CE" Vital="yes" Source="ThirdPartyLicense\CDP4Reporting-CE.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_CDP4RequirementsVerification_CE" Guid="{BDA5383C-7DD6-4C69-B0A9-D4A3330660FE}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_CDP4RequirementsVerification_CE" Guid="{BDA5383C-7DD6-4C69-B0A9-D4A3330660FE}" Location="local" >
 		<File Id="fil_license_CDP4RequirementsVerification_CE" Vital="yes" Source="ThirdPartyLicense\CDP4RequirementsVerification-CE.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_CDP4ServicesDal_CE" Guid="{C934670E-D7B9-4C5E-8743-42EC4A5EFC87}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_CDP4ServicesDal_CE" Guid="{C934670E-D7B9-4C5E-8743-42EC4A5EFC87}" Location="local" >
 		<File Id="fil_license_CDP4ServicesDal_CE" Vital="yes" Source="ThirdPartyLicense\CDP4ServicesDal-CE.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_CDP4WspDal_CE" Guid="{58AF4B27-31A9-45F2-AE84-41671CE36DC3}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_CDP4WspDal_CE" Guid="{58AF4B27-31A9-45F2-AE84-41671CE36DC3}" Location="local" >
 		<File Id="fil_license_CDP4WspDal_CE" Vital="yes" Source="ThirdPartyLicense\CDP4WspDal-CE.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_ClosedXml" Guid="{B9FE98CC-CD82-4BBF-856B-91DE433CAF19}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_ClosedXml" Guid="{B9FE98CC-CD82-4BBF-856B-91DE433CAF19}" Location="local" >
 		<File Id="fil_license_ClosedXml" Vital="yes" Source="ThirdPartyLicense\ClosedXML.txt" KeyPath="yes"></File>
 	  </Component>
 
-      <Component Id="comp_license_CommonServiceLocator" Guid="{53ED95A6-B511-44FF-AD7C-C6276653CC9A}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_CommonServiceLocator" Guid="{53ED95A6-B511-44FF-AD7C-C6276653CC9A}" Location="local" >
         <File Id="fil_license_CommonServiceLocator" Vital="yes" Source="ThirdPartyLicense\CommonServiceLocator.txt" KeyPath="yes"></File>
       </Component>
       
-      <Component Id="comp_license_CsvHelper" Guid="{D0FE295F-4166-411D-8ACE-D0AD91ACAD72}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_CsvHelper" Guid="{D0FE295F-4166-411D-8ACE-D0AD91ACAD72}" Location="local" >
         <File Id="fil_license_CsvHelper" Vital="yes" Source="ThirdPartyLicense\CsvHelper.txt" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_license_dotliquid" Guid="{2D19A3AF-8E09-45F6-A42B-D055CDD3B6E8}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_dotliquid" Guid="{2D19A3AF-8E09-45F6-A42B-D055CDD3B6E8}" Location="local" >
         <File Id="fil_license_dotliquid" Vital="yes" Source="ThirdPartyLicense\dotliquid.txt" KeyPath="yes"></File>
       </Component>
       
-      <Component Id="comp_license_SharpZipLib" Guid="{8B371FB5-BA3A-49FF-B612-EA1CF7A94D3E}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_SharpZipLib" Guid="{8B371FB5-BA3A-49FF-B612-EA1CF7A94D3E}" Location="local" >
         <File Id="fil_license_SharpZipLib" Vital="yes" Source="ThirdPartyLicense\SharpZipLib.txt" KeyPath="yes"></File>
       </Component>
 
-	  <Component Id="comp_license_DynamicData" Guid="{1C5AE12D-1831-4EE3-AA76-6EF0A6CABBEA}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_DynamicData" Guid="{1C5AE12D-1831-4EE3-AA76-6EF0A6CABBEA}" Location="local" >
 		<File Id="fil_license_DynamicData" Vital="yes" Source="ThirdPartyLicense\DynamicData.txt" KeyPath="yes"></File>
 	  </Component>
 
-      <Component Id="comp_license_DynamicLanguageRuntime" Guid="{656EB66E-847A-41A7-8802-9707C71A767E}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_DynamicLanguageRuntime" Guid="{656EB66E-847A-41A7-8802-9707C71A767E}" Location="local" >
         <File Id="fil_license_DynamicLanguageRuntime" Vital="yes" Source="ThirdPartyLicense\DynamicLanguageRuntime.txt" KeyPath="yes"></File>
       </Component>
       
-      <Component Id="comp_license_Hardcodet_Wpf_TaskbarNotification" Guid="{DB9EFD5A-CDD1-48E7-8D36-E38A0F7AB60E}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_Hardcodet_Wpf_TaskbarNotification" Guid="{DB9EFD5A-CDD1-48E7-8D36-E38A0F7AB60E}" Location="local" >
         <File Id="fil_license_Hardcodet_Wpf_TaskbarNotification" Vital="yes" Source="ThirdPartyLicense\Hardcodet.Wpf.TaskbarNotification.txt" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_license_IronPython" Guid="{EA96D593-72DE-4557-A3F4-4B621927A51F}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_IronPython" Guid="{EA96D593-72DE-4557-A3F4-4B621927A51F}" Location="local" >
         <File Id="fil_license_IronPython" Vital="yes" Source="ThirdPartyLicense\IronPython.txt" KeyPath="yes"></File>
       </Component>
 
-	  <Component Id="comp_license_Markdown_Xaml" Guid="{45EB0CA6-EA59-4519-8DD3-445ABA621FDC}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_Markdown_Xaml" Guid="{45EB0CA6-EA59-4519-8DD3-445ABA621FDC}" Location="local" >
 		<File Id="fil_license_Markdown_Xaml" Vital="yes" Source="ThirdPartyLicense\Markdown.Xaml.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_Microsoft_AspNet_WebApi_Client" Guid="{BF0816AE-EACF-46F6-9CA4-8A7348BA271E}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_Microsoft_AspNet_WebApi_Client" Guid="{BF0816AE-EACF-46F6-9CA4-8A7348BA271E}" Location="local" >
 		<File Id="fil_license_Microsoft_AspNet_WebApi_Client" Vital="yes" Source="ThirdPartyLicense\Microsoft.AspNet.WebApi.Client.txt" KeyPath="yes"></File>
 	  </Component>
 		
-	  <Component Id="comp_license_Microsoft_Bcl_AsyncInterfaces" Guid="{7516F3FC-2AD8-4B66-8CFB-768A64D56B13}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_Microsoft_Bcl_AsyncInterfaces" Guid="{7516F3FC-2AD8-4B66-8CFB-768A64D56B13}" Location="local" >
 		<File Id="fil_license_Microsoft_Bcl_AsyncInterfaces" Vital="yes" Source="ThirdPartyLicense\Microsoft.Bcl.AsyncInterfaces.txt" KeyPath="yes"></File>
 	  </Component>
 		
-	  <Component Id="comp_license_Microsoft_Bcl_HashCode" Guid="{F3760361-6B5F-4F34-83D2-94A25773C2EC}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_Microsoft_Bcl_HashCode" Guid="{F3760361-6B5F-4F34-83D2-94A25773C2EC}" Location="local" >
 		<File Id="fil_license_Microsoft_Bcl_HashCode" Vital="yes" Source="ThirdPartyLicense\Microsoft.Bcl.HashCode.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_Microsoft_CSharp" Guid="{3D66F95A-A7FF-4C93-B79C-11ABFE096999}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_Microsoft_CSharp" Guid="{3D66F95A-A7FF-4C93-B79C-11ABFE096999}" Location="local" >
 		<File Id="fil_license_Microsoft_CSharp" Vital="yes" Source="ThirdPartyLicense\Microsoft.CSharp.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_Microsoft_Net_Extensions" Guid="{F57EB00B-064E-454F-8636-45AAE1D2F243}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_Microsoft_Net_Extensions" Guid="{F57EB00B-064E-454F-8636-45AAE1D2F243}" Location="local" >
 		<File Id="fil_license_Microsoft_Net_Extensions" Vital="yes" Source="ThirdPartyLicense\Microsoft.Net.Extensions.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_Microsoft_Xaml_Behaviors" Guid="{89E51110-3BA3-41E2-B1CB-464AB1729DAC}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_Microsoft_Xaml_Behaviors" Guid="{89E51110-3BA3-41E2-B1CB-464AB1729DAC}" Location="local" >
 		<File Id="fil_license_Microsoft_Xaml_Behaviors" Vital="yes" Source="ThirdPartyLicense\Microsoft.Xaml.Behaviors.Wpf.txt" KeyPath="yes"></File>
 	  </Component>
 
-      <Component Id="comp_license_NetOfficeFw" Guid="{C5467549-76C0-4BA2-813A-EE2F3E56CF95}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_NetOfficeFw" Guid="{C5467549-76C0-4BA2-813A-EE2F3E56CF95}" Location="local" >
         <File Id="fil_license_NetOfficeFw" Vital="yes" Source="ThirdPartyLicense\NetOfficeFw.txt" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_license_Newtonsoft_Json" Guid="{A7632998-F4FF-4BF8-A4A7-D98E66898832}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_Newtonsoft_Json" Guid="{A7632998-F4FF-4BF8-A4A7-D98E66898832}" Location="local" >
         <File Id="fil_license_Newtonsoft_Json" Vital="yes" Source="ThirdPartyLicense\Newtonsoft.Json.txt" KeyPath="yes"></File>
       </Component>
 
-	  <Component Id="comp_license_NLog_Extensions" Guid="{AB059561-736A-4D71-B4E0-06A7C14C6008}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_NLog_Extensions" Guid="{AB059561-736A-4D71-B4E0-06A7C14C6008}" Location="local" >
 		<File Id="fil_license_NLog_Extensions" Vital="yes" Source="ThirdPartyLicense\NLog.Extensions.Logging.txt" KeyPath="yes"></File>
 	  </Component>
 
-      <Component Id="comp_license_NLog" Guid="{FDCB34D8-0F89-494C-BFD5-1D8978CA5A3A}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_NLog" Guid="{FDCB34D8-0F89-494C-BFD5-1D8978CA5A3A}" Location="local" >
         <File Id="fil_license_NLog" Vital="yes" Source="ThirdPartyLicense\NLog.txt" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_license_ReactiveUI" Guid="{A7FEA9D3-97BA-4191-8252-FC802950A4DE}" Location="local" Win64="$(var.Win64)">
+      <Component Id="comp_license_ReactiveUI" Guid="{A7FEA9D3-97BA-4191-8252-FC802950A4DE}" Location="local" >
         <File Id="fil_license_ReactiveUI" Vital="yes" Source="ThirdPartyLicense\ReactiveUI.txt" KeyPath="yes"></File>
       </Component>
 
-	  <Component Id="comp_license_ReactiveUI_WPF" Guid="{A2CBA98B-A85F-46FE-B148-065386C1C992}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_ReactiveUI_WPF" Guid="{A2CBA98B-A85F-46FE-B148-065386C1C992}" Location="local" >
 		<File Id="fil_license_ReactiveUI_WPF" Vital="yes" Source="ThirdPartyLicense\ReactiveUI.WPF.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_ReqIFSharp" Guid="{B580827A-926D-4102-8E68-DA695B1A1E26}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_ReqIFSharp" Guid="{B580827A-926D-4102-8E68-DA695B1A1E26}" Location="local" >
 		<File Id="fil_license_ReqIFSharp" Vital="yes" Source="ThirdPartyLicense\ReqIFSharp.txt" KeyPath="yes"></File>
 	  </Component>
 
-    <Component Id="comp_license_Splat" Guid="{6C702C45-B36D-4105-92FC-E1FF3B03A911}" Location="local" Win64="$(var.Win64)">
+    <Component Id="comp_license_Splat" Guid="{6C702C45-B36D-4105-92FC-E1FF3B03A911}" Location="local" >
       <File Id="fil_license_Splat" Vital="yes" Source="ThirdPartyLicense\Splat.txt" KeyPath="yes"></File>
     </Component>
 
-	  <Component Id="comp_license_System_Buffers" Guid="{6CC659BC-8B5A-4F6E-9995-1D156942061B}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_System_Buffers" Guid="{6CC659BC-8B5A-4F6E-9995-1D156942061B}" Location="local" >
 		<File Id="fil_license_System_Buffers" Vital="yes" Source="ThirdPartyLicense\System.Buffers.txt" KeyPath="yes"></File>
 	  </Component>
 		
-	  <Component Id="comp_license_System_ComponentModel_Composition" Guid="{407E1BF5-1C05-481C-A2B8-1337182AAE8B}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_System_ComponentModel_Composition" Guid="{407E1BF5-1C05-481C-A2B8-1337182AAE8B}" Location="local" >
 		<File Id="fil_license_System_ComponentModel_Composition" Vital="yes" Source="ThirdPartyLicense\System.ComponentModel.Composition.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_System_Memory" Guid="{72445D90-D78D-40A9-8D97-E30548F33715}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_System_Memory" Guid="{72445D90-D78D-40A9-8D97-E30548F33715}" Location="local" >
 		<File Id="fil_license_System_Memory" Vital="yes" Source="ThirdPartyLicense\System.Memory.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_System_Numerics_Vectors" Guid="{02DBF790-01B0-4273-8893-2FC6EE394239}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_System_Numerics_Vectors" Guid="{02DBF790-01B0-4273-8893-2FC6EE394239}" Location="local" >
 		<File Id="fil_license_System_Numerics_Vectors" Vital="yes" Source="ThirdPartyLicense\System.Numerics.Vectors.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_System_Reactive" Guid="{4D0AC2E3-9BE9-4982-B3C8-E44C39945B9A}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_System_Reactive" Guid="{4D0AC2E3-9BE9-4982-B3C8-E44C39945B9A}" Location="local" >
 		<File Id="fil_license_System_Reactive" Vital="yes" Source="ThirdPartyLicense\System.Reactive.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_System_Runtime_CompilerServices_Unsafe" Guid="{4C609DE0-BEA5-4E31-9D40-45BFFA08B927}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_System_Runtime_CompilerServices_Unsafe" Guid="{4C609DE0-BEA5-4E31-9D40-45BFFA08B927}" Location="local" >
 		<File Id="fil_license_System_Runtime_CompilerServices_Unsafe" Vital="yes" Source="ThirdPartyLicense\System.Runtime.CompilerServices.Unsafe.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_System_Threading_Tasks_Extensions" Guid="{B1E571CD-A77F-4983-9528-AC4016215C2F}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_System_Threading_Tasks_Extensions" Guid="{B1E571CD-A77F-4983-9528-AC4016215C2F}" Location="local" >
 		<File Id="fil_license_System_Threading_Tasks_Extensions" Vital="yes" Source="ThirdPartyLicense\System.Threading.Tasks.Extensions.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_System_ValueTuple" Guid="{50ADFA0C-4753-46DE-852A-596BC87DD7F8}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_System_ValueTuple" Guid="{50ADFA0C-4753-46DE-852A-596BC87DD7F8}" Location="local" >
 		<File Id="fil_license_System_ValueTuple" Vital="yes" Source="ThirdPartyLicense\System.ValueTuple.txt" KeyPath="yes"></File>
 	  </Component>
 
-	  <Component Id="comp_license_System_Xml_XmlSerializer" Guid="{0C741452-C104-4353-B257-F98E3CE844B2}" Location="local" Win64="$(var.Win64)">
+	  <Component Id="comp_license_System_Xml_XmlSerializer" Guid="{0C741452-C104-4353-B257-F98E3CE844B2}" Location="local" >
 		<File Id="fil_license_System_Xml_XmlSerializer" Vital="yes" Source="ThirdPartyLicense\System.Xml.XmlSerializer.txt" KeyPath="yes"></File>
 	  </Component>
 
