@@ -33,6 +33,6 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Gets the Thing Status of this row.
         /// </summary>
-        ThingStatus ThingStatus { get; }
+        ThingStatus ThingStatus { get; set; }
     }
 }

@@ -251,7 +251,7 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         protected override void UpdateThingStatus()
         {
-            this.ThingStatus = new ThingStatus(this.Thing);
+            ThingStatus.SetOrUpdateThingStatus(this, this.Thing);
         }
 
         /// <summary>
@@ -361,7 +361,7 @@ namespace CDP4ProductTree.ViewModels
         /// </summary>
         protected void UpdateProperties()
         {
-            this.ThingStatus = new ThingStatus(this.Thing);
+            ThingStatus.SetOrUpdateThingStatus(this, this.Thing);
             this.Value = null;
             this.IsPublishable = false;
             this.UpdateOwnerNameAndShortName();

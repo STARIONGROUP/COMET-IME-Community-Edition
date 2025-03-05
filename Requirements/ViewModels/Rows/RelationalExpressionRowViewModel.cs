@@ -209,7 +209,7 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         protected override void UpdateThingStatus()
         {
-            this.ThingStatus = new ThingStatus(this.Thing);
+            ThingStatus.SetOrUpdateThingStatus(this, this.Thing);
             this.UpdateTooltip();
             this.ResetRequirementStateOfComplianceTree();
         }
