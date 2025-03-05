@@ -129,9 +129,9 @@ namespace CDP4RelationshipMatrix.ViewModels
         /// <param name="sourceX">The second type of the source/target of the <see cref="BinaryRelationship"/></param>
         public void PopulatePossibleRules(ClassKind? sourceY, ClassKind? sourceX)
         {
-            this.PossibleRules.Clear();
             if (!sourceY.HasValue || !sourceX.HasValue)
             {
+                this.PossibleRules.Clear();
                 return;
             }
 
@@ -142,8 +142,23 @@ namespace CDP4RelationshipMatrix.ViewModels
                     && (x.TargetCategory.PermissibleClass.Contains(sourceY.Value) ||
                         x.TargetCategory.PermissibleClass.Contains(sourceX.Value))).ToList();
 
-            this.PossibleRules.AddRange(rules.OrderBy(x => x.Name));
-            this.SelectedRule = this.PossibleRules.FirstOrDefault(x => x == this.SelectedRule);
+            var newPossibleRules = rules.Except(this.PossibleRules).ToList();
+
+            var oldPossibleRules
+                = this.PossibleRules.Except(rules).ToList();
+            
+            if (oldPossibleRules.Any() || newPossibleRules.Any())
+            {
+                this.PossibleRules.Clear();
+                this.PossibleRules.AddRange(rules.OrderBy(x => x.Name));
+            }
+
+            var newSelectedRule = this.PossibleRules.FirstOrDefault(x => x == this.SelectedRule);
+
+            if (this.SelectedRule != newSelectedRule)
+            {
+                this.SelectedRule = newSelectedRule;
+            }
         }
 
         /// <summary>

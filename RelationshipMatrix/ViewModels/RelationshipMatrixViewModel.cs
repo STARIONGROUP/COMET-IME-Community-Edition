@@ -189,6 +189,11 @@ namespace CDP4RelationshipMatrix.ViewModels
         private static Logger logger = LogManager.GetCurrentClassLogger();
 
         /// <summary>
+        /// perform the final rebuild after all messagebus changes were consumed
+        /// </summary>
+        private bool finalRefreshRebuildIsActive { get; set; }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RelationshipMatrixViewModel" /> class
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration" /></param>
@@ -245,8 +250,41 @@ namespace CDP4RelationshipMatrix.ViewModels
             this.CurrentIteration = this.iterationSetup.IterationNumber;
             this.ActiveParticipant = this.modelSetup.Participant.Single(x => x.Person == this.Session.ActivePerson);
 
+            this.Disposables.Add(
+                this.WhenAnyValue(x => x.HasUpdateStarted)
+                    .Subscribe(this.ToggleSuppressRebuild));
+
             this.AddSubscriptions();
             this.UpdateProperties();
+        }
+
+        /// <summary>
+        /// Toggles the suppressed value
+        /// <see cref="finalRefreshRebuildIsActive"/> is used to make sure that rebuild the matrix
+        /// is only performed once after data updates are finished
+        /// </summary>
+        /// <param name="shouldSuppress"></param>
+        private void ToggleSuppressRebuild(bool shouldSuppress)
+        {
+            if (shouldSuppress)
+            {
+                if (!this.finalRefreshRebuildIsActive)
+                {
+                    this.SuppressRebuild();
+                }
+            }
+            else
+            {
+                //Force rebuild
+                if (!this.finalRefreshRebuildIsActive)
+                {
+                    this.finalRefreshRebuildIsActive = true;
+                    this.HasUpdateStarted = true;
+                    this.EnableRebuild(true);
+                    this.HasUpdateStarted = false;
+                    this.finalRefreshRebuildIsActive = false;
+                }
+            }
         }
 
         /// <summary>
