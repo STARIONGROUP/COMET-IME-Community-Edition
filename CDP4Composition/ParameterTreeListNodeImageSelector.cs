@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTreeListNodeImageSelector.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
@@ -27,7 +27,6 @@ namespace CDP4Composition
 {
     using System;
     using System.Windows.Media;
-    using System.Windows.Media.Imaging;
 
     using CDP4Common.CommonData;
     using CDP4Common.Helpers;

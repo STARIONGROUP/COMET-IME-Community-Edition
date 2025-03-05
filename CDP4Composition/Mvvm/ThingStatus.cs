@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ThingStatus.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft, Mihail Militaru
 //            Nathanael Smiechowski, Kamil Wojnowski
@@ -27,18 +27,36 @@
 namespace CDP4Composition.Mvvm
 {
     using System.Linq;
+
     using CDP4Common.CommonData;
+
+    using ReactiveUI;
 
     /// <summary>
     /// A class that gives information on the status of a <see cref="Thing"/>
     /// </summary>
-    public class ThingStatus
+    public class ThingStatus : ReactiveObject
     {
+        /// <summary>
+        /// Backing field for <see cref="IsLocked"/>
+        /// </summary>
+        private bool isLocked = false;
+
+        /// <summary>
+        /// Backing field for <see cref="IsHidden"/>
+        /// </summary>
+        private bool isHidden = false;
+
+        /// <summary>
+        /// Backing field for <see cref="IsFavorite"/>
+        /// </summary>
+        private bool isFavorite = false;
+
         /// <summary>
         /// Initializes a new instace of the <see cref="ThingStatus"/> class
         /// </summary>
         /// <param name="thing">The <see cref="Thing"/></param>
-        public ThingStatus(Thing thing)
+        private ThingStatus(Thing thing)
         {
             this.Thing = thing;
             this.HasError = thing.ValidationErrors.Any();
@@ -46,33 +64,73 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// Updates the status of the <see cref="ThingStatus"/>
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        public static ThingStatus CreateNewThingStatus(Thing thing)
+        {
+            return new ThingStatus(thing);
+        }
+
+        /// <summary>
+        /// Updates the status of the <see cref="ThingStatus"/>
+        /// </summary>
+        /// <param name="viewModel">The viewmodel where the ThingStatus should be present on</param>
+        /// <param name="thing">The <see cref="Thing"/></param>
+        public static void SetOrUpdateThingStatus(IHaveThingStatus viewModel, Thing thing)
+        {
+            if (viewModel.ThingStatus == null)
+            {
+                viewModel.ThingStatus = CreateNewThingStatus(thing);
+            }
+            else
+            {
+                viewModel.ThingStatus.Thing = thing;
+                viewModel.ThingStatus.HasError = thing.ValidationErrors.Any();
+                viewModel.ThingStatus.HasRelationship = thing.HasRelationship;
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="Thing"/>
         /// </summary>
-        public Thing Thing { get; }
+        public Thing Thing { get; private set; }
 
         /// <summary>
         /// Asserts whether the <see cref="Thing"/> has errors
         /// </summary>
-        public bool HasError { get; }
+        public bool HasError { get; private set; }
 
         /// <summary>
         /// Gets a value indicating whether the thing has associated relationships
         /// </summary>
-        public bool HasRelationship { get; }
+        public bool HasRelationship { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the thing is marked as a user's favorite
         /// </summary>
-        public bool IsFavorite { get; set; } = false;
+        public bool IsFavorite
+        {
+            get => this.isFavorite;
+            set => this.RaiseAndSetIfChanged(ref this.isFavorite, value);
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the thing is marked as locked
         /// </summary>
-        public bool IsLocked { get; set; } = false;
+        public bool IsLocked
+        {
+            get => this.isLocked;
+            set => this.RaiseAndSetIfChanged(ref this.isLocked, value);
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the thing is marked as hidden
         /// </summary>
-        public bool IsHidden { get; set; } = false;
+        public bool IsHidden
+        {
+            get => this.isHidden;
+            set => this.RaiseAndSetIfChanged(ref this.isHidden, value);
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{A9113A52-C31F-4C76-B87F-AB28E079284C}</ProjectGuid>
-    <MinIMEVersion>10.0.3</MinIMEVersion>
+    <MinIMEVersion>10.0.4</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4CrossViewEditor</AssemblyTitle>

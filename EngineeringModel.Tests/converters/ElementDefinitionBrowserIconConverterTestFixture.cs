@@ -115,7 +115,7 @@ namespace CDP4EngineeringModel.Tests.Converters
             var parameter = new Parameter();
             parameter.ParameterType = new BooleanParameterType();
             parameter.StateDependence = new ActualFiniteStateList();
-            var icon = (BitmapImage)this.elementDefinitionTreeListNodeImageSelector.Convert(new object[] { new ThingStatus(parameter) }, null, ClassKind.Option, null);
+            var icon = (BitmapImage)this.elementDefinitionTreeListNodeImageSelector.Convert(new object[] { ThingStatus.CreateNewThingStatus(parameter) }, null, ClassKind.Option, null);
 
             // overlay
             Assert.AreEqual(generic.UriSource.ToString(), icon.UriSource.ToString());
@@ -143,7 +143,7 @@ namespace CDP4EngineeringModel.Tests.Converters
             var parameter = new Parameter();
             parameter.ParameterType = new ArrayParameterType();
             parameter.StateDependence = new ActualFiniteStateList();
-            var icon = (BitmapImage)this.elementDefinitionTreeListNodeImageSelector.Convert(new object[] { new ThingStatus(parameter) }, null, ClassKind.ActualFiniteState, null);
+            var icon = (BitmapImage)this.elementDefinitionTreeListNodeImageSelector.Convert(new object[] { ThingStatus.CreateNewThingStatus(parameter) }, null, ClassKind.ActualFiniteState, null);
 
             Assert.AreEqual(generic.UriSource.ToString(), icon.UriSource.ToString());
         }

@@ -57,6 +57,11 @@ namespace CDP4EngineeringModel.Selectors
         private IIconCacheService iconCacheService;
 
         /// <summary>
+        /// The <see cref="ThingToIconUriConverter" />
+        /// </summary>
+        private ThingToIconUriConverter thingToIconUriConverter = new();
+
+        /// <summary>
         /// Select node and adds icon to it
         /// </summary>
         /// <param name="rowData"><see cref="TreeListRowData"/></param>
@@ -101,7 +106,6 @@ namespace CDP4EngineeringModel.Selectors
         {
             try
             {
-                var genericConverter = new ThingToIconUriConverter();
                 var thingStatus = value.SingleOrDefault() as ThingStatus;
 
                 var parameterBase = thingStatus?.Thing as ParameterBase;
@@ -110,7 +114,7 @@ namespace CDP4EngineeringModel.Selectors
 
                 if (parameterBase == null || parameter == null || !Enum.TryParse(parameter.ToString(), out valuesetRowType))
                 {
-                    return genericConverter.Convert(value, targetType, parameter, culture);
+                    return this.thingToIconUriConverter.Convert(value, targetType, parameter, culture);
                 }
 
                 var isCompound = parameterBase.ParameterType is CompoundParameterType;

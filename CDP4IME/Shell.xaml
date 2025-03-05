@@ -190,7 +190,7 @@
                                                           MinValue="5"
                                                           Value="{Binding SelectedSession.AutoRefreshInterval,
                                                                           Mode=TwoWay,
-                                                                          UpdateSourceTrigger=PropertyChanged}" />
+                                                                          UpdateSourceTrigger=LostFocus}" />
                                             <TextBlock VerticalAlignment="Center"
                                                        IsEnabled="{Binding IsSessionSelected}"
                                                        Text=" sec." />
