@@ -2,7 +2,7 @@
 // <copyright file="CDP4IMEInstallerTestFixture.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2020 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
+//    Author: Sam GerenÃ©, Alex Vorobiev, Merlin Bieze, Naron Phou, Patxi Ozkoidi, Alexander van Delft
 //            Nathanael Smiechowski, Kamil Wojnowski
 //
 //    This file is part of CDP4-IME Community Edition. 

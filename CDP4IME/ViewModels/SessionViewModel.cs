@@ -40,6 +40,8 @@ namespace COMET.ViewModels
 
     using CDP4Dal;
 
+    using CDP4DalCommon.Authentication;
+
     using CommonServiceLocator;
 
     using ReactiveUI;
@@ -98,6 +100,11 @@ namespace COMET.ViewModels
         /// Backing field for the <see cref="LastUpdateDateTime"/> property.
         /// </summary>
         private DateTime lastUpdateDateTime;
+        
+        /// <summary>
+        /// Gets the <see cref="IAuthenticationRefreshService"/> used to refresh authentication information, if needed  
+        /// </summary>
+        private readonly IAuthenticationRefreshService authenticationRefreshService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionViewModel"/> class.
@@ -105,7 +112,8 @@ namespace COMET.ViewModels
         /// <param name="session">
         /// The session that is encapsulated
         /// </param>
-        public SessionViewModel(ISession session)
+        /// <param name="authenticationSchemeResponse">The <see cref="AuthenticationSchemeResponse"/> associated to the opened <see cref="ISession"/></param>
+        public SessionViewModel(ISession session, AuthenticationSchemeResponse authenticationSchemeResponse)
         {
             this.Session = session;
             this.AutoRefreshInterval = defaultRefreshInterval;
@@ -125,6 +133,13 @@ namespace COMET.ViewModels
                     x => x.IsAutoRefreshEnabled,
                     x => x.AutoRefreshInterval)
                 .Subscribe(_ => this.SetTimer());
+
+            if (this.Session.Dal is ISupportAuthenticationRefresh supportAuthenticationRefresh)
+            {
+                this.authenticationRefreshService = supportAuthenticationRefresh.AuthenticationRefreshService;
+                this.authenticationRefreshService.Initialize(this.Session, authenticationSchemeResponse);
+                this.authenticationRefreshService.StartAsync().ConfigureAwait(false);
+            }
         }
 
         /// <summary>
@@ -244,6 +259,7 @@ namespace COMET.ViewModels
         private async void ExecuteClose()
         {
             await this.Session.Close();
+            this.authenticationRefreshService?.Dispose();
             this.IsClosed = true;
         }
 
@@ -356,6 +372,7 @@ namespace COMET.ViewModels
             {
                 LockProvider.EnterLock(LockType.SesionRefresh);
                 this.timer.Stop();
+                this.authenticationRefreshService?.Dispose();
             }
             finally
             {

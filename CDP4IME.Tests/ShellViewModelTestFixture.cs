@@ -42,6 +42,8 @@ namespace COMET.Tests
     using CDP4Dal.DAL;
     using CDP4Dal.Events;
 
+    using CDP4DalCommon.Authentication;
+
     using CDP4ShellDialogs.ViewModels;
 
     using COMET.Settings;
@@ -203,7 +205,7 @@ namespace COMET.Tests
             Assert.IsFalse(this.viewModel.HasSessions);
 
             var mockedSession = new Mock<ISession>();
-            var selectionResult = new DataSourceSelectionResult(true, mockedSession.Object);
+            var selectionResult = new DataSourceSelectionResult(true, mockedSession.Object, new AuthenticationSchemeResponse());
 
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>())).Returns(selectionResult);
             await this.viewModel.OpenDataSourceCommand.Execute();
@@ -222,7 +224,7 @@ namespace COMET.Tests
             Assert.IsFalse(this.viewModel.HasSessions);
 
             var mockedSession = new Mock<ISession>();
-            var selectionResult = new DataSourceSelectionResult(true, mockedSession.Object, true);
+            var selectionResult = new DataSourceSelectionResult(true, mockedSession.Object, new AuthenticationSchemeResponse(), true);
 
             this.navigationService.Setup(x => x.NavigateModal(It.IsAny<DataSourceSelectionViewModel>())).Returns(selectionResult);
             await this.viewModel.OpenDataSourceCommand.Execute();

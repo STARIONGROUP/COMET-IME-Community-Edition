@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OpenIdAuthenticationDialogViewModel.cs" company="Starion Group S.A.">
+// <copyright file="ExternalAuthenticationDialogViewModel.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2025 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -26,36 +26,29 @@
 namespace CDP4ShellDialogs.ViewModels
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Net;
-    using System.Net.Http;
     using System.Net.NetworkInformation;
-    using System.Text.Json;
     using System.Threading.Tasks;
     using System.Web;
 
     using CDP4Composition.Navigation;
 
-    using CDP4ShellDialogs.Model;
+    using CDP4Dal;
+
+    using CDP4DalCommon.Authentication;
+
+    using CommonServiceLocator;
 
     /// <summary>
-    /// The <see cref="OpenIdAuthenticationDialogViewModel" /> is a <see cref="DialogViewModelBase" /> that provides OpenID authentication support
+    /// The <see cref="ExternalAuthenticationDialogViewModel" /> is a <see cref="DialogViewModelBase" /> that provides OpenID authentication support
     /// </summary>
-    public class OpenIdAuthenticationDialogViewModel : DialogViewModelBase
+    public class ExternalAuthenticationDialogViewModel : DialogViewModelBase
     {
         /// <summary>
-        /// Gets the <see cref="System.Text.Json.JsonSerializerOptions" />
+        /// Gets the <see cref="AuthenticationSchemeResponse" /> that provides information to communicate with the External authentication provider
         /// </summary>
-        private static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
-        };
-
-        /// <summary>
-        /// Gets the authority uri
-        /// </summary>
-        private readonly string authority;
+        private readonly AuthenticationSchemeResponse authenticationSchemeResponse;
 
         /// <summary>
         /// Gets the callback uri
@@ -63,21 +56,15 @@ namespace CDP4ShellDialogs.ViewModels
         private readonly string callbackUri;
 
         /// <summary>
-        /// Gets the identifier of the client
-        /// </summary>
-        private readonly string clientId;
-
-        /// <summary>
         /// Gets the <see cref="HttpListener" />
         /// </summary>
         private readonly HttpListener listener;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenIdAuthenticationDialogViewModel" />
+        /// Initializes a new instance of the <see cref="ExternalAuthenticationDialogViewModel" />
         /// </summary>
-        /// <param name="authority">The URI to the OpenID authority</param>
-        /// <param name="clientId">The identifier of the specific client that provides authentication</param>
-        public OpenIdAuthenticationDialogViewModel(string authority, string clientId)
+        /// <param name="authenticationSchemeResponse">The <see cref="AuthenticationSchemeResponse" /> that provides information to communicate with the External authentication provider</param>
+        public ExternalAuthenticationDialogViewModel(AuthenticationSchemeResponse authenticationSchemeResponse)
         {
             var port = 0;
 
@@ -86,13 +73,13 @@ namespace CDP4ShellDialogs.ViewModels
                 throw new InvalidOperationException("Unable to get unused port");
             }
 
-            this.authority = authority.TrimEnd('/');
-            this.clientId = clientId;
+            this.authenticationSchemeResponse = authenticationSchemeResponse;
+
             this.callbackUri = $"http://127.0.0.1:{port}/";
-            var uri = new UriBuilder(new Uri($"{this.authority}/protocol/openid-connect/auth"));
+            var uri = new UriBuilder(new Uri($"{this.authenticationSchemeResponse.Authority}/protocol/openid-connect/auth"));
             var queryParameters = HttpUtility.ParseQueryString(uri.Query);
             queryParameters["response_type"] = "code";
-            queryParameters["client_id"] = this.clientId;
+            queryParameters["client_id"] = this.authenticationSchemeResponse.ClientId;
             queryParameters["redirect_uri"] = this.callbackUri;
             uri.Query = string.Join("&", queryParameters.AllKeys.Select(key => $"{key}={queryParameters[key]}"));
 
@@ -145,37 +132,10 @@ namespace CDP4ShellDialogs.ViewModels
                     throw new InvalidOperationException("Unable to get authorization code");
                 }
 
-                using (var httpClient = new HttpClient())
-                {
-                    httpClient.BaseAddress = new Uri(this.authority);
+                var openIdConnectService = ServiceLocator.Current.GetInstance<IProvideExternalAuthenticationService>();
 
-                    var parameters = new List<KeyValuePair<string, string>>
-                    {
-                        new KeyValuePair<string, string>("code", code),
-                        new KeyValuePair<string, string>("client_id", this.clientId),
-                        new KeyValuePair<string, string>("redirect_uri", this.callbackUri),
-                        new KeyValuePair<string, string>("grant_type", "authorization_code")
-                    };
-
-                    var httpMessage = new HttpRequestMessage(HttpMethod.Post, new Uri($"{this.authority}/protocol/openid-connect/token"));
-                    httpMessage.Content = new FormUrlEncodedContent(parameters);
-
-                    using (var httpResponse = await httpClient.SendAsync(httpMessage))
-                    {
-                        var intStatusCode = (int)httpResponse.StatusCode;
-
-                        if (intStatusCode >= 200 && intStatusCode < 300)
-                        {
-                            var content = await httpResponse.Content.ReadAsStringAsync();
-                            var openIdAuthentication = JsonSerializer.Deserialize<OpenIdAuthenticationDto>(content, JsonSerializerOptions);
-                            this.DialogResult = new OpenIdAuthenticationResult(true, openIdAuthentication);
-                        }
-                        else
-                        {
-                            this.DialogResult = new OpenIdAuthenticationResult(false, null);
-                        }
-                    }
-                }
+                var openIdAuthentication = await openIdConnectService.RequestAuthenticationToken(code, this.authenticationSchemeResponse, this.callbackUri);
+                this.DialogResult = new ExternalAuthenticationResult(true, openIdAuthentication);
             }
         }
 

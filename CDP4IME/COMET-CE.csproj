@@ -43,10 +43,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="28.1.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="28.1.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.1.0" />
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.1.0" />
+    <PackageReference Include="CDP4Common-CE" Version="28.3.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="28.3.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.3.0" />
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="28.3.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DevExpress.Charts" Version="23.2.5" />
     <PackageReference Include="DevExpress.Charts.Core" Version="23.2.5" />
@@ -107,6 +107,7 @@
     <PackageReference Include="ReactiveUI.WPF" Version="20.1.63" />
     <PackageReference Include="Splat.NLog" Version="15.2.22" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.ComponentModel.Composition" />

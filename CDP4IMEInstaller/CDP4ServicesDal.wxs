@@ -25,18 +25,57 @@
         <File Id="fil_MessagePack_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)MessagePack.dll" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="comp_Microsoft_Bcl_Memory_CDP4ServicesDal" Guid="{9B6E30B5-67F2-49C1-9C8D-B5E2F4323217}" Location="local" >
+        <File Id="fil_Microsoft_Bcl_Memory_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.Bcl.Memory.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Microsoft_Bcl_TimeProvider_CDP4ServicesDal" Guid="{4BFAA059-5121-4088-B697-8A0C45FD0620}" Location="local" >
+        <File Id="fil_Microsoft_Bcl_TimeProvider_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.Bcl.TimeProvider.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Microsoft_IdentityModel_Abstractions_CDP4ServicesDal" Guid="{06A1D891-740B-4F68-B35C-75F5957F48D8}" Location="local" >
+        <File Id="fil_Microsoft_IdentityModel_Abstractions_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.IdentityModel.Abstractions.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Microsoft_IdentityModel_JsonWebTokens_CDP4ServicesDal" Guid="{5167983D-9142-4A5C-9D04-65FB0124B0D7}" Location="local" >
+        <File Id="fil_Microsoft_IdentityModel_JsonWebTokens_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.IdentityModel.JsonWebTokens.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Microsoft_IdentityModel_Logging_CDP4ServicesDal" Guid="{E51E9B0E-1833-4EE8-942F-4295D5A7C52D}" Location="local" >
+        <File Id="fil_Microsoft_IdentityModel_Logging_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.IdentityModel.Logging.dll" KeyPath="yes"></File>
+      </Component>
+      
+      <Component Id="comp_Microsoft_IdentityModel_Tokens_CDP4ServicesDal" Guid="{69D8C3AD-5E19-4516-8DC0-AD8CACE190A8}" Location="local" >
+        <File Id="fil_Microsoft_IdentityModel_Tokens_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.IdentityModel.Tokens.dll" KeyPath="yes"></File>
+      </Component>
+
       <Component Id="comp_StringTools_CDP4ServicesDal" Guid="{62D576BC-D8E0-4887-A923-BF55EB7AC5B7}" Location="local" >
         <File Id="fil_StringTools_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.NET.StringTools.dll" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="comp_Polly_Core_CDP4ServicesDal" Guid="{D3448743-1F03-426D-B44E-5A8AFE9C250F}" Location="local" >
+        <File Id="fil_Polly_Core_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Polly.Core.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_Polly_CDP4ServicesDal" Guid="{BA7972ED-CEFF-40B5-B003-406458F91BB2}" Location="local" >
+        <File Id="fil_Polly_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Polly.dll" KeyPath="yes"></File>
+      </Component>
+      
       <Component Id="comp_Immutable_CDP4ServicesDal" Guid="{417F785C-F9EE-428E-B784-DF45E510E17A}" Location="local" >
         <File Id="fil_Immutable_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Collections.Immutable.dll" KeyPath="yes"></File>
       </Component>
 
+      <Component Id="comp_IdentityModel_Tokens_Jwt_CDP4ServicesDal" Guid="{DD612805-6AC3-402B-B65A-2C93F8240822}" Location="local" >
+        <File Id="fil_IdentityModel_Tokens_Jwt_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.IdentityModel.Tokens.Jwt.dll" KeyPath="yes"></File>
+      </Component>
+      <Component Id="comp_System_Diagnostics_DiagnosticSource_CDP4ServicesDal" Guid="{F95F665A-0783-4670-B694-EAC59D6626C9}" Location="local" >
+        <File Id="fil_System_Diagnostics_DiagnosticSource_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Diagnostics.DiagnosticSource.dll" KeyPath="yes"></File>
+      </Component>
+      
       <Component Id="comp_Pipelines_CDP4ServicesDal" Guid="{0447E257-943F-4A1F-BB4D-7FC3AE24E5C4}" Location="local" >
         <File Id="fil_Pipelines_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.IO.Pipelines.dll" KeyPath="yes"></File>
       </Component>
-
-    </ComponentGroup>
+      
+      </ComponentGroup>
   </Fragment>
 </Wix>
