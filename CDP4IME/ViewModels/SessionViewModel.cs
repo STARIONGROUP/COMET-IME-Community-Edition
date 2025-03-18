@@ -29,6 +29,7 @@ namespace COMET.ViewModels
     using System.Globalization;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Windows;
     using System.Windows.Input;
     using System.Windows.Threading;
 
@@ -36,6 +37,7 @@ namespace COMET.ViewModels
     using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
     using CDP4Composition.Utilities;
 
     using CDP4Dal;
@@ -105,6 +107,11 @@ namespace COMET.ViewModels
         /// Gets the <see cref="IAuthenticationRefreshService"/> used to refresh authentication information, if needed  
         /// </summary>
         private readonly IAuthenticationRefreshService authenticationRefreshService;
+
+        /// <summary>
+        /// Gets the injected <see cref="IMessageBoxService"/>
+        /// </summary>
+        private IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SessionViewModel"/> class.
@@ -349,6 +356,11 @@ namespace COMET.ViewModels
                 {
                     LockProvider.EnterLock(LockType.SesionRefresh);
                     await this.Session.Refresh();
+                }
+                catch (Exception ex)
+                {
+                    this.ErrorMsg = ex.Message;
+                    this.messageBoxService.ShowAlwaysOnTop($"Automatic Session refresh failed for {this.Session.DataSourceUri}.\nThe server might not be reachable at this moment.", "Session Refresh failed", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
                 }
                 finally
                 {
