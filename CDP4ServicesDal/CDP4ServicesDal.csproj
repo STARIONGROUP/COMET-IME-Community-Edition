@@ -39,16 +39,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="28.0.0-rc31">
+    <PackageReference Include="CDP4Common-CE" Version="29.0.0-rc1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="28.0.0-rc31">
+    <PackageReference Include="CDP4Dal-CE" Version="29.0.0-rc1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.0.0-rc31">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="29.0.0-rc1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4ServicesDal-CE" Version="28.0.0-rc31" />
+    <PackageReference Include="CDP4ServicesDal-CE" Version="29.0.0-rc1" />
 
     <!--This extra reference to Microsoft.Bcl.AsyncInterfaces is necessary, as version 8.0.0 is references by MessagePack 3.1.1
     Transitive references/versions are sometimes preferred over AssemblyRedirects by default. Adding this reference to a specific version of Microsoft.Bcl.AsyncInterfaces
@@ -56,7 +56,7 @@
     Please notice that this "problem" with importancy of assembly references is different in COMET-IME.exe and the Excel addin.
     Problems in the Excel Addin might not be present in the COMET-IME.exe (and maybe even vice versa).
     -->
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.1" >
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     
