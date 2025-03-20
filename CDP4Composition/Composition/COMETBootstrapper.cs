@@ -30,6 +30,7 @@ namespace CDP4Composition.Composition
     using System.ComponentModel.Composition.Hosting;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Windows;
 
@@ -151,7 +152,7 @@ namespace CDP4Composition.Composition
                 {
                     this.SetStatusProgress(counter, pluginLoader.DirectoryCatalogues.Count);
                     this.ShowStatusMessage($"Loading Plugin: {Path.GetFileName(directoryCatalog.FullPath)}");
-
+                    
                     catalog.Catalogs.Add(directoryCatalog);
                     this.UpdateBootstrapperStatus($"DirectoryCatalogue {directoryCatalog.FullPath} Loaded");
 
@@ -172,6 +173,26 @@ namespace CDP4Composition.Composition
                     }
                 }
             }
+            
+            AppDomain.CurrentDomain.AssemblyResolve += ((sender, args) =>
+            {
+                var missingAssemblyName = new AssemblyName(args.Name).Name;
+                
+                var directoryCatalogContainingMissingAssembly = pluginLoader
+                    .DirectoryCatalogues.FirstOrDefault(directoryCatalog => directoryCatalog.LoadedFiles.Any(f => string.Equals(Path.GetFileNameWithoutExtension(f), missingAssemblyName, StringComparison.InvariantCultureIgnoreCase)));
+                
+                if (directoryCatalogContainingMissingAssembly != null)
+                {
+                    var missingAssemblyPath = Path.Combine(directoryCatalogContainingMissingAssembly.FullPath, $"{missingAssemblyName}.dll");
+
+                    if (File.Exists(missingAssemblyPath))
+                    {
+                        return Assembly.LoadFile(missingAssemblyPath);
+                    }
+                }
+                
+                return null;
+            });
 
             this.UpdateBootstrapperStatus($"{pluginLoader.DirectoryCatalogues.Count} CDP4-COMET Plugins Loaded");
             this.ShowStatusMessage($"{pluginLoader.DirectoryCatalogues.Count} CDP4-COMET Plugins Loaded");

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OpenIdAuthenticationResult.cs" company="Starion Group S.A.">
+// <copyright file="ExternalAuthenticationResult.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2025 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -29,28 +29,29 @@ namespace CDP4ShellDialogs.ViewModels
 
     using CDP4Composition.Navigation;
 
-    using CDP4ShellDialogs.Model;
+    using CDP4DalCommon.Authentication;
+
     using CDP4ShellDialogs.Views;
 
     /// <summary>
-    /// The <see cref="OpenIdAuthenticationResult" /> is a <see cref="BaseDialogResult" /> for the
-    /// <see cref="OpenIdAuthenticationDialog" />
+    /// The <see cref="ExternalAuthenticationResult" /> is a <see cref="BaseDialogResult" /> for the
+    /// <see cref="ExternalAuthenticationDialog" />
     /// </summary>
-    public class OpenIdAuthenticationResult : BaseDialogResult
+    public class ExternalAuthenticationResult : BaseDialogResult
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseDialogResult" /> class
         /// </summary>
         /// <param name="res">The <see cref="MessageBoxResult" /></param>
-        /// <param name="openIdAuthenticationDto">The <see cref="OpenIdAuthenticationDto" /> that has been received</param>
-        public OpenIdAuthenticationResult(bool? res, OpenIdAuthenticationDto openIdAuthenticationDto) : base(res)
+        /// <param name="authenticationTokens">The <see cref="AuthenticationTokens" /> that has been received</param>
+        public ExternalAuthenticationResult(bool? res, AuthenticationToken authenticationTokens) : base(res)
         {
-            this.OpenIdAuthenticationDto = openIdAuthenticationDto;
+            this.AuthenticationTokens = authenticationTokens;
         }
 
         /// <summary>
-        /// Gets the <see cref="OpenIdAuthenticationDto" />
+        /// Gets the <see cref="AuthenticationTokens" />
         /// </summary>
-        public OpenIdAuthenticationDto OpenIdAuthenticationDto { get; }
+        public AuthenticationToken AuthenticationTokens { get; }
     }
 }

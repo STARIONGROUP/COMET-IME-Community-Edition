@@ -527,7 +527,7 @@ namespace CDP4ShellDialogs.ViewModels
                         await this.session.Open();
                     }
 
-                    this.DialogResult = new DataSourceSelectionResult(true, this.session, openModel);
+                    this.DialogResult = new DataSourceSelectionResult(true, this.session, this.AvailableAuthenticationScheme, openModel);
                 }
                 catch (Exception ex)
                 {
@@ -550,7 +550,7 @@ namespace CDP4ShellDialogs.ViewModels
                 this.session.Cancel();
             }
 
-            this.DialogResult = new DataSourceSelectionResult(false, null);
+            this.DialogResult = new DataSourceSelectionResult(false, null, null);
         }
 
         /// <summary>
@@ -833,7 +833,7 @@ namespace CDP4ShellDialogs.ViewModels
 
             var temporaryCredentials = new Credentials(new Uri(this.Uri), this.IsFullTrustCheckBoxEnabled, this.CreateProxySettings());
             var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
-            var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType());
+            var dalInstance = (IDal) ServiceLocator.Current.GetInstance(dal.Value.GetType());
 
             this.IsBusy = true;
 
@@ -849,34 +849,46 @@ namespace CDP4ShellDialogs.ViewModels
             {
                 this.AvailableAuthenticationScheme = null;
                 this.ErrorMessage = ex.Message;
-            }
-            finally
-            {
                 this.IsBusy = false;
-
-                if (this.AvailableAuthenticationScheme != null && this.AvailableAuthenticationScheme.Schemes.Contains(AuthenticationSchemeKind.ExternalJwtBearer))
+                return;
+            }
+            
+            if (this.AvailableAuthenticationScheme != null && this.AvailableAuthenticationScheme.Schemes.Contains(AuthenticationSchemeKind.ExternalJwtBearer))
+            {
+                ExternalAuthenticationResult openIdAuthenticationResult;
+                    
+                try
                 {
-                    var openIdConnectViewModel = new OpenIdAuthenticationDialogViewModel(this.AvailableAuthenticationScheme.Authority, this.AvailableAuthenticationScheme.ClientId);
+                    var openIdConnectViewModel = new ExternalAuthenticationDialogViewModel(this.AvailableAuthenticationScheme);
                     openIdConnectViewModel.Initializes();
-                    var openIdAuthenticationResult = this.dialogNavigationService.NavigateModal(openIdConnectViewModel) as OpenIdAuthenticationResult;
+                    openIdAuthenticationResult = this.dialogNavigationService.NavigateModal(openIdConnectViewModel) as ExternalAuthenticationResult;
                     openIdConnectViewModel.Stop();
+                }
+                catch
+                {
+                    this.ErrorMessage = "Failed to authenticate against the External Authentication provider";
+                    this.IsBusy = false;
+                    return;
+                }
 
-                    if (openIdAuthenticationResult?.Result == true)
+                if (openIdAuthenticationResult?.Result == true)
+                {
+                    this.session.Credentials.ProvideUserToken(openIdAuthenticationResult.AuthenticationTokens, AuthenticationSchemeKind.ExternalJwtBearer);
+
+                    try
                     {
-                        this.session.Credentials.ProvideUserToken(openIdAuthenticationResult.OpenIdAuthenticationDto.AccessToken, AuthenticationSchemeKind.ExternalJwtBearer);
-
-                        try
-                        {
-                            this.UserName = await this.session.QueryAuthenticatedUserName();
-                            this.IsAuthenticatedViaExternalProvider = true;
-                        }
-                        catch (Exception ex)
-                        {
-                            this.ErrorMessage = ex.Message;
-                        }
+                        this.UserName = await this.session.QueryAuthenticatedUserName();
+                        this.IsAuthenticatedViaExternalProvider = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        this.ErrorMessage = ex.Message;
+                        this.IsBusy = false;
                     }
                 }
             }
+            
+            this.IsBusy = false;
         }
 
         /// <summary>

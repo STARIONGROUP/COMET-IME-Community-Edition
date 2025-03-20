@@ -43,6 +43,8 @@ namespace COMET.Tests.ViewModels
     using CDP4Dal.DAL;
     using CDP4Dal.Events;
 
+    using CDP4DalCommon.Authentication;
+
     using COMET.ViewModels;
 
     using CommonServiceLocator;
@@ -109,7 +111,12 @@ namespace COMET.Tests.ViewModels
             var credentials = new Credentials("John", "Doe", new Uri(this.uri));
 
             var session = new Session(this.mockedDal.Object, credentials, this.messageBus);
-            this.sessionViewModel = new SessionViewModel(session);
+            
+            this.sessionViewModel = new SessionViewModel(session, new AuthenticationSchemeResponse()
+            {
+                Schemes = [AuthenticationSchemeKind.Basic]
+            });
+            
             var openTaskCompletionSource = new TaskCompletionSource<IEnumerable<CDP4Common.DTO.Thing>>();
             openTaskCompletionSource.SetResult(this.dalOutputs);
             this.mockedDal.Setup(x => x.Open(It.IsAny<Credentials>(), It.IsAny<CancellationToken>())).Returns(openTaskCompletionSource.Task);

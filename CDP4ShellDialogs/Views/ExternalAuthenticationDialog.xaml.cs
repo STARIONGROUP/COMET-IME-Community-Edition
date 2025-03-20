@@ -39,8 +39,8 @@ namespace CDP4ShellDialogs.Views
     /// Interaction logic for OpenIdAuthenticationDialog.xaml
     /// </summary>
     [ExcludeFromCodeCoverage]
-    [DialogViewExport("OpenIdAuthenticationDialogViewModel", "The OpenId authentication browser support")]
-    public partial class OpenIdAuthenticationDialog : IDialogView
+    [DialogViewExport("ExternalAuthenticationDialogViewModel", "The External authentication browser support")]
+    public partial class ExternalAuthenticationDialog : IDialogView
     {
         /// <summary>
         /// Asserts that the subscription to resolve assembly has been done once
@@ -48,14 +48,14 @@ namespace CDP4ShellDialogs.Views
         private static bool subscribedOnce;
         
         /// <summary>
-        /// Initializes a new instance of <see cref="OpenIdAuthenticationDialog" />
+        /// Initializes a new instance of <see cref="ExternalAuthenticationDialog" />
         /// </summary>
-        public OpenIdAuthenticationDialog()
+        public ExternalAuthenticationDialog()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="OpenIdAuthenticationDialog" />
+        /// Initializes a new instance of <see cref="ExternalAuthenticationDialog" />
         /// </summary>
         /// <param name="initializeComponent">
         /// a value indicating whether the contained Components shall be loaded
@@ -63,7 +63,7 @@ namespace CDP4ShellDialogs.Views
         /// <remarks>
         /// This constructor is called by the navigation service
         /// </remarks>
-        public OpenIdAuthenticationDialog(bool initializeComponent)
+        public ExternalAuthenticationDialog(bool initializeComponent)
         {
             if (initializeComponent)
             {

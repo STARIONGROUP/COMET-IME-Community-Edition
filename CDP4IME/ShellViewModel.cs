@@ -414,7 +414,7 @@ namespace COMET
                 return;
             }
 
-            this.Sessions.Add(new SessionViewModel(result.Session));
+            this.Sessions.Add(new SessionViewModel(result.Session, result.AuthenticationSchemeResponse));
             this.SelectedSession = this.Sessions.First();
 
             if (result.OpenModel)

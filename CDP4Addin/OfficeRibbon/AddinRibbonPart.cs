@@ -74,6 +74,11 @@ namespace CDP4AddinCE
         private readonly IExceptionHandlerService exceptionHandlerService;
 
         /// <summary>
+        /// The <see cref="IAuthenticationRefreshService" /> that provides authentication refresh behavior 
+        /// </summary>
+        private IAuthenticationRefreshService authenticationRefreshService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="AddinRibbonPart"/> class.
         /// </summary>
         /// <param name="order">
@@ -119,6 +124,13 @@ namespace CDP4AddinCE
                     var dataSelection = new DataSourceSelectionViewModel(this.DialogNavigationService, this.CDPMessageBus, this.exceptionHandlerService);
                     var dataSelectionResult = this.DialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
 
+                    if(dataSelectionResult?.Result == true && dataSelectionResult.Session.Dal is ISupportAuthenticationRefresh supportAuthenticationRefresh)
+                    {
+                        this.authenticationRefreshService = supportAuthenticationRefresh.AuthenticationRefreshService;
+                        this.authenticationRefreshService.Initialize(dataSelectionResult.Session, dataSelectionResult.AuthenticationSchemeResponse);
+                        this.authenticationRefreshService.StartAsync().ConfigureAwait(false);
+                    }
+                    
                     if (dataSelectionResult?.OpenModel ?? false)
                     {
                         this.OpenModelDialog();
@@ -157,7 +169,7 @@ namespace CDP4AddinCE
         {
             var sessionsOpening = new List<ISession> { this.session };
             var modelOpeningDialogViewModel = new ModelOpeningDialogViewModel(sessionsOpening, null);
-            var modelOpeningDialogViewModelResult = this.DialogNavigationService.NavigateModal(modelOpeningDialogViewModel) as DataSourceSelectionResult;
+            var modelOpeningDialogViewModelResult =this.DialogNavigationService.NavigateModal(modelOpeningDialogViewModel) as DataSourceSelectionResult;
         }
 
         /// <summary>
@@ -236,6 +248,8 @@ namespace CDP4AddinCE
 
             if (sessionChange.Status == SessionStatus.Closed)
             {
+                this.authenticationRefreshService?.Dispose();
+                this.authenticationRefreshService = null;
                 this.session = null;
             }
         }
