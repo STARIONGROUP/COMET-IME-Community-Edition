@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProductTreeListNodeImageSelector.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
@@ -42,6 +42,16 @@ namespace CDP4ProductTree.Selectors
     public class ProductTreeListNodeImageSelector : TreeListNodeImageSelector
     {
         /// <summary>
+        /// The <see cref="ThingToIconUriConverter" />
+        /// </summary>
+        private readonly ThingToIconUriConverter thingToIconUriConverter = new();
+
+        /// <summary>
+        /// The <see cref="ProductTreeIconUriConverter" />
+        /// </summary>
+        private readonly ProductTreeIconUriConverter productTreeIconUriConverter = new();
+
+        /// <summary>
         /// Select node and adds icon to it
         /// </summary>
         /// <param name="rowData"><see cref="TreeListRowData"/></param>
@@ -52,13 +62,11 @@ namespace CDP4ProductTree.Selectors
 
             if (rowData.Row is ParameterOrOverrideBaseRowViewModel parameterOrOverrideBaseRow)
             {
-                var productTreeIconConverter = new ProductTreeIconUriConverter();
-                var productTreeIcon = productTreeIconConverter.Convert(new object[] { thingStatus, parameterOrOverrideBaseRow.Usage }, null, null, CultureInfo.InvariantCulture);
+                var productTreeIcon = this.productTreeIconUriConverter.Convert([thingStatus, parameterOrOverrideBaseRow.Usage], null, null, CultureInfo.InvariantCulture);
                 return productTreeIcon as ImageSource;
             }
 
-            var converter = new ThingToIconUriConverter();
-            var icon = converter.Convert(new object[] { thingStatus }, null, null, CultureInfo.InvariantCulture);
+            var icon = this.thingToIconUriConverter.Convert([thingStatus], null, null, CultureInfo.InvariantCulture);
 
             return icon as ImageSource;
         }

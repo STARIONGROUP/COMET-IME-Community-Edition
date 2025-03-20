@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementsTreeListNodeImageSelector.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
@@ -45,6 +45,11 @@ namespace CDP4Requirements.Selectors
     public class RequirementsTreeListNodeImageSelector : TreeListNodeImageSelector
     {
         /// <summary>
+        /// The <see cref="ThingToIconUriConverter" />
+        /// </summary>
+        private readonly ThingToIconUriConverter thingToIconUriConverter = new ThingToIconUriConverter();
+
+        /// <summary>
         /// Select node and adds icon to it
         /// </summary>
         /// <param name="rowData"><see cref="TreeListRowData"/></param>
@@ -63,9 +68,7 @@ namespace CDP4Requirements.Selectors
                 thing = parametricConstraintRow.Thing;
             }
 
-            var converter = new ThingToIconUriConverter();
-
-            var image = converter.Convert(new object[] { thing, thingStatus }, null, null, CultureInfo.InvariantCulture);
+            var image = this.thingToIconUriConverter.Convert([thing, thingStatus], null, null, CultureInfo.InvariantCulture);
 
             return image as ImageSource;
         }

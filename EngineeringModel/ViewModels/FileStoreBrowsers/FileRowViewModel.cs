@@ -217,7 +217,8 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void UpdateThingStatus()
         {
             base.UpdateThingStatus();
-            this.ThingStatus = new ThingStatus(this.Thing) { IsLocked = this.Thing.LockedBy != null };
+            ThingStatus.SetOrUpdateThingStatus(this, this.Thing);
+            this.ThingStatus.IsLocked = this.Thing.LockedBy != null;
         }
 
         /// <summary>

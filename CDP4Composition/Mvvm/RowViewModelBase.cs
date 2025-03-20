@@ -170,7 +170,7 @@ namespace CDP4Composition.Mvvm
         public ThingStatus ThingStatus
         {
             get { return this.thingStatus; }
-            protected set { this.RaiseAndSetIfChanged(ref this.thingStatus, value); }
+            set { this.RaiseAndSetIfChanged(ref this.thingStatus, value); }
         }
 
         /// <summary>
@@ -428,18 +428,18 @@ namespace CDP4Composition.Mvvm
                         highlightByCategoryObserver,
                         new MessageBusEventHandlerSubscription<HighlightByCategoryEvent>(
                             e => thingAsCategorizableThing.IsMemberOfCategory(e.Category), 
-                            highlightByCategoryEventAction
-                    )));
+                            highlightByCategoryEventAction)));
                 }
 
                 var relationshipObserver = this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Relationship));
 
                 this.Disposables.Add(this.MessageBusHandler.GetHandler<ObjectChangedEvent>().RegisterEventHandler(
-                    relationshipObserver, 
+                    relationshipObserver,
                     new ObjectChangedMessageBusEventHandlerSubscription(
-                        typeof(Relationship), 
-                        objectChange => true, 
-                        objectChange => this.UpdateThingStatus())));
+                        typeof(Relationship),
+                        objectChange => true,
+                        objectChange =>
+                            this.UpdateThingStatus())));
             }
 
             this.PropertyChanged += (sender, args) =>

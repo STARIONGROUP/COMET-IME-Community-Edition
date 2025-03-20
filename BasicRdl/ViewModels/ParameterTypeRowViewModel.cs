@@ -167,10 +167,8 @@ namespace BasicRdl.ViewModels
         /// </summary>
         protected override void UpdateThingStatus()
         {
-            this.ThingStatus = new ThingStatus(this.Thing)
-            {
-                IsFavorite = this.IsFavorite
-            };
+            ThingStatus.SetOrUpdateThingStatus(this, this.Thing);
+            this.ThingStatus.IsFavorite = this.IsFavorite;
         }
 
         /// <summary>

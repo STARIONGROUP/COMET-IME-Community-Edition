@@ -29,7 +29,7 @@ namespace CDP4Composition.Services
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
-    using System.Windows.Input;
+    using System.Windows.Threading;
 
     using DevExpress.Xpf.Editors;
     using DevExpress.Xpf.Grid;
@@ -125,17 +125,41 @@ namespace CDP4Composition.Services
                 {
                     if (grid is TreeListControl treeListControl)
                     {
-                        treeListControl.View.EndDataUpdate();
+                        //Dispatcher because we want to be sure no other MessageBus subscriptions are executed
+                        //before we end the data update
+                        DispatchAction(() => treeListControl.View.EndDataUpdate());
                     }
                     else if (grid is GridControl gridControl && gridControl.DataController.IsUpdateLocked)
                     {
-                        grid.EndDataUpdate();
+                        //Dispatcher because we want to be sure no other MessageBus subscriptions are executed
+                        //before we end the data update
+                        DispatchAction(() => grid.EndDataUpdate());
                     }
                 }
             }
             catch (Exception exception)
             {
                 Logger.Error(exception, $"A problem occurend when UpdateStartedPropertyChanged was called");
+            }
+        }
+
+        /// <summary>
+        /// Start an <see cref="Action"/> on the main/UI thread
+        /// </summary>
+        /// <param name="action">The <see cref="Action"/></param>
+        private static void DispatchAction(Action action)
+        {
+            if (Application.Current?.MainWindow == null)
+            {
+                Dispatcher.CurrentDispatcher.Invoke(
+                    action,
+                    DispatcherPriority.Render);
+            }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(
+                    action,
+                    DispatcherPriority.Render);
             }
         }
     }

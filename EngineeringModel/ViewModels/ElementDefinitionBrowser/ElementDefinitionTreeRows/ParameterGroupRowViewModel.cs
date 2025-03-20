@@ -210,7 +210,7 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         protected override void UpdateThingStatus()
         {
-            this.ThingStatus = new ThingStatus(this.Thing);
+            ThingStatus.SetOrUpdateThingStatus(this, this.Thing);
         }
 
         /// <summary>
