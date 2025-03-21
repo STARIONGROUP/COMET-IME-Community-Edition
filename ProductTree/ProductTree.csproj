@@ -12,8 +12,8 @@
     <Description>CDP4-COMET Product Tree Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
     <LangVersion>latest</LangVersion>
-    <AssemblyVersion>11.0.0.4</AssemblyVersion>
-    <FileVersion>11.0.0.4</FileVersion>
+    <AssemblyVersion>11.0.0.5</AssemblyVersion>
+    <FileVersion>11.0.0.5</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -135,13 +135,13 @@
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="CDP4Common-CE" Version="29.0.0-rc1">
+	<PackageReference Include="CDP4Common-CE" Version="29.0.0-rc2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="29.0.0-rc1">
+    <PackageReference Include="CDP4Dal-CE" Version="29.0.0-rc2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="29.0.0-rc1">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="29.0.0-rc2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
