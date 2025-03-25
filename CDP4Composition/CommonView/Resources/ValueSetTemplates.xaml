@@ -299,4 +299,168 @@
                                          TextEditTemplate="{StaticResource ReferenceTextEditTemplate}"
                                          TimeOfDayTemplate="{StaticResource ReferenceTimeTemplate}" />
 
+
+    <av:DataTemplate x:Key="SimpleParameterValueTextEditTemplate">
+        <dxe:TextEdit Name="PART_Editor"
+                      IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                      ValidateOnTextInput="True"
+                      Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                           Converter={StaticResource BooleanToVisibilityConverter}}" />
+    </av:DataTemplate>
+
+    <av:DataTemplate x:Key="SimpleParameterValueBooleanTemplate">
+        <dxe:ComboBoxEdit Name="PART_Editor"
+                          VerticalContentAlignment="Center"
+                          IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                          IsTextEditable="False"
+                          NullText="-"
+                          ShowBorder="True"
+                          ShowCustomItems="True"
+                          Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                               Converter={StaticResource BooleanToVisibilityConverter}}">
+            <system:Boolean>True</system:Boolean>
+            <system:Boolean>False</system:Boolean>
+        </dxe:ComboBoxEdit>
+    </av:DataTemplate>
+
+    <av:DataTemplate x:Key="SimpleParameterValueMultiEnumTemplate">
+        <dxe:ComboBoxEdit Name="PART_Editor"
+                          VerticalContentAlignment="Center"
+                          DisplayMember="Name"
+                          IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                          IsTextEditable="False"
+                          ItemsSource="{Binding RowData.Row.EnumerationValueDefinition}"
+                          NullText="-"
+                          ShowBorder="True"
+                          ShowNullText="True"
+                          Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                               Converter={StaticResource BooleanToVisibilityConverter}}">
+            <dxe:ComboBoxEdit.StyleSettings>
+                <dxe:CheckedComboBoxStyleSettings />
+            </dxe:ComboBoxEdit.StyleSettings>
+        </dxe:ComboBoxEdit>
+    </av:DataTemplate>
+
+    <av:DataTemplate x:Key="SimpleParameterValueSingleEnumTemplate">
+        <dxe:ComboBoxEdit Name="PART_Editor"
+                          VerticalContentAlignment="Center"
+                          DisplayMember="Name"
+                          IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                          IsTextEditable="False"
+                          ItemsSource="{Binding RowData.Row.EnumerationValueDefinition}"
+                          NullText="-"
+                          ShowBorder="True"
+                          ShowCustomItems="true"
+                          ShowNullText="True"
+                          Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                               Converter={StaticResource BooleanToVisibilityConverter}}" />
+    </av:DataTemplate>
+
+    <av:DataTemplate x:Key="SimpleParameterValueMultiEnumTemplateShortName">
+        <dxe:ComboBoxEdit Name="PART_Editor"
+                          VerticalContentAlignment="Center"
+                          DisplayMember="Name"
+                          IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                          IsTextEditable="False"
+                          ItemsSource="{Binding RowData.Row.EnumerationValueDefinition}"
+                          NullText="-"
+                          ShowBorder="True"
+                          ShowNullText="True"
+                          ValueMember="ShortName"
+                          Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                               Converter={StaticResource BooleanToVisibilityConverter}}">
+            <dxe:ComboBoxEdit.StyleSettings>
+                <dxe:CheckedComboBoxStyleSettings />
+            </dxe:ComboBoxEdit.StyleSettings>
+        </dxe:ComboBoxEdit>
+    </av:DataTemplate>
+
+    <av:DataTemplate x:Key="SimpleParameterValueSingleEnumTemplateShortName">
+        <dxe:ComboBoxEdit Name="PART_Editor"
+                          VerticalContentAlignment="Center"
+                          DisplayMember="Name"
+                          IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                          IsTextEditable="False"
+                          ItemsSource="{Binding RowData.Row.EnumerationValueDefinition}"
+                          NullText="-"
+                          ShowBorder="True"
+                          ShowCustomItems="true"
+                          ShowNullText="True"
+                          ValueMember="ShortName"
+                          Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                               Converter={StaticResource BooleanToVisibilityConverter}}" />
+    </av:DataTemplate>
+
+    <av:DataTemplate x:Key="SimpleParameterValueDateTimeTemplate">
+        <dxe:DateEdit Name="PART_Editor"
+                      AllowNullInput="True"
+                      IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                      Mask="yyyy-MM-ddTHH:mm:ss"
+                      MaskUseAsDisplayFormat="True"
+                      NullText="-"
+                      ShowBorder="True"
+                      ShowNullText="True"
+                      Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                           Converter={StaticResource BooleanToVisibilityConverter}}">
+            <dxe:DateEdit.StyleSettings>
+                <dxe:DateEditPickerStyleSettings />
+            </dxe:DateEdit.StyleSettings>
+        </dxe:DateEdit>
+    </av:DataTemplate>
+
+    <av:DataTemplate x:Key="SimpleParameterValueDateTemplate">
+        <dxe:DateEdit Name="PART_Editor"
+                      AllowNullInput="True"
+                      IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                      Mask="yyyy-MM-dd"
+                      MaskUseAsDisplayFormat="True"
+                      NullText="-"
+                      ShowBorder="True"
+                      ShowNullText="True"
+                      Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                           Converter={StaticResource BooleanToVisibilityConverter}}">
+            <dxe:DateEdit.StyleSettings>
+                <dxe:DateEditCalendarStyleSettings />
+            </dxe:DateEdit.StyleSettings>
+        </dxe:DateEdit>
+    </av:DataTemplate>
+
+    <av:DataTemplate x:Key="SimpleParameterValueTimeTemplate">
+        <dxe:DateEdit Name="PART_Editor"
+                      AllowNullInput="True"
+                      IsReadOnly="{Binding RowData.Row.IsReadOnly}"
+                      Mask="HH:mm:ss"
+                      MaskUseAsDisplayFormat="True"
+                      NullText="-"
+                      ShowBorder="True"
+                      ShowNullText="True"
+                      Visibility="{Binding RowData.Row.IsValueSetEditorActive,
+                                           Converter={StaticResource BooleanToVisibilityConverter}}">
+            <dxe:DateEdit.StyleSettings>
+                <dxe:DateEditPickerStyleSettings />
+            </dxe:DateEdit.StyleSettings>
+        </dxe:DateEdit>
+    </av:DataTemplate>
+
+    <resources:ValueCellTemplateSelector x:Key="SimpleParameterValueCellTemplateSelector"
+                                         BooleanTemplate="{StaticResource SimpleParameterValueBooleanTemplate}"
+                                         DateTemplate="{StaticResource SimpleParameterValueDateTemplate}"
+                                         DateTimeTemplate="{StaticResource SimpleParameterValueDateTimeTemplate}"
+                                         InactiveTemplate="{StaticResource InactiveTemplate}"
+                                         MultiEnumTemplate="{StaticResource SimpleParameterValueMultiEnumTemplate}"
+                                         SingleEnumTemplate="{StaticResource SimpleParameterValueSingleEnumTemplate}"
+                                         TextEditTemplate="{StaticResource SimpleParameterValueTextEditTemplate}"
+                                         TimeOfDayTemplate="{StaticResource SimpleParameterValueTimeTemplate}" />
+
+    <resources:ValueCellTemplateSelector x:Key="SimpleParameterValueCellTemplateSelectorShortNames"
+                                         BooleanTemplate="{StaticResource SimpleParameterValueBooleanTemplate}"
+                                         DateTemplate="{StaticResource SimpleParameterValueDateTemplate}"
+                                         DateTimeTemplate="{StaticResource SimpleParameterValueDateTimeTemplate}"
+                                         InactiveTemplate="{StaticResource InactiveTemplate}"
+                                         MultiEnumTemplate="{StaticResource SimpleParameterValueMultiEnumTemplateShortName}"
+                                         SingleEnumTemplate="{StaticResource SimpleParameterValueSingleEnumTemplateShortName}"
+                                         TextEditTemplate="{StaticResource SimpleParameterValueTextEditTemplate}"
+                                         TimeOfDayTemplate="{StaticResource SimpleParameterValueTimeTemplate}" />
+
+
 </av:ResourceDictionary>
