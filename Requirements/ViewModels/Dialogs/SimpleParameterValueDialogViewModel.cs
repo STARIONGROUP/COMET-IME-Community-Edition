@@ -185,7 +185,7 @@ namespace CDP4Requirements.ViewModels
         protected override void UpdateTransaction()
         {
             base.UpdateTransaction();
-            this.Thing.Value = new ValueArray<string>(this.Values.Select(x => x.Manual.ToValueSetString(x.ParameterType)));
+            this.Thing.Value = new ValueArray<string>(this.Values.Select(x => x.Value.ToValueSetString(x.ParameterType)));
 
             if (this.Thing.ParameterType is QuantityKind)
             {
