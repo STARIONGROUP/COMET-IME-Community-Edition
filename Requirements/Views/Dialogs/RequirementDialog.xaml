@@ -22,6 +22,10 @@
     <dx:DXWindow.Resources>
         <ResourceDictionary>
             <cdp4Composition:ThingToIconUriConverter x:Key="ThingToIconUriConverter" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/ValueSetTemplates.xaml" />
+            </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </dx:DXWindow.Resources>
     
@@ -151,7 +155,11 @@
                         </dxg:GridControl.View>
                         <dxg:GridControl.Columns>
                             <dxg:GridColumn Header="Type" FieldName="ParameterTypeShortName" AllowEditing="False" Width="40"/>
-                            <dxg:GridColumn Header="Value" FieldName="Definition" AllowEditing="False"/>
+                            <dxg:GridColumn Header="Value" 
+                                            FieldName="Value" 
+                                            AllowEditing="False"
+                                            CellTemplateSelector="{StaticResource SimpleParameterValueCellTemplateSelector}"
+                                            />
                             <dxg:GridColumn Header="Type Name" FieldName="ParameterTypeName" AllowEditing="False" Width="80"/>
                             <dxg:GridColumn Header="Scale" FieldName="ScaleShortName" Width="80" AllowEditing="False">
                             </dxg:GridColumn>
