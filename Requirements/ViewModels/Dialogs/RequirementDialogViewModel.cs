@@ -72,7 +72,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Backing field for <see cref="SelectedSimpleParameterValue"/>
         /// </summary>
-        private SimpleParameterValueRowViewModel selectedSimpleParameterValue;
+        private CDP4Requirements.ViewModels.Dialogs.SimpleParameterValueRowViewModel selectedSimpleParameterValue;
 
         /// <summary>
         /// Backing field for <see cref="SelectedParametricConstraintExpression"/>
@@ -142,7 +142,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets or sets the list of <see cref="SimpleParameterValue"/>
         /// </summary>
-        public DisposableReactiveList<SimpleParameterValueRowViewModel> SimpleParameterValue { get; set; }
+        public DisposableReactiveList<CDP4Requirements.ViewModels.Dialogs.SimpleParameterValueRowViewModel> SimpleParameterValue { get; set; }
 
         /// <summary>
         /// Gets or sets the list of <see cref="ParametricConstraint"/>
@@ -184,7 +184,7 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="SelectedSimpleParameterValue"/>
         /// </summary>
-        public SimpleParameterValueRowViewModel SelectedSimpleParameterValue
+        public CDP4Requirements.ViewModels.Dialogs.SimpleParameterValueRowViewModel SelectedSimpleParameterValue
         {
             get { return this.selectedSimpleParameterValue; }
             set { this.RaiseAndSetIfChanged(ref this.selectedSimpleParameterValue, value); }
@@ -229,7 +229,7 @@ namespace CDP4Requirements.ViewModels
             var iteration = (Iteration)this.Container.Container ?? this.ChainOfContainer.OfType<Iteration>().Single();
             var model = (EngineeringModel)iteration.Container;
             this.mRdl = model.EngineeringModelSetup.RequiredRdl.Single();
-            this.SimpleParameterValue = new DisposableReactiveList<SimpleParameterValueRowViewModel>();
+            this.SimpleParameterValue = new DisposableReactiveList<CDP4Requirements.ViewModels.Dialogs.SimpleParameterValueRowViewModel>();
             this.ParametricConstraintExpression = new DisposableReactiveList<IRowViewModelBase<BooleanExpression>>();
             this.PossibleLanguageCode = new ReactiveList<LanguageCodeUsage>();
             this.PopulateSimpleParameterValues();
@@ -344,7 +344,7 @@ namespace CDP4Requirements.ViewModels
             this.SimpleParameterValue.ClearAndDispose();
             foreach (var thing in this.Thing.ParameterValue.Where(t => t.ChangeKind != ChangeKind.Delete))
             {
-                var row = new SimpleParameterValueRowViewModel(thing, this.Session, this);
+                var row = new CDP4Requirements.ViewModels.Dialogs.SimpleParameterValueRowViewModel(thing, this.Session, this, 0, true);
                 this.SimpleParameterValue.Add(row);
             }
         }

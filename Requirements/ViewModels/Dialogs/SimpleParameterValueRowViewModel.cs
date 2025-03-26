@@ -33,9 +33,9 @@ namespace CDP4Requirements.ViewModels.Dialogs
         private bool isReadOnly;
 
         /// <summary>
-        /// Backing field for <see cref="Manual"/>
+        /// Backing field for <see cref="Value"/>
         /// </summary>
-        private object manual;
+        private object value;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleParameterValueRowViewModel"/> class
@@ -59,10 +59,10 @@ namespace CDP4Requirements.ViewModels.Dialogs
         /// <summary>
         /// Gets or sets the value for this <see cref="SimpleParameterValue"/>
         /// </summary>
-        public object Manual
+        public object Value
         {
-            get { return this.manual; }
-            set { this.RaiseAndSetIfChanged(ref this.manual, value); }
+            get { return this.value; }
+            set { this.RaiseAndSetIfChanged(ref this.value, value); }
         }
 
         /// <summary>
@@ -192,7 +192,7 @@ namespace CDP4Requirements.ViewModels.Dialogs
 
             this.ParameterTypeName = this.ParameterType.Name;
             this.ParameterTypeClassKind = this.ParameterType.ClassKind;
-            this.Manual = this.Thing.Value.Count() > this.valueIndex ? this.Thing.Value[this.valueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
+            this.Value = this.Thing.Value.Count() > this.valueIndex ? this.Thing.Value[this.valueIndex].ToValueSetObject(this.ParameterType) : ValueSetConverter.DefaultObject(this.ParameterType);
         }
 
         /// <summary>

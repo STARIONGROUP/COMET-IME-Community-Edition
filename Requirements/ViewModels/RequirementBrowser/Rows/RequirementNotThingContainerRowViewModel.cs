@@ -1,25 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ParametricConstraintsFolderRowViewModel.cs" company="Starion Group S.A.">
+// <copyright file="RequirementNotThingContainerRowViewModel.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate
 //
-//    This file is part of COMET-IME Community Edition.
-//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET-IME Community Edition. 
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET-IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET-IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
 //
 //    You should have received a copy of the GNU Affero General Public License
-//    along with this program. If not, see http://www.gnu.org/licenses/.
+//    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -32,28 +32,19 @@ namespace CDP4Requirements.ViewModels.RequirementBrowser.Rows
 
     using CDP4Dal;
 
-    using CDP4RequirementsVerification;
-
-    using ReactiveUI;
-
     /// <summary>
-    /// Specific FolderRowViewModel for showing the ParametricConstraint's top folder in the RequirementBrowser 
+    /// The <see cref="RequirementNotThingContainerRowViewModel"/> row view model.
     /// </summary>
-    public class ParametricConstraintsFolderRowViewModel : FolderRowViewModel, IHaveWritableRequirementStateOfCompliance
+    public class RequirementNotThingContainerRowViewModel : FolderRowViewModel
     {
         /// <summary>
-        /// Backing field for <see cref="ParametricConstraintsFolderRowViewModel.RequirementStateOfCompliance"/> 
-        /// </summary>
-        private RequirementStateOfCompliance requirementStateOfCompliance;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FolderRowViewModel"/> class
+        /// Initializes a new instance of the <see cref="RequirementNotThingContainerRowViewModel"/> class
         /// </summary>
         /// <param name="shortname">The short-name for this folder</param>
         /// <param name="name">The Name of the folder</param>
         /// <param name="session">The <see cref="ISession"/></param>
         /// <param name="containerViewModel">The view-model that contains this row</param>
-        public ParametricConstraintsFolderRowViewModel(string shortname, string name, ISession session, IViewModelBase<Thing> containerViewModel) : base(shortname, name, session, containerViewModel)
+        public RequirementNotThingContainerRowViewModel(string shortname, string name, ISession session, IViewModelBase<Thing> containerViewModel) : base(shortname, name, session, containerViewModel)
         {
         }
 
@@ -61,14 +52,5 @@ namespace CDP4Requirements.ViewModels.RequirementBrowser.Rows
         /// Gets a value indicating whether the value set editors are active
         /// </summary>
         public static bool IsValueSetEditorActive => false;
-
-        /// <summary>
-        /// Gets or sets the RequirementStateOfCompliance
-        /// </summary>
-        public RequirementStateOfCompliance RequirementStateOfCompliance
-        {
-            get => this.requirementStateOfCompliance;
-            set => this.RaiseAndSetIfChanged(ref this.requirementStateOfCompliance, value);
-        }
     }
 }
