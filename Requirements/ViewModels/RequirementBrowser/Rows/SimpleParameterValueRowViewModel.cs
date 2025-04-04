@@ -263,7 +263,7 @@ namespace CDP4Requirements.ViewModels
         {
             if (columnName == "Value")
             {
-                return ParameterValueValidator.Validate(newValue, this.Thing.ParameterType, this.Thing.Scale);
+                return ParameterValueValidator.Validate(newValue, this.Thing.ParameterType, this.Scale);
             }
 
             return null;
