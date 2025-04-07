@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{DA9183AB-D060-488F-89E9-DEC1F0177B1E}</ProjectGuid>
-    <MinIMEVersion>10.0.4</MinIMEVersion>
+    <MinIMEVersion>10.0.5</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <AssemblyTitle>CDP4Scripting</AssemblyTitle>
     <Company>Starion Group S.A.</Company>

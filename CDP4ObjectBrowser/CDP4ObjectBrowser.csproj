@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{C6B4A2B4-5DD4-45D8-93B4-17DF82641B86}</ProjectGuid>
-    <MinIMEVersion>10.0.4</MinIMEVersion>
+    <MinIMEVersion>10.0.5</MinIMEVersion>
     <TargetFramework>net48</TargetFramework>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <AssemblyTitle>CDP4ObjectBrowser</AssemblyTitle>
