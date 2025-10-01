@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AddinRibbonPart.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -38,6 +38,7 @@ namespace CDP4AddinCE
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using CDP4Composition.Services.AppSettingService;
 
     using CDP4Dal;
@@ -74,6 +75,11 @@ namespace CDP4AddinCE
         private readonly IExceptionHandlerService exceptionHandlerService;
 
         /// <summary>
+        /// The <see cref="ISessionCreator"/>
+        /// </summary>
+        private readonly ISessionCreator sessionCreator;
+
+        /// <summary>
         /// The <see cref="IAuthenticationRefreshService" /> that provides authentication refresh behavior 
         /// </summary>
         private IAuthenticationRefreshService authenticationRefreshService;
@@ -99,12 +105,16 @@ namespace CDP4AddinCE
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
         /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
-        public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IAppSettingsService<AddinAppSettings> appSettingService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService)
+        /// <param name="sessionCreator">
+        /// The <see cref="ISessionCreator"/>
+        /// </param>
+        public AddinRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IAppSettingsService<AddinAppSettings> appSettingService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService, ISessionCreator sessionCreator)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, messageBus)
         {
             messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
             this.appSettingService = appSettingService;
             this.exceptionHandlerService = exceptionHandlerService;
+            this.sessionCreator = sessionCreator;
         }
 
         /// <summary>
@@ -121,7 +131,7 @@ namespace CDP4AddinCE
             switch (ribbonControlId)
             {
                 case "CDP4_Open":
-                    var dataSelection = new DataSourceSelectionViewModel(this.DialogNavigationService, this.CDPMessageBus, this.exceptionHandlerService);
+                    var dataSelection = new DataSourceSelectionViewModel(this.DialogNavigationService, this.CDPMessageBus, this.exceptionHandlerService, this.sessionCreator);
                     var dataSelectionResult = this.DialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
 
                     if(dataSelectionResult?.Result == true && dataSelectionResult.Session.Dal is ISupportAuthenticationRefresh supportAuthenticationRefresh)

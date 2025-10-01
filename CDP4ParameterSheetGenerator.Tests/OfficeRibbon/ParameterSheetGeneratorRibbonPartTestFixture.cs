@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSheetGeneratorRibbonPartTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -34,14 +34,16 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.ExceptionHandlerService;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-
+    using CDP4Composition.Services;
     using CDP4Dal;
+    using CDP4Dal.DAL;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
 
@@ -81,6 +83,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IPermissionService> permittingPermissionService;
         private Mock<IPluginSettingsService> pluginSettingsService;
+        private Mock<ISessionCreator> sessionCreator;
 
         private Mock<IOfficeApplicationWrapper> officeApplicationWrapper;
         private Mock<IExcelQuery> excelQuery;
@@ -122,6 +125,9 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
             this.serviceLocator = new Mock<IServiceLocator>();
+            this.sessionCreator = new Mock<ISessionCreator>();
+
+            this.sessionCreator.Setup(x => x.CreateSession(It.IsAny<IDal>(), It.IsAny<Credentials>(), this.messageBus, It.IsAny<IExceptionHandlerService>())).Returns(this.session.Object);
 
             this.excelQuery = new Mock<IExcelQuery>();
             this.excelQuery.Setup(x => x.IsActiveWorkbookAvailable(It.IsAny<NetOffice.ExcelApi.Application>())).Returns(true);
@@ -136,7 +142,7 @@ namespace CDP4ParameterSheetGenerator.Tests.OfficeRibbon
             this.amountOfRibbonControls = 10;
             this.order = 1;
 
-            this.ribbonPart = new ParameterSheetGeneratorRibbonPart(this.order, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingsService.Object, this.officeApplicationWrapper.Object, this.messageBus);
+            this.ribbonPart = new ParameterSheetGeneratorRibbonPart(this.order, this.panelNavigationService.Object, this.thingDialogNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingsService.Object, this.officeApplicationWrapper.Object, this.messageBus, this.sessionCreator.Object);
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 

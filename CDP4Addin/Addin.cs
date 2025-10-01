@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Addin.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -51,6 +51,7 @@ namespace CDP4AddinCE
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using CDP4Composition.Services.AppSettingService;
 
     using CDP4Dal;
@@ -381,6 +382,10 @@ namespace CDP4AddinCE
             logger.Trace("System.Text.Json");
             var systemTextJsonExtensions = new Version("9.0.0.0");
             this.RedirectAssembly("System.Text.Json", systemTextJsonExtensions, "cc7b13ffcd2ddd51");
+
+            logger.Trace("Microsoft.Extensions.Logging.Abstractions");
+            var microsoftExtensionsLoggingAbstractions = new Version("8.0.0.0");
+            this.RedirectAssembly("Microsoft.Extensions.Logging.Abstractions", microsoftExtensionsLoggingAbstractions, "adb9793829ddae60");
         }
 
         /// <summary>
@@ -812,10 +817,11 @@ namespace CDP4AddinCE
             var dialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             var pluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
             var exceptionHandlerService = ServiceLocator.Current.GetInstance<IExceptionHandlerService>();
+            var sessionCreator = ServiceLocator.Current.GetInstance<ISessionCreator>();
 
             this.FluentRibbonManager.IsActive = true;
             var appSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<AddinAppSettings>>();
-            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService, this.messageBus, exceptionHandlerService);
+            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService, this.messageBus, exceptionHandlerService, sessionCreator);
             this.FluentRibbonManager.RegisterRibbonPart(ribbonpart);
             this.fluentRibbonXml = this.FluentRibbonManager.GetFluentXml();
 

@@ -28,6 +28,12 @@
             <Component Id="_F768C9A9" Guid="{F768C9A9-68A4-468D-9229-C6550264816A}" Location="local" >
                 <File Id="_C6550264816A" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x64/d3dcompiler_47.dll" KeyPath="yes" />
             </Component>
+            <Component Id="_9C6D006C" Guid="{9C6D006C-7113-4C13-B0B3-4E8643ED87A3}" Location="local" >
+                <File Id="_4E8643ED87A3" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x64/dxcompiler.dll" KeyPath="yes" />
+            </Component>
+            <Component Id="_9C6D006D" Guid="{9C6D006D-7113-4C13-B0B3-4E8643ED87A4}" Location="local" >
+                <File Id="_4E8643ED87A4" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x64/dxil.dll" KeyPath="yes" />
+            </Component>
             <Component Id="_9C6D006B" Guid="{9C6D006B-7113-4C13-B0B3-4E8643ED87A2}" Location="local" >
                 <File Id="_4E8643ED87A2" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x64/icudtl.dat" KeyPath="yes" />
             </Component>
@@ -42,9 +48,6 @@
             </Component>
             <Component Id="_1D68BCFF" Guid="{1D68BCFF-3995-4D4D-BAC2-1021B95C0A07}" Location="local" >
                 <File Id="_1021B95C0A07" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x64/resources.pak" KeyPath="yes" />
-            </Component>
-            <Component Id="_BFE82EFC" Guid="{BFE82EFC-BBEF-422A-AA38-7D9B036440CC}" Location="local" >
-                <File Id="_7D9B036440CC" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x64/snapshot_blob.bin" KeyPath="yes" />
             </Component>
             <Component Id="_C5EDE0D6" Guid="{C5EDE0D6-F19D-48B1-9A5D-5277D05C0B94}" Location="local" >
                 <File Id="_5277D05C0B94" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x64/v8_context_snapshot.bin" KeyPath="yes" />
@@ -99,9 +102,6 @@
             </Component>
             <Component Id="_70981C97" Guid="{70981C97-2133-4116-957B-B9FF2A5A23B2}" Location="local">
                 <File Id="_B9FF2A5A23B2" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x86/resources.pak" KeyPath="yes" />
-            </Component>
-            <Component Id="_9A662EF1" Guid="{9A662EF1-5F87-4576-B938-61E7F7B13382}" Location="local">
-                <File Id="_61E7F7B13382" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x86/snapshot_blob.bin" KeyPath="yes" />
             </Component>
             <Component Id="_61D7F842" Guid="{61D7F842-4DF1-4D06-A962-7CD8FD497E3C}" Location="local">
                 <File Id="_7CD8FD497E3C" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)/x86/v8_context_snapshot.bin" KeyPath="yes" />

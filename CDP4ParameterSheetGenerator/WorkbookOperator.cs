@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="WorkbookOperator.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -35,9 +35,8 @@ namespace CDP4ParameterSheetGenerator
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ExceptionHandlerService;
     using CDP4Common.SiteDirectoryData;
-
-    using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
     using CDP4Composition.Utilities;
     using CDP4Composition.ViewModels;
 
@@ -87,6 +86,11 @@ namespace CDP4ParameterSheetGenerator
         private readonly Workbook workbook;
 
         /// <summary>
+        /// The <see cref="ISessionCreator"/>
+        /// </summary>
+        private readonly ISessionCreator sessionCreator;
+
+        /// <summary>
         /// The excel <see cref="Application"/> that is being managed by the current <see cref="WorkbookOperator"/>  
         /// </summary>
         private readonly Application application;
@@ -106,7 +110,10 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="messageBus">
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
-        public WorkbookOperator(Application application, Workbook workbook, IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus)
+        /// <param name="sessionCreator">
+        /// The <see cref="ISessionCreator"/>
+        /// </param>
+        public WorkbookOperator(Application application, Workbook workbook, IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, ISessionCreator sessionCreator)
         {
             if (application == null)
             {
@@ -121,6 +128,7 @@ namespace CDP4ParameterSheetGenerator
             workbook.Activate();
 
             this.workbook = workbook;
+            this.sessionCreator = sessionCreator;
             this.application = application;
             this.DialogNavigationService = dialogNavigationService;
             this.CDPMessageBus = messageBus;
@@ -566,7 +574,7 @@ namespace CDP4ParameterSheetGenerator
             var workbookDataDal = new WorkbookDataDal(this.workbook);
             var workbookData = workbookDataDal.Read();
 
-            var workbookSession = dal.CreateSession(credentials, this.CDPMessageBus, exceptionHandlerService);
+            var workbookSession = this.sessionCreator.CreateSession(dal, credentials, this.CDPMessageBus, exceptionHandlerService);
 
             if (workbookData != null)
             {

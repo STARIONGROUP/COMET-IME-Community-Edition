@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSheetGeneratorModule.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -32,7 +32,7 @@ namespace CDP4ParameterSheetGenerator
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-
+    using CDP4Composition.Services;
     using CDP4Dal;
 
     using CDP4OfficeInfrastructure;
@@ -65,8 +65,11 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="messageBus">
         /// The MEF injected instance of <see cref="ICDPMessageBus"/>
         /// </param>
+        /// <param name="sessionCreator">
+        /// The <see cref="ISessionCreator"/>
+        /// </param>
         [ImportingConstructor]
-        public ParameterSheetGeneratorModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IOfficeApplicationWrapper officeApplicationWrapper, ICDPMessageBus messageBus)
+        public ParameterSheetGeneratorModule(IFluentRibbonManager ribbonManager, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IOfficeApplicationWrapper officeApplicationWrapper, ICDPMessageBus messageBus, ISessionCreator sessionCreator)
         {
             this.RibbonManager = ribbonManager;
             this.PanelNavigationService = panelNavigationService;
@@ -74,6 +77,7 @@ namespace CDP4ParameterSheetGenerator
             this.DialogNavigationService = dialogNavigationService;
             this.OfficeApplicationWrapper = officeApplicationWrapper;
             this.CDPMessageBus = messageBus;
+            this.SessionCreator = sessionCreator;
         }
 
         /// <summary>
@@ -112,6 +116,11 @@ namespace CDP4ParameterSheetGenerator
         internal ICDPMessageBus CDPMessageBus { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ISessionCreator"/>
+        /// </summary>
+        internal ISessionCreator SessionCreator { get; }
+
+        /// <summary>
         /// Initialize the Module
         /// </summary>
         public void Initialize()
@@ -124,7 +133,7 @@ namespace CDP4ParameterSheetGenerator
         /// </summary>
         private void RegisterRibbonPart()
         {
-            var ribbonPart = new ParameterSheetGeneratorRibbonPart(10, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.OfficeApplicationWrapper, this.CDPMessageBus);
+            var ribbonPart = new ParameterSheetGeneratorRibbonPart(10, this.PanelNavigationService, this.ThingDialogNavigationService, this.DialogNavigationService, this.PluginSettingsService, this.OfficeApplicationWrapper, this.CDPMessageBus, this.SessionCreator);
             this.RibbonManager.RegisterRibbonPart(ribbonPart);
         }
     }

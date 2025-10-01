@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceExportViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -35,9 +35,8 @@ namespace COMET.Tests.ViewModels
 
     using CDP4Common.DTO;
     using CDP4Common.ExceptionHandlerService;
-
     using CDP4Composition.Navigation;
-
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
@@ -87,6 +86,7 @@ namespace COMET.Tests.ViewModels
         private Mock<IServiceLocator> serviceLocator;
         private Mock<IOpenSaveFileDialogService> fileDialogService;
         private Mock<IExceptionHandlerService> exceptionHandlerService;
+        private Mock<ISessionCreator> sessionCreator;
         private CDPMessageBus messageBus;
 
         [SetUp]
@@ -104,6 +104,11 @@ namespace COMET.Tests.ViewModels
             this.mockedDal.Setup(x => x.IsValidUri(It.IsAny<string>())).Returns(true);
             this.mockedDal.Setup(x => x.Open(It.IsAny<Credentials>(), this.tokenSource.Token)).Returns(openTaskCompletionSource.Task);
 
+            this.sessionCreator = new Mock<ISessionCreator>();
+
+            this.sessionCreator.Setup(x => x.CreateSession(It.IsAny<IDal>(), It.IsAny<Credentials>(), It.IsAny<ICDPMessageBus>(), It.IsAny<IExceptionHandlerService>()))
+                .Returns(this.session.Object);
+
             this.mockedMetaData = new Mock<IDalMetaData>();
             this.mockedMetaData.Setup(x => x.Name).Returns("MockedDal");
             this.mockedMetaData.Setup(x => x.DalType).Returns(DalType.File);
@@ -120,7 +125,7 @@ namespace COMET.Tests.ViewModels
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>())
                 .Returns(new AvailableDals(dataAccessLayerKinds));
 
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
         }
 
         [Test]
@@ -156,15 +161,15 @@ namespace COMET.Tests.ViewModels
         [Test]
         public void VerifyVersionChecks()
         {
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
             Assert.AreEqual(1, this.viewModel.Versions.Count);
 
             this.session.Setup(x => x.DalVersion).Returns(new Version("1.1.0"));
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
             Assert.AreEqual(2, this.viewModel.Versions.Count);
 
             this.session.Setup(x => x.DalVersion).Returns(new Version("1.2.0"));
-            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            this.viewModel = new DataSourceExportViewModel(new List<ISession> { this.session.Object }, this.fileDialogService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
             Assert.AreEqual(3, this.viewModel.Versions.Count);
         }
 
