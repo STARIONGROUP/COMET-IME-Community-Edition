@@ -34,10 +34,9 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Threading.Tasks;
 
     using CDP4Common.ExceptionHandlerService;
-
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
     using CDP4Composition.Utilities;
 
     using CDP4Dal;
@@ -75,6 +74,11 @@ namespace CDP4ShellDialogs.ViewModels
         /// The <see cref="IExceptionHandlerService" />
         /// </summary>
         private readonly IExceptionHandlerService exceptionHandlerService;
+
+        /// <summary>
+        /// Holds a reference to the INJECTED <see cref="ISessionCreator"/>
+        /// </summary>
+        private readonly ISessionCreator sessionCreator;
 
         /// <summary name="messageBus">
         /// The <see cref="ICDPMessageBus" />
@@ -199,10 +203,11 @@ namespace CDP4ShellDialogs.ViewModels
         /// The <see cref="ICDPMessageBus" />
         /// </param>
         /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService" /></param>
+        /// <param name="sessionCreator">The INJECTED <see cref="ISessionCreator"/></param>
         /// <param name="openSessions">
         /// The openSessions.
         /// </param>
-        public DataSourceSelectionViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService, IEnumerable<ISession> openSessions = null)
+        public DataSourceSelectionViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService, ISessionCreator sessionCreator, IEnumerable<ISession> openSessions = null)
         {
             this.messageBus = messageBus;
 
@@ -211,6 +216,7 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.openSessions = openSessions;
             this.exceptionHandlerService = exceptionHandlerService;
+            this.sessionCreator = sessionCreator;
             this.dialogNavigationService = dialogNavigationService;
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
 
@@ -263,10 +269,11 @@ namespace CDP4ShellDialogs.ViewModels
             this.Subscriptions.Add(this.WhenAnyValue(x => x.AvailableAuthenticationScheme).Subscribe(_ => this.OnAuthenticationSchemeReponseChanges()));
             this.ResetProperties();
             
-            this.Subscriptions.Add(this.WhenAnyValue(x => x.SelectedUri, 
+            this.Subscriptions.Add(this.WhenAnyValue(x => x.Uri, 
+                    x => x.SelectedDataSourceKind,
                     x => x.IsFullTrustAllowed,
                     x => x.IsProxyEnabled)
-                .Subscribe(_ => this.RequestAuthenticationScheme().ConfigureAwait(false)));
+                .Subscribe(async _ => await this.RequestAuthenticationScheme()));
         }
 
         /// <summary>
@@ -820,15 +827,17 @@ namespace CDP4ShellDialogs.ViewModels
             this.ErrorMessage = string.Empty;
             this.IsAuthenticatedViaExternalProvider = false;
 
-            if (this.SelectedUri == null)
+            if (this.SelectedUri == null && !System.Uri.TryCreate(this.Uri, UriKind.Absolute, out _))
             {
                 this.AvailableAuthenticationScheme = null;
                 return;
             }
 
-            if (this.SelectedDataSourceKind.DalType == DalType.Web && !this.SelectedUri.Uri.EndsWith("/") && !this.Uri.EndsWith("/"))
+            var uriToBeChecked = this.SelectedUri?.Uri ?? this.Uri;
+
+            if (this.SelectedDataSourceKind.DalType == DalType.Web && !uriToBeChecked.EndsWith("/") && !this.Uri.EndsWith("/"))
             {
-                this.Uri += "/";
+                this.uri += "/";
             }
 
             var temporaryCredentials = new Credentials(new Uri(this.Uri), this.IsFullTrustCheckBoxEnabled, this.CreateProxySettings());
@@ -837,12 +846,9 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.IsBusy = true;
 
-            // Required to display Loading spinner corectly
-            await Task.Delay(1);
-            
             try
             {
-                this.session = dalInstance.CreateSession(temporaryCredentials, this.messageBus, this.exceptionHandlerService);
+                this.session = this.sessionCreator.CreateSession(dalInstance, temporaryCredentials, this.messageBus, this.exceptionHandlerService);
                 this.AvailableAuthenticationScheme = await this.session.QueryAvailableAuthenticationScheme();
             }
             catch (Exception ex)

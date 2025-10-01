@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShellViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -40,6 +40,7 @@ namespace COMET
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
     using CDP4Composition.Services.AppSettingService;
     using CDP4Composition.ViewModels;
 
@@ -141,6 +142,11 @@ namespace COMET
         private readonly IExceptionHandlerService exceptionHandlerService;
 
         /// <summary>
+        /// The <see cref="ISessionCreator"/>
+        /// </summary>
+        private readonly ISessionCreator sessionCreator;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ShellViewModel"/> class.
         /// </summary>
         /// <param name="dialogNavigationService">
@@ -153,8 +159,11 @@ namespace COMET
         /// The <see cref="DockLayoutViewModel" for the panel dock/>
         /// </param>
         /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
+        /// <param name="sessionCreator">
+        /// The <see cref="ISessionCreator"/>
+        /// </param>
         [ImportingConstructor]
-        public ShellViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, DockLayoutViewModel dockViewModel, IExceptionHandlerService exceptionHandlerService)
+        public ShellViewModel(IDialogNavigationService dialogNavigationService, ICDPMessageBus messageBus, DockLayoutViewModel dockViewModel, IExceptionHandlerService exceptionHandlerService, ISessionCreator sessionCreator)
         {
             if (dialogNavigationService == null)
             {
@@ -166,6 +175,7 @@ namespace COMET
 
             this.messageBus = messageBus;
             this.exceptionHandlerService = exceptionHandlerService;
+            this.sessionCreator = sessionCreator;
             this.messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
 
             this.dialogNavigationService = dialogNavigationService;
@@ -406,7 +416,7 @@ namespace COMET
         private async Task ExecuteOpenDataSourceRequest()
         {
             var openSessions = this.Sessions.Select(x => x.Session).ToList();
-            var dataSelection = new DataSourceSelectionViewModel(this.dialogNavigationService, this.messageBus, this.exceptionHandlerService, openSessions);
+            var dataSelection = new DataSourceSelectionViewModel(this.dialogNavigationService, this.messageBus, this.exceptionHandlerService, this.sessionCreator, openSessions);
             var result = this.dialogNavigationService.NavigateModal(dataSelection) as DataSourceSelectionResult;
 
             if (result == null || !result.Result.HasValue || !result.Result.Value)
@@ -428,7 +438,7 @@ namespace COMET
         /// </summary>
         private void ExecuteSaveSessionCommand()
         {
-            var sessionExport = new DataSourceExportViewModel(this.Sessions.Select(x => x.Session), new OpenSaveFileDialogService(), this.messageBus, this.exceptionHandlerService);
+            var sessionExport = new DataSourceExportViewModel(this.Sessions.Select(x => x.Session), new OpenSaveFileDialogService(), this.messageBus, this.exceptionHandlerService, this.sessionCreator);
             this.dialogNavigationService.NavigateModal(sessionExport);
         }
 

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSheetGeneratorRibbonPart.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -39,7 +39,7 @@ namespace CDP4ParameterSheetGenerator
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-
+    using CDP4Composition.Services;
     using CDP4Dal;
     using CDP4Dal.Events;
 
@@ -71,6 +71,11 @@ namespace CDP4ParameterSheetGenerator
         private readonly IOfficeApplicationWrapper officeApplicationWrapper;
 
         /// <summary>
+        /// The <see cref="ISessionCreator"/>
+        /// </summary>
+        private readonly ISessionCreator sessionCreator;
+
+        /// <summary>
         /// Gets or sets the <see cref="IExcelQuery"/> that is used to query the excel application
         /// </summary>
         internal IExcelQuery ExcelQuery { get; set; }
@@ -99,11 +104,15 @@ namespace CDP4ParameterSheetGenerator
         /// <param name="messageBus">
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
-        public ParameterSheetGeneratorRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper, ICDPMessageBus messageBus)
+        /// <param name="sessionCreator">
+        /// The <see cref="ISessionCreator"/>
+        /// </param>
+        public ParameterSheetGeneratorRibbonPart(int order, IPanelNavigationService panelNavigationService, IThingDialogNavigationService thingDialogNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService, IOfficeApplicationWrapper officeApplicationWrapper, ICDPMessageBus messageBus, ISessionCreator sessionCreator)
             : base(order, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, messageBus)
         {
             this.ExcelQuery = new ExcelQuery();
             this.officeApplicationWrapper = officeApplicationWrapper;
+            this.sessionCreator = sessionCreator;
             this.Iterations = new List<Iteration>();
 
             messageBus.Listen<SessionEvent>().Subscribe(this.SessionChangeEventHandler);
@@ -506,7 +515,7 @@ namespace CDP4ParameterSheetGenerator
 
                 try
                 {
-                    var workbookOperator = new WorkbookOperator(application, workbook, this.DialogNavigationService, this.CDPMessageBus);
+                    var workbookOperator = new WorkbookOperator(application, workbook, this.DialogNavigationService, this.CDPMessageBus, this.sessionCreator);
                     await workbookOperator.Rebuild(this.Session, iteration, activeParticipant);
                 }
                 catch (Exception ex)
@@ -548,7 +557,7 @@ namespace CDP4ParameterSheetGenerator
 
             try
             {
-                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService, this.CDPMessageBus);
+                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService, this.CDPMessageBus, this.sessionCreator);
                 await workbookOperator.SubmitOutput(this.Session, iteration);
             }
             catch (Exception ex)
@@ -589,7 +598,7 @@ namespace CDP4ParameterSheetGenerator
 
             try
             {
-                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService, this.CDPMessageBus);
+                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService, this.CDPMessageBus, this.sessionCreator);
                 await workbookOperator.SubmitInput(this.Session, iteration);
             }
             catch (Exception ex)
@@ -630,7 +639,7 @@ namespace CDP4ParameterSheetGenerator
 
             try
             {
-                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService, this.CDPMessageBus);
+                var workbookOperator = new WorkbookOperator(application, activeWorkbook, this.DialogNavigationService, this.CDPMessageBus, this.sessionCreator);
                 await workbookOperator.SubmitAll(this.Session, iteration);
             }
             catch (Exception ex)

@@ -63,9 +63,9 @@
                                               ItemsSource="{Binding Path=AvailableUris}"
                                               SelectedItem="{Binding Path=SelectedUri,
                                                      Mode=TwoWay,
-                                                     UpdateSourceTrigger=PropertyChanged}"
+                                                     UpdateSourceTrigger=LostFocus}"
                                               Text="{Binding SelectedUriText,
-                                              UpdateSourceTrigger=PropertyChanged,
+                                              UpdateSourceTrigger=LostFocus,
                                               Mode=TwoWay}" />
                                     <dx:SimpleButton Grid.Column="1"
                                                      Margin="10,0,0,0"

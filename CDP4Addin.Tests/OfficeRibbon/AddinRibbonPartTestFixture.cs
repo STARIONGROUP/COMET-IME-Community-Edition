@@ -1,6 +1,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="AddinRibbonPartTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -45,6 +45,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
     using CDP4Composition.Services.AppSettingService;
     using CDP4Composition.Utilities;
 
@@ -74,6 +75,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
         private Mock<IPanelNavigationService> panelNavigationService;
         private Mock<IDialogNavigationService> dialogNavigationService;
         private Mock<IExceptionHandlerService> exceptionHandlerService;
+        private Mock<ISessionCreator> sessionCreator;
         private Mock<ISession> session;
         private Assembler assembler;
         private Mock<IAppSettingsService<AddinAppSettings>> appSettingService;
@@ -109,6 +111,8 @@ namespace CDP4Addin.Tests.OfficeRibbon
 
             this.panelNavigationService = new Mock<IPanelNavigationService>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
+            this.sessionCreator = new Mock<ISessionCreator>();
+
             this.serviceLocator = new Mock<IServiceLocator>();
 
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
@@ -133,7 +137,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
             this.amountOfRibbonControls = 9;
             this.order = 1;
 
-            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, this.dialogNavigationService.Object, null, this.appSettingService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, this.dialogNavigationService.Object, null, this.appSettingService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
 
             var fluentRibbonManager = new FluentRibbonManager();
             fluentRibbonManager.IsActive = true;

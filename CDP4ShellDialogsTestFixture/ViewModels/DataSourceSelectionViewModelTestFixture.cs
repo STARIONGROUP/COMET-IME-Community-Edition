@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceSelectionViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -37,8 +37,8 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
     using CDP4Common.DTO;
     using CDP4Common.ExceptionHandlerService;
-
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
     using CDP4Composition.Utilities;
 
     using CDP4Dal;
@@ -83,6 +83,9 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
         private Mock<IDialogNavigationService> navService;
         private Mock<IExceptionHandlerService> exceptionHandlerService;
+
+        private Mock<ISessionCreator> sessionCreator;
+
         private CDPMessageBus messageBus;
 
         [SetUp]
@@ -95,6 +98,10 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             this.mockedDal = new Mock<IDal>();
             this.navService = new Mock<IDialogNavigationService>();
             this.exceptionHandlerService = new Mock<IExceptionHandlerService>();
+            this.sessionCreator = new Mock<ISessionCreator>();
+
+            this.sessionCreator.Setup(x => x.CreateSession(It.IsAny<IDal>(), It.IsAny<Credentials>(), this.messageBus, It.IsAny<IExceptionHandlerService>())).Returns(this.session.Object);
+
             this.mockedDal.Setup(x => x.IsValidUri(It.IsAny<string>())).Returns(true);
             var openTaskCompletionSource = new TaskCompletionSource<IEnumerable<Thing>>();
             openTaskCompletionSource.SetResult(this.dalOutputs);
@@ -127,12 +134,23 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             this.session.Setup(x => x.DataSourceUri).Returns("https://www.stariongroup.eu");
             this.session.Setup(x => x.Credentials).Returns(this.credentials);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
+            var authenticationSchemeResponse = new AuthenticationSchemeResponse
+            {
+                Schemes = new List<AuthenticationSchemeKind>
+                {
+                    AuthenticationSchemeKind.Basic, AuthenticationSchemeKind.ExternalJwtBearer
+                },
+                Authority = "http://127.0.0.1/"
+            };
+
+            this.session.Setup(x => x.QueryAvailableAuthenticationScheme()).ReturnsAsync(authenticationSchemeResponse);
         }
 
         [Test]
         public async Task AssertThatOkCommandCanExecuteAndASessionObjectIsSet()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
 
             Assert.IsTrue(((ICommand)viewmodel.CancelCommand).CanExecute(null));
 
@@ -156,7 +174,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public async Task AssertThatUriManagerDoesNotThrow()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
             Assert.IsTrue(((ICommand)viewmodel.OpenUriManagerCommand).CanExecute(null));
             Assert.DoesNotThrowAsync(async () => await viewmodel.OpenUriManagerCommand.Execute());
         }
@@ -164,7 +182,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public async Task AssertThatProxyManagerDoesNotThrow()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
             Assert.IsTrue(((ICommand)viewmodel.OpenProxyConfigurationCommand).CanExecute(null));
             Assert.DoesNotThrowAsync(async () => await viewmodel.OpenProxyConfigurationCommand.Execute());
         }
@@ -172,7 +190,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void AssertViewModelWorksWithMultipleUris()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
 
             Assert.IsTrue(((ICommand)viewmodel.CancelCommand).CanExecute(null));
             Assert.That(viewmodel.ErrorMessage, Is.Null.Or.Empty);
@@ -212,7 +230,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public async Task VerifyThatCancelWorks()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
 
             await viewmodel.CancelCommand.Execute();
 
@@ -224,17 +242,12 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         {
             var sessions = new List<ISession>();
             sessions.Add(this.session.Object);
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, sessions);
 
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object, sessions);
+
+            viewmodel.Uri = "https://www.stariongroup.eu";
             viewmodel.UserName = "John";
             viewmodel.Password = "Dow";
-            viewmodel.Uri = "https://www.stariongroup.eu";
-
-            await viewmodel.OkCommand.Execute();
-
-            Assert.AreEqual("A session with the username John already exists", viewmodel.ErrorMessage);
-
-            viewmodel.Uri = "https://www.stariongroup.eu/";
 
             await viewmodel.OkCommand.Execute();
 
@@ -244,7 +257,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void Verify_that_when_proxy_is_enabled_proxy_address_and_port_are_set()
         {
-            var vm = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            var vm = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
             Assert.IsFalse(vm.IsProxyEnabled);
             Assert.AreEqual(string.Empty, vm.ProxyUri);
             Assert.AreEqual(string.Empty, vm.ProxyPort);
@@ -263,7 +276,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void AssertThatShowPasswordButtonTextMatchesState()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
 
             // When password is hidden button should be Show
             viewmodel.IsPasswordVisible = false;
@@ -277,7 +290,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         [Test]
         public void AssertThatIsFullTrustAllowedWorks()
         {
-            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object);
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
             Assert.That(viewmodel.IsFullTrustAllowed, Is.False);
             Assert.That(viewmodel.IsFullTrustCheckBoxEnabled, Is.True);
 
@@ -291,6 +304,56 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.First(x => x.DalType == DalType.Web);
             Assert.That(viewmodel.IsFullTrustCheckBoxEnabled, Is.True);
             Assert.That(viewmodel.IsFullTrustAllowed, Is.False);
+        }
+
+        [Test]
+        public async Task AssertThatRequestSchemaIsCheckedUponChangesInViewModel()
+        {
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
+            viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.Single(x => x.DalType == DalType.File);
+
+            Assert.That(viewmodel.Uri, Is.Empty);
+            Assert.That(viewmodel.SelectedDataSourceKind.DalType, Is.EqualTo(DalType.File));
+            Assert.That(viewmodel.IsFullTrustAllowed, Is.False);
+            Assert.That(viewmodel.IsProxyEnabled, Is.False);
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Never);
+
+            viewmodel.IsFullTrustAllowed = true;
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Never);
+
+            viewmodel.IsProxyEnabled = true;
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Never);
+
+            viewmodel.Uri = "Not a valid URI";
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Never);
+
+            viewmodel.SelectedUri = new UriRowViewModel { Uri = "https://www.stariongroup.eu" };
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Once);
+
+            viewmodel.Uri = "Not a valid URI";
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Once);
+
+            viewmodel.Uri = "https://www.stariongroup.eu";
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(2));
+
+            viewmodel.IsFullTrustAllowed = false;
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(3));
+
+            viewmodel.IsProxyEnabled = false;
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(4));
+
+            viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.Single(x => x.DalType == DalType.Web);
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(5));
         }
     }
 }
