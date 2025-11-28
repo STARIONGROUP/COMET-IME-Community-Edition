@@ -2,7 +2,7 @@
 
 The CDP4-COMET Integrated Modelling Environment (IME) is the Desktop application, including Microsoft Excel integration, that is used in combination with the CDP4-COMET webservices to model according to ECSS-E-TM-10-25. The **IME** makes use of a plugin framework, the end-user functionality is implemented in CDP4-COMET IME plugins that are loaded at run-time. This makes it straightforward to package, distribute and update the environment.
 
-The user manual for the CDP4-COMET IME is available [online](https://www.stariongroup.eu/wp-content/uploads/2024/04/CDP4-COMET-User-Manual-2024.pdf)
+The user manual for the CDP4-COMET IME is available [online](https://www.stariongroup.eu/wp-content/uploads/2024/10/CDP4-COMET-User-Manual-Aug-2024.pdf)
 
 ## Build status
 
