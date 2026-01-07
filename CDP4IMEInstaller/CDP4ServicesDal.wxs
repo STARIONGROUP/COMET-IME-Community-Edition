@@ -25,10 +25,6 @@
         <File Id="fil_MessagePack_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)MessagePack.dll" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="comp_Microsoft_Bcl_Memory_CDP4ServicesDal" Guid="{9B6E30B5-67F2-49C1-9C8D-B5E2F4323217}" Location="local" >
-        <File Id="fil_Microsoft_Bcl_Memory_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.Bcl.Memory.dll" KeyPath="yes"></File>
-      </Component>
-
       <Component Id="comp_Microsoft_Bcl_TimeProvider_CDP4ServicesDal" Guid="{4BFAA059-5121-4088-B697-8A0C45FD0620}" Location="local" >
         <File Id="fil_Microsoft_Bcl_TimeProvider_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)Microsoft.Bcl.TimeProvider.dll" KeyPath="yes"></File>
       </Component>
@@ -68,6 +64,7 @@
       <Component Id="comp_IdentityModel_Tokens_Jwt_CDP4ServicesDal" Guid="{DD612805-6AC3-402B-B65A-2C93F8240822}" Location="local" >
         <File Id="fil_IdentityModel_Tokens_Jwt_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.IdentityModel.Tokens.Jwt.dll" KeyPath="yes"></File>
       </Component>
+
       <Component Id="comp_System_Diagnostics_DiagnosticSource_CDP4ServicesDal" Guid="{F95F665A-0783-4670-B694-EAC59D6626C9}" Location="local" >
         <File Id="fil_System_Diagnostics_DiagnosticSource_CDP4ServicesDal" Vital="yes" Source="$(var.CDP4ServicesDal.TargetDir)System.Diagnostics.DiagnosticSource.dll" KeyPath="yes"></File>
       </Component>

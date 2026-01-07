@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ShellViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -128,7 +128,7 @@ namespace COMET.Tests
             var availableDals = new AvailableDals(dals);
             this.serviceLocator.Setup(x => x.GetInstance<AvailableDals>()).Returns(availableDals);
 
-            this.viewModel = new ShellViewModel(this.navigationService.Object, this.messageBus, null, null);
+            this.viewModel = new ShellViewModel(this.navigationService.Object, this.messageBus, null, null, null);
         }
 
         [TearDown]
@@ -142,7 +142,7 @@ namespace COMET.Tests
         [Test]
         public void VerifyThatArgumentNullExceptionIsThrown()
         {
-            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null, null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new ShellViewModel(null, null, null, null, null));
         }
 
         [Test]

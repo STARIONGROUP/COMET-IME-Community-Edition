@@ -9,6 +9,9 @@ namespace CDP4Composition.Tests.DragDrop
     using System.Windows;
     using CDP4Dal.Operations;
     using CDP4Composition.DragDrop;
+
+    using CDP4DalCommon.Protocol.Operations;
+
     using NUnit.Framework;
 
     /// <summary>

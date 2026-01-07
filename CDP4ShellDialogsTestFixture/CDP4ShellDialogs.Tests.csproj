@@ -31,30 +31,30 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="28.3.0" />
-    <PackageReference Include="CDP4Dal-CE" Version="28.3.0" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="28.3.0" />
+    <PackageReference Include="CDP4Common-CE" Version="29.0.0" />
+    <PackageReference Include="CDP4Dal-CE" Version="29.0.0" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="29.0.0" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="NLog" Version="5.3.4" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="5.3.14" />
-    <PackageReference Include="ReactiveUI.WPF" Version="20.1.63" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="NLog" Version="6.0.4" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="6.0.4" />
+    <PackageReference Include="ReactiveUI.WPF" Version="21.0.1" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-    <PackageReference Include="Castle.Core" Version="5.1.1" />
+    <PackageReference Include="Castle.Core" Version="5.2.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="NUnit" Version="3.13.3" />
-    <PackageReference Include="NUnit.Console" Version="3.18.3" />
+    <PackageReference Include="NUnit.Console" Version="3.20.1" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
-    <PackageReference Include="coverlet.collector" Version="6.0.2">
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.msbuild" Version="6.0.2">
+    <PackageReference Include="coverlet.msbuild" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DalExtensionMethods.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+// <copyright file="SessionCreator.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -23,19 +23,25 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace CDP4Composition.Extensions
+namespace CDP4Composition.Services
 {
     using CDP4Common.ExceptionHandlerService;
+
+    using CDP4Composition.Extensions;
 
     using CDP4Dal;
     using CDP4Dal.DAL;
 
     using CommonServiceLocator;
 
+    using System.ComponentModel.Composition;
+
     /// <summary>
-    /// The purpose of these <see cref="DalExtensionMethods"/> is to add functionality to <see cref="IDal"/> instances
+    /// The purpose of these <see cref="SessionCreator"/> is to Create a session and try to run any <see cref="ISessionCreationHook"/>s if found.
     /// </summary>
-    public static class DalExtensionMethods
+    [Export(typeof(ISessionCreator))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class SessionCreator : ISessionCreator
     {
         /// <summary>
         /// Creates an <see cref="ISession"/> and tries to run <see cref="ISessionCreationHook"/>s if found.
@@ -45,7 +51,7 @@ namespace CDP4Composition.Extensions
         /// <param name="messageBus">The <see cref="ICDPMessageBus"/></param>
         /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
         /// <returns></returns>
-        public static ISession CreateSession(this IDal dal, Credentials credentials, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService)
+        public ISession CreateSession(IDal dal, Credentials credentials, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService)
         {
             var session = new Session(dal, credentials, messageBus, exceptionHandlerService);
 

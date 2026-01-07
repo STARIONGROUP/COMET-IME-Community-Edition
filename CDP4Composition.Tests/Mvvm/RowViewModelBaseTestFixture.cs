@@ -1,8 +1,8 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="RowViewModelBaseTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate
 //
 //    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -31,6 +31,7 @@ namespace CDP4Composition.Tests.Mvvm
     using System.Linq;
     using System.Reactive.Concurrency;
 
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -126,7 +127,7 @@ namespace CDP4Composition.Tests.Mvvm
         public void VerifyThatUpdatePersonMsgIsCaughtForDirectMessageBusSubscription()
         {
             var row = new RowTestClass(this.person, this.session.Object);
-            Assert.IsTrue(row.isUpdatePropertyCalled);
+            Assert.That(row.isUpdatePropertyCalled, Is.True);
 
             row.isUpdatePropertyCalled = false;
 
@@ -134,7 +135,7 @@ namespace CDP4Composition.Tests.Mvvm
             rev.SetValue(this.person, 50);
 
             this.messageBus.SendObjectChangeEvent(this.person, EventKind.Updated);
-            Assert.IsTrue(row.isUpdatePropertyCalled);
+            Assert.That(row.isUpdatePropertyCalled, Is.True);
         }
 
         [Test]
@@ -142,7 +143,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var containerViewModel = new TestMessageBusHandlerContainerViewModel();
             var row = new RowTestClass(this.person, this.session.Object, containerViewModel);
-            Assert.IsTrue(row.isUpdatePropertyCalled);
+            Assert.That(row.isUpdatePropertyCalled, Is.True);
 
             row.isUpdatePropertyCalled = false;
 
@@ -150,17 +151,17 @@ namespace CDP4Composition.Tests.Mvvm
             rev.SetValue(this.person, 50);
 
             this.messageBus.SendObjectChangeEvent(this.person, EventKind.Updated);
-            Assert.IsTrue(row.isUpdatePropertyCalled);
+            Assert.That(row.isUpdatePropertyCalled, Is.True);
         }
 
         [Test]
         public void VerifyThatUpdateHightlightMsgIsCaughtForDirectMessageBusSubscription()
         {
             var row = new RowTestClass(this.person, this.session.Object);
-            Assert.IsFalse(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.False);
 
             this.messageBus.SendMessage(new HighlightEvent(this.person), this.person);
-            Assert.IsTrue(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.True);
         }
 
         [Test]
@@ -168,26 +169,26 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var containerViewModel = new TestMessageBusHandlerContainerViewModel();
             var row = new RowTestClass(this.person, this.session.Object, containerViewModel);
-            Assert.IsFalse(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.False);
 
             this.messageBus.SendMessage(new HighlightEvent(this.person), this.person);
-            Assert.IsFalse(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.False);
 
             this.messageBus.SendMessage(new HighlightEvent(this.person), null);
-            Assert.IsTrue(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.True);
         }
 
         [Test]
         public void VerifyThatUpdateHightlightByCategoryMsgIsCaughtForDirectMessageBusSubscription()
         {
             var row = new CategorizableRowTestClass(this.elementDefinition, this.session.Object);
-            Assert.IsFalse(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.False);
 
             this.messageBus.SendMessage(new HighlightByCategoryEvent(this.category), this.category);
-            Assert.IsFalse(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.False);
 
             this.messageBus.SendMessage(new HighlightByCategoryEvent(this.category), null);
-            Assert.IsTrue(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.True);
         }
 
         [Test]
@@ -195,23 +196,23 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var containerViewModel = new TestMessageBusHandlerContainerViewModel();
             var row = new CategorizableRowTestClass(this.elementDefinition, this.session.Object, containerViewModel);
-            Assert.IsFalse(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.False);
 
             this.messageBus.SendMessage(new HighlightByCategoryEvent(this.category), this.category);
-            Assert.IsFalse(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.False);
 
             this.messageBus.SendMessage(new HighlightByCategoryEvent(this.category), null);
-            Assert.IsTrue(row.IsHighlighted);
+            Assert.That(row.IsHighlighted, Is.True);
         }
 
         [Test]
         public void VerifyThatUpdateRelationshipMsgIsCaughtForDirectMessageBusSubscription()
         {
             var row = new CategorizableRowTestClass(this.elementDefinition, this.session.Object);
-            Assert.IsFalse(row.ThingStatusHasChanged);
+            Assert.That(row.ThingStatusHasChanged, Is.False);
 
             this.messageBus.SendObjectChangeEvent(this.binaryRelationShip, EventKind.Updated);
-            Assert.IsTrue(row.ThingStatusHasChanged);
+            Assert.That(row.ThingStatusHasChanged, Is.True);
         }
 
         [Test]
@@ -219,10 +220,10 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var containerViewModel = new TestMessageBusHandlerContainerViewModel();
             var row = new CategorizableRowTestClass(this.elementDefinition, this.session.Object, containerViewModel);
-            Assert.IsFalse(row.ThingStatusHasChanged);
+            Assert.That(row.ThingStatusHasChanged, Is.False);
 
             this.messageBus.SendObjectChangeEvent(this.binaryRelationShip, EventKind.Updated);
-            Assert.IsTrue(row.ThingStatusHasChanged);
+            Assert.That(row.ThingStatusHasChanged, Is.True);
         }
 
         [Test]
@@ -239,7 +240,7 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var row = new RowTestClass(this.person, this.session.Object);
 
-            Assert.Throws<InvalidOperationException>(() => row.CreateCloneAndWrite("abc", "Exception"));
+            Assert.That(() => row.CreateCloneAndWrite("abc", "Exception"), Throws.TypeOf<InvalidOperationException>());
         }
 
         [Test]
@@ -251,10 +252,10 @@ namespace CDP4Composition.Tests.Mvvm
             row.isUpdatePropertyCalled = false;
             row.CreateCloneAndWrite("abc", "ShortName");
 
-            Assert.IsTrue(row.HasError);
+            Assert.That(row.HasError, Is.True);
             Assert.That(row.ErrorMsg, Is.Not.Null.Or.Not.Empty);
 
-            Assert.IsTrue(row.isUpdatePropertyCalled);
+            Assert.That(row.isUpdatePropertyCalled, Is.True);
 
             row.Dispose();
         }
@@ -263,7 +264,7 @@ namespace CDP4Composition.Tests.Mvvm
         public void VerifyThatRowTypeIsCorrect()
         {
             var row = new RowTestClass(this.person, this.session.Object);
-            Assert.AreEqual("Person", row.RowType);
+            Assert.That("Person", Is.EqualTo(row.RowType));
         }
 
         [Test]
@@ -271,10 +272,10 @@ namespace CDP4Composition.Tests.Mvvm
         {
             var row = new RowTestClass(this.person, this.session.Object);
             row.ComputeRow(new List<Person> { this.person });
-            Assert.AreEqual(1, row.ContainedRows.Count);
+            Assert.That(1, Is.EqualTo(row.ContainedRows.Count));
 
             row.ComputeRow(new List<Person>());
-            Assert.AreEqual(0, row.ContainedRows.Count);
+            Assert.That(0, Is.EqualTo(row.ContainedRows.Count));
         }
 
         [Test]
@@ -283,12 +284,22 @@ namespace CDP4Composition.Tests.Mvvm
             var row = new RowTestClass(this.person, this.session.Object);
             row.ComputeRow(new List<Person> { this.person });
 
-            Assert.IsFalse(row.AllChildRowsExpanded());
+            Assert.That(row.AllChildRowsExpanded(), Is.False);
 
             row.IsExpanded = true;
             row.ContainedRows[0].IsExpanded = true;
 
-            Assert.IsTrue(row.AllChildRowsExpanded());
+            Assert.That(row.AllChildRowsExpanded(), Is.True);
+        }
+
+        [Test]
+        public void VerifyThatNotThingIsNotEditable()
+        {
+            var row = new NotThingRowTestClass(new NotThing("NotThing"), this.session.Object, null);
+
+            Assert.That(row.IsEditable("AnyPropertyName"), Is.False);
+
+            this.permissionService.Verify(x => x.CanWrite(It.IsAny<NotThing>()), Times.Never);
         }
 
         internal class CategorizableRowTestClass : RowViewModelBase<ElementDefinition>
@@ -355,33 +366,40 @@ namespace CDP4Composition.Tests.Mvvm
                 this.ContainedRows.Add(row);
             }
         }
-    }
 
-    /// <summary>
-    /// Implementation of <see cref="IViewModelBase{Thing}"/> and <see cref="IHaveMessageBusHandler"/>
-    /// </summary>
-    internal class TestMessageBusHandlerContainerViewModel : IViewModelBase<Thing>, IHaveMessageBusHandler
-    {
-        /// <summary>
-        /// The <see cref="MessageBusHandler"/>
-        /// </summary>
-        public MessageBusHandler MessageBusHandler { get; } = new MessageBusHandler();
-
-        /// <summary>
-        /// The <see cref="Thing"/>
-        /// </summary>
-        public Thing Thing { get; }
-
-        /// <summary name="messageBus">
-        /// The <see cref="ICDPMessageBus"/>
-        /// </summary>
-        public ICDPMessageBus CDPMessageBus { get; }
-
-        /// <summary>
-        /// Disposes the instance
-        /// </summary>
-        public void Dispose()
+        internal class NotThingRowTestClass : RowViewModelBase<NotThing>
         {
+            public NotThingRowTestClass(NotThing thing, ISession session, IViewModelBase<Thing> containerViewModel) : base(thing, session, containerViewModel)
+            {
+            }
+        }
+
+        /// <summary>
+        /// Implementation of <see cref="IViewModelBase{Thing}"/> and <see cref="IHaveMessageBusHandler"/>
+        /// </summary>
+        internal class TestMessageBusHandlerContainerViewModel : IViewModelBase<Thing>, IHaveMessageBusHandler
+        {
+            /// <summary>
+            /// The <see cref="MessageBusHandler"/>
+            /// </summary>
+            public MessageBusHandler MessageBusHandler { get; } = new MessageBusHandler();
+
+            /// <summary>
+            /// The <see cref="Thing"/>
+            /// </summary>
+            public Thing Thing { get; }
+
+            /// <summary name="messageBus">
+            /// The <see cref="ICDPMessageBus"/>
+            /// </summary>
+            public ICDPMessageBus CDPMessageBus { get; }
+
+            /// <summary>
+            /// Disposes the instance
+            /// </summary>
+            public void Dispose()
+            {
+            }
         }
     }
 }

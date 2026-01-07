@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterSheetGeneratorModuleTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -28,7 +28,7 @@ namespace CDP4ParameterSheetGenerator.Tests
     using CDP4Composition;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
-
+    using CDP4Composition.Services;
     using CDP4Dal;
 
     using CDP4OfficeInfrastructure;
@@ -55,6 +55,8 @@ namespace CDP4ParameterSheetGenerator.Tests
 
         private CDPMessageBus messageBus;
 
+        private Mock<ISessionCreator> sessionCreator;
+
         [SetUp]
         public void SetUp()
         {
@@ -63,7 +65,9 @@ namespace CDP4ParameterSheetGenerator.Tests
             this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.officeApplicationWrapper = new Mock<IOfficeApplicationWrapper>();
             this.dialogNavigationService = new Mock<IDialogNavigationService>();
+            this.sessionCreator = new Mock<ISessionCreator>();
             this.messageBus = new CDPMessageBus();
+
         }
 
         [TearDown]
@@ -80,7 +84,8 @@ namespace CDP4ParameterSheetGenerator.Tests
                 this.thingDialogNavigationService.Object,
                 this.dialogNavigationService.Object,
                 this.officeApplicationWrapper.Object,
-                this.messageBus);
+                this.messageBus,
+                this.sessionCreator.Object);
 
             module.Initialize();
 

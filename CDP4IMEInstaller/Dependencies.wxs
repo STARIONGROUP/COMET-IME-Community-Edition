@@ -7,109 +7,101 @@
 	<Fragment>
     <ComponentGroup Id="DEPENDENCIES" Directory="BIN">
 
-        <Component Id="_45BC7C9B" Guid="{45BC7C9B-2C1D-4418-8611-B296565209C5}" Location="local" >
-            <File Id="_B296565209C5" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)app.manifest" KeyPath="yes"></File>
-        </Component>
+      <Component Id="_45BC7C9B" Guid="{45BC7C9B-2C1D-4418-8611-B296565209C5}" Location="local" >
+          <File Id="_B296565209C5" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)app.manifest" KeyPath="yes"></File>
+      </Component>
 
-        <Component Id="_C73F3BD2" Guid="{C73F3BD2-5894-4FB5-930D-A6E998A5BEE4}" Location="local" >
-            <File Id="_A6E998A5BEE4" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CefSharp.Core.dll" KeyPath="yes"></File>
-        </Component>
+      <Component Id="_C73F3BD2" Guid="{C73F3BD2-5894-4FB5-930D-A6E998A5BEE4}" Location="local" >
+          <File Id="_A6E998A5BEE4" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CefSharp.Core.dll" KeyPath="yes"></File>
+      </Component>
 
-        <Component Id="_7FEE313A" Guid="{7FEE313A-5AEA-4ECA-AA14-D361D8D78B46}" Location="local" >
-            <File Id="_D361D8D78B46" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CefSharp.dll" KeyPath="yes"></File>
-        </Component>
+      <Component Id="_7FEE313A" Guid="{7FEE313A-5AEA-4ECA-AA14-D361D8D78B46}" Location="local" >
+          <File Id="_D361D8D78B46" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CefSharp.dll" KeyPath="yes"></File>
+      </Component>
 
-        <Component Id="_6B30D756" Guid="{6B30D756-C1F8-4D1D-886E-3E416058D793}" Location="local" >
-            <File Id="_3E416058D793" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CefSharp.Wpf.dll" KeyPath="yes"></File>
-        </Component>
+      <Component Id="_6B30D756" Guid="{6B30D756-C1F8-4D1D-886E-3E416058D793}" Location="local" >
+          <File Id="_3E416058D793" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CefSharp.Wpf.dll" KeyPath="yes"></File>
+      </Component>
 
-        <Component Id="_03B104AF18B2" Guid="{168E2EB4-2585-487D-B110-03B104AF18B2}" Location="local" >
-		<File Id="_168E2EB4" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CommonServiceLocator.dll" KeyPath="yes"></File>
-	  </Component>
+      <Component Id="_03B104AF18B2" Guid="{168E2EB4-2585-487D-B110-03B104AF18B2}" Location="local" >
+  		  <File Id="_168E2EB4" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CommonServiceLocator.dll" KeyPath="yes"></File>
+	    </Component>
 
-	  <Component Id="_91B49567CEDD" Guid="{CEDA27B1-0A8A-4B78-B0C5-91B49567CEDD}" Location="local" >
-		<File Id="_CEDA27B1" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CsvHelper.dll" KeyPath="yes"></File>
-	  </Component>
+	    <Component Id="_91B49567CEDD" Guid="{CEDA27B1-0A8A-4B78-B0C5-91B49567CEDD}" Location="local" >
+	  	  <File Id="_CEDA27B1" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CsvHelper.dll" KeyPath="yes"></File>
+	    </Component>
 
-	  <Component Id="comp_DynamicData" Guid="{4F205D65-7FEA-46A9-A122-5D1C00876E6D}" Location="local" >
-		<File Id="fil_DynamicData" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)DynamicData.dll" KeyPath="yes" />
-	  </Component>
+	    <Component Id="comp_DynamicData" Guid="{4F205D65-7FEA-46A9-A122-5D1C00876E6D}" Location="local" >
+		    <File Id="fil_DynamicData" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)DynamicData.dll" KeyPath="yes" />
+	    </Component>
 
-	  <Component Id="_7D7C7995B7FC" Guid="{DE458569-7B72-45C5-A2A2-7D7C7995B7FC}" Location="local" >
-		<File Id="_DE458569" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Markdown.Xaml.dll" KeyPath="yes"></File>
-	  </Component>
+	    <Component Id="_7D7C7995B7FC" Guid="{DE458569-7B72-45C5-A2A2-7D7C7995B7FC}" Location="local" >
+		    <File Id="_DE458569" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Markdown.Xaml.dll" KeyPath="yes"></File>
+	    </Component>
 
-	  <Component Id="_853B9FED" Guid="{853B9FED-1186-4843-B742-BFDD9DB23819}" >
-	    <File Id="_BFDD9DB23819" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes"></File>
+    	<Component Id="_853B9FED" Guid="{853B9FED-1186-4843-B742-BFDD9DB23819}" >
+	      <File Id="_BFDD9DB23819" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Bcl.AsyncInterfaces.dll" KeyPath="yes"></File>
       </Component>
       
       <Component Id="_083BB53E" Guid="{083BB53E-89E0-4DE4-B0AA-1DF86E0EC617}" >
-	    <File Id="_1DF86E0EC617" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Bcl.HashCode.dll" KeyPath="yes"></File>
+	      <File Id="_1DF86E0EC617" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Bcl.HashCode.dll" KeyPath="yes"></File>
       </Component>
       
       <Component Id="_55784171" Guid="{55784171-5F51-48FD-B6DC-69E991CED1C8}" >
-		<File Id="_69E991CED1C8" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Configuration.Abstractions.dll" KeyPath="yes"></File>
-	  </Component>
+	      <File Id="_69E991CED1C8" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Configuration.Abstractions.dll" KeyPath="yes"></File>
+	    </Component>
 	  
-      <Component Id="_DCCD8B63" Guid="{DCCD8B63-A3AF-4DF7-9393-DF341655E29A}" >
-		<File Id="_DF341655E29A" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Configuration.dll" KeyPath="yes"></File>
-	  </Component>
-      
-      <Component Id="_58C82168" Guid="{58C82168-49F0-451D-88F0-0E027F724309}" >
-	    <File Id="_0E027F724309" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Configuration.Binder.dll" KeyPath="yes"></File>
-      </Component>
-      
       <Component Id="_CD93126B" Guid="{CD93126B-CB6A-405A-8E1E-F8ABA8679C4C}" >
-		<File Id="_F8ABA8679C4C" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" KeyPath="yes"></File>
+	      <File Id="_F8ABA8679C4C" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.DependencyInjection.Abstractions.dll" KeyPath="yes"></File>
       </Component>
       
       <Component Id="_3F63366D" Guid="{3F63366D-2BD2-46FA-ACB9-F515D992464E}" >
-		<File Id="_F515D992464E" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Logging.Abstractions.dll" KeyPath="yes"></File>
+	      <File Id="_F515D992464E" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Logging.Abstractions.dll" KeyPath="yes"></File>
       </Component>
       
       <Component Id="_91497BB2" Guid="{91497BB2-3B1B-423E-83A7-4740D161A418}" >
-	    <File Id="_4740D161A418" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Logging.dll" KeyPath="yes"></File>
+	      <File Id="_4740D161A418" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Logging.dll" KeyPath="yes"></File>
       </Component>
       
       <Component Id="_31111BC1" Guid="{31111BC1-BAC6-4ED7-B927-AA36B0D7668F}" >
-		<File Id="_AA36B0D7668F" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Options.dll" KeyPath="yes"></File>
+		    <File Id="_AA36B0D7668F" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Options.dll" KeyPath="yes"></File>
       </Component>
       
       <Component Id="_9A5443D3" Guid="{9A5443D3-A200-4C86-B7C2-3BB8E3362E19}" >
-		<File Id="_3BB8E3362E19" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Primitives.dll" KeyPath="yes"></File>
+	    	<File Id="_3BB8E3362E19" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.Primitives.dll" KeyPath="yes"></File>
       </Component>
 
       <Component Id="_53430A99" Guid="{53430A99-34F8-4144-99D6-3E5503A3C9F9}" >
 	      <File Id="_3E5503A3C9F9" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Xaml.Behaviors.dll" KeyPath="yes"></File>
       </Component>
 
-	  <Component Id="comp_Newtonsoft_Json" Guid="{92569C63-3D66-4F94-83CA-B81D0CB55958}" Location="local" >
+	    <Component Id="comp_Newtonsoft_Json" Guid="{92569C63-3D66-4F94-83CA-B81D0CB55958}" Location="local" >
 		    <File Id="fil_Newtonsoft_Json" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Newtonsoft.Json.dll" KeyPath="yes" />
-	  </Component>
+	    </Component>
 
-    <Component Id="comp_Newtonsoft_Json_Bson" Guid="{92569C64-3D66-4F94-83CA-B81D0CB55959}" Location="local" >
+      <Component Id="comp_Newtonsoft_Json_Bson" Guid="{92569C64-3D66-4F94-83CA-B81D0CB55959}" Location="local" >
         <File Id="fil_Newtonsoft_Json_Bson" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Newtonsoft.Json.Bson.dll" KeyPath="yes" />
-    </Component>
+      </Component>
 
-    <Component Id="comp_NLog" Guid="{1AD65224-46C7-42CA-8A2D-51C2C48633BC}" Location="local" >
-		  <File Id="fil_NLog" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)NLog.dll" KeyPath="yes" />
-	  </Component>
+      <Component Id="comp_NLog" Guid="{1AD65224-46C7-42CA-8A2D-51C2C48633BC}" Location="local" >
+		    <File Id="fil_NLog" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)NLog.dll" KeyPath="yes" />
+	    </Component>
 
-	  <Component Id="comp_NLogExtensions" Guid="{16D4EE52-5590-4FE7-9FBD-AAE8E6C31CC1}" Location="local" >
-		<File Id="fil_NLogExtensions" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)NLog.Extensions.Logging.dll" KeyPath="yes" />
-	  </Component>
+	    <Component Id="comp_NLogExtensions" Guid="{16D4EE52-5590-4FE7-9FBD-AAE8E6C31CC1}" Location="local" >
+		    <File Id="fil_NLogExtensions" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)NLog.Extensions.Logging.dll" KeyPath="yes" />
+	    </Component>
 
-	  <Component Id="comp_ReactiveUI" Guid="{D942F4F1-5B90-480D-97F3-36D55C68DCD2}" Location="local" >
-		<File Id="fil_ReactiveUI" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)ReactiveUI.dll" KeyPath="yes" />
-	  </Component>
+	    <Component Id="comp_ReactiveUI" Guid="{D942F4F1-5B90-480D-97F3-36D55C68DCD2}" Location="local" >
+		    <File Id="fil_ReactiveUI" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)ReactiveUI.dll" KeyPath="yes" />
+	    </Component>
 
-	  <Component Id="comp_ReactiveUIWPF" Guid="{05B46F62-F7D0-435D-95D3-E33D3DC7E739}" Location="local" >
-		<File Id="fil_ReactiveUIWPF" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)ReactiveUI.Wpf.dll" KeyPath="yes" />
-	  </Component>
+	    <Component Id="comp_ReactiveUIWPF" Guid="{05B46F62-F7D0-435D-95D3-E33D3DC7E739}" Location="local" >
+		    <File Id="fil_ReactiveUIWPF" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)ReactiveUI.Wpf.dll" KeyPath="yes" />
+	    </Component>
 
-	  <Component Id="comp_Splat" Guid="{618C780F-E4E6-45AA-8538-97405890369D}" Location="local" >
-		<File Id="fil_Splat" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Splat.dll" KeyPath="yes" />
-	  </Component>
+	    <Component Id="comp_Splat" Guid="{618C780F-E4E6-45AA-8538-97405890369D}" Location="local" >
+		    <File Id="fil_Splat" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Splat.dll" KeyPath="yes" />
+	    </Component>
 
       <Component Id="comp_SplatNlog" Guid="{618C780F-E4E6-45AA-8538-97405890369F}" Location="local" >
         <File Id="fil_SplatNlog" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Splat.Nlog.dll" KeyPath="yes" />
@@ -127,24 +119,20 @@
         <File Id="_ADA9F0B76B88" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.ComponentModel.Annotations.dll" KeyPath="yes"></File>
       </Component>
 
-      <Component Id="_7607D4E3" Guid="{7607D4E3-FE6E-4366-B37B-ADA9F0B76B77}" >
-        <File Id="_ADA9F0B76B77" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Collections.Immutable.dll" KeyPath="yes"></File>
-      </Component>
-
-      <Component Id="_A36A3ED6" Guid="{A36A3ED6-8B87-4D6A-960E-68E6F17B4205}" >
-	    <File Id="_68E6F17B4205" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Memory.dll" KeyPath="yes"></File>
+      <Component Id="_A36A3ED6" Guid="{A36A3ED6-8B87-4D6A-960E-68E6F17B4205}">
+	      <File Id="_68E6F17B4205" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Memory.dll" KeyPath="yes"></File>
       </Component>
       
       <Component Id="_311D75D2" Guid="{311D75D2-84A9-4B07-AC38-04A86C0316A8}" >
-	    <File Id="_04A86C0316A8" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Numerics.Vectors.dll" KeyPath="yes"></File>
+	      <File Id="_04A86C0316A8" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Numerics.Vectors.dll" KeyPath="yes"></File>
       </Component>
 
-	  <Component Id="comp_SystemReactive" Guid="{2E5F63D6-88B8-46A5-9D52-1AB1CFD2B839}" Location="local" >
-		<File Id="fil_SystemReactive" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Reactive.dll" KeyPath="yes" />
-	  </Component>
+	    <Component Id="comp_SystemReactive" Guid="{2E5F63D6-88B8-46A5-9D52-1AB1CFD2B839}" Location="local" >
+		    <File Id="fil_SystemReactive" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Reactive.dll" KeyPath="yes" />
+	    </Component>
       
       <Component Id="_A8F01EE7" Guid="{A8F01EE7-22B8-4035-AA49-1A98EE45C128}" >
-	    <File Id="_1A98EE45C128" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes"></File>
+	      <File Id="_1A98EE45C128" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Runtime.CompilerServices.Unsafe.dll" KeyPath="yes"></File>
       </Component>
 
       <Component Id="_BF16F5F2" Guid="{BF16F5F2-87D2-448F-9D18-3ADB29BA3EEF}" >
@@ -156,20 +144,40 @@
       </Component>
 
       <Component Id="_BF16F5F1" Guid="{BF16F5F1-87D2-448F-9D18-2ADB29BA3EEF}" >
-	    <File Id="_2ADB29BA3EEF" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Threading.Tasks.Extensions.dll" KeyPath="yes"></File>
+	      <File Id="_2ADB29BA3EEF" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Threading.Tasks.Extensions.dll" KeyPath="yes"></File>
+      </Component>
+
+	    <Component Id="_CF15179B2D4B" Guid="{9EC4A891-FF0D-47CD-9E61-CF15179B2D4B}" Location="local" >
+  		  <File Id="_9EC4A891" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Net.Http.Formatting.dll" KeyPath="yes"></File>
+	    </Component>
+
+      <Component Id="_CF15179B2D4C" Guid="{9EC4A892-FF0D-47CD-9E61-CF15179B2D4C}" Location="local" >
+        <File Id="_9EC4A892" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CDP4-COMET.exe.config" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="_BFF301E41AAA" Guid="{14164D03-F56B-4A64-B76B-BFF301E41AAA}" Location="local" >
+        <File Id="_14164D03" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Microsoft.Extensions.DependencyInjection.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="_27FC9C3CBC01" Guid="{31FF44D4-37A7-4ED4-8DA1-27FC9C3CBC01}" Location="local" >
+        <File Id="_31FF44D4" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Splat.Builder.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="_FDDA5F427B8B" Guid="{67FDD033-80D3-4D77-BF16-FDDA5F427B8B}" Location="local" >
+        <File Id="_67FDD033" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Splat.Core.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="_09B563BD1DE4" Guid="{B85A4B88-7F46-4B4D-87C9-09B563BD1DE4}" Location="local" >
+        <File Id="_B85A4B88" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)Splat.Logging.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="_6393021EABED" Guid="{0955857C-1532-4340-8396-6393021EABED}" Location="local" >
+        <File Id="_0955857C" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Diagnostics.DiagnosticSource.dll" KeyPath="yes"></File>
       </Component>
       
-      <Component Id="_CBD30435" Guid="{CBD30435-0BB6-4E1C-BD32-2E8A699A828B}" >
-	    <File Id="_2E8A699A828B" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.ValueTuple.dll" KeyPath="yes"></File>
-      </Component>	    
-
-	  <Component Id="_CF15179B2D4B" Guid="{9EC4A891-FF0D-47CD-9E61-CF15179B2D4B}" Location="local" >
-		<File Id="_9EC4A891" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.Net.Http.Formatting.dll" KeyPath="yes"></File>
-	  </Component>
-
-    <Component Id="_CF15179B2D4C" Guid="{9EC4A892-FF0D-47CD-9E61-CF15179B2D4C}" Location="local" >
-      <File Id="_9EC4A892" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)CDP4-COMET.exe.config" KeyPath="yes"></File>
-    </Component>
+      <Component Id="_A1DA71AB2E37" Guid="{F62637A0-295C-4E0F-82B1-A1DA71AB2E37}" Location="local" >
+        <File Id="_F62637A0" Vital="yes" Source="$(var.CDP4COMETCE.TargetDir)System.IO.Pipelines.dll" KeyPath="yes"></File>
+      </Component>
 
     </ComponentGroup>
   </Fragment>

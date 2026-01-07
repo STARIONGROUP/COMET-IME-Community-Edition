@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="Addin.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -51,6 +51,7 @@ namespace CDP4AddinCE
     using CDP4Composition.Navigation.Events;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+    using CDP4Composition.Services;
     using CDP4Composition.Services.AppSettingService;
 
     using CDP4Dal;
@@ -339,10 +340,10 @@ namespace CDP4AddinCE
         {
             //These assemblies are present in the main folder (bin), but are not used (yet) bij the Addin itself
             logger.Trace("Pre-register Addin Assemblies");
+            Assembly.Load("System.Memory");
             Assembly.Load("Markdown.Xaml");
             Assembly.Load("System.Net.Http.Formatting");
             Assembly.Load("System.Threading.Tasks.Extensions");
-            Assembly.Load("System.Runtime.CompilerServices.Unsafe");
         }
 
         /// <summary>
@@ -363,7 +364,7 @@ namespace CDP4AddinCE
             this.RedirectAssembly("System.Numerics.Vectors", systemVectors, "b03f5f7f11d50a3a");
 
             logger.Trace("Microsoft.Bcl.AsyncInterfaces");
-            var asyncInterfaces = new Version("8.0.0.0");
+            var asyncInterfaces = new Version("9.0.0.1");
             this.RedirectAssembly("Microsoft.Bcl.AsyncInterfaces", asyncInterfaces, "cc7b13ffcd2ddd51");
 
             logger.Trace("System.Runtime.CompilerServices.Unsafe");
@@ -373,6 +374,18 @@ namespace CDP4AddinCE
             logger.Trace("System.Threading.Tasks.Extensions");
             var taskExtensions = new Version("4.2.0.1");
             this.RedirectAssembly("System.Threading.Tasks.Extensions", taskExtensions, "cc7b13ffcd2ddd51");
+
+            logger.Trace("System.Net.Http.Formatting");
+            var netHttpExtensions = new Version("6.0.0.0");
+            this.RedirectAssembly("System.Net.Http.Formatting", netHttpExtensions, "31bf3856ad364e35");
+
+            logger.Trace("System.Text.Json");
+            var systemTextJsonExtensions = new Version("9.0.0.0");
+            this.RedirectAssembly("System.Text.Json", systemTextJsonExtensions, "cc7b13ffcd2ddd51");
+
+            logger.Trace("Microsoft.Extensions.Logging.Abstractions");
+            var microsoftExtensionsLoggingAbstractions = new Version("8.0.0.0");
+            this.RedirectAssembly("Microsoft.Extensions.Logging.Abstractions", microsoftExtensionsLoggingAbstractions, "adb9793829ddae60");
         }
 
         /// <summary>
@@ -804,10 +817,11 @@ namespace CDP4AddinCE
             var dialogNavigationService = ServiceLocator.Current.GetInstance<IDialogNavigationService>();
             var pluginSettingsService = ServiceLocator.Current.GetInstance<IPluginSettingsService>();
             var exceptionHandlerService = ServiceLocator.Current.GetInstance<IExceptionHandlerService>();
+            var sessionCreator = ServiceLocator.Current.GetInstance<ISessionCreator>();
 
             this.FluentRibbonManager.IsActive = true;
             var appSettingsService = ServiceLocator.Current.GetInstance<IAppSettingsService<AddinAppSettings>>();
-            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService, this.messageBus, exceptionHandlerService);
+            var ribbonpart = new AddinRibbonPart(0, panelNavigationService, thingDialogNavigationService, dialogNavigationService, pluginSettingsService, appSettingsService, this.messageBus, exceptionHandlerService, sessionCreator);
             this.FluentRibbonManager.RegisterRibbonPart(ribbonpart);
             this.fluentRibbonXml = this.FluentRibbonManager.GetFluentXml();
 

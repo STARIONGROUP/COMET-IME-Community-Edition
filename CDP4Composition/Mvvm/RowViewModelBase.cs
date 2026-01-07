@@ -376,6 +376,11 @@ namespace CDP4Composition.Mvvm
         /// </returns>
         public virtual bool IsEditable(string propertyName = "")
         {
+            if (this.Thing is NotThing)
+            {
+                return false;
+            }
+
             return this.Session.PermissionService.CanWrite(this.Thing);
         }
 

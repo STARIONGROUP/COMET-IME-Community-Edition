@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RequirementRowViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate
 //
 //    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -112,6 +112,11 @@ namespace CDP4Requirements.ViewModels
         private bool isParametricConstraintDisplayed;
 
         /// <summary>
+        /// Gets a value indicating whether the value set editors are active
+        /// </summary>
+        public static bool IsValueSetEditorActive => false;
+
+        /// <summary>
         /// Gets or sets the <see cref="CDP4RequirementsVerification.RequirementStateOfCompliance"/>
         /// </summary>
         public RequirementStateOfCompliance RequirementStateOfCompliance
@@ -129,7 +134,7 @@ namespace CDP4Requirements.ViewModels
         public RequirementRowViewModel(Requirement req, ISession session, IViewModelBase<Thing> containerViewModel)
             : base(req, session, containerViewModel)
         {
-            this.simpleParameters = new FolderRowViewModel("Simple Parameter Values", "Simple Parameter Values", this.Session, this);
+            this.simpleParameters = new RequirementNotThingContainerRowViewModel("Simple Parameter Values", "Simple Parameter Values", this.Session, this);
             this.parametricConstraints = new ParametricConstraintsFolderRowViewModel("Parametric Constraints", "Parametric Constraints", this.Session, this);
 
             this.SetSubscriptions();

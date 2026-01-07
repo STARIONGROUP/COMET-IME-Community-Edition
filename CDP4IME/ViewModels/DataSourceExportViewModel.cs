@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DataSourceExportViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2025 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -36,7 +36,6 @@ namespace COMET.ViewModels
     using CDP4Common.MetaInfo;
 
     using CDP4Composition.Exceptions;
-    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services;
@@ -45,6 +44,8 @@ namespace COMET.ViewModels
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
     using CDP4Dal.Operations;
+
+    using CDP4DalCommon.Protocol.Operations;
 
     using CommonServiceLocator;
 
@@ -142,6 +143,11 @@ namespace COMET.ViewModels
         private readonly IExceptionHandlerService exceptionHandlerService;
 
         /// <summary>
+        /// The <see cref="ISessionCreator"/>
+        /// </summary>
+        private readonly ISessionCreator sessionCreator;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceExportViewModel"/> class.
         /// </summary>
         /// <param name="sessions">
@@ -154,7 +160,10 @@ namespace COMET.ViewModels
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
         /// <param name="exceptionHandlerService">The <see cref="IExceptionHandlerService"/></param>
-        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService)
+        /// <param name="sessionCreator">
+        /// The <see cref="ISessionCreator"/>
+        /// </param>
+        public DataSourceExportViewModel(IEnumerable<ISession> sessions, IOpenSaveFileDialogService openSaveFileDialogService, ICDPMessageBus messageBus, IExceptionHandlerService exceptionHandlerService, ISessionCreator sessionCreator)
         {
             if (openSaveFileDialogService == null)
             {
@@ -163,6 +172,7 @@ namespace COMET.ViewModels
 
             this.messageBus = messageBus;
             this.exceptionHandlerService = exceptionHandlerService;
+            this.sessionCreator = sessionCreator;
 
             this.openSaveFileDialogService = openSaveFileDialogService;
             this.AvailableDals = new List<IDalMetaData>();
@@ -375,7 +385,7 @@ namespace COMET.ViewModels
                 var dal = this.dals.Single(x => x.Metadata == this.SelectedDal);
                 var dalInstance = (IDal)Activator.CreateInstance(dal.Value.GetType(), this.SelectedVersion.Value);
 
-                var fileExportSession = dalInstance.CreateSession(creds, this.messageBus, this.exceptionHandlerService);
+                var fileExportSession = this.sessionCreator.CreateSession(dalInstance, creds, this.messageBus, this.exceptionHandlerService);
 
                 // create write
                 var operationContainers = new List<OperationContainer>();
