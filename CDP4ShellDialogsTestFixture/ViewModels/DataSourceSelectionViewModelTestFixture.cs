@@ -353,7 +353,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.Single(x => x.DalType == DalType.Web);
 
-            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(5));
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(4));
         }
     }
 }

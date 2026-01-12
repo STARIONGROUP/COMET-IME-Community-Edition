@@ -352,27 +352,27 @@ namespace CDP4AddinCE
         private void RedirectAssemblies()
         {
             logger.Trace("System.Buffers");
-            var systemBuffers = new Version("4.0.3.0");
+            var systemBuffers = new Version("4.0.5.0");
             this.RedirectAssembly("System.Buffers", systemBuffers, "cc7b13ffcd2ddd51");
 
             logger.Trace("System.Memory");
-            var systemMemory = new Version("4.0.1.2");
+            var systemMemory = new Version("4.0.5.0");
             this.RedirectAssembly("System.Memory", systemMemory, "cc7b13ffcd2ddd51");
 
             logger.Trace("System.Numerics.Vectors");
-            var systemVectors = new Version("4.1.4.0");
+            var systemVectors = new Version("4.1.6.0");
             this.RedirectAssembly("System.Numerics.Vectors", systemVectors, "b03f5f7f11d50a3a");
 
             logger.Trace("Microsoft.Bcl.AsyncInterfaces");
-            var asyncInterfaces = new Version("9.0.0.1");
+            var asyncInterfaces = new Version("10.0.0.1");
             this.RedirectAssembly("Microsoft.Bcl.AsyncInterfaces", asyncInterfaces, "cc7b13ffcd2ddd51");
 
             logger.Trace("System.Runtime.CompilerServices.Unsafe");
-            var compilerServices = new Version("6.0.0.0");
+            var compilerServices = new Version("6.0.3.0");
             this.RedirectAssembly("System.Runtime.CompilerServices.Unsafe", compilerServices, "b03f5f7f11d50a3a");
 
             logger.Trace("System.Threading.Tasks.Extensions");
-            var taskExtensions = new Version("4.2.0.1");
+            var taskExtensions = new Version("4.2.4.0");
             this.RedirectAssembly("System.Threading.Tasks.Extensions", taskExtensions, "cc7b13ffcd2ddd51");
 
             logger.Trace("System.Net.Http.Formatting");
@@ -380,7 +380,7 @@ namespace CDP4AddinCE
             this.RedirectAssembly("System.Net.Http.Formatting", netHttpExtensions, "31bf3856ad364e35");
 
             logger.Trace("System.Text.Json");
-            var systemTextJsonExtensions = new Version("9.0.0.0");
+            var systemTextJsonExtensions = new Version("10.0.0.1");
             this.RedirectAssembly("System.Text.Json", systemTextJsonExtensions, "cc7b13ffcd2ddd51");
 
             logger.Trace("Microsoft.Extensions.Logging.Abstractions");

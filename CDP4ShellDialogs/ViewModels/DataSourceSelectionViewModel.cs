@@ -220,7 +220,7 @@ namespace CDP4ShellDialogs.ViewModels
             this.dialogNavigationService = dialogNavigationService;
             this.AvailableDataSourceKinds = new ReactiveList<IDalMetaData>();
 
-            this.WhenAnyValue(vm => vm.SelectedDataSourceKind).Subscribe(_ => this.UpdateFullTrustCheckBoxEnabled());
+            this.WhenAnyValue(vm => vm.SelectedDataSourceKind).Subscribe(_ => this.OnSelectedDataSourceKindChanged());
 
             this.WhenAnyValue(vm => vm.IsProxyEnabled).Subscribe(_ => this.UpdateProxyAddressProperty());
             this.WhenAnyValue(vm => vm.IsPasswordVisible).Subscribe(_ => this.ChangeShowPasswordButtonText());
@@ -236,7 +236,7 @@ namespace CDP4ShellDialogs.ViewModels
                 (username, password, datasource, uri, isproxyenabled, authenticationSchemeResponse, authenticatedViaExternalProvider) =>
                     datasource != null &&
                     !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource)
-                    && authenticationSchemeResponse != null
+                    && (this.SelectedDataSourceKind?.DalType != DalType.Web || authenticationSchemeResponse != null)
                     && ((!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password)) || authenticatedViaExternalProvider));
 
             this.OkCommand = ReactiveCommandCreator.CreateAsyncTask(() => this.ExecuteOk(false), canOk, RxApp.MainThreadScheduler);
@@ -519,7 +519,7 @@ namespace CDP4ShellDialogs.ViewModels
                 {
                     this.LoadingMessage = "Opening Session...";
 
-                    if (this.ShouldProvideCredentialsInformation)
+                    if (this.SelectedDataSourceKind?.DalType == DalType.Web && this.ShouldProvideCredentialsInformation)
                     {
                         var authenticationInformation = new AuthenticationInformation(this.UserName, this.Password);
 
@@ -531,6 +531,12 @@ namespace CDP4ShellDialogs.ViewModels
                     }
                     else
                     {
+                        var temporaryCredentials = new Credentials(this.userName, this.password, new Uri(this.Uri), this.IsFullTrustCheckBoxEnabled, this.CreateProxySettings());
+                        var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
+                        var dalInstance = (IDal)ServiceLocator.Current.GetInstance(dal.Value.GetType());
+
+                        this.session = this.sessionCreator.CreateSession(dalInstance, temporaryCredentials, this.messageBus, this.exceptionHandlerService);
+
                         await this.session.Open();
                     }
 
@@ -683,7 +689,7 @@ namespace CDP4ShellDialogs.ViewModels
         /// <summary>
         /// updates the Full Trust checkbox
         /// </summary>
-        private void UpdateFullTrustCheckBoxEnabled()
+        private void OnSelectedDataSourceKindChanged()
         {
             if (this.SelectedDataSourceKind?.DalType == DalType.Web)
             {
@@ -694,6 +700,14 @@ namespace CDP4ShellDialogs.ViewModels
                 this.IsFullTrustCheckBoxEnabled = false;
                 this.IsFullTrustAllowed = false;
             }
+
+            this.UserName = string.Empty;
+            this.Password = string.Empty;
+
+            this.selectedUri = null;
+            this.selectedUriText = string.Empty;
+
+            this.UpdateUri();
         }
 
         /// <summary>
@@ -808,8 +822,10 @@ namespace CDP4ShellDialogs.ViewModels
         {
             var previousValue = this.ShouldProvideCredentialsInformation;
 
-            this.ShouldProvideCredentialsInformation = this.AvailableAuthenticationScheme != null
-                                                       && this.AvailableAuthenticationScheme.Schemes.Intersect(SchemesWithCredentials).Any();
+            this.ShouldProvideCredentialsInformation = this.SelectedDataSourceKind?.DalType == DalType.File
+                                                        ||
+                                                        (this.AvailableAuthenticationScheme != null
+                                                       && this.AvailableAuthenticationScheme.Schemes.Intersect(SchemesWithCredentials).Any());
 
             if (previousValue != this.ShouldProvideCredentialsInformation)
             {

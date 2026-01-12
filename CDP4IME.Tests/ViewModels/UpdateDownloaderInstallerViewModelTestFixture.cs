@@ -25,6 +25,23 @@
 
 namespace COMET.Tests.ViewModels
 {
+    using CDP4Composition.Modularity;
+    using CDP4Composition.Navigation;
+    using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services.AppSettingService;
+    using CDP4Composition.Utilities;
+    using CDP4UpdateServerDal;
+    using CDP4UpdateServerDal.Enumerators;
+    using COMET.Behaviors;
+    using COMET.Services;
+    using COMET.Settings;
+    using COMET.ViewModels;
+    using CommonServiceLocator;
+    using DevExpress.Mvvm.Native;
+    using Moq;
+    using Newtonsoft.Json;
+    using NUnit.Framework;
+    using ReactiveUI;
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -33,37 +50,13 @@ namespace COMET.Tests.ViewModels
     using System.Net.Http;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Reactive.Threading.Tasks;
     using System.Reflection;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Windows.Input;
-
-    using CDP4Composition.Modularity;
-    using CDP4Composition.Navigation;
-    using CDP4Composition.Navigation.Interfaces;
-    using CDP4Composition.Services.AppSettingService;
-    using CDP4Composition.Utilities;
-
-    using CDP4UpdateServerDal;
-    using CDP4UpdateServerDal.Enumerators;
-
-    using COMET.Behaviors;
-    using COMET.Services;
-    using COMET.Settings;
-    using COMET.ViewModels;
-
-    using CommonServiceLocator;
-
-    using DevExpress.Mvvm.Native;
-
-    using Moq;
-
-    using Newtonsoft.Json;
-
-    using NUnit.Framework;
-
-    using ReactiveUI;
+    using System.Windows.Threading;
 
     [TestFixture, Apartment(ApartmentState.STA)]
     public class UpdateDownloaderInstallerViewModelTestFixture : UpdateDownloaderInstallerDataSetup
@@ -95,7 +88,8 @@ namespace COMET.Tests.ViewModels
         [SetUp]
         public override void Setup()
         {
-            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+            RxApp.MainThreadScheduler = Scheduler.Immediate;
+            RxApp.TaskpoolScheduler = Scheduler.Immediate;
             base.Setup();
 
             this.updatablePlugins = new List<(FileInfo cdp4ckFile, Manifest manifest)>()
@@ -411,7 +405,10 @@ namespace COMET.Tests.ViewModels
             };
 
             vm.AvailablePlugins.Add(mockedRow.Object);
-            await  vm.InstallCommand.Execute();
+            await vm.InstallCommand.Execute().ToTask();
+
+            await Task.Delay(1000);
+
             mockedRow.Verify(x => x.Install(It.IsAny<CancellationToken>()), Times.Once);
             mockedRow.Verify(x => x.HandlingCancelationOfInstallation(), Times.Once);
             Assert.IsNull(vm.CancellationTokenSource);
