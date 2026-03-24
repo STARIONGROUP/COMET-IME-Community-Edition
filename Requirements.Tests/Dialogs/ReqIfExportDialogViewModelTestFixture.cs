@@ -104,6 +104,19 @@ namespace CDP4Requirements.Tests.Controls
         }
 
         [Test]
+        public void VerifyThatConstructorWorks()
+        {
+            var vm = new ReqIfExportDialogViewModel(new List<ISession> { this.session.Object }, new List<Iteration> { this.iteration }, this.fileDialogService.Object, this.serializer.Object);
+            Assert.IsNotNull(vm);
+            Assert.IsNotNull(vm.Sessions);
+            Assert.IsNotNull(vm.Iterations);
+            Assert.IsNotNull(vm.OkCommand);
+            Assert.IsNotNull(vm.CancelCommand);
+            Assert.IsNotNull(vm.BrowseCommand);
+            Assert.IsFalse(vm.IncludeDeprecated);
+        }
+
+        [Test]
         public void VerifyThatExceptionRaises1()
         {
             Assert.Throws<ArgumentNullException>(() => new ReqIfExportDialogViewModel(null, new List<Iteration>(), this.fileDialogService.Object, this.serializer.Object));

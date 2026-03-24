@@ -1,6 +1,6 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ReqIFBuilder.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2021 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski
 //
@@ -25,10 +25,6 @@
 
 namespace CDP4Requirements.ReqIFDal
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -36,6 +32,10 @@ namespace CDP4Requirements.ReqIFDal
     using CDP4Dal;
 
     using ReqIFSharp;
+    
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// The <see cref="ReqIF"/> builder class
@@ -56,11 +56,6 @@ namespace CDP4Requirements.ReqIFDal
         /// The <see cref="ISession"/> containing the data
         /// </summary>
         private ISession currentSession;
-
-        /// <summary>
-        /// The <see cref="Iteration"/> containing the data
-        /// </summary>
-        private Iteration exportedIteration;
 
         /// <summary>
         /// The <see cref="ThingToReqIfMapper"/>
@@ -116,6 +111,46 @@ namespace CDP4Requirements.ReqIFDal
         private readonly Cdp4ModelValidationFailureHandler cdp4ModelValidationFailureHandler;
 
         /// <summary>
+        /// The to be exported <see cref="EngineeringModel"/>
+        /// </summary>
+        private EngineeringModel toBeExportedEngineeringModel;
+
+        /// <summary>
+        /// The to be exported <see cref="ParameterizedCategoryRule"/>s
+        /// </summary>
+        private IEnumerable<ParameterizedCategoryRule> toBeExportedParameterizedCategoryRules;
+
+        /// <summary>
+        /// The to be exported <see cref="Iteration"/>
+        /// </summary>
+        private Iteration toBeExportedIteration;
+
+        /// <summary>
+        /// The to be exported <see cref="BinaryRelationship"/> between <see cref="Requirement"/>s
+        /// </summary>
+        private IEnumerable<BinaryRelationship> toBeExportedRequirementRelations;
+
+        /// <summary>
+        /// The to be exported <see cref="BinaryRelationship"/> between <see cref="RequirementsSpecification"/>s
+        /// </summary>
+        private IEnumerable<BinaryRelationship> toBeExportedRequirementsSpecificationRelations;
+
+        /// <summary>
+        /// The to be exported <see cref="RequirementsSpecification"/>s
+        /// </summary>
+        private IEnumerable<RequirementsSpecification> toBeExportedRequirementsSpecifications;
+
+        /// <summary>
+        /// The to be exported <see cref="Requirement"/>s
+        /// </summary>
+        private IEnumerable<Requirement> toBeExportedRequirements;
+
+        /// <summary>
+        /// The to be exported <see cref="RequirementsGroup"/>s
+        /// </summary>
+        private IEnumerable<RequirementsGroup> toBeExportedRequirementGroups;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ReqIFBuilder"/> class
         /// </summary>
         /// <param name="lang">The language setting for the reqif file. Default is "en"</param>
@@ -139,16 +174,19 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         /// <param name="session">The <see cref="ISession"/> containing the <see cref="Iteration"/></param>
         /// <param name="iteration">The <see cref="Iteration"/></param>
+        /// <param name="includeDeprecated">Indicates if Deprecated items should be included or not</param>
         /// <returns>The <see cref="ReqIF"/> instance</returns>
-        public ReqIF BuildReqIF(ISession session, Iteration iteration)
+        public ReqIF BuildReqIF(ISession session, Iteration iteration, bool includeDeprecated = false)
         {
             this.currentSession = session ?? throw new ArgumentNullException(nameof(session));
-            this.exportedIteration = iteration ?? throw new ArgumentNullException(nameof(iteration));
+            var exportedIteration = iteration ?? throw new ArgumentNullException(nameof(iteration));
 
             if (iteration.Cache != this.currentSession.Assembler.Cache)
             {
                 throw new InvalidOperationException("The iteration is not contained in the session's database.");
             }
+
+            this.SetIterationProperties(exportedIteration, includeDeprecated);
 
             this.reqIFBuilt = new ReqIF { Lang = this.language };
             this.SetHeader();
@@ -162,18 +200,68 @@ namespace CDP4Requirements.ReqIFDal
         }
 
         /// <summary>
+        /// Sets all properties related to the <see cref="Iteration"/> to be exported
+        /// </summary>
+        /// <param name="toBeExportedIteration">The <see cref="Iteration"/> to be Exported</param>
+        /// <param name="includeDeprecated">Indicates if Deprecated items should be included or not</param>
+        private void SetIterationProperties(Iteration toBeExportedIteration, bool includeDeprecated)
+        {
+            this.toBeExportedIteration = toBeExportedIteration;
+
+            this.toBeExportedEngineeringModel = (EngineeringModel)toBeExportedIteration.Container;
+
+            this.toBeExportedParameterizedCategoryRules = 
+                this.toBeExportedEngineeringModel.RequiredRdls
+                    .SelectMany(rdl => rdl.Rule)
+                    .OfType<ParameterizedCategoryRule>()
+                    .ToArray();
+
+            this.toBeExportedRequirementsSpecifications =
+                toBeExportedIteration.RequirementsSpecification
+                    .Where(x => includeDeprecated || !x.IsDeprecated).ToArray();
+
+            this.toBeExportedRequirements =
+                this.toBeExportedRequirementsSpecifications.SelectMany(x => x.Requirement)
+                    .Where(x => includeDeprecated || !x.IsDeprecated).ToArray();
+
+            this.toBeExportedRequirementRelations = toBeExportedIteration.Relationship
+                .OfType<BinaryRelationship>()
+                .Where(
+                    x =>
+                        x.Source.ClassKind == ClassKind.Requirement && 
+                        x.Target.ClassKind == ClassKind.Requirement)
+                .Where(
+                    x => 
+                        this.toBeExportedRequirements.Contains(x.Source) && 
+                        this.toBeExportedRequirements.Contains(x.Target))
+                .ToArray();
+
+            this.toBeExportedRequirementsSpecificationRelations = toBeExportedIteration.Relationship
+                .OfType<BinaryRelationship>()
+                .Where(
+                    x =>
+                        x.Source.ClassKind == ClassKind.RequirementsSpecification && 
+                        x.Target.ClassKind == ClassKind.RequirementsSpecification)
+                .Where(
+                    x =>
+                        this.toBeExportedRequirementsSpecifications.Contains(x.Source) && 
+                        this.toBeExportedRequirementsSpecifications.Contains(x.Target))
+                .ToArray();
+
+            this.toBeExportedRequirementGroups = this.toBeExportedRequirementsSpecifications.SelectMany(x => x.GetAllContainedGroups()).ToArray();
+        }
+
+        /// <summary>
         /// Set the header of the <see cref="ReqIF"/> object
         /// </summary>
         private void SetHeader()
         {
-            var model = (EngineeringModel)this.exportedIteration.Container;
-
             var reqifHeader = new ReqIFHeader
             {
-                Identifier = this.exportedIteration.Iid.ToString(),
+                Identifier = this.toBeExportedIteration.Iid.ToString(),
                 CreationTime = DateTime.UtcNow,
-                Title = model.EngineeringModelSetup.Name + " (" + model.EngineeringModelSetup.ShortName + ")",
-                Comment = model.EngineeringModelSetup.Definition.Any() ? model.EngineeringModelSetup.Definition.First().Content : string.Empty,
+                Title = this.toBeExportedEngineeringModel.EngineeringModelSetup.Name + " (" + this.toBeExportedEngineeringModel.EngineeringModelSetup.ShortName + ")",
+                Comment = this.toBeExportedEngineeringModel.EngineeringModelSetup.Definition.Any() ? this.toBeExportedEngineeringModel.EngineeringModelSetup.Definition.First().Content : string.Empty,
                 ReqIFToolId = "COMET",
                 RepositoryId = this.currentSession.DataSourceUri,
                 SourceToolId = "COMET"
@@ -239,27 +327,24 @@ namespace CDP4Requirements.ReqIFDal
         {
             var parameterTypes = new List<ParameterType>();
 
-            var reqRelationships = this.exportedIteration.Relationship
-                .OfType<BinaryRelationship>()
-                .Where(
-                    x =>
-                        x.Source.ClassKind == ClassKind.Requirement && x.Target.ClassKind == ClassKind.Requirement);
+            parameterTypes.AddRange(
+                this.toBeExportedRequirementRelations
+                    .SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
 
-            var specRlationships = this.exportedIteration.Relationship
-                .OfType<BinaryRelationship>()
-                .Where(
-                    x =>
-                        x.Source.ClassKind == ClassKind.RequirementsSpecification && x.Target.ClassKind == ClassKind.RequirementsSpecification);
+            parameterTypes.AddRange(
+                this.toBeExportedRequirementsSpecificationRelations
+                    .SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
 
-            var specs = this.exportedIteration.RequirementsSpecification;
-            var groups = specs.SelectMany(x => x.GetAllContainedGroups()).ToList();
-            var reqs = specs.SelectMany(x => x.Requirement);
+            parameterTypes.AddRange(
+                this.toBeExportedRequirementsSpecifications.SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
 
-            parameterTypes.AddRange(reqRelationships.SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
-            parameterTypes.AddRange(specRlationships.SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
-            parameterTypes.AddRange(specs.SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
-            parameterTypes.AddRange(groups.SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
-            parameterTypes.AddRange(reqs.SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
+            parameterTypes.AddRange(
+                this.toBeExportedRequirementGroups
+                    .SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
+
+            parameterTypes.AddRange(
+                this.toBeExportedRequirements
+                    .SelectMany(x => x.ParameterValue.Select(pv => pv.ParameterType)));
 
             foreach (var parameterType in parameterTypes.Where(p => p != null).Distinct())
             {
@@ -275,12 +360,9 @@ namespace CDP4Requirements.ReqIFDal
         /// </remarks>
         private void InstantiateSpecificationType()
         {
-            var model = (EngineeringModel)this.exportedIteration.Container;
-            var rules = model.RequiredRdls.SelectMany(rdl => rdl.Rule).OfType<ParameterizedCategoryRule>().ToArray();
-
-            foreach (var requirementsSpecification in this.exportedIteration.RequirementsSpecification)
+            foreach (var requirementsSpecification in this.toBeExportedRequirementsSpecifications.ToArray())
             {
-                var appliedRules = rules.Where(r => requirementsSpecification.IsMemberOfCategory(r.Category)).ToArray();
+                var appliedRules = this.toBeExportedParameterizedCategoryRules.Where(r => requirementsSpecification.IsMemberOfCategory(r.Category)).ToArray();
                 var existingTypes = this.specTypeMap.Where(x => x.Value.Count == appliedRules.Length && !x.Value.Except(appliedRules).Any());
                 var existingSpecificationType = existingTypes.Select(x => x.Key).OfType<SpecificationType>().SingleOrDefault();
 
@@ -302,7 +384,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         private void InstantiateSpecificationObject()
         {
-            foreach (var requirementsSpecification in this.exportedIteration.RequirementsSpecification)
+            foreach (var requirementsSpecification in this.toBeExportedRequirementsSpecifications.ToArray())
             {
                 this.requirementSpecificationsMap.Add(requirementsSpecification, this.mapper.ToReqIfSpecification(requirementsSpecification, (SpecificationType)this.specType[requirementsSpecification]));
             }
@@ -316,16 +398,11 @@ namespace CDP4Requirements.ReqIFDal
         /// </remarks>
         private void InstantiateRequirementType()
         {
-            var model = (EngineeringModel)this.exportedIteration.Container;
-            var rules = model.RequiredRdls.SelectMany(rdl => rdl.Rule).OfType<ParameterizedCategoryRule>().ToArray();
-
-            var requirements = this.exportedIteration.RequirementsSpecification.SelectMany(s => s.Requirement).Where(x => !x.IsDeprecated);
-
-            foreach (var requirement in requirements)
+            foreach (var requirement in this.toBeExportedRequirements)
             {
                 // TODO: Next step in GH IME #255. Currently a short term fix. The intent of reuse of spec type with use of applied rules is a bit unintuitive and convoluted without clear reasoning. Needs to be completely looked over.
                 // current solution will create a spec type per requirement and not reuse them (which leads to errors due to no use of rules/different SPVs)
-                var appliedRules = rules.Where(r => requirement.IsMemberOfCategory(r.Category)).ToArray();
+                var appliedRules = this.toBeExportedParameterizedCategoryRules.Where(r => requirement.IsMemberOfCategory(r.Category)).ToArray();
 
                 var reqType = this.mapper.ToReqIfSpecObjectType(requirement, appliedRules, this.parameterTypeMap);
 
@@ -339,9 +416,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         private void InstantiateRequirementSpecObject()
         {
-            var requirements = this.exportedIteration.RequirementsSpecification.SelectMany(x => x.Requirement).Where(x => !x.IsDeprecated).ToList();
-
-            foreach (var requirement in requirements)
+            foreach (var requirement in this.toBeExportedRequirements)
             {
                 this.requirementMap.Add(requirement, this.mapper.ToReqIfSpecObject(requirement, (SpecObjectType)this.specType[requirement]));
             }
@@ -355,16 +430,23 @@ namespace CDP4Requirements.ReqIFDal
         /// </remarks>
         private void InstantiateGroupType()
         {
-            var model = (EngineeringModel)this.exportedIteration.Container;
-            var rules = model.RequiredRdls.SelectMany(rdl => rdl.Rule).OfType<ParameterizedCategoryRule>().ToArray();
-
-            var groups = this.exportedIteration.RequirementsSpecification.SelectMany(x => x.GetAllContainedGroups()).ToList();
-
-            foreach (var group in groups)
+            foreach (var group in this.toBeExportedRequirementGroups)
             {
-                var appliedRules = rules.Where(r => group.IsMemberOfCategory(r.Category)).ToArray();
-                var existingTypes = this.specTypeMap.Where(x => x.Value.Count == appliedRules.Length && !x.Value.Except(appliedRules).Any());
-                var existingSpecObjectType = existingTypes.Select(x => x.Key).OfType<SpecObjectType>().SingleOrDefault(x => x.LongName.StartsWith(ThingToReqIfMapper.GroupNamePrefix));
+                var appliedRules = 
+                    this.toBeExportedParameterizedCategoryRules
+                        .Where(r => group.IsMemberOfCategory(r.Category))
+                        .ToArray();
+                
+                var existingTypes = 
+                    this.specTypeMap
+                        .Where(x => x.Value.Count == appliedRules.Length && !x.Value.Except(appliedRules).Any())
+                        .ToArray();
+                
+                var existingSpecObjectType = 
+                    existingTypes
+                        .Select(x => x.Key)
+                        .OfType<SpecObjectType>()
+                        .SingleOrDefault(x => x.LongName.StartsWith(ThingToReqIfMapper.GroupNamePrefix));
 
                 if (existingSpecObjectType != null)
                 {
@@ -384,9 +466,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </summary>
         private void InstantiateGroupSpecObject()
         {
-            var requirementsGroups = this.exportedIteration.RequirementsSpecification.SelectMany(x => x.GetAllContainedGroups()).ToList();
-
-            foreach (var requirementsGroup in requirementsGroups)
+            foreach (var requirementsGroup in this.toBeExportedRequirementGroups)
             {
                 this.requirementsGroupMap.Add(requirementsGroup, this.mapper.ToReqIfSpecObject(requirementsGroup, (SpecObjectType)this.specType[requirementsGroup]));
             }
@@ -400,22 +480,22 @@ namespace CDP4Requirements.ReqIFDal
         /// </remarks>
         private void InstantiateRelationType()
         {
-            var model = (EngineeringModel)this.exportedIteration.Container;
-            var rules = model.RequiredRdls.SelectMany(rdl => rdl.Rule).OfType<ParameterizedCategoryRule>().ToArray();
-
-            // todo also take into account the binaryrelationshipRule
-            var relationships = this.exportedIteration.Relationship
-                .OfType<BinaryRelationship>()
-                .Where(
-                    x =>
-                        x.Source.ClassKind == ClassKind.Requirement && x.Target.ClassKind == ClassKind.Requirement);
-
-            foreach (var relationship in relationships)
+            foreach (var relationship in this.toBeExportedRequirementRelations)
             {
-                var appliedRules = rules.Where(r => relationship.IsMemberOfCategory(r.Category)).ToArray();
+                var appliedRules = 
+                    this.toBeExportedParameterizedCategoryRules
+                        .Where(r => relationship.IsMemberOfCategory(r.Category))
+                        .ToArray();
 
-                var existingTypes = this.specTypeMap.Where(x => x.Value.Count == appliedRules.Length && !x.Value.Except(appliedRules).Any());
-                var existingSpecObjectType = existingTypes.Select(x => x.Key).OfType<SpecRelationType>().SingleOrDefault();
+                var existingTypes = 
+                    this.specTypeMap
+                        .Where(x => x.Value.Count == appliedRules.Length && !x.Value.Except(appliedRules).Any());
+
+                var existingSpecObjectType = 
+                    existingTypes
+                        .Select(x => x.Key)
+                        .OfType<SpecRelationType>()
+                        .SingleOrDefault();
 
                 if (existingSpecObjectType != null)
                 {
@@ -438,13 +518,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </remarks>
         private void InstantiateSpecRelation()
         {
-            var relationships = this.exportedIteration.Relationship
-                .OfType<BinaryRelationship>()
-                .Where(
-                    x =>
-                        x.Source.ClassKind == ClassKind.Requirement && x.Target.ClassKind == ClassKind.Requirement);
-
-            foreach (var relationship in relationships)
+            foreach (var relationship in this.toBeExportedRequirementRelations)
             {
                 if (this.requirementMap.TryGetValue((Requirement)relationship.Source, out var source)
                     && this.requirementMap.TryGetValue((Requirement)relationship.Target, out var target))
@@ -462,23 +536,22 @@ namespace CDP4Requirements.ReqIFDal
         /// </remarks>
         private void InstantiateRelationGroupType()
         {
-            var model = (EngineeringModel)this.exportedIteration.Container;
-            var rules = model.RequiredRdls.SelectMany(rdl => rdl.Rule).OfType<ParameterizedCategoryRule>().ToArray();
-
-            // todo also take into account the binaryrelationshipRule
-
-            var relationships = this.exportedIteration.Relationship
-                .OfType<BinaryRelationship>()
-                .Where(
-                    x =>
-                        x.Source.ClassKind == ClassKind.RequirementsSpecification && x.Target.ClassKind == ClassKind.RequirementsSpecification);
-
-            foreach (var relationship in relationships)
+            foreach (var relationship in this.toBeExportedRequirementsSpecificationRelations)
             {
-                var appliedRules = rules.Where(r => relationship.IsMemberOfCategory(r.Category)).ToArray();
+                var appliedRules = 
+                    this.toBeExportedParameterizedCategoryRules
+                        .Where(r => relationship.IsMemberOfCategory(r.Category))
+                        .ToArray();
 
-                var existingTypes = this.specTypeMap.Where(x => x.Value.Count == appliedRules.Length && !x.Value.Except(appliedRules).Any());
-                var existingRelationGroupType = existingTypes.Select(x => x.Key).OfType<RelationGroupType>().SingleOrDefault();
+                var existingTypes = 
+                    this.specTypeMap
+                        .Where(x => x.Value.Count == appliedRules.Length && !x.Value.Except(appliedRules).Any());
+
+                var existingRelationGroupType = 
+                    existingTypes
+                        .Select(x => x.Key)
+                        .OfType<RelationGroupType>()
+                        .SingleOrDefault();
 
                 if (existingRelationGroupType != null)
                 {
@@ -501,19 +574,7 @@ namespace CDP4Requirements.ReqIFDal
         /// </remarks>
         private void InstantiateRelationGroup()
         {
-            var relationships = this.exportedIteration.Relationship
-                .OfType<BinaryRelationship>()
-                .Where(
-                    x =>
-                        x.Source.ClassKind == ClassKind.RequirementsSpecification && x.Target.ClassKind == ClassKind.RequirementsSpecification);
-
-            var requirementRelationships = this.exportedIteration.Relationship
-                .OfType<BinaryRelationship>()
-                .Where(
-                    x =>
-                        x.Source.ClassKind == ClassKind.Requirement && x.Target.ClassKind == ClassKind.Requirement).ToArray();
-
-            foreach (var relationship in relationships)
+            foreach (var relationship in this.toBeExportedRequirementsSpecificationRelations)
             {
                 var sourceSpec = (RequirementsSpecification)relationship.Source;
                 var targetSpec = (RequirementsSpecification)relationship.Target;
@@ -524,7 +585,10 @@ namespace CDP4Requirements.ReqIFDal
                 var relationGroup = this.mapper.ToReqIfRelationGroup(relationship, (RelationGroupType)this.specType[relationship], source, target);
 
                 // get all relation which sources are requirements of sourceSpec and which targets are requirements from targetSpec
-                var associatedRequirementRelationships = requirementRelationships.Where(x => x.Source.Container == sourceSpec && x.Target.Container == targetSpec);
+                var associatedRequirementRelationships =
+                    this.toBeExportedRequirementRelations
+                        .Where(x => x.Source.Container == sourceSpec && x.Target.Container == targetSpec)
+                        .ToArray();
 
                 foreach (var requirementRelationship in associatedRequirementRelationships)
                 {
@@ -553,13 +617,18 @@ namespace CDP4Requirements.ReqIFDal
                 var requirementSpecification = pair.Key;
                 var reqifSpecification = pair.Value;
 
-                foreach (var requirementsGroup in requirementSpecification.Group)
+                if (!this.toBeExportedRequirementsSpecifications.Contains(requirementSpecification))
+                {
+                    continue;
+                }
+
+                foreach (var requirementsGroup in requirementSpecification.Group.Where(x => this.toBeExportedRequirementGroups.Contains(x)))
                 {
                     var child = this.BuildGroupHierarchy(requirementSpecification, requirementsGroup);
                     reqifSpecification.Children.Add(child);
                 }
 
-                foreach (var requirement in requirementSpecification.Requirement.Where(x => !x.IsDeprecated && x.Group == null))
+                foreach (var requirement in requirementSpecification.Requirement.Where(x => this.toBeExportedRequirements.Contains(x) && x.Group == null))
                 {
                     var child = new SpecHierarchy
                     {
@@ -588,13 +657,13 @@ namespace CDP4Requirements.ReqIFDal
                 Object = this.requirementsGroupMap[requirementGroup]
             };
 
-            foreach (var group in requirementGroup.Group)
+            foreach (var group in requirementGroup.Group.Where(x => this.toBeExportedRequirementGroups.Contains(x)))
             {
                 var child = this.BuildGroupHierarchy(reqSpec, group);
                 specHierarchy.Children.Add(child);
             }
 
-            foreach (var requirement in reqSpec.Requirement.Where(x => x.Group == requirementGroup))
+            foreach (var requirement in reqSpec.Requirement.Where(x => this.toBeExportedRequirements.Contains(x) && x.Group == requirementGroup))
             {
                 var child = new SpecHierarchy
                 {

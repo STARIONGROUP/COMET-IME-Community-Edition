@@ -64,6 +64,12 @@
                     </dxg:GridControl>
                 </dxlc:LayoutItem>
 
+                <dxlc:LayoutItem>
+                    <dxe:CheckEdit MaxHeight="25"
+                                   Content="Include Deprecated"
+                                   EditValue="{Binding IncludeDeprecated, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                </dxlc:LayoutItem>
+
                 <dxlc:LayoutItem AddColonToLabel="True" 
                                  LabelPosition="Top"
                                  Label="Path">
@@ -85,6 +91,7 @@
                     </Grid>
 
                 </dxlc:LayoutItem>
+
                 <dxlc:LayoutItem>
                     <TextBox IsReadOnly="True" 
                              VerticalAlignment="Bottom"

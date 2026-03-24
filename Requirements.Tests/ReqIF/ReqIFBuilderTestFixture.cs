@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIFBuilderTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -77,7 +77,9 @@ namespace CDP4Requirements.Tests
         private BinaryRelationship deriveRelationship1;
         private BinaryRelationship deriveRelationship2;
         private BinaryRelationship deriveRelationship3;
-        private BinaryRelationship specDeriveRelationship;
+        private BinaryRelationship deriveRelationship4;
+        private BinaryRelationship specDeriveRelationship1;
+        private BinaryRelationship specDeriveRelationship2;
         private BinaryRelationshipRule derivedRule;
         private BinaryRelationshipRule specRuleType;
 
@@ -90,6 +92,7 @@ namespace CDP4Requirements.Tests
         private SimpleParameterValue reqValue1;
         private SimpleParameterValue reqValue11;
         private SimpleParameterValue reqValue2;
+        private SimpleParameterValue deprecatedReqValue;
 
         private ParameterizedCategoryRule parameRule;
 
@@ -235,22 +238,38 @@ namespace CDP4Requirements.Tests
                 Target = this.req1
             };
 
+            this.deriveRelationship4 = new BinaryRelationship(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Source = this.req,
+                Target = this.deprecatedRequirement
+            };
+
             this.deriveRelationship1.Category.Add(this.deriveCat);
             this.deriveRelationship2.Category.Add(this.deriveCat);
             this.deriveRelationship3.Category.Add(this.deriveCat);
+            this.deriveRelationship4.Category.Add(this.deriveCat);
 
-            this.specDeriveRelationship = new BinaryRelationship(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            this.specDeriveRelationship1 = new BinaryRelationship(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Source = this.reqSpec,
                 Target = this.reqSpec2
             };
 
-            this.specDeriveRelationship.Category.Add(this.specRelationRuleCategory);
+            this.specDeriveRelationship2 = new BinaryRelationship(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Source = this.reqSpec,
+                Target = this.deprecatedRequirementsSpecification
+            };
+
+            this.specDeriveRelationship1.Category.Add(this.specRelationRuleCategory);
+            this.specDeriveRelationship2.Category.Add(this.specRelationRuleCategory);
 
             this.iteration.Relationship.Add(this.deriveRelationship1);
             this.iteration.Relationship.Add(this.deriveRelationship2);
             this.iteration.Relationship.Add(this.deriveRelationship3);
-            this.iteration.Relationship.Add(this.specDeriveRelationship);
+            this.iteration.Relationship.Add(this.deriveRelationship4);
+            this.iteration.Relationship.Add(this.specDeriveRelationship1);
+            this.iteration.Relationship.Add(this.specDeriveRelationship2);
 
             this.reqValue = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
@@ -276,14 +295,21 @@ namespace CDP4Requirements.Tests
                 Value = new ValueArray<string>(new[] { "true" })
             };
 
+            this.deprecatedReqValue = new SimpleParameterValue(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ParameterType = this.booleanParameterType,
+                Value = new ValueArray<string>(new[] { "true" })
+            };
+
             this.req.ParameterValue.Add(this.reqValue);
             this.req1.ParameterValue.Add(this.reqValue1);
             this.req11.ParameterValue.Add(this.reqValue11);
             this.req2.ParameterValue.Add(this.reqValue2);
+            this.deprecatedRequirement.ParameterValue.Add(this.deprecatedReqValue);
         }
 
         [Test]
-        public void VerifyThatRequirementSpecificationCanBeExportedIntoReqIF()
+        public void VerifyThatRequirementSpecificationCanBeExportedIntoReqIF_DefaultExcludingDeprecated()
         {
             var builder = new ReqIFBuilder();
 
@@ -293,8 +319,130 @@ namespace CDP4Requirements.Tests
             // 2 + 1 extra datatype for requriement text
             Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
             Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
+            Assert.AreEqual(2, reqif.CoreContent.Specifications.Count); // 2 specification
+            Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
+            Assert.AreEqual(1, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+
+            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Single().SpecRelations);
+
+            var serializer = new ReqIFSerializer(false);
+            serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
+        }
+
+        [Test]
+        public void VerifyThatRequirementSpecificationCanBeExportedIntoReqIF_IncludingDeprecated()
+        {
+            var builder = new ReqIFBuilder();
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true);
+            Assert.IsNotNull(reqif);
+
+            // 2 + 1 extra datatype for requriement text
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
+            Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 5 requirements + 2 groups
+            Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 3 specification
+            Assert.AreEqual(9, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type,3 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(4, reqif.CoreContent.SpecRelations.Count); // 4 specRelation from 3 relationship
+            Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 2 RelationGroup from 1 binaryRelationship
+
+            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.First().SpecRelations);
+            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations);
+
+            var serializer = new ReqIFSerializer(false);
+            serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
+        }
+
+        [Test]
+        public void VerifyThatRequirementSpecificationCanBeExportedIntoReqIF_HavingDeprecatedRequirementsSpecification()
+        {
+            var builder = new ReqIFBuilder();
+
+            this.deprecatedRequirementsSpecification.IsDeprecated = false;
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true);
+            Assert.IsNotNull(reqif);
+
+            // 2 + 1 extra datatype for requriement text
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
+            Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
+            Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
+            Assert.AreEqual(9, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(4, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
+            Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+
+            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.First().SpecRelations);
+            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations);
+
+            var serializer = new ReqIFSerializer(false);
+            serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
+        }
+
+        [Test]
+        public void VerifyThatRequirementSpecificationCanBeExportedIntoReqIF_HavingDeprecatedRequirement()
+        {
+            var builder = new ReqIFBuilder();
+
+            this.deprecatedRequirement.IsDeprecated = false;
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration, true);
+            Assert.IsNotNull(reqif);
+
+            // 2 + 1 extra datatype for requriement text
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
+            Assert.AreEqual(7, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
+            Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
+            Assert.AreEqual(9, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(4, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
+            Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+
+            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.First().SpecRelations);
+            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations);
+
+            var serializer = new ReqIFSerializer(false);
+            serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
+        }
+        
+        [Test]
+        public void VerifyThatRequirementSpecificationCanBeExportedIntoReqIF_Default_HavingDeprecatedRequirementsSpecification()
+        {
+            var builder = new ReqIFBuilder();
+
+            this.deprecatedRequirementsSpecification.IsDeprecated = false;
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration);
+            Assert.IsNotNull(reqif);
+
+            // 2 + 1 extra datatype for requriement text
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
+            Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
             Assert.AreEqual(3, reqif.CoreContent.Specifications.Count); // 2 specification
             Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 1 Spec type, 1 Relation type, 1 relationGroup type
+            Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
+            Assert.AreEqual(2, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
+
+            Assert.IsNotEmpty(reqif.CoreContent.SpecRelationGroups.First().SpecRelations);
+            Assert.IsEmpty(reqif.CoreContent.SpecRelationGroups.Skip(1).First().SpecRelations);
+
+            var serializer = new ReqIFSerializer(false);
+            serializer.Serialize(reqif, @"output.xml", (o, e) => { throw new Exception(); });
+        }
+
+        [Test]
+        public void VerifyThatRequirementSpecificationCanBeExportedIntoReqIF_Default_HavingDeprecatedRequirement()
+        {
+            var builder = new ReqIFBuilder();
+
+            this.deprecatedRequirement.IsDeprecated = false;
+
+            var reqif = builder.BuildReqIF(this.session.Object, this.iteration);
+            Assert.IsNotNull(reqif);
+
+            // 2 + 1 extra datatype for requriement text
+            Assert.AreEqual(3, reqif.CoreContent.DataTypes.Count); // booleanPt and boolean and Text datatype
+            Assert.AreEqual(6, reqif.CoreContent.SpecObjects.Count); // 4 requirements + 2 groups
+            Assert.AreEqual(2, reqif.CoreContent.Specifications.Count); // 2 specification
+            Assert.AreEqual(8, reqif.CoreContent.SpecTypes.Count); // 1 group type, 1 Req type, 2 Spec type, 1 Relation type, 1 relationGroup type
             Assert.AreEqual(3, reqif.CoreContent.SpecRelations.Count); // 3 specRelation from 3 relationship
             Assert.AreEqual(1, reqif.CoreContent.SpecRelationGroups.Count); // 1 RelationGroup from 1 binaryRelationship
 
