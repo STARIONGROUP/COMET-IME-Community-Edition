@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ReqIfExportDialogViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET IME Community Edition.
+//    The CDP4-COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -61,6 +61,12 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="Path"/>
         /// </summary>
         private string path;
+
+        /// <summary>
+        /// Backing field for <see cref="IncludeDeprecated"/>
+        /// </summary>
+        /// <remarks>Defaults to false as that is the backwards compatible way</remarks>
+        private bool includeDeprecated;
 
         /// <summary>
         /// Backing field for <see cref="SelectedIteration"/>
@@ -227,6 +233,15 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the indicator if deprecated items should be included or not in the export
+        /// </summary>
+        public bool IncludeDeprecated
+        {
+            get => this.includeDeprecated;
+            set => this.RaiseAndSetIfChanged(ref this.includeDeprecated, value);
+        }
+
+        /// <summary>
         /// Gets the <see cref="ICommand"/> to cancel creation of a ReqIf file
         /// </summary>
         public ReactiveCommand<Unit, Unit> CancelReqIfCommand { get; private set; }
@@ -313,7 +328,7 @@ namespace CDP4Requirements.ViewModels
                     var session = this.Sessions.Single(x => x.Assembler.Cache == this.SelectedIteration.Iteration.Cache);
                     var reqifBuilder = new ReqIFBuilder();
 
-                    return reqifBuilder.BuildReqIF(session, this.SelectedIteration.Iteration);
+                    return reqifBuilder.BuildReqIF(session, this.SelectedIteration.Iteration, this.IncludeDeprecated);
                 },
                 this.cancellationToken);
         }
