@@ -57,8 +57,6 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
         /// The view-model that is being tested
         /// </summary>
         private TestClass viewModel;
-
-        private EngineeringModelSetup engeEngineeringModelSetup;
         private Uri uri;
         private Mock<ISession> session;
 
@@ -167,6 +165,60 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
             Assert.AreEqual(3, sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.Count);
             var sortedList = sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups.OrderBy(em => em.MenuItemContent);
             Assert.AreEqual(sortedList, sessionEngineeringModelSetupMenuGroupViewModel.EngineeringModelSetups);
+        }
+
+        [Test]
+        public void VerifyThatUpdatedEngineeringModelSetupNameIsReflectedInMenuItemContent()
+        {
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+
+            var siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "OldName" };
+            siteDirectory.Model.Add(engineeringModelSetup);
+
+            this.messageBus.SendObjectChangeEvent(engineeringModelSetup, EventKind.Added);
+
+            var group = this.viewModel.EngineeringModelSetups.Single();
+            var menuItem = group.EngineeringModelSetups.Single();
+
+            Assert.AreEqual("OldName", menuItem.MenuItemContent);
+
+            engineeringModelSetup.Name = "NewName";
+            engineeringModelSetup.RevisionNumber = 1;
+
+            this.messageBus.SendObjectChangeEvent(engineeringModelSetup, EventKind.Updated);
+
+            Assert.AreEqual("NewName", menuItem.MenuItemContent);
+        }
+
+        [Test]
+        public void VerifyThatGalleryGroupIsResortedAfterEngineeringModelSetupNameChange()
+        {
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Open));
+
+            var siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            var setupBeta = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Beta" };
+            siteDirectory.Model.Add(setupBeta);
+
+            var setupAlpha = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Alpha" };
+            siteDirectory.Model.Add(setupAlpha);
+
+            this.messageBus.SendObjectChangeEvent(setupBeta, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(setupAlpha, EventKind.Added);
+
+            var group = this.viewModel.EngineeringModelSetups.Single();
+
+            Assert.AreEqual("Alpha", group.EngineeringModelSetups[0].MenuItemContent);
+            Assert.AreEqual("Beta", group.EngineeringModelSetups[1].MenuItemContent);
+
+            setupAlpha.Name = "Gamma";
+            setupAlpha.RevisionNumber = 1;
+
+            this.messageBus.SendObjectChangeEvent(setupAlpha, EventKind.Updated);
+
+            Assert.AreEqual("Beta", group.EngineeringModelSetups[0].MenuItemContent);
+            Assert.AreEqual("Gamma", group.EngineeringModelSetups[1].MenuItemContent);
         }
 
         private class TestClass : RibbonButtonEngineeringModelSetupDependentViewModel

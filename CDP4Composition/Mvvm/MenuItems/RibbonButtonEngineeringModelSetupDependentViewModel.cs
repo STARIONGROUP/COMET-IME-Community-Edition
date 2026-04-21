@@ -87,6 +87,12 @@ namespace CDP4Composition.Mvvm
                 .Select(x => x.ChangedThing as EngineeringModelSetup)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.EngineeringModelSetupRemovedEventHandler);
+
+            messageBus.Listen<ObjectChangedEvent>(typeof(EngineeringModelSetup))
+                .Where(x => x.EventKind == EventKind.Updated)
+                .Select(x => x.ChangedThing as EngineeringModelSetup)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(this.EngineeringModelSetupUpdatedEventHandler);
         }
 
         /// <summary>
@@ -156,6 +162,22 @@ namespace CDP4Composition.Mvvm
             }
 
             ((ICommand)menuItemToRemove.ClosePanelsCommand).Execute(default);
+        }
+
+        /// <summary>
+        /// The event-handler that is invoked by the subscription that listens for <see cref="EngineeringModelSetup"/>s updated
+        /// </summary>
+        /// <param name="engineeringModelSetup">the engineering model setup</param>
+        protected virtual void EngineeringModelSetupUpdatedEventHandler(EngineeringModelSetup engineeringModelSetup)
+        {
+            var group = this.EngineeringModelSetups.SingleOrDefault(x => x.Thing == engineeringModelSetup.Container);
+
+            if (group == null)
+            {
+                return;
+            }
+
+            group.EngineeringModelSetups.Sort((x, y) => x.MenuItemContent.CompareTo(y.MenuItemContent));
         }
 
         /// <summary>

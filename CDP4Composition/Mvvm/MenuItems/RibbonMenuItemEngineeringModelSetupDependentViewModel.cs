@@ -82,6 +82,7 @@ namespace CDP4Composition.Mvvm
         private void SetProperties()
         {
             this.RevisionNumber = this.EngineeringModelSetup.RevisionNumber;
+            this.UpdateStaticMenuItemContent(this.EngineeringModelSetup.Name);
         }
 
         /// <summary>
