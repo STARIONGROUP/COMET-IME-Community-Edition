@@ -97,7 +97,7 @@ namespace CDP4Composition.Mvvm
         /// <summary>
         /// Static part of the MenuItemCentent
         /// </summary>
-        private readonly string staticMenuItemContent;
+        private string staticMenuItemContent;
 
         /// <summary>
         /// Backing field for <see cref="IsChecked"/> 
@@ -151,6 +151,17 @@ namespace CDP4Composition.Mvvm
                 prefix = $"({panelCount}) ";
             }
 
+            this.MenuItemContent = $"{prefix}{this.staticMenuItemContent}";
+        }
+
+        /// <summary>
+        /// Updates the static part of the menu item content and recomputes <see cref="MenuItemContent"/> preserving the open-panel count prefix.
+        /// </summary>
+        /// <param name="newContent">The new static content (e.g. an updated name)</param>
+        protected void UpdateStaticMenuItemContent(string newContent)
+        {
+            this.staticMenuItemContent = newContent;
+            var prefix = this.PanelViewModels.Count > 0 ? $"({this.PanelViewModels.Count}) " : string.Empty;
             this.MenuItemContent = $"{prefix}{this.staticMenuItemContent}";
         }
 
