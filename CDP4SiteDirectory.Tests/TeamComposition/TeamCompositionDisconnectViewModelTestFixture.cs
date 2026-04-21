@@ -63,7 +63,6 @@ namespace CDP4SiteDirectory.Tests
         private Mock<IPermissionService> permissionService;
         private Mock<ISession> session;
         private Uri uri = new Uri("https://www.stariongroup.eu");
-        private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private Person person;
         private CDPMessageBus messageBus;
 

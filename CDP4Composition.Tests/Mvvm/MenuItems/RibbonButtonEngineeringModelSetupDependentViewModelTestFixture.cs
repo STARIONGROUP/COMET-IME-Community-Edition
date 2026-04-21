@@ -57,8 +57,6 @@ namespace CDP4Composition.Tests.Mvvm.MenuItems
         /// The view-model that is being tested
         /// </summary>
         private TestClass viewModel;
-
-        private EngineeringModelSetup engeEngineeringModelSetup;
         private Uri uri;
         private Mock<ISession> session;
 
