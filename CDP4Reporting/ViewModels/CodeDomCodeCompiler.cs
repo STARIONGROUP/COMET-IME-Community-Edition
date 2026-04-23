@@ -37,6 +37,19 @@ namespace CDP4Reporting.ViewModels
     public class CodeDomCodeCompiler : CodeCompilerBase
     {
         /// <summary>
+        /// Holds a reference to the assemblies cached from the current AppDomain. 
+        /// This is used to avoid the overhead of retrieving the assembly locations multiple times during compilation.
+        /// Also a bugfix for facade assemblies loaded in the first compile run, which are not loaded in subsequent runs, 
+        /// causing the assembly retrieval to fail and the compiler to throw an exception.
+        /// </summary>
+        private static string[] cachedAssemblyLocations;
+
+        /// <summary>
+        /// Holds a lock object for synchronizing access to the cached assembly locations. This ensures that only one thread can retrieve and cache the assembly locations at a time, preventing
+        /// </summary>
+        private static readonly object cacheLock = new object();
+
+        /// <summary>
         /// Creates a new instance of the <see cref="CodeDomCodeCompiler"/> class
         /// </summary>
         /// <param name="onOutput">An <see cref="Action{T}"/> of type <see cref="string"/> that is invoked when user output is needed during compilation or data retrieval</param>
@@ -61,13 +74,19 @@ namespace CDP4Reporting.ViewModels
                 WarningLevel = 0
             };
 
-            var currentAssemblies =
-                AppDomain.CurrentDomain.GetAssemblies()
-                    .Where(x => !x.IsDynamic)
-                    .Select(x => x.Location)
-                    .ToArray();
+            if (cachedAssemblyLocations == null)
+            {
+                lock (cacheLock)
+                {
+                    cachedAssemblyLocations ??= AppDomain.CurrentDomain.GetAssemblies()
+                        .Where(x => !x.IsDynamic)
+                        .Where(x => !string.IsNullOrEmpty(x.Location))
+                        .Select(x => x.Location)
+                        .ToArray();
+                }
+            }
 
-            parameters.ReferencedAssemblies.AddRange(currentAssemblies);
+            parameters.ReferencedAssemblies.AddRange(cachedAssemblyLocations);
 
             var result = compiler.CompileAssemblyFromSource(parameters, source);
 
