@@ -36,13 +36,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="30.0.0-rc2">
+    <PackageReference Include="CDP4Common-CE" Version="30.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="30.0.0-rc2">
+    <PackageReference Include="CDP4Dal-CE" Version="30.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.0.0-rc2">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
@@ -151,10 +151,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="6.0.7">
+    <PackageReference Include="NLog" Version="6.1.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference> 
-  	<PackageReference Include="NLog.Extensions.Logging" Version="6.1.0">
+  	<PackageReference Include="NLog.Extensions.Logging" Version="6.1.2">
 	    <ExcludeAssets>runtime</ExcludeAssets>
   	</PackageReference>
     <PackageReference Include="ReactiveUI.WPF" Version="22.3.1">
@@ -166,7 +166,7 @@
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135">
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142">
 	    <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
   </ItemGroup>

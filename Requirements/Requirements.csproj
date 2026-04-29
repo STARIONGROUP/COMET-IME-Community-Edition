@@ -42,16 +42,16 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="30.0.0-rc2">
+    <PackageReference Include="CDP4Common-CE" Version="30.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="30.0.0-rc2">
+    <PackageReference Include="CDP4Dal-CE" Version="30.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.0.0-rc2">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4RequirementsVerification-CE" Version="30.0.0-rc2">
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="30.0.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
@@ -181,19 +181,19 @@
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
 	<PackageReference Include="DotLiquid" Version="2.3.197" />
-	<PackageReference Include="NetOfficeFw.Core" Version="1.9.7">
+	<PackageReference Include="NetOfficeFw.Core" Version="1.9.9">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="NetOfficeFw.Excel" Version="1.9.7">
+	<PackageReference Include="NetOfficeFw.Excel" Version="1.9.9">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="Newtonsoft.Json" Version="13.0.4">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="NLog" Version="6.0.7">
+	<PackageReference Include="NLog" Version="6.1.2">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="NLog.Extensions.Logging" Version="6.1.0">
+	<PackageReference Include="NLog.Extensions.Logging" Version="6.1.2">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReactiveUI.WPF" Version="22.3.1">
@@ -202,10 +202,10 @@
 	<PackageReference Include="ReactiveUI" Version="22.3.1">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="System.ComponentModel.Composition" Version="10.0.1">
+	<PackageReference Include="System.ComponentModel.Composition" Version="10.0.7">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135">
+	<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReqIFSharp" Version="4.0.0" />
