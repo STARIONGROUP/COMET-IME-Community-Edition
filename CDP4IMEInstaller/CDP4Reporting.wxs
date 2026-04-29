@@ -22,5 +22,18 @@
 	    </Component>
 
     </ComponentGroup>
+
+    <ComponentGroup Id="CDP4REPORTING_REPORTINGREFS" Directory="REPORTINGREFS">
+
+      <Component Id="comp_CDP4Reporting_netstandardref" Guid="{B020E124-E9AE-4EEC-B37B-50A06CD4337E}" Location="local" >
+        <File Id="fil_CDP4Reporting_netstandardref" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)refs\netstandard.dll" KeyPath="yes"></File>
+      </Component>
+
+      <Component Id="comp_CDP4Reporting_systemruntimeref" Guid="{B020E124-E9AE-4EEC-B37B-50A06CD4337F}" Location="local" >
+        <File Id="fil_CDP4Reporting_systemruntimeref" Vital="yes" Source="$(var.CDP4Reporting.TargetDir)refs\System.Runtime.dll" KeyPath="yes"></File>
+      </Component>
+    
+    </ComponentGroup>
+
   </Fragment>
 </Wix>

@@ -1,6 +1,6 @@
 ﻿<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
 
-  <Package Name="CDP4-COMET-CE" Language="1033" Version="11.0.0.11" Manufacturer="Starion Group S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4" InstallerVersion="200">
+  <Package Name="CDP4-COMET-CE" Language="1033" Version="11.0.0.12" Manufacturer="Starion Group S.A." UpgradeCode="83b3da1e-4a38-40f0-b2a6-5f58b32238a4" InstallerVersion="200">
 
     <?include variables.wxi ?>
    
@@ -114,6 +114,7 @@
 
     <Feature Id="CDP4REPORTINGPLUGIN" TypicalDefault="install" InstallDefault="local" AllowAdvertise="no" Title="CDP4-COMET Reporting Plugin" Level="1">
       <ComponentGroupRef Id="CDP4REPORTING_CG" />
+      <ComponentGroupRef Id="CDP4REPORTING_REPORTINGREFS" />
     </Feature>
 
     <Feature Id="GRAPHERPLUGIN" TypicalDefault="install" InstallDefault="local" AllowAdvertise="no" Title="CDP4-COMET Grapher Plugin" Level="1">
