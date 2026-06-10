@@ -59,8 +59,15 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         public void TearDown()
         {
             // Delete tmp dir
-            File.Delete(this.tempfile.FullName);
-            Directory.Delete(this.tempfile.DirectoryName);
+            if (File.Exists(this.tempfile.FullName))
+            {
+                File.Delete(this.tempfile.FullName);
+            }
+
+            if (Directory.Exists(this.tempfile.DirectoryName))
+            {
+                Directory.Delete(this.tempfile.DirectoryName);
+            }
         }
 
         [Test]
@@ -81,7 +88,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
                 new UriConfig
                 {
                     Alias = "Alias0", 
-                    Uri = "Uri0", 
+                    Uri = "https://example.com/uri0", 
                     DalType = "Web"
                 }
             };
@@ -89,8 +96,8 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             configurator.Write(rows);
 
             // Normalize line endings, because JSON.Net serialization is a bit inconsistent on handling indentation and line endings on different platforms
-            var testFileContent = File.ReadAllText(this.testfile.FullName).Replace("\r\n", "\n");
-            var configFileContent = File.ReadAllText(configurator.ConfigurationFilePath).Replace("\r\n", "\n");
+            var testFileContent = File.ReadAllText(this.testfile.FullName).Replace("\r\n", "\n").TrimEnd('\n');
+            var configFileContent = File.ReadAllText(configurator.ConfigurationFilePath).Replace("\r\n", "\n").TrimEnd('\n');
 
             // Ensure the generated file is the same as the testing one
             Assert.AreEqual(testFileContent.Length, configFileContent.Length,
@@ -113,7 +120,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             Assert.NotNull(configViewModel.UriRowList);
 
             Assert.IsTrue(configViewModel.UriRowList[0].Alias.Equals("Alias0"));
-            Assert.IsTrue(configViewModel.UriRowList[0].Uri.Equals("Uri0"));
+            Assert.IsTrue(configViewModel.UriRowList[0].Uri.Equals("https://example.com/uri0"));
             Assert.IsTrue(configViewModel.UriRowList[0].DalType == CDP4Dal.Composition.DalType.Web);
 
             // Close viewmodel
@@ -168,6 +175,45 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             // Re-Save config file.
             await configViewModel.ApplyCommand.Execute();
             Assert.IsTrue(File.Exists(new UriConfigFileHandler().ConfigurationFilePath));
+        }
+
+        [Test]
+        public void VerifyThatUriRowViewModelValidatesUri()
+        {
+            var row = new UriRowViewModel();
+
+            Assert.IsTrue(row.HasErrors);
+            Assert.AreEqual("URI cannot be empty.", row[nameof(row.Uri)]);
+
+            row.Uri = "not a uri";
+            Assert.IsTrue(row.HasErrors);
+            Assert.AreEqual("URI must be a valid absolute URI.", row[nameof(row.Uri)]);
+
+            row.Uri = "https://example.com ";
+            Assert.IsTrue(row.HasErrors);
+            Assert.AreEqual("URI cannot contain leading or trailing spaces.", row[nameof(row.Uri)]);
+
+            row.Uri = "https://example.com";
+            Assert.IsFalse(row.HasErrors);
+            Assert.IsNull(row[nameof(row.Uri)]);
+        }
+
+        [Test]
+        public void VerifyThatApplyCommandIsDisabledWhenUriIsInvalid()
+        {
+            Directory.CreateDirectory(this.tempfile.DirectoryName);
+            this.testfile.CopyTo(this.tempfile.FullName, true);
+
+            var configViewModel = new UriManagerViewModel();
+            var applyCommand = (System.Windows.Input.ICommand)configViewModel.ApplyCommand;
+
+            Assert.IsTrue(applyCommand.CanExecute(null));
+
+            configViewModel.UriRowList[0].Uri = string.Empty;
+            Assert.IsFalse(applyCommand.CanExecute(null));
+
+            configViewModel.UriRowList[0].Uri = "https://example.com/uri0";
+            Assert.IsTrue(applyCommand.CanExecute(null));
         }
     }
 }

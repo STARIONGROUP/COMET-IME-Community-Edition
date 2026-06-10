@@ -16,6 +16,7 @@
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <UseWPF>true</UseWPF>
+    <CefSharpAnyCpuSupport>true</CefSharpAnyCpuSupport>
     <UseWindowsForms>true</UseWindowsForms>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
