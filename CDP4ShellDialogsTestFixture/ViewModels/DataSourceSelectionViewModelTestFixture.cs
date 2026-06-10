@@ -27,6 +27,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Concurrency;
@@ -307,7 +308,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         }
 
         [Test]
-        public async Task AssertThatRequestSchemaIsCheckedUponChangesInViewModel()
+        public async Task AssertThatRequestSchemaIsNotCheckedForInvalidUriOrNonWebDataSource()
         {
             var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
             viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.Single(x => x.DalType == DalType.File);
@@ -317,43 +318,220 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             Assert.That(viewmodel.IsFullTrustAllowed, Is.False);
             Assert.That(viewmodel.IsProxyEnabled, Is.False);
 
-            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Never);
-
-            viewmodel.IsFullTrustAllowed = true;
-
-            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Never);
-
             viewmodel.IsProxyEnabled = true;
-
-            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Never);
-
             viewmodel.Uri = "Not a valid URI";
 
+            // an invalid uri must not schedule any authentication scheme resolution
+            await Task.Delay(1500);
+
             this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Never);
+            Assert.That(viewmodel.AvailableAuthenticationScheme, Is.Null);
+            Assert.That(viewmodel.IsResolvingBusy, Is.False);
+            Assert.That(viewmodel.ErrorMessage, Is.Null.Or.Empty);
+        }
+
+        [Test]
+        public async Task AssertThatRequestSchemaIsResolvedAfterDebounceForValidUri()
+        {
+            this.SetupAuthenticationSchemes(AuthenticationSchemeKind.Basic);
+
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
 
             viewmodel.SelectedUri = new UriRowViewModel { Uri = "https://www.stariongroup.eu" };
 
-            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Once);
+            // the resolution is debounced and must not happen synchronously
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Never);
 
-            viewmodel.Uri = "Not a valid URI";
+            await WaitUntil(() => viewmodel.AvailableAuthenticationScheme != null);
+
+            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.AtLeastOnce);
+            Assert.That(viewmodel.AvailableAuthenticationScheme.Schemes, Does.Contain(AuthenticationSchemeKind.Basic));
+
+            await WaitUntil(() => !viewmodel.IsResolvingBusy);
+            Assert.That(viewmodel.IsResolvingBusy, Is.False);
+        }
+
+        [Test]
+        public async Task AssertThatRapidChangesAreDebouncedToASingleResolution()
+        {
+            this.SetupAuthenticationSchemes(AuthenticationSchemeKind.Basic);
+
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
+
+            for (var i = 0; i < 5; i++)
+            {
+                viewmodel.Uri = $"https://www.stariongroup.eu/{i}";
+            }
+
+            await WaitUntil(() => viewmodel.AvailableAuthenticationScheme != null);
 
             this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Once);
+        }
+
+        [Test]
+        public async Task AssertThatResolutionErrorIsReportedAndBusyIsReset()
+        {
+            this.session.Setup(x => x.QueryAvailableAuthenticationScheme()).ThrowsAsync(new Exception("resolve failure"));
+
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
 
             viewmodel.Uri = "https://www.stariongroup.eu";
 
-            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(2));
+            await WaitUntil(() => viewmodel.ErrorMessage == "resolve failure");
 
-            viewmodel.IsFullTrustAllowed = false;
+            Assert.That(viewmodel.ErrorMessage, Is.EqualTo("resolve failure"));
+            Assert.That(viewmodel.AvailableAuthenticationScheme, Is.Null);
 
-            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(3));
+            await WaitUntil(() => !viewmodel.IsResolvingBusy);
+            Assert.That(viewmodel.IsResolvingBusy, Is.False);
+        }
 
-            viewmodel.IsProxyEnabled = false;
+        [Test]
+        public async Task AssertThatEmptySchemesReportNotAComet()
+        {
+            this.session.Setup(x => x.QueryAvailableAuthenticationScheme())
+                .ReturnsAsync(new AuthenticationSchemeResponse { Schemes = new List<AuthenticationSchemeKind>() });
 
-            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(4));
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
 
-            viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.Single(x => x.DalType == DalType.Web);
+            viewmodel.Uri = "https://www.stariongroup.eu";
 
-            this.session.Verify(x => x.QueryAvailableAuthenticationScheme(), Times.Exactly(4));
+            await WaitUntil(() => viewmodel.ErrorMessage == "Not a COMET-CDP4 server");
+
+            Assert.That(viewmodel.ErrorMessage, Is.EqualTo("Not a COMET-CDP4 server"));
+
+            await WaitUntil(() => !viewmodel.IsResolvingBusy);
+            Assert.That(viewmodel.IsResolvingBusy, Is.False);
+        }
+
+        [Test]
+        public async Task AssertThatExternalProviderSchemeNavigatesToExternalAuthenticationDialog()
+        {
+            this.session.Setup(x => x.QueryAvailableAuthenticationScheme())
+                .ReturnsAsync(new AuthenticationSchemeResponse
+                {
+                    Schemes = new List<AuthenticationSchemeKind> { AuthenticationSchemeKind.ExternalJwtBearer },
+                    Authority = "http://127.0.0.1/"
+                });
+
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
+
+            viewmodel.Uri = "https://www.stariongroup.eu";
+
+            await WaitUntil(() => viewmodel.AvailableAuthenticationScheme != null);
+
+            this.navService.Verify(x => x.NavigateModal(It.IsAny<ExternalAuthenticationDialogViewModel>()), Times.AtLeastOnce);
+
+            await WaitUntil(() => !viewmodel.IsResolvingBusy);
+            Assert.That(viewmodel.IsAuthenticatedViaExternalProvider, Is.False);
+            Assert.That(viewmodel.IsResolvingBusy, Is.False);
+        }
+
+        [Test]
+        public async Task AssertThatExecuteOkForFileDataSourceOpensSession()
+        {
+            this.session.Setup(x => x.Open(It.IsAny<bool>())).Returns(Task.CompletedTask);
+
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
+            viewmodel.SelectedDataSourceKind = viewmodel.AvailableDataSourceKinds.Single(x => x.DalType == DalType.File);
+
+            viewmodel.ShouldProvideCredentialsInformation = true;
+            viewmodel.Uri = "https://www.stariongroup.eu";
+            viewmodel.UserName = "John";
+            viewmodel.Password = "Doe";
+
+            await viewmodel.OkCommand.Execute().Catch(Observable.Return(Unit.Default));
+
+            this.session.Verify(x => x.Open(It.IsAny<bool>()), Times.Once);
+        }
+
+        [Test]
+        public async Task AssertThatExecuteOkForWebDataSourceWithCredentialsAuthenticatesAndOpens()
+        {
+            this.SetupAuthenticationSchemes(AuthenticationSchemeKind.Basic);
+
+            this.session.Setup(x => x.AuthenticateAndOpen(It.IsAny<AuthenticationSchemeKind>(), It.IsAny<AuthenticationInformation>(), It.IsAny<bool>()))
+                .Returns(Task.CompletedTask);
+
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
+
+            // let the resolution run so that the internal session gets created and the scheme is resolved
+            viewmodel.Uri = "https://www.stariongroup.eu";
+            await WaitUntil(() => viewmodel.AvailableAuthenticationScheme != null && !viewmodel.IsResolvingBusy);
+
+            Assert.That(viewmodel.ShouldProvideCredentialsInformation, Is.True);
+
+            viewmodel.UserName = "John";
+            viewmodel.Password = "Doe";
+
+            await viewmodel.OkCommand.Execute().Catch(Observable.Return(Unit.Default));
+
+            this.session.Verify(x => x.AuthenticateAndOpen(AuthenticationSchemeKind.Basic, It.IsAny<AuthenticationInformation>(), It.IsAny<bool>()), Times.Once);
+        }
+
+        [Test]
+        public async Task AssertThatExecuteOkForExternalAuthenticationOpensSession()
+        {
+            this.SetupAuthenticationSchemes(AuthenticationSchemeKind.ExternalJwtBearer);
+
+            this.session.Setup(x => x.Open(It.IsAny<bool>())).Returns(Task.CompletedTask);
+
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
+
+            // let the resolution run so that the internal session gets created
+            viewmodel.Uri = "https://www.stariongroup.eu";
+            await WaitUntil(() => viewmodel.AvailableAuthenticationScheme != null && !viewmodel.IsResolvingBusy);
+
+            // an external-only scheme does not require credentials to be entered
+            Assert.That(viewmodel.ShouldProvideCredentialsInformation, Is.False);
+
+            viewmodel.UserName = "John";
+            viewmodel.Password = "Doe";
+
+            await viewmodel.OkCommand.Execute().Catch(Observable.Return(Unit.Default));
+
+            this.session.Verify(x => x.Open(It.IsAny<bool>()), Times.Once);
+        }
+
+        [Test]
+        public void AssertThatIsResolvingBusyCanBeSet()
+        {
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
+
+            Assert.That(viewmodel.IsResolvingBusy, Is.False);
+
+            viewmodel.IsResolvingBusy = true;
+
+            Assert.That(viewmodel.IsResolvingBusy, Is.True);
+        }
+
+        /// <summary>
+        /// Sets up the mocked session to return the provided <see cref="AuthenticationSchemeKind"/> values
+        /// </summary>
+        /// <param name="schemes">The supported <see cref="AuthenticationSchemeKind"/> values</param>
+        private void SetupAuthenticationSchemes(params AuthenticationSchemeKind[] schemes)
+        {
+            this.session.Setup(x => x.QueryAvailableAuthenticationScheme())
+                .ReturnsAsync(new AuthenticationSchemeResponse
+                {
+                    Schemes = schemes.ToList(),
+                    Authority = "http://127.0.0.1/"
+                });
+        }
+
+        /// <summary>
+        /// Polls a <paramref name="condition"/> until it is satisfied or the timeout elapses.
+        /// </summary>
+        /// <param name="condition">The condition to wait for</param>
+        /// <param name="timeoutMilliseconds">The maximum time to wait</param>
+        private static async Task WaitUntil(Func<bool> condition, int timeoutMilliseconds = 8000)
+        {
+            var stopwatch = Stopwatch.StartNew();
+
+            while (!condition() && stopwatch.ElapsedMilliseconds < timeoutMilliseconds)
+            {
+                await Task.Delay(25);
+            }
         }
     }
 }

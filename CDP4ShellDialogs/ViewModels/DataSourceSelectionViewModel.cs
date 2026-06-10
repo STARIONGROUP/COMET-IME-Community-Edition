@@ -31,9 +31,13 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Threading;
 
     using CDP4Common.ExceptionHandlerService;
+    
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Services;
@@ -42,15 +46,15 @@ namespace CDP4ShellDialogs.ViewModels
     using CDP4Dal;
     using CDP4Dal.Composition;
     using CDP4Dal.DAL;
-
+    
     using CDP4DalCommon.Authentication;
-
+    
     using CDP4ShellDialogs.Proxy;
-
+    
     using CommonServiceLocator;
-
+    
     using Microsoft.Win32;
-
+    
     using ReactiveUI;
 
     /// <summary>
@@ -60,6 +64,11 @@ namespace CDP4ShellDialogs.ViewModels
     /// </summary>
     public class DataSourceSelectionViewModel : DialogViewModelBase
     {
+        /// <summary>
+        /// Holds a reference to the authentication scheme resolver
+        /// </summary>
+        private SingleConcurrentActionRunner authenticationSchemeResolver = new SingleConcurrentActionRunner();
+
         /// <summary>
         /// Provides all <see cref="AuthenticationSchemeKind" /> that requires to provides credentials
         /// </summary>
@@ -196,6 +205,11 @@ namespace CDP4ShellDialogs.ViewModels
         private string userName;
 
         /// <summary>
+        /// Backing field for the <see cref="IsResolvingBusy" /> property.
+        /// </summary>
+        private bool isResolvingBusy;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DataSourceSelectionViewModel" /> class.
         /// </summary>
         /// <param name="dialogNavigationService">An instance of <see cref="IDialogNavigationService" />.</param>
@@ -229,16 +243,16 @@ namespace CDP4ShellDialogs.ViewModels
                 vm => vm.UserName,
                 vm => vm.Password,
                 vm => vm.SelectedDataSourceKind,
-                vm => vm.Uri,
                 vm => vm.IsProxyEnabled,
                 vm => vm.AvailableAuthenticationScheme,
                 vm => vm.IsAuthenticatedViaExternalProvider,
-                (username, password, datasource, uri, isproxyenabled, authenticationSchemeResponse, authenticatedViaExternalProvider) =>
-                    datasource != null &&
-                    !string.IsNullOrEmpty(uri) && this.IsValidUri(uri, datasource)
+                vm => vm.IsBusy,
+                (username, password, datasource, isproxyenabled, authenticationSchemeResponse, authenticatedViaExternalProvider, isBusy) =>
+                    datasource != null
                     && (this.SelectedDataSourceKind?.DalType != DalType.Web || authenticationSchemeResponse != null)
-                    && ((!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password)) || authenticatedViaExternalProvider));
-
+                    && ((!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password)) || authenticatedViaExternalProvider)
+                    && !isBusy).ObserveOn(RxApp.MainThreadScheduler)
+                ;
             this.OkCommand = ReactiveCommandCreator.CreateAsyncTask(() => this.ExecuteOk(false), canOk, RxApp.MainThreadScheduler);
             this.OkCommand.ThrownExceptions.Select(ex => ex).Subscribe(x => { this.ErrorMessage = x.Message; });
 
@@ -270,10 +284,13 @@ namespace CDP4ShellDialogs.ViewModels
             this.ResetProperties();
             
             this.Subscriptions.Add(this.WhenAnyValue(x => x.Uri, 
+                    x => x.SelectedUri,
                     x => x.SelectedDataSourceKind,
                     x => x.IsFullTrustAllowed,
                     x => x.IsProxyEnabled)
-                .Subscribe(async _ => await this.RequestAuthenticationScheme()));
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => 
+                    this.RequestAuthenticationScheme()));
         }
 
         /// <summary>
@@ -293,6 +310,15 @@ namespace CDP4ShellDialogs.ViewModels
         {
             get => this.uri;
             set => this.RaiseAndSetIfChanged(ref this.uri, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether server resolving is busy.
+        /// </summary>
+        public bool IsResolvingBusy
+        {
+            get => this.isResolvingBusy;
+            set => this.RaiseAndSetIfChanged(ref this.isResolvingBusy, value);
         }
 
         /// <summary>
@@ -519,24 +545,32 @@ namespace CDP4ShellDialogs.ViewModels
                 {
                     this.LoadingMessage = "Opening Session...";
 
-                    if (this.SelectedDataSourceKind?.DalType == DalType.Web && this.ShouldProvideCredentialsInformation)
+                    if (this.ShouldProvideCredentialsInformation)
                     {
-                        var authenticationInformation = new AuthenticationInformation(this.UserName, this.Password);
+                        if (this.SelectedDataSourceKind?.DalType == DalType.Web)
+                        {
+                            var authenticationInformation = new AuthenticationInformation(this.UserName, this.Password);
 
-                        var authenticationScheme = this.AvailableAuthenticationScheme.Schemes.Contains(AuthenticationSchemeKind.LocalJwtBearer)
-                            ? AuthenticationSchemeKind.LocalJwtBearer
-                            : AuthenticationSchemeKind.Basic;
+                            var authenticationScheme = this.AvailableAuthenticationScheme.Schemes.Contains(AuthenticationSchemeKind.LocalJwtBearer)
+                                ? AuthenticationSchemeKind.LocalJwtBearer
+                                : AuthenticationSchemeKind.Basic;
 
-                        await this.session.AuthenticateAndOpen(authenticationScheme, authenticationInformation);
+                            await this.session.AuthenticateAndOpen(authenticationScheme, authenticationInformation);
+                        }
+                        else
+                        {
+                            var temporaryCredentials = new Credentials(this.userName, this.password, new Uri(this.Uri), this.IsFullTrustAllowed, this.CreateProxySettings());
+                            var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
+                            var dalInstance = (IDal)ServiceLocator.Current.GetInstance(dal.Value.GetType());
+
+                            this.session = this.sessionCreator.CreateSession(dalInstance, temporaryCredentials, this.messageBus, this.exceptionHandlerService);
+
+                            await this.session.Open();
+                        }
                     }
                     else
                     {
-                        var temporaryCredentials = new Credentials(this.userName, this.password, new Uri(this.Uri), this.IsFullTrustCheckBoxEnabled, this.CreateProxySettings());
-                        var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
-                        var dalInstance = (IDal)ServiceLocator.Current.GetInstance(dal.Value.GetType());
-
-                        this.session = this.sessionCreator.CreateSession(dalInstance, temporaryCredentials, this.messageBus, this.exceptionHandlerService);
-
+                        // External 
                         await this.session.Open();
                     }
 
@@ -704,8 +738,8 @@ namespace CDP4ShellDialogs.ViewModels
             this.UserName = string.Empty;
             this.Password = string.Empty;
 
-            this.selectedUri = null;
-            this.selectedUriText = string.Empty;
+            this.SelectedUri = null;
+            this.SelectedUriText = string.Empty;
 
             this.UpdateUri();
         }
@@ -835,82 +869,196 @@ namespace CDP4ShellDialogs.ViewModels
         }
 
         /// <summary>
+        /// Requests supported schemes based on the currently selected DataSource
+        /// </summary>
+        private void RequestAuthenticationScheme()
+        {
+            if (this.SelectedUri == null && !System.Uri.TryCreate(this.Uri, UriKind.Absolute, out _))
+            {
+                this.ErrorMessage = "";
+                this.AvailableAuthenticationScheme = null;
+                this.IsResolvingBusy = false;
+                this.authenticationSchemeResolver.CancelCurrentTask();
+                return;
+            }
+
+            this.authenticationSchemeResolver.DelayRunTaskWithInnerCancellationToken(
+                async x => await this.RequestAuthenticationSchemeInternal(x), 1000);
+        }
+
+        /// <summary>
         /// Requests supported shemes based on the currently selected DataSource
         /// </summary>
         /// <returns>An awaitable <see cref="Task" /></returns>
-        private async Task RequestAuthenticationScheme()
+        private async Task RequestAuthenticationSchemeInternal(CancellationToken cancellationToken)
         {
-            this.ErrorMessage = string.Empty;
-            this.IsAuthenticatedViaExternalProvider = false;
-
-            if (this.SelectedUri == null && !System.Uri.TryCreate(this.Uri, UriKind.Absolute, out _))
-            {
-                this.AvailableAuthenticationScheme = null;
-                return;
-            }
-
-            var uriToBeChecked = this.SelectedUri?.Uri ?? this.Uri;
-
-            if (this.SelectedDataSourceKind.DalType == DalType.Web && !uriToBeChecked.EndsWith("/") && !this.Uri.EndsWith("/"))
-            {
-                this.uri += "/";
-            }
-
-            var temporaryCredentials = new Credentials(new Uri(this.Uri), this.IsFullTrustCheckBoxEnabled, this.CreateProxySettings());
-            var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
-            var dalInstance = (IDal) ServiceLocator.Current.GetInstance(dal.Value.GetType());
-
-            this.IsBusy = true;
-
             try
             {
-                this.session = this.sessionCreator.CreateSession(dalInstance, temporaryCredentials, this.messageBus, this.exceptionHandlerService);
-                this.AvailableAuthenticationScheme = await this.session.QueryAvailableAuthenticationScheme();
-            }
-            catch (Exception ex)
-            {
-                this.AvailableAuthenticationScheme = null;
-                this.ErrorMessage = ex.Message;
-                this.IsBusy = false;
-                return;
-            }
-            
-            if (this.AvailableAuthenticationScheme != null && this.AvailableAuthenticationScheme.Schemes.Contains(AuthenticationSchemeKind.ExternalJwtBearer))
-            {
-                ExternalAuthenticationResult openIdAuthenticationResult;
-                    
-                try
+                cancellationToken.ThrowIfCancellationRequested();
+
+                this.ErrorMessage = string.Empty;
+
+                this.DispatchAction(() => { this.IsAuthenticatedViaExternalProvider = false; });
+
+                var uriToBeChecked = this.SelectedUri?.Uri ?? this.Uri;
+
+                if (this.SelectedDataSourceKind.DalType == DalType.Web && !uriToBeChecked.EndsWith("/") && !this.Uri.EndsWith("/"))
                 {
-                    var openIdConnectViewModel = new ExternalAuthenticationDialogViewModel(this.AvailableAuthenticationScheme);
-                    openIdConnectViewModel.Initializes();
-                    openIdAuthenticationResult = this.dialogNavigationService.NavigateModal(openIdConnectViewModel) as ExternalAuthenticationResult;
-                    openIdConnectViewModel.Stop();
+                    this.uri += "/";
                 }
-                catch
+
+                if (string.IsNullOrEmpty(this.Uri) || !this.IsValidUri(this.Uri, this.SelectedDataSourceKind))
                 {
-                    this.ErrorMessage = "Failed to authenticate against the External Authentication provider";
-                    this.IsBusy = false;
                     return;
                 }
 
-                if (openIdAuthenticationResult?.Result == true)
+                cancellationToken.ThrowIfCancellationRequested();
+                this.IsResolvingBusy = true;
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var temporaryCredentials = new Credentials(new Uri(this.Uri), this.IsFullTrustAllowed, this.CreateProxySettings());
+                var dal = this.dals.Single(x => x.Metadata.Name == this.selectedDataSourceKind.Name);
+                var dalInstance = (IDal)ServiceLocator.Current.GetInstance(dal.Value.GetType());
+
+                try
                 {
-                    this.session.Credentials.ProvideUserToken(openIdAuthenticationResult.AuthenticationTokens, AuthenticationSchemeKind.ExternalJwtBearer);
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    this.session = this.sessionCreator.CreateSession(dalInstance, temporaryCredentials, this.messageBus, this.exceptionHandlerService);
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    this.AvailableAuthenticationScheme = await this.session.QueryAvailableAuthenticationScheme();
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+                catch (OperationCanceledException)
+                {
+                    //swallow
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    this.AvailableAuthenticationScheme = null;
+                    this.ErrorMessage = ex.Message;
+
+                    cancellationToken.ThrowIfCancellationRequested();
+                    this.IsResolvingBusy = false;
+
+                    return;
+                }
+
+                cancellationToken.ThrowIfCancellationRequested();
+
+                if ((this.AvailableAuthenticationScheme?.Schemes.Count ?? 0) == 0)
+                {
+                    this.ErrorMessage = "Not a COMET-CDP4 server";
+                }
+                else if (this.AvailableAuthenticationScheme.Schemes.Contains(AuthenticationSchemeKind.ExternalJwtBearer))
+                {
+                    ExternalAuthenticationResult openIdAuthenticationResult = null;
 
                     try
                     {
-                        this.UserName = await this.session.QueryAuthenticatedUserName();
-                        this.IsAuthenticatedViaExternalProvider = true;
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        this.DispatchAction(() =>
+                        {
+                            var openIdConnectViewModel = new ExternalAuthenticationDialogViewModel(this.AvailableAuthenticationScheme);
+                            openIdConnectViewModel.Initializes();
+
+                            openIdAuthenticationResult = this.dialogNavigationService.NavigateModal(openIdConnectViewModel) as ExternalAuthenticationResult;
+                            openIdConnectViewModel.Stop();
+                        });
+
+                        cancellationToken.ThrowIfCancellationRequested();
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        //swallow
+                        return;
                     }
                     catch (Exception ex)
                     {
-                        this.ErrorMessage = ex.Message;
-                        this.IsBusy = false;
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        this.ErrorMessage = "Failed to authenticate against the External Authentication provider";
+
+                        cancellationToken.ThrowIfCancellationRequested();
+                        this.IsResolvingBusy = false;
+
+                        return;
+                    }
+
+                    cancellationToken.ThrowIfCancellationRequested();
+
+                    if (openIdAuthenticationResult?.Result == true)
+                    {
+                        this.session.Credentials.ProvideUserToken(openIdAuthenticationResult.AuthenticationTokens, AuthenticationSchemeKind.ExternalJwtBearer);
+
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        try
+                        {
+                            this.UserName = await this.session.QueryAuthenticatedUserName();
+
+                            this.DispatchAction(() => { this.IsAuthenticatedViaExternalProvider = true; });
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            //swallow
+                            return;
+                        }
+                        catch (Exception ex)
+                        {
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            this.ErrorMessage = ex.Message;
+
+                            cancellationToken.ThrowIfCancellationRequested();
+
+                            this.IsResolvingBusy = false;
+
+                            return;
+                        }
                     }
                 }
+
+                cancellationToken.ThrowIfCancellationRequested();
             }
-            
-            this.IsBusy = false;
+            catch (OperationCanceledException)
+            {
+                //swallow
+                return;
+            }
+            catch (Exception ex)
+            {
+                this.ErrorMessage = ex.Message;
+            }
+
+            cancellationToken.ThrowIfCancellationRequested();
+            this.IsResolvingBusy = false;
+        }
+
+        /// <summary>
+        /// Start an <see cref="Action"/> on the main/UI thread
+        /// </summary>
+        /// <param name="action">The <see cref="Action"/></param>
+        private void DispatchAction(Action action)
+        {
+            if (Application.Current?.Dispatcher == null)
+            {
+                Dispatcher.CurrentDispatcher.Invoke(
+                    action,
+                    DispatcherPriority.Normal);
+            }
+            else
+            {
+                Application.Current.Dispatcher.Invoke(
+                    action,
+                    DispatcherPriority.Normal);
+            }
         }
 
         /// <summary>
