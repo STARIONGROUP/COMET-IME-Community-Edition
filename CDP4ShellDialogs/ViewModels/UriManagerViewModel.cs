@@ -65,12 +65,11 @@ namespace CDP4ShellDialogs.ViewModels
                 this.DalTypesList.Add(type);
             }
             
-            var canApply = this.UriRowList.CountChanged.Select(_ => Unit.Default).Merge(this.UriRowList.CountChanged
-                        .Select(_ => this.WhenUriRowsChanged())
-                        .StartWith(this.WhenUriRowsChanged())
-                        .Switch())
-                .Select(_ => this.UriRowList.All(row => !row.HasErrors))
-                .StartWith(this.UriRowList.All(row => !row.HasErrors));
+            var canApply = this.UriRowList.CountChanged
+                .Select(_ => this.WhenUriRowsChanged().StartWith(Unit.Default))
+                .StartWith(this.WhenUriRowsChanged().StartWith(Unit.Default))
+                .Switch()
+                .Select(_ => this.UriRowList.All(row => !row.HasErrors));
             
             this.ApplyCommand = ReactiveCommandCreator.Create(this.ExecuteApply, canApply);
             this.CloseCommand = ReactiveCommandCreator.Create(this.ExecuteClose);
