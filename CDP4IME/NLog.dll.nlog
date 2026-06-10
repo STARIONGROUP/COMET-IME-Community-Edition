@@ -18,9 +18,13 @@
             archiveNumbering="Rolling"
             layout="${longdate}|${level:uppercase=true}|${logger}|${callsite}|${message}">
     </target>
+    
     <target name="console" xsi:type="Console" layout="${level}: ${message}"/>
   </targets>
   <rules>
+    <!-- Always allow this logger -->
+    <logger name="ForceLogger" minlevel="Trace" writeTo="logfile" final="true" />
+
     <logger name="*" minlevel="Fatal" writeTo="logfile"/>
     <!-- <logger name="*" minlevel="Warn" writeTo="console"/> -->
   </rules>

@@ -7,8 +7,8 @@
     <Product>CDP4ShellDialogs</Product>
     <Description>CDP4-COMET Shell Dialogs</Description>
     <Copyright>Copyright © Starion Group S.A</Copyright>
-    <AssemblyVersion>11.0.0.11</AssemblyVersion>
-    <FileVersion>11.0.0.11</FileVersion>
+    <AssemblyVersion>11.0.0.12</AssemblyVersion>
+    <FileVersion>11.0.0.12</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
@@ -39,10 +39,10 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CefSharp.Wpf" Version="140.1.140" />
-    <PackageReference Include="CDP4Common-CE" Version="29.0.3" />
-    <PackageReference Include="CDP4Dal-CE" Version="29.0.3" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="29.0.3" />
+    <PackageReference Include="CefSharp.Wpf" Version="146.0.100" />
+    <PackageReference Include="CDP4Common-CE" Version="30.0.1" />
+    <PackageReference Include="CDP4Dal-CE" Version="30.0.1" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.0.1" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.5" />
     <PackageReference Include="DevExpress.Data" Version="23.2.5" />
@@ -77,8 +77,8 @@
     <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.5" />
     <PackageReference Include="DevExpress.Xpo" Version="23.2.5" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageReference Include="NLog" Version="6.0.7" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="6.1.0" />
+    <PackageReference Include="NLog" Version="6.1.2" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="6.1.2" />
     <PackageReference Include="ReactiveUI.WPF" Version="22.3.1" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
   </ItemGroup>

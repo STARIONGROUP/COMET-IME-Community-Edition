@@ -1,0 +1,434 @@
+<Project>
+  <PropertyGroup>
+    <AssemblyName>CDP4Requirements</AssemblyName>
+    <IntermediateOutputPath>obj\Debug\</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <MSBuildProjectExtensionsPath>C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\</MSBuildProjectExtensionsPath>
+    <_TargetAssemblyProjectName>Requirements</_TargetAssemblyProjectName>
+    <RootNamespace>CDP4Requirements</RootNamespace>
+  </PropertyGroup>
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <PropertyGroup>
+    <ProjectGuid>{CB6F4AD4-4DFA-4F99-A2E8-9B468820266E}</ProjectGuid>
+    <MinIMEVersion>11.0.0</MinIMEVersion>
+    <RootNamespace>CDP4Requirements</RootNamespace>
+    <TargetFramework>net48</TargetFramework>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <AssemblyTitle>CDP4Requirements</AssemblyTitle>
+    <Company>Starion Group S.A.</Company>
+    <Product>Requirements</Product>
+    <Description>CDP4-COMET Requirements Plugin</Description>
+    <Copyright>Copyright © Starion Group S.A.</Copyright>
+    <AssemblyVersion>11.0.0.12</AssemblyVersion>
+    <FileVersion>11.0.0.12</FileVersion>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4Requirements\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <OutputPath>..\CDP4IME\bin\$(Configuration)\$(TargetFramework)\plugins\CDP4Requirements\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DebugType>full</DebugType>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <DebugType>pdbonly</DebugType>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <Import Project="..\Sdk.Plugin.target" />
+  <ItemGroup>
+    <PackageReference Include="CDP4Common-CE" Version="30.0.0-rc2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CDP4Dal-CE" Version="30.0.0-rc2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.0.0-rc2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CDP4RequirementsVerification-CE" Version="30.0.0-rc2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="CommonServiceLocator" Version="2.0.7">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Charts" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Charts.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.CodeParser" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Data" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Data.Desktop" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.DataAccess" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Diagram.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Gauges.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Images" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Mvvm" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Office.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Pdf.Drawing" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.PivotGrid.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Printing.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Reporting.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.RichEdit.Export" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Sparkline.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.SpellChecker.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Charts" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Diagram" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.DocumentViewer.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.ExpressionEditor" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Grid.Core" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.LayoutControl" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Accordion" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.NavBar" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Ribbon" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Docking" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Office" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.PivotGrid" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Printing" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.PropertyGrid" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Reporting" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.RichEdit" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.SpellChecker" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Wpf.Themes.Seven" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DevExpress.Xpo" Version="23.2.5">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="DotLiquid" Version="2.3.197" />
+    <PackageReference Include="NetOfficeFw.Core" Version="1.9.9">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="NetOfficeFw.Excel" Version="1.9.9">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="NLog" Version="6.1.2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="NLog.Extensions.Logging" Version="6.1.2">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="ReactiveUI.WPF" Version="22.3.1">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="ReactiveUI" Version="22.3.1">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.ComponentModel.Composition" Version="10.0.7">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.142">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="ReqIFSharp" Version="4.0.0" />
+    <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0">
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CDP4Composition\CDP4Composition.csproj">
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
+    <ProjectReference Include="..\CDP4OfficeInfrastructure\CDP4OfficeInfrastructure.csproj">
+      <Private>false</Private>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RibbonXml\RequirementRibbon.xml">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DotLiquidTemplate\RequirementsSpecificationReportTemplate.liquid" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\cdp4common-ce\30.0.0-rc2\lib\net48\CDP4Common.dll" />
+    <ReferencePath Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\CDP4Composition\bin\Debug\net48\CDP4Composition.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\cdp4dal-ce\30.0.0-rc2\lib\net48\CDP4Dal.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\cdp4dalcommon-ce\30.0.0-rc2\lib\net48\CDP4DalCommon.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\cdp4jsonserializer-ce\30.0.0-rc2\lib\net48\CDP4JsonSerializer.dll" />
+    <ReferencePath Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\CDP4OfficeInfrastructure\bin\Debug\net48\CDP4OfficeInfrastructure.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\cdp4requirementsverification-ce\30.0.0-rc2\lib\net48\CDP4RequirementsVerification.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\commonservicelocator\2.0.7\lib\net48\CommonServiceLocator.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\csvhelper\33.1.0\lib\net48\CsvHelper.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.charts\23.2.5\lib\net452\DevExpress.Charts.Designer.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.charts.core\23.2.5\lib\net452\DevExpress.Charts.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.codeparser\23.2.5\lib\net452\DevExpress.CodeParser.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.data.desktop\23.2.5\lib\net452\DevExpress.Data.Desktop.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.data\23.2.5\lib\net452\DevExpress.Data.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.dataaccess\23.2.5\lib\net452\DevExpress.DataAccess.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.datavisualization.core\23.2.5\lib\net452\DevExpress.DataVisualization.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.diagram.core\23.2.5\lib\net452\DevExpress.Diagram.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.drawing\23.2.5\lib\net452\DevExpress.Drawing.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.images\23.2.5\lib\net452\DevExpress.Images.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.mvvm\23.2.5\lib\net452\DevExpress.Mvvm.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.office.core\23.2.5\lib\net452\DevExpress.Office.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.pdf.core\23.2.5\lib\net452\DevExpress.Pdf.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.pdf.drawing\23.2.5\lib\net452\DevExpress.Pdf.v23.2.Drawing.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.pivotgrid.core\23.2.5\lib\net452\DevExpress.PivotGrid.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.printing.core\23.2.5\lib\net452\DevExpress.Printing.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.richedit.core\23.2.5\lib\net452\DevExpress.RichEdit.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.richedit.export\23.2.5\lib\net452\DevExpress.RichEdit.v23.2.Export.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.sparkline.core\23.2.5\lib\net452\DevExpress.Sparkline.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.spellchecker.core\23.2.5\lib\net452\DevExpress.SpellChecker.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.accordion\23.2.5\lib\net452\DevExpress.Xpf.Accordion.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.charts\23.2.5\lib\net452\DevExpress.Xpf.Charts.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.reporting\23.2.5\lib\net452\DevExpress.Xpf.CodeView.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.controls\23.2.5\lib\net452\DevExpress.Xpf.Controls.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.core\23.2.5\lib\net452\DevExpress.Xpf.Core.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.reporting\23.2.5\lib\net452\DevExpress.Xpf.DataAccess.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.diagram\23.2.5\lib\net452\DevExpress.Xpf.Diagram.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.docking\23.2.5\lib\net452\DevExpress.Xpf.Docking.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.documentviewer.core\23.2.5\lib\net452\DevExpress.Xpf.DocumentViewer.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.expressioneditor\23.2.5\lib\net452\DevExpress.Xpf.ExpressionEditor.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.grid.core\23.2.5\lib\net452\DevExpress.Xpf.Grid.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.grid.core\23.2.5\lib\net452\DevExpress.Xpf.Grid.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.grid.core\23.2.5\lib\net452\DevExpress.Xpf.Grid.v23.2.Extensions.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.docking\23.2.5\lib\net452\DevExpress.Xpf.Layout.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.layoutcontrol\23.2.5\lib\net452\DevExpress.Xpf.LayoutControl.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.navbar\23.2.5\lib\net452\DevExpress.Xpf.NavBar.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.office\23.2.5\lib\net452\DevExpress.Xpf.Office.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.pivotgrid\23.2.5\lib\net452\DevExpress.Xpf.PivotGrid.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.printing\23.2.5\lib\net452\DevExpress.Xpf.Printing.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.propertygrid\23.2.5\lib\net452\DevExpress.Xpf.PropertyGrid.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.reporting\23.2.5\lib\net452\DevExpress.Xpf.ReportDesigner.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.ribbon\23.2.5\lib\net452\DevExpress.Xpf.Ribbon.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.richedit\23.2.5\lib\net452\DevExpress.Xpf.RichEdit.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.spellchecker\23.2.5\lib\net452\DevExpress.Xpf.SpellChecker.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.themes.office2019colorful\23.2.5\lib\net452\DevExpress.Xpf.Themes.Office2019Colorful.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.wpf.themes.seven\23.2.5\lib\net452\DevExpress.Xpf.Themes.Seven.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.xpo\23.2.5\lib\net452\DevExpress.Xpo.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.charts\23.2.5\lib\net452\DevExpress.XtraCharts.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.gauges.core\23.2.5\lib\net452\DevExpress.XtraGauges.v23.2.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\devexpress.reporting.core\23.2.5\lib\net452\DevExpress.XtraReports.v23.2.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\dotliquid\2.3.197\lib\net45\DotLiquid.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\dynamicdata\9.4.1\lib\net462\DynamicData.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\netofficefw.excel\1.9.9\lib\net462\ExcelApi.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\sharpziplib\1.4.2\lib\netstandard2.0\ICSharpCode.SharpZipLib.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\markdown.xaml\1.0.0\lib\net45\Markdown.Xaml.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.bcl.asyncinterfaces\10.0.7\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.bcl.hashcode\1.1.1\ref\net461\Microsoft.Bcl.HashCode.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Microsoft.CSharp.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.extensions.configuration.abstractions\8.0.0\lib\net462\Microsoft.Extensions.Configuration.Abstractions.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\8.0.0\lib\net462\Microsoft.Extensions.DependencyInjection.Abstractions.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.extensions.dependencyinjection\8.0.0\lib\net462\Microsoft.Extensions.DependencyInjection.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.extensions.logging.abstractions\8.0.0\lib\net462\Microsoft.Extensions.Logging.Abstractions.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.extensions.logging\8.0.0\lib\net462\Microsoft.Extensions.Logging.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.extensions.options\8.0.0\lib\net462\Microsoft.Extensions.Options.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.extensions.primitives\8.0.0\lib\net462\Microsoft.Extensions.Primitives.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\microsoft.xaml.behaviors.wpf\1.1.142\lib\net462\Microsoft.Xaml.Behaviors.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\mscorlib.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\netofficefw.core\1.9.9\lib\net462\NetOffice.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\newtonsoft.json\13.0.4\lib\net45\Newtonsoft.Json.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\nlog\6.1.2\lib\net46\NLog.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\nlog.extensions.logging\6.1.2\lib\net462\NLog.Extensions.Logging.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\netofficefw.office\1.9.9\lib\net462\OfficeApi.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\PresentationCore.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\PresentationFramework.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\reactiveui\22.3.1\lib\net472\ReactiveUI.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\reactiveui.wpf\22.3.1\lib\net472\ReactiveUI.Wpf.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\reqifsharp\4.0.0\lib\netstandard2.0\ReqIFSharp.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\splat.builder\17.1.1\lib\net472\Splat.Builder.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\splat.core\17.1.1\lib\net472\Splat.Core.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\splat\17.1.1\lib\net472\Splat.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\splat.logging\17.1.1\lib\netstandard2.0\Splat.Logging.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\stdole\7.0.3300\lib\net10\stdole.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.buffers\4.6.1\lib\net462\System.Buffers.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.componentmodel.annotations\5.0.0\ref\net461\System.ComponentModel.Annotations.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.ComponentModel.Composition.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Configuration.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Core.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Data.DataSetExtensions.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Data.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.diagnostics.diagnosticsource\8.0.0\lib\net462\System.Diagnostics.DiagnosticSource.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Drawing.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.IO.Compression.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.IO.Compression.FileSystem.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.io.pipelines\10.0.1\lib\net462\System.IO.Pipelines.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.memory\4.6.3\lib\net462\System.Memory.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Numerics.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.numerics.vectors\4.6.1\lib\net462\System.Numerics.Vectors.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.reactive\6.1.0\lib\net472\System.Reactive.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.runtime.compilerservices.unsafe\6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Runtime.Serialization.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Security.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.ServiceModel.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.text.encodings.web\10.0.1\lib\net462\System.Text.Encodings.Web.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.text.json\10.0.1\lib\net462\System.Text.Json.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\System.Text.RegularExpressions.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\system.threading.tasks.extensions\4.6.3\lib\net462\System.Threading.Tasks.Extensions.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Transactions.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Web.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Windows.Controls.Ribbon.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Windows.Forms.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Xaml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Xml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\System.Xml.Linq.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\UIAutomationClient.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\UIAutomationClientsideProviders.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\UIAutomationProvider.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\UIAutomationTypes.dll" />
+    <ReferencePath Include="C:\Users\avandelft\.nuget\packages\netofficefw.vbide\1.9.9\lib\net462\VBIDEApi.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\WindowsBase.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\WindowsFormsIntegration.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\netstandard.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\AndExpressionDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\ExclusiveOrExpressionDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\NotExpressionDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\OrExpressionDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\ParametricConstraintDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\RelationalExpressionDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\RequirementDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\RequirementsContainerParameterValueDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\RequirementsGroupDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\RequirementsSpecificationDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\Dialogs\SimpleParameterValueDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\HtmlExportRibbon.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\HtmlReport\HtmlExportRequirementsSpecificationSelectionDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\ReqIfRibbon.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\ReqIf\ParameterTypeMappingDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\ReqIf\RelationGroupTypeMappingDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\ReqIf\ReqIfExportDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\ReqIf\ReqIfImportDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\ReqIf\RequirementSpecificationMappingDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\ReqIf\SpecificationTypeMappingDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\ReqIf\SpecObjectTypesMappingDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\ReqIf\SpecRelationTypeMappingDialog.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\RequirementBrowserRibbon.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\RequirementsBrowser.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\RequirementsRibbon.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\RequirementsSpecificationEditor.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\Views\UserControls\LoadingControl.g.cs" />
+    <Compile Include="C:\Users\avandelft\source\repos\COMET-IME-Community-Edition\Requirements\obj\Debug\GeneratedInternalTypeHelper.g.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="C:\Users\avandelft\.nuget\packages\devexpress.data\23.2.5\analyzers\dotnet\cs\DevExpress.Generator.dll" />
+    <Analyzer Include="C:\Users\avandelft\.nuget\packages\microsoft.extensions.logging.abstractions\8.0.0\analyzers\dotnet\roslyn4.4\cs\Microsoft.Extensions.Logging.Generators.dll" />
+    <Analyzer Include="C:\Users\avandelft\.nuget\packages\microsoft.extensions.options\8.0.0\analyzers\dotnet\roslyn4.4\cs\Microsoft.Extensions.Options.SourceGeneration.dll" />
+    <Analyzer Include="C:\Users\avandelft\.nuget\packages\system.text.json\10.0.1\analyzers\dotnet\roslyn4.4\cs\System.Text.Json.SourceGeneration.dll" />
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+</Project>

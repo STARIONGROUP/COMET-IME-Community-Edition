@@ -11,8 +11,8 @@
 	<Product>CDP4EngineeringModel</Product>
 	<Description>CDP4-COMET Engineering Model Plugin</Description>
 	<Copyright>Copyright © Starion Group S.A.</Copyright>
-	<AssemblyVersion>11.0.0.11</AssemblyVersion>
-	<FileVersion>11.0.0.11</FileVersion>
+	<AssemblyVersion>11.0.0.12</AssemblyVersion>
+	<FileVersion>11.0.0.12</FileVersion>
   <LangVersion>latest</LangVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
@@ -40,13 +40,13 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="29.0.3">
+    <PackageReference Include="CDP4Common-CE" Version="30.0.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4Dal-CE" Version="29.0.3">
+    <PackageReference Include="CDP4Dal-CE" Version="30.0.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="29.0.3">
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.0.1">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
     <PackageReference Include="CommonServiceLocator" Version="2.0.7">
@@ -151,10 +151,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="6.0.7">
+    <PackageReference Include="NLog" Version="6.1.2">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="NLog.Extensions.Logging" Version="6.1.0">
+	<PackageReference Include="NLog.Extensions.Logging" Version="6.1.2">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReactiveUI.WPF" Version="22.3.1">

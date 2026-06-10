@@ -241,6 +241,8 @@ namespace CDP4Reporting.Tests.ViewModels
             this.serviceLocator.Setup(x => x.GetInstance<IDynamicTableChecker<XtraReport>>()).Returns(this.dynamicTableChecker.Object);
             this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(this.messageBoxService.Object);
 
+            this.serviceLocator.Setup(x => x.GetInstance<ICDPMessageBus>()).Returns(this.messageBus);
+
             this.assembler = new Assembler(this.uri, this.messageBus);
             this.cache = this.assembler.Cache;
 

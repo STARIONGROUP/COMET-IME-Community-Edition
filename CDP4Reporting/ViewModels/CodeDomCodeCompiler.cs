@@ -25,17 +25,27 @@
 
 namespace CDP4Reporting.ViewModels
 {
+    using CDP4Reporting.ReportScript;
+
     using System;
     using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.RegularExpressions;
 
-    using CDP4Reporting.ReportScript;
+    using CDP4Reporting.Utilities;
+
+    using NLog;
 
     using CompilerResults = CDP4Reporting.ReportScript.CompilerResults;
 
     public class CodeDomCodeCompiler : CodeCompilerBase
     {
+        /// <summary>
+        /// The logger for the current class
+        /// </summary>
+        private readonly Logger logger = LogManager.GetLogger("ForceLogger");
+
         /// <summary>
         /// Holds a reference to the assemblies cached from the current AppDomain. 
         /// This is used to avoid the overhead of retrieving the assembly locations multiple times during compilation.
@@ -47,7 +57,12 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Holds a lock object for synchronizing access to the cached assembly locations. This ensures that only one thread can retrieve and cache the assembly locations at a time, preventing
         /// </summary>
-        private static readonly object cacheLock = new object();
+        private static readonly object compilerLock = new object();
+
+        /// <summary>
+        /// Sets a value indicating that only WhiteListed Assemblies are allowed for compilation
+        /// </summary>
+        public static List<string> ExtraWhiteListAssemblies = [];
 
         /// <summary>
         /// Creates a new instance of the <see cref="CodeDomCodeCompiler"/> class
@@ -74,19 +89,99 @@ namespace CDP4Reporting.ViewModels
                 WarningLevel = 0
             };
 
-            if (cachedAssemblyLocations == null)
+            var logAssemblies = false;
+            var useWhiteListAssemblies = false;
+            var extraWhiteListAssemblies = new List<string>();
+
+            lock (compilerLock)
             {
-                lock (cacheLock)
+                if (source.ToUpper().Contains("[LogAssemblies]".ToUpper()))
                 {
-                    cachedAssemblyLocations ??= AppDomain.CurrentDomain.GetAssemblies()
-                        .Where(x => !x.IsDynamic)
-                        .Where(x => !string.IsNullOrEmpty(x.Location))
-                        .Select(x => x.Location)
-                        .ToArray();
+                    logAssemblies = true;
+                    source = Regex.Replace(source, Regex.Escape("[LogAssemblies]"), "", RegexOptions.IgnoreCase);
                 }
+
+                if (source.ToUpper().Contains("[UseWhiteListAssemblies]".ToUpper()))
+                {
+                    useWhiteListAssemblies = true;
+                    source = Regex.Replace(source, Regex.Escape("[UseWhiteListAssemblies]"), "", RegexOptions.IgnoreCase);
+                }
+
+                var pattern = """\[WhiteListAssembly\("([^"]+)"\)\]""";
+
+                extraWhiteListAssemblies = Regex.Matches(source, pattern)
+                    .OfType<Match>()
+                    .Select(m => m.Groups[1].Value)
+                    .ToList();
+
+                source = Regex.Replace(source, pattern, "");
             }
 
-            parameters.ReferencedAssemblies.AddRange(cachedAssemblyLocations);
+            if (useWhiteListAssemblies)
+            {
+                DebugUtilities.AddOutput("Using WhiteList Assemblies...");
+
+                parameters.ReferencedAssemblies.Add("mscorlib.dll");
+                parameters.ReferencedAssemblies.Add("System.dll");
+                parameters.ReferencedAssemblies.Add("System.Xml.dll");
+                parameters.ReferencedAssemblies.Add("System.Xml.Linq.dll");
+                parameters.ReferencedAssemblies.Add("System.Linq.dll");
+                parameters.ReferencedAssemblies.Add("System.Data.dll");
+                parameters.ReferencedAssemblies.Add("System.Data.DataSetExtensions.dll");
+                parameters.ReferencedAssemblies.Add("System.Core.dll");
+                parameters.ReferencedAssemblies.Add("Microsoft.CSharp.dll");
+                parameters.ReferencedAssemblies.Add("CDP4Common.dll");
+                parameters.ReferencedAssemblies.Add("CDP4Composition.dll");
+                parameters.ReferencedAssemblies.Add("CDP4Dal.dll");
+                parameters.ReferencedAssemblies.Add("CDP4JsonSerializer.dll");
+                parameters.ReferencedAssemblies.Add("./plugins/CDP4Reporting/refs/netstandard.dll");
+                parameters.ReferencedAssemblies.Add("./plugins/CDP4Reporting/refs/System.Runtime.dll");
+                parameters.ReferencedAssemblies.Add("./plugins/CDP4Reporting/CDP4Reporting.dll");
+                parameters.ReferencedAssemblies.Add("./plugins/CDP4Reporting/CDP4ReportingPlugin.dll");
+                parameters.ReferencedAssemblies.Add("CDP4RequirementsVerification.dll");
+                parameters.ReferencedAssemblies.Add("Newtonsoft.Json.dll");
+                parameters.ReferencedAssemblies.Add("System.Text.Json.dll");
+
+                if (extraWhiteListAssemblies.Any())
+                {
+                    foreach (var assembly in extraWhiteListAssemblies)
+                    {
+                        DebugUtilities.AddOutput($"Using extra assembly: {assembly}");
+                        parameters.ReferencedAssemblies.Add(assembly);
+                    }
+                }
+            }
+            else
+            {
+                if (cachedAssemblyLocations == null)
+                {
+                    lock (compilerLock)
+                    {
+                        DebugUtilities.AddOutput("Setting Cached Assemblies...");
+
+                        cachedAssemblyLocations ??= AppDomain.CurrentDomain.GetAssemblies()
+                            .Where(x => !x.IsDynamic)
+                            .Where(x => !string.IsNullOrEmpty(x.Location))
+                            .Select(x => x.Location)
+                            .ToArray();
+                    }
+                }
+
+                parameters.ReferencedAssemblies.AddRange(cachedAssemblyLocations);
+            }
+
+            if (logAssemblies)
+            {
+                var loadedAssemblies= AppDomain.CurrentDomain.GetAssemblies()
+                    .Where(x => !x.IsDynamic)
+                    .Where(x => !string.IsNullOrEmpty(x.Location))
+                    .Select(x => (x.FullName, x))
+                    .OrderBy(x => x.FullName)
+                    .ToArray();
+
+                this.logger?.Info($"Loaded Assemblies: \n{string.Join("\n", loadedAssemblies.Select(x => x.FullName + " - " + x.x.Location))}\n");
+                this.logger?.Info($"To Be Loaded Assemblies: \n{string.Join("\n", parameters.ReferencedAssemblies.Cast<string>().ToArray())}\n");
+            }
 
             var result = compiler.CompileAssemblyFromSource(parameters, source);
 
