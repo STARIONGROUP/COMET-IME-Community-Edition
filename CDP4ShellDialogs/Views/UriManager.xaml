@@ -53,8 +53,6 @@
                                                                       Mode=TwoWay,
                                                                       ValidatesOnDataErrors=True,
                                                                       UpdateSourceTrigger=PropertyChanged}"
-                                                  HorizontalAlignment="Stretch"
-                                                  VerticalAlignment="Stretch"
                                                   ShowError="True" />
                                 </DataTemplate>
                             </dxg:GridColumn.CellTemplate>
