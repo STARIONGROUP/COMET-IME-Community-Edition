@@ -97,5 +97,27 @@ namespace CDP4Composition.Utilities
 
             await Task.Run(action.Invoke, this.cancellationToken);
         }
+
+        /// <summary>
+        /// Delayed executes the <see cref="Func{CancellationToken, Task}"/> 
+        /// </summary>
+        /// <param name="func">The <see cref="Func{CancellationToken, Task}"/></param>
+        /// <param name="milliseconds">Milliseconds to delay the execution of the <see cref="Action"/></param>
+        public void DelayRunTaskWithInnerCancellationToken(Func<CancellationToken, Task> func, int milliseconds)
+        {
+            this.CancelCurrentTask();
+
+            this.cancellationTokenSource = new CancellationTokenSource();
+            this.cancellationToken = this.cancellationTokenSource.Token;
+
+            this.currentTask = Task.Delay(milliseconds, this.cancellationToken)
+                .ContinueWith(
+                    async _ =>
+                    {
+                        this.cancellationToken.ThrowIfCancellationRequested();
+                        await func.Invoke(this.cancellationToken);
+                    },
+                    this.cancellationToken);
+        }
     }
 }
