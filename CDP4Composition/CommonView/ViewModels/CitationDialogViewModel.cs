@@ -109,17 +109,20 @@ namespace CDP4CommonView.ViewModels
         protected override void PopulatePossibleSource()
         {
             this.PossibleSource.Clear();
-            IEnumerable<ReferenceSource> referenceSources = null;
-            var rdlsInChain = this.ChainOfContainer.Where(x => x is ReferenceDataLibrary).ToList();
-            if (rdlsInChain.Any())
-            {
-                referenceSources = rdlsInChain.SelectMany(x => ((ReferenceDataLibrary)x).ReferenceSource).OrderBy(x => x.Name);
-            }
 
-            if (referenceSources != null)
+            var rdlsInChain = this.ChainOfContainer.OfType<ReferenceDataLibrary>().ToList();
+
+            if (!rdlsInChain.Any())
             {
-                this.PossibleSource.AddRange(referenceSources);
+                return;
             }
+            
+            var referenceSources = rdlsInChain
+                .SelectMany(rdl => rdl.ReferenceSource.Concat(rdl.GetRequiredRdls().SelectMany(required => required.ReferenceSource)))
+                .Distinct()
+                .OrderBy(x => x.Name);
+
+            this.PossibleSource.AddRange(referenceSources);
         }
     }
 }
