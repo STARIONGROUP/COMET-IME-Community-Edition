@@ -26,6 +26,7 @@
 namespace CDP4CommonView.Tests
 {
     using System;
+    using System.Linq;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
@@ -224,6 +225,71 @@ namespace CDP4CommonView.Tests
             Assert.IsTrue(this.viewmodel.SelectedExample.Value.Equals(this.viewmodel.Example[2].Value));
             await this.viewmodel.DeleteExampleCommand.Execute();
             Assert.AreEqual(this.viewmodel.Example.Count, 2);
+        }
+
+        [Test]
+        public void VerifyThatLanguageUsedByAnotherDefinitionIsNotSelectable()
+        {
+            var existingDefinition = new Definition(Guid.NewGuid(), null, null) { LanguageCode = "en", Content = "English definition" };
+            var newDefinition = new Definition(Guid.NewGuid(), null, null) { LanguageCode = null, Content = null };
+
+            var requirement = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.assembler.Cache.TryAdd(new CacheKey(requirement.Iid, null), new Lazy<Thing>(() => requirement));
+
+            var clone = requirement.Clone(false);
+            clone.Definition.Add(existingDefinition);
+            clone.Definition.Add(newDefinition);
+
+            this.transaction.CreateOrUpdate(clone);
+
+            var vm = new DefinitionDialogViewModel(newDefinition, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, clone, null);
+            
+            Assert.That(vm.PossibleLanguageCode.Any(x => x.Name == "en"), Is.False);
+            Assert.That(vm.SelectedLanguageCode, Is.Not.Null);
+            Assert.That(vm.SelectedLanguageCode.Name, Is.Not.EqualTo("en"));
+        }
+
+        [Test]
+        public void VerifyThatDefinitionsInDifferentLanguagesCanCoexist()
+        {
+            var englishDefinition = new Definition(Guid.NewGuid(), null, null) { LanguageCode = "en", Content = "English definition" };
+            var frenchDefinition = new Definition(Guid.NewGuid(), null, null) { LanguageCode = "fr", Content = "French definition" };
+
+            var requirement = new Requirement(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.assembler.Cache.TryAdd(new CacheKey(requirement.Iid, null), new Lazy<Thing>(() => requirement));
+
+            var clone = requirement.Clone(false);
+            clone.Definition.Add(englishDefinition);
+            clone.Definition.Add(frenchDefinition);
+
+            this.transaction.CreateOrUpdate(clone);
+
+            var vm = new DefinitionDialogViewModel(englishDefinition, this.transaction, this.session.Object, true, ThingDialogKind.Update, null, clone, null);
+
+            Assert.That(vm.SelectedLanguageCode.Name, Is.EqualTo("en"));
+            Assert.That(vm.PossibleLanguageCode.Any(x => x.Name == "en"), Is.True);
+            Assert.That(vm.PossibleLanguageCode.Any(x => x.Name == "fr"), Is.False);
+        }
+
+        [Test]
+        public void VerifyThatTheOneDefinitionPerLanguageRuleAppliesToAnyDefinedThing()
+        {
+            var existingDefinition = new Definition(Guid.NewGuid(), null, null) { LanguageCode = "en", Content = "English definition" };
+            var newDefinition = new Definition(Guid.NewGuid(), null, null) { LanguageCode = null, Content = null };
+
+            var group = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.assembler.Cache.TryAdd(new CacheKey(group.Iid, null), new Lazy<Thing>(() => group));
+
+            var clone = group.Clone(false);
+            clone.Definition.Add(existingDefinition);
+            clone.Definition.Add(newDefinition);
+
+            this.transaction.CreateOrUpdate(clone);
+
+            var vm = new DefinitionDialogViewModel(newDefinition, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, clone, null);
+
+            Assert.That(vm.PossibleLanguageCode.Any(x => x.Name == "en"), Is.False);
+            Assert.That(vm.SelectedLanguageCode.Name, Is.Not.EqualTo("en"));
         }
     }
 }

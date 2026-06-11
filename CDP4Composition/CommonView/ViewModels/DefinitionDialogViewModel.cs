@@ -200,55 +200,60 @@ namespace CDP4CommonView.ViewModels
         protected override void UpdateProperties()
         {
             base.UpdateProperties();
-            
+
             var definedThing = (DefinedThing)this.Container;
             this.PossibleLanguageCode.Clear();
-            var usedCodes = definedThing.Definition.Select(x => x.LanguageCode);            
-            var languageCodeUsages = new List<LanguageCodeUsage>();
-            foreach (var usedCode in usedCodes)
+
+            var languageCodesToExclude = definedThing.Definition
+                .Where(definition => definition.Iid != this.Thing.Iid)
+                .Select(definition => definition.LanguageCode)
+                .Where(languageCode => !string.IsNullOrEmpty(languageCode))
+                .ToList();
+
+            var customLanguageCodeUsages = new List<LanguageCodeUsage>();
+
+            foreach (var usedCode in definedThing.Definition.Select(x => x.LanguageCode))
             {
-                if (usedCode == null)
+                if (string.IsNullOrEmpty(usedCode) || languageCodesToExclude.Contains(usedCode) || CultureInfoUtility.CultureInfoAvailable.Any(x => x.Name == usedCode))
                 {
                     continue;
                 }
 
-                var cultureInfo = CultureInfoUtility.CultureInfoAvailable.SingleOrDefault(x => x.Name == usedCode);
-
-                if (cultureInfo == null)
+                try
                 {
-                    try
-                    {
-                        cultureInfo = new CultureInfo(usedCode);
-                        var languageCodeUsage = new LanguageCodeUsage(cultureInfo, true);
-                        languageCodeUsages.Add(languageCodeUsage);
-                    }
-                    catch (CultureNotFoundException ex)
-                    {
-                        var languageCodeUsage = new LanguageCodeUsage(usedCode, usedCode, true);
-                        languageCodeUsages.Add(languageCodeUsage);
-                        logger.Debug(ex, "The culture {0} could not be found and is ignored", usedCode);
-                    }
+                    customLanguageCodeUsages.Add(new LanguageCodeUsage(new CultureInfo(usedCode), true));
+                }
+                catch (CultureNotFoundException ex)
+                {
+                    customLanguageCodeUsages.Add(new LanguageCodeUsage(usedCode, usedCode, true));
+                    logger.Debug(ex, "The culture {0} could not be found and is ignored", usedCode);
                 }
             }
-            
-            this.PossibleLanguageCode.AddRange(languageCodeUsages.OrderBy(x => x.FullName));
+
+            this.PossibleLanguageCode.AddRange(customLanguageCodeUsages.OrderBy(x => x.FullName));
 
             foreach (var cultureInfo in CultureInfoUtility.CultureInfoAvailable)
             {
-                if (languageCodeUsages.All(x => x.Name != cultureInfo.Name))
+                if (languageCodesToExclude.Contains(cultureInfo.Name))
                 {
-                    var languageCodeUsage = new LanguageCodeUsage(cultureInfo, false);
-                    this.PossibleLanguageCode.Add(languageCodeUsage);
+                    continue;
+                }
+
+                if (customLanguageCodeUsages.All(x => x.Name != cultureInfo.Name))
+                {
+                    this.PossibleLanguageCode.Add(new LanguageCodeUsage(cultureInfo, false));
                 }
             }
 
             if (string.IsNullOrEmpty(this.Thing.LanguageCode))
             {
-                this.SelectedLanguageCode = this.PossibleLanguageCode.Single(x => x.Name == CultureInfoUtility.DefaultCultureName);
+                this.SelectedLanguageCode =
+                    this.PossibleLanguageCode.FirstOrDefault(x => x.Name == CultureInfoUtility.DefaultCultureName)
+                    ?? this.PossibleLanguageCode.FirstOrDefault();
             }
             else
             {
-                this.SelectedLanguageCode = this.PossibleLanguageCode.Single(x => x.Name == this.Thing.LanguageCode);
+                this.SelectedLanguageCode = this.PossibleLanguageCode.FirstOrDefault(x => x.Name == this.Thing.LanguageCode);
             }
         }
 

@@ -88,7 +88,22 @@ namespace CDP4Requirements.ViewModels
         /// Backing field for <see cref="RequirementText"/>
         /// </summary>
         private string requirementText;
-        
+
+        /// <summary>
+        /// A value indicating whether the reload of <see cref="RequirementText"/> on a change of
+        /// <see cref="SelectedLanguageCode"/> must be suppressed. This is set while the selected language is
+        /// re-pointed to a rebuilt instance for the same language, so that re-populating the Definitions list does
+        /// not discard the description the user has entered.
+        /// </summary>
+        private bool suppressRequirementTextUpdate;
+
+        /// <summary>
+        /// A value indicating whether the next re-population of the Definitions list must keep the currently selected
+        /// description language. This is set only after a Definition is created from the Definitions tab, so that
+        /// adding a Definition does not change the description; on edit or delete the selection follows the Definitions.
+        /// </summary>
+        private bool preserveSelectedLanguageOnPopulate;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementDialogViewModel"/> class.
         /// </summary>
@@ -255,7 +270,13 @@ namespace CDP4Requirements.ViewModels
 
             this.InspectSimpleParameterValueCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedSimpleParameterValue.Thing), canExecuteInspectSelectedSimpleParameterValueCommand);
 
-            this.WhenAnyValue(x => x.SelectedLanguageCode).Where(x => x != null).Subscribe(x => this.UpdateRequirementText());
+            this.WhenAnyValue(x => x.SelectedLanguageCode).Where(x => x != null && !this.suppressRequirementTextUpdate).Subscribe(x => this.UpdateRequirementText());
+
+            var canCreateDefinition = this.WhenAnyValue(vm => vm.IsReadOnly, v => !v);
+            this.CreateDefinitionCommand = ReactiveCommandCreator.Create(this.ExecuteCreateDefinitionCommand, canCreateDefinition);
+
+            var canEditDefinition = this.WhenAny(vm => vm.SelectedDefinition, v => v.Value != null && !this.IsReadOnly);
+            this.EditDefinitionCommand = ReactiveCommandCreator.Create(() => this.ExecuteEditCommand(this.SelectedDefinition.Thing, this.PopulateDefinition), canEditDefinition);
         }
 
         /// <summary>
@@ -374,12 +395,56 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Executes the creation of a new <see cref="Definition"/> from the Definitions tab.
+        /// </summary>
+        private void ExecuteCreateDefinitionCommand()
+        {
+            var newDefinition = new Definition();
+
+            Definition languageReservation = null;
+
+            var descriptionLanguage = this.SelectedLanguageCode?.Name;
+
+            if (!string.IsNullOrWhiteSpace(this.RequirementText)
+                && !string.IsNullOrEmpty(descriptionLanguage)
+                && this.Thing.Definition.All(definition => definition.LanguageCode != descriptionLanguage))
+            {
+                languageReservation = new Definition(Guid.NewGuid(), null, null) { LanguageCode = descriptionLanguage };
+                this.Thing.Definition.Add(languageReservation);
+            }
+
+            bool? result;
+
+            try
+            {
+                result = this.thingDialogNavigationService.Navigate(newDefinition, this.transaction, this.Session, false, ThingDialogKind.Create, this.thingDialogNavigationService, this.Thing, this.ChainOfContainer);
+            }
+            finally
+            {
+                if (languageReservation != null)
+                {
+                    this.Thing.Definition.Remove(languageReservation);
+                }
+            }
+
+            if (result == true)
+            {
+                this.preserveSelectedLanguageOnPopulate = true;
+                this.PopulateDefinition();
+            }
+        }
+
+        /// <summary>
         /// Update the language code
         /// </summary>
         private void UpdateLanguageCodes()
         {
+            var previouslySelectedLanguage = this.SelectedLanguageCode?.Name;
+            var preserveSelectedLanguage = this.preserveSelectedLanguageOnPopulate;
+            this.preserveSelectedLanguageOnPopulate = false;
+
             this.PossibleLanguageCode.Clear();
-            
+
             var usedCodes = this.Thing.Definition.Select(x => x.LanguageCode);
 
             var languageCodeUsages = new List<LanguageCodeUsage>();            
@@ -415,14 +480,26 @@ namespace CDP4Requirements.ViewModels
                 }
             }
             
+            if (preserveSelectedLanguage && previouslySelectedLanguage != null)
+            {
+                var preserved = this.PossibleLanguageCode.FirstOrDefault(x => x.Name == previouslySelectedLanguage);
+
+                if (preserved != null)
+                {
+                    this.suppressRequirementTextUpdate = true;
+                    this.SelectedLanguageCode = preserved;
+                    this.suppressRequirementTextUpdate = false;
+                    return;
+                }
+            }
+
             if (this.Thing.Definition.Count == 0)
             {
                 this.SelectedLanguageCode = this.PossibleLanguageCode.Single(x => x.Name == CultureInfoUtility.DefaultCultureName);
                 return;
             }
 
-            var definition = this.Thing.Definition.SingleOrDefault(x => x.LanguageCode == CultureInfoUtility.DefaultCultureName) ?? this.Thing.Definition.First();
-            
+            var definition = this.Thing.Definition.First();
             this.SelectedLanguageCode = this.PossibleLanguageCode.Single(x => x.Name == definition.LanguageCode);
         }
 
