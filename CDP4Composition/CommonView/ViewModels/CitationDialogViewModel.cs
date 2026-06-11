@@ -118,7 +118,7 @@ namespace CDP4CommonView.ViewModels
             }
             
             var referenceSources = rdlsInChain
-                .SelectMany(rdl => rdl.ReferenceSource.Concat(rdl.GetRequiredRdls().SelectMany(required => required.ReferenceSource)))
+                .SelectMany(rdl => rdl.QueryReferenceSourcesFromChainOfRdls())
                 .Distinct()
                 .OrderBy(x => x.Name);
 
