@@ -14,7 +14,7 @@
              navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
              Icon="pack://application:,,,/CDP4Composition;component/Resources/Images/comet.ico"
              ShowTitle="True"
-             mc:Ignorable="d" MinWidth="450" Width="450" MaxWidth="850" MaxHeight="550" d:DesignHeight="474">
+             mc:Ignorable="d" MinWidth="450" Width="450" MaxWidth="850" MaxHeight="550" MinHeight="415" d:DesignHeight="474">
 
     <dx:DXWindow.Resources>
         <ResourceDictionary>
@@ -29,7 +29,7 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Image Grid.Row="0" x:Name="logo" Stretch="Fill"
                            Source="pack://application:,,,/CDP4Composition;component/Resources/Images/cometlogo.png" Width="200" Margin="0,15,0,30" />
@@ -185,26 +185,28 @@
                                                      Content="..." />
                                 </Grid>
                             </dxlc:LayoutItem>
-                            <dxlc:LayoutItem>
+                            <dxlc:LayoutItem
+                                Visibility="{Binding Path=IsAuthenticatedViaExternalProvider,
+                                UpdateSourceTrigger=PropertyChanged,
+                                Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <TextBlock
                                     Text="{Binding Path=UserName, StringFormat=Authenticated as {0},
                                         Mode=OneWay}"
                                     Padding="10"
-                                    Visibility="{Binding Path=IsAuthenticatedViaExternalProvider,
-                                              UpdateSourceTrigger=PropertyChanged,
-                                              Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                    Background="LightGreen" />
                             </dxlc:LayoutItem>
-                            <dxlc:LayoutItem>
+                            <dxlc:LayoutItem  
+                                Visibility="{Binding Path=HasError,
+                                   UpdateSourceTrigger=PropertyChanged,
+                                   Converter={StaticResource BooleanToVisibilityConverter}}">
                                 <TextBlock
                                     Text="{Binding Path=ErrorMessage,
                                         Mode=OneWay}"
                                     Padding="10"
-                                    Visibility="{Binding Path=HasError,
-                                              UpdateSourceTrigger=PropertyChanged,
-                                              Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Background="#FFF5E5E5" />
                             </dxlc:LayoutItem>
-                            <dxlc:LayoutItem>
+                            <dxlc:LayoutItem 
+                                Visibility="{Binding IsResolvingBusy, Converter={StaticResource BooleanToVisibilityConverter}}" >
                                 <Grid Margin="0" Background="LightBlue">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="auto" />
@@ -241,13 +243,11 @@
                                     <TextBlock
                                         Grid.Column="1"
                                         Padding="10, 10, 2, 10" 
-                                        Text="Resolving Authentication Scheme"
-                                        Visibility="{Binding IsResolvingBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        Text="Resolving Authentication Scheme"/>
                                     <TextBlock
                                         Grid.Column="2"
                                         Padding="2, 10, 10, 10" 
-                                        Text="{Binding SelectedUriText, UpdateSourceTrigger=PropertyChanged}"
-                                        Visibility="{Binding IsResolvingBusy, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                                        Text="{Binding SelectedUriText, UpdateSourceTrigger=PropertyChanged}"/>
                                 </Grid>
 
                             </dxlc:LayoutItem>
