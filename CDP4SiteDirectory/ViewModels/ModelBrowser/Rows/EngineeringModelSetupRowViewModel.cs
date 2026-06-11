@@ -26,6 +26,7 @@
 namespace CDP4SiteDirectory.ViewModels
 {
     using System.Collections.Generic;
+    using System.Collections.Specialized;
     using System.Linq;
 
     using CDP4Common.CommonData;
@@ -42,7 +43,6 @@ namespace CDP4SiteDirectory.ViewModels
 
     using FolderRowViewModel = CDP4Composition.FolderRowViewModel;
     using DomainOfExpertiseRowViewModel = ModelBrowser.Rows.DomainOfExpertiseRowViewModel;
-    using DevExpress.Mvvm.Native;
 
     /// <summary>
     /// The Row-view-model representing a <see cref="EngineeringModelSetup"/>
@@ -106,9 +106,6 @@ namespace CDP4SiteDirectory.ViewModels
             this.ContainedRows.Add(this.organizationFolderRow);
 
             this.UpdateProperties();
-
-            this.participantFolderRow.ContainedRows.ForEach(x => x.ContainedRows.CollectionChanged += (s, e) => 
-                this.UpdateContainers());
         }
 
         /// <summary>
@@ -220,6 +217,7 @@ namespace CDP4SiteDirectory.ViewModels
             var row = this.participantFolderRow.ContainedRows.SingleOrDefault(r => r.Thing == participant);
             if (row != null)
             {
+                row.ContainedRows.CollectionChanged -= this.ParticipantDomainsChanged;
                 this.participantFolderRow.ContainedRows.RemoveAndDispose(row);
             }
         }
@@ -234,6 +232,21 @@ namespace CDP4SiteDirectory.ViewModels
         {
             var row = new ModelParticipantRowViewModel(participant, this.Session, this);
             this.participantFolderRow.ContainedRows.Add(row);
+
+            // refresh the participants shown under the Active Domains folder whenever this
+            // participant's domains change (e.g. a domain of expertise is added when editing it)
+            row.ContainedRows.CollectionChanged += this.ParticipantDomainsChanged;
+        }
+
+        /// <summary>
+        /// Handles a change in the <see cref="DomainOfExpertise"/>s shown under a <see cref="Participant"/> row
+        /// by refreshing the participants listed under the Active Domains folder.
+        /// </summary>
+        /// <param name="sender">The sender</param>
+        /// <param name="e">The <see cref="NotifyCollectionChangedEventArgs"/></param>
+        private void ParticipantDomainsChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            this.UpdateContainers();
         }
 
         /// <summary>
