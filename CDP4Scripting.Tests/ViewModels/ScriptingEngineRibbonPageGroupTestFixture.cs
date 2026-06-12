@@ -40,6 +40,7 @@ namespace CDP4Scripting.Tests.ViewModels
     using CDP4Composition.Navigation.Events;
 
     using CDP4Dal;
+    using CDP4Dal.Events;
 
     using CDP4Scripting.Events;
     using CDP4Scripting.Interfaces;
@@ -367,6 +368,60 @@ namespace CDP4Scripting.Tests.ViewModels
             Assert.IsTrue(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Contains(panel2.Object));
             Assert.IsFalse(this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Contains(panel1.Object));
             Assert.IsFalse(this.scriptingEngineRibbonPageGroupViewModel.PathScriptingFiles.ContainsKey("panel 1"));
+        }
+
+        [Test]
+        public void VerifyThatScriptPanelsAreClosedWhenLastSessionIsClosed()
+        {
+            var avalonEditor = new TextEditor();
+
+            var panel1 = new Mock<ScriptPanelViewModel>("panel 1", this.scriptingProxy.Object, this.messageBus, "*.py", this.openSessions, true);
+            panel1.As<IPanelViewModel>();
+            panel1.As<IScriptPanelViewModel>().SetupProperty(x => x.Caption, "panel 1");
+            panel1.SetupProperty(x => x.AvalonEditor, avalonEditor);
+
+            var panel2 = new Mock<ScriptPanelViewModel>("panel 2", this.scriptingProxy.Object, this.messageBus, "*.py", this.openSessions, true);
+            panel2.As<IPanelViewModel>();
+            panel2.As<IScriptPanelViewModel>().SetupProperty(x => x.Caption, "panel 2");
+            panel2.SetupProperty(x => x.AvalonEditor, avalonEditor);
+
+            this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Add(panel1.Object);
+            this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Add(panel2.Object);
+
+            var session = new Mock<ISession>();
+
+            this.messageBus.SendMessage(new SessionEvent(session.Object, SessionStatus.Open));
+            Assert.AreEqual(1, this.scriptingEngineRibbonPageGroupViewModel.OpenSessions.Count);
+
+            this.messageBus.SendMessage(new SessionEvent(session.Object, SessionStatus.Closed));
+            Assert.AreEqual(0, this.scriptingEngineRibbonPageGroupViewModel.OpenSessions.Count);
+
+            this.panelNavigationService.Verify(x => x.CloseInDock(panel1.Object as IPanelViewModel), Times.Once);
+            this.panelNavigationService.Verify(x => x.CloseInDock(panel2.Object as IPanelViewModel), Times.Once);
+        }
+
+        [Test]
+        public void VerifyThatScriptPanelsAreNotClosedWhenOtherSessionsRemainOpen()
+        {
+            var avalonEditor = new TextEditor();
+
+            var panel1 = new Mock<ScriptPanelViewModel>("panel 1", this.scriptingProxy.Object, this.messageBus, "*.py", this.openSessions, true);
+            panel1.As<IPanelViewModel>();
+            panel1.As<IScriptPanelViewModel>().SetupProperty(x => x.Caption, "panel 1");
+            panel1.SetupProperty(x => x.AvalonEditor, avalonEditor);
+
+            this.scriptingEngineRibbonPageGroupViewModel.CollectionScriptPanelViewModels.Add(panel1.Object);
+
+            var session1 = new Mock<ISession>();
+            var session2 = new Mock<ISession>();
+
+            this.messageBus.SendMessage(new SessionEvent(session1.Object, SessionStatus.Open));
+            this.messageBus.SendMessage(new SessionEvent(session2.Object, SessionStatus.Open));
+            
+            this.messageBus.SendMessage(new SessionEvent(session1.Object, SessionStatus.Closed));
+            Assert.AreEqual(1, this.scriptingEngineRibbonPageGroupViewModel.OpenSessions.Count);
+
+            this.panelNavigationService.Verify(x => x.CloseInDock(It.IsAny<IPanelViewModel>()), Times.Never);
         }
     }
 }
