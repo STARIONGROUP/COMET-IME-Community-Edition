@@ -126,6 +126,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             Assert.AreEqual(this.fileRevision1.Name, viewModel.Name);
             Assert.AreEqual(this.fileRevision1.Creator.Person.Name, viewModel.CreatorValue);
             Assert.IsFalse(viewModel.IsLocked);
+            Assert.IsFalse(viewModel.ThingStatus.IsLocked);
             Assert.AreEqual(string.Empty, viewModel.Locker);
             Assert.AreEqual("1", viewModel.Name);
             this.fileStoreFileAndFolderHandler.Verify(x => x.UpdateFileRowPosition(this.file, It.IsAny<FileRevision>()), Times.Never);
@@ -135,6 +136,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.CommonFileStoreBrowser
             this.messageBus.SendObjectChangeEvent(this.file, EventKind.Updated);
 
             Assert.IsTrue(viewModel.IsLocked);
+            Assert.IsTrue(viewModel.ThingStatus.IsLocked);
             Assert.AreEqual("John Doe", viewModel.Locker);
             this.fileStoreFileAndFolderHandler.Verify(x => x.UpdateFileRowPosition(this.file, It.IsAny<FileRevision>()), Times.Never);
 
