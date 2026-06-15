@@ -365,6 +365,23 @@ namespace CDP4Scripting.ViewModels
             else if (sessionChange.Status == SessionStatus.Closed)
             {
                 this.OpenSessions.Remove(sessionChange.Session);
+
+                if (this.OpenSessions.Count == 0)
+                {
+                    this.CloseAllScriptPanels();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Closes all the open <see cref="IScriptPanelViewModel"/>s. This is invoked when the last <see cref="ISession"/> is
+        /// closed so that the scripting panels are cleaned up on disconnect, like the other panels of the application.
+        /// </summary>
+        private void CloseAllScriptPanels()
+        {
+            foreach (var scriptPanelViewModel in this.CollectionScriptPanelViewModels.ToList())
+            {
+                this.PanelNavigationService.CloseInDock(scriptPanelViewModel as IPanelViewModel);
             }
         }
 
