@@ -75,6 +75,11 @@ namespace CDP4ShellDialogs.ViewModels
         private static readonly AuthenticationSchemeKind[] SchemesWithCredentials = { AuthenticationSchemeKind.Basic, AuthenticationSchemeKind.LocalJwtBearer };
 
         /// <summary>
+        /// Holds a reference to the injected messagebox service
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+
+        /// <summary>
         /// The dialog navigation service.
         /// </summary>
         private readonly IDialogNavigationService dialogNavigationService;
@@ -1012,6 +1017,27 @@ namespace CDP4ShellDialogs.ViewModels
                         }
                         catch (Exception ex)
                         {
+                            var msgBoxResult = this.messageBoxService.ShowAlwaysOnTop($"Connecting to server '{this.SelectedUriText}' failed:\nError: {ex.Message}\n\nDo you want to logout?", "Logout?", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes);
+
+                            if (msgBoxResult == MessageBoxResult.Yes)
+                            {
+                                this.DispatchAction(() =>
+                                {
+                                    var openIdConnectLogoutViewModel = new ExternalAuthenticationLogoutDialogViewModel(this.AvailableAuthenticationScheme);
+
+                                    openIdConnectLogoutViewModel.Initializes();
+
+                                    try
+                                    {
+                                        var result = this.dialogNavigationService.NavigateModal(openIdConnectLogoutViewModel);
+                                    }
+                                    finally
+                                    {
+                                        openIdConnectLogoutViewModel.Stop();
+                                    }
+                                });
+                            }
+
                             cancellationToken.ThrowIfCancellationRequested();
 
                             this.ErrorMessage = ex.Message;

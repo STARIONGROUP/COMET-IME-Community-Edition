@@ -34,6 +34,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
     using System.Reactive.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using System.Windows;
     using System.Windows.Input;
 
     using CDP4Common.DTO;
@@ -87,6 +88,8 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
         private Mock<ISessionCreator> sessionCreator;
 
+        private Mock<IMessageBoxService> messageBoxService;
+
         private CDPMessageBus messageBus;
 
         [SetUp]
@@ -100,6 +103,7 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
             this.navService = new Mock<IDialogNavigationService>();
             this.exceptionHandlerService = new Mock<IExceptionHandlerService>();
             this.sessionCreator = new Mock<ISessionCreator>();
+            this.messageBoxService = new Mock<IMessageBoxService>();
 
             this.sessionCreator.Setup(x => x.CreateSession(It.IsAny<IDal>(), It.IsAny<Credentials>(), this.messageBus, It.IsAny<IExceptionHandlerService>())).Returns(this.session.Object);
 
@@ -130,6 +134,9 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
 
             this.serviceLocator.Setup(x => x.GetInstance<ICDPMessageBus>())
                 .Returns(this.messageBus);
+
+            this.serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>())
+                .Returns(this.messageBoxService.Object);
 
             this.credentials = new Credentials("John", "Doe", new Uri("https://www.stariongroup.eu"));
             this.session.Setup(x => x.DataSourceUri).Returns("https://www.stariongroup.eu");
@@ -428,6 +435,60 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
         }
 
         [Test]
+        public async Task AssertThatFailingUserNameQueryPromptsForLogoutAndReportsError()
+        {
+            this.SetupExternalAuthenticationWithFailingUserNameQuery("username failure");
+
+            this.messageBoxService
+                .Setup(x => x.ShowAlwaysOnTop(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>(), It.IsAny<MessageBoxResult>()))
+                .Returns(MessageBoxResult.No);
+
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
+
+            viewmodel.Uri = "https://www.stariongroup.eu";
+
+            await WaitUntil(() => viewmodel.ErrorMessage == "username failure");
+
+            // the user is prompted with the logout question
+            this.messageBoxService.Verify(
+                x => x.ShowAlwaysOnTop(It.IsRegex("Do you want to logout"), "Logout?", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes),
+                Times.Once);
+
+            // when the prompt is answered with No, no logout dialog must be navigated to
+            this.navService.Verify(x => x.NavigateModal(It.IsAny<ExternalAuthenticationLogoutDialogViewModel>()), Times.Never);
+
+            Assert.That(viewmodel.ErrorMessage, Is.EqualTo("username failure"));
+            Assert.That(viewmodel.IsAuthenticatedViaExternalProvider, Is.False);
+
+            await WaitUntil(() => !viewmodel.IsResolvingBusy);
+            Assert.That(viewmodel.IsResolvingBusy, Is.False);
+        }
+
+        [Test]
+        public async Task AssertThatAcceptingLogoutPromptNavigatesToLogoutDialog()
+        {
+            this.SetupExternalAuthenticationWithFailingUserNameQuery("username failure");
+
+            this.messageBoxService
+                .Setup(x => x.ShowAlwaysOnTop(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>(), It.IsAny<MessageBoxResult>()))
+                .Returns(MessageBoxResult.Yes);
+
+            var viewmodel = new DataSourceSelectionViewModel(this.navService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
+
+            viewmodel.Uri = "https://www.stariongroup.eu";
+
+            await WaitUntil(() => viewmodel.ErrorMessage == "username failure");
+
+            // when the prompt is accepted, the logout dialog is navigated to
+            this.navService.Verify(x => x.NavigateModal(It.IsAny<ExternalAuthenticationLogoutDialogViewModel>()), Times.Once);
+
+            Assert.That(viewmodel.ErrorMessage, Is.EqualTo("username failure"));
+
+            await WaitUntil(() => !viewmodel.IsResolvingBusy);
+            Assert.That(viewmodel.IsResolvingBusy, Is.False);
+        }
+
+        [Test]
         public async Task AssertThatExecuteOkForFileDataSourceOpensSession()
         {
             this.session.Setup(x => x.Open(It.IsAny<bool>())).Returns(Task.CompletedTask);
@@ -517,6 +578,22 @@ namespace CDP4ShellDialogsTestFixture.ViewModels
                     Schemes = schemes.ToList(),
                     Authority = "http://127.0.0.1/"
                 });
+        }
+
+        /// <summary>
+        /// Sets up an external-authentication resolution that successfully obtains a token but fails when querying the
+        /// authenticated user name, which triggers the logout prompt flow.
+        /// </summary>
+        /// <param name="userNameQueryError">The error message thrown by <see cref="ISession.QueryAuthenticatedUserName"/></param>
+        private void SetupExternalAuthenticationWithFailingUserNameQuery(string userNameQueryError)
+        {
+            this.SetupAuthenticationSchemes(AuthenticationSchemeKind.ExternalJwtBearer);
+
+            this.navService
+                .Setup(x => x.NavigateModal(It.IsAny<ExternalAuthenticationDialogViewModel>()))
+                .Returns(new ExternalAuthenticationResult(true, new AuthenticationToken("access-token", "refresh-token")));
+
+            this.session.Setup(x => x.QueryAuthenticatedUserName()).ThrowsAsync(new Exception(userNameQueryError));
         }
 
         /// <summary>
