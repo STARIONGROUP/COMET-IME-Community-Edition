@@ -40,6 +40,7 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -47,6 +48,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
     using CDP4Dal.Permission;
 
     using CDP4EngineeringModel.ViewModels;
+
+    using CommonServiceLocator;
 
     using Moq;
 
@@ -79,6 +82,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         private BinaryRelationshipRule binaryRelationshipRule;
         private DecompositionRule decompositionRule;
         private CDPMessageBus messageBus;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IFilterStringService> filterStringService;
 
         [SetUp]
         public void SetUp()
@@ -87,6 +92,11 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+
+            this.filterStringService = new Mock<IFilterStringService>();
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
             this.systemDomainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "System", ShortName = "SYS" };
@@ -168,6 +178,49 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             Assert.AreEqual("System [SYS]", dialog.Owner);
             Assert.IsTrue(dialog.IsActive);
+            Assert.AreEqual(this.binaryRelationshipRule, dialog.SelectedRule);
+        }
+
+        [Test]
+        public void VerifyThatDeprecatedRulesAreHiddenWhenShowDeprecatedThingsIsOff()
+        {
+            this.filterStringService.Setup(x => x.ShowDeprecatedThings).Returns(false);
+            this.decompositionRule.IsDeprecated = true;
+
+            var clone = this.ruleVerificationList.Clone(false);
+
+            var dialog = new UserRuleVerificationDialogViewModel(this.userRuleVerification, this.thingTransaction, this.session.Object, true, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, clone, null);
+
+            CollectionAssert.DoesNotContain(dialog.PossibleRule, this.decompositionRule);
+            CollectionAssert.Contains(dialog.PossibleRule, this.binaryRelationshipRule);
+        }
+
+        [Test]
+        public void VerifyThatDeprecatedRulesAreShownWhenShowDeprecatedThingsIsOn()
+        {
+            this.filterStringService.Setup(x => x.ShowDeprecatedThings).Returns(true);
+            this.decompositionRule.IsDeprecated = true;
+
+            var clone = this.ruleVerificationList.Clone(false);
+
+            var dialog = new UserRuleVerificationDialogViewModel(this.userRuleVerification, this.thingTransaction, this.session.Object, true, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, clone, null);
+
+            CollectionAssert.Contains(dialog.PossibleRule, this.decompositionRule);
+            CollectionAssert.Contains(dialog.PossibleRule, this.binaryRelationshipRule);
+        }
+
+        [Test]
+        public void VerifyThatAssignedDeprecatedRuleRemainsVisibleWhenShowDeprecatedThingsIsOff()
+        {
+            this.filterStringService.Setup(x => x.ShowDeprecatedThings).Returns(false);
+            
+            this.binaryRelationshipRule.IsDeprecated = true;
+
+            var clone = this.ruleVerificationList.Clone(false);
+
+            var dialog = new UserRuleVerificationDialogViewModel(this.userRuleVerification, this.thingTransaction, this.session.Object, true, ThingDialogKind.Inspect, this.thingDialogNavigationService.Object, clone, null);
+
+            CollectionAssert.Contains(dialog.PossibleRule, this.binaryRelationshipRule);
             Assert.AreEqual(this.binaryRelationshipRule, dialog.SelectedRule);
         }
 

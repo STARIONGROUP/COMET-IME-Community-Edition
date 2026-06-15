@@ -41,6 +41,9 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
+
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -155,9 +158,17 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulatePossibleRule();
 
+            var showDeprecatedThings = ServiceLocator.Current.GetInstance<IFilterStringService>().ShowDeprecatedThings;
+
             var rules = this.GetPossibleRule();
+
             foreach (var rule in rules)
             {
+                if (!showDeprecatedThings && rule.IsDeprecated && !Equals(rule, this.SelectedRule))
+                {
+                    continue;
+                }
+
                 this.PossibleRule.Add(rule);
             }
         }
