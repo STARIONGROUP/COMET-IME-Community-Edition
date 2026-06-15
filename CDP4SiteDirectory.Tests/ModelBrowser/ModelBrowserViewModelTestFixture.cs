@@ -238,6 +238,49 @@ namespace CDP4SiteDirectory.Tests
         }
 
         [Test]
+        public void VerifyThatAddingDomainToParticipantUpdatesActiveDomainFolder()
+        {
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
+
+            var model = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri);
+
+            var domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "Thermal" };
+            model.ActiveDomain.Add(domain);
+
+            this.siteDirectory.Model.Add(model);
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+
+            var modelrow = viewmodel.ModelSetup.First();
+            var participantFolderRow = modelrow.ContainedRows[0];
+            var domainFolderRow = modelrow.ContainedRows[2];
+
+            Assert.AreEqual(0, participantFolderRow.ContainedRows.Count);
+            Assert.AreEqual(1, domainFolderRow.ContainedRows.Count);
+            Assert.AreEqual(0, domainFolderRow.ContainedRows[0].ContainedRows.Count);
+
+            var participant = new Participant(Guid.NewGuid(), null, this.uri);
+            participant.Person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "blabla", Surname = "blabla" };
+            model.Participant.Add(participant);
+
+            var modelRevisionProperty = typeof(EngineeringModelSetup).GetProperty("RevisionNumber");
+            modelRevisionProperty?.SetValue(model, 5);
+            this.messageBus.SendObjectChangeEvent(model, EventKind.Updated);
+
+            Assert.AreEqual(1, participantFolderRow.ContainedRows.Count);
+            Assert.AreEqual(0, domainFolderRow.ContainedRows[0].ContainedRows.Count);
+
+            participant.Domain.Add(domain);
+            var participantRevisionProperty = typeof(Participant).GetProperty("RevisionNumber");
+            participantRevisionProperty?.SetValue(participant, 6);
+            this.messageBus.SendObjectChangeEvent(participant, EventKind.Updated);
+
+            var domainRow = domainFolderRow.ContainedRows[0];
+            Assert.AreEqual(1, domainRow.ContainedRows.Count);
+            Assert.AreEqual(participant, domainRow.ContainedRows[0].Thing);
+        }
+
+        [Test]
         public void VerifyThatDisposeWorks()
         {
             var viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), null, this.navigationService.Object, null, null);
