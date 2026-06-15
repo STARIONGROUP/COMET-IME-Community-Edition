@@ -108,16 +108,24 @@
                 </lc:LayoutGroup>
 
                 <lc:LayoutGroup Header="Active Domain" Orientation="Vertical" IsEnabled="{Binding IsActiveDomainSelectionReadOnly, Converter={StaticResource NotConverter}}">
-                    <lc:LayoutItem HorizontalAlignment="Right">
-                        <dx:SimpleButton x:Name="ShowDeprecatedDomainBox"
-                                         Margin="0,0,10,0"
-                                         IsChecked="{Binding ShowDeprecatedDomains}"
-                                         Glyph="{dx:DXImage Image=Show_16x16.png}"
-                                         ToolTip="Show Deprecated Domains of Expertise"
-                                         ButtonKind="Toggle"
-                                         Width="25"
-                                         Height="25"/>
-                    </lc:LayoutItem>
+                    <lc:LayoutGroup Orientation="Horizontal">
+                        <lc:LayoutItem HorizontalAlignment="Left">
+                            <CheckBox Content="Select All"
+                                      Margin="10,0,0,0"
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding AreAllActiveDomainsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </lc:LayoutItem>
+                        <lc:LayoutItem HorizontalAlignment="Right">
+                            <dx:SimpleButton x:Name="ShowDeprecatedDomainBox"
+                                             Margin="0,0,10,0"
+                                             IsChecked="{Binding ShowDeprecatedDomains}"
+                                             Glyph="{dx:DXImage Image=Show_16x16.png}"
+                                             ToolTip="Show Deprecated Domains of Expertise"
+                                             ButtonKind="Toggle"
+                                             Width="25"
+                                             Height="25"/>
+                        </lc:LayoutItem>
+                    </lc:LayoutGroup>
                     <lc:LayoutItem>
                         <dxe:ListBoxEdit
                             MaxHeight="250"
@@ -129,14 +137,14 @@
                             ItemsSource="{Binding PossibleActiveDomain}">
 
                             <dxe:ListBoxEdit.StyleSettings>
-                                <dxe:CheckedListBoxEditStyleSettings>
+                                <dxe:CheckedListBoxEditStyleSettings ShowSelectAllItem="False">
                                     <dxe:CheckedListBoxEditStyleSettings.ItemContainerStyle>
                                         <Style BasedOn="{StaticResource {themes:EditorListBoxThemeKey ResourceKey=CheckBoxItemStyle}}" TargetType="dxe:ListBoxEditItem">
                                             <Setter Property="Visibility" Value="{Binding IsVisible, Converter={dxmvvm:BooleanToVisibilityConverter}}" />
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Path=IsDeprecated}" Value="True">
-                                                    <Setter Property = "FontStyle" Value="Italic"/>
-                                                    <Setter Property = "IsEnabled" Value="{Binding IsEnabled}" />
+                                                    <Setter Property="Background" Value="LightGray" />
+                                                    <Setter Property="Opacity" Value="0.5" />
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
