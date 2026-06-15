@@ -28,6 +28,7 @@ namespace CDP4ShellDialogs.ViewModels
     using System;
     using System.Linq;
     using System.Reactive;
+    using System.Reactive.Linq;
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
@@ -52,7 +53,6 @@ namespace CDP4ShellDialogs.ViewModels
         /// </summary>
         public UriManagerViewModel()
         {
-            this.ApplyCommand = ReactiveCommandCreator.Create(this.ExecuteApply);
             this.DeleteRowCommand = ReactiveCommandCreator.Create(this.DeleteSelectedRow);
 
             this.UriRowList = new ReactiveList<UriRowViewModel>();
@@ -64,7 +64,14 @@ namespace CDP4ShellDialogs.ViewModels
             {
                 this.DalTypesList.Add(type);
             }
-
+            
+            var canApply = this.UriRowList.CountChanged
+                .Select(_ => this.WhenUriRowsChanged().StartWith(Unit.Default))
+                .StartWith(this.WhenUriRowsChanged().StartWith(Unit.Default))
+                .Switch()
+                .Select(_ => this.UriRowList.All(row => !row.HasErrors));
+            
+            this.ApplyCommand = ReactiveCommandCreator.Create(this.ExecuteApply, canApply);
             this.CloseCommand = ReactiveCommandCreator.Create(this.ExecuteClose);
         }
 
@@ -83,6 +90,16 @@ namespace CDP4ShellDialogs.ViewModels
                 var row = new UriRowViewModel { UriConfig = uri };
                 this.UriRowList.Add(row);
             }
+        }
+
+        /// <summary>
+        /// Creates an observable that emits when any row changes.
+        /// </summary>
+        private IObservable<Unit> WhenUriRowsChanged()
+        {
+            return this.UriRowList.Any()
+                ? this.UriRowList.Select(row => row.Changed.Select(_ => Unit.Default)).Merge()
+                : Observable.Never<Unit>();
         }
        
         /// <summary>
