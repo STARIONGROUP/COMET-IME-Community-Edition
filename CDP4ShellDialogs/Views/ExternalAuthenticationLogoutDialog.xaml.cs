@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OpenIdAuthenticationDialog.xaml.cs" company="Starion Group S.A.">
+// <copyright file="ExternalAuthenticationLogoutDialog.xaml.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2025 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
@@ -26,6 +26,8 @@
 namespace CDP4ShellDialogs.Views
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using System.Reflection;
 
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation.Interfaces;
@@ -37,18 +39,18 @@ namespace CDP4ShellDialogs.Views
     /// Interaction logic for OpenIdAuthenticationDialog.xaml
     /// </summary>
     [ExcludeFromCodeCoverage]
-    [DialogViewExport("ExternalAuthenticationDialogViewModel", "The External authentication browser support")]
-    public partial class ExternalAuthenticationDialog : IDialogView
+    [DialogViewExport("ExternalAuthenticationLogoutDialogViewModel", "The External authentication logout browser support")]
+    public partial class ExternalAuthenticationLogoutDialog : IDialogView
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="ExternalAuthenticationDialog" />
+        /// Initializes a new instance of <see cref="ExternalAuthenticationLogoutDialog" />
         /// </summary>
-        public ExternalAuthenticationDialog()
+        public ExternalAuthenticationLogoutDialog()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of <see cref="ExternalAuthenticationDialog" />
+        /// Initializes a new instance of <see cref="ExternalAuthenticationLogoutDialog" />
         /// </summary>
         /// <param name="initializeComponent">
         /// a value indicating whether the contained Components shall be loaded
@@ -56,7 +58,7 @@ namespace CDP4ShellDialogs.Views
         /// <remarks>
         /// This constructor is called by the navigation service
         /// </remarks>
-        public ExternalAuthenticationDialog(bool initializeComponent)
+        public ExternalAuthenticationLogoutDialog(bool initializeComponent)
         {
             if (initializeComponent)
             {

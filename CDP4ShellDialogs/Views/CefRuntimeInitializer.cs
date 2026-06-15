@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="OpenIdAuthenticationDialog.xaml.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2025 Starion Group S.A.
+// <copyright file="CefRuntimeInitializer.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2026 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
@@ -25,49 +25,31 @@
 
 namespace CDP4ShellDialogs.Views
 {
-    using System.Diagnostics.CodeAnalysis;
-
-    using CDP4Composition.Attributes;
-    using CDP4Composition.Navigation.Interfaces;
+    using System.IO;
+    using System.Reflection;
 
     using CefSharp;
-    using CefSharp.Wpf;
 
     /// <summary>
-    /// Interaction logic for OpenIdAuthenticationDialog.xaml
+    /// Handles initializing the CEF runtime
     /// </summary>
-    [ExcludeFromCodeCoverage]
-    [DialogViewExport("ExternalAuthenticationDialogViewModel", "The External authentication browser support")]
-    public partial class ExternalAuthenticationDialog : IDialogView
+    public static class CefRuntimeInitializer
     {
         /// <summary>
-        /// Initializes a new instance of <see cref="ExternalAuthenticationDialog" />
+        /// Asserts that the subscription to resolve assembly has been done once
         /// </summary>
-        public ExternalAuthenticationDialog()
-        {
-        }
+        private static bool subscribedOnce;
 
         /// <summary>
-        /// Initializes a new instance of <see cref="ExternalAuthenticationDialog" />
+        /// Try to initialize
         /// </summary>
-        /// <param name="initializeComponent">
-        /// a value indicating whether the contained Components shall be loaded
-        /// </param>
-        /// <remarks>
-        /// This constructor is called by the navigation service
-        /// </remarks>
-        public ExternalAuthenticationDialog(bool initializeComponent)
+        public static void TryInitialize()
         {
-            if (initializeComponent)
+            if (!subscribedOnce)
             {
-                CefRuntimeInitializer.TryInitialize();
-
-                this.InitializeComponent();
-
-                if (Cef.IsInitialized == null)
-                {
-                    Cef.Initialize(new CefSettings(), performDependencyCheck: true, browserProcessHandler: null);
-                }
+                var location = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                CefRuntime.SubscribeAnyCpuAssemblyResolver(location);
+                subscribedOnce = true;
             }
         }
     }

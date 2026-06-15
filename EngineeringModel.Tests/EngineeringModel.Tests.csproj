@@ -31,9 +31,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-	<PackageReference Include="CDP4Common-CE" Version="30.0.1" />
-	<PackageReference Include="CDP4Dal-CE" Version="30.0.1" />
-	<PackageReference Include="CDP4JsonSerializer-CE" Version="30.0.1" />
+	<PackageReference Include="CDP4Common-CE" Version="30.1.1" />
+	<PackageReference Include="CDP4Dal-CE" Version="30.1.1" />
+	<PackageReference Include="CDP4JsonSerializer-CE" Version="30.1.1" />
 	<PackageReference Include="CommonServiceLocator" Version="2.0.7" />
 	<PackageReference Include="NLog.Extensions.Logging" Version="6.1.2" />
 	<PackageReference Include="ReactiveUI" Version="22.3.1" />
