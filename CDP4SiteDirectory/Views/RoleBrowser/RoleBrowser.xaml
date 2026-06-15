@@ -133,7 +133,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <views:CommonThingControl GridView="{Binding ElementName=View}" />
+        <views:CommonThingControl GridView="{Binding ElementName=View}" FilteringMode="ParentBranch" />
 
         <views:SessionHeader Grid.Row="1" />
 

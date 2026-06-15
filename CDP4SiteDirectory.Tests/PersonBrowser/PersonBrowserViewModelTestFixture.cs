@@ -166,6 +166,30 @@ namespace CDP4SiteDirectory.Tests
             this.navigation.Verify(x => x.Navigate(It.IsAny<Person>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Update, this.navigation.Object, It.IsAny<Thing>(), null));
         }
 
+        [Test]
+        public async Task VerifyThatDeprecatedPersonPropagatesIsDeprecatedToParticipantChildren()
+        {
+            var modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
+            this.siteDir.Model.Add(modelSetup);
+
+            var participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person };
+            modelSetup.Participant.Add(participant);
+
+            this.person.IsDeprecated = true;
+
+            var browser = new PersonBrowserViewModel(this.session.Object, this.siteDir, this.navigation.Object, this.panelnavigation.Object, null, null);
+
+            await this.DelayedCheck(() => browser.SingleRunBackgroundWorker == null);
+
+            var personRow = browser.PersonRowViewModels.Single(x => x.Thing == this.person);
+            Assert.IsTrue(personRow.IsDeprecated);
+
+            var participantRow = (ParticipantRowViewModel)personRow.ContainedRows.Single(x => x.Thing == participant);
+            Assert.IsTrue(participantRow.IsDeprecated);
+
+            browser.Dispose();
+        }
+
         /// <summary>
         /// Checks for <see cref="BackgroundWorker"/>s to finish
         /// </summary>

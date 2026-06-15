@@ -134,6 +134,26 @@ namespace CDP4SiteDirectory.Tests
         }
 
         [Test]
+        public void VerifyThatDeprecatedRolePropagatesIsDeprecatedToPermissionChildren()
+        {
+            var permission = new PersonPermission(Guid.NewGuid(), this.cache, this.uri) { ObjectClass = ClassKind.Alias };
+            this.personRole.PersonPermission.Add(permission);
+            this.personRole.IsDeprecated = true;
+
+            var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null, null);
+
+            var personRoleRow = viewmodel.Roles.First();
+            var deprecatedRoleRow = (PersonRoleRowViewModel)personRoleRow.ContainedRows.Single(x => x.Thing == this.personRole);
+
+            Assert.IsTrue(deprecatedRoleRow.IsDeprecated);
+
+            var permissionRow = (PersonPermissionRowViewModel)deprecatedRoleRow.ContainedRows.Single(x => x.Thing == permission);
+            Assert.IsTrue(permissionRow.IsDeprecated);
+
+            viewmodel.Dispose();
+        }
+
+        [Test]
         public void VerifyThatNewRolesAreAdded()
         {
             var viewmodel = new RoleBrowserViewModel(this.session.Object, this.siteDir, null, this.navigation.Object, null, null);
