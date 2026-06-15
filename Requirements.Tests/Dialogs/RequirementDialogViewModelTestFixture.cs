@@ -29,6 +29,7 @@ namespace CDP4Requirements.Tests.Dialogs
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows.Input;
@@ -52,6 +53,8 @@ namespace CDP4Requirements.Tests.Dialogs
     using Moq;
 
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     [TestFixture]
     internal class RequirementDialogViewModelTestFixture
@@ -82,6 +85,7 @@ namespace CDP4Requirements.Tests.Dialogs
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -293,6 +297,107 @@ namespace CDP4Requirements.Tests.Dialogs
             vm.RequirementText = "some text";
 
             Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
+        }
+
+        [Test]
+        public async Task VerifyThatTheRequirementTextLanguageIsReservedWhileCreatingADefinition()
+        {
+            var vm = new RequirementDialogViewModel(this.requirement, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
+
+            vm.RequirementText = "the requirement";
+            var reservedLanguage = vm.SelectedLanguageCode.Name;
+
+            var languageWasReservedDuringNavigation = false;
+
+            this.thingDialogNavigationService
+                .Setup(x => x.Navigate(It.IsAny<Definition>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), It.IsAny<bool>(), ThingDialogKind.Create, It.IsAny<IThingDialogNavigationService>(), It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()))
+                .Callback<Thing, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, IEnumerable<Thing>>(
+                    (_, _, _, _, _, _, container, _) =>
+                        languageWasReservedDuringNavigation = ((Requirement)container).Definition.Any(definition => definition.LanguageCode == reservedLanguage))
+                .Returns(false);
+
+            await vm.CreateDefinitionCommand.Execute();
+            
+            Assert.IsTrue(languageWasReservedDuringNavigation);
+            Assert.IsFalse(this.requirement.Definition.Any(definition => definition.LanguageCode == reservedLanguage));
+        }
+
+        [Test]
+        public async Task VerifyThatNoLanguageIsReservedWhenThereIsNoRequirementDescription()
+        {
+            var vm = new RequirementDialogViewModel(this.requirement, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
+
+            var anyLanguageReservedDuringNavigation = true;
+
+            this.thingDialogNavigationService
+                .Setup(x => x.Navigate(It.IsAny<Definition>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), It.IsAny<bool>(), ThingDialogKind.Create, It.IsAny<IThingDialogNavigationService>(), It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()))
+                .Callback<Thing, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, IEnumerable<Thing>>(
+                    (_, _, _, _, _, _, container, _) =>
+                        anyLanguageReservedDuringNavigation = ((Requirement)container).Definition.Any())
+                .Returns(false);
+
+            await vm.CreateDefinitionCommand.Execute();
+
+            Assert.IsFalse(anyLanguageReservedDuringNavigation);
+        }
+
+        [Test]
+        public async Task VerifyThatCreatingADefinitionDoesNotOverwriteTheRequirementDescription()
+        {
+            var vm = new RequirementDialogViewModel(this.requirement, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
+
+            vm.RequirementText = "the description";
+            var descriptionLanguage = vm.SelectedLanguageCode.Name;
+            
+            this.thingDialogNavigationService
+                .Setup(x => x.Navigate(It.IsAny<Definition>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), It.IsAny<bool>(), ThingDialogKind.Create, It.IsAny<IThingDialogNavigationService>(), It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()))
+                .Callback<Thing, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, IEnumerable<Thing>>(
+                    (_, _, _, _, _, _, container, _) =>
+                        ((Requirement)container).Definition.Add(new Definition(Guid.NewGuid(), this.cache, this.uri) { LanguageCode = "nl", Content = "de eis" }))
+                .Returns(true);
+
+            await vm.CreateDefinitionCommand.Execute();
+
+            Assert.AreEqual(descriptionLanguage, vm.SelectedLanguageCode.Name);
+            Assert.AreEqual("the description", vm.RequirementText);
+        }
+
+        [Test]
+        public void VerifyThatTheFirstDefinitionIsShownAsTheRequirementDescription()
+        {
+            this.requirement.Definition.Add(new Definition(Guid.NewGuid(), this.cache, this.uri) { LanguageCode = "da", Content = "den oprindelige beskrivelse" });
+            this.requirement.Definition.Add(new Definition(Guid.NewGuid(), this.cache, this.uri) { LanguageCode = "en", Content = "added later" });
+
+            var vm = new RequirementDialogViewModel(this.requirement, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
+
+            Assert.AreEqual("da", vm.SelectedLanguageCode.Name);
+            Assert.AreEqual("den oprindelige beskrivelse", vm.RequirementText);
+        }
+
+        [Test]
+        public async Task VerifyThatEditingTheDescriptionLanguageMovesTheSelectionInsteadOfDuplicating()
+        {
+            this.requirement.Definition.Add(new Definition(Guid.NewGuid(), this.cache, this.uri) { LanguageCode = "en", Content = "the description" });
+
+            var vm = new RequirementDialogViewModel(this.requirement, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.clone);
+
+            Assert.AreEqual("en", vm.SelectedLanguageCode.Name);
+            
+            this.thingDialogNavigationService
+                .Setup(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), It.IsAny<bool>(), ThingDialogKind.Update, It.IsAny<IThingDialogNavigationService>(), It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()))
+                .Callback(() => this.requirement.Definition.First().LanguageCode = "da")
+                .Returns(true);
+
+            vm.SelectedDefinition = vm.Definition.Single();
+            await vm.EditDefinitionCommand.Execute();
+            
+            Assert.AreEqual("da", vm.SelectedLanguageCode.Name);
+            Assert.AreEqual("the description", vm.RequirementText);
         }
     }
 }
