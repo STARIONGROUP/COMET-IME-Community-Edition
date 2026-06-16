@@ -32,6 +32,7 @@ namespace CDP4RelationshipMatrix.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Mvvm;
@@ -143,8 +144,8 @@ namespace CDP4RelationshipMatrix.ViewModels
                         onLightUpdateAction.Invoke();
                     }
                 };
-
-            this.possibleClassKind.AddRange(this.PluginSetting.PossibleClassKinds.OrderBy(x => x.ToString()));
+            
+            this.possibleClassKind.AddRange(this.PluginSetting.PossibleClassKinds.Where(IsCategorizableClassKind).OrderBy(x => x.ToString()));
             this.possibleDisplayKinds.AddRange(this.PluginSetting.PossibleDisplayKinds.OrderBy(x => x.ToString()));
 
             this.PossibleCategories = new ReactiveList<Category>();
@@ -206,6 +207,18 @@ namespace CDP4RelationshipMatrix.ViewModels
                 });
 
             this.Disposables.Add(categorySubscription);
+
+            var activeDomainSubscription = this.Session.CDPMessageBus
+                .Listen<ObjectChangedEvent>(typeof(EngineeringModelSetup))
+                .Where(objectChange => objectChange.ChangedThing.Cache == this.Session.Assembler.Cache)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ =>
+                {
+                    this.PopulatePossibleOwners();
+                    this.OnLightUpdateAction();
+                });
+
+            this.Disposables.Add(activeDomainSubscription);
         }
 
         /// <summary>
@@ -423,15 +436,34 @@ namespace CDP4RelationshipMatrix.ViewModels
         }
 
         /// <summary>
+        /// Asserts whether instances of the provided <see cref="ClassKind"/> are <see cref="ICategorizableThing"/>,
+        /// and can therefore be selected and filtered by <see cref="Category"/> in the relationship matrix.
+        /// </summary>
+        /// <param name="classKind">The <see cref="ClassKind"/> to check</param>
+        /// <returns>true if instances of the <see cref="ClassKind"/> are categorizable</returns>
+        private static bool IsCategorizableClassKind(ClassKind classKind)
+        {
+            return TypeInitializer.Initialize(classKind) is ICategorizableThing;
+        }
+
+        /// <summary>
         /// Populates the possible <see cref="DomainOfExpertise"/> of the <see cref="PossibleOwners"/> property
         /// </summary>
         private void PopulatePossibleOwners()
         {
+            var allOwnersWereSelected = this.PossibleOwners.Count == 0
+                                        || this.PossibleOwners.All(owner => this.SelectedOwners.Contains(owner));
+
             this.PossibleOwners.Clear();
 
             var engineeringModel = this.Iteration.TopContainer as EngineeringModel;
             var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
             this.PossibleOwners.AddRange(domains);
+
+            if (allOwnersWereSelected)
+            {
+                this.SelectedOwners = new List<DomainOfExpertise>(this.PossibleOwners);
+            }
         }
 
         /// <summary>
