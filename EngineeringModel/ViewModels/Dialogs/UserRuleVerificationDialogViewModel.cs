@@ -59,6 +59,11 @@ namespace CDP4EngineeringModel.ViewModels
         private readonly BinaryRelationshipRule defaultRule = new BinaryRelationshipRule(Guid.NewGuid(), null, null) { Name = "-", ShortName = "-" };
 
         /// <summary>
+        /// The <see cref="IFilterStringService"/> that exposes whether deprecated things are shown.
+        /// </summary>
+        private IFilterStringService filterStringService;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="UserRuleVerificationDialogViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -158,7 +163,12 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulatePossibleRule();
 
-            var showDeprecatedThings = ServiceLocator.Current.GetInstance<IFilterStringService>().ShowDeprecatedThings;
+            if (this.filterStringService == null)
+            {
+                this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
+            }
+
+            var showDeprecatedThings = this.filterStringService.ShowDeprecatedThings;
 
             var rules = this.GetPossibleRule();
 
