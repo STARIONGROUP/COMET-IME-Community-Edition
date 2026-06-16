@@ -34,12 +34,41 @@
         </Style.Triggers>
     </Style>
 
+    <!-- Like ListBoxEditItemStyleDeprecated, but a deprecated item can only be deselected, never (re)selected: an
+         unselected deprecated item is disabled. A selected (already assigned) deprecated item stays enabled so it can
+         still be unchecked. This also prevents Select-All from checking deprecated items. -->
+    <Style BasedOn="{StaticResource ListBoxEditItemStyleDeprecated}" TargetType="{x:Type dxe:ListBoxEditItem}" x:Key="ListBoxEditItemStyleDeprecatedNotSelectable">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsDeprecated}" Value="True" />
+                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="IsEnabled" Value="False" />
+            </MultiDataTrigger>
+        </Style.Triggers>
+    </Style>
+
     <Style BasedOn="{StaticResource {themes:EditorListBoxThemeKey ResourceKey=CheckBoxItemStyle}}" TargetType="{x:Type dxe:ComboBoxEditItem}" x:Key="ComboBoxEditItemStyleDeprecated">
         <Style.Triggers>
             <DataTrigger Binding="{Binding IsDeprecated}" Value="True">
                 <Setter Property="Background" Value="LightGray"/>
                 <Setter Property="Opacity" Value="0.5"/>
             </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Like ComboBoxEditItemStyleDeprecated, but a deprecated item can only be deselected, never (re)selected: an
+         unselected deprecated item is disabled. Used by the checked-combobox category pickers. -->
+    <Style BasedOn="{StaticResource ComboBoxEditItemStyleDeprecated}" TargetType="{x:Type dxe:ComboBoxEditItem}" x:Key="ComboBoxEditItemStyleDeprecatedNotSelectable">
+        <Style.Triggers>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding IsDeprecated}" Value="True" />
+                    <Condition Binding="{Binding IsSelected, RelativeSource={RelativeSource Self}}" Value="False" />
+                </MultiDataTrigger.Conditions>
+                <Setter Property="IsEnabled" Value="False" />
+            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
 
