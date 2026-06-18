@@ -39,7 +39,9 @@ namespace CDP4EngineeringModel.Tests
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -47,11 +49,15 @@ namespace CDP4EngineeringModel.Tests
 
     using CDP4EngineeringModel.ViewModels;
 
+    using CommonServiceLocator;
+
     using Moq;
 
     using NUnit.Framework;
 
     using ReactiveUI;
+
+    using ActiveDomainRowViewModel = CDP4Composition.CommonView.ViewModels.ActiveDomainRowViewModel;
 
     /// <summary>
     /// suite of tests for the <see cref="EngineeringModelSetupDialogViewModel"/> class.
@@ -98,6 +104,8 @@ namespace CDP4EngineeringModel.Tests
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache;
         private SiteDirectory siteDirClone;
         private CDPMessageBus messageBus;
+        private Mock<IServiceLocator> serviceLocator;
+        private Mock<IFilterStringService> filterStringService;
 
         [SetUp]
         public void SetUp()
@@ -106,6 +114,11 @@ namespace CDP4EngineeringModel.Tests
 
             this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+
+            this.filterStringService = new Mock<IFilterStringService>();
+            this.serviceLocator = new Mock<IServiceLocator>();
+            this.serviceLocator.Setup(x => x.GetInstance<IFilterStringService>()).Returns(this.filterStringService.Object);
+            ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
             this.uri = new Uri("http://test.com");
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.cache, this.uri);
@@ -389,9 +402,9 @@ namespace CDP4EngineeringModel.Tests
 
             this.viewModel = new EngineeringModelSetupDialogViewModel(engineeringModelSetup.Clone(false), transaction, this.session.Object, true, ThingDialogKind.Update, null, this.siteDirClone);
 
-            // Count of visible items
+            // Count of visible items: the two non-deprecated domains plus domain1 (deprecated but assigned, so always visible)
             var visibleDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsVisible);
-            Assert.AreEqual(2, visibleDomains);
+            Assert.AreEqual(3, visibleDomains);
 
             this.viewModel.ShowDeprecatedDomains = true;
             visibleDomains = this.viewModel.PossibleActiveDomain.Count(d => d.IsVisible);
@@ -401,6 +414,129 @@ namespace CDP4EngineeringModel.Tests
             Assert.AreEqual(2, deprecatedDomains);
 
             Assert.AreEqual(this.viewModel.PossibleActiveDomain[0].Name, domain1.Name);
+        }
+
+        [Test]
+        public void VerifyThatSelectAllDoesNotSelectDeprecatedDomains()
+        {
+            this.viewModel = this.CreateActiveDomainViewModel(out var normalDomain, out var otherNormalDomain, out var deprecatedDomain, activeDomainSelector: (n, o, d) => new[] { n });
+
+            this.viewModel.ShowDeprecatedDomains = true;
+            this.viewModel.AreAllActiveDomainsSelected = true;
+
+            Assert.IsFalse(this.viewModel.ActiveDomain.Any(r => r.IsDeprecated), "Select All must not select deprecated domains.");
+            Assert.IsTrue(this.viewModel.ActiveDomain.Any(r => r.DomainOfExpertise == normalDomain));
+            Assert.IsTrue(this.viewModel.ActiveDomain.Any(r => r.DomainOfExpertise == otherNormalDomain));
+        }
+
+        [Test]
+        public void VerifyThatUnselectAllDoesNotUnselectDeprecatedDomains()
+        {
+            this.viewModel = this.CreateActiveDomainViewModel(out var normalDomain, out _, out var deprecatedDomain, activeDomainSelector: (n, o, d) => new[] { n, d });
+
+            this.viewModel.ShowDeprecatedDomains = true;
+            this.viewModel.AreAllActiveDomainsSelected = false;
+
+            Assert.IsTrue(this.viewModel.ActiveDomain.Any(r => r.DomainOfExpertise == deprecatedDomain), "Unselect All must not unselect an already-assigned deprecated domain.");
+            Assert.IsFalse(this.viewModel.ActiveDomain.Any(r => r.DomainOfExpertise == normalDomain));
+        }
+
+        [Test]
+        public void VerifyThatDeprecatedDomainCanBeIndividuallyAssigned()
+        {
+            this.viewModel = this.CreateActiveDomainViewModel(out var normalDomain, out _, out var deprecatedDomain, activeDomainSelector: (n, o, d) => new[] { n });
+
+            this.viewModel.ShowDeprecatedDomains = true;
+
+            var deprecatedRow = this.viewModel.PossibleActiveDomain.Single(r => r.DomainOfExpertise == deprecatedDomain);
+
+            this.viewModel.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel>(this.viewModel.ActiveDomain.Concat(new[] { deprecatedRow }));
+
+            Assert.IsTrue(this.viewModel.ActiveDomain.Contains(deprecatedRow), "A deprecated domain ticked individually must be assignable.");
+            Assert.IsTrue(deprecatedRow.IsEnabled);
+        }
+
+        [Test]
+        public void VerifyThatShowDeprecatedDomainsInitializesFromGlobalSetting()
+        {
+            this.filterStringService.Setup(x => x.ShowDeprecatedThings).Returns(true);
+
+            this.viewModel = this.CreateActiveDomainViewModel(out _, out _, out var deprecatedDomain, activeDomainSelector: (n, o, d) => new[] { n });
+
+            Assert.IsTrue(this.viewModel.ShowDeprecatedDomains, "The local toggle must default to the global Show Deprecated Things setting.");
+
+            var deprecatedRow = this.viewModel.PossibleActiveDomain.Single(r => r.DomainOfExpertise == deprecatedDomain);
+            Assert.IsTrue(deprecatedRow.IsVisible, "Deprecated domains must be visible when the global setting shows deprecated things.");
+        }
+
+        [Test]
+        public void VerifyThatAssignedDeprecatedDomainIsAlwaysVisible()
+        {
+            this.viewModel = this.CreateActiveDomainViewModel(out _, out _, out var deprecatedDomain, activeDomainSelector: (n, o, d) => new[] { n, d });
+
+            Assert.IsFalse(this.viewModel.ShowDeprecatedDomains);
+
+            var deprecatedRow = this.viewModel.PossibleActiveDomain.Single(r => r.DomainOfExpertise == deprecatedDomain);
+
+            Assert.IsTrue(deprecatedRow.IsVisible, "An assigned deprecated domain must stay visible even when deprecated domains are hidden.");
+        }
+
+        [Test]
+        public void VerifyThatUnassignedDeprecatedDomainIsHiddenWhenDeprecatedAreHidden()
+        {
+            this.viewModel = this.CreateActiveDomainViewModel(out _, out _, out var deprecatedDomain, activeDomainSelector: (n, o, d) => new[] { n });
+
+            Assert.IsFalse(this.viewModel.ShowDeprecatedDomains);
+
+            var deprecatedRow = this.viewModel.PossibleActiveDomain.Single(r => r.DomainOfExpertise == deprecatedDomain);
+
+            Assert.IsFalse(deprecatedRow.IsVisible, "An unassigned deprecated domain must be hidden when deprecated domains are hidden.");
+        }
+
+        [Test]
+        public void VerifyThatAreAllActiveDomainsSelectedReflectsSelectionOfNonDeprecatedDomains()
+        {
+            this.viewModel = this.CreateActiveDomainViewModel(out _, out _, out _, activeDomainSelector: (n, o, d) => new[] { n });
+
+            this.viewModel.ShowDeprecatedDomains = true;
+
+            Assert.IsFalse(this.viewModel.AreAllActiveDomainsSelected, "Not all non-deprecated domains are selected yet.");
+
+            this.viewModel.AreAllActiveDomainsSelected = true;
+
+            Assert.IsTrue(this.viewModel.AreAllActiveDomainsSelected);
+            Assert.IsFalse(this.viewModel.ActiveDomain.Any(r => r.IsDeprecated));
+        }
+
+        /// <summary>
+        /// Creates an <see cref="EngineeringModelSetupDialogViewModel"/> in Update mode with two non-deprecated domains
+        /// and one deprecated domain in the container <see cref="SiteDirectory"/>.
+        /// </summary>
+        private EngineeringModelSetupDialogViewModel CreateActiveDomainViewModel(out DomainOfExpertise normalDomain, out DomainOfExpertise otherNormalDomain, out DomainOfExpertise deprecatedDomain, Func<DomainOfExpertise, DomainOfExpertise, DomainOfExpertise, DomainOfExpertise[]> activeDomainSelector = null)
+        {
+            normalDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "normal" };
+            otherNormalDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "otherNormal" };
+            deprecatedDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "deprecated", IsDeprecated = true };
+
+            this.siteDirClone.Domain.Add(normalDomain);
+            this.siteDirClone.Domain.Add(otherNormalDomain);
+            this.siteDirClone.Domain.Add(deprecatedDomain);
+
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
+
+            var selected = activeDomainSelector?.Invoke(normalDomain, otherNormalDomain, deprecatedDomain) ?? new[] { normalDomain };
+
+            foreach (var domain in selected)
+            {
+                engineeringModelSetup.ActiveDomain.Add(domain);
+            }
+
+            this.cache.TryAdd(new CacheKey(engineeringModelSetup.Iid, null), new Lazy<Thing>(() => engineeringModelSetup));
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDirectory);
+            var transaction = new ThingTransaction(transactionContext, this.siteDirClone);
+
+            return new EngineeringModelSetupDialogViewModel(engineeringModelSetup.Clone(false), transaction, this.session.Object, true, ThingDialogKind.Update, null, this.siteDirClone);
         }
     }
 }

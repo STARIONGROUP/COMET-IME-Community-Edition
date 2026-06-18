@@ -41,6 +41,9 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
+
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -60,6 +63,11 @@ namespace CDP4EngineeringModel.ViewModels
     public class EngineeringModelSetupDialogViewModel : CDP4CommonView.EngineeringModelSetupDialogViewModel, IThingDialogViewModel
     {
         /// <summary>
+        /// The (injected) <see cref="IFilterStringService" />
+        /// </summary>
+        private IFilterStringService filterStringService;
+
+        /// <summary>
         /// Initialize the dialog
         /// </summary>
         protected override void Initialize()
@@ -72,38 +80,22 @@ namespace CDP4EngineeringModel.ViewModels
             this.PossibleActiveDomain = new ReactiveList<ActiveDomainRowViewModel>();
             this.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel>();
 
-            this.ActiveDomain.ItemsAdded.Subscribe(this.SetActiveState);
-            this.ActiveDomain.ItemsRemoved.Subscribe(this.SetInactiveState);
-
             this.SelectedOrganizations = new ReactiveList<Organization>();
 
+            this.filterStringService ??= ServiceLocator.Current.GetInstance<IFilterStringService>();
+            this.ShowDeprecatedDomains = this.filterStringService.ShowDeprecatedThings;
+
             this.WhenAnyValue(vm => vm.ShowDeprecatedDomains).Subscribe(_ => this.ShowHideDeprecatedDomains());
+
+            this.WhenAnyValue(vm => vm.ActiveDomain).Subscribe(_ =>
+            {
+                this.RaisePropertyChanged(nameof(this.AreAllActiveDomainsSelected));
+                this.ShowHideDeprecatedDomains();
+            });
         }
 
         /// <summary>
-        /// Set active domain inactive state
-        /// </summary>
-        /// <param name="oldRow">
-        ///     <see cref="ActiveDomainRowViewModel" />
-        /// </param>
-        private void SetInactiveState(ActiveDomainRowViewModel oldRow)
-        {
-            oldRow.IsEnabled = false;
-        }
-
-        /// <summary>
-        /// Set active domain active state
-        /// </summary>
-        /// <param name="newRow">
-        ///     <see cref="ActiveDomainRowViewModel" />
-        /// </param>
-        private void SetActiveState(ActiveDomainRowViewModel newRow)
-        {
-            newRow.IsEnabled = true;
-        }
-
-        /// <summary>
-        /// Show/hide deprecated domains from the view
+        /// Updates the visibility of the deprecated <see cref="DomainOfExpertise" /> rows.
         /// </summary>
         private void ShowHideDeprecatedDomains()
         {
@@ -111,7 +103,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             foreach (var activeDomainRowViewModel in deprecatedItems)
             {
-                activeDomainRowViewModel.IsVisible = this.ShowDeprecatedDomains;
+                activeDomainRowViewModel.IsVisible = this.ShowDeprecatedDomains || this.ActiveDomain.Contains(activeDomainRowViewModel);
             }
         }
 
@@ -127,7 +119,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             foreach (var domainOfExpertise in sitedir.Domain.OrderBy(x => x.Name))
             {
-                var activeDomainRowModel = new ActiveDomainRowViewModel(domainOfExpertise, !this.ShowDeprecatedDomains && !domainOfExpertise.IsDeprecated);
+                var activeDomainRowModel = new ActiveDomainRowViewModel(domainOfExpertise, !domainOfExpertise.IsDeprecated);
                 this.PossibleActiveDomain.Add(activeDomainRowModel);
             }
 
@@ -141,6 +133,8 @@ namespace CDP4EngineeringModel.ViewModels
                     activeDomainRowModel.IsEnabled = true;
                 }
             }
+
+            this.ShowHideDeprecatedDomains();
         }
 
         /// <summary>
@@ -453,9 +447,43 @@ namespace CDP4EngineeringModel.ViewModels
         public new ReactiveList<ActiveDomainRowViewModel> PossibleActiveDomain { get; set; }
 
         /// <summary>
+        /// Backing field for <see cref="ActiveDomain" />
+        /// </summary>
+        private ReactiveList<ActiveDomainRowViewModel> activeDomain;
+
+        /// <summary>
         /// Gets or sets the value of active domain.
         /// </summary>
-        public new ReactiveList<ActiveDomainRowViewModel> ActiveDomain { get; set; }
+        public new ReactiveList<ActiveDomainRowViewModel> ActiveDomain
+        {
+            get => this.activeDomain;
+            set => this.RaiseAndSetIfChanged(ref this.activeDomain, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether all non-deprecated <see cref="DomainOfExpertise" /> rows are selected.
+        /// </summary>
+        public bool AreAllActiveDomainsSelected
+        {
+            get => (this.PossibleActiveDomain != null)
+                   && this.PossibleActiveDomain.Any(row => !row.IsDeprecated)
+                   && this.PossibleActiveDomain.Where(row => !row.IsDeprecated).All(row => this.ActiveDomain.Contains(row));
+
+            set
+            {
+                if (value)
+                {
+                    var nonDeprecatedDomains = this.PossibleActiveDomain.Where(row => !row.IsDeprecated);
+                    this.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel>(this.ActiveDomain.Union(nonDeprecatedDomains));
+                }
+                else
+                {
+                    this.ActiveDomain = new ReactiveList<ActiveDomainRowViewModel>(this.ActiveDomain.Where(row => row.IsDeprecated));
+                }
+
+                this.RaisePropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the ShortName
