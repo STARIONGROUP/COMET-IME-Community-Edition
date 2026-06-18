@@ -177,6 +177,29 @@ namespace CDP4CommonView.Tests
         }
 
         [Test]
+        public void VerifyThatPossibleCategoriesGetPopulated()
+        {
+            var siteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), null, null) { ShortName = "GenericRDL" };
+
+            var applicableCategory = new Category(Guid.NewGuid(), null, null) { ShortName = "REFSRC", Name = "ReferenceSource category" };
+            applicableCategory.PermissibleClass.Add(ClassKind.ReferenceSource);
+
+            var nonApplicableCategory = new Category(Guid.NewGuid(), null, null) { ShortName = "OTHER", Name = "Other category" };
+            nonApplicableCategory.PermissibleClass.Add(ClassKind.ElementDefinition);
+
+            siteRdl.DefinedCategory.Add(applicableCategory);
+            siteRdl.DefinedCategory.Add(nonApplicableCategory);
+
+            var openRdls = new List<ReferenceDataLibrary> { siteRdl };
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(openRdls);
+
+            this.viewmodel = new ReferenceSourceDialogViewModel(this.referenceSource, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, null, null);
+
+            Assert.AreEqual(1, this.viewmodel.PossibleCategory.Count);
+            Assert.AreEqual(applicableCategory.ShortName, this.viewmodel.PossibleCategory.Single().ShortName);
+        }
+
+        [Test]
         public void VerifyThatTheLanguageCodesArePopulated()
         {
             var siteRdl = new SiteReferenceDataLibrary() { ShortName = "GenericRDL" };

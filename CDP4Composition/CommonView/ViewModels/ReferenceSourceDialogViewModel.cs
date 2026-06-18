@@ -100,7 +100,11 @@ namespace CDP4CommonView.ViewModels
         public ReferenceSourceDialogViewModel(ReferenceSource referenceSource, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(referenceSource, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
-            this.WhenAnyValue(vm => vm.Container).Subscribe(_ => this.PopulatePossiblePublishedIn());            
+            this.WhenAnyValue(vm => vm.Container).Subscribe(_ =>
+            {
+                this.PopulatePossiblePublishedIn();
+                this.PopulatePossibleCategories();
+            });
         }
 
         /// <summary>
@@ -185,6 +189,29 @@ namespace CDP4CommonView.ViewModels
 
                 this.PossiblePublishedIn.AddRange(allPossibleReferenceSources);
             }
+        }
+
+        /// <summary>
+        /// Populates the <see cref="CDP4CommonView.ReferenceSourceDialogViewModel.PossibleCategory"/> property with the
+        /// <see cref="Category"/>s of the container <see cref="ReferenceDataLibrary"/> (and its required libraries) that
+        /// are applicable to a <see cref="ReferenceSource"/>.
+        /// </summary>
+        private void PopulatePossibleCategories()
+        {
+            this.PossibleCategory.Clear();
+
+            var containerRdl = this.Container as ReferenceDataLibrary;
+
+            if (containerRdl == null)
+            {
+                return;
+            }
+
+            var allowedCategories = new List<Category>(containerRdl.DefinedCategory.Where(c => c.PermissibleClass.Contains(this.Thing.ClassKind)));
+            allowedCategories.AddRange(containerRdl.GetRequiredRdls().SelectMany(rdl => rdl.DefinedCategory)
+                .Where(c => c.PermissibleClass.Contains(this.Thing.ClassKind)));
+
+            this.PossibleCategory.AddRange(allowedCategories.OrderBy(c => c.ShortName));
         }
     }
 }

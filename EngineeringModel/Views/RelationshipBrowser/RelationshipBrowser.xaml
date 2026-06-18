@@ -13,6 +13,7 @@
              xmlns:dynamic="clr-namespace:System.Dynamic;assembly=System.Core"
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              xmlns:views1="clr-namespace:CDP4EngineeringModel.Views"
              xmlns:viewModels="clr-namespace:CDP4EngineeringModel.ViewModels"
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
@@ -185,15 +186,18 @@
                         </dxlc:LayoutGroup>
 
                         <dxlc:LayoutItem Label="Categories: ">
-                            <dxe:ComboBoxEdit ItemsSource="{Binding PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                              DisplayMember="Name"
+                            <dxe:ComboBoxEdit DisplayMember="Name"
                                               SeparatorString=", "
                                               AllowNullInput="True"
                                               ShowNullText="True"
                                               NullText="No Categories"
+                                              ItemContainerStyle="{StaticResource ComboBoxEditItemStyleDeprecatedNotSelectable}"
                                               EditValue="{Binding AppliedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource CategoryListConverter}}">
+                                <dxmvvm:Interaction.Behaviors>
+                                    <behaviours:CategoryComboBoxVisibilityBehavior PossibleCategories="{Binding PossibleCategories}" />
+                                </dxmvvm:Interaction.Behaviors>
                                 <dxe:ComboBoxEdit.StyleSettings>
-                                    <dxe:CheckedComboBoxStyleSettings />
+                                    <dxe:CheckedComboBoxStyleSettings ShowSelectAllItem="False" />
                                 </dxe:ComboBoxEdit.StyleSettings>
                             </dxe:ComboBoxEdit>
                         </dxlc:LayoutItem>
@@ -245,15 +249,18 @@
                             </dxg:GridControl>
                         </dxlc:LayoutItem>
                         <dxlc:LayoutItem Label="Categories: ">
-                            <dxe:ComboBoxEdit ItemsSource="{Binding PossibleCategories, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                              DisplayMember="Name"
+                            <dxe:ComboBoxEdit DisplayMember="Name"
                                               SeparatorString=", "
                                               AllowNullInput="True"
                                               ShowNullText="True"
                                               NullText="No Categories"
+                                              ItemContainerStyle="{StaticResource ComboBoxEditItemStyleDeprecatedNotSelectable}"
                                               EditValue="{Binding AppliedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource CategoryListConverter}}">
+                                <dxmvvm:Interaction.Behaviors>
+                                    <behaviours:CategoryComboBoxVisibilityBehavior PossibleCategories="{Binding PossibleCategories}" />
+                                </dxmvvm:Interaction.Behaviors>
                                 <dxe:ComboBoxEdit.StyleSettings>
-                                    <dxe:CheckedComboBoxStyleSettings />
+                                    <dxe:CheckedComboBoxStyleSettings ShowSelectAllItem="False" />
                                 </dxe:ComboBoxEdit.StyleSettings>
                             </dxe:ComboBoxEdit>
                         </dxlc:LayoutItem>
