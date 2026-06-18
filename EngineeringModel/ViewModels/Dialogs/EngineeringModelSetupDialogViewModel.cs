@@ -82,7 +82,7 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.SelectedOrganizations = new ReactiveList<Organization>();
 
-            this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
+            this.filterStringService ??= ServiceLocator.Current.GetInstance<IFilterStringService>();
             this.ShowDeprecatedDomains = this.filterStringService.ShowDeprecatedThings;
 
             this.WhenAnyValue(vm => vm.ShowDeprecatedDomains).Subscribe(_ => this.ShowHideDeprecatedDomains());
