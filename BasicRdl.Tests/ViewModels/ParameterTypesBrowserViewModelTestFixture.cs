@@ -64,6 +64,7 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IServiceLocator> serviceLocator;
         private Uri uri;
         private SiteDirectory siteDirectory;
+        private SiteReferenceDataLibrary siteRdl;
         private ParameterTypesBrowserViewModel ParameterTypesBrowserViewModel;
         private Person person;
         private Assembler assembler;
@@ -102,12 +103,18 @@ namespace BasicRdl.Tests.ViewModels
             this.siteDirectory =
                 new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
 
+            this.siteRdl =
+                new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test RDL", ShortName = "testRDL" };
+
+            this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteRdl);
+
             this.person =
                 new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new ReferenceDataLibrary[] { this.siteRdl });
 
             this.ParameterTypesBrowserViewModel = new ParameterTypesBrowserViewModel(this.session.Object,
                 this.siteDirectory, this.dialogNavigationService.Object, this.panelNavigationService.Object, null, null,
@@ -134,14 +141,14 @@ namespace BasicRdl.Tests.ViewModels
         [Test]
         public void VerifyThatParameterTypeEventsAreCaught()
         {
-            var textParamType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var textParamType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteRdl };
 
             this.messageBus.SendObjectChangeEvent(textParamType, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             this.messageBus.SendObjectChangeEvent(textParamType, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
-            var booleanParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var booleanParamType = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteRdl };
             this.messageBus.SendObjectChangeEvent(booleanParamType, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             this.messageBus.SendObjectChangeEvent(booleanParamType, EventKind.Removed);
@@ -150,7 +157,7 @@ namespace BasicRdl.Tests.ViewModels
             var defaultScale = new CyclicRatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             var simpleQuantityKind =
-                new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale };
+                new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale, Container = this.siteRdl };
 
             this.messageBus.SendObjectChangeEvent(simpleQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
@@ -160,7 +167,8 @@ namespace BasicRdl.Tests.ViewModels
             var specializedQuantityKind =
                 new SpecializedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri)
                 {
-                    DefaultScale = defaultScale
+                    DefaultScale = defaultScale,
+                    Container = this.siteRdl
                 };
 
             this.messageBus.SendObjectChangeEvent(specializedQuantityKind, EventKind.Added);
@@ -169,12 +177,69 @@ namespace BasicRdl.Tests.ViewModels
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
 
             var derivedQuantityKind =
-                new DerivedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale };
+                new DerivedQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri) { DefaultScale = defaultScale, Container = this.siteRdl };
 
             this.messageBus.SendObjectChangeEvent(derivedQuantityKind, EventKind.Added);
             Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
             this.messageBus.SendObjectChangeEvent(derivedQuantityKind, EventKind.Removed);
             Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
+        }
+
+        [Test]
+        public void VerifyThatDuplicateAddedEventsDoNotCreateDuplicateRows()
+        {
+            var parameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteRdl };
+
+            this.messageBus.SendObjectChangeEvent(parameterType, EventKind.Added);
+            this.messageBus.SendObjectChangeEvent(parameterType, EventKind.Added);
+
+            Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
+        }
+
+        [Test]
+        public void VerifyThatParameterTypeRowIsRemovedRegardlessOfInstance()
+        {
+            var iid = Guid.NewGuid();
+            var addedParameterType = new TextParameterType(iid, this.assembler.Cache, this.uri) { Container = this.siteRdl };
+
+            this.messageBus.SendObjectChangeEvent(addedParameterType, EventKind.Added);
+            Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count);
+
+            var removedParameterType = new TextParameterType(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedParameterType, EventKind.Removed);
+
+            Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
+        }
+
+        [Test]
+        public void VerifyThatAddedParameterTypeFromClosedReferenceDataLibraryIsIgnored()
+        {
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "closed RDL", ShortName = "closedRDL" };
+            this.siteDirectory.SiteReferenceDataLibrary.Add(closedRdl);
+
+            var parameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = closedRdl };
+            this.messageBus.SendObjectChangeEvent(parameterType, EventKind.Added);
+
+            Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any());
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsParameterTypes()
+        {
+            var modelRdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "model RDL", ShortName = "modelRDL" };
+            var parameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = modelRdl };
+            modelRdl.ParameterType.Add(parameterType);
+
+            var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            engineeringModelSetup.RequiredRdl.Add(modelRdl);
+            this.siteDirectory.Model.Add(engineeringModelSetup);
+
+            Assert.IsFalse(this.ParameterTypesBrowserViewModel.ParameterTypes.Any(x => x.Thing.Iid == parameterType.Iid));
+
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new ReferenceDataLibrary[] { this.siteRdl, modelRdl });
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, this.ParameterTypesBrowserViewModel.ParameterTypes.Count(x => x.Thing.Iid == parameterType.Iid));
         }
 
         [Test]
@@ -220,6 +285,8 @@ namespace BasicRdl.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;
+            this.siteDirectory.SiteReferenceDataLibrary.Add(sRdl);
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new ReferenceDataLibrary[] { sRdl });
 
             var cat = new BooleanParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {

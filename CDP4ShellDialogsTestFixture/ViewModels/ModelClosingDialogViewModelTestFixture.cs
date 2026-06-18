@@ -62,7 +62,11 @@ namespace CDP4ShellDialogs.Tests
         private EngineeringModelSetup model1;
         private EngineeringModelSetup model2;
         private IterationSetup iterationSetup11;
+        private IterationSetup iterationSetup12;
         private IterationSetup iterationSetup21;
+        private Iteration iteration11;
+        private Iteration iteration12;
+        private Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> openIterations;
         private Person person;
         private Participant participant;
         private DomainOfExpertise domain;
@@ -97,8 +101,10 @@ namespace CDP4ShellDialogs.Tests
             this.model2 = new EngineeringModelSetup(Guid.NewGuid(), null, this.uri) { Name = "model2" };
             this.model2.RequiredRdl.Add(model2RDL);
             this.iterationSetup11 = new IterationSetup(Guid.NewGuid(), null, this.uri);
+            this.iterationSetup12 = new IterationSetup(Guid.NewGuid(), null, this.uri);
             this.iterationSetup21 = new IterationSetup(Guid.NewGuid(), null, this.uri);
             this.iterationSetup11.IterationIid = Guid.NewGuid();
+            this.iterationSetup12.IterationIid = Guid.NewGuid();
             this.person = new Person(Guid.NewGuid(), null, this.uri) { GivenName = "testPerson" };
             this.domain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domaintest" };
 
@@ -113,6 +119,7 @@ namespace CDP4ShellDialogs.Tests
             this.model2.Participant.Add(this.participant);
 
             this.model1.IterationSetup.Add(this.iterationSetup11);
+            this.model1.IterationSetup.Add(this.iterationSetup12);
             this.model2.IterationSetup.Add(this.iterationSetup21);
 
             this.iterationSetup21.IterationIid = Guid.NewGuid();
@@ -126,20 +133,45 @@ namespace CDP4ShellDialogs.Tests
             var lazysiteDirectory = new Lazy<Thing>(() => this.siteDirectory);
             this.assembler.Cache.GetOrAdd(new CacheKey(lazysiteDirectory.Value.Iid, null), lazysiteDirectory);
 
-            var iteration11 = new Iteration(Guid.NewGuid(), null, this.uri) { IterationSetup = this.iterationSetup11 };
-            var lazyiteration = new Lazy<Thing>(() => iteration11);
+            this.iteration11 = new Iteration(Guid.NewGuid(), null, this.uri) { IterationSetup = this.iterationSetup11 };
+            var lazyiteration = new Lazy<Thing>(() => this.iteration11);
             this.assembler.Cache.GetOrAdd(new CacheKey(lazyiteration.Value.Iid, null), lazyiteration);
 
-            this.iterationSetup11.IterationIid = iteration11.Iid;
+            this.iterationSetup11.IterationIid = this.iteration11.Iid;
             var lazyiterationSetup11 = new Lazy<Thing>(() => this.iterationSetup11);
             this.assembler.Cache.GetOrAdd(new CacheKey(lazyiterationSetup11.Value.Iid, null), lazyiterationSetup11);
+
+            this.iteration12 = new Iteration(Guid.NewGuid(), null, this.uri) { IterationSetup = this.iterationSetup12 };
+            var lazyiteration12 = new Lazy<Thing>(() => this.iteration12);
+            this.assembler.Cache.GetOrAdd(new CacheKey(lazyiteration12.Value.Iid, null), lazyiteration12);
+
+            this.iterationSetup12.IterationIid = this.iteration12.Iid;
+            var lazyiterationSetup12 = new Lazy<Thing>(() => this.iterationSetup12);
+            this.assembler.Cache.GetOrAdd(new CacheKey(lazyiterationSetup12.Value.Iid, null), lazyiterationSetup12);
+
+            this.openIterations = new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>();
 
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>());
+            this.session.Setup(x => x.OpenIterations).Returns(() => this.openIterations);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
+            this.session.Setup(x => x.CloseIterationSetup(It.IsAny<IterationSetup>()))
+                .Returns(Task.CompletedTask)
+                .Callback<IterationSetup>(
+                    closedSetup =>
+                    {
+                        var openIteration = this.openIterations.Keys.FirstOrDefault(it => it.IterationSetup == closedSetup);
+
+                        if (openIteration != null)
+                        {
+                            this.openIterations.Remove(openIteration);
+                        }
+                    });
+
+            this.session.Setup(x => x.CloseModelRdl(It.IsAny<ModelReferenceDataLibrary>())).Returns(Task.CompletedTask);
         }
 
         [TearDown]
@@ -160,10 +192,7 @@ namespace CDP4ShellDialogs.Tests
             Assert.AreEqual("Iteration Selection", viewmodel.DialogTitle);
             Assert.IsTrue(((ICommand)viewmodel.CloseCommand).CanExecute(null));
 
-            var iteration = new Iteration(this.iterationSetup11.IterationIid, this.assembler.Cache, this.uri);
-            iteration.IterationSetup = this.iterationSetup11;
-
-            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { iteration, null } });
+            this.openIterations.Add(this.iteration11, null);
             await viewmodel.CloseCommand.Execute();
 
             var res = viewmodel.DialogResult;
@@ -172,6 +201,39 @@ namespace CDP4ShellDialogs.Tests
 
             this.session.Verify(x => x.CloseIterationSetup(It.IsAny<IterationSetup>()));
             this.session.Verify(x => x.CloseModelRdl(It.IsAny<ModelReferenceDataLibrary>()));
+        }
+
+        [Test]
+        public async Task VerifyThatClosingLastOpenIterationClosesTheModelRdl()
+        {
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelClosingDialogViewModel(sessions);
+
+            this.openIterations.Add(this.iteration11, null);
+
+            viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iterationSetup11, this.participant, this.session.Object));
+
+            await viewmodel.CloseCommand.Execute();
+
+            this.session.Verify(x => x.CloseIterationSetup(this.iterationSetup11), Times.Once);
+            this.session.Verify(x => x.CloseModelRdl(this.model1.RequiredRdl.Single()), Times.Once);
+        }
+
+        [Test]
+        public async Task VerifyThatClosingNonLastOpenIterationDoesNotCloseTheModelRdl()
+        {
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelClosingDialogViewModel(sessions);
+
+            this.openIterations.Add(this.iteration11, null);
+            this.openIterations.Add(this.iteration12, null);
+
+            viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iterationSetup11, this.participant, this.session.Object));
+
+            await viewmodel.CloseCommand.Execute();
+
+            this.session.Verify(x => x.CloseIterationSetup(this.iterationSetup11), Times.Once);
+            this.session.Verify(x => x.CloseModelRdl(It.IsAny<ModelReferenceDataLibrary>()), Times.Never);
         }
 
         [Test]

@@ -98,6 +98,8 @@ namespace BasicRDL.Tests.ViewModels
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(() => this.siteDirectory.SiteReferenceDataLibrary.Cast<ReferenceDataLibrary>().ToList());
+
             this.browser = new ReferenceSourceBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigation.Object, this.navigation.Object, null, this.pluginSettingsService.Object);
         }
 
@@ -131,6 +133,25 @@ namespace BasicRDL.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(referenceSource, EventKind.Removed);
             Assert.AreEqual(0, this.browser.ReferenceSources.Count);
+        }
+
+        [Test]
+        public void VerifyThatReferenceSourceRowIsNotDuplicatedAndIsRemovedAcrossCacheReopen()
+        {
+            var iid = Guid.NewGuid();
+
+            var referenceSource = new ReferenceSource(iid, this.assembler.Cache, this.uri) { Name = "rs", ShortName = "rs", Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(referenceSource, EventKind.Added);
+
+            var reInstantiatedReferenceSource = new ReferenceSource(iid, this.assembler.Cache, this.uri) { Name = "rs", ShortName = "rs", Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(reInstantiatedReferenceSource, EventKind.Added);
+
+            Assert.AreEqual(1, this.browser.ReferenceSources.Count(x => x.Thing.Iid == iid));
+
+            var removedReferenceSource = new ReferenceSource(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedReferenceSource, EventKind.Removed);
+
+            Assert.IsFalse(this.browser.ReferenceSources.Any(x => x.Thing.Iid == iid));
         }
 
         [Test]
@@ -189,6 +210,7 @@ namespace BasicRDL.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;
+            this.siteDirectory.SiteReferenceDataLibrary.Add(sRdl);
 
             var rs = new ReferenceSource(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "rs1", ShortName = "1", Container = sRdl };
             var rs2 = new ReferenceSource(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "rs2", ShortName = "2", Container = sRdl };
@@ -202,6 +224,32 @@ namespace BasicRDL.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.ReferenceSources.Count(x => x.ContainerRdl == "test") == 2);
+        }
+
+        [Test]
+        public void VerifyThatAddedReferenceSourceFromClosedReferenceDataLibraryIsIgnored()
+        {
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var referenceSource = new ReferenceSource(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "rs", ShortName = "rs", Container = closedRdl };
+
+            this.messageBus.SendObjectChangeEvent(referenceSource, EventKind.Added);
+
+            Assert.IsFalse(this.browser.ReferenceSources.Any());
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsReferenceSources()
+        {
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var referenceSource = new ReferenceSource(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "rs", ShortName = "rs", Container = rdl };
+            rdl.ReferenceSource.Add(referenceSource);
+
+            Assert.IsFalse(this.browser.ReferenceSources.Any(x => x.Thing.Iid == referenceSource.Iid));
+
+            this.siteDirectory.SiteReferenceDataLibrary.Add(rdl);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, this.browser.ReferenceSources.Count(x => x.Thing.Iid == referenceSource.Iid));
         }
     }
 }

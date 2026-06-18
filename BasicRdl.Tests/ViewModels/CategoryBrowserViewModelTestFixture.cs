@@ -82,6 +82,7 @@ namespace BasicRdl.Tests.ViewModels
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(() => this.siteDir.SiteReferenceDataLibrary.Cast<ReferenceDataLibrary>().ToList());
         }
 
         [TearDown]
@@ -108,6 +109,7 @@ namespace BasicRdl.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;
+            this.siteDir.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             this.messageBus.SendObjectChangeEvent(cat, EventKind.Added);
@@ -119,12 +121,36 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatCategoryRowIsNotDuplicatedAndIsRemovedAcrossCacheReopen()
+        {
+            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
+            var iid = Guid.NewGuid();
+
+            var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDir };
+            this.siteDir.SiteReferenceDataLibrary.Add(sRdl);
+
+            var category = new Category(iid, this.assembler.Cache, this.uri) { Name = "cat", ShortName = "cat", Container = sRdl };
+            this.messageBus.SendObjectChangeEvent(category, EventKind.Added);
+
+            var reInstantiatedCategory = new Category(iid, this.assembler.Cache, this.uri) { Name = "cat", ShortName = "cat", Container = sRdl };
+            this.messageBus.SendObjectChangeEvent(reInstantiatedCategory, EventKind.Added);
+
+            Assert.AreEqual(1, vm.Categories.Count(x => x.Thing.Iid == iid));
+
+            var removedCategory = new Category(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedCategory, EventKind.Removed);
+
+            Assert.IsFalse(vm.Categories.Any(x => x.Thing.Iid == iid));
+        }
+
+        [Test]
         public void VerifyThatUpdatedCategoryEventAreCaught()
         {
             var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;
+            this.siteDir.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
@@ -177,6 +203,7 @@ namespace BasicRdl.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;
+            this.siteDir.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
@@ -190,6 +217,40 @@ namespace BasicRdl.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.Categories.All(x => x.ContainerRdl == "test"));
+        }
+
+        [Test]
+        public void VerifyThatAddedCategoryFromClosedReferenceDataLibraryIsIgnored()
+        {
+            // A reload re-reads the SiteDirectory deeply and re-adds Things from closed RDLs to the cache; such an
+            // Added event must be ignored, otherwise data from a closed Iteration/Model RDL reappears on reload.
+            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
+
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDir };
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat", ShortName = "cat", Container = closedRdl };
+
+            this.messageBus.SendObjectChangeEvent(category, EventKind.Added);
+
+            Assert.IsFalse(vm.Categories.Any());
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsCategories()
+        {
+            // Re-opening a previously closed RDL (e.g. when re-opening an Iteration) raises RdlOpened; the browser
+            // must then show that library's Categories again.
+            var vm = new CategoryBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
+
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDir };
+            var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat", ShortName = "cat", Container = rdl };
+            rdl.DefinedCategory.Add(category);
+
+            Assert.IsFalse(vm.Categories.Any(x => x.Thing.Iid == category.Iid));
+
+            this.siteDir.SiteReferenceDataLibrary.Add(rdl);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, vm.Categories.Count(x => x.Thing.Iid == category.Iid));
         }
     }
 }

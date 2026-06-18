@@ -93,6 +93,8 @@ namespace BasicRDL.Tests.ViewModels
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(() => this.siteDirectory.SiteReferenceDataLibrary.Cast<ReferenceDataLibrary>().ToList());
+
             this.glossaryBrowser = new GlossaryBrowserViewModel(this.session.Object, this.siteDirectory, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
         }
 
@@ -147,6 +149,7 @@ namespace BasicRDL.Tests.ViewModels
 
             var rdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             rdl.Glossary.Add(glossary2);
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new ReferenceDataLibrary[] { this.srdl, rdl });
             this.messageBus.SendObjectChangeEvent(glossary2, EventKind.Added);
             Assert.IsTrue(this.glossaryBrowser.Glossaries.Count == 2);
         }
@@ -176,6 +179,21 @@ namespace BasicRDL.Tests.ViewModels
             // Remove a glossary
             this.messageBus.SendObjectChangeEvent(glossary, EventKind.Removed);
             Assert.IsFalse(this.glossaryBrowser.Glossaries.Any());
+        }
+
+        [Test]
+        public void VerifyThatGlossaryRowIsRemovedRegardlessOfInstance()
+        {
+            var iid = Guid.NewGuid();
+
+            var glossary = new Glossary(iid, this.assembler.Cache, this.uri) { Name = "test Glossary", ShortName = "TG", Container = this.srdl };
+            this.messageBus.SendObjectChangeEvent(glossary, EventKind.Added);
+            Assert.AreEqual(1, this.glossaryBrowser.Glossaries.Count(x => x.Thing.Iid == iid));
+
+            var removedGlossary = new Glossary(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedGlossary, EventKind.Removed);
+
+            Assert.IsFalse(this.glossaryBrowser.Glossaries.Any(x => x.Thing.Iid == iid));
         }
 
         [Test]
@@ -280,6 +298,7 @@ namespace BasicRDL.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;
+            this.siteDirectory.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new Glossary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new Glossary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
@@ -293,6 +312,32 @@ namespace BasicRDL.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.Glossaries.Count(x => x.ContainerRdlShortName == "test") == 2);
+        }
+
+        [Test]
+        public void VerifyThatAddedGlossaryFromClosedReferenceDataLibraryIsIgnored()
+        {
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var glossary = new Glossary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "g", ShortName = "g", Container = closedRdl };
+
+            this.messageBus.SendObjectChangeEvent(glossary, EventKind.Added);
+
+            Assert.IsFalse(this.glossaryBrowser.Glossaries.Any());
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsGlossaries()
+        {
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var glossary = new Glossary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "g", ShortName = "g", Container = rdl };
+            rdl.Glossary.Add(glossary);
+
+            Assert.IsFalse(this.glossaryBrowser.Glossaries.Any(x => x.Thing.Iid == glossary.Iid));
+
+            this.siteDirectory.SiteReferenceDataLibrary.Add(rdl);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, this.glossaryBrowser.Glossaries.Count(x => x.Thing.Iid == glossary.Iid));
         }
     }
 }

@@ -161,7 +161,15 @@ namespace BasicRdl.ViewModels
         {
             base.Initialize();
 
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+            this.PopulateConstants();
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="Constant"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateConstants()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid).ToList();
 
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
                          .Where(x => openDataLibrariesIids.Contains(x.Iid)))
@@ -226,6 +234,13 @@ namespace BasicRdl.ViewModels
                     .Subscribe(this.RefreshContainerName);
 
             this.Disposables.Add(rdlUpdateListener);
+
+            var rdlOpenedListener = this.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.PopulateConstants());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -236,7 +251,12 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void AddConstantRowViewModel(Constant constant)
         {
-            if (this.Constants.Any(x => x.Thing == constant))
+            if (this.Constants.Any(x => x.Thing.Iid == constant.Iid))
+            {
+                return;
+            }
+
+            if (!this.IsInOpenReferenceDataLibrary(constant))
             {
                 return;
             }
@@ -253,9 +273,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void RemoveConstantRowViewModel(Constant constant)
         {
-            var row = this.Constants.SingleOrDefault(rowViewModel => rowViewModel.Thing == constant);
+            var rows = this.Constants.Where(rowViewModel => rowViewModel.Thing.Iid == constant.Iid).ToList();
 
-            if (row != null)
+            foreach (var row in rows)
             {
                 this.Constants.RemoveAndDispose(row);
             }

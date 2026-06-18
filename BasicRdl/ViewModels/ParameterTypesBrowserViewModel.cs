@@ -271,6 +271,14 @@ namespace BasicRdl.ViewModels
                 this.favoritesService.SubscribeToChanges(this.Session, typeof(ParameterType), this.RefreshFavorites);
 
             this.Disposables.Add(favoritesListener);
+
+            var rdlOpenedListener =
+                this.CDPMessageBus.Listen<SessionEvent>()
+                    .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                    .ObserveOn(RxApp.MainThreadScheduler)
+                    .Subscribe(_ => this.PopulateParameterTypes());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -496,6 +504,16 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void AddParameterTypeRowViewModel(ParameterType parameterType)
         {
+            if (this.ParameterTypes.Any(x => x.Thing.Iid == parameterType.Iid))
+            {
+                return;
+            }
+
+            if (!this.IsInOpenReferenceDataLibrary(parameterType))
+            {
+                return;
+            }
+
             var row = new ParameterTypeRowViewModel(parameterType, this.Session, this);
 
             if (this.FavoriteParameterTypeIids != null)
@@ -514,9 +532,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void RemoveParameterTypeRowViewModel(ParameterType parameterType)
         {
-            var row = this.ParameterTypes.SingleOrDefault(rowViewModel => rowViewModel.Thing == parameterType);
+            var rows = this.ParameterTypes.Where(rowViewModel => rowViewModel.Thing.Iid == parameterType.Iid).ToList();
 
-            if (row != null)
+            foreach (var row in rows)
             {
                 this.ParameterTypes.RemoveAndDispose(row);
             }
@@ -551,7 +569,15 @@ namespace BasicRdl.ViewModels
         {
             base.Initialize();
 
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+            this.PopulateParameterTypes();
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="ParameterType"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateParameterTypes()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid).ToList();
 
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
                          .Where(x => openDataLibrariesIids.Contains(x.Iid)))

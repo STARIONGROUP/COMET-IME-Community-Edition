@@ -52,6 +52,7 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IPermissionService> permissionService;
         private Uri uri;
         private SiteDirectory siteDirectory;
+        private SiteReferenceDataLibrary siteRdl;
         private MeasurementScalesBrowserViewModel measurementScalesBrowserViewModel;
         private Person person;
         private Assembler assembler;
@@ -74,10 +75,12 @@ namespace BasicRdl.Tests.ViewModels
 
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
+            this.siteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test RDL", ShortName = "testRDL", Container = this.siteDirectory };
+            this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteRdl);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
-
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(() => this.siteDirectory.SiteReferenceDataLibrary.Cast<ReferenceDataLibrary>().ToList());
             this.measurementScalesBrowserViewModel = new MeasurementScalesBrowserViewModel(this.session.Object, this.siteDirectory, null, null, null, null);
         }
 
@@ -112,7 +115,8 @@ namespace BasicRdl.Tests.ViewModels
             {
                 Name = "ratio scale",
                 ShortName = "ratioscale",
-                Unit = simpleUnit
+                Unit = simpleUnit,
+                Container = this.siteRdl
             };
 
             this.messageBus.SendObjectChangeEvent(ratioScale, EventKind.Added);
@@ -120,6 +124,27 @@ namespace BasicRdl.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(ratioScale, EventKind.Removed);
             Assert.IsFalse(this.measurementScalesBrowserViewModel.MeasurementScales.Any(x => x.Thing == ratioScale));
+        }
+
+        [Test]
+        public void VerifyThatMeasurementScaleRowIsNotDuplicatedAndIsRemovedAcrossCacheReopen()
+        {
+            var iid = Guid.NewGuid();
+
+            var simpleUnit = new SimpleUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "u", ShortName = "u" };
+
+            var scale = new RatioScale(iid, this.assembler.Cache, this.uri) { Name = "rs", ShortName = "rs", Unit = simpleUnit, Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(scale, EventKind.Added);
+
+            var reInstantiatedScale = new RatioScale(iid, this.assembler.Cache, this.uri) { Name = "rs", ShortName = "rs", Unit = simpleUnit, Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(reInstantiatedScale, EventKind.Added);
+
+            Assert.AreEqual(1, this.measurementScalesBrowserViewModel.MeasurementScales.Count(x => x.Thing.Iid == iid));
+
+            var removedScale = new RatioScale(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedScale, EventKind.Removed);
+
+            Assert.IsFalse(this.measurementScalesBrowserViewModel.MeasurementScales.Any(x => x.Thing.Iid == iid));
         }
 
         [Test]
@@ -156,6 +181,7 @@ namespace BasicRdl.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;
+            this.siteDirectory.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new CyclicRatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new CyclicRatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
@@ -169,6 +195,32 @@ namespace BasicRdl.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.MeasurementScales.Count(x => x.ContainerRdl == "test") == 2);
+        }
+
+        [Test]
+        public void VerifyThatAddedMeasurementScaleFromClosedReferenceDataLibraryIsIgnored()
+        {
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "rs", ShortName = "rs", Container = closedRdl };
+
+            this.messageBus.SendObjectChangeEvent(scale, EventKind.Added);
+
+            Assert.IsFalse(this.measurementScalesBrowserViewModel.MeasurementScales.Any());
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsMeasurementScales()
+        {
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var scale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "rs", ShortName = "rs", Container = rdl };
+            rdl.Scale.Add(scale);
+
+            Assert.IsFalse(this.measurementScalesBrowserViewModel.MeasurementScales.Any(x => x.Thing.Iid == scale.Iid));
+
+            this.siteDirectory.SiteReferenceDataLibrary.Add(rdl);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, this.measurementScalesBrowserViewModel.MeasurementScales.Count(x => x.Thing.Iid == scale.Iid));
         }
     }
 }

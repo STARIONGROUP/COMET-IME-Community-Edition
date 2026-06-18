@@ -183,6 +183,13 @@ namespace BasicRdl.ViewModels
                     .Subscribe(this.RefreshContainerName);
 
             this.Disposables.Add(rdlUpdateListener);
+
+            var rdlOpenedListener = this.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.PopulateGlossaries());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -191,7 +198,12 @@ namespace BasicRdl.ViewModels
         /// <param name="glossary">The associated <see cref="Glossary"/></param>
         private void AddGlossaryRowViewModel(Glossary glossary)
         {
-            if (this.Glossaries.Any(rowViewModel => rowViewModel.Thing == glossary))
+            if (this.Glossaries.Any(rowViewModel => rowViewModel.Thing.Iid == glossary.Iid))
+            {
+                return;
+            }
+
+            if (!this.IsInOpenReferenceDataLibrary(glossary))
             {
                 return;
             }
@@ -206,9 +218,9 @@ namespace BasicRdl.ViewModels
         /// <param name="glossary">The associated <see cref="Glossary"/></param>
         private void RemoveGlossaryRowViewModel(Glossary glossary)
         {
-            var row = this.Glossaries.SingleOrDefault(x => x.Thing == glossary);
+            var rows = this.Glossaries.Where(x => x.Thing.Iid == glossary.Iid).ToList();
 
-            if (row != null)
+            foreach (var row in rows)
             {
                 this.Glossaries.RemoveAndDispose(row);
             }
@@ -244,7 +256,15 @@ namespace BasicRdl.ViewModels
             base.Initialize();
             this.Glossaries = new DisposableReactiveList<GlossaryRowViewModel>();
 
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+            this.PopulateGlossaries();
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="Glossary"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateGlossaries()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid).ToList();
 
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
                          .Where(x => openDataLibrariesIids.Contains(x.Iid)))

@@ -150,6 +150,13 @@ namespace BasicRdl.ViewModels
                     .Subscribe(this.RefreshContainerName);
 
             this.Disposables.Add(rdlUpdateListener);
+
+            var rdlOpenedListener = this.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.PopulateFileTypes());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -160,7 +167,12 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void AddFileTypeRowViewModel(FileType filetype)
         {
-            if (this.FileTypes.Any(x => x.Thing == filetype))
+            if (this.FileTypes.Any(x => x.Thing.Iid == filetype.Iid))
+            {
+                return;
+            }
+
+            if (!this.IsInOpenReferenceDataLibrary(filetype))
             {
                 return;
             }
@@ -177,9 +189,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void RemoveFileTypeRowViewModel(FileType filetype)
         {
-            var row = this.FileTypes.SingleOrDefault(rowViewModel => rowViewModel.Thing == filetype);
+            var rows = this.FileTypes.Where(rowViewModel => rowViewModel.Thing.Iid == filetype.Iid).ToList();
 
-            if (row != null)
+            foreach (var row in rows)
             {
                 this.FileTypes.RemoveAndDispose(row);
             }
@@ -214,7 +226,18 @@ namespace BasicRdl.ViewModels
         {
             base.Initialize();
             this.FileTypes = new DisposableReactiveList<FileTypeRowViewModel>();
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+
+            this.PopulateFileTypes();
+
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<FileType>(), this.WhenAnyValue(x => x.CanWriteFileType));
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="FileType"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateFileTypes()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid).ToList();
 
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
                          .Where(x => openDataLibrariesIids.Contains(x.Iid)))
@@ -224,8 +247,6 @@ namespace BasicRdl.ViewModels
                     this.AddFileTypeRowViewModel(filetype);
                 }
             }
-
-            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<FileType>(), this.WhenAnyValue(x => x.CanWriteFileType));
         }
 
         /// <summary>

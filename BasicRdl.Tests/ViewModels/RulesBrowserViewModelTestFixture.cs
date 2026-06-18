@@ -51,6 +51,7 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<ISession> session;
         private Mock<IPermissionService> permissionService;
         private SiteDirectory siteDir;
+        private SiteReferenceDataLibrary siteRdl;
         private Uri uri;
         private Person person;
         private RulesBrowserViewModel RulesViewModel;
@@ -73,12 +74,14 @@ namespace BasicRdl.Tests.ViewModels
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
 
-            var siteReferenceDataLibrary = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
-            this.siteDir.SiteReferenceDataLibrary.Add(siteReferenceDataLibrary);
+            this.siteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test RDL", ShortName = "testRDL", Container = this.siteDir };
+            this.siteDir.SiteReferenceDataLibrary.Add(this.siteRdl);
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(() => this.siteDir.SiteReferenceDataLibrary.Cast<ReferenceDataLibrary>().ToList());
 
             this.RulesViewModel = new RulesBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
         }
@@ -110,7 +113,8 @@ namespace BasicRdl.Tests.ViewModels
             var binaryRelationshipRule = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "simple rule name",
-                ShortName = "simpleruleshortname"
+                ShortName = "simpleruleshortname",
+                Container = this.siteRdl
             };
 
             this.messageBus.SendObjectChangeEvent(binaryRelationshipRule, EventKind.Added);
@@ -120,6 +124,25 @@ namespace BasicRdl.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(binaryRelationshipRule, EventKind.Removed);
             Assert.IsFalse(this.RulesViewModel.Rules.Any(x => x.Thing == binaryRelationshipRule));
+        }
+
+        [Test]
+        public void VerifyThatRuleRowIsNotDuplicatedAndIsRemovedAcrossCacheReopen()
+        {
+            var iid = Guid.NewGuid();
+
+            var rule = new BinaryRelationshipRule(iid, this.assembler.Cache, this.uri) { Name = "r", ShortName = "r", Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(rule, EventKind.Added);
+
+            var reInstantiatedRule = new BinaryRelationshipRule(iid, this.assembler.Cache, this.uri) { Name = "r", ShortName = "r", Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(reInstantiatedRule, EventKind.Added);
+
+            Assert.AreEqual(1, this.RulesViewModel.Rules.Count(x => x.Thing.Iid == iid));
+
+            var removedRule = new BinaryRelationshipRule(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedRule, EventKind.Removed);
+
+            Assert.IsFalse(this.RulesViewModel.Rules.Any(x => x.Thing.Iid == iid));
         }
 
         [Test]
@@ -153,6 +176,7 @@ namespace BasicRdl.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;
+            this.siteDir.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
@@ -166,6 +190,32 @@ namespace BasicRdl.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.Rules.Count(x => x.ContainerRdl == "test") == 2);
+        }
+
+        [Test]
+        public void VerifyThatAddedRuleFromClosedReferenceDataLibraryIsIgnored()
+        {
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDir };
+            var rule = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "r", ShortName = "r", Container = closedRdl };
+
+            this.messageBus.SendObjectChangeEvent(rule, EventKind.Added);
+
+            Assert.AreEqual(0, this.RulesViewModel.Rules.Count);
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsRules()
+        {
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDir };
+            var rule = new BinaryRelationshipRule(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "r", ShortName = "r", Container = rdl };
+            rdl.Rule.Add(rule);
+
+            Assert.IsFalse(this.RulesViewModel.Rules.Any(x => x.Thing.Iid == rule.Iid));
+
+            this.siteDir.SiteReferenceDataLibrary.Add(rdl);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, this.RulesViewModel.Rules.Count(x => x.Thing.Iid == rule.Iid));
         }
     }
 }
