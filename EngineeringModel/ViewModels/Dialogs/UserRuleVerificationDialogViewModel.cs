@@ -41,6 +41,9 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
+    using CDP4Composition.Services;
+
+    using CommonServiceLocator;
 
     using ReactiveUI;
 
@@ -54,6 +57,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// The default <see cref="Rule"/> that is used to populate the dialog for a <see cref="Create"/> dialog
         /// </summary>
         private readonly BinaryRelationshipRule defaultRule = new BinaryRelationshipRule(Guid.NewGuid(), null, null) { Name = "-", ShortName = "-" };
+
+        /// <summary>
+        /// The <see cref="IFilterStringService"/> that exposes whether deprecated things are shown.
+        /// </summary>
+        private IFilterStringService filterStringService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserRuleVerificationDialogViewModel"/> class.
@@ -155,9 +163,22 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulatePossibleRule();
 
+            if (this.filterStringService == null)
+            {
+                this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
+            }
+
+            var showDeprecatedThings = this.filterStringService.ShowDeprecatedThings;
+
             var rules = this.GetPossibleRule();
+
             foreach (var rule in rules)
             {
+                if (!showDeprecatedThings && rule.IsDeprecated && !Equals(rule, this.SelectedRule))
+                {
+                    continue;
+                }
+
                 this.PossibleRule.Add(rule);
             }
         }
