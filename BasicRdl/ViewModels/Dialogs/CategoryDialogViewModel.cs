@@ -178,19 +178,19 @@ namespace BasicRdl.ViewModels
             }
 
             var allPossibleSuperCategories = new List<Category>(rdlContainer.DefinedCategory);
-            allPossibleSuperCategories.Remove(this.Thing);
 
             foreach (var rdl in rdlContainer.GetRequiredRdls())
             {
                 allPossibleSuperCategories.AddRange(rdl.DefinedCategory);
             }
 
-            var possibleSuperCategories = allPossibleSuperCategories.ToList();
+            var possibleSuperCategories = allPossibleSuperCategories.Where(c => c.Iid != this.Thing.Iid).ToList();
 
             // TODO Deal with Update of Category, what happens when container is changed?? is it allowed?
             if (this.dialogKind != ThingDialogKind.Create)
             {
-                possibleSuperCategories = possibleSuperCategories.Except(this.GetRdlSubCategories(this.Thing)).ToList();
+                var subCategoryIids = this.GetRdlSubCategories(this.Thing).Select(c => c.Iid).ToList();
+                possibleSuperCategories = possibleSuperCategories.Where(c => !subCategoryIids.Contains(c.Iid)).ToList();
             }
 
             return possibleSuperCategories.OrderBy(c => c.ShortName);
@@ -204,12 +204,15 @@ namespace BasicRdl.ViewModels
         private IEnumerable<Category> GetRdlSubCategories(Category category)
         {
             var subCategories = new List<Category>();
-            var rdl = (ReferenceDataLibrary)category.Container;
+
+            if (!(category.Container is ReferenceDataLibrary rdl))
+            {
+                return subCategories;
+            }
 
             foreach (var cat in rdl.DefinedCategory)
             {
-                // Get the sub-categories for the current sub-category
-                if (!cat.SuperCategory.Contains(category))
+                if (cat.SuperCategory.All(superCategory => superCategory.Iid != category.Iid))
                 {
                     continue;
                 }

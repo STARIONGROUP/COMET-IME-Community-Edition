@@ -209,7 +209,12 @@ namespace BasicRdl.Tests.ViewModels
             this.transaction = new ThingTransaction(transactionContext, clonerdl);
 
             vm = new CategoryDialogViewModel(cat31.Clone(false), this.transaction, this.session.Object, true, ThingDialogKind.Update, null, clonerdl);
-            Assert.AreEqual(10, vm.PossibleSuperCategories.Count);
+            Assert.AreEqual(6, vm.PossibleSuperCategories.Count);
+            Assert.That(vm.PossibleSuperCategories.All(c => c.Iid != cat31.Iid), Is.True, "a Category may not be a super-category of itself");
+            Assert.That(
+                vm.PossibleSuperCategories.Any(c => c.Iid == cat311.Iid || c.Iid == cat312.Iid || c.Iid == cat3111.Iid),
+                Is.False,
+                "a Category may not be a super-category of one of its own descendants");
         }
 
         [Test]

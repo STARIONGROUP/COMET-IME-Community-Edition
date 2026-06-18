@@ -9,6 +9,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
              xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
+             xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours;assembly=CDP4Composition"
              Height="300"
              d:DesignWidth="571"
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
@@ -16,7 +17,6 @@
     <dx:DXWindow.Resources>
         <ResourceDictionary>
             <converters:ReactiveClassKindToObjectListConverter x:Key="ReactiveClassKindToObjectListConverter" />
-            <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -63,20 +63,9 @@
             </lc:LayoutGroup>
             <lc:LayoutGroup Header="Super Categories" Orientation="Vertical">
                 <lc:LayoutItem>
-                    <dxe:ListBoxEdit Name="SuperCategoriesList"
-                                     MaxHeight="250"
-                                     Margin="10"
-                                     DisplayMember="Name"
-                                     IsReadOnly="{Binding IsReadOnly}"
-                                     EditValue="{Binding SuperCategory,
-                                                         Converter={StaticResource ReactiveCategoryToObjectListConverter},
-                                                         UpdateSourceTrigger=PropertyChanged}"
-                                     ItemsSource="{Binding PossibleSuperCategories}"
-                                     SelectionMode="Multiple">
-                        <dxe:ListBoxEdit.StyleSettings>
-                            <dxe:CheckedListBoxEditStyleSettings ItemContainerStyle="{StaticResource ListBoxEditItemStyleDeprecated}" />
-                        </dxe:ListBoxEdit.StyleSettings>
-                    </dxe:ListBoxEdit>
+                    <items:CategorySelectionGrid behaviours:CategorySelectionGridProperties.PossibleCategories="{Binding PossibleSuperCategories}"
+                                                 behaviours:CategorySelectionGridProperties.SelectedCategories="{Binding SuperCategory}"
+                                                 behaviours:CategorySelectionGridProperties.IsReadOnly="{Binding IsReadOnly}" />
                 </lc:LayoutItem>
             </lc:LayoutGroup>
 
