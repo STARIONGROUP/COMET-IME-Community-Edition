@@ -27,6 +27,7 @@ namespace CDP4Requirements.ViewModels
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -89,6 +90,19 @@ namespace CDP4Requirements.ViewModels
         public RequirementsGroupDialogViewModel(RequirementsGroup requirementsGroup, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(requirementsGroup, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="ICommand"/>s of this dialog
+        /// </summary>
+        protected override void InitializeCommands()
+        {
+            base.InitializeCommands();
+
+            var canNeverExecute = Observable.Return(false);
+
+            this.CreateGroupCommand = ReactiveCommandCreator.Create(canNeverExecute);
+            this.EditGroupCommand = ReactiveCommandCreator.Create(canNeverExecute);
         }
 
         /// <summary>
