@@ -63,6 +63,11 @@ namespace CDP4EngineeringModel.ViewModels
     public class EngineeringModelSetupDialogViewModel : CDP4CommonView.EngineeringModelSetupDialogViewModel, IThingDialogViewModel
     {
         /// <summary>
+        /// The (injected) <see cref="IFilterStringService" />
+        /// </summary>
+        private IFilterStringService filterStringService;
+
+        /// <summary>
         /// Initialize the dialog
         /// </summary>
         protected override void Initialize()
@@ -77,7 +82,8 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.SelectedOrganizations = new ReactiveList<Organization>();
 
-            this.ShowDeprecatedDomains = ServiceLocator.Current.GetInstance<IFilterStringService>().ShowDeprecatedThings;
+            this.filterStringService = ServiceLocator.Current.GetInstance<IFilterStringService>();
+            this.ShowDeprecatedDomains = this.filterStringService.ShowDeprecatedThings;
 
             this.WhenAnyValue(vm => vm.ShowDeprecatedDomains).Subscribe(_ => this.ShowHideDeprecatedDomains());
 
