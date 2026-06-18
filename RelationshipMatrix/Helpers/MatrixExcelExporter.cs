@@ -45,13 +45,20 @@ namespace CDP4RelationshipMatrix.Helpers
         /// <summary>
         /// Initializes a new instance of the <see cref="MatrixExcelExporter"/> class
         /// </summary>
-        public MatrixExcelExporter(SourceConfigurationViewModel sourceXConfiguration, SourceConfigurationViewModel sourceYConfiguration, RelationshipConfigurationViewModel relationshipConfiguration, MatrixViewModel matrix, Iteration iteration)
+        /// <param name="sourceXConfiguration">The x axis configuration</param>
+        /// <param name="sourceYConfiguration">The y axis configuration</param>
+        /// <param name="relationshipConfiguration">The relationship configuration</param>
+        /// <param name="matrix">The matrix to export</param>
+        /// <param name="iteration">The <see cref="Iteration"/> the matrix belongs to</param>
+        /// <param name="showDirectionality">A value indicating whether the directionality of relationships should be exported</param>
+        public MatrixExcelExporter(SourceConfigurationViewModel sourceXConfiguration, SourceConfigurationViewModel sourceYConfiguration, RelationshipConfigurationViewModel relationshipConfiguration, MatrixViewModel matrix, Iteration iteration, bool showDirectionality)
         {
             this.SourceXConfiguration = sourceXConfiguration ?? throw new ArgumentNullException(nameof(sourceXConfiguration));
             this.SourceYConfiguration = sourceYConfiguration ?? throw new ArgumentNullException(nameof(sourceYConfiguration));
             this.RelationshipConfiguration = relationshipConfiguration ?? throw new ArgumentNullException(nameof(relationshipConfiguration));
             this.Matrix = matrix ?? throw new ArgumentNullException(nameof(matrix));
             this.Iteration = iteration ?? throw new ArgumentNullException(nameof(iteration));
+            this.ShowDirectionality = showDirectionality;
         }
 
         /// <summary>
@@ -80,6 +87,12 @@ namespace CDP4RelationshipMatrix.Helpers
         public Iteration Iteration { get; }
 
         /// <summary>
+        /// Gets a value indicating whether the directionality of relationships is exported.
+        /// When <c>false</c>, a neutral marker is used for every relationship, matching the matrix display when directionality is hidden.
+        /// </summary>
+        public bool ShowDirectionality { get; }
+
+        /// <summary>
         /// Exports the matrix into a excel workbook
         /// </summary>
         /// <param name="path">The path to save the file to.</param>
@@ -93,6 +106,7 @@ namespace CDP4RelationshipMatrix.Helpers
             using (var workbook = new XLWorkbook())
             {
                 this.ConstructMatrixSheet(workbook);
+                this.ConstructRelationshipListSheet(workbook);
                 this.ConstructMetaSheet(workbook);
                 workbook.SaveAs(path);
             }
@@ -155,14 +169,14 @@ namespace CDP4RelationshipMatrix.Helpers
 
                 for (var j = 1; j < this.Matrix.Records[i - 1].Count; j++)
                 {
-                    var trace = relation[j].RelationshipDirection != RelationshipDirectionKind.None;
+                    var relationshipDirection = relation[j].RelationshipDirection;
 
-                    if (trace)
+                    if (relationshipDirection != RelationshipDirectionKind.None)
                     {
                         traceCount++;
+                        
+                        worksheetMatrix.Cell(i + 1, j + 1).Value = this.GetDirectionalityMarker(relationshipDirection);
                     }
-
-                    worksheetMatrix.Cell(i + 1, j + 1).Value = trace ? "X" : string.Empty;
                 }
 
                 worksheetMatrix.Cell(i + 1, this.Matrix.Records[i - 1].Count + 1).Value = traceCount;
@@ -213,6 +227,82 @@ namespace CDP4RelationshipMatrix.Helpers
 
             // set tab color
             worksheetMatrix.SetTabColor(XLColor.DarkSeaGreen);
+        }
+
+        /// <summary>
+        /// Constructs the sheet that lists, in a tabular form, every <see cref="BinaryRelationship"/> shown in the matrix
+        /// together with its attributes (source, relationship name, target, categories and owner).
+        /// </summary>
+        /// <param name="workbook">The workbook</param>
+        private void ConstructRelationshipListSheet(XLWorkbook workbook)
+        {
+            var worksheet = workbook.Worksheets.Add("Relationships");
+
+            worksheet.Cell(1, 1).Value = "Source";
+            worksheet.Cell(1, 2).Value = "Relationship";
+            worksheet.Cell(1, 3).Value = "Target";
+            worksheet.Cell(1, 4).Value = "Categories";
+            worksheet.Cell(1, 5).Value = "Owner";
+
+            worksheet.Row(1).Style.Font.Bold = true;
+            
+            var relationships = this.Matrix.Records
+                .SelectMany(record => record.Values)
+                .SelectMany(cell => cell.Relationships)
+                .GroupBy(relationship => relationship.Iid)
+                .Select(group => group.First())
+                .OrderBy(relationship => relationship.Source?.UserFriendlyName)
+                .ThenBy(relationship => relationship.Target?.UserFriendlyName)
+                .ToList();
+
+            var forwardRelationshipName = this.RelationshipConfiguration.SelectedRule?.ForwardRelationshipName ?? string.Empty;
+
+            for (var i = 0; i < relationships.Count; i++)
+            {
+                var relationship = relationships[i];
+                var row = i + 2;
+
+                worksheet.Cell(row, 1).Value = relationship.Source?.UserFriendlyName ?? string.Empty;
+                worksheet.Cell(row, 2).Value = forwardRelationshipName;
+                worksheet.Cell(row, 3).Value = relationship.Target?.UserFriendlyName ?? string.Empty;
+                worksheet.Cell(row, 4).Value = string.Join(", ", relationship.Category.Select(category => category.Name));
+                worksheet.Cell(row, 5).Value = relationship.Owner?.Name ?? string.Empty;
+            }
+
+            worksheet.Columns().AdjustToContents();
+            worksheet.SetTabColor(XLColor.LightSteelBlue);
+        }
+
+        /// <summary>
+        /// Gets the textual marker that represents the directionality of a relationship for an exported cell
+        /// </summary>
+        /// <param name="relationshipDirection">The <see cref="RelationshipDirectionKind"/> asserted on the cell</param>
+        /// <returns>
+        /// An arrow denoting the direction of the relationship between the row and column <see cref="Thing"/> when
+        /// <see cref="ShowDirectionality"/> is <c>true</c>; a neutral "X" marker when directionality is hidden;
+        /// or an empty string when no relationship exists
+        /// </returns>
+        private string GetDirectionalityMarker(RelationshipDirectionKind relationshipDirection)
+        {
+            if (relationshipDirection == RelationshipDirectionKind.None)
+            {
+                return string.Empty;
+            }
+
+            if (!this.ShowDirectionality)
+            {
+                return "X";
+            }
+
+            switch (relationshipDirection)
+            {
+                case RelationshipDirectionKind.RowThingToColumnThing:
+                    return "↑";
+                case RelationshipDirectionKind.ColumnThingToRowThing:
+                    return "←";
+                default:
+                    return "↔";
+            }
         }
 
         /// <summary>

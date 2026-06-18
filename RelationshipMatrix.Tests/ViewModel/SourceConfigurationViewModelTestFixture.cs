@@ -25,9 +25,14 @@
 
 namespace CDP4RelationshipMatrix.Tests.ViewModel
 {
+    using System;
     using System.Collections.Generic;
 
+    using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
+
+    using CDP4Dal.Events;
 
     using CDP4RelationshipMatrix.ViewModels;
 
@@ -88,6 +93,95 @@ namespace CDP4RelationshipMatrix.Tests.ViewModel
 
             this.source.SourceYConfiguration.IncludeSubcategories = true;
             Assert.AreEqual(this.categoryStringResult4, this.source.SourceYConfiguration.CategoriesString);
+
+            this.source.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatOnlyCategorizableClassKindsAreAvailableInTheSelectors()
+        {
+            this.settings.PossibleClassKinds.Add(ClassKind.Requirement);
+            this.settings.PossibleClassKinds.Add(ClassKind.Parameter);
+            this.settings.PossibleClassKinds.Add(ClassKind.NestedElement);
+            this.settings.PossibleClassKinds.Add(ClassKind.ParametricConstraint);
+
+            var viewModel = new RelationshipMatrixViewModel(
+                this.iteration,
+                this.session.Object,
+                this.thingDialogNavigationService.Object,
+                this.panelNavigationService.Object,
+                this.dialogNavigationService.Object,
+                this.pluginService.Object);
+
+            var possibleClassKinds = viewModel.SourceXConfiguration.PossibleClassKinds;
+
+            // categorizable types remain available
+            Assert.That(possibleClassKinds, Does.Contain(ClassKind.ElementDefinition));
+            Assert.That(possibleClassKinds, Does.Contain(ClassKind.ElementUsage));
+            Assert.That(possibleClassKinds, Does.Contain(ClassKind.Requirement));
+
+            // non-categorizable types are excluded
+            Assert.That(possibleClassKinds, Does.Not.Contain(ClassKind.Parameter));
+            Assert.That(possibleClassKinds, Does.Not.Contain(ClassKind.NestedElement));
+            Assert.That(possibleClassKinds, Does.Not.Contain(ClassKind.ParametricConstraint));
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatOwnersDefaultToAllWhenClassKindIsSelected()
+        {
+            var configuration = this.source.SourceXConfiguration;
+
+            configuration.SelectedClassKind = ClassKind.ElementDefinition;
+
+            Assert.That(configuration.PossibleOwners, Is.Not.Empty);
+            Assert.That(configuration.SelectedOwners, Is.EquivalentTo(configuration.PossibleOwners));
+
+            this.source.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatAddedActiveDomainIsSelectedWhenAllOwnersAreSelected()
+        {
+            var configuration = this.source.SourceXConfiguration;
+
+            configuration.SelectedClassKind = ClassKind.ElementDefinition;
+
+            var addedDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain2", ShortName = "domain2" };
+            this.sitedir.Domain.Add(addedDomain);
+            this.engineeringModelSetup.ActiveDomain.Add(addedDomain);
+            this.assembler.Cache.TryAdd(new CacheKey(addedDomain.Iid, null), new Lazy<Thing>(() => addedDomain));
+
+            this.rev.SetValue(this.engineeringModelSetup, 10);
+            this.messageBus.SendObjectChangeEvent(this.engineeringModelSetup, EventKind.Updated);
+
+            Assert.That(configuration.PossibleOwners, Does.Contain(addedDomain));
+            Assert.That(configuration.SelectedOwners, Does.Contain(addedDomain));
+
+            this.source.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatAddedActiveDomainIsNotSelectedWhenOwnerSelectionIsPartial()
+        {
+            var configuration = this.source.SourceXConfiguration;
+
+            configuration.SelectedClassKind = ClassKind.ElementDefinition;
+
+            // narrow the selection so that not all owners are selected
+            configuration.SelectedOwners = new List<DomainOfExpertise>();
+
+            var addedDomain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "domain2", ShortName = "domain2" };
+            this.sitedir.Domain.Add(addedDomain);
+            this.engineeringModelSetup.ActiveDomain.Add(addedDomain);
+            this.assembler.Cache.TryAdd(new CacheKey(addedDomain.Iid, null), new Lazy<Thing>(() => addedDomain));
+
+            this.rev.SetValue(this.engineeringModelSetup, 10);
+            this.messageBus.SendObjectChangeEvent(this.engineeringModelSetup, EventKind.Updated);
+
+            Assert.That(configuration.PossibleOwners, Does.Contain(addedDomain));
+            Assert.That(configuration.SelectedOwners, Is.Empty);
 
             this.source.Dispose();
         }

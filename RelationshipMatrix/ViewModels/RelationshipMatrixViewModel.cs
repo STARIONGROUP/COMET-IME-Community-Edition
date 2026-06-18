@@ -996,7 +996,7 @@ namespace CDP4RelationshipMatrix.ViewModels
             try
             {
                 // initiate exporter
-                var exporter = new MatrixExcelExporter(this.SourceXConfiguration, this.SourceYConfiguration, this.RelationshipConfiguration, this.Matrix, this.Thing);
+                var exporter = new MatrixExcelExporter(this.SourceXConfiguration, this.SourceYConfiguration, this.RelationshipConfiguration, this.Matrix, this.Thing, this.ShowDirectionality);
 
                 exporter.Export(path);
             }
