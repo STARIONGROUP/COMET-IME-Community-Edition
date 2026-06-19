@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -593,6 +593,26 @@ namespace CDP4ProductTree.Tests.ProductTreeRows
             vm.DragOver(dropinfo.Object);
 
             this.thingCreator.Verify(x => x.CreateBinaryRelationshipForRequirementVerification(It.IsAny<ISession>(), It.IsAny<Iteration>(), It.IsAny<ParameterOrOverrideBase>(), It.IsAny<RelationalExpression>()), Times.Never);
+        }
+
+        [Test]
+        public void VerifyThatSetUsageDoesNotThrowWhenTheIterationIsNotOpen()
+        {
+            var published = new ValueArray<string>(new List<string> { "manual" }, this.valueset);
+            var actual = new ValueArray<string>(new List<string> { "manual" }, this.valueset);
+
+            this.valueset.Published = published;
+            this.valueset.Manual = actual;
+            this.valueset.ValueSwitch = ParameterSwitchKind.MANUAL;
+            this.parameter1.ValueSet.Add(this.valueset);
+
+            var subscription = new ParameterSubscription(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.parameter1.ParameterSubscription.Add(subscription);
+
+            // OpenIterations is empty (see Setup), so the iteration cannot be resolved and the owner tuple is null
+            ParameterRowViewModel row = null;
+            Assert.DoesNotThrow(() => row = new ParameterRowViewModel(this.parameter1, this.option, this.session.Object, null));
+            Assert.AreEqual(ParameterUsageKind.Unused, row.Usage);
         }
 
         [Test]

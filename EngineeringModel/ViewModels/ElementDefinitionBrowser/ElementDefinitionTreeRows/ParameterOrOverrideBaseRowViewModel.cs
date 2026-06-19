@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterOrOverrideBaseRowViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -257,7 +257,12 @@ namespace CDP4EngineeringModel.ViewModels
             this.SetOwnerValue();
 
             // refresh the container row if this is replaced by a subscription
-            this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out var tuple);
+            var iteration = this.Thing.GetContainerOfType<Iteration>();
+
+            if (iteration == null || !this.Session.OpenIterations.TryGetValue(iteration, out var tuple) || tuple == null)
+            {
+                return;
+            }
 
             if (this.Thing.ParameterSubscription.Any(x => x.Owner == tuple.Item1))
             {

@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterRowViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -433,6 +433,23 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             row.CreateCloneAndWrite(ParameterSwitchKind.REFERENCE, "Switch");
 
             this.session.Verify(x => x.Write(It.Is<OperationContainer>(op => ((CDP4Common.DTO.ParameterValueSet)op.Operations.Single().ModifiedThing).ValueSwitch == ParameterSwitchKind.REFERENCE)));
+        }
+
+        [Test]
+        public void VerifyThatUpdatePropertiesDoesNotThrowWhenTheIterationIsNotOpen()
+        {
+             this.parameter.ParameterSubscription.Add(new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.someotherDomain });
+
+            var row = new ParameterRowViewModel(this.parameter, this.session.Object, null, false);
+
+            // OpenIterations is empty (see Setup), so when the row reacts to the update of its parameter the iteration
+            // cannot be resolved and the owner tuple is null
+            var revision = typeof(Thing).GetProperty("RevisionNumber");
+            revision.SetValue(this.parameter, 10);
+
+            Assert.DoesNotThrow(() => this.messageBus.SendObjectChangeEvent(this.parameter, EventKind.Updated));
+
+            row.Dispose();
         }
 
         [Test]
