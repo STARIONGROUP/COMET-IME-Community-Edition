@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MultiRelationshipRowViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -32,6 +32,7 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Mvvm;
 
@@ -49,6 +50,21 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for the <see cref="Name"/> property.
         /// </summary>
         private string name;
+
+        /// <summary>
+        /// Backing field for the <see cref="Categories"/> property.
+        /// </summary>
+        private string categories;
+
+        /// <summary>
+        /// Backing field for the <see cref="RelatedThings"/> property.
+        /// </summary>
+        private string relatedThings;
+
+        /// <summary>
+        /// Backing field for the <see cref="RelatedThingsKinds"/> property.
+        /// </summary>
+        private string relatedThingsKinds;
 
         /// <summary>
         /// Disctionary to map the related things and the related observables to be able to dispose them
@@ -101,44 +117,48 @@ namespace CDP4EngineeringModel.ViewModels
                 var elementSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(element)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateName());
+                    .Subscribe(_ => this.UpdateRelatedThings());
 
                 this.oldRelatedThingSubcriptions.Add(element, elementSubscription);
                 this.Disposables.Add(elementSubscription);
             }
 
+            this.Categories = string.Join(" ", this.Thing.Category.Select(x => x.ShortName));
+
+            this.UpdateRelatedThings();
+        }
+
+        /// <summary>
+        /// Updates the related-things columns and the name. Called both when the set of related things changes and
+        /// when an individual related <see cref="Thing"/> is updated (e.g. its name changes).
+        /// </summary>
+        protected void UpdateRelatedThings()
+        {
+            this.RelatedThings = string.Join(", ", this.Thing.RelatedThing.Select(this.GetThingName));
+            this.RelatedThingsKinds = string.Join(", ", this.Thing.RelatedThing.Select(thing => thing.ClassKind.ToString()));
+
             this.UpdateName();
         }
 
         /// <summary>
-        /// Update the relationship name
+        /// Update the relationship name. When the <see cref="MultiRelationship"/> is named the name is shown; otherwise
+        /// the related items are used as a fallback (the related items are also shown in the Related Things column).
         /// </summary>
         protected void UpdateName()
         {
-            if (!string.IsNullOrWhiteSpace(this.Thing.Name))
-            {
-                this.Name = this.Thing.Name;
-                return;
-            }
+            this.Name = string.IsNullOrWhiteSpace(this.Thing.Name)
+                ? this.RelatedThings
+                : this.Thing.Name;
+        }
 
-            var first = true;
-
-            var text = "";
-
-            foreach (var thing in this.Thing.RelatedThing)
-            {
-                if (!first)
-                {
-                    text = text + ", ";
-                }
-
-                var thingName = thing is INamedThing ? (thing as INamedThing).Name : thing.ClassKind.ToString();
-                text = text + thingName;
-
-                first = false;
-            }
-
-            this.Name = text;
+        /// <summary>
+        /// Gets the visual name of the related <see cref="Thing"/>
+        /// </summary>
+        /// <param name="thing">The related <see cref="Thing"/></param>
+        /// <returns>The name of the <see cref="Thing"/>, or its <see cref="ClassKind"/> when it is not an <see cref="INamedThing"/></returns>
+        private string GetThingName(Thing thing)
+        {
+            return thing is INamedThing namedThing ? namedThing.Name : thing.ClassKind.ToString();
         }
 
         /// <summary>
@@ -148,6 +168,33 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get => this.name;
             set => this.RaiseAndSetIfChanged(ref this.name, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the display names of the related <see cref="Thing"/>s of the <see cref="MultiRelationship"/>
+        /// </summary>
+        public string RelatedThings
+        {
+            get => this.relatedThings;
+            set => this.RaiseAndSetIfChanged(ref this.relatedThings, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ClassKind"/>s of the related <see cref="Thing"/>s as a display string
+        /// </summary>
+        public string RelatedThingsKinds
+        {
+            get => this.relatedThingsKinds;
+            set => this.RaiseAndSetIfChanged(ref this.relatedThingsKinds, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the short names of the <see cref="Category"/> instances that are directly applied to the <see cref="MultiRelationship"/>
+        /// </summary>
+        public string Categories
+        {
+            get => this.categories;
+            set => this.RaiseAndSetIfChanged(ref this.categories, value);
         }
     }
 }

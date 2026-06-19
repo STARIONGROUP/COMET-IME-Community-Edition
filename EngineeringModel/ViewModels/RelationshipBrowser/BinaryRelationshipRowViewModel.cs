@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="BinaryRelationshipRowViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -26,10 +26,12 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Linq;
     using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation.Interfaces;
@@ -49,6 +51,31 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for the <see cref="Name"/> property.
         /// </summary>
         private string name;
+
+        /// <summary>
+        /// Backing field for the <see cref="Categories"/> property.
+        /// </summary>
+        private string categories;
+
+        /// <summary>
+        /// Backing field for the <see cref="SourceName"/> property.
+        /// </summary>
+        private string sourceName;
+
+        /// <summary>
+        /// Backing field for the <see cref="TargetName"/> property.
+        /// </summary>
+        private string targetName;
+
+        /// <summary>
+        /// Backing field for the <see cref="SourceClassKind"/> property.
+        /// </summary>
+        private string sourceClassKind;
+
+        /// <summary>
+        /// Backing field for the <see cref="TargetClassKind"/> property.
+        /// </summary>
+        private string targetClassKind;
 
         /// <summary>
         /// Source thing before any update
@@ -113,7 +140,7 @@ namespace CDP4EngineeringModel.ViewModels
                 this.sourceSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Source)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateName());
+                    .Subscribe(_ => this.UpdateProperties());
 
                 this.Disposables.Add(this.sourceSubscription);
             }
@@ -131,16 +158,23 @@ namespace CDP4EngineeringModel.ViewModels
                 this.targetSubscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(this.Thing.Target)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.UpdateName());
+                    .Subscribe(_ => this.UpdateProperties());
 
                 this.Disposables.Add(this.targetSubscription);
             }
+
+            this.Categories = string.Join(" ", this.Thing.Category.Select(x => x.ShortName));
+            this.SourceName = this.FormatName(this.Source);
+            this.TargetName = this.FormatName(this.Target);
+            this.SourceClassKind = this.Thing.Source?.ClassKind.ToString();
+            this.TargetClassKind = this.Thing.Target?.ClassKind.ToString();
 
             this.UpdateName();
         }
 
         /// <summary>
-        /// Updates the relationship name
+        /// Updates the relationship name. When the <see cref="BinaryRelationship"/> is named the name is shown; otherwise
+        /// the path of the related items is used as a fallback (the related items are also shown in the Source/Target columns).
         /// </summary>
         protected void UpdateName()
         {
@@ -202,6 +236,51 @@ namespace CDP4EngineeringModel.ViewModels
         {
             get => this.name;
             set => this.RaiseAndSetIfChanged(ref this.name, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the short names of the <see cref="Category"/> instances that are directly applied to the <see cref="BinaryRelationship"/>
+        /// </summary>
+        public string Categories
+        {
+            get => this.categories;
+            set => this.RaiseAndSetIfChanged(ref this.categories, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the display name of the <see cref="BinaryRelationship.Source"/>
+        /// </summary>
+        public string SourceName
+        {
+            get => this.sourceName;
+            set => this.RaiseAndSetIfChanged(ref this.sourceName, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the display name of the <see cref="BinaryRelationship.Target"/>
+        /// </summary>
+        public string TargetName
+        {
+            get => this.targetName;
+            set => this.RaiseAndSetIfChanged(ref this.targetName, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ClassKind"/> of the <see cref="BinaryRelationship.Source"/> as a display string
+        /// </summary>
+        public string SourceClassKind
+        {
+            get => this.sourceClassKind;
+            set => this.RaiseAndSetIfChanged(ref this.sourceClassKind, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ClassKind"/> of the <see cref="BinaryRelationship.Target"/> as a display string
+        /// </summary>
+        public string TargetClassKind
+        {
+            get => this.targetClassKind;
+            set => this.RaiseAndSetIfChanged(ref this.targetClassKind, value);
         }
     }
 }
