@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CategorySelectionGrid.xaml.cs" company="Starion Group S.A.">
+// <copyright file="CategoryGridSelectionBehavior.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
