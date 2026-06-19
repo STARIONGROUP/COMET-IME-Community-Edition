@@ -1,8 +1,9 @@
 ﻿// -------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionDialogViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary,
+//              Rowan de Voogt
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -28,20 +29,22 @@ namespace CDP4EngineeringModel.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive;
+    using System.Reactive.Linq;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4Dal.Operations;
-    
+
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
     using CDP4Dal;
-    
+
     using ReactiveUI;
 
     /// <summary>
@@ -69,6 +72,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// Backing field for see <see cref="AreOrganizationsVisible"/>
         /// </summary>
         private bool areOrganizationsVisible;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedParameterTreeRow"/>
+        /// </summary>
+        private IRowViewModelBase<Thing> selectedParameterTreeRow;
+
+        /// <summary>
+        /// Backing field for <see cref="SelectedParameterTypeToAdd"/>
+        /// </summary>
+        private ParameterType selectedParameterTypeToAdd;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionDialogViewModel"/> class.
@@ -155,6 +168,60 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets the <see cref="ParameterGroup"/> and <see cref="Parameter"/> rows shown on the Parameters tab.
+        /// The rows are reused from the Element Definition browser so that the same hierarchy and properties are displayed.
+        /// </summary>
+        public ReactiveList<IRowViewModelBase<Thing>> ParameterRows { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the row that is selected in the Parameters tree.
+        /// </summary>
+        public IRowViewModelBase<Thing> SelectedParameterTreeRow
+        {
+            get { return this.selectedParameterTreeRow; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedParameterTreeRow, value); }
+        }
+
+        /// <summary>
+        /// Gets the possible <see cref="ParameterType"/>s that a new <see cref="Parameter"/> can be created from.
+        /// </summary>
+        public ReactiveList<ParameterType> PossibleParameterTypesToAdd { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ParameterType"/> selected for the creation of a new <see cref="Parameter"/>.
+        /// </summary>
+        public ParameterType SelectedParameterTypeToAdd
+        {
+            get { return this.selectedParameterTypeToAdd; }
+            set { this.RaiseAndSetIfChanged(ref this.selectedParameterTypeToAdd, value); }
+        }
+
+        /// <summary>
+        /// Gets the command to create a <see cref="Parameter"/> as part of this dialog's transaction.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CreateParameterTreeCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command to create a <see cref="ParameterGroup"/> as part of this dialog's transaction.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CreateParameterGroupTreeCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command to edit the selected parameter or parameter group as part of this dialog's transaction.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> EditParameterTreeCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command to delete the selected parameter or parameter group as part of this dialog's transaction.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> DeleteParameterTreeCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the command to inspect the selected parameter or parameter group.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> InspectParameterTreeCommand { get; private set; }
+
+        /// <summary>
         /// Initialize the dialog
         /// </summary>
         protected override void Initialize()
@@ -163,9 +230,145 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.PossibleOrganizations = new List<Organization>();
             this.SelectedOrganizations = new ReactiveList<Organization>();
+            this.ParameterRows = new ReactiveList<IRowViewModelBase<Thing>>();
+            this.PossibleParameterTypesToAdd = new ReactiveList<ParameterType>();
 
             this.PopulatePossibleCategories();
             this.PopulatePossibleOrganizations();
+            this.PopulatePossibleParameterTypesToAdd();
+            this.PopulateParameterRows();
+        }
+
+        /// <summary>
+        /// Initializes the <see cref="ReactiveCommand"/>s of this dialog
+        /// </summary>
+        protected override void InitializeCommands()
+        {
+            base.InitializeCommands();
+
+            var canCreateParameter = this.WhenAnyValue(vm => vm.SelectedParameterTypeToAdd, vm => vm.IsReadOnly, (parameterType, readOnly) => parameterType != null && !readOnly);
+            var canCreateGroup = this.WhenAnyValue(vm => vm.IsReadOnly, readOnly => !readOnly);
+            var canModifySelected = this.WhenAnyValue(vm => vm.SelectedParameterTreeRow, vm => vm.IsReadOnly, (row, readOnly) => row != null && !readOnly);
+            var canInspectSelected = this.WhenAnyValue(vm => vm.SelectedParameterTreeRow).Select(row => row != null);
+
+            this.CreateParameterTreeCommand = ReactiveCommandCreator.Create(this.CreateParameter, canCreateParameter);
+            this.CreateParameterGroupTreeCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ParameterGroup>(this.PopulateParameterRows), canCreateGroup);
+            this.EditParameterTreeCommand = ReactiveCommandCreator.Create(() => this.ExecuteEditCommand(this.SelectedParameterTreeRow.Thing, this.PopulateParameterRows), canModifySelected);
+            this.DeleteParameterTreeCommand = ReactiveCommandCreator.Create(this.DeleteSelectedParameterTreeRow, canModifySelected);
+            this.InspectParameterTreeCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedParameterTreeRow.Thing), canInspectSelected);
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Parameter"/> of the <see cref="SelectedParameterTypeToAdd"/> as part of this dialog's
+        /// transaction. A blank Parameter cannot be created through the Parameter dialog (it requires a ParameterType),
+        /// so the Parameter is staged directly on the transaction, mirroring how the browser creates one.
+        /// </summary>
+        private void CreateParameter()
+        {
+            var parameter = new Parameter(Guid.NewGuid(), this.Thing.Cache, this.Thing.IDalUri)
+            {
+                Owner = this.SelectedOwner,
+                ParameterType = this.SelectedParameterTypeToAdd,
+                Scale = (this.SelectedParameterTypeToAdd as QuantityKind)?.DefaultScale
+            };
+
+            this.Thing.Parameter.Add(parameter);
+            this.transaction.Create(parameter);
+
+            this.PopulateParameterRows();
+        }
+
+        /// <summary>
+        /// Deletes the selected <see cref="Parameter"/> or <see cref="ParameterGroup"/> as part of this dialog's
+        /// transaction and refreshes the tree.
+        /// </summary>
+        private void DeleteSelectedParameterTreeRow()
+        {
+            var thing = this.SelectedParameterTreeRow.Thing;
+            this.transaction.Delete(thing.Clone(false), this.Thing);
+
+            switch (thing)
+            {
+                case Parameter parameter:
+                    this.Thing.Parameter.Remove(parameter);
+                    break;
+                case ParameterGroup parameterGroup:
+                    this.Thing.ParameterGroup.Remove(parameterGroup);
+                    break;
+            }
+
+            this.PopulateParameterRows();
+        }
+
+        /// <summary>
+        /// Populates the <see cref="PossibleParameterTypesToAdd"/> from the model reference data libraries.
+        /// </summary>
+        private void PopulatePossibleParameterTypesToAdd()
+        {
+            this.PossibleParameterTypesToAdd.Clear();
+
+            var model = (EngineeringModel)this.Container.Container;
+            var mrdl = model.EngineeringModelSetup.RequiredRdl.Single();
+
+            var parameterTypes = new List<ParameterType>(mrdl.ParameterType);
+            parameterTypes.AddRange(mrdl.GetRequiredRdls().SelectMany(rdl => rdl.ParameterType).Except(parameterTypes));
+
+            this.PossibleParameterTypesToAdd.AddRange(parameterTypes.OrderBy(p => p.ShortName));
+            this.SelectedParameterTypeToAdd = this.PossibleParameterTypesToAdd.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Builds the parameter / parameter-group tree shown on the Parameters tab. The rows are reused from the Element
+        /// Definition browser (so the same properties are shown), but the nesting is built here, keyed by <see cref="Thing.Iid"/>
+        /// so that it survives the cloning performed by the transaction, and it reflects the parameters and groups that are
+        /// currently staged on this dialog's <see cref="Thing"/>.
+        /// </summary>
+        private void PopulateParameterRows()
+        {
+            foreach (var row in this.ParameterRows)
+            {
+                row.Dispose();
+            }
+
+            this.ParameterRows.Clear();
+
+            var currentDomain = this.Session.QuerySelectedDomainOfExpertise((Iteration)this.Container);
+
+            var groupRowByIid = new Dictionary<Guid, ParameterGroupRowViewModel>();
+            var groups = this.Thing.ParameterGroup.ToList();
+
+            foreach (var group in groups)
+            {
+                groupRowByIid[group.Iid] = new ParameterGroupRowViewModel(group, currentDomain, this.Session, this);
+            }
+
+            foreach (var group in groups)
+            {
+                var groupRow = groupRowByIid[group.Iid];
+
+                if (group.ContainingGroup != null && groupRowByIid.TryGetValue(group.ContainingGroup.Iid, out var parentRow))
+                {
+                    parentRow.ContainedRows.Add(groupRow);
+                }
+                else
+                {
+                    this.ParameterRows.Add(groupRow);
+                }
+            }
+
+            foreach (var parameter in this.Thing.Parameter)
+            {
+                var parameterRow = new ParameterRowViewModel(parameter, this.Session, this, true);
+
+                if (parameter.Group != null && groupRowByIid.TryGetValue(parameter.Group.Iid, out var groupRow))
+                {
+                    groupRow.ContainedRows.Add(parameterRow);
+                }
+                else
+                {
+                    this.ParameterRows.Add(parameterRow);
+                }
+            }
         }
 
         /// <summary>
@@ -289,6 +492,25 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.UpdateOkCanExecute();
             this.OkCanExecute = this.OkCanExecute && this.SelectedOwner != null;
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <param name="disposing">
+        /// a value indicating whether the class is being disposed of
+        /// </param>
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (disposing)
+            {
+                foreach (var row in this.ParameterRows)
+                {
+                    row.Dispose();
+                }
+            }
         }
     }
 }
