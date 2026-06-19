@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RelationshipBrowserRibbon.xaml.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+// <copyright file="BinaryRelationshipBrowserRibbon.xaml.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -35,23 +35,23 @@ namespace CDP4EngineeringModel.Views
     using CDP4EngineeringModel.ViewModels;
 
     /// <summary>
-    /// Interaction logic for <see cref="RelationshipBrowserRibbon"/> XAML
+    /// Interaction logic for <see cref="BinaryRelationshipBrowserRibbon"/> XAML
     /// </summary>
     [Export(typeof(ExtendedRibbonPageGroup))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public partial class RelationshipBrowserRibbon : ExtendedRibbonPageGroup, IView
+    public partial class BinaryRelationshipBrowserRibbon : ExtendedRibbonPageGroup, IView
     {
         /// <summary>
-        /// Creates a new instance of the <see cref="RelationshipBrowserRibbon"/> class
+        /// Creates a new instance of the <see cref="BinaryRelationshipBrowserRibbon"/> class
         /// </summary>
         /// <param name="messageBus">
         /// The <see cref="ICDPMessageBus"/>
         /// </param>
         [ImportingConstructor]
-        public RelationshipBrowserRibbon(ICDPMessageBus messageBus)
+        public BinaryRelationshipBrowserRibbon(ICDPMessageBus messageBus)
         {
             this.InitializeComponent();
-            this.DataContext = new RelationshipBrowserRibbonViewModel(messageBus);
+            this.DataContext = new BinaryRelationshipBrowserRibbonViewModel(messageBus);
         }
     }
 }

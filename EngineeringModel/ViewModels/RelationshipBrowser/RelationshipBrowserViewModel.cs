@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="RelationshipBrowserViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
-//    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The COMET-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The COMET-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -25,31 +25,34 @@
 
 namespace CDP4EngineeringModel.ViewModels
 {
-    using System;
     using System.Linq;
-    using System.Reactive;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
-    
+
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
-    
+
     using CDP4Dal;
     using CDP4Dal.Events;
     using CDP4Dal.Permission;
-    
+
     using ReactiveUI;
 
     /// <summary>
-    /// The view-model for the <see cref="RelationshipBrowserViewModel"/> view
+    /// The abstract base view-model for the dedicated relationship browsers. It holds the rows representing the
+    /// <typeparamref name="TRelationship"/> instances of an <see cref="Iteration"/> and the shared creator and command logic.
     /// </summary>
-    public class RelationshipBrowserViewModel : BrowserViewModelBase<Iteration>, IPanelViewModel
+    /// <typeparam name="TRelationship">The type of <see cref="Relationship"/> that is displayed by the browser</typeparam>
+    /// <typeparam name="TRow">The concrete type of row view-model used to represent a <typeparamref name="TRelationship"/></typeparam>
+    public abstract class RelationshipBrowserViewModel<TRelationship, TRow> : BrowserViewModelBase<Iteration>, IPanelViewModel
+        where TRelationship : Relationship, new()
+        where TRow : class, IRowViewModelBase<Thing>
     {
         /// <summary>
         /// Backing field for <see cref="CurrentModel"/>
@@ -62,50 +65,56 @@ namespace CDP4EngineeringModel.ViewModels
         private int currentIteration;
 
         /// <summary>
-        /// Row folder containing all te binary relationships
-        /// </summary>
-        private CDP4Composition.FolderRowViewModel binaryRelationshipsFolder;
-
-        /// <summary>
-        /// Row folder containing all te multi relationships
-        /// </summary>
-        private CDP4Composition.FolderRowViewModel multiRelationshipsFolder;
-
-        /// <summary>
         /// Backing field for <see cref="CanCreateRelationship"/>
         /// </summary>
         private bool canCreateRelationship;
 
         /// <summary>
-        /// The Panel Caption
-        /// </summary>
-        private const string PanelCaption = "Relationships";
-        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="RelationshipBrowserViewModel"/> class
+        /// Initializes a new instance of the <see cref="RelationshipBrowserViewModel{TRelationship,TRow}"/> class
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/></param>
         /// <param name="session">The session</param>
-        /// <param name="permissionService">the <see cref="IPermissionService"/></param>
         /// <param name="thingDialogNavigationService">the <see cref="IThingDialogNavigationService"/></param>
         /// <param name="panelNavigationService">the <see cref="IPanelNavigationService"/></param>
         /// <param name="dialogNavigationService">The <see cref="IDialogNavigationService"/></param>
-        public RelationshipBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
+        /// <param name="pluginSettingsService">The <see cref="IPluginSettingsService"/></param>
+        protected RelationshipBrowserViewModel(Iteration iteration, ISession session, IThingDialogNavigationService thingDialogNavigationService, IPanelNavigationService panelNavigationService, IDialogNavigationService dialogNavigationService, IPluginSettingsService pluginSettingsService)
             : base(iteration, session, thingDialogNavigationService, panelNavigationService, dialogNavigationService, pluginSettingsService)
         {
-            this.Caption = $"{PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
-            this.ToolTip = $"{((EngineeringModel) this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
+            this.Caption = $"{this.PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
             this.RelationshipCreator = new RelationshipCreatorMainViewModel(this.Session, this.Thing);
 
-            this.UpdateBinaryRelationships();
-            this.UpdateMultiRelationships();
+            this.UpdateRelationships();
             this.ComputeUserDependentPermission();
         }
-        
+
         /// <summary>
-        /// Gets the folder rows representing relationship types
+        /// Gets the rows representing the <typeparamref name="TRelationship"/> instances of the <see cref="Iteration"/>
         /// </summary>
-        public DisposableReactiveList<CDP4Composition.FolderRowViewModel> RelationshipTypes { get; private set; }
+        public DisposableReactiveList<TRow> Relationships { get; private set; }
+
+        /// <summary>
+        /// Gets the caption of the panel
+        /// </summary>
+        protected abstract string PanelCaption { get; }
+
+        /// <summary>
+        /// Gets the <see cref="ClassKind"/> of the <typeparamref name="TRelationship"/> used for permission and context-menu purposes
+        /// </summary>
+        protected abstract ClassKind RelationshipClassKind { get; }
+
+        /// <summary>
+        /// Gets the label of the create context-menu item
+        /// </summary>
+        protected abstract string CreateMenuItemLabel { get; }
+
+        /// <summary>
+        /// Creates the row view-model that represents the provided <paramref name="relationship"/>
+        /// </summary>
+        /// <param name="relationship">The <typeparamref name="TRelationship"/> that the row will represent</param>
+        /// <returns>The <typeparamref name="TRow"/> representing the <paramref name="relationship"/></returns>
+        protected abstract TRow CreateRow(TRelationship relationship);
 
         /// <summary>
         /// Gets the view model current <see cref="EngineeringModelSetup"/>
@@ -134,7 +143,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether the create <see cref="BinaryRelationship"/> command can be executed
+        /// Gets a value indicating whether the create <typeparamref name="TRelationship"/> command can be executed
         /// </summary>
         public bool CanCreateRelationship
         {
@@ -153,99 +162,38 @@ namespace CDP4EngineeringModel.ViewModels
         public string TargetName { get; set; } = LayoutGroupNames.LeftGroup;
 
         /// <summary>
-        /// Gets or sets the CreateMultiRelationshipCommand Command
+        /// Updates the rows representing the <typeparamref name="TRelationship"/> instances of the <see cref="Iteration"/>
         /// </summary>
-        public ReactiveCommand<Unit, Unit> CreateMultiRelationshipCommand { get; set; }
-
-        /// <summary>
-        /// Updates all the Binary relationships
-        /// </summary>
-        private void UpdateBinaryRelationships()
-        {            
-            var currentRelationship = this.binaryRelationshipsFolder.ContainedRows.Select(x => (Relationship)x.Thing).ToList();
-            var updatedRelationship = this.Thing.Relationship.Where(x => x is BinaryRelationship).ToList();
-
-            var newRelationship = updatedRelationship.Except(currentRelationship).ToList();
-            var oldRelationship = currentRelationship.Except(updatedRelationship).ToList();
-            
-            foreach (var relationship in oldRelationship)
-            {
-                this.RemoveBinaryRelationshipRowViewModel((BinaryRelationship)relationship);
-            }
-
-            foreach (var relationship in newRelationship)
-            {
-                this.AddBinaryRelationshipRowViewModel((BinaryRelationship)relationship);
-            }
-        }
-
-        /// <summary>
-        /// Updates all the Multi relationships
-        /// </summary>
-        private void UpdateMultiRelationships()
+        private void UpdateRelationships()
         {
-            var currentRelationships = this.multiRelationshipsFolder.ContainedRows.Select(x => (Relationship)x.Thing).ToList();
-            var updatedRelationships = this.Thing.Relationship.Where(x => x is MultiRelationship).ToList();
+            var currentRelationships = this.Relationships.Select(x => (TRelationship)x.Thing).ToList();
+            var updatedRelationships = this.Thing.Relationship.OfType<TRelationship>().ToList();
 
             var newRelationships = updatedRelationships.Except(currentRelationships).ToList();
             var oldRelationships = currentRelationships.Except(updatedRelationships).ToList();
 
             foreach (var relationship in oldRelationships)
             {
-                this.RemoveMultiRelationshipRowViewModel((MultiRelationship)relationship);
+                this.RemoveRelationshipRowViewModel(relationship);
             }
 
             foreach (var relationship in newRelationships)
             {
-                this.AddMultiRelationshipRowViewModel((MultiRelationship)relationship);
+                this.Relationships.Add(this.CreateRow(relationship));
             }
         }
 
         /// <summary>
-        /// Adds a <see cref="BinaryRelationship"/> row view model to the tree.
+        /// Removes the row view-model that represents the provided <paramref name="relationship"/>
         /// </summary>
-        /// <param name="relationship">The <see cref="BinaryRelationship"/> that this row will belong to.</param>
-        private void AddBinaryRelationshipRowViewModel(BinaryRelationship relationship)
+        /// <param name="relationship">The <typeparamref name="TRelationship"/> that is removed</param>
+        private void RemoveRelationshipRowViewModel(TRelationship relationship)
         {
-            var row = new BinaryRelationshipRowViewModel(relationship, this.Session, this);
-            this.binaryRelationshipsFolder.ContainedRows.Add(row);
-        }
-
-        /// <summary>
-        /// Adds a <see cref="MultiRelationship"/> row view model to the tree.
-        /// </summary>
-        /// <param name="relationship">The <see cref="MultiRelationship"/> that this row will belong to.</param>
-        private void AddMultiRelationshipRowViewModel(MultiRelationship relationship)
-        {
-            var row = new MultiRelationshipRowViewModel(relationship, this.Session,  this);
-            this.multiRelationshipsFolder.ContainedRows.Add(row);
-        }
-
-        /// <summary>
-        /// Removes a binary relationship row view-model.
-        /// </summary>
-        /// <param name="relationship">The relationship that is removed.</param>
-        private void RemoveBinaryRelationshipRowViewModel(BinaryRelationship relationship)
-        {
-            var row = this.binaryRelationshipsFolder.ContainedRows.FirstOrDefault(pr => pr.Thing == relationship);
+            var row = this.Relationships.FirstOrDefault(r => r.Thing == relationship);
 
             if (row != null)
             {
-                this.binaryRelationshipsFolder.ContainedRows.RemoveAndDispose(row);
-            }
-        }
-
-        /// <summary>
-        /// Removes a multi relationship row view-model.
-        /// </summary>
-        /// <param name="relationship">The relationship that is removed.</param>
-        private void RemoveMultiRelationshipRowViewModel(MultiRelationship relationship)
-        {
-            var row = this.multiRelationshipsFolder.ContainedRows.FirstOrDefault(pr => pr.Thing == relationship);
-
-            if (row != null)
-            {
-                this.multiRelationshipsFolder.ContainedRows.RemoveAndDispose(row);
+                this.Relationships.RemoveAndDispose(row);
             }
         }
 
@@ -254,9 +202,9 @@ namespace CDP4EngineeringModel.ViewModels
         /// </summary>
         private void ComputeUserDependentPermission()
         {
-            this.CanCreateRelationship = this.PermissionService.CanWrite(ClassKind.BinaryRelationship, this.Thing);
+            this.CanCreateRelationship = this.PermissionService.CanWrite(this.RelationshipClassKind, this.Thing);
         }
-        
+
         /// <summary>
         /// Initializes the browser
         /// </summary>
@@ -270,11 +218,7 @@ namespace CDP4EngineeringModel.ViewModels
             var currentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(this.Thing);
             this.DomainOfExpertise = currentDomainOfExpertise == null ? "None" : $"{currentDomainOfExpertise.Name} [{currentDomainOfExpertise.ShortName}]";
 
-            this.RelationshipTypes = new DisposableReactiveList<CDP4Composition.FolderRowViewModel>();
-            this.binaryRelationshipsFolder = new CDP4Composition.FolderRowViewModel("Binary Relationships", "Binary Relationships", this.Session, this);
-            this.multiRelationshipsFolder = new CDP4Composition.FolderRowViewModel("Multi Relationships", "Multi Relationships", this.Session, this);
-            this.RelationshipTypes.Add(this.binaryRelationshipsFolder);
-            this.RelationshipTypes.Add(this.multiRelationshipsFolder);
+            this.Relationships = new DisposableReactiveList<TRow>();
         }
 
         /// <summary>
@@ -286,8 +230,12 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
-            this.binaryRelationshipsFolder.Dispose();
-            this.multiRelationshipsFolder.Dispose();
+
+            foreach (var relationship in this.Relationships)
+            {
+                relationship.Dispose();
+            }
+
             this.RelationshipCreator.Dispose();
         }
 
@@ -297,12 +245,11 @@ namespace CDP4EngineeringModel.ViewModels
         /// <param name="objectChange">The <see cref="ObjectChangedEvent"/></param>
         protected override void ObjectChangeEventHandler(ObjectChangedEvent objectChange)
         {
-            this.Caption = string.Format("{0}, iteration_{1}", PanelCaption, this.Thing.IterationSetup.IterationNumber);
-            this.ToolTip = string.Format("{0}\n{1}\n{2}", ((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name, this.Thing.IDalUri, this.Session.ActivePerson.Name);
+            this.Caption = $"{this.PanelCaption}, iteration_{this.Thing.IterationSetup.IterationNumber}";
+            this.ToolTip = $"{((EngineeringModel)this.Thing.Container).EngineeringModelSetup.Name}\n{this.Thing.IDalUri}\n{this.Session.ActivePerson.Name}";
 
             base.ObjectChangeEventHandler(objectChange);
-            this.UpdateBinaryRelationships();
-            this.UpdateMultiRelationships();
+            this.UpdateRelationships();
         }
 
         /// <summary>
@@ -311,9 +258,8 @@ namespace CDP4EngineeringModel.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
-            
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Binary Relationship", "", this.CreateCommand, MenuItemKind.Create, ClassKind.BinaryRelationship));
-            this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Multi Relationship", "", this.CreateMultiRelationshipCommand, MenuItemKind.Create, ClassKind.MultiRelationship));
+
+            this.ContextMenu.Add(new ContextMenuItemViewModel(this.CreateMenuItemLabel, "", this.CreateCommand, MenuItemKind.Create, this.RelationshipClassKind));
         }
 
         /// <summary>
@@ -324,8 +270,7 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.InitializeCommands();
 
-            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<BinaryRelationship>(this.Thing), this.WhenAnyValue(x => x.CanCreateRelationship));
-            this.CreateMultiRelationshipCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<MultiRelationship>(this.Thing), this.WhenAnyValue(x => x.CanCreateRelationship));
+            this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<TRelationship>(this.Thing), this.WhenAnyValue(x => x.CanCreateRelationship));
         }
     }
 }

@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="RelationshipBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+// <copyright file="BinaryRelationshipBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -29,6 +29,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
@@ -55,8 +56,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels
 
     using NUnit.Framework;
 
+    using ReactiveUI;
+
     [TestFixture]
-    public class RelationshipBrowserViewModelTestFixture
+    public class BinaryRelationshipBrowserViewModelTestFixture
     {
         private readonly PropertyInfo revision = typeof(Thing).GetProperty("RevisionNumber");
         private Mock<ISession> session;
@@ -76,8 +79,6 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         private ElementDefinition elementDefinition1;
         private ElementDefinition elementDefinition2;
         private ElementDefinition elementDefinition3;
-        private ElementDefinition elementDefinition4;
-        private ElementDefinition elementDefinition5;
         private DomainOfExpertise domain;
 
         private SiteReferenceDataLibrary srdl;
@@ -89,6 +90,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.assembler = new Assembler(this.uri, this.messageBus);
@@ -125,14 +127,10 @@ namespace CDP4EngineeringModel.Tests.ViewModels
             this.elementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "E1" };
             this.elementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "E2" };
             this.elementDefinition3 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "E3" };
-            this.elementDefinition4 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "E4" };
-            this.elementDefinition5 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "E5" };
 
             this.iteration.Element.Add(this.elementDefinition1);
             this.iteration.Element.Add(this.elementDefinition2);
             this.iteration.Element.Add(this.elementDefinition3);
-            this.iteration.Element.Add(this.elementDefinition4);
-            this.iteration.Element.Add(this.elementDefinition5);
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
@@ -152,47 +150,45 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         [Test]
         public void VerifyThatBinaryRelationshipsAreAddedModifiedRemoved()
         {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
-            //Add relationship1 and relationship2
             var relationship = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = this.elementDefinition1, Target = this.elementDefinition2, Owner = this.domain };
             this.iteration.Relationship.Add(relationship);
 
             this.revision.SetValue(this.iteration, 1);
             this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
-            Assert.AreEqual(1, viewmodel.RelationshipTypes[0].ContainedRows.Count);
+            Assert.AreEqual(1, viewmodel.Relationships.Count);
 
-            //Modify element name
+            // Modify element name
             this.elementDefinition1.Name = "EX";
 
             this.revision.SetValue(this.elementDefinition1, 1);
             this.messageBus.SendObjectChangeEvent(this.elementDefinition1, EventKind.Updated);
 
-            Assert.IsTrue(((BinaryRelationshipRowViewModel)viewmodel.RelationshipTypes[0].ContainedRows[0]).Name.Contains("EX"));
+            Assert.IsTrue(((BinaryRelationshipRowViewModel)viewmodel.Relationships[0]).Name.Contains("EX"));
+            Assert.That(((BinaryRelationshipRowViewModel)viewmodel.Relationships[0]).SourceName, Does.Contain("EX"));
 
-            //Modify relationship
-
+            // Modify relationship
             relationship.Source = this.elementDefinition3;
 
             this.revision.SetValue(relationship, 1);
             this.messageBus.SendObjectChangeEvent(relationship, EventKind.Updated);
 
-            Assert.IsTrue(((BinaryRelationshipRowViewModel)viewmodel.RelationshipTypes[0].ContainedRows[0]).Name.Contains("E3"));
+            Assert.IsTrue(((BinaryRelationshipRowViewModel)viewmodel.Relationships[0]).Name.Contains("E3"));
 
-            //Remove relationships
-
+            // Remove relationships
             this.iteration.Relationship.Clear();
             this.revision.SetValue(this.iteration, 2);
             this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
-            Assert.AreEqual(0, viewmodel.RelationshipTypes[0].ContainedRows.Count);
+            Assert.AreEqual(0, viewmodel.Relationships.Count);
         }
 
         [Test]
         public async Task VerifyThatCreateBinaryRelationshipWorks()
         {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
             var creator = viewmodel.RelationshipCreator.BinaryRelationshipCreator;
 
             var dropinfo = new Mock<IDropInfo>();
@@ -219,90 +215,61 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         }
 
         [Test]
-        public async Task VerifyThatCreateMultiRelationshipWorks()
+        public void VerifyThatBinaryRelationshipNameUsesNameWhenSetAndPathOtherwise()
         {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
-            viewmodel.RelationshipCreator.SelectedRelationshipCreator = viewmodel.RelationshipCreator.MultiRelationshipCreator;
-            var creator = viewmodel.RelationshipCreator.MultiRelationshipCreator;
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
-            var dropinfo = new Mock<IDropInfo>();
-            dropinfo.Setup(x => x.Payload).Returns(this.elementDefinition1);
-            dropinfo.SetupProperty(x => x.Effects);
+            var named = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = this.elementDefinition1, Target = this.elementDefinition2, Owner = this.domain, Name = "myRelationship" };
+            var unnamed = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = this.elementDefinition1, Target = this.elementDefinition2, Owner = this.domain };
+            this.iteration.Relationship.Add(named);
+            this.iteration.Relationship.Add(unnamed);
 
-            creator.DragOver(dropinfo.Object);
-            dropinfo.VerifySet(x => x.Effects = DragDropEffects.Copy);
+            this.revision.SetValue(this.iteration, 1);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
-            await creator.Drop(dropinfo.Object);
-            Assert.IsTrue(creator.RelatedThings.Any(x => x.Thing == this.elementDefinition1));
+            var namedRow = (BinaryRelationshipRowViewModel)viewmodel.Relationships.Single(x => x.Thing == named);
+            var unnamedRow = (BinaryRelationshipRowViewModel)viewmodel.Relationships.Single(x => x.Thing == unnamed);
 
-            var dropinfo2 = new Mock<IDropInfo>();
-            dropinfo2.Setup(x => x.Payload).Returns(this.elementDefinition2);
-            await creator.Drop(dropinfo2.Object);
+            // when named, only the name is shown (source/target are in dedicated columns)
+            Assert.That(namedRow.Name, Is.EqualTo("myRelationship"));
 
-            Assert.AreEqual(2, creator.RelatedThings.Count);
-            await creator.RelatedThings.First().RemoveRelatedThingCommand.Execute();
-            Assert.AreEqual(1, creator.RelatedThings.Count);
-
-            Assert.IsTrue(((ICommand)viewmodel.RelationshipCreator.CreateRelationshipCommand).CanExecute(null));
-            await viewmodel.RelationshipCreator.CreateRelationshipCommand.Execute();
-
-            creator.ReInitializeControl();
-            Assert.AreEqual(0, creator.RelatedThings.Count);
-
-            creator.Dispose();
+            // when not named, the path of the related items is used as a fallback
+            Assert.That(unnamedRow.Name, Does.Contain("E1"));
+            Assert.That(unnamedRow.Name, Does.Contain("E2"));
+            Assert.That(unnamedRow.Name, Does.Contain("→"));
         }
 
         [Test]
-        public void VerifyThatMultiRelationshipsAreAddedModifiedRemoved()
+        public void VerifyThatBinaryRelationshipCategoriesSourceAndTargetArePopulated()
         {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var category = new Category(Guid.NewGuid(), this.cache, this.uri) { Name = "Connection", ShortName = "CONN" };
+            this.srdl.DefinedCategory.Add(category);
 
-            //Add relationship1 and relationship2 and relationship3
-            var relationship = new MultiRelationship(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain, ModifiedOn = DateTime.Now };
-            relationship.RelatedThing.Add(this.elementDefinition1);
-            relationship.RelatedThing.Add(this.elementDefinition2);
-            relationship.RelatedThing.Add(this.elementDefinition3);
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            var relationship = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = this.elementDefinition1, Target = this.elementDefinition2, Owner = this.domain };
+            relationship.Category.Add(category);
             this.iteration.Relationship.Add(relationship);
 
             this.revision.SetValue(this.iteration, 1);
             this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
 
-            Assert.AreEqual(1, viewmodel.RelationshipTypes[1].ContainedRows.Count);
+            var row = (BinaryRelationshipRowViewModel)viewmodel.Relationships[0];
 
-            //Modify element definition name
-            this.elementDefinition3.Name = "EG";
-
-            this.revision.SetValue(this.elementDefinition3, 1);
-            this.messageBus.SendObjectChangeEvent(this.elementDefinition3, EventKind.Updated);
-
-            Assert.IsTrue(((MultiRelationshipRowViewModel)viewmodel.RelationshipTypes[1].ContainedRows[0]).Name.Contains("EG"));
-
-            //Modify relationship content
-
-            relationship.RelatedThing.Add(this.elementDefinition4);
-            this.revision.SetValue(relationship, 1);
-            this.messageBus.SendObjectChangeEvent(relationship, EventKind.Updated);
-
-            Assert.IsTrue(((MultiRelationshipRowViewModel)viewmodel.RelationshipTypes[1].ContainedRows[0]).Name.Contains("E4"));
-
-            //Remove relationships
-
-            this.iteration.Relationship.Clear();
-            this.revision.SetValue(this.iteration, 2);
-            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
-
-            Assert.AreEqual(0, viewmodel.RelationshipTypes[1].ContainedRows.Count);
+            Assert.That(row.Categories, Does.Contain("CONN"));
+            Assert.That(row.SourceName, Does.Contain("E1"));
+            Assert.That(row.TargetName, Does.Contain("E2"));
+            Assert.That(row.OwnerShortName, Is.EqualTo("DMN"));
+            Assert.That(row.SourceClassKind, Is.EqualTo(ClassKind.ElementDefinition.ToString()));
+            Assert.That(row.TargetClassKind, Is.EqualTo(ClassKind.ElementDefinition.ToString()));
         }
 
         [Test]
-        public void VerifyThatRelationsBrowserIsCreated()
+        public void VerifyThatBrowserIsCreated()
         {
-            var viewmodel = new RelationshipBrowserViewModel(this.iteration, this.session.Object,
-                this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
 
-            Assert.AreEqual(2, viewmodel.RelationshipTypes.Count);
-
-            Assert.That(viewmodel.Caption, Is.Not.Null.Or.Empty);
+            Assert.That(viewmodel.Caption, Does.StartWith(BinaryRelationshipBrowserViewModel.PanelCaptionText));
             Assert.That(viewmodel.ToolTip, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.DataSource, Is.Not.Null.Or.Empty);
             Assert.That(viewmodel.DomainOfExpertise, Is.Not.Null.Or.Empty);
