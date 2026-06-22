@@ -53,7 +53,10 @@ namespace CDP4EngineeringModel.Tests
     using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
+    using CDP4DalCommon.Protocol.Operations;
+
     using CDP4EngineeringModel.Services;
+    using CDP4EngineeringModel.Utilities;
     using CDP4EngineeringModel.ViewModels;
 
     using CommonServiceLocator;
@@ -104,6 +107,8 @@ namespace CDP4EngineeringModel.Tests
         [SetUp]
         public void Setup()
         {
+            ParameterClipboard.CopiedThing = null;
+
             this.cache = new List<Thing>();
             this.messageBus = new CDPMessageBus();
 
@@ -205,6 +210,7 @@ namespace CDP4EngineeringModel.Tests
         [TearDown]
         public void TearDown()
         {
+            ParameterClipboard.CopiedThing = null;
             this.messageBus.ClearSubscriptions();
         }
 
@@ -647,14 +653,14 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = defRow;
             vm.PopulateContextMenu();
-            Assert.AreEqual(14, vm.ContextMenu.Count);
+            Assert.AreEqual(15, vm.ContextMenu.Count);
             vm.SelectedThing = defRow.ContainedRows[0];
             vm.PopulateContextMenu();
-            Assert.AreEqual(8, vm.ContextMenu.Count);
+            Assert.AreEqual(10, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[1];
             vm.PopulateContextMenu();
-            Assert.AreEqual(7, vm.ContextMenu.Count);
+            Assert.AreEqual(9, vm.ContextMenu.Count);
 
             var usageRow = defRow.ContainedRows[2];
             var usage2Row = defRow.ContainedRows[3];
@@ -665,7 +671,7 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = usageRow.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(8, vm.ContextMenu.Count);
+            Assert.AreEqual(10, vm.ContextMenu.Count);
 
             vm.SelectedThing = usage2Row.ContainedRows.Single();
             vm.PopulateContextMenu();
@@ -974,6 +980,264 @@ namespace CDP4EngineeringModel.Tests
             vm.SelectedThing = defRow;
             await vm.UnsetAsTopElementDefinitionCommand.Execute();
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+        }
+
+        [Test]
+        public async Task VerifyThatCopyAndPasteParameterCreatesParameterOnTargetElementDefinition()
+        {
+            OperationContainer capturedOperationContainer = null;
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>()))
+                .Callback<OperationContainer>(oc => capturedOperationContainer = oc)
+                .Returns(Task.CompletedTask);
+
+            // the source Parameter is owned by a different domain than the one performing the paste
+            var sourceOwner = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "OtherDomain" };
+            this.sitedir.Domain.Add(sourceOwner);
+
+            var sourceDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "source", Owner = sourceOwner, Container = this.iteration };
+            var sourceParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = sourceOwner, Container = sourceDef };
+            sourceDef.Parameter.Add(sourceParameter);
+
+            var targetDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "target", Owner = this.domain, Container = this.iteration };
+
+            this.iteration.Element.Add(sourceDef);
+            this.iteration.Element.Add(targetDef);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            var sourceRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == sourceDef);
+            vm.SelectedThing = sourceRow.ContainedRows.Single(x => x.Thing == sourceParameter);
+            vm.ComputePermission();
+
+            Assert.IsTrue(vm.CanCopyParameterGroup);
+            await vm.CopyParameterGroupCommand.Execute();
+
+            var targetRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == targetDef);
+            vm.SelectedThing = targetRow;
+            vm.ComputePermission();
+
+            Assert.IsTrue(vm.CanPasteParameterGroup);
+            await vm.PasteParameterGroupCommand.Execute();
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+
+            Assert.IsNotNull(capturedOperationContainer);
+
+            var createdParameters = capturedOperationContainer.Operations
+                .Where(o => o.OperationKind == OperationKind.Create && o.ModifiedThing is CDP4Common.DTO.Parameter)
+                .Select(o => (CDP4Common.DTO.Parameter)o.ModifiedThing)
+                .ToList();
+
+            Assert.AreEqual(1, createdParameters.Count);
+            Assert.AreEqual(this.pt.Iid, createdParameters.Single().ParameterType);
+
+            // the copied Parameter is owned by the domain performing the paste, not the original owner
+            Assert.AreEqual(this.domain.Iid, createdParameters.Single().Owner);
+        }
+
+        [Test]
+        public async Task VerifyThatPasteParameterSkipsExistingParameterType()
+        {
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask);
+
+            var sourceDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "source", Owner = this.domain, Container = this.iteration };
+            var sourceParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Container = sourceDef };
+            sourceDef.Parameter.Add(sourceParameter);
+
+            var targetDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "target", Owner = this.domain, Container = this.iteration };
+            var existingParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Container = targetDef };
+            targetDef.Parameter.Add(existingParameter);
+
+            this.iteration.Element.Add(sourceDef);
+            this.iteration.Element.Add(targetDef);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            var sourceRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == sourceDef);
+            vm.SelectedThing = sourceRow.ContainedRows.Single(x => x.Thing == sourceParameter);
+            vm.ComputePermission();
+            await vm.CopyParameterGroupCommand.Execute();
+
+            var targetRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == targetDef);
+            vm.SelectedThing = targetRow;
+            vm.ComputePermission();
+            await vm.PasteParameterGroupCommand.Execute();
+
+            // the target already holds a Parameter of the same ParameterType so nothing is written
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+        }
+
+        [Test]
+        public async Task VerifyThatCopyAndPasteParameterGroupCopiesGroupsAndSkipsExistingTypes()
+        {
+            OperationContainer capturedOperationContainer = null;
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>()))
+                .Callback<OperationContainer>(oc => capturedOperationContainer = oc)
+                .Returns(Task.CompletedTask);
+
+            var otherParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.srdl.ParameterType.Add(otherParameterType);
+
+            var sourceDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "source", Owner = this.domain, Container = this.iteration };
+            var sourceGroup = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "group", Container = sourceDef };
+            var sourceSubGroup = new ParameterGroup(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "subgroup", ContainingGroup = sourceGroup, Container = sourceDef };
+            sourceDef.ParameterGroup.Add(sourceGroup);
+            sourceDef.ParameterGroup.Add(sourceSubGroup);
+
+            var groupParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Group = sourceGroup, Container = sourceDef };
+            var subGroupParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = otherParameterType, Owner = this.domain, Group = sourceSubGroup, Container = sourceDef };
+            sourceDef.Parameter.Add(groupParameter);
+            sourceDef.Parameter.Add(subGroupParameter);
+
+            var targetDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "target", Owner = this.domain, Container = this.iteration };
+            var existingParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Container = targetDef };
+            targetDef.Parameter.Add(existingParameter);
+
+            this.iteration.Element.Add(sourceDef);
+            this.iteration.Element.Add(targetDef);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            var sourceRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == sourceDef);
+            vm.SelectedThing = sourceRow.ContainedRows.Single(x => x.Thing == sourceGroup);
+            vm.ComputePermission();
+
+            Assert.IsTrue(vm.CanCopyParameterGroup);
+            await vm.CopyParameterGroupCommand.Execute();
+
+            var targetRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == targetDef);
+            vm.SelectedThing = targetRow;
+            vm.ComputePermission();
+            await vm.PasteParameterGroupCommand.Execute();
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            Assert.IsNotNull(capturedOperationContainer);
+
+            var createdGroups = capturedOperationContainer.Operations
+                .Where(o => o.OperationKind == OperationKind.Create && o.ModifiedThing is CDP4Common.DTO.ParameterGroup)
+                .ToList();
+
+            var createdParameters = capturedOperationContainer.Operations
+                .Where(o => o.OperationKind == OperationKind.Create && o.ModifiedThing is CDP4Common.DTO.Parameter)
+                .Select(o => (CDP4Common.DTO.Parameter)o.ModifiedThing)
+                .ToList();
+
+            // both groups are copied
+            Assert.AreEqual(2, createdGroups.Count);
+
+            // only the parameter whose ParameterType is not yet on the target is copied
+            Assert.AreEqual(1, createdParameters.Count);
+            Assert.AreEqual(otherParameterType.Iid, createdParameters.Single().ParameterType);
+        }
+
+        [Test]
+        public async Task VerifyThatPasteSkipsParameterWhoseParameterTypeIsNotInTargetRdlChain()
+        {
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask);
+
+            // a ParameterType that lives in a SiteReferenceDataLibrary outside the target model's RDL chain
+            var srdl2 = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.sitedir.SiteReferenceDataLibrary.Add(srdl2);
+            var inaccessiblePt = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Inaccessible" };
+            srdl2.ParameterType.Add(inaccessiblePt);
+
+            var sourceDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "source", Owner = this.domain, Container = this.iteration };
+            var sourceParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = inaccessiblePt, Owner = this.domain, Container = sourceDef };
+            sourceDef.Parameter.Add(sourceParameter);
+
+            var targetDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "target", Owner = this.domain, Container = this.iteration };
+
+            this.iteration.Element.Add(sourceDef);
+            this.iteration.Element.Add(targetDef);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            var sourceRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == sourceDef);
+            vm.SelectedThing = sourceRow.ContainedRows.Single(x => x.Thing == sourceParameter);
+            vm.ComputePermission();
+            await vm.CopyParameterGroupCommand.Execute();
+
+            var targetRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == targetDef);
+            vm.SelectedThing = targetRow;
+            vm.ComputePermission();
+            await vm.PasteParameterGroupCommand.Execute();
+
+            // the ParameterType is not reachable from the target model's RDL chain so nothing is written and the user is informed
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
+            Assert.That(vm.Feedback, Does.Contain("not available"));
+        }
+
+        [Test]
+        public async Task VerifyThatClipboardIsSharedAcrossBrowserInstances()
+        {
+            OperationContainer capturedOperationContainer = null;
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>()))
+                .Callback<OperationContainer>(oc => capturedOperationContainer = oc)
+                .Returns(Task.CompletedTask);
+
+            var sourceDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "source", Owner = this.domain, Container = this.iteration };
+            var sourceParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Container = sourceDef };
+            sourceDef.Parameter.Add(sourceParameter);
+
+            var targetDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "target", Owner = this.domain, Container = this.iteration };
+
+            this.iteration.Element.Add(sourceDef);
+            this.iteration.Element.Add(targetDef);
+
+            // copy in one browser instance
+            var copyBrowser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => copyBrowser.SingleRunBackgroundWorker == null);
+
+            var sourceRow = copyBrowser.ElementDefinitionRowViewModels.Single(x => x.Thing == sourceDef);
+            copyBrowser.SelectedThing = sourceRow.ContainedRows.Single(x => x.Thing == sourceParameter);
+            copyBrowser.ComputePermission();
+            await copyBrowser.CopyParameterGroupCommand.Execute();
+
+            // paste in a different browser instance
+            var pasteBrowser = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => pasteBrowser.SingleRunBackgroundWorker == null);
+
+            var targetRow = pasteBrowser.ElementDefinitionRowViewModels.Single(x => x.Thing == targetDef);
+            pasteBrowser.SelectedThing = targetRow;
+            pasteBrowser.ComputePermission();
+
+            Assert.IsTrue(pasteBrowser.CanPasteParameterGroup);
+            await pasteBrowser.PasteParameterGroupCommand.Execute();
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+
+            var createdParameters = capturedOperationContainer.Operations
+                .Where(o => o.OperationKind == OperationKind.Create && o.ModifiedThing is CDP4Common.DTO.Parameter)
+                .ToList();
+
+            Assert.AreEqual(1, createdParameters.Count);
+        }
+
+        [Test]
+        public async Task VerifyThatClipboardIsClearedWhenSessionIsClosed()
+        {
+            var sourceDef = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "source", Owner = this.domain, Container = this.iteration };
+            var sourceParameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri) { ParameterType = this.pt, Owner = this.domain, Container = sourceDef };
+            sourceDef.Parameter.Add(sourceParameter);
+            this.iteration.Element.Add(sourceDef);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            var sourceRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == sourceDef);
+            vm.SelectedThing = sourceRow.ContainedRows.Single(x => x.Thing == sourceParameter);
+            vm.ComputePermission();
+            await vm.CopyParameterGroupCommand.Execute();
+
+            Assert.IsNotNull(ParameterClipboard.CopiedThing);
+
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.Closed));
+
+            Assert.IsNull(ParameterClipboard.CopiedThing);
         }
 
         /// <summary>
