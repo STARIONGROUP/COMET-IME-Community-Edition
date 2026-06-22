@@ -26,6 +26,9 @@
 namespace CDP4Requirements.Tests.Dialogs
 {
     using System;
+    using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Windows.Input;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
@@ -43,6 +46,8 @@ namespace CDP4Requirements.Tests.Dialogs
     using Moq;
 
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     [TestFixture]
     internal class RequirementsGroupDialogViewModelTestFixture
@@ -72,6 +77,8 @@ namespace CDP4Requirements.Tests.Dialogs
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
             this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
@@ -149,6 +156,24 @@ namespace CDP4Requirements.Tests.Dialogs
         public void VerifyThatParameterlessContructorExists()
         {
             Assert.DoesNotThrow(() => new RequirementsGroupDialogViewModel());
+        }
+
+        [Test]
+        public void VerifyThatCreateAndEditGroupCommandsAreDisabled()
+        {
+            var clone = this.reqSpec.Clone(true);
+            this.thingTransaction.CreateOrUpdate(clone);
+
+            var subGroup = new RequirementsGroup(Guid.NewGuid(), null, this.uri);
+            this.reqGroup.Group.Add(subGroup);
+
+            var vm = new RequirementsGroupDialogViewModel(this.reqGroup, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Update, null, clone);
+
+            vm.SelectedGroup = vm.Group.Single();
+
+            Assert.That(((ICommand)vm.CreateGroupCommand).CanExecute(null), Is.False);
+            Assert.That(((ICommand)vm.EditGroupCommand).CanExecute(null), Is.False);
         }
     }
 }
