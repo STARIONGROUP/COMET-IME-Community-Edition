@@ -60,6 +60,7 @@ namespace BasicRDL.Tests.ViewModels
         private Mock<IPermissionService> permissionService;
         private Uri uri;
         private SiteDirectory siteDirectory;
+        private SiteReferenceDataLibrary siteRdl;
         private ConstantsBrowserViewModel browser;
         private List<ReferenceDataLibrary> openRdlList;
         private Person person;
@@ -86,10 +87,15 @@ namespace BasicRDL.Tests.ViewModels
             this.siteDirectory = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
 
+            this.siteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test RDL", ShortName = "testRDL", Container = this.siteDirectory };
+            this.siteDirectory.SiteReferenceDataLibrary.Add(this.siteRdl);
+
             this.openRdlList = new List<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary);
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(() => this.siteDirectory.SiteReferenceDataLibrary.Cast<ReferenceDataLibrary>().ToList());
 
             this.browser = new ConstantsBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigation.Object, this.navigation.Object, null, null);
         }
@@ -122,7 +128,8 @@ namespace BasicRDL.Tests.ViewModels
                                {
                                    Name = "constant name",
                                    ShortName = "constantshortname",
-                                   Scale = ratioScale
+                                   Scale = ratioScale,
+                                   Container = this.siteRdl
                                };
 
             this.messageBus.SendObjectChangeEvent(constant, EventKind.Added);
@@ -130,6 +137,27 @@ namespace BasicRDL.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(constant, EventKind.Removed);
             Assert.AreEqual(0, this.browser.Constants.Count);
+        }
+
+        [Test]
+        public void VerifyThatConstantRowIsNotDuplicatedAndIsRemovedAcrossCacheReopen()
+        {
+            var iid = Guid.NewGuid();
+
+            var ratioScale = new RatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "rs", ShortName = "rs" };
+
+            var constant = new Constant(iid, this.assembler.Cache, this.uri) { Name = "c", ShortName = "c", Scale = ratioScale, Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(constant, EventKind.Added);
+
+            var reInstantiatedConstant = new Constant(iid, this.assembler.Cache, this.uri) { Name = "c", ShortName = "c", Scale = ratioScale, Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(reInstantiatedConstant, EventKind.Added);
+
+            Assert.AreEqual(1, this.browser.Constants.Count(x => x.Thing.Iid == iid));
+
+            var removedConstant = new Constant(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedConstant, EventKind.Removed);
+
+            Assert.IsFalse(this.browser.Constants.Any(x => x.Thing.Iid == iid));
         }
 
         [Test]
@@ -147,7 +175,8 @@ namespace BasicRDL.Tests.ViewModels
             {
                 Name = "constant name",
                 ShortName = "constantshortname",
-                Scale = ratioScale
+                Scale = ratioScale,
+                Container = this.siteRdl
             };
 
             this.messageBus.SendObjectChangeEvent(constant, EventKind.Added);
@@ -186,6 +215,7 @@ namespace BasicRDL.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;
+            this.siteDirectory.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new Constant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new Constant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
@@ -199,6 +229,32 @@ namespace BasicRDL.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.Constants.All(x => x.ContainerRdl == "test"));
+        }
+
+        [Test]
+        public void VerifyThatAddedConstantFromClosedReferenceDataLibraryIsIgnored()
+        {
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var constant = new Constant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "c", ShortName = "c", Container = closedRdl };
+
+            this.messageBus.SendObjectChangeEvent(constant, EventKind.Added);
+
+            Assert.IsFalse(this.browser.Constants.Any());
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsConstants()
+        {
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var constant = new Constant(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "c", ShortName = "c", Container = rdl };
+            rdl.Constant.Add(constant);
+
+            Assert.IsFalse(this.browser.Constants.Any(x => x.Thing.Iid == constant.Iid));
+
+            this.siteDirectory.SiteReferenceDataLibrary.Add(rdl);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, this.browser.Constants.Count(x => x.Thing.Iid == constant.Iid));
         }
     }
 }

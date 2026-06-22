@@ -180,6 +180,13 @@ namespace BasicRdl.ViewModels
                     .Subscribe(this.RefreshContainerName);
 
             this.Disposables.Add(rdlUpdateListener);
+
+            var rdlOpenedListener = this.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.PopulateMeasurementScales());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -190,6 +197,16 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void AddMeasurementScaleRowViewModel(MeasurementScale scale)
         {
+            if (this.MeasurementScales.Any(x => x.Thing.Iid == scale.Iid))
+            {
+                return;
+            }
+
+            if (!this.IsInOpenReferenceDataLibrary(scale))
+            {
+                return;
+            }
+
             var row = new MeasurementScaleRowViewModel(scale, this.Session, this);
             this.MeasurementScales.Add(row);
         }
@@ -202,9 +219,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void RemoveMeasurementScaleRowViewModel(MeasurementScale scale)
         {
-            var row = this.MeasurementScales.SingleOrDefault(rowViewModel => rowViewModel.Thing == scale);
+            var rows = this.MeasurementScales.Where(rowViewModel => rowViewModel.Thing.Iid == scale.Iid).ToList();
 
-            if (row != null)
+            foreach (var row in rows)
             {
                 this.MeasurementScales.RemoveAndDispose(row);
             }
@@ -239,7 +256,15 @@ namespace BasicRdl.ViewModels
         {
             base.Initialize();
 
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+            this.PopulateMeasurementScales();
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="MeasurementScale"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateMeasurementScales()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid).ToList();
 
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
                          .Where(x => openDataLibrariesIids.Contains(x.Iid)))

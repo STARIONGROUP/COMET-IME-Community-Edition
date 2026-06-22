@@ -135,7 +135,16 @@ namespace BasicRdl.ViewModels
             base.Initialize();
             this.UnitPrefixes = new DisposableReactiveList<UnitPrefixRowViewModel>();
 
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(x => x.Iid);
+            this.PopulateUnitPrefixes();
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="UnitPrefix"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateUnitPrefixes()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(x => x.Iid).ToList();
+
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
                 foreach (var unitPrefix in referenceDataLibrary.UnitPrefix)
@@ -190,6 +199,13 @@ namespace BasicRdl.ViewModels
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(this.RefreshContainerName);
             this.Disposables.Add(rdlUpdateListener);
+
+            var rdlOpenedListener = this.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.PopulateUnitPrefixes());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -200,7 +216,12 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void AddUnitPrefixRowViewModel(UnitPrefix unitPrefix)
         {
-            if (this.UnitPrefixes.Any(x => x.Thing == unitPrefix))
+            if (this.UnitPrefixes.Any(x => x.Thing.Iid == unitPrefix.Iid))
+            {
+                return;
+            }
+
+            if (!this.IsInOpenReferenceDataLibrary(unitPrefix))
             {
                 return;
             }
@@ -217,8 +238,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void RemoveUnitPrefixRowViewModel(UnitPrefix unitPrefix)
         {
-            var row = this.UnitPrefixes.SingleOrDefault(rowViewModel => rowViewModel.Thing == unitPrefix);
-            if (row != null)
+            var rows = this.UnitPrefixes.Where(rowViewModel => rowViewModel.Thing.Iid == unitPrefix.Iid).ToList();
+
+            foreach (var row in rows)
             {
                 this.UnitPrefixes.RemoveAndDispose(row);
             }

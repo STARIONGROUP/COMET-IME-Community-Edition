@@ -160,6 +160,13 @@ namespace BasicRdl.ViewModels
                     .Subscribe(this.RefreshContainerName);
 
             this.Disposables.Add(rdlUpdateListener);
+
+            var rdlOpenedListener = this.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.PopulateRules());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -170,6 +177,16 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void AddRuleRowViewModel(Rule rule)
         {
+            if (this.Rules.Any(x => x.Thing.Iid == rule.Iid))
+            {
+                return;
+            }
+
+            if (!this.IsInOpenReferenceDataLibrary(rule))
+            {
+                return;
+            }
+
             var row = new RuleRowViewModel(rule, this.Session, this);
             this.Rules.Add(row);
         }
@@ -182,9 +199,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void RemoveRuleRowViewModel(Rule rule)
         {
-            var row = this.Rules.SingleOrDefault(rowViewModel => rowViewModel.Thing == rule);
+            var rows = this.Rules.Where(rowViewModel => rowViewModel.Thing.Iid == rule.Iid).ToList();
 
-            if (row != null)
+            foreach (var row in rows)
             {
                 this.Rules.RemoveAndDispose(row);
             }
@@ -260,7 +277,15 @@ namespace BasicRdl.ViewModels
         {
             base.Initialize();
 
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+            this.PopulateRules();
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="Rule"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateRules()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid).ToList();
 
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {

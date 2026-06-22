@@ -95,6 +95,9 @@ namespace BasicRDL.Tests.ViewModels
             this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
 
+            // every SiteReferenceDataLibrary added to the SiteDirectory is treated as open in these tests
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(() => this.siteDirectory.SiteReferenceDataLibrary.Cast<ReferenceDataLibrary>().ToList());
+
             this.browser = new UnitPrefixBrowserViewModel(this.session.Object, this.siteDirectory, this.dialogNavigation.Object, this.navigation.Object, null, null);
         }
 
@@ -128,6 +131,25 @@ namespace BasicRDL.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(unitPrefix, EventKind.Removed);
             Assert.AreEqual(0, this.browser.UnitPrefixes.Count);
+        }
+
+        [Test]
+        public void VerifyThatUnitPrefixRowIsNotDuplicatedAndIsRemovedAcrossCacheReopen()
+        {
+            var iid = Guid.NewGuid();
+
+            var unitPrefix = new UnitPrefix(iid, this.assembler.Cache, this.uri) { Name = "up", ShortName = "up", Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(unitPrefix, EventKind.Added);
+
+            var reInstantiatedUnitPrefix = new UnitPrefix(iid, this.assembler.Cache, this.uri) { Name = "up", ShortName = "up", Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(reInstantiatedUnitPrefix, EventKind.Added);
+
+            Assert.AreEqual(1, this.browser.UnitPrefixes.Count(x => x.Thing.Iid == iid));
+
+            var removedUnitPrefix = new UnitPrefix(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedUnitPrefix, EventKind.Removed);
+
+            Assert.IsFalse(this.browser.UnitPrefixes.Any(x => x.Thing.Iid == iid));
         }
 
         [Test]
@@ -186,6 +208,7 @@ namespace BasicRDL.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;
+            this.siteDirectory.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new UnitPrefix(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new UnitPrefix(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
@@ -199,6 +222,32 @@ namespace BasicRDL.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.UnitPrefixes.Count(x => x.ContainerRdl == "test") == 2);
+        }
+
+        [Test]
+        public void VerifyThatAddedUnitPrefixFromClosedReferenceDataLibraryIsIgnored()
+        {
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var unitPrefix = new UnitPrefix(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "up", ShortName = "up", Container = closedRdl };
+
+            this.messageBus.SendObjectChangeEvent(unitPrefix, EventKind.Added);
+
+            Assert.IsFalse(this.browser.UnitPrefixes.Any());
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsUnitPrefixes()
+        {
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var unitPrefix = new UnitPrefix(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "up", ShortName = "up", Container = rdl };
+            rdl.UnitPrefix.Add(unitPrefix);
+
+            Assert.IsFalse(this.browser.UnitPrefixes.Any(x => x.Thing.Iid == unitPrefix.Iid));
+
+            this.siteDirectory.SiteReferenceDataLibrary.Add(rdl);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, this.browser.UnitPrefixes.Count(x => x.Thing.Iid == unitPrefix.Iid));
         }
     }
 }

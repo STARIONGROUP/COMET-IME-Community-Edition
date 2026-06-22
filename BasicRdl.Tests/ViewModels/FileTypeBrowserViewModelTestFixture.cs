@@ -86,7 +86,7 @@ namespace BasicRDL.Tests.ViewModels
             this.srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
 
             this.siteDirectory.SiteReferenceDataLibrary.Add(this.srdl);
-            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new HashSet<ReferenceDataLibrary>(this.siteDirectory.SiteReferenceDataLibrary));
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(() => this.siteDirectory.SiteReferenceDataLibrary.Cast<ReferenceDataLibrary>().ToList());
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
@@ -133,6 +133,25 @@ namespace BasicRDL.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatFileTypeRowIsNotDuplicatedAndIsRemovedAcrossCacheReopen()
+        {
+            var iid = Guid.NewGuid();
+
+            var filetype = new FileType(iid, this.assembler.Cache, this.uri) { Name = "ft", ShortName = "ft", Extension = "txt", Container = this.srdl };
+            this.messageBus.SendObjectChangeEvent(filetype, EventKind.Added);
+
+            var reInstantiatedFileType = new FileType(iid, this.assembler.Cache, this.uri) { Name = "ft", ShortName = "ft", Extension = "txt", Container = this.srdl };
+            this.messageBus.SendObjectChangeEvent(reInstantiatedFileType, EventKind.Added);
+
+            Assert.AreEqual(1, this.browser.FileTypes.Count(x => x.Thing.Iid == iid));
+
+            var removedFileType = new FileType(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedFileType, EventKind.Removed);
+
+            Assert.IsFalse(this.browser.FileTypes.Any(x => x.Thing.Iid == iid));
+        }
+
+        [Test]
         public void VerifyThatRdlShortnameIsUpdated()
         {
             this.srdl.FileType.Clear();
@@ -140,6 +159,7 @@ namespace BasicRDL.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDirectory;
+            this.siteDirectory.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
@@ -153,6 +173,34 @@ namespace BasicRDL.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.FileTypes.All(x => x.ContainerRdl == "test"));
+        }
+
+        [Test]
+        public void VerifyThatAddedFileTypeFromClosedReferenceDataLibraryIsIgnored()
+        {
+            var initialCount = this.browser.FileTypes.Count;
+
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var filetype = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ft", ShortName = "ft", Extension = "txt", Container = closedRdl };
+
+            this.messageBus.SendObjectChangeEvent(filetype, EventKind.Added);
+
+            Assert.AreEqual(initialCount, this.browser.FileTypes.Count);
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsFileTypes()
+        {
+           var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDirectory };
+            var filetype = new FileType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "ft", ShortName = "ft", Extension = "txt", Container = rdl };
+            rdl.FileType.Add(filetype);
+
+            Assert.IsFalse(this.browser.FileTypes.Any(x => x.Thing.Iid == filetype.Iid));
+
+            this.siteDirectory.SiteReferenceDataLibrary.Add(rdl);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, this.browser.FileTypes.Count(x => x.Thing.Iid == filetype.Iid));
         }
     }
 }

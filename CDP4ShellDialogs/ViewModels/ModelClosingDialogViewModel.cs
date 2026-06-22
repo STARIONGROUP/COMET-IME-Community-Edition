@@ -2,7 +2,7 @@
 // <copyright file="ModelClosingDialogViewModel.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2022 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerenï¿½, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Thï¿½ate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -139,7 +139,7 @@ namespace CDP4ShellDialogs.ViewModels
                     var modelSetup = (EngineeringModelSetup)modelrow.Thing.Container;
                     await session.CloseIterationSetup((IterationSetup)iteration.Thing);
 
-                    if (session.OpenIterations.Keys.Count(it => it.IterationSetup.Container == modelSetup) == 1)
+                    if (session.OpenIterations.Keys.All(it => it.IterationSetup.Container != modelSetup))
                     {
                         var modelRdl = modelSetup.RequiredRdl.Single();
                         await session.CloseModelRdl(modelRdl);

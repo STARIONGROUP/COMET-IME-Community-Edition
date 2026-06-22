@@ -145,7 +145,15 @@ namespace BasicRdl.ViewModels
             base.Initialize();
             this.ReferenceSources = new DisposableReactiveList<ReferenceSourceRowViewModel>();
 
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(x => x.Iid);
+            this.PopulateReferenceSources();
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="ReferenceSource"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateReferenceSources()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(x => x.Iid).ToList();
 
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries().Where(x => openDataLibrariesIids.Contains(x.Iid)))
             {
@@ -205,6 +213,13 @@ namespace BasicRdl.ViewModels
                     .Subscribe(this.RefreshContainerName);
 
             this.Disposables.Add(rdlUpdateListener);
+
+            var rdlOpenedListener = this.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.PopulateReferenceSources());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -215,7 +230,14 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void AddReferenceSourceRowViewModel(ReferenceSource referenceSource)
         {
-            if (this.ReferenceSources.Any(x => x.Thing == referenceSource))
+            if (this.ReferenceSources.Any(x => x.Thing.Iid == referenceSource.Iid))
+            {
+                return;
+            }
+
+            // Only show ReferenceSources that reside in a currently open ReferenceDataLibrary. A reload re-reads the
+            // SiteDirectory deeply and re-adds Things from closed RDLs to the cache; without this guard those would reappear.
+            if (!this.IsInOpenReferenceDataLibrary(referenceSource))
             {
                 return;
             }
@@ -232,9 +254,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void RemoveReferenceSourceRowViewModel(ReferenceSource referenceSource)
         {
-            var row = this.ReferenceSources.SingleOrDefault(rowViewModel => rowViewModel.Thing == referenceSource);
+            var rows = this.ReferenceSources.Where(rowViewModel => rowViewModel.Thing.Iid == referenceSource.Iid).ToList();
 
-            if (row != null)
+            foreach (var row in rows)
             {
                 this.ReferenceSources.RemoveAndDispose(row);
             }

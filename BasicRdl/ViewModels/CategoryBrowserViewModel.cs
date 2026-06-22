@@ -147,7 +147,15 @@ namespace BasicRdl.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+            this.PopulateCategories();
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="Category"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateCategories()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid).ToList();
 
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
                          .Where(x => openDataLibrariesIids.Contains(x.Iid)))
@@ -240,6 +248,13 @@ namespace BasicRdl.ViewModels
                 .Subscribe(this.RefreshContainerName);
 
             this.Disposables.Add(rdlUpdateListener);
+
+            var rdlOpenedListener = this.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.PopulateCategories());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -248,7 +263,12 @@ namespace BasicRdl.ViewModels
         /// <param name="category">The associated <see cref="Category"/></param>
         private void AddCategoryRowViewModel(Category category)
         {
-            if (this.Categories.Any(x => x.Thing == category))
+            if (this.Categories.Any(x => x.Thing.Iid == category.Iid))
+            {
+                return;
+            }
+
+            if (!this.IsInOpenReferenceDataLibrary(category))
             {
                 return;
             }
@@ -265,9 +285,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void RemoveCategoryRowViewModel(Category category)
         {
-            var row = this.Categories.SingleOrDefault(rowViewModel => rowViewModel.Thing == category);
+            var rows = this.Categories.Where(rowViewModel => rowViewModel.Thing.Iid == category.Iid).ToList();
 
-            if (row != null)
+            foreach (var row in rows)
             {
                 this.Categories.RemoveAndDispose(row);
             }

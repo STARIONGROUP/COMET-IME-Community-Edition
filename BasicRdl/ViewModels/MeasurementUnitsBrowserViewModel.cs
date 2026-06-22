@@ -175,6 +175,13 @@ namespace BasicRdl.ViewModels
                     .Subscribe(this.RefreshContainerName);
 
             this.Disposables.Add(rdlUpdateListener);
+
+            var rdlOpenedListener = this.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.RdlOpened)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.PopulateMeasurementUnits());
+
+            this.Disposables.Add(rdlOpenedListener);
         }
 
         /// <summary>
@@ -183,6 +190,16 @@ namespace BasicRdl.ViewModels
         /// <param name="measurementUnit">The associated <see cref="MeasurementUnit"/></param>
         private void AddMeasurementUnitRowViewModel(MeasurementUnit measurementUnit)
         {
+            if (this.MeasurementUnits.Any(x => x.Thing.Iid == measurementUnit.Iid))
+            {
+                return;
+            }
+
+            if (!this.IsInOpenReferenceDataLibrary(measurementUnit))
+            {
+                return;
+            }
+
             var row = new MeasurementUnitRowViewModel(measurementUnit, this.Session, this);
             this.MeasurementUnits.Add(row);
         }
@@ -195,9 +212,9 @@ namespace BasicRdl.ViewModels
         /// </param>
         private void RemoveMeasurementUnitRowViewModel(MeasurementUnit measurementUnit)
         {
-            var row = this.MeasurementUnits.SingleOrDefault(rowViewModel => rowViewModel.Thing == measurementUnit);
+            var rows = this.MeasurementUnits.Where(rowViewModel => rowViewModel.Thing.Iid == measurementUnit.Iid).ToList();
 
-            if (row != null)
+            foreach (var row in rows)
             {
                 this.MeasurementUnits.RemoveAndDispose(row);
             }
@@ -296,7 +313,16 @@ namespace BasicRdl.ViewModels
         protected override void Initialize()
         {
             base.Initialize();
-            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid);
+
+            this.PopulateMeasurementUnits();
+        }
+
+        /// <summary>
+        /// Adds a row for every <see cref="MeasurementUnit"/> contained in the currently open <see cref="ReferenceDataLibrary"/>s.
+        /// </summary>
+        private void PopulateMeasurementUnits()
+        {
+            var openDataLibrariesIids = this.Session.OpenReferenceDataLibraries.Select(y => y.Iid).ToList();
 
             foreach (var referenceDataLibrary in this.Thing.AvailableReferenceDataLibraries()
                          .Where(x => openDataLibrariesIids.Contains(x.Iid)))

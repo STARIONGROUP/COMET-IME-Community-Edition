@@ -53,6 +53,7 @@ namespace BasicRdl.Tests.ViewModels
         private Mock<IPermissionService> permissionService;
         private Mock<IPermissionService> nonpermissivePermissionService;
         private SiteDirectory siteDir;
+        private SiteReferenceDataLibrary siteRdl;
         private Uri uri;
         private MeasurementUnitsBrowserViewModel measurementUnitsViewModel;
         private Person person;
@@ -80,9 +81,14 @@ namespace BasicRdl.Tests.ViewModels
 
             this.siteDir = new SiteDirectory(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "site directory" };
             this.person = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "John", Surname = "Doe" };
+
+            this.siteRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "test RDL", ShortName = "testRDL", Container = this.siteDir };
+            this.siteDir.SiteReferenceDataLibrary.Add(this.siteRdl);
+
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(() => this.siteDir.SiteReferenceDataLibrary.Cast<ReferenceDataLibrary>().ToList());
 
             this.measurementUnitsViewModel = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
         }
@@ -114,7 +120,8 @@ namespace BasicRdl.Tests.ViewModels
             var simpleUnit = new SimpleUnit(Guid.NewGuid(), this.assembler.Cache, this.uri)
             {
                 Name = "simple unit name",
-                ShortName = "simpleunitshortname"
+                ShortName = "simpleunitshortname",
+                Container = this.siteRdl
             };
 
             this.messageBus.SendObjectChangeEvent(simpleUnit, EventKind.Added);
@@ -124,6 +131,25 @@ namespace BasicRdl.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(simpleUnit, EventKind.Removed);
             Assert.IsFalse(this.measurementUnitsViewModel.MeasurementUnits.Any(x => x.Thing == simpleUnit));
+        }
+
+        [Test]
+        public void VerifyThatMeasurementUnitRowIsNotDuplicatedAndIsRemovedAcrossCacheReopen()
+        {
+            var iid = Guid.NewGuid();
+
+            var simpleUnit = new SimpleUnit(iid, this.assembler.Cache, this.uri) { Name = "u", ShortName = "u", Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(simpleUnit, EventKind.Added);
+
+            var reInstantiatedUnit = new SimpleUnit(iid, this.assembler.Cache, this.uri) { Name = "u", ShortName = "u", Container = this.siteRdl };
+            this.messageBus.SendObjectChangeEvent(reInstantiatedUnit, EventKind.Added);
+
+            Assert.AreEqual(1, this.measurementUnitsViewModel.MeasurementUnits.Count(x => x.Thing.Iid == iid));
+
+            var removedUnit = new SimpleUnit(iid, this.assembler.Cache, this.uri);
+            this.messageBus.SendObjectChangeEvent(removedUnit, EventKind.Removed);
+
+            Assert.IsFalse(this.measurementUnitsViewModel.MeasurementUnits.Any(x => x.Thing.Iid == iid));
         }
 
         [Test]
@@ -154,6 +180,7 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyThatAnyUnitCannotBeCreatedWithNonPermissiveService()
         {
             this.session.Setup(x => x.PermissionService).Returns(this.nonpermissivePermissionService.Object);
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new List<ReferenceDataLibrary>());
             var browser = new MeasurementUnitsBrowserViewModel(this.session.Object, this.siteDir, null, null, null, null);
             Assert.IsFalse(browser.CanCreateRdlElement);
 
@@ -170,6 +197,7 @@ namespace BasicRdl.Tests.ViewModels
 
             var sRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri);
             sRdl.Container = this.siteDir;
+            this.siteDir.SiteReferenceDataLibrary.Add(sRdl);
 
             var cat = new LinearConversionUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat1", ShortName = "1", Container = sRdl };
             var cat2 = new LinearConversionUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "cat2", ShortName = "2", Container = sRdl };
@@ -183,6 +211,32 @@ namespace BasicRdl.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.MeasurementUnits.Count(x => x.ContainerRdl == "test") == 2);
+        }
+
+        [Test]
+        public void VerifyThatAddedMeasurementUnitFromClosedReferenceDataLibraryIsIgnored()
+        {
+            var closedRdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDir };
+            var unit = new SimpleUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "u", ShortName = "u", Container = closedRdl };
+
+            this.messageBus.SendObjectChangeEvent(unit, EventKind.Added);
+
+            Assert.IsFalse(this.measurementUnitsViewModel.MeasurementUnits.Any());
+        }
+
+        [Test]
+        public void VerifyThatOpeningAReferenceDataLibraryPopulatesItsMeasurementUnits()
+        {
+            var rdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteDir };
+            var unit = new SimpleUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "u", ShortName = "u", Container = rdl };
+            rdl.Unit.Add(unit);
+
+            Assert.IsFalse(this.measurementUnitsViewModel.MeasurementUnits.Any(x => x.Thing.Iid == unit.Iid));
+
+            this.siteDir.SiteReferenceDataLibrary.Add(rdl);
+            this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
+
+            Assert.AreEqual(1, this.measurementUnitsViewModel.MeasurementUnits.Count(x => x.Thing.Iid == unit.Iid));
         }
     }
 }

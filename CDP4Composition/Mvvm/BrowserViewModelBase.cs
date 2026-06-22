@@ -824,6 +824,22 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// Asserts whether the <paramref name="thing"/> is contained in a <see cref="ReferenceDataLibrary"/> that is currently
+        /// open in the associated <see cref="ISession"/>.
+        /// </summary>
+        /// <param name="thing">
+        /// The <see cref="Thing"/> to check.
+        /// </param>
+        /// <returns>
+        /// True if the <paramref name="thing"/>'s container is an open <see cref="ReferenceDataLibrary"/>, otherwise false.
+        /// </returns>
+        protected bool IsInOpenReferenceDataLibrary(Thing thing)
+        {
+            return thing.Container is ReferenceDataLibrary referenceDataLibrary
+                   && this.Session.OpenReferenceDataLibraries.Any(openRdl => openRdl.Iid == referenceDataLibrary.Iid);
+        }
+
+        /// <summary>
         /// Executes the <see cref="ChangeFocusCommand"/>
         /// </summary>
         protected virtual void ExecuteChangeFocusCommand()
