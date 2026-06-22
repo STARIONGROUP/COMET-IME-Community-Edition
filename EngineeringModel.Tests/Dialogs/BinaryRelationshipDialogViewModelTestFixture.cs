@@ -132,6 +132,9 @@ namespace CDP4EngineeringModel.Tests
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
             var assembler = new Assembler(this.uri, this.messageBus);
+            assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
+            assembler.Cache.TryAdd(new CacheKey(this.req1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.req1));
+            assembler.Cache.TryAdd(new CacheKey(this.req2.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.req2));
             this.session.Setup(x => x.Assembler).Returns(assembler);
 
             var dal = new Mock<IDal>();
@@ -153,30 +156,31 @@ namespace CDP4EngineeringModel.Tests
                 true, ThingDialogKind.Create, this.dialogNavigationService.Object, clone);
 
             Assert.AreEqual(1, vm.PossibleCategory.Count);
-            Assert.AreEqual(0, vm.PossibleSource.Count);
-            Assert.AreEqual(0, vm.PossibleTarget.Count);
             Assert.AreEqual(null, vm.Name);
 
-            vm.PossibleSource.Add(this.req1);
-            vm.PossibleTarget.Add(this.req2);
-
             vm.Category = new ReactiveList<Category> { this.relationshipCat };
-            Assert.AreEqual(1, vm.PossibleSource.Count);
-            Assert.AreEqual(1, vm.PossibleTarget.Count);
 
-            Assert.IsTrue(vm.PossibleSource.Contains(this.req1));
-            vm.SelectedSource = this.req1;
-            Assert.IsTrue(vm.PossibleTarget.Contains(this.req2));
-            vm.SelectedTarget = this.req2;
-
-            Assert.IsFalse(vm.PossibleTarget.Contains(this.req1));
-            Assert.IsFalse(vm.PossibleSource.Contains(this.req2));
-
+            // the possible sources and targets are populated for the selected (defaulted) class kinds from the cache
             vm.SelectedSourceClasskind = this.req1.ClassKind;
             vm.SelectedTargetClasskind = this.req2.ClassKind;
 
             Assert.AreEqual(this.req1.ClassKind, vm.SelectedSourceClasskind);
             Assert.AreEqual(this.req2.ClassKind, vm.SelectedTargetClasskind);
+
+            Assert.IsTrue(vm.PossibleSource.Contains(this.req1));
+            Assert.IsTrue(vm.PossibleTarget.Contains(this.req1));
+            Assert.IsTrue(vm.PossibleTarget.Contains(this.req2));
+
+            vm.SelectedSource = this.req1;
+
+            // the selected source can no longer be chosen as target
+            Assert.IsFalse(vm.PossibleTarget.Contains(this.req1));
+            Assert.IsTrue(vm.PossibleTarget.Contains(this.req2));
+
+            vm.SelectedTarget = this.req2;
+
+            // the selected target can no longer be chosen as source
+            Assert.IsFalse(vm.PossibleSource.Contains(this.req2));
 
             Assert.IsTrue(vm.PossibleOwner.Contains(this.domain));
             vm.SelectedOwner = this.domain;
@@ -184,6 +188,35 @@ namespace CDP4EngineeringModel.Tests
             Assert.IsTrue(((ICommand)vm.OkCommand).CanExecute(null));
             Assert.IsTrue(((ICommand)vm.CancelCommand).CanExecute(null));
             Assert.IsTrue(vm.OkCanExecute);
+        }
+
+        [Test]
+        public void VerifyThatSourceAndTargetCannotBeTheSameThing()
+        {
+            var clone = this.iteration.Clone(false);
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
+            var transaction = new ThingTransaction(transactionContext, clone);
+
+            var vm = new BinaryRelationshipDialogViewModel(new BinaryRelationship(), transaction, this.session.Object,
+                true, ThingDialogKind.Create, this.dialogNavigationService.Object, clone);
+
+            vm.SelectedSourceClasskind = this.req1.ClassKind;
+            vm.SelectedTargetClasskind = this.req2.ClassKind;
+
+            vm.SelectedSource = this.req1;
+            vm.SelectedTarget = this.req2;
+            vm.SelectedOwner = this.domain;
+
+            Assert.IsTrue(vm.OkCanExecute);
+
+            // re-selecting the source as the target is not allowed
+            vm.SelectedTarget = this.req1;
+
+            Assert.IsFalse(vm.OkCanExecute);
+
+            // and the source is excluded from the list of possible targets
+            Assert.IsFalse(vm.PossibleTarget.Contains(this.req1));
         }
 
         [Test]
