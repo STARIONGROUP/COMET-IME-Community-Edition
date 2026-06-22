@@ -291,6 +291,28 @@ namespace CDP4EngineeringModel.Tests.Dialogs
         }
 
         [Test]
+        public void VerifyThatUsedParameterTypesAreExcludedFromTheAddList()
+        {
+            this.elementDefinition.Owner = this.domainOfExpertise;
+
+            var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            Assert.That(elementDefinitionDialogViewModel.PossibleParameterTypesToAdd, Does.Contain(this.parameterType));
+
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.parameterType,
+                Owner = this.domainOfExpertise
+            };
+
+            this.elementDefinition.Parameter.Add(parameter);
+
+            var dialogWithUsedType = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            Assert.That(dialogWithUsedType.PossibleParameterTypesToAdd, Does.Not.Contain(this.parameterType));
+        }
+
+        [Test]
         public async Task VerifyThatDeleteParameterRemovesItFromTheTree()
         {
             this.elementDefinition.Owner = this.domainOfExpertise;

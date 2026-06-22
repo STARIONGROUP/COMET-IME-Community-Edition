@@ -183,7 +183,9 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets the possible <see cref="ParameterType"/>s that a new <see cref="Parameter"/> can be created from.
+        /// Gets the <see cref="ParameterType"/>s from which a new <see cref="Parameter"/> can be created.
+        /// <see cref="ParameterType"/>s that are already used by a <see cref="Parameter"/> of this <see cref="ElementDefinition"/>
+        /// are excluded, as the same <see cref="ParameterType"/> may not be applied twice.
         /// </summary>
         public ReactiveList<ParameterType> PossibleParameterTypesToAdd { get; private set; }
 
@@ -197,7 +199,7 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
-        /// Gets the command to create a <see cref="Parameter"/> as part of this dialog's transaction.
+        /// Gets the command to create a <see cref="Parameter"/> of the <see cref="SelectedParameterTypeToAdd"/> as part of this dialog's transaction.
         /// </summary>
         public ReactiveCommand<Unit, Unit> CreateParameterTreeCommand { get; private set; }
 
@@ -235,8 +237,8 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.PopulatePossibleCategories();
             this.PopulatePossibleOrganizations();
-            this.PopulatePossibleParameterTypesToAdd();
             this.PopulateParameterRows();
+            this.PopulatePossibleParameterTypesToAdd();
         }
 
         /// <summary>
@@ -252,7 +254,7 @@ namespace CDP4EngineeringModel.ViewModels
             var canInspectSelected = this.WhenAnyValue(vm => vm.SelectedParameterTreeRow).Select(row => row != null);
 
             this.CreateParameterTreeCommand = ReactiveCommandCreator.Create(this.CreateParameter, canCreateParameter);
-            this.CreateParameterGroupTreeCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ParameterGroup>(this.PopulateParameterRows), canCreateGroup);
+            this.CreateParameterGroupTreeCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ParameterGroup>(this.RefreshParameterTree), canCreateGroup);
             this.EditParameterTreeCommand = ReactiveCommandCreator.Create(() => this.ExecuteEditCommand(this.SelectedParameterTreeRow.Thing, this.PopulateParameterRows), canModifySelected);
             this.DeleteParameterTreeCommand = ReactiveCommandCreator.Create(this.DeleteSelectedParameterTreeRow, canModifySelected);
             this.InspectParameterTreeCommand = ReactiveCommandCreator.Create(() => this.ExecuteInspectCommand(this.SelectedParameterTreeRow.Thing), canInspectSelected);
@@ -275,7 +277,16 @@ namespace CDP4EngineeringModel.ViewModels
             this.Thing.Parameter.Add(parameter);
             this.transaction.Create(parameter);
 
+            this.RefreshParameterTree();
+        }
+
+        /// <summary>
+        /// Rebuilds the parameter tree and the list of <see cref="ParameterType"/>s that are still available for creation.
+        /// </summary>
+        private void RefreshParameterTree()
+        {
             this.PopulateParameterRows();
+            this.PopulatePossibleParameterTypesToAdd();
         }
 
         /// <summary>
@@ -297,11 +308,12 @@ namespace CDP4EngineeringModel.ViewModels
                     break;
             }
 
-            this.PopulateParameterRows();
+            this.RefreshParameterTree();
         }
 
         /// <summary>
-        /// Populates the <see cref="PossibleParameterTypesToAdd"/> from the model reference data libraries.
+        /// Populates the <see cref="PossibleParameterTypesToAdd"/> from the model reference data libraries, excluding the
+        /// <see cref="ParameterType"/>s that are already used by a <see cref="Parameter"/> of this <see cref="ElementDefinition"/>.
         /// </summary>
         private void PopulatePossibleParameterTypesToAdd()
         {
@@ -313,7 +325,12 @@ namespace CDP4EngineeringModel.ViewModels
             var parameterTypes = new List<ParameterType>(mrdl.ParameterType);
             parameterTypes.AddRange(mrdl.GetRequiredRdls().SelectMany(rdl => rdl.ParameterType).Except(parameterTypes));
 
-            this.PossibleParameterTypesToAdd.AddRange(parameterTypes.OrderBy(p => p.ShortName));
+            var usedParameterTypeIids = this.Thing.Parameter.Select(p => p.ParameterType.Iid).ToList();
+
+            this.PossibleParameterTypesToAdd.AddRange(parameterTypes
+                .Where(p => !usedParameterTypeIids.Contains(p.Iid))
+                .OrderBy(p => p.ShortName));
+
             this.SelectedParameterTypeToAdd = this.PossibleParameterTypesToAdd.FirstOrDefault();
         }
 

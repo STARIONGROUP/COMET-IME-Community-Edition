@@ -78,19 +78,22 @@
                 </lc:LayoutItem>
             </lc:LayoutGroup>
             <lc:LayoutGroup Header="Parameters" Orientation="Vertical">
-                <lc:LayoutItem Label="New Parameter Type: ">
-                    <dxe:ComboBoxEdit Name="ParameterTypeToAdd"
-                                      MaxWidth="250"
-                                      HorizontalAlignment="Left"
-                                      DisplayMember="Name"
-                                      EditValue="{Binding SelectedParameterTypeToAdd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                      IsEnabled="{Binding IsReadOnly, Converter={StaticResource NotConverter}}"
-                                      IsTextEditable="False"
-                                      ItemsSource="{Binding PossibleParameterTypesToAdd}"
-                                      NullText="Select a Parameter Type to add..." />
-                </lc:LayoutItem>
                 <lc:LayoutItem>
+                    <StackPanel MaxWidth="700"
+                                HorizontalAlignment="Left"
+                                Orientation="Vertical">
                     <dxb:ToolBarControl Height="30" Background="Transparent">
+                        <dxb:BarEditItem x:Name="ParameterTypeToAdd"
+                                         EditValue="{Binding SelectedParameterTypeToAdd, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                         EditWidth="200"
+                                         IsEnabled="{Binding IsReadOnly, Converter={StaticResource NotConverter}}">
+                            <dxb:BarEditItem.EditSettings>
+                                <dxe:ComboBoxEditSettings DisplayMember="Name"
+                                                          IsTextEditable="False"
+                                                          ItemsSource="{Binding PossibleParameterTypesToAdd}"
+                                                          NullText="Select a Parameter Type to add..." />
+                            </dxb:BarEditItem.EditSettings>
+                        </dxb:BarEditItem>
                         <dxb:BarButtonItem x:Name="CreateParameterButton"
                                            Command="{Binding CreateParameterTreeCommand}"
                                            Content="Add Parameter"
@@ -114,10 +117,7 @@
                                            Glyph="{dx:DXImage Image=Find_16x16.png}"
                                            Hint="Inspect the selected Parameter or Parameter Group (Ctrl+I)." />
                     </dxb:ToolBarControl>
-                </lc:LayoutItem>
-                <lc:LayoutItem>
-                    <dxg:TreeListControl MaxWidth="700"
-                                         Height="250"
+                    <dxg:TreeListControl Height="250"
                                          ItemsSource="{Binding ParameterRows}"
                                          SelectedItem="{Binding SelectedParameterTreeRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                          SelectionMode="Row">
@@ -174,6 +174,7 @@
                             <dxg:TreeListColumn FieldName="ModelCode" Header="Model Code" />
                         </dxg:TreeListControl.Columns>
                     </dxg:TreeListControl>
+                    </StackPanel>
                 </lc:LayoutItem>
             </lc:LayoutGroup>
             <items:AliasLayoutGroup />
