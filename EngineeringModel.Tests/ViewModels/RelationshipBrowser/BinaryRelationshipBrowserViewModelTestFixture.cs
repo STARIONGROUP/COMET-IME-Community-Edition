@@ -215,6 +215,35 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         }
 
         [Test]
+        public async Task VerifyThatBinaryRelationshipFromThingToItselfCannotBeCreated()
+        {
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+            var creator = viewmodel.RelationshipCreator.BinaryRelationshipCreator;
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementDefinition1);
+            dropinfo.SetupProperty(x => x.Effects);
+
+            await creator.SourceViewModel.Drop(dropinfo.Object);
+
+            var dropinfo2 = new Mock<IDropInfo>();
+            dropinfo2.Setup(x => x.Payload).Returns(this.elementDefinition1);
+            await creator.TargetViewModel.Drop(dropinfo2.Object);
+
+            Assert.AreSame(creator.SourceViewModel.RelatedThing, creator.TargetViewModel.RelatedThing);
+            Assert.IsFalse(creator.CanCreate);
+            Assert.IsTrue(creator.IsSourceAndTargetSame);
+            Assert.IsFalse(((ICommand)viewmodel.RelationshipCreator.CreateRelationshipCommand).CanExecute(null));
+
+            var dropinfo3 = new Mock<IDropInfo>();
+            dropinfo3.Setup(x => x.Payload).Returns(this.elementDefinition2);
+            await creator.TargetViewModel.Drop(dropinfo3.Object);
+
+            Assert.IsFalse(creator.IsSourceAndTargetSame);
+            Assert.IsTrue(creator.CanCreate);
+        }
+
+        [Test]
         public void VerifyThatBinaryRelationshipNameUsesNameWhenSetAndPathOtherwise()
         {
             var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);

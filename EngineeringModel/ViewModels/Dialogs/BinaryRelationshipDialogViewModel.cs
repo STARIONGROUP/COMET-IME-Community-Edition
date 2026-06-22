@@ -173,8 +173,19 @@ namespace CDP4EngineeringModel.ViewModels
 
             this.WhenAnyValue(x => x.SelectedSourceClasskind).Subscribe(x => { this.PopulatePossibleSource(); });
             this.WhenAnyValue(x => x.SelectedTargetClasskind).Subscribe(x => { this.PopulatePossibleTarget(); });
-            this.WhenAnyValue(x => x.SelectedSource).Subscribe(x => this.UpdateOkCanExecute());
-            this.WhenAnyValue(x => x.SelectedTarget).Subscribe(x => this.UpdateOkCanExecute());
+
+            this.WhenAnyValue(x => x.SelectedSource).Subscribe(x =>
+            {
+                this.PopulatePossibleTarget();
+                this.UpdateOkCanExecute();
+            });
+
+            this.WhenAnyValue(x => x.SelectedTarget).Subscribe(x =>
+            {
+                this.PopulatePossibleSource();
+                this.UpdateOkCanExecute();
+            });
+            
             this.WhenAnyValue(x => x.SelectedOwner).Subscribe(x => this.UpdateOkCanExecute());
         }
 
@@ -246,7 +257,7 @@ namespace CDP4EngineeringModel.ViewModels
             base.UpdateOkCanExecute();
 
             this.OkCanExecute = this.OkCanExecute && (this.SelectedSource != null) && (this.SelectedTarget != null) &&
-                                (this.SelectedOwner != null);
+                                (this.SelectedOwner != null) && (this.SelectedSource != this.SelectedTarget);
         }
 
         /// <summary>

@@ -156,6 +156,14 @@
                             </TextBox>
                         </dxlc:LayoutGroup>
 
+                        <dxlc:LayoutItem Label="Error: "
+                                         Visibility="{Binding IsSourceAndTargetSame, Converter={dx:BooleanToVisibilityConverter}}">
+                            <TextBox Margin="5"
+                                     Text="The source and target cannot be the same Thing."
+                                     IsReadOnly="True"
+                                     TextWrapping="Wrap" />
+                        </dxlc:LayoutItem>
+
                         <dxlc:LayoutItem Label="Categories: ">
                             <dxe:ComboBoxEdit DisplayMember="Name"
                                               SeparatorString=", "

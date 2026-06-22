@@ -75,6 +75,11 @@ namespace CDP4EngineeringModel.ViewModels
         private bool canCreate;
 
         /// <summary>
+        /// Backing field for <see cref="IsSourceAndTargetSame" />
+        /// </summary>
+        private bool isSourceAndTargetSame;
+
+        /// <summary>
         /// Backing field for <see cref="Name" />
         /// </summary>
         private string name;
@@ -96,7 +101,7 @@ namespace CDP4EngineeringModel.ViewModels
             this.PossibleCategories = new ReactiveList<Category>();
             this.SourceViewModel = new RelatedThingViewModel(session.CDPMessageBus);
             this.TargetViewModel = new RelatedThingViewModel(session.CDPMessageBus);
-            var relatedThingChangedSubscriber = this.WhenAnyValue(x => x.TargetViewModel.RelatedThing, y => y.SourceViewModel.RelatedThing).Subscribe(x => this.CanCreate = this.SourceViewModel.RelatedThing != null && this.TargetViewModel.RelatedThing != null);
+            var relatedThingChangedSubscriber = this.WhenAnyValue(x => x.TargetViewModel.RelatedThing, y => y.SourceViewModel.RelatedThing).Subscribe(_ => this.UpdateCanCreate());
             this.Subscriptions.Add(relatedThingChangedSubscriber);
 
             this.InitializeRequiredRdlSubscription();
@@ -153,9 +158,32 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the selected source and target are the same <see cref="Thing" />.
+        /// A <see cref="BinaryRelationship" /> from a <see cref="Thing" /> to itself is not allowed.
+        /// </summary>
+        public bool IsSourceAndTargetSame
+        {
+            get => this.isSourceAndTargetSame;
+            private set => this.RaiseAndSetIfChanged(ref this.isSourceAndTargetSame, value);
+        }
+
+        /// <summary>
         /// Gets the type of the <see cref="Relationship" /> to create
         /// </summary>
         public string CreatorKind => "Binary Relationship";
+
+        /// <summary>
+        /// Updates the <see cref="CanCreate" /> and <see cref="IsSourceAndTargetSame" /> properties based on the
+        /// currently selected source and target.
+        /// </summary>
+        private void UpdateCanCreate()
+        {
+            var source = this.SourceViewModel.RelatedThing;
+            var target = this.TargetViewModel.RelatedThing;
+
+            this.IsSourceAndTargetSame = (source != null) && (source == target);
+            this.CanCreate = (source != null) && (target != null) && (source != target);
+        }
 
         /// <summary>
         /// Re-initializes the view-model

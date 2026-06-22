@@ -455,8 +455,13 @@ namespace CDP4RelationshipEditor.ViewModels
 
             if (beginItemContent == null || endItemContent == null)
             {
-                // connector was drawn with either the source or target missing
-                // remove the dummy connector
+                this.Behavior.RemoveItem(connector);
+                this.Behavior.ResetTool();
+                return;
+            }
+
+            if (beginItemContent.Thing == endItemContent.Thing)
+            {
                 this.Behavior.RemoveItem(connector);
                 this.Behavior.ResetTool();
                 return;
