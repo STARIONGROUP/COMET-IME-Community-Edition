@@ -1,8 +1,9 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ElementDefinitionDialogViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary,
+//              Rowan de Voogt
 //
 //    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -74,6 +75,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
         private ElementDefinition elementDefinition;
         private CDPMessageBus messageBus;
+        private Assembler assembler;
+        private SimpleQuantityKind parameterType;
 
         [SetUp]
         public void SetUp()
@@ -82,22 +85,31 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.messageBus = new CDPMessageBus();
             this.cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
+            this.assembler = new Assembler(this.uri, this.messageBus);
 
-            this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();            
+            this.thingDialogNavigationService = new Mock<IThingDialogNavigationService>();
             this.session = new Mock<ISession>();
             this.permissionService = new Mock<IPermissionService>();
+            this.permissionService.Setup(x => x.CanRead(It.IsAny<Thing>())).Returns(true);
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
             
             this.domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "system", ShortName = "SYS" };
 
-            var participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
+            var person = new Person(Guid.NewGuid(), this.cache, this.uri);
+            this.session.Setup(x => x.ActivePerson).Returns(person);
+
+            var participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = person };
             participant.Domain.Add(domainOfExpertise);
 
             var engineeringModelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, this.uri);
+            engineeringModelSetup.Participant.Add(participant);
             engineeringModelSetup.ActiveDomain.Add(this.domainOfExpertise);
             var srdl = new SiteReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri) { Name = "testRDL", ShortName = "test" };
             var category = new Category(Guid.NewGuid(), this.cache, this.uri) { Name = "test Category", ShortName = "testCategory" };
             category.PermissibleClass.Add(ClassKind.ElementDefinition);
             srdl.DefinedCategory.Add(category);
+            this.parameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { Name = "mass", ShortName = "m" };
+            srdl.ParameterType.Add(this.parameterType);
             var mrdl = new ModelReferenceDataLibrary(Guid.NewGuid(), this.cache, this.uri) { RequiredRdl = srdl };
             engineeringModelSetup.RequiredRdl.Add(mrdl);
             srdl.DefinedCategory.Add(new Category(Guid.NewGuid(), this.cache, this.uri));
@@ -123,6 +135,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.session.Setup(x => x.OpenIterations).Returns(openIterations);
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
+            this.session.Setup(x => x.Assembler).Returns(this.assembler);
+            this.session.Setup(x => x.PermissionService).Returns(this.permissionService.Object);
 
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
         }
@@ -195,6 +209,165 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             await elementDefinitionDialogViewModel.OkCommand.Execute();
 
             this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
+        }
+
+        [Test]
+        public void VerifyThatParameterRowsShowsGroupsAndParametersButNotUsages()
+        {
+            this.elementDefinition.Owner = this.domainOfExpertise;
+
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.parameterType,
+                Owner = this.domainOfExpertise
+            };
+
+            this.elementDefinition.Parameter.Add(parameter);
+
+            var parameterGroup = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "group" };
+            this.elementDefinition.ParameterGroup.Add(parameterGroup);
+
+            var referencedElementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "ref", ShortName = "ref", Owner = this.domainOfExpertise };
+            this.engineeringModel.Iteration.First().Element.Add(referencedElementDefinition);
+
+            var elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Name = "usage",
+                ShortName = "usage",
+                Owner = this.domainOfExpertise,
+                ElementDefinition = referencedElementDefinition
+            };
+
+            this.elementDefinition.ContainedElement.Add(elementUsage);
+
+            var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            var rowThings = elementDefinitionDialogViewModel.ParameterRows.Select(x => x.Thing).ToList();
+
+            Assert.That(rowThings, Does.Contain(parameter));
+            Assert.That(rowThings, Does.Contain(parameterGroup));
+            Assert.That(rowThings, Does.Not.Contain(elementUsage));
+        }
+
+        [Test]
+        public void VerifyThatAParameterIsNestedUnderItsGroup()
+        {
+            this.elementDefinition.Owner = this.domainOfExpertise;
+
+            var parameterGroup = new ParameterGroup(Guid.NewGuid(), this.cache, this.uri) { Name = "group" };
+            this.elementDefinition.ParameterGroup.Add(parameterGroup);
+
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.parameterType,
+                Owner = this.domainOfExpertise,
+                Group = parameterGroup
+            };
+
+            this.elementDefinition.Parameter.Add(parameter);
+
+            var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            var groupRow = elementDefinitionDialogViewModel.ParameterRows.Single(x => Equals(x.Thing, parameterGroup));
+
+            Assert.That(elementDefinitionDialogViewModel.ParameterRows.Select(x => x.Thing), Does.Not.Contain(parameter));
+            Assert.That(groupRow.ContainedRows.Select(x => x.Thing), Does.Contain(parameter));
+        }
+
+        [Test]
+        public async Task VerifyThatCreateParameterStagesAParameterAndShowsItInTheTree()
+        {
+            this.elementDefinition.Owner = this.domainOfExpertise;
+
+            var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            Assert.That(elementDefinitionDialogViewModel.SelectedParameterTypeToAdd, Is.EqualTo(this.parameterType));
+
+            await elementDefinitionDialogViewModel.CreateParameterTreeCommand.Execute();
+
+            Assert.That(this.elementDefinition.Parameter, Has.Count.EqualTo(1));
+            Assert.That(this.elementDefinition.Parameter.Single().ParameterType, Is.EqualTo(this.parameterType));
+            Assert.That(elementDefinitionDialogViewModel.ParameterRows.Select(x => x.Thing), Does.Contain(this.elementDefinition.Parameter.Single()));
+        }
+
+        [Test]
+        public void VerifyThatUsedParameterTypesAreExcludedFromTheAddList()
+        {
+            this.elementDefinition.Owner = this.domainOfExpertise;
+
+            var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            Assert.That(elementDefinitionDialogViewModel.PossibleParameterTypesToAdd, Does.Contain(this.parameterType));
+
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.parameterType,
+                Owner = this.domainOfExpertise
+            };
+
+            this.elementDefinition.Parameter.Add(parameter);
+
+            var dialogWithUsedType = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            Assert.That(dialogWithUsedType.PossibleParameterTypesToAdd, Does.Not.Contain(this.parameterType));
+        }
+
+        [Test]
+        public async Task VerifyThatDeleteParameterRemovesItFromTheTree()
+        {
+            this.elementDefinition.Owner = this.domainOfExpertise;
+
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.parameterType,
+                Owner = this.domainOfExpertise
+            };
+
+            this.elementDefinition.Parameter.Add(parameter);
+
+            var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            elementDefinitionDialogViewModel.SelectedParameterTreeRow = elementDefinitionDialogViewModel.ParameterRows.Single(x => Equals(x.Thing, parameter));
+
+            await elementDefinitionDialogViewModel.DeleteParameterTreeCommand.Execute();
+
+            Assert.That(this.elementDefinition.Parameter, Does.Not.Contain(parameter));
+            Assert.That(elementDefinitionDialogViewModel.ParameterRows.Select(x => x.Thing), Does.Not.Contain(parameter));
+        }
+
+        [Test]
+        public async Task VerifyThatEditParameterTreeCommandEditsWithinTheDialogTransaction()
+        {
+            this.elementDefinition.Owner = this.domainOfExpertise;
+
+            var parameter = new Parameter(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = this.parameterType,
+                Owner = this.domainOfExpertise
+            };
+
+            this.elementDefinition.Parameter.Add(parameter);
+
+            IThingTransaction usedTransaction = null;
+
+            this.thingDialogNavigationService
+                .Setup(x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), false, ThingDialogKind.Update, It.IsAny<IThingDialogNavigationService>(), It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()))
+                .Callback<Thing, IThingTransaction, ISession, bool, ThingDialogKind, IThingDialogNavigationService, Thing, IEnumerable<Thing>>((t, tr, s, r, k, n, c, ch) => usedTransaction = tr)
+                .Returns(true);
+
+            var elementDefinitionDialogViewModel = new ElementDefinitionDialogViewModel(this.elementDefinition, this.thingTransaction, this.session.Object, true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.iterationClone);
+
+            elementDefinitionDialogViewModel.SelectedParameterTreeRow = elementDefinitionDialogViewModel.ParameterRows.Single(row => Equals(row.Thing, parameter));
+
+            await elementDefinitionDialogViewModel.EditParameterTreeCommand.Execute();
+
+            // the edit is routed through the child dialog as a non-root (isRoot = false) navigation, so the change
+            // is part of this dialog's transaction chain rather than an independent live write.
+            this.thingDialogNavigationService.Verify(
+                x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), It.IsAny<ISession>(), false, ThingDialogKind.Update, It.IsAny<IThingDialogNavigationService>(), It.IsAny<Thing>(), It.IsAny<IEnumerable<Thing>>()),
+                Times.Once);
+
+            Assert.That(usedTransaction, Is.Not.Null);
         }
     }
 }
