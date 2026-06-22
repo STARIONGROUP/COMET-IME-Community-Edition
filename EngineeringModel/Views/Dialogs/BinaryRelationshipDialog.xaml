@@ -18,6 +18,7 @@
         <ResourceDictionary>
             <converters:ReactiveClassKindToObjectListConverter x:Key="ReactiveClassKindToObjectListConverter" />
             <converters:NotConverter x:Key="NotConverter" />
+            <converters:ThingToFriendlyNameConverter x:Key="ThingToFriendlyNameConverter" />
         </ResourceDictionary>
     </dx:DXWindow.Resources>
     <lc:LayoutControl Margin="5"
@@ -49,21 +50,23 @@
                         </Grid.ColumnDefinitions>
                         <dxe:ComboBoxEdit Name="Source"
                                           DisplayMember="UserFriendlyShortName"
+                                          ApplyItemTemplateToSelectedItem="True"
                                           EditValue="{Binding Path=SelectedSource,
                                                               Mode=TwoWay,
                                                               UpdateSourceTrigger=PropertyChanged}"
                                           IsEnabled="{Binding IsReadOnly, Converter={StaticResource NotConverter}, Mode=OneWay}"
                                           IsReadOnly="{Binding IsReadOnly}"
-                                          IsTextEditable="True"
-                                          AutoComplete="True"
+                                          IsTextEditable="False"
+                                          IncrementalSearch="True"
                                           ItemsSource="{Binding Path=PossibleSource}"
                                           ShowCustomItems="false"
-                                          ToolTip="{Binding ElementName=Source, Path=EditValue.UserFriendlyName, UpdateSourceTrigger=PropertyChanged}">
-                            <dxe:ComboBoxEdit.ItemContainerStyle>
-                                <Style TargetType="dxe:ComboBoxEditItem">
-                                    <Setter Property="ToolTip" Value="{Binding UserFriendlyName}"/>
-                                </Style>
-                            </dxe:ComboBoxEdit.ItemContainerStyle>
+                                          ToolTip="{Binding ElementName=Source, Path=EditValue, Converter={StaticResource ThingToFriendlyNameConverter}, ConverterParameter=Name, UpdateSourceTrigger=PropertyChanged}">
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource ThingToFriendlyNameConverter}}"
+                                               ToolTip="{Binding Converter={StaticResource ThingToFriendlyNameConverter}, ConverterParameter=Name}"/>
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
                         </dxe:ComboBoxEdit>
                         <Button Grid.Column="1"
                                 Width="25"
@@ -105,21 +108,23 @@
                         </Grid.ColumnDefinitions>
                         <dxe:ComboBoxEdit Name="Target"
                                           DisplayMember="UserFriendlyShortName"
+                                          ApplyItemTemplateToSelectedItem="True"
                                           IsEnabled="{Binding IsReadOnly, Converter={StaticResource NotConverter}, Mode=OneWay}"
                                           EditValue="{Binding Path=SelectedTarget,
                                                               Mode=TwoWay,
                                                               UpdateSourceTrigger=PropertyChanged}"
                                           IsReadOnly="{Binding IsReadOnly}"
-                                          IsTextEditable="True"
-                                          AutoComplete="True"
+                                          IsTextEditable="False"
+                                          IncrementalSearch="True"
                                           ItemsSource="{Binding Path=PossibleTarget}"
                                           ShowCustomItems="false"
-                                          ToolTip="{Binding ElementName=Target, Path=EditValue.UserFriendlyName, UpdateSourceTrigger=PropertyChanged}">
-                            <dxe:ComboBoxEdit.ItemContainerStyle>
-                                <Style TargetType="dxe:ComboBoxEditItem">
-                                    <Setter Property="ToolTip" Value="{Binding UserFriendlyName}"/>
-                                </Style>
-                            </dxe:ComboBoxEdit.ItemContainerStyle>
+                                          ToolTip="{Binding ElementName=Target, Path=EditValue, Converter={StaticResource ThingToFriendlyNameConverter}, ConverterParameter=Name, UpdateSourceTrigger=PropertyChanged}">
+                            <dxe:ComboBoxEdit.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource ThingToFriendlyNameConverter}}"
+                                               ToolTip="{Binding Converter={StaticResource ThingToFriendlyNameConverter}, ConverterParameter=Name}"/>
+                                </DataTemplate>
+                            </dxe:ComboBoxEdit.ItemTemplate>
                         </dxe:ComboBoxEdit>
                         <Button Grid.Column="1"
                                 Width="25"

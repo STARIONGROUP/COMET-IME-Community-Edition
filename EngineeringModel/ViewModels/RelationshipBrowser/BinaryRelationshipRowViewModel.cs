@@ -33,6 +33,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -220,6 +221,11 @@ namespace CDP4EngineeringModel.ViewModels
             if (thing is BooleanExpression booleanExpression)
             {
                 return booleanExpression.StringValue;
+            }
+
+            if (thing is ParametricConstraint parametricConstraint)
+            {
+                return parametricConstraint.GetDisplayName();
             }
 
             return thing is INamedThing namedThing
