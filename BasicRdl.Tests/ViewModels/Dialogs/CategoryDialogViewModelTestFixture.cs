@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="CategoryDialogViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -209,7 +209,12 @@ namespace BasicRdl.Tests.ViewModels
             this.transaction = new ThingTransaction(transactionContext, clonerdl);
 
             vm = new CategoryDialogViewModel(cat31.Clone(false), this.transaction, this.session.Object, true, ThingDialogKind.Update, null, clonerdl);
-            Assert.AreEqual(10, vm.PossibleSuperCategories.Count);
+            Assert.AreEqual(6, vm.PossibleSuperCategories.Count);
+            Assert.That(vm.PossibleSuperCategories.All(c => c.Iid != cat31.Iid), Is.True, "a Category may not be a super-category of itself");
+            Assert.That(
+                vm.PossibleSuperCategories.Any(c => c.Iid == cat311.Iid || c.Iid == cat312.Iid || c.Iid == cat3111.Iid),
+                Is.False,
+                "a Category may not be a super-category of one of its own descendants");
         }
 
         [Test]

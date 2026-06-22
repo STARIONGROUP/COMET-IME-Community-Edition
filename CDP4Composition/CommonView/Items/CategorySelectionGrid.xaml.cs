@@ -1,5 +1,5 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="CategoryLayoutGroup.xaml.cs" company="Starion Group S.A.">
+// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="CategorySelectionGrid.xaml.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
@@ -25,17 +25,26 @@
 
 namespace CDP4CommonView.Items
 {
+    using System.Windows.Controls;
+
+    using CDP4Common.SiteDirectoryData;
+
     /// <summary>
-    /// Interaction logic for CategoryLayoutGroup
+    /// Interaction logic for <see cref="CategorySelectionGrid"/>, the reusable grid that lets a user select
+    /// <see cref="Category"/>s (showing short name, name, super categories and the optional Container RDL and Definition
+    /// columns) with check boxes, a "Select All" toggle and a "Column Chooser" button. It is used both for assigning
+    /// <see cref="Category"/>s to a categorizable thing and for selecting the super categories of a <see cref="Category"/>.
+    /// The grid is parameterized through the CDP4Composition.Mvvm.Behaviours.CategorySelectionGridProperties attached
+    /// properties so that no parameters or logic have to live in this code-behind.
     /// </summary>
-    public partial class CategoryLayoutGroup
+    public partial class CategorySelectionGrid : UserControl
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CategoryLayoutGroup"/> class.
+        /// Initializes a new instance of the <see cref="CategorySelectionGrid"/> class.
         /// </summary>
-        public CategoryLayoutGroup()
+        public CategorySelectionGrid()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

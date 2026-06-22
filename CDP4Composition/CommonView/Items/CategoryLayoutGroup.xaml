@@ -2,59 +2,18 @@
                   xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                  xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
                   xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
-                  xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:items="clr-namespace:CDP4CommonView.Items"
                   xmlns:behaviours="clr-namespace:CDP4Composition.Mvvm.Behaviours"
-                  xmlns:converters="clr-namespace:CDP4Composition.Converters"
-                  xmlns:themes="http://schemas.devexpress.com/winfx/2008/xaml/editors/themekeys"
                   Header="Category"
                   Orientation="Vertical"
                   mc:Ignorable="d"
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch">
-    <dxlc:LayoutGroup.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-            <converters:ReactiveCategoryToObjectListConverter x:Key="ReactiveCategoryToObjectListConverter" />
-            <converters:CategoryVisibilityConverter x:Key="CategoryVisibilityConverter" />
-            <converters:NotConverter x:Key="NotConverter" />
-        </ResourceDictionary>
-    </dxlc:LayoutGroup.Resources>
-    <dxlc:LayoutItem HorizontalAlignment="Left">
-        <CheckBox x:Name="SelectAllCategoriesCheckBox"
-                  Content="Select All"
-                  Margin="10,0,0,0"
-                  VerticalAlignment="Center"
-                  IsEnabled="{Binding IsReadOnly, Converter={StaticResource NotConverter}}" />
-    </dxlc:LayoutItem>
     <dxlc:LayoutItem>
-        <dxe:ListBoxEdit Name="CategoriesList"
-                         MaxHeight="350"
-                         VerticalAlignment="Stretch"
-                         HorizontalAlignment="Stretch"
-                        Margin="10"
-                        IsReadOnly="{Binding IsReadOnly}"
-                        DisplayMember="Name"
-                        EditValue="{Binding Category,
-                                            Converter={StaticResource ReactiveCategoryToObjectListConverter},
-                                            UpdateSourceTrigger=PropertyChanged}"
-                        SelectionMode="Multiple">
-            <dxmvvm:Interaction.Behaviors>
-                <behaviours:CategorySelectAllBehavior SelectAllCheckBox="{Binding ElementName=SelectAllCategoriesCheckBox}" />
-            </dxmvvm:Interaction.Behaviors>
-            <dxe:ListBoxEdit.ItemsSource>
-                <MultiBinding Converter="{StaticResource CategoryVisibilityConverter}" Mode="OneTime">
-                    <Binding Path="PossibleCategory" />
-                    <Binding Path="Category" />
-                </MultiBinding>
-            </dxe:ListBoxEdit.ItemsSource>
-            <dxe:ListBoxEdit.StyleSettings>
-                <dxe:CheckedListBoxEditStyleSettings ShowSelectAllItem="False" ItemContainerStyle="{StaticResource ListBoxEditItemStyleDeprecatedNotSelectable}" />
-            </dxe:ListBoxEdit.StyleSettings>
-        </dxe:ListBoxEdit>
+        <items:CategorySelectionGrid behaviours:CategorySelectionGridProperties.PossibleCategories="{Binding PossibleCategory}"
+                                     behaviours:CategorySelectionGridProperties.SelectedCategories="{Binding Category}"
+                                     behaviours:CategorySelectionGridProperties.IsReadOnly="{Binding IsReadOnly}" />
     </dxlc:LayoutItem>
 </dxlc:LayoutGroup>
