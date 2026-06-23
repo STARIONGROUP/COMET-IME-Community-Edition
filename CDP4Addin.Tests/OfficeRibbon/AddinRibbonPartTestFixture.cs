@@ -99,6 +99,9 @@ namespace CDP4Addin.Tests.OfficeRibbon
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDirectory);
             this.session.Setup(x => x.DataSourceUri).Returns("test");
+            this.session.Setup(x => x.Name).Returns("test");
+            this.session.Setup(x => x.Refresh()).Returns(Task.CompletedTask);
+            this.session.Setup(x => x.Reload()).Returns(Task.CompletedTask);
             this.session.Setup(x => x.Assembler).Returns(this.assembler);
             var iterationDictionary = new Dictionary<CDP4Common.EngineeringModelData.Iteration, Tuple<DomainOfExpertise, Participant>>();
             this.session.Setup(x => x.OpenIterations).Returns(iterationDictionary);
@@ -134,7 +137,7 @@ namespace CDP4Addin.Tests.OfficeRibbon
 
             this.serviceLocator.Setup(s => s.GetInstance<IAssemblyInformationService>()).Returns(this.assemblyLocationLoader.Object);
 
-            this.amountOfRibbonControls = 9;
+            this.amountOfRibbonControls = 18;
             this.order = 1;
 
             this.ribbonPart = new AddinRibbonPart(this.order, this.panelNavigationService.Object, null, this.dialogNavigationService.Object, null, this.appSettingService.Object, this.messageBus, this.exceptionHandlerService.Object, this.sessionCreator.Object);
@@ -185,6 +188,11 @@ namespace CDP4Addin.Tests.OfficeRibbon
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToOpen"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Plugins"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Refresh"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_Reload"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_AutoRefreshToggle"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_AutoRefreshInterval"));
+            Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_AutoRefreshCountdown"));
 
             var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
             this.messageBus.SendMessage(openSessionEvent);
@@ -195,6 +203,11 @@ namespace CDP4Addin.Tests.OfficeRibbon
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_SelectModelToOpen"));
             Assert.IsFalse(this.ribbonPart.GetEnabled("CDP4_SelectModelToClose"));
             Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Plugins"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Refresh"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_Reload"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_AutoRefreshToggle"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_AutoRefreshInterval"));
+            Assert.IsTrue(this.ribbonPart.GetEnabled("CDP4_AutoRefreshCountdown"));
 
             var closeSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Closed);
             this.messageBus.SendMessage(closeSessionEvent);
@@ -250,6 +263,87 @@ namespace CDP4Addin.Tests.OfficeRibbon
             await this.ribbonPart.OnAction("CDP4_SelectModelToOpen");
 
             this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()));
+        }
+
+        [Test]
+        public async Task Verify_that_when_On_Action_CDP4_Refresh_the_session_is_refreshed()
+        {
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            this.messageBus.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_Refresh");
+
+            this.session.Verify(x => x.Refresh());
+        }
+
+        [Test]
+        public async Task Verify_that_when_On_Action_CDP4_Reload_the_session_is_reloaded()
+        {
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            this.messageBus.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_Reload");
+
+            this.session.Verify(x => x.Reload());
+        }
+
+        [Test]
+        public async Task Verify_that_CDP4_AutoRefreshToggle_toggles_the_pressed_state()
+        {
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            this.messageBus.SendMessage(openSessionEvent);
+
+            Assert.IsFalse(this.ribbonPart.GetPressed("CDP4_AutoRefreshToggle"));
+
+            await this.ribbonPart.OnAction("CDP4_AutoRefreshToggle");
+
+            Assert.IsTrue(this.ribbonPart.GetPressed("CDP4_AutoRefreshToggle"));
+
+            await this.ribbonPart.OnAction("CDP4_AutoRefreshToggle");
+
+            Assert.IsFalse(this.ribbonPart.GetPressed("CDP4_AutoRefreshToggle"));
+        }
+
+        [Test]
+        public void Verify_that_the_interval_editBox_text_reflects_and_updates_the_interval()
+        {
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            this.messageBus.SendMessage(openSessionEvent);
+
+            Assert.AreEqual("60", this.ribbonPart.GetText("CDP4_AutoRefreshInterval"));
+
+            this.ribbonPart.OnChange("CDP4_AutoRefreshInterval", "120");
+            Assert.AreEqual("120", this.ribbonPart.GetText("CDP4_AutoRefreshInterval"));
+
+            // out-of-range values are clamped
+            this.ribbonPart.OnChange("CDP4_AutoRefreshInterval", "9000");
+            Assert.AreEqual("300", this.ribbonPart.GetText("CDP4_AutoRefreshInterval"));
+
+            // invalid input is ignored and the previous value kept
+            this.ribbonPart.OnChange("CDP4_AutoRefreshInterval", "abc");
+            Assert.AreEqual("300", this.ribbonPart.GetText("CDP4_AutoRefreshInterval"));
+        }
+
+        [Test]
+        public void Verify_that_the_countdown_is_hidden_and_empty_when_auto_refresh_is_off()
+        {
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            this.messageBus.SendMessage(openSessionEvent);
+
+            Assert.IsFalse(this.ribbonPart.GetVisible("CDP4_AutoRefreshCountdown"));
+            Assert.AreEqual(string.Empty, this.ribbonPart.GetLabel("CDP4_AutoRefreshCountdown"));
+        }
+
+        [Test]
+        public async Task Verify_that_the_countdown_is_shown_with_text_when_auto_refresh_is_enabled()
+        {
+            var openSessionEvent = new SessionEvent(this.session.Object, SessionStatus.Open);
+            this.messageBus.SendMessage(openSessionEvent);
+
+            await this.ribbonPart.OnAction("CDP4_AutoRefreshToggle");
+
+            Assert.IsTrue(this.ribbonPart.GetVisible("CDP4_AutoRefreshCountdown"));
+            Assert.That(this.ribbonPart.GetLabel("CDP4_AutoRefreshCountdown"), Does.StartWith("Next refresh in "));
         }
     }
 }

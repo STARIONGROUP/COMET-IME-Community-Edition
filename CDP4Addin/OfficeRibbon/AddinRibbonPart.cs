@@ -27,10 +27,13 @@ namespace CDP4AddinCE
 {
     using System;
     using System.Collections.Generic;
+    using System.Reactive.Linq;
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using CDP4AddinCE.Events;
     using CDP4AddinCE.Settings;
+    using CDP4AddinCE.ViewModels;
 
     using CDP4Common.ExceptionHandlerService;
 
@@ -47,6 +50,8 @@ namespace CDP4AddinCE
     using CDP4ShellDialogs.ViewModels;
 
     using NLog;
+
+    using ReactiveUI;
 
     /// <summary>
     /// The purpose of the <see cref="AddinRibbonPart"/> class is to describe and provide a part of the Fluent Ribbon
@@ -80,9 +85,23 @@ namespace CDP4AddinCE
         private readonly ISessionCreator sessionCreator;
 
         /// <summary>
-        /// The <see cref="IAuthenticationRefreshService" /> that provides authentication refresh behavior 
+        /// The <see cref="IAuthenticationRefreshService" /> that provides authentication refresh behavior
         /// </summary>
         private IAuthenticationRefreshService authenticationRefreshService;
+
+        /// <summary>
+        /// The <see cref="SessionRefreshViewModel"/> that holds the auto-refresh state and timer for the active <see cref="session"/>.
+        /// </summary>
+        /// <remarks>
+        /// A single instance is kept alive for the lifetime of the <see cref="session"/> so that the automatic refresh
+        /// timer keeps running in the background while the user works in Excel.
+        /// </remarks>
+        private SessionRefreshViewModel sessionRefreshViewModel;
+
+        /// <summary>
+        /// The subscription that requests a ribbon refresh while the auto-refresh countdown is running.
+        /// </summary>
+        private IDisposable countdownSubscription;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AddinRibbonPart"/> class.
@@ -166,6 +185,16 @@ namespace CDP4AddinCE
                     var modelPluginDialogViewModel = new PluginManagerViewModel<AddinAppSettings>(this.appSettingService);
                     var modelPluginDialogResult = this.DialogNavigationService.NavigateModal(modelPluginDialogViewModel) as DataSourceSelectionResult;
                     break;
+                case "CDP4_Refresh":
+                    await this.GetOrCreateSessionRefreshViewModel().Refresh.Execute();
+                    break;
+                case "CDP4_Reload":
+                    await this.GetOrCreateSessionRefreshViewModel().Reload.Execute();
+                    break;
+                case "CDP4_AutoRefreshToggle":
+                    var toggled = this.GetOrCreateSessionRefreshViewModel();
+                    toggled.IsAutoRefreshEnabled = !toggled.IsAutoRefreshEnabled;
+                    break;
                 default:
                     logger.Debug("The ribbon control with Id {0} and Tag {1} is not handled by the current RibbonPart", ribbonControlId, ribbonControlTag);
                     break;
@@ -210,9 +239,157 @@ namespace CDP4AddinCE
                     return this.session != null && this.session.OpenIterations.Count > 0;
                 case "CDP4_Plugins":
                     return true;
+                case "CDP4_Refresh":
+                case "CDP4_Reload":
+                case "CDP4_AutoRefreshToggle":
+                case "CDP4_AutoRefreshInterval":
+                case "CDP4_AutoRefreshCountdown":
+                    return this.session != null;
                 default:
                     return false;
             }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether a control is visible or not
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        /// <returns>
+        /// true if visible, false if not
+        /// </returns>
+        public override bool GetVisible(string ribbonControlId, string ribbonControlTag = "")
+        {
+            switch (ribbonControlId)
+            {
+                case "CDP4_AutoRefreshCountdown":
+                    return this.sessionRefreshViewModel?.IsAutoRefreshEnabled ?? false;
+                default:
+                    return true;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether a toggle control is pressed or not
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        /// <returns>
+        /// true if pressed, false if not pressed
+        /// </returns>
+        public override bool GetPressed(string ribbonControlId, string ribbonControlTag = "")
+        {
+            switch (ribbonControlId)
+            {
+                case "CDP4_AutoRefreshToggle":
+                    return this.sessionRefreshViewModel?.IsAutoRefreshEnabled ?? false;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the label as a <see cref="string"/> for the control
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        /// <returns>
+        /// the label that is displayed on the control
+        /// </returns>
+        public override string GetLabel(string ribbonControlId, string ribbonControlTag = "")
+        {
+            switch (ribbonControlId)
+            {
+                case "CDP4_AutoRefreshCountdown":
+                    var viewModel = this.sessionRefreshViewModel;
+
+                    if (viewModel == null || !viewModel.IsAutoRefreshEnabled)
+                    {
+                        return string.Empty;
+                    }
+
+                    return $"Next refresh in {viewModel.AutoRefreshSecondsLeft}s";
+                default:
+                    return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets the text shown in an editBox control
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        /// <returns>
+        /// the text shown in the editBox
+        /// </returns>
+        public override string GetText(string ribbonControlId, string ribbonControlTag = "")
+        {
+            switch (ribbonControlId)
+            {
+                case "CDP4_AutoRefreshInterval":
+                    return (this.sessionRefreshViewModel?.AutoRefreshInterval ?? SessionRefreshViewModel.DefaultRefreshInterval).ToString();
+                default:
+                    return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Invoked when the text of an editBox control has changed
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="text">
+        /// The new text entered in the editBox
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        public override void OnChange(string ribbonControlId, string text, string ribbonControlTag = "")
+        {
+            switch (ribbonControlId)
+            {
+                case "CDP4_AutoRefreshInterval":
+                    this.GetOrCreateSessionRefreshViewModel().SetIntervalFromText(text);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="SessionRefreshViewModel"/> associated to the active <see cref="session"/>, creating it on first use.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="SessionRefreshViewModel"/> that holds the auto-refresh state and timer for the active <see cref="session"/>.
+        /// </returns>
+        private SessionRefreshViewModel GetOrCreateSessionRefreshViewModel()
+        {
+            if (this.sessionRefreshViewModel == null)
+            {
+                this.sessionRefreshViewModel = new SessionRefreshViewModel(this.session);
+                
+                this.countdownSubscription = this.sessionRefreshViewModel
+                    .WhenAnyValue(x => x.IsAutoRefreshEnabled, x => x.AutoRefreshSecondsLeft)
+                    .Where(tuple => !tuple.Item1 || tuple.Item2 % 5 == 0)
+                    .Subscribe(_ => this.CDPMessageBus.SendMessage(new RibbonInvalidationEvent()));
+            }
+
+            return this.sessionRefreshViewModel;
         }
 
         /// <summary>
@@ -254,12 +431,17 @@ namespace CDP4AddinCE
             if (sessionChange.Status == SessionStatus.Open)
             {
                 this.session = sessionChange.Session;
+                this.GetOrCreateSessionRefreshViewModel();
             }
 
             if (sessionChange.Status == SessionStatus.Closed)
             {
                 this.authenticationRefreshService?.Dispose();
                 this.authenticationRefreshService = null;
+                this.countdownSubscription?.Dispose();
+                this.countdownSubscription = null;
+                this.sessionRefreshViewModel?.Dispose();
+                this.sessionRefreshViewModel = null;
                 this.session = null;
             }
         }
