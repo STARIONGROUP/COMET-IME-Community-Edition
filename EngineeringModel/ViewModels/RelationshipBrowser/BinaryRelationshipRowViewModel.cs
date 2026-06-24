@@ -33,6 +33,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -98,6 +99,16 @@ namespace CDP4EngineeringModel.ViewModels
         private IDisposable targetSubscription;
 
         /// <summary>
+        /// Subscription on the <see cref="BooleanExpression"/>s of the source when it is a <see cref="ParametricConstraint"/>
+        /// </summary>
+        private IDisposable sourceExpressionSubscription;
+
+        /// <summary>
+        /// Subscription on the <see cref="BooleanExpression"/>s of the target when it is a <see cref="ParametricConstraint"/>
+        /// </summary>
+        private IDisposable targetExpressionSubscription;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BinaryRelationshipRowViewModel"/> class
         /// </summary>
         /// <param name="relationship">The <see cref="BinaryRelationship"/> associated with this row</param>
@@ -143,6 +154,8 @@ namespace CDP4EngineeringModel.ViewModels
                     .Subscribe(_ => this.UpdateProperties());
 
                 this.Disposables.Add(this.sourceSubscription);
+
+                this.SetExpressionSubscription(this.Thing.Source, ref this.sourceExpressionSubscription);
             }
 
             if (this.oldTarget != this.Thing.Target)
@@ -161,6 +174,8 @@ namespace CDP4EngineeringModel.ViewModels
                     .Subscribe(_ => this.UpdateProperties());
 
                 this.Disposables.Add(this.targetSubscription);
+
+                this.SetExpressionSubscription(this.Thing.Target, ref this.targetExpressionSubscription);
             }
 
             this.Categories = string.Join(" ", this.Thing.Category.Select(x => x.ShortName));
@@ -170,6 +185,36 @@ namespace CDP4EngineeringModel.ViewModels
             this.TargetClassKind = this.Thing.Target?.ClassKind.ToString();
 
             this.UpdateName();
+        }
+
+        /// <summary>
+        /// Sets the subscription that listens for changes on the <see cref="BooleanExpression"/>s of the given
+        /// <paramref name="thing"/> when it is a <see cref="ParametricConstraint"/>. This is required because the
+        /// displayed name of a <see cref="ParametricConstraint"/> is derived from its expressions, and changing an
+        /// expression does not raise an update on the <see cref="ParametricConstraint"/> itself.
+        /// </summary>
+        /// <param name="thing">The source or target <see cref="Thing"/> of the <see cref="BinaryRelationship"/>.</param>
+        /// <param name="subscription">The subscription field to (re)assign.</param>
+        private void SetExpressionSubscription(Thing thing, ref IDisposable subscription)
+        {
+            if (subscription != null)
+            {
+                this.Disposables.Remove(subscription);
+                subscription.Dispose();
+                subscription = null;
+            }
+
+            if (!(thing is ParametricConstraint parametricConstraint))
+            {
+                return;
+            }
+
+            subscription = this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(BooleanExpression))
+                .Where(objectChange => objectChange.EventKind == EventKind.Updated && objectChange.ChangedThing.Container != null && objectChange.ChangedThing.Container.Iid == parametricConstraint.Iid)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.UpdateProperties());
+
+            this.Disposables.Add(subscription);
         }
 
         /// <summary>
@@ -220,6 +265,11 @@ namespace CDP4EngineeringModel.ViewModels
             if (thing is BooleanExpression booleanExpression)
             {
                 return booleanExpression.StringValue;
+            }
+
+            if (thing is ParametricConstraint parametricConstraint)
+            {
+                return parametricConstraint.GetDisplayName();
             }
 
             return thing is INamedThing namedThing

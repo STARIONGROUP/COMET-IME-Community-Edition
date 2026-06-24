@@ -294,6 +294,74 @@ namespace CDP4EngineeringModel.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatParametricConstraintSourceShowsItsExpressionInsteadOfNotImplemented()
+        {
+            var requirementsSpecification = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri) { Name = "RS", ShortName = "RS" };
+            var requirement = new Requirement(Guid.NewGuid(), this.cache, this.uri) { Name = "Requirement", ShortName = "REQ1" };
+            requirementsSpecification.Requirement.Add(requirement);
+            this.iteration.RequirementsSpecification.Add(requirementsSpecification);
+
+            var relationalExpression = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { ShortName = "mass" }
+            };
+
+            var parametricConstraint = new ParametricConstraint(Guid.NewGuid(), this.cache, this.uri);
+            parametricConstraint.Expression.Add(relationalExpression);
+            requirement.ParametricConstraint.Add(parametricConstraint);
+
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            var relationship = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = parametricConstraint, Target = this.elementDefinition1, Owner = this.domain };
+            this.iteration.Relationship.Add(relationship);
+
+            this.revision.SetValue(this.iteration, 1);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+
+            var row = (BinaryRelationshipRowViewModel)viewmodel.Relationships[0];
+            
+            Assert.That(row.SourceName, Does.Contain("REQ1"));
+            Assert.That(row.SourceName, Does.Contain("mass"));
+            Assert.That(row.SourceName, Does.Not.Contain("not implemented"));
+        }
+
+        [Test]
+        public void VerifyThatSourceNameRefreshesWhenParametricConstraintExpressionChanges()
+        {
+            var requirementsSpecification = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri) { Name = "RS", ShortName = "RS" };
+            var requirement = new Requirement(Guid.NewGuid(), this.cache, this.uri) { Name = "Requirement", ShortName = "REQ1" };
+            requirementsSpecification.Requirement.Add(requirement);
+            this.iteration.RequirementsSpecification.Add(requirementsSpecification);
+
+            var parametricConstraint = new ParametricConstraint(Guid.NewGuid(), this.cache, this.uri);
+            requirement.ParametricConstraint.Add(parametricConstraint);
+
+            var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
+
+            var relationship = new BinaryRelationship(Guid.NewGuid(), this.cache, this.uri) { Source = parametricConstraint, Target = this.elementDefinition1, Owner = this.domain };
+            this.iteration.Relationship.Add(relationship);
+
+            this.revision.SetValue(this.iteration, 1);
+            this.messageBus.SendObjectChangeEvent(this.iteration, EventKind.Updated);
+
+            var row = (BinaryRelationshipRowViewModel)viewmodel.Relationships[0];
+
+            Assert.That(row.SourceName, Does.Not.Contain("mass"));
+
+           var relationalExpression = new RelationalExpression(Guid.NewGuid(), this.cache, this.uri)
+            {
+                ParameterType = new SimpleQuantityKind(Guid.NewGuid(), this.cache, this.uri) { ShortName = "mass" }
+            };
+
+            parametricConstraint.Expression.Add(relationalExpression);
+
+            this.revision.SetValue(relationalExpression, 1);
+            this.messageBus.SendObjectChangeEvent(relationalExpression, EventKind.Updated);
+
+            Assert.That(row.SourceName, Does.Contain("mass"));
+        }
+
+        [Test]
         public void VerifyThatBrowserIsCreated()
         {
             var viewmodel = new BinaryRelationshipBrowserViewModel(this.iteration, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, null, null);
