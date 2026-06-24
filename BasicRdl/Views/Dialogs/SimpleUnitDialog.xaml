@@ -22,8 +22,8 @@
                 <items:ShortNameLayoutItem />
                 <items:NameLayoutItem />
                 <items:ShortNameContainerLayoutItem />
-                <items:IsDeprecatedLayoutItem />
                 <items:IsBaseUnitLayoutItem />
+                <items:IsDeprecatedLayoutItem />
                 <items:AliasDisplayLayoutItem />
                 <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>

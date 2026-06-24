@@ -66,8 +66,8 @@
                                   ShowError="True"/>
                 </dxlc:LayoutItem>
 
-                <items:IsDeprecatedLayoutItem />
                 <items:IsBaseUnitLayoutItem />
+                <items:IsDeprecatedLayoutItem />
                 <items:AliasDisplayLayoutItem />
                 <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>
