@@ -27,7 +27,10 @@ namespace CDP4ShellDialogs.Tests.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
+    using System.Threading.Tasks;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
@@ -139,6 +142,64 @@ namespace CDP4ShellDialogs.Tests.ViewModels
             viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iterationSetup11, this.participant, this.session.Object));
             Assert.AreEqual("Switch Domain", viewmodel.DialogTitle);
             Assert.IsTrue(((ICommand)viewmodel.CancelCommand).CanExecute(null));
+        }
+
+        [Test]
+        public void VerifyThatSelectedRowSessionAndIterationRowsArePopulated()
+        {
+            var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) { EngineeringModelSetup = this.model1 };
+            var openIteration = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri) { IterationSetup = this.iterationSetup11 };
+            engineeringModel.Iteration.Add(openIteration);
+
+            this.session.Setup(x => x.OpenIterations)
+                .Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>> { { openIteration, null } });
+
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelIterationDomainSwitchDialogViewModel(sessions);
+
+            Assert.That(viewmodel.SelectedRowSession, Is.EqualTo(viewmodel.SessionsAvailable.First()));
+            Assert.That(viewmodel.IterationRows.Count, Is.EqualTo(1));
+            Assert.That(viewmodel.IterationRows.First().ModelName, Is.EqualTo("model1"));
+        }
+
+        [Test]
+        public async Task VerifyThatMultipleDomainsCanBeSwitchedAtOnce()
+        {
+            var domain2 = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "domain2", ShortName = "domain2" };
+            this.participant.Domain.Add(domain2);
+
+            var engineeringModel1 = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) { EngineeringModelSetup = this.model1 };
+            var openIteration1 = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri) { IterationSetup = this.iterationSetup11 };
+            engineeringModel1.Iteration.Add(openIteration1);
+            this.iterationSetup11.IterationIid = openIteration1.Iid;
+
+            var engineeringModel2 = new EngineeringModel(Guid.NewGuid(), this.assembler.Cache, this.uri) { EngineeringModelSetup = this.model2 };
+            var openIteration2 = new Iteration(Guid.NewGuid(), this.assembler.Cache, this.uri) { IterationSetup = this.iterationSetup21 };
+            engineeringModel2.Iteration.Add(openIteration2);
+            this.iterationSetup21.IterationIid = openIteration2.Iid;
+
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domain);
+
+            this.session.Setup(x => x.OpenIterations).Returns(new Dictionary<Iteration, Tuple<DomainOfExpertise, Participant>>
+            {
+                { openIteration1, null },
+                { openIteration2, null }
+            });
+
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelIterationDomainSwitchDialogViewModel(sessions);
+
+            Assert.That(viewmodel.IterationRows.Count, Is.EqualTo(2));
+
+            foreach (var row in viewmodel.IterationRows)
+            {
+                row.SelectedDomain = domain2;
+            }
+
+            await viewmodel.SwitchCommand.Execute();
+
+            this.session.Verify(x => x.SwitchDomain(this.iterationSetup11.IterationIid, domain2), Times.Once);
+            this.session.Verify(x => x.SwitchDomain(this.iterationSetup21.IterationIid, domain2), Times.Once);
         }
     }
 }
