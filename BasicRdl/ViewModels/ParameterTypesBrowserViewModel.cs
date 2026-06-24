@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypesBrowserViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Rowan de Voogt
 //
 //    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -48,6 +48,7 @@ namespace BasicRdl.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using CommonServiceLocator;
 
@@ -68,6 +69,11 @@ namespace BasicRdl.ViewModels
         /// Backing field for the <see cref="CanCreateParameterType"/> property
         /// </summary>
         private bool canCreateParameterType;
+
+        /// <summary>
+        /// Backing field for the <see cref="CanSetAsBaseQuantityKind"/> property
+        /// </summary>
+        private bool canSetAsBaseQuantityKind;
 
         /// <summary>
         /// The backing field for <see cref="ShowOnlyFavorites"/> property.
@@ -141,6 +147,20 @@ namespace BasicRdl.ViewModels
             get => this.canCreateParameterType;
             set => this.RaiseAndSetIfChanged(ref this.canCreateParameterType, value);
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the selected <see cref="QuantityKind"/> may be set or unset as a base quantity kind
+        /// </summary>
+        public bool CanSetAsBaseQuantityKind
+        {
+            get => this.canSetAsBaseQuantityKind;
+            private set => this.RaiseAndSetIfChanged(ref this.canSetAsBaseQuantityKind, value);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> used to set or unset the selected <see cref="QuantityKind"/> as a base quantity kind
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> SetAsBaseQuantityKindCommand { get; private set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to display favorites.
@@ -319,6 +339,10 @@ namespace BasicRdl.ViewModels
             this.CreateSampledFunctionParameterType = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<SampledFunctionParameterType>(), this.WhenAnyValue(vm => vm.CanCreateParameterType));
 
             this.ToggleFavoriteCommand = ReactiveCommandCreator.Create(this.ExecuteToggleFavoriteCommand);
+
+            this.SetAsBaseQuantityKindCommand = ReactiveCommandCreator.Create(
+                this.ExecuteSetAsBaseQuantityKindCommand,
+                this.WhenAnyValue(x => x.CanSetAsBaseQuantityKind));
         }
 
         /// <summary>
@@ -328,6 +352,16 @@ namespace BasicRdl.ViewModels
         {
             base.ComputePermission();
             this.CanCreateParameterType = this.Session.OpenReferenceDataLibraries.Any();
+
+            if (this.SelectedThing is ParameterTypeRowViewModel selectedRow && selectedRow.Thing is QuantityKind)
+            {
+                var rdl = selectedRow.Thing.Container as ReferenceDataLibrary;
+                this.CanSetAsBaseQuantityKind = rdl != null && this.Session.PermissionService.CanWrite(rdl);
+            }
+            else
+            {
+                this.CanSetAsBaseQuantityKind = false;
+            }
         }
 
         /// <summary>
@@ -345,6 +379,16 @@ namespace BasicRdl.ViewModels
                         "",
                         this.ToggleFavoriteCommand,
                         MenuItemKind.Favorite));
+
+                if (selectedParameterTypeRow.Thing is QuantityKind)
+                {
+                    this.ContextMenu.Add(
+                        new ContextMenuItemViewModel(
+                            selectedParameterTypeRow.IsBaseQuantityKind ? "Unset as Base Quantity Kind" : "Set as Base Quantity Kind",
+                            "",
+                            this.SetAsBaseQuantityKindCommand,
+                            MenuItemKind.None));
+                }
             }
 
             this.ContextMenu.Add(
@@ -442,6 +486,41 @@ namespace BasicRdl.ViewModels
                     this.CreateTimeOfDayParameterType,
                     MenuItemKind.Create,
                     ClassKind.TimeOfDayParameterType));
+        }
+
+        /// <summary>
+        /// Executes the <see cref="SetAsBaseQuantityKindCommand"/> by toggling the base-quantity-kind membership of the selected
+        /// <see cref="QuantityKind"/> on the container <see cref="ReferenceDataLibrary"/>.
+        /// </summary>
+        private async void ExecuteSetAsBaseQuantityKindCommand()
+        {
+            if (!(this.SelectedThing is ParameterTypeRowViewModel selectedRow) || !(selectedRow.Thing is QuantityKind quantityKind))
+            {
+                return;
+            }
+
+            var rdl = quantityKind.Container as ReferenceDataLibrary;
+
+            if (rdl == null)
+            {
+                return;
+            }
+
+            var rdlClone = rdl.Clone(false);
+            var existingBaseQuantityKind = rdlClone.BaseQuantityKind.FirstOrDefault(q => q.Iid == quantityKind.Iid);
+
+            if (existingBaseQuantityKind != null)
+            {
+                rdlClone.BaseQuantityKind.Remove(existingBaseQuantityKind);
+            }
+            else
+            {
+                rdlClone.BaseQuantityKind.Add(quantityKind);
+            }
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
+            var transaction = new ThingTransaction(transactionContext, rdlClone);
+            await this.DalWrite(transaction);
         }
 
         /// <summary>
@@ -558,6 +637,11 @@ namespace BasicRdl.ViewModels
                 if (parameter.ContainerRdl != rdl.ShortName)
                 {
                     parameter.ContainerRdl = rdl.ShortName;
+                }
+
+                if (parameter.Thing is QuantityKind quantityKind)
+                {
+                    parameter.IsBaseQuantityKind = rdl.BaseQuantityKind.Any(q => q.Iid == quantityKind.Iid);
                 }
             }
         }

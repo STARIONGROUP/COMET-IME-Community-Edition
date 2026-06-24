@@ -112,9 +112,10 @@
                                                  UpdateSourceTrigger=PropertyChanged}" 
                                   ShowError="True"/>
                 </dxlc:LayoutItem>
+                <items:IsBaseQuantityKindLayoutItem />
                 <items:IsDeprecatedLayoutItem />
-                
-                <dxlc:LayoutItem Label="Generalization Scales: " 
+
+                <dxlc:LayoutItem Label="Generalization Scales: "
                                  LabelPosition="Top"
                                  Height="130">
                     <dxg:GridControl x:Name="ScalesGrid"

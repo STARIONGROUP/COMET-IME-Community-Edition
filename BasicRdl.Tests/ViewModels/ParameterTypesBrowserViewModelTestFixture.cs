@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ParameterTypesBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Rowan de Voogt
 //
 //    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -28,6 +28,8 @@ namespace BasicRdl.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
+    using System.Windows.Input;
 
     using BasicRdl.ViewModels;
 
@@ -41,6 +43,7 @@ namespace BasicRdl.Tests.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CommonServiceLocator;
@@ -48,6 +51,8 @@ namespace BasicRdl.Tests.ViewModels
     using Moq;
 
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     /// <summary>
     /// Suite of tests for the <see cref="ParameterTypesBrowserViewModel"/>
@@ -73,6 +78,7 @@ namespace BasicRdl.Tests.ViewModels
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.serviceLocator = new Mock<IServiceLocator>();
             ServiceLocator.SetLocatorProvider(() => this.serviceLocator.Object);
 
@@ -311,6 +317,114 @@ namespace BasicRdl.Tests.ViewModels
 
             this.messageBus.SendObjectChangeEvent(sRdl, EventKind.Updated);
             Assert.IsTrue(vm.ParameterTypes.Count(x => x.ContainerRdl == "test") == 2);
+        }
+
+        [Test]
+        public void VerifyThatCanSetAsBaseQuantityKindIsFalseWhenNoRowIsSelected()
+        {
+            Assert.IsFalse(this.ParameterTypesBrowserViewModel.CanSetAsBaseQuantityKind);
+        }
+
+        [Test]
+        public void VerifyThatCanSetAsBaseQuantityKindIsTrueWhenWritableQuantityKindRowIsSelected()
+        {
+            var quantityKind = this.CreateSimpleQuantityKind();
+
+            this.messageBus.SendObjectChangeEvent(quantityKind, EventKind.Added);
+            this.ParameterTypesBrowserViewModel.SelectedThing = this.ParameterTypesBrowserViewModel.ParameterTypes.First();
+
+            Assert.IsTrue(this.ParameterTypesBrowserViewModel.CanSetAsBaseQuantityKind);
+        }
+
+        [Test]
+        public void VerifyThatCanSetAsBaseQuantityKindIsFalseWhenNonQuantityKindRowIsSelected()
+        {
+            var textParameterType = new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { Container = this.siteRdl };
+
+            this.messageBus.SendObjectChangeEvent(textParameterType, EventKind.Added);
+            this.ParameterTypesBrowserViewModel.SelectedThing = this.ParameterTypesBrowserViewModel.ParameterTypes.First();
+
+            Assert.IsFalse(this.ParameterTypesBrowserViewModel.CanSetAsBaseQuantityKind);
+        }
+
+        [Test]
+        public void VerifyThatContextMenuShowsSetAsBaseQuantityKindWhenNotBase()
+        {
+            var quantityKind = this.CreateSimpleQuantityKind();
+
+            this.messageBus.SendObjectChangeEvent(quantityKind, EventKind.Added);
+            this.ParameterTypesBrowserViewModel.SelectedThing = this.ParameterTypesBrowserViewModel.ParameterTypes.First();
+            this.ParameterTypesBrowserViewModel.PopulateContextMenu();
+
+            Assert.IsTrue(this.ParameterTypesBrowserViewModel.ContextMenu.Any(x => x.Header == "Set as Base Quantity Kind"));
+            Assert.IsFalse(this.ParameterTypesBrowserViewModel.ContextMenu.Any(x => x.Header == "Unset as Base Quantity Kind"));
+        }
+
+        [Test]
+        public void VerifyThatContextMenuShowsUnsetAsBaseQuantityKindWhenIsBase()
+        {
+            var quantityKind = this.CreateSimpleQuantityKind();
+            this.siteRdl.BaseQuantityKind.Add(quantityKind);
+
+            this.messageBus.SendObjectChangeEvent(quantityKind, EventKind.Added);
+            this.ParameterTypesBrowserViewModel.SelectedThing = this.ParameterTypesBrowserViewModel.ParameterTypes.First();
+            this.ParameterTypesBrowserViewModel.PopulateContextMenu();
+
+            Assert.IsTrue(this.ParameterTypesBrowserViewModel.ContextMenu.Any(x => x.Header == "Unset as Base Quantity Kind"));
+            Assert.IsFalse(this.ParameterTypesBrowserViewModel.ContextMenu.Any(x => x.Header == "Set as Base Quantity Kind"));
+        }
+
+        [Test]
+        public void VerifyThatIsBaseQuantityKindIsUpdatedOnRdlUpdate()
+        {
+            var quantityKind = this.CreateSimpleQuantityKind();
+
+            this.messageBus.SendObjectChangeEvent(quantityKind, EventKind.Added);
+            var row = this.ParameterTypesBrowserViewModel.ParameterTypes.First();
+            Assert.IsFalse(row.IsBaseQuantityKind);
+
+            this.siteRdl.BaseQuantityKind.Add(quantityKind);
+            var rev = typeof(Thing).GetProperty("RevisionNumber");
+            rev.SetValue(this.siteRdl, 2);
+            this.messageBus.SendObjectChangeEvent(this.siteRdl, EventKind.Updated);
+
+            Assert.IsTrue(row.IsBaseQuantityKind);
+        }
+
+        [Test]
+        public void VerifyThatSetAsBaseQuantityKindCommandCallsSessionWrite()
+        {
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(System.Threading.Tasks.Task.CompletedTask);
+
+            var quantityKind = this.CreateSimpleQuantityKind();
+
+            this.messageBus.SendObjectChangeEvent(quantityKind, EventKind.Added);
+            this.ParameterTypesBrowserViewModel.SelectedThing = this.ParameterTypesBrowserViewModel.ParameterTypes.First();
+
+            ((ICommand)this.ParameterTypesBrowserViewModel.SetAsBaseQuantityKindCommand).Execute(null);
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="SimpleQuantityKind"/> contained by the test <see cref="siteRdl"/>.
+        /// </summary>
+        /// <returns>The created <see cref="SimpleQuantityKind"/>.</returns>
+        private SimpleQuantityKind CreateSimpleQuantityKind()
+        {
+            var defaultScale = new CyclicRatioScale(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                Name = "qk",
+                ShortName = "qk",
+                DefaultScale = defaultScale,
+                Container = this.siteRdl
+            };
+
+            this.siteRdl.ParameterType.Add(quantityKind);
+
+            return quantityKind;
         }
     }
 }

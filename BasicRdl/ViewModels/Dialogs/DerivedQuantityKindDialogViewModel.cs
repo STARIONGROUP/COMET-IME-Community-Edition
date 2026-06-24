@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DerivedQuantityKindDialogViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 // 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Rowan de Voogt
 // 
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -50,6 +50,11 @@ namespace BasicRdl.ViewModels
     [ThingDialogViewModelExport(ClassKind.DerivedQuantityKind)]
     public class DerivedQuantityKindDialogViewModel : CDP4CommonView.DerivedQuantityKindDialogViewModel, IThingDialogViewModel
     {
+        /// <summary>
+        /// The backing field for <see cref="IsBaseQuantityKind"/>
+        /// </summary>
+        private bool isBaseQuantityKind;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DerivedQuantityKindDialogViewModel"/> class.
         /// </summary>
@@ -102,7 +107,16 @@ namespace BasicRdl.ViewModels
         /// Gets or sets the Inspect <see cref="ICommand"/> to inspect the <see cref="SelectedDefaultScale"/>
         /// </summary>
         public ReactiveCommand<Unit, Unit> InspectSelectedScaleCommand { get; protected set; }
-        
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="DerivedQuantityKind"/> is a base quantity kind of the container <see cref="ReferenceDataLibrary"/>.
+        /// </summary>
+        public bool IsBaseQuantityKind
+        {
+            get => this.isBaseQuantityKind;
+            set => this.RaiseAndSetIfChanged(ref this.isBaseQuantityKind, value);
+        }
+
         /// <summary>
         /// Updates the <see cref="OkCanExecute"/> property using validation rules
         /// </summary>
@@ -119,6 +133,35 @@ namespace BasicRdl.ViewModels
         {
             base.UpdateProperties();
             this.PopulatePossiblePossibleScales();
+
+            var containerRdl = this.Container as ReferenceDataLibrary;
+            this.IsBaseQuantityKind = containerRdl != null && containerRdl.BaseQuantityKind.Any(q => q.Iid == this.Thing.Iid);
+        }
+
+        /// <summary>
+        /// Update the transaction with the Thing represented by this Dialog
+        /// </summary>
+        protected override void UpdateTransaction()
+        {
+            base.UpdateTransaction();
+
+            var containerRdl = this.Container as ReferenceDataLibrary;
+
+            if (containerRdl == null)
+            {
+                return;
+            }
+
+            var existingBaseQuantityKind = containerRdl.BaseQuantityKind.FirstOrDefault(q => q.Iid == this.Thing.Iid);
+
+            if (this.IsBaseQuantityKind && existingBaseQuantityKind == null)
+            {
+                containerRdl.BaseQuantityKind.Add(this.Thing);
+            }
+            else if (!this.IsBaseQuantityKind && existingBaseQuantityKind != null)
+            {
+                containerRdl.BaseQuantityKind.Remove(existingBaseQuantityKind);
+            }
         }
 
         /// <summary>
