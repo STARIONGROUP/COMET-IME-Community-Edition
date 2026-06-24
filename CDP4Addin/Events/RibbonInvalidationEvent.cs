@@ -25,10 +25,13 @@
 
 namespace CDP4AddinCE.Events
 {
+    using System.Runtime.InteropServices;
+
     /// <summary>
     /// An event published on the <see cref="CDP4Dal.ICDPMessageBus"/> to request that the Office Fluent Ribbon
     /// re-queries its callbacks (for example to update the auto-refresh countdown shown on the ribbon).
     /// </summary>
+    [ComVisible(false)]
     public class RibbonInvalidationEvent
     {
     }

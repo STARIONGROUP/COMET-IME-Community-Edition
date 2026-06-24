@@ -28,6 +28,7 @@ namespace CDP4AddinCE.ViewModels
     using System;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Runtime.InteropServices;
     using System.Windows.Threading;
 
     using CDP4Composition.Mvvm;
@@ -45,6 +46,7 @@ namespace CDP4AddinCE.ViewModels
     /// and exposes the on-demand Refresh and Reload commands. This is the add-in counterpart of the auto-refresh
     /// control that is available on the ribbon of the CDP4-COMET IME.
     /// </summary>
+    [ComVisible(false)]
     public class SessionRefreshViewModel : ReactiveObject, IDisposable
     {
         /// <summary>
