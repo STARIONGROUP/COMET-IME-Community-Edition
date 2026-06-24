@@ -38,6 +38,7 @@ namespace CDP4SiteDirectory.Tests.Dialogs
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
 
+    using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -163,6 +164,16 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         {
             var naturalLanguageDialogViewModel = new NaturalLanguageDialogViewModel();
             Assert.IsNotNull(naturalLanguageDialogViewModel);
+        }
+
+        [Test]
+        public void VerifyThatNativeNameValidationIsDisabled()
+        {
+            var property = typeof(NaturalLanguageDialogViewModel).GetProperty(nameof(NaturalLanguageDialogViewModel.NativeName));
+            var attribute = property.GetCustomAttributes(typeof(ValidationOverrideAttribute), true).Cast<ValidationOverrideAttribute>().SingleOrDefault();
+
+            Assert.IsNotNull(attribute, "The NativeName property should carry a ValidationOverrideAttribute.");
+            Assert.IsFalse(attribute.IsValidationEnabled, "The NativeName is a free-text string and its validation must be disabled.");
         }
     }
 }
