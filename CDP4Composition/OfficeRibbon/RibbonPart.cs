@@ -385,6 +385,41 @@ namespace CDP4Composition
         }
 
         /// <summary>
+        /// Gets the text shown in an editBox control
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        /// <returns>
+        /// a string that represents the text shown in the editBox
+        /// </returns>
+        public virtual string GetText(string ribbonControlId, string ribbonControlTag = "")
+        {
+            logger.Debug("The GetText method of the {0} is not overriden", this.GetType());
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Invoked when the text of an editBox control has changed
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="text">
+        /// The new text entered in the editBox
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        public virtual void OnChange(string ribbonControlId, string text, string ribbonControlTag = "")
+        {
+            logger.Debug("The OnChange method of the {0} is not overriden", this.GetType());
+        }
+
+        /// <summary>
         /// Gets a value indicating whether a control is visible or not
         /// </summary>
         /// <param name="ribbonControlId">

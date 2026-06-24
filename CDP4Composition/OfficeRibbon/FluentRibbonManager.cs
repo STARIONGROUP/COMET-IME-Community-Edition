@@ -520,6 +520,47 @@ namespace CDP4Composition
         }
 
         /// <summary>
+        /// Gets the text shown in an editBox control
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        /// <returns>
+        /// a string that represents the text shown in the editBox
+        /// </returns>
+        public string GetText(string ribbonControlId, string ribbonControlTag = "")
+        {
+            var ribbonPart = this.GetRibbonPartBase(ribbonControlId);
+            if (ribbonPart != null)
+            {
+                return ribbonPart.GetText(ribbonControlId, ribbonControlTag);
+            }
+
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Invoked when the text of an editBox control has changed
+        /// </summary>
+        /// <param name="ribbonControlId">
+        /// The Id property of the associated RibbonControl
+        /// </param>
+        /// <param name="text">
+        /// The new text entered in the editBox
+        /// </param>
+        /// <param name="ribbonControlTag">
+        /// The Tag property of the associated RibbonControl
+        /// </param>
+        public void OnChange(string ribbonControlId, string text, string ribbonControlTag = "")
+        {
+            var ribbonPart = this.GetRibbonPartBase(ribbonControlId);
+            ribbonPart?.OnChange(ribbonControlId, text, ribbonControlTag);
+        }
+
+        /// <summary>
         /// Gets a value indicating whether a control is visible or not
         /// </summary>
         /// <param name="ribbonControlId">

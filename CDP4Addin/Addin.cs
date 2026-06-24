@@ -40,6 +40,7 @@ namespace CDP4AddinCE
     using System.Threading.Tasks;
     using System.Windows;
 
+    using CDP4AddinCE.Events;
     using CDP4AddinCE.Settings;
     using CDP4AddinCE.Utils;
 
@@ -191,6 +192,90 @@ namespace CDP4AddinCE
             try
             {
                 await this.FluentRibbonManager.OnAction(control.Id, control.Tag);
+            }
+            catch (Exception ex)
+            {
+                // NOTE: manually handle exceptions as the UI specific dispatcher thread does not work
+                HandleException(ex);
+            }
+
+            if (this.RibbonUI != null)
+            {
+                this.RibbonUI.Invalidate();
+            }
+            else
+            {
+                logger.Warn("The RibbonUI is null and cannot be invalidated");
+            }
+        }
+
+        /// <summary>
+        /// Executes the OnAction callback for a toggle/checkBox control that is invoked from the <see cref="Office.IRibbonControl"/>
+        /// </summary>
+        /// <param name="control">
+        /// The ribbon control that invokes the callback
+        /// </param>
+        /// <param name="pressed">
+        /// a value indicating whether the toggle control is pressed
+        /// </param>
+        /// <remarks>
+        /// A checkBox or toggleButton uses a different callback signature than a regular button. The pressed state is
+        /// owned by the <see cref="RibbonPart"/>; the control is toggled there and re-queried through GetPressed.
+        /// </remarks>
+        public async Task OnToggleAction(IRibbonControl control, bool pressed)
+        {
+            logger.Trace("{0} OnToggleAction {1}", control.Id, pressed);
+
+            try
+            {
+                await this.FluentRibbonManager.OnAction(control.Id, control.Tag);
+            }
+            catch (Exception ex)
+            {
+                HandleException(ex);
+            }
+
+            if (this.RibbonUI != null)
+            {
+                this.RibbonUI.Invalidate();
+            }
+            else
+            {
+                logger.Warn("The RibbonUI is null and cannot be invalidated");
+            }
+        }
+
+        /// <summary>
+        /// Executes the GetText callback that supplies the text shown in an editBox control
+        /// </summary>
+        /// <param name="control">
+        /// The ribbon control that invokes the callback
+        /// </param>
+        /// <returns>
+        /// the text shown in the editBox
+        /// </returns>
+        public string GetText(IRibbonControl control)
+        {
+            logger.Trace("{0} GetText", control.Id);
+            return this.FluentRibbonManager.GetText(control.Id, control.Tag);
+        }
+
+        /// <summary>
+        /// Executes the OnChange callback that is invoked when the text of an editBox control has changed
+        /// </summary>
+        /// <param name="control">
+        /// The ribbon control that invokes the callback
+        /// </param>
+        /// <param name="text">
+        /// The new text entered in the editBox
+        /// </param>
+        public void OnEditBoxChange(IRibbonControl control, string text)
+        {
+            logger.Trace("{0} OnEditBoxChange {1}", control.Id, text);
+
+            try
+            {
+                this.FluentRibbonManager.OnChange(control.Id, text, control.Tag);
             }
             catch (Exception ex)
             {
@@ -461,6 +546,10 @@ namespace CDP4AddinCE
                 .Where(x => x.Status == SessionStatus.Closed)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(this.HandleCloseSession);
+
+            this.messageBus.Listen<RibbonInvalidationEvent>()
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.RibbonUI?.Invalidate());
         }
 
         /// <summary>

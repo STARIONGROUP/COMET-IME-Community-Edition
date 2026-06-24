@@ -8,6 +8,19 @@
     <button id="CDP4_SelectModelToOpen" label="Open" screentip="Select an Engineering Model to open" imageMso="ServerConnection" onAction="OnAction" getEnabled="GetEnabled" />
     <button id="CDP4_SelectModelToClose" label="Close" screentip="Select an Engineering Model to close" imageMso="FileDropSqlDatabase" onAction="OnAction" getEnabled="GetEnabled" />
   </group>
+  <group id="CDP4refresh" label="Refresh">
+    <box id="CDP4_RefreshButtonsRow" boxStyle="horizontal">
+      <button id="CDP4_Refresh" label="Refresh" screentip="Refresh the data-source (current revision + delta)" imageMso="Refresh" onAction="OnAction" getEnabled="GetEnabled" />
+      <button id="CDP4_Reload" label="Reload" screentip="Reload all the data from the data-source (revision 0 + delta)" imageMso="RefreshAll" onAction="OnAction" getEnabled="GetEnabled" />
+    </box>
+    <box id="CDP4_AutoRefreshSettingsRow" boxStyle="horizontal">
+      <checkBox id="CDP4_AutoRefreshToggle" label="Auto Refresh every" screentip="Enable automatic refresh of the data-source at the configured interval" getPressed="GetPressed" onAction="OnToggleAction" getEnabled="GetEnabled" />
+      <editBox id="CDP4_AutoRefreshInterval" sizeString="000" screentip="Automatic refresh interval in seconds (5-300)" getText="GetText" onChange="OnEditBoxChange" getEnabled="GetEnabled" />
+    </box>
+    <box id="CDP4_AutoRefreshCountdownRow" boxStyle="horizontal">
+      <button id="CDP4_AutoRefreshCountdown" getLabel="GetLabel" getVisible="GetVisible" getEnabled="GetEnabled" onAction="OnAction" />
+    </box>
+  </group>
   <group id="CDP4info" label="Info">
     <button id="CDP4_Plugins" label="Plugins" screentip="Select Plugins" imageMso="DatabaseAnalyzeTable" onAction="OnAction" getEnabled="GetEnabled" />
   </group>
