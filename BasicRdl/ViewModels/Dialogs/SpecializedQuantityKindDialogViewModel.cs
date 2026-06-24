@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SpecializedQuantityKindDialogViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 // 
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Rowan de Voogt
 // 
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -50,6 +50,11 @@ namespace BasicRdl.ViewModels
     [ThingDialogViewModelExport(ClassKind.SpecializedQuantityKind)]
     public class SpecializedQuantityKindDialogViewModel : CDP4CommonView.SpecializedQuantityKindDialogViewModel, IThingDialogViewModel
     {
+        /// <summary>
+        /// The backing field for <see cref="IsBaseQuantityKind"/>
+        /// </summary>
+        private bool isBaseQuantityKind;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SpecializedQuantityKindDialogViewModel"/> class.
         /// </summary>
@@ -106,7 +111,16 @@ namespace BasicRdl.ViewModels
         /// <summary>
         /// Gets all the possible <see cref="MeasurementScale"/> for the current <see cref="SpecializedQuantityKind"/>
         /// </summary>
-        public ReactiveList<MeasurementScale> AllPossibleScale { get; private set; } 
+        public ReactiveList<MeasurementScale> AllPossibleScale { get; private set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="SpecializedQuantityKind"/> is a base quantity kind of the container <see cref="ReferenceDataLibrary"/>.
+        /// </summary>
+        public bool IsBaseQuantityKind
+        {
+            get => this.isBaseQuantityKind;
+            set => this.RaiseAndSetIfChanged(ref this.isBaseQuantityKind, value);
+        }
 
         /// <summary>
         /// Initializes the dialog
@@ -135,6 +149,35 @@ namespace BasicRdl.ViewModels
             base.UpdateProperties();
             this.PopulatePossiblePossibleScales();
             this.PopulateGeneralScale();
+
+            var containerRdl = this.Container as ReferenceDataLibrary;
+            this.IsBaseQuantityKind = containerRdl != null && containerRdl.BaseQuantityKind.Any(q => q.Iid == this.Thing.Iid);
+        }
+
+        /// <summary>
+        /// Update the transaction with the Thing represented by this Dialog
+        /// </summary>
+        protected override void UpdateTransaction()
+        {
+            base.UpdateTransaction();
+
+            var containerRdl = this.Container as ReferenceDataLibrary;
+
+            if (containerRdl == null)
+            {
+                return;
+            }
+
+            var existingBaseQuantityKind = containerRdl.BaseQuantityKind.FirstOrDefault(q => q.Iid == this.Thing.Iid);
+
+            if (this.IsBaseQuantityKind && existingBaseQuantityKind == null)
+            {
+                containerRdl.BaseQuantityKind.Add(this.Thing);
+            }
+            else if (!this.IsBaseQuantityKind && existingBaseQuantityKind != null)
+            {
+                containerRdl.BaseQuantityKind.Remove(existingBaseQuantityKind);
+            }
         }
 
         /// <summary>

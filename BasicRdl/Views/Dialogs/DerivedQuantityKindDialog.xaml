@@ -39,6 +39,7 @@
                                                  ValidatesOnDataErrors=True,
                                                  UpdateSourceTrigger=PropertyChanged}" />
                 </dxlc:LayoutItem>
+                <items:IsBaseQuantityKindLayoutItem />
                 <items:IsDeprecatedLayoutItem />
                 <items:ScaleLayoutItem/>
                 <items:AliasDisplayLayoutItem />

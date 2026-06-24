@@ -42,6 +42,7 @@
                                                  UpdateSourceTrigger=PropertyChanged}" 
                                   ShowError="True"/>
                 </dxlc:LayoutItem>
+                <items:IsBaseQuantityKindLayoutItem />
                 <items:IsDeprecatedLayoutItem />
                 <items:ScaleLayoutItem/>
                 <items:AliasDisplayLayoutItem />

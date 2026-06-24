@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SimpleQuantityKindDialogViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Rowan de Voogt
 //
 //    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -171,6 +171,27 @@ namespace BasicRdl.Tests.ViewModels
         public void VerifyThatParameterlessContructorExists()
         {
             Assert.DoesNotThrow(() => new SimpleQuantityKindDialogViewModel());
+        }
+
+        [Test]
+        public void VerifyThatIsBaseQuantityKindIsTrueWhenQuantityKindIsInRdlBaseQuantityKind()
+        {
+            this.rdl.ParameterType.Add(this.simpleQuantityKind);
+            this.rdl.BaseQuantityKind.Add(this.simpleQuantityKind);
+
+            var vm = new SimpleQuantityKindDialogViewModel(this.simpleQuantityKind, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.navigation.Object, this.rdl);
+
+            Assert.IsTrue(vm.IsBaseQuantityKind);
+        }
+
+        [Test]
+        public void VerifyThatIsBaseQuantityKindIsFalseForNewQuantityKind()
+        {
+            this.rdl.ParameterType.Add(this.simpleQuantityKind);
+
+            var vm = new SimpleQuantityKindDialogViewModel(this.simpleQuantityKind, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, this.navigation.Object, this.rdl);
+
+            Assert.IsFalse(vm.IsBaseQuantityKind);
         }
     }
 }
