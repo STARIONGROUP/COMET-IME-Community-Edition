@@ -85,11 +85,14 @@
                 </b:Interaction.Behaviors>
                 <dxmvvm:Interaction.Behaviors>
                     <cdp4Composition:ContextMenuBehavior />
+                    <dxmvvm:KeyToCommand KeyGesture="Ctrl+C" Command="{Binding Path=CopyParameterGroupCommand}" />
+                    <dxmvvm:KeyToCommand KeyGesture="Ctrl+V" Command="{Binding Path=PasteParameterGroupCommand}" />
                 </dxmvvm:Interaction.Behaviors>
                 <dxg:TreeListControl.View>
                     <dragDrop:TreeListViewDragDrop Name="View"
                                       AllowEditing="False"
                                       AutoWidth="False"
+                                      ClipboardCopyAllowed="False"
                                       EditorShowMode="MouseUpFocused"
                                       ExpandCollapseNodesOnNavigation="True"
                                       ExpandStateFieldName="IsExpanded"

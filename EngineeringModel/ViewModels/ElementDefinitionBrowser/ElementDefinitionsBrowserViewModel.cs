@@ -145,6 +145,16 @@ namespace CDP4EngineeringModel.ViewModels
         private bool canCreateOverride;
 
         /// <summary>
+        /// Backing field for <see cref="CanCopyParameterGroup"/>
+        /// </summary>
+        private bool canCopyParameterGroup;
+
+        /// <summary>
+        /// Backing field for <see cref="CanPasteParameterGroup"/>
+        /// </summary>
+        private bool canPasteParameterGroup;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ElementDefinitionsBrowserViewModel"/> class
         /// </summary>
         /// <param name="iteration">The associated <see cref="Iteration"/></param>
@@ -275,6 +285,24 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether the copy parameter or parameter group command shall be enabled
+        /// </summary>
+        public bool CanCopyParameterGroup
+        {
+            get => this.canCopyParameterGroup;
+            private set => this.RaiseAndSetIfChanged(ref this.canCopyParameterGroup, value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the paste parameter or parameter group command shall be enabled
+        /// </summary>
+        public bool CanPasteParameterGroup
+        {
+            get => this.canPasteParameterGroup;
+            private set => this.RaiseAndSetIfChanged(ref this.canPasteParameterGroup, value);
+        }
+
+        /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to Copy Model Code to clipboard <see cref="ParameterRowViewModel"/>
         /// </summary>
         public ReactiveCommand<Unit, Unit> CopyModelCodeToClipboardCommand { get; private set; }
@@ -298,6 +326,16 @@ namespace CDP4EngineeringModel.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> used to copy a <see cref="ElementDefinition"/>
         /// </summary>
         public ReactiveCommand<Unit, Unit> CopyElementDefinitionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> used to copy a <see cref="Parameter"/> or a <see cref="ParameterGroup"/> to the clipboard
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CopyParameterGroupCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> used to paste the copied <see cref="Parameter"/> or <see cref="ParameterGroup"/> into the selected <see cref="ElementDefinition"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> PasteParameterGroupCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand"/> to create a <see cref="ParameterOverride"/>
@@ -582,6 +620,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.CreateParameterGroup = ReactiveCommandCreator.Create(this.ExecuteCreateParameterGroup, this.WhenAnyValue(vm => vm.CanCreateParameterGroup));
             this.CreateElementDefinition = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<ElementDefinition>(this.Thing), this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
             this.CopyElementDefinitionCommand = ReactiveCommandCreator.Create(this.ExecuteCopyElementDefinition, this.WhenAnyValue(vm => vm.CanCreateElementDefinition));
+            this.CopyParameterGroupCommand = ReactiveCommandCreator.Create(this.ExecuteCopyParameterGroup, this.WhenAnyValue(vm => vm.CanCopyParameterGroup));
+            this.PasteParameterGroupCommand = ReactiveCommandCreator.Create(this.ExecutePasteParameterGroup, this.WhenAnyValue(vm => vm.CanPasteParameterGroup));
             this.CreateSubscriptionCommand = ReactiveCommandCreator.Create(this.ExecuteCreateSubscriptionCommand, this.WhenAnyValue(x => x.CanCreateSubscription));
             this.BatchCreateSubscriptionCommand = ReactiveCommandCreator.Create(this.ExecuteBatchCreateSubscriptionCommand, this.WhenAnyValue(x => x.CanCreateBatchSubscriptions));
             this.BatchDeleteSubscriptionCommand = ReactiveCommandCreator.Create(this.ExecuteBatchDeleteSubscriptionCommand, this.WhenAnyValue(x => x.CanDeleteBatchSubscriptions));
@@ -599,6 +639,8 @@ namespace CDP4EngineeringModel.ViewModels
         public override void ComputePermission()
         {
             base.ComputePermission();
+
+            this.ComputeCopyPasteParameterPermission();
 
             if (this.SelectedThing == null)
             {
@@ -668,16 +710,17 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Create an Element Definition", "", this.CreateElementDefinition, MenuItemKind.Create, ClassKind.ElementDefinition));
                 this.ContextMenu.Insert(1, new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
                 this.ContextMenu.Insert(2, new ContextMenuItemViewModel("Copy the Element Definition", "", this.CopyElementDefinitionCommand, MenuItemKind.Copy, ClassKind.ElementDefinition));
-                this.ContextMenu.Insert(3, new ContextMenuItemViewModel("Highlight Element Usages", "", this.HighlightElementUsagesCommand, MenuItemKind.Highlight, ClassKind.ElementUsage));
-                this.ContextMenu.Insert(4, new ContextMenuItemViewModel("Change Ownership", "", this.ChangeOwnershipCommand, MenuItemKind.Edit, ClassKind.NotThing));
+                this.ContextMenu.Insert(3, new ContextMenuItemViewModel("Paste a Parameter or Parameter Group", "CTRL+V", this.PasteParameterGroupCommand, MenuItemKind.None, ClassKind.Parameter));
+                this.ContextMenu.Insert(4, new ContextMenuItemViewModel("Highlight Element Usages", "", this.HighlightElementUsagesCommand, MenuItemKind.Highlight, ClassKind.ElementUsage));
+                this.ContextMenu.Insert(5, new ContextMenuItemViewModel("Change Ownership", "", this.ChangeOwnershipCommand, MenuItemKind.Edit, ClassKind.NotThing));
 
                 if (elementDefRow.IsTopElement)
                 {
-                    this.ContextMenu.Insert(5, new ContextMenuItemViewModel("Unset as Top Element", "", this.UnsetAsTopElementDefinitionCommand, MenuItemKind.Edit, ClassKind.NotThing));
+                    this.ContextMenu.Insert(6, new ContextMenuItemViewModel("Unset as Top Element", "", this.UnsetAsTopElementDefinitionCommand, MenuItemKind.Edit, ClassKind.NotThing));
                 }
                 else
                 {
-                    this.ContextMenu.Insert(5, new ContextMenuItemViewModel("Set as Top Element", "", this.SetAsTopElementDefinitionCommand, MenuItemKind.Edit, ClassKind.NotThing));
+                    this.ContextMenu.Insert(6, new ContextMenuItemViewModel("Set as Top Element", "", this.SetAsTopElementDefinitionCommand, MenuItemKind.Edit, ClassKind.NotThing));
                 }
 
                 return;
@@ -728,6 +771,8 @@ namespace CDP4EngineeringModel.ViewModels
             if (parameterGroupRow != null)
             {
                 this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Create a Parameter Group", "", this.CreateParameterGroup, MenuItemKind.Create, ClassKind.ParameterGroup));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Copy the Parameter Group", "CTRL+C", this.CopyParameterGroupCommand, MenuItemKind.Copy, ClassKind.ParameterGroup));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Paste a Parameter or Parameter Group", "CTRL+V", this.PasteParameterGroupCommand, MenuItemKind.None, ClassKind.ParameterGroup));
                 return;
             }
 
@@ -743,6 +788,9 @@ namespace CDP4EngineeringModel.ViewModels
                 {
                     this.ContextMenu.Insert(0, new ContextMenuItemViewModel("Subscribe to this Parameter", "", this.CreateSubscriptionCommand, MenuItemKind.Create, ClassKind.ParameterSubscription));
                 }
+
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Copy the Parameter", "CTRL+C", this.CopyParameterGroupCommand, MenuItemKind.Copy, ClassKind.Parameter));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Paste a Parameter or Parameter Group", "CTRL+V", this.PasteParameterGroupCommand, MenuItemKind.None, ClassKind.Parameter));
 
                 return;
             }
@@ -1283,6 +1331,98 @@ namespace CDP4EngineeringModel.ViewModels
         }
 
         /// <summary>
+        /// Computes whether the <see cref="CopyParameterGroupCommand"/> and <see cref="PasteParameterGroupCommand"/> shall be enabled
+        /// </summary>
+        private void ComputeCopyPasteParameterPermission()
+        {
+            this.CanCopyParameterGroup = this.SelectedThing is ParameterRowViewModel || this.SelectedThing is ParameterGroupRowViewModel;
+
+            var targetElementDefinition = this.GetPasteTargetElementDefinition();
+
+            this.CanPasteParameterGroup = ParameterClipboard.CopiedThing != null
+                                          && targetElementDefinition != null
+                                          && this.PermissionService.CanWrite(ClassKind.Parameter, targetElementDefinition);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ElementDefinition"/> that the copied <see cref="Parameter"/> or <see cref="ParameterGroup"/> would be pasted into
+        /// based on the currently selected row, or null when no valid target can be resolved.
+        /// </summary>
+        /// <returns>The target <see cref="ElementDefinition"/> or null</returns>
+        private ElementDefinition GetPasteTargetElementDefinition()
+        {
+            switch (this.SelectedThing)
+            {
+                case ElementDefinitionRowViewModel elementDefinitionRow:
+                    return elementDefinitionRow.Thing;
+                case ParameterGroupRowViewModel parameterGroupRow:
+                    return parameterGroupRow.Thing.GetContainerOfType<ElementDefinition>();
+                case ParameterRowViewModel parameterRow when parameterRow.ContainerViewModel is ElementDefinitionRowViewModel:
+                    return parameterRow.Thing.GetContainerOfType<ElementDefinition>();
+                default:
+                    return null;
+            }
+        }
+
+        /// <summary>
+        /// Execute the <see cref="CopyParameterGroupCommand"/>
+        /// </summary>
+        private void ExecuteCopyParameterGroup()
+        {
+            if (this.SelectedThing == null || !(this.SelectedThing.Thing is Parameter || this.SelectedThing.Thing is ParameterGroup))
+            {
+                return;
+            }
+
+            ParameterClipboard.CopiedThing = this.SelectedThing.Thing;
+            this.ComputeCopyPasteParameterPermission();
+        }
+
+        /// <summary>
+        /// Execute the <see cref="PasteParameterGroupCommand"/>
+        /// </summary>
+        private async void ExecutePasteParameterGroup()
+        {
+            var source = ParameterClipboard.CopiedThing;
+            var targetElementDefinition = this.GetPasteTargetElementDefinition();
+
+            if (source == null || targetElementDefinition == null)
+            {
+                return;
+            }
+
+            var targetIteration = targetElementDefinition.GetContainerOfType<Iteration>();
+            var owner = targetIteration == null ? null : this.Session.QuerySelectedDomainOfExpertise(targetIteration);
+
+            if (owner == null)
+            {
+                this.Feedback = "The domain of expertise of the user performing the action could not be determined.";
+                return;
+            }
+
+            var targetGroup = (this.SelectedThing as ParameterGroupRowViewModel)?.Thing;
+
+            try
+            {
+                this.IsBusy = true;
+
+                var copyCreator = new CopyParameterAndGroupCreator(this.Session);
+                var warnings = await copyCreator.Copy(source, targetElementDefinition, targetGroup, owner);
+
+                this.Feedback = warnings.Any() ? string.Join(" ", warnings) : string.Empty;
+            }
+            catch (Exception exception)
+            {
+                logger.Error(exception, "An error occured when pasting a Parameter or Parameter Group");
+                this.Feedback = exception.Message;
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
         /// Execute the <see cref="BatchCreateSubscriptionCommand"/>
         /// </summary>
         /// <returns>
@@ -1505,6 +1645,26 @@ namespace CDP4EngineeringModel.ViewModels
                 .Subscribe(_ => this.UpdateProperties());
 
             this.Disposables.Add(iterationSetupSubscription);
+
+            var sessionCloseSubscription = this.Session.CDPMessageBus.Listen<SessionEvent>()
+                .Where(sessionEvent => sessionEvent.Session == this.Session && sessionEvent.Status == SessionStatus.Closed)
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(_ => this.ClearParameterClipboardForClosedSession());
+
+            this.Disposables.Add(sessionCloseSubscription);
+        }
+
+        /// <summary>
+        /// Clears the shared <see cref="ParameterClipboard"/> when the copied <see cref="Thing"/> originates from the
+        /// <see cref="ISession"/> that is being closed, so that it cannot be pasted from a session that is no longer open and
+        /// the copied object graph is released for garbage collection.
+        /// </summary>
+        private void ClearParameterClipboardForClosedSession()
+        {
+            if (ParameterClipboard.CopiedThing != null && ParameterClipboard.CopiedThing.Cache == this.Session.Assembler.Cache)
+            {
+                ParameterClipboard.CopiedThing = null;
+            }
         }
 
         /// <summary>
