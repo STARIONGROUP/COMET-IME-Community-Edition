@@ -167,6 +167,16 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatGuidanceIsShownWhenQuantityKindFactorListIsEmpty()
+        {
+            Assert.IsNotEmpty(this.viewmodel.QuantityKindFactor);
+            Assert.IsFalse(this.viewmodel.IsQuantityKindFactorListEmpty);
+
+            this.viewmodel.QuantityKindFactor.Clear();
+            Assert.IsTrue(this.viewmodel.IsQuantityKindFactorListEmpty);
+        }
+
+        [Test]
         public void VerifThatUpdatingContainerPopulatesPossiblePossibleScales()
         {
             this.viewmodel.PossiblePossibleScale.Clear();

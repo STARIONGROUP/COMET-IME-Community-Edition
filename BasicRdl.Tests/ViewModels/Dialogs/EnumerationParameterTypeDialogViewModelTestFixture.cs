@@ -129,6 +129,16 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatGuidanceIsShownWhenValueDefinitionListIsEmpty()
+        {
+            Assert.AreEqual(1, this.viewmodel.ValueDefinition.Count);
+            Assert.IsFalse(this.viewmodel.IsValueDefinitionListEmpty);
+
+            this.viewmodel.ValueDefinition.Clear();
+            Assert.IsTrue(this.viewmodel.IsValueDefinitionListEmpty);
+        }
+
+        [Test]
         public void VerifyDialogValidation()
         {
             Assert.AreEqual(0, this.viewmodel.ValidationErrors.Count);
