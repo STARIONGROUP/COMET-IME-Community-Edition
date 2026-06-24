@@ -67,6 +67,7 @@
                 </dxlc:LayoutItem>
 
                 <items:IsDeprecatedLayoutItem />
+                <items:IsBaseUnitLayoutItem />
                 <items:AliasDisplayLayoutItem />
                 <items:DefinitionDisplayLayoutItem />
             </dxlc:LayoutGroup>

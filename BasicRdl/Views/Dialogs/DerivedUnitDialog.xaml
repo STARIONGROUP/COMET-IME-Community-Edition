@@ -35,6 +35,7 @@
                 <items:ShortNameLayoutItem />
                 <items:ShortNameContainerLayoutItem />
                 <items:IsDeprecatedLayoutItem />
+                <items:IsBaseUnitLayoutItem />
                 <dxb:ToolBarControl Height="30" Background="Transparent">
                     <dxb:BarButtonItem x:Name="CreateUnitFactorButton"
                                                Command="{Binding CreateUnitFactorCommand}"

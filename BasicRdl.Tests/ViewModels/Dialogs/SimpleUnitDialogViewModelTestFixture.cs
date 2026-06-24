@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="SimpleUnitDialogViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Rowan de Voogt
 //
 //    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -131,6 +131,43 @@ namespace BasicRdl.Tests.ViewModels.Dialogs
         {
             var dialogViewModel = new SimpleUnitDialogViewModel();
             Assert.IsFalse(dialogViewModel.IsDeprecated);
+        }
+
+        [Test]
+        public void VerifyThatIsBaseUnitIsTrueWhenUnitIsInRdlBaseUnit()
+        {
+            var simpleUnit = new SimpleUnit(Guid.NewGuid(), null, null);
+            this.genericSiteReferenceDataLibrary.Unit.Add(simpleUnit);
+            this.genericSiteReferenceDataLibrary.BaseUnit.Add(simpleUnit);
+
+            var vm = new SimpleUnitDialogViewModel(
+                simpleUnit,
+                this.transaction,
+                this.session.Object,
+                true,
+                ThingDialogKind.Inspect,
+                this.dialogService.Object,
+                this.genericSiteReferenceDataLibrary);
+
+            Assert.IsTrue(vm.IsBaseUnit);
+        }
+
+        [Test]
+        public void VerifyThatIsBaseUnitIsFalseForNewUnit()
+        {
+            var simpleUnit = new SimpleUnit(Guid.NewGuid(), null, null);
+            this.genericSiteReferenceDataLibrary.Unit.Add(simpleUnit);
+
+            var vm = new SimpleUnitDialogViewModel(
+                simpleUnit,
+                this.transaction,
+                this.session.Object,
+                true,
+                ThingDialogKind.Inspect,
+                this.dialogService.Object,
+                this.genericSiteReferenceDataLibrary);
+
+            Assert.IsFalse(vm.IsBaseUnit);
         }
     }
 }
