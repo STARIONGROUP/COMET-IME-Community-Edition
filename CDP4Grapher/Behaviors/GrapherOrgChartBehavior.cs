@@ -1,20 +1,20 @@
 // --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherOrgChartBehavior.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft,
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Rowan de Voogt
 
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET IME Community Edition. 
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -30,6 +30,7 @@ namespace CDP4Grapher.Behaviors
     using System.Linq;
     using System.Windows;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Navigation;
@@ -382,6 +383,24 @@ namespace CDP4Grapher.Behaviors
         public void ExitIsolation()
         {
             (this.AssociatedObject.DataContext as IGrapherViewModel)?.ExitIsolation();
+        }
+
+        /// <summary>
+        /// Opens the edit dialog for the provided <see cref="Thing"/>
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> to edit</param>
+        public void Edit(Thing thing)
+        {
+            (this.AssociatedObject.DataContext as IGrapherViewModel)?.Edit(thing);
+        }
+
+        /// <summary>
+        /// Opens the inspect dialog for the provided <see cref="Thing"/>
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> to inspect</param>
+        public void Inspect(Thing thing)
+        {
+            (this.AssociatedObject.DataContext as IGrapherViewModel)?.Inspect(thing);
         }
     }
 }

@@ -1,19 +1,19 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramControlContextMenuViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Kamil Wojnowski, Rowan de Voogt
 //
-//    This file is part of CDP4-IME Community Edition. 
-//    The CDP4-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    This file is part of CDP4-COMET IME Community Edition. 
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
-//    The CDP4-IME Community Edition is free software; you can redistribute it and/or
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
 //    modify it under the terms of the GNU Affero General Public
 //    License as published by the Free Software Foundation; either
 //    version 3 of the License, or any later version.
 //
-//    The CDP4-IME Community Edition is distributed in the hope that it will be useful,
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
 //    but WITHOUT ANY WARRANTY; without even the implied warranty of
 //    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 //    GNU Affero General Public License for more details.
@@ -30,6 +30,8 @@ namespace CDP4Grapher.ViewModels
     using System.Reactive;
     using System.Reactive.Linq;
     using System.Windows.Input;
+
+    using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Mvvm;
 
@@ -79,6 +81,21 @@ namespace CDP4Grapher.ViewModels
         public IGrapherOrgChartBehavior Behavior { get; set; }
 
         /// <summary>
+        /// Gets the <see cref="ElementDefinition"/> represented by the <see cref="HoveredElement"/>, if any.
+        /// For a usage node this is the referenced <see cref="ElementDefinition"/>, for the root node the node itself.
+        /// </summary>
+        private ElementDefinition HoveredElementDefinition =>
+            this.HoveredElement?.NestedElementElement is ElementUsage elementUsage
+                ? elementUsage.ElementDefinition
+                : this.HoveredElement?.NestedElementElement as ElementDefinition;
+
+        /// <summary>
+        /// Gets the <see cref="ElementUsage"/> represented by the <see cref="HoveredElement"/>, if any.
+        /// The root node of the tree is not an <see cref="ElementUsage"/> and therefore returns null.
+        /// </summary>
+        private ElementUsage HoveredElementUsage => this.HoveredElement?.NestedElementElement as ElementUsage;
+
+        /// <summary>
         /// Holds the <see cref="BarButtonItem"/> and <see cref="BarSubItem"/> representing an overridable diagram Context Menu
         /// </summary>
         public List<IBarManagerControllerAction> ContextMenu { get; set; } = new List<IBarManagerControllerAction>();
@@ -110,6 +127,26 @@ namespace CDP4Grapher.ViewModels
         /// Gets the <see cref="ReactiveCommand"/> to exit isolation
         /// </summary>
         public ReactiveCommand<Unit, Unit> ExitIsolationCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to edit the <see cref="ElementDefinition"/> of the <see cref="HoveredElement"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> EditElementDefinitionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to inspect the <see cref="ElementDefinition"/> of the <see cref="HoveredElement"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> InspectElementDefinitionCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to edit the <see cref="ElementUsage"/> of the <see cref="HoveredElement"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> EditElementUsageCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to inspect the <see cref="ElementUsage"/> of the <see cref="HoveredElement"/>
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> InspectElementUsageCommand { get; private set; }
         
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> to export the generated diagram as png
@@ -213,6 +250,22 @@ namespace CDP4Grapher.ViewModels
                 this.WhenAnyValue(x => x.CanExitIsolation)
                     .ObserveOn(RxApp.MainThreadScheduler));
 
+            this.EditElementDefinitionCommand = ReactiveCommandCreator.Create(this.ExecuteEditElementDefinition,
+                this.WhenAnyValue(x => x.HoveredElement)
+                    .Select(x => x?.NestedElementElement != null).ObserveOn(RxApp.MainThreadScheduler));
+
+            this.InspectElementDefinitionCommand = ReactiveCommandCreator.Create(this.ExecuteInspectElementDefinition,
+                this.WhenAnyValue(x => x.HoveredElement)
+                    .Select(x => x?.NestedElementElement != null).ObserveOn(RxApp.MainThreadScheduler));
+
+            this.EditElementUsageCommand = ReactiveCommandCreator.Create(this.ExecuteEditElementUsage,
+                this.WhenAnyValue(x => x.HoveredElement)
+                    .Select(x => x?.NestedElementElement is ElementUsage).ObserveOn(RxApp.MainThreadScheduler));
+
+            this.InspectElementUsageCommand = ReactiveCommandCreator.Create(this.ExecuteInspectElementUsage,
+                this.WhenAnyValue(x => x.HoveredElement)
+                    .Select(x => x?.NestedElementElement is ElementUsage).ObserveOn(RxApp.MainThreadScheduler));
+
             this.ExportGraphAsJpg = ReactiveCommandCreator.Create(this.ExecuteExportGraphAsPng, this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
             
             this.ExportGraphAsPdf = ReactiveCommandCreator.Create(this.ExecuteExportGraphAsPdf, this.WhenAnyValue(x => x.CanExportDiagram).ObserveOn(RxApp.MainThreadScheduler));
@@ -251,6 +304,10 @@ namespace CDP4Grapher.ViewModels
         /// </summary>
         private void CreateContextMenu()
         {
+            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Edit Element Definition", this.EditElementDefinitionCommand, "XAF/Action_Inline_Edit.svg"));
+            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Inspect Element Definition", this.InspectElementDefinitionCommand, "Find/Find.svg"));
+            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Edit Element Usage", this.EditElementUsageCommand, "XAF/Action_Inline_Edit.svg"));
+            this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Inspect Element Usage", this.InspectElementUsageCommand, "Find/Find.svg"));
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Isolate", this.IsolateCommand, "Snap/SeparatorListNone.svg"));
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Exit Isolation", this.ExitIsolationCommand, "Icon Builder/Actions_RemoveCircled.svg"));
             this.ContextMenu.Add(this.GenerateContextMenuItem<BarButtonItem>("Export Graph as JPG", this.ExportGraphAsJpg, "XAF/Action_Export_ToImage.svg"));
@@ -327,6 +384,38 @@ namespace CDP4Grapher.ViewModels
             this.CanExportDiagram = false;
             this.Behavior.ExportGraph(DiagramExportFormat.JPEG);
             this.CanExportDiagram = true;
+        }
+
+        /// <summary>
+        /// Executes the <see cref="EditElementDefinitionCommand"/>
+        /// </summary>
+        private void ExecuteEditElementDefinition()
+        {
+            this.Behavior.Edit(this.HoveredElementDefinition);
+        }
+
+        /// <summary>
+        /// Executes the <see cref="InspectElementDefinitionCommand"/>
+        /// </summary>
+        private void ExecuteInspectElementDefinition()
+        {
+            this.Behavior.Inspect(this.HoveredElementDefinition);
+        }
+
+        /// <summary>
+        /// Executes the <see cref="EditElementUsageCommand"/>
+        /// </summary>
+        private void ExecuteEditElementUsage()
+        {
+            this.Behavior.Edit(this.HoveredElementUsage);
+        }
+
+        /// <summary>
+        /// Executes the <see cref="InspectElementUsageCommand"/>
+        /// </summary>
+        private void ExecuteInspectElementUsage()
+        {
+            this.Behavior.Inspect(this.HoveredElementUsage);
         }
 
         /// <summary>

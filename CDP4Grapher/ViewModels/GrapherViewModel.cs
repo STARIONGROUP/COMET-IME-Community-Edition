@@ -1,10 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary,
+//              Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -30,6 +31,7 @@ namespace CDP4Grapher.ViewModels
     using System.Reactive.Linq;
     using System.Windows;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
@@ -352,6 +354,34 @@ namespace CDP4Grapher.ViewModels
         {
             this.SelectedElement = new ElementParameterRowControlViewModel(element.NestedElementElement, this.option);
             this.SelectedElementModelCode = element.ModelCode;
+        }
+
+        /// <summary>
+        /// Opens the edit dialog for the provided <see cref="Thing"/>
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> to edit</param>
+        public void Edit(Thing thing)
+        {
+            if (thing == null)
+            {
+                return;
+            }
+
+            this.ExecuteUpdateCommand(thing);
+        }
+
+        /// <summary>
+        /// Opens the inspect dialog for the provided <see cref="Thing"/>
+        /// </summary>
+        /// <param name="thing">The <see cref="Thing"/> to inspect</param>
+        public void Inspect(Thing thing)
+        {
+            if (thing == null)
+            {
+                return;
+            }
+
+            this.ExecuteInspectCommand(thing);
         }
     }
 }
