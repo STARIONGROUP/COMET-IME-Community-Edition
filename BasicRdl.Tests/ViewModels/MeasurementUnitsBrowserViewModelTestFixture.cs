@@ -1,8 +1,8 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MeasurementUnitsBrowserViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary, Rowan de Voogt
 //
 //    This file is part of COMET-IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -28,6 +28,7 @@ namespace BasicRdl.Tests.ViewModels
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Concurrency;
     using System.Windows.Input;
 
     using BasicRdl.ViewModels;
@@ -37,11 +38,14 @@ namespace BasicRdl.Tests.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using Moq;
 
     using NUnit.Framework;
+
+    using ReactiveUI;
 
     /// <summary>
     /// TestFixture for the <see cref="MeasurementUnitsBrowserViewModel"/>
@@ -63,6 +67,7 @@ namespace BasicRdl.Tests.ViewModels
         [SetUp]
         public void Setup()
         {
+            RxApp.MainThreadScheduler = Scheduler.CurrentThread;
             this.messageBus = new CDPMessageBus();
             this.session = new Mock<ISession>();
             this.uri = new Uri("https://www.stariongroup.eu");
@@ -237,6 +242,87 @@ namespace BasicRdl.Tests.ViewModels
             this.messageBus.SendMessage(new SessionEvent(this.session.Object, SessionStatus.RdlOpened));
 
             Assert.AreEqual(1, this.measurementUnitsViewModel.MeasurementUnits.Count(x => x.Thing.Iid == unit.Iid));
+        }
+
+        [Test]
+        public void VerifyThatCanSetAsBaseUnitIsFalseWhenNoRowIsSelected()
+        {
+            Assert.IsFalse(this.measurementUnitsViewModel.CanSetAsBaseUnit);
+        }
+
+        [Test]
+        public void VerifyThatCanSetAsBaseUnitIsTrueWhenWritableRowIsSelected()
+        {
+            var simpleUnit = new SimpleUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "su", ShortName = "su" };
+            this.siteRdl.Unit.Add(simpleUnit);
+
+            this.messageBus.SendObjectChangeEvent(simpleUnit, EventKind.Added);
+            Assert.AreEqual(1, this.measurementUnitsViewModel.MeasurementUnits.Count);
+
+            this.measurementUnitsViewModel.SelectedThing = this.measurementUnitsViewModel.MeasurementUnits.First();
+            Assert.IsTrue(this.measurementUnitsViewModel.CanSetAsBaseUnit);
+        }
+
+        [Test]
+        public void VerifyThatContextMenuShowsSetAsBaseUnitWhenNotBaseUnit()
+        {
+            var simpleUnit = new SimpleUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "su", ShortName = "su" };
+            this.siteRdl.Unit.Add(simpleUnit);
+
+            this.messageBus.SendObjectChangeEvent(simpleUnit, EventKind.Added);
+            this.measurementUnitsViewModel.SelectedThing = this.measurementUnitsViewModel.MeasurementUnits.First();
+
+            Assert.IsTrue(this.measurementUnitsViewModel.ContextMenu.Any(x => x.Header == "Set as Base Unit"));
+            Assert.IsFalse(this.measurementUnitsViewModel.ContextMenu.Any(x => x.Header == "Unset as Base Unit"));
+        }
+
+        [Test]
+        public void VerifyThatContextMenuShowsUnsetAsBaseUnitWhenIsBaseUnit()
+        {
+            var simpleUnit = new SimpleUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "su", ShortName = "su" };
+            this.siteRdl.Unit.Add(simpleUnit);
+            this.siteRdl.BaseUnit.Add(simpleUnit);
+
+            this.messageBus.SendObjectChangeEvent(simpleUnit, EventKind.Added);
+            this.measurementUnitsViewModel.SelectedThing = this.measurementUnitsViewModel.MeasurementUnits.First();
+
+            Assert.IsTrue(this.measurementUnitsViewModel.ContextMenu.Any(x => x.Header == "Unset as Base Unit"));
+            Assert.IsFalse(this.measurementUnitsViewModel.ContextMenu.Any(x => x.Header == "Set as Base Unit"));
+        }
+
+        [Test]
+        public void VerifyThatIsBaseUnitIsUpdatedOnRdlUpdate()
+        {
+            var simpleUnit = new SimpleUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "su", ShortName = "su" };
+            this.siteRdl.Unit.Add(simpleUnit);
+
+            this.messageBus.SendObjectChangeEvent(simpleUnit, EventKind.Added);
+            var row = this.measurementUnitsViewModel.MeasurementUnits.First();
+            Assert.IsFalse(row.IsBaseUnit);
+
+            // Simulate the RDL being updated to include the unit as a base unit
+            this.siteRdl.BaseUnit.Add(simpleUnit);
+            var rev = typeof(Thing).GetProperty("RevisionNumber");
+            rev.SetValue(this.siteRdl, 2);
+            this.messageBus.SendObjectChangeEvent(this.siteRdl, EventKind.Updated);
+
+            Assert.IsTrue(row.IsBaseUnit);
+        }
+
+        [Test]
+        public void VerifyThatSetAsBaseUnitCommandCallsSessionWrite()
+        {
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(System.Threading.Tasks.Task.CompletedTask);
+
+            var simpleUnit = new SimpleUnit(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "su", ShortName = "su" };
+            this.siteRdl.Unit.Add(simpleUnit);
+
+            this.messageBus.SendObjectChangeEvent(simpleUnit, EventKind.Added);
+            this.measurementUnitsViewModel.SelectedThing = this.measurementUnitsViewModel.MeasurementUnits.First();
+
+            ((ICommand)this.measurementUnitsViewModel.SetAsBaseUnitCommand).Execute(null);
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
         }
     }
 }

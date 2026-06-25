@@ -108,6 +108,7 @@
                         </Button>
                     </Grid>
                 </dxlc:LayoutItem>
+                <items:IsBaseUnitLayoutItem />
                 <items:IsDeprecatedLayoutItem />
                 <items:AliasDisplayLayoutItem />
                 <items:DefinitionDisplayLayoutItem />

@@ -1,10 +1,10 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="MeasurementUnitsBrowserViewModel.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -29,6 +29,7 @@ namespace BasicRdl.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -42,6 +43,7 @@ namespace BasicRdl.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using ReactiveUI;
 
@@ -66,6 +68,11 @@ namespace BasicRdl.ViewModels
         /// Backing field for <see cref="CanCreateRdlElement"/>
         /// </summary>
         private bool canCreateRdlElement;
+
+        /// <summary>
+        /// Backing field for <see cref="CanSetAsBaseUnit"/>
+        /// </summary>
+        private bool canSetAsBaseUnit;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MeasurementUnitsBrowserViewModel"/> class.
@@ -112,6 +119,20 @@ namespace BasicRdl.ViewModels
             get => this.canCreateRdlElement;
             private set => this.RaiseAndSetIfChanged(ref this.canCreateRdlElement, value);
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the selected <see cref="MeasurementUnit"/> may be set or unset as a base unit
+        /// </summary>
+        public bool CanSetAsBaseUnit
+        {
+            get => this.canSetAsBaseUnit;
+            private set => this.RaiseAndSetIfChanged(ref this.canSetAsBaseUnit, value);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> used to set or unset the selected <see cref="MeasurementUnit"/> as a base unit
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> SetAsBaseUnitCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ReactiveCommand"/> used to create a <see cref="SimpleUnit"/>
@@ -239,6 +260,8 @@ namespace BasicRdl.ViewModels
                 {
                     measurementUnit.ContainerRdl = rdl.ShortName;
                 }
+
+                measurementUnit.IsBaseUnit = rdl.BaseUnit.Any(u => u.Iid == measurementUnit.Thing.Iid);
             }
         }
 
@@ -249,6 +272,16 @@ namespace BasicRdl.ViewModels
         {
             base.ComputePermission();
             this.CanCreateRdlElement = this.Session.OpenReferenceDataLibraries.Any();
+
+            if (this.SelectedThing is MeasurementUnitRowViewModel selectedRow)
+            {
+                var rdl = selectedRow.Thing.Container as ReferenceDataLibrary;
+                this.CanSetAsBaseUnit = rdl != null && this.Session.PermissionService.CanWrite(rdl);
+            }
+            else
+            {
+                this.CanSetAsBaseUnit = false;
+            }
         }
 
         /// <summary>
@@ -257,6 +290,15 @@ namespace BasicRdl.ViewModels
         public override void PopulateContextMenu()
         {
             base.PopulateContextMenu();
+
+            if (this.SelectedThing is MeasurementUnitRowViewModel selectedRow)
+            {
+                this.ContextMenu.Add(new ContextMenuItemViewModel(
+                    selectedRow.IsBaseUnit ? "Unset as Base Unit" : "Set as Base Unit",
+                    "",
+                    this.SetAsBaseUnitCommand,
+                    MenuItemKind.None));
+            }
 
             this.ContextMenu.Add(
                 new ContextMenuItemViewModel(
@@ -298,6 +340,10 @@ namespace BasicRdl.ViewModels
         {
             base.InitializeCommands();
 
+            this.SetAsBaseUnitCommand = ReactiveCommandCreator.Create(
+                this.ExecuteSetAsBaseUnitCommand,
+                this.WhenAnyValue(x => x.CanSetAsBaseUnit));
+
             this.CreateSimpleUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<SimpleUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
             this.CreateDerivedUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<DerivedUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
@@ -305,6 +351,41 @@ namespace BasicRdl.ViewModels
             this.CreateLinearConversionUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<LinearConversionUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
 
             this.CreatePrefixedUnit = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<PrefixedUnit>(), this.WhenAnyValue(x => x.CanCreateRdlElement));
+        }
+
+        /// <summary>
+        /// Executes the <see cref="SetAsBaseUnitCommand"/> by toggling the base-unit membership of the selected
+        /// <see cref="MeasurementUnit"/> on the container <see cref="ReferenceDataLibrary"/>.
+        /// </summary>
+        private async void ExecuteSetAsBaseUnitCommand()
+        {
+            if (!(this.SelectedThing is MeasurementUnitRowViewModel selectedRow))
+            {
+                return;
+            }
+
+            var unit = selectedRow.Thing;
+            var rdl = unit.Container as ReferenceDataLibrary;
+
+            if (rdl == null)
+            {
+                return;
+            }
+
+            var rdlClone = rdl.Clone(false);
+
+            if (selectedRow.IsBaseUnit)
+            {
+                rdlClone.BaseUnit.RemoveAll(u => u.Iid == unit.Iid);
+            }
+            else
+            {
+                rdlClone.BaseUnit.Add(unit);
+            }
+
+            var transactionContext = TransactionContextResolver.ResolveContext(this.Thing);
+            var transaction = new ThingTransaction(transactionContext, rdlClone);
+            await this.DalWrite(transaction);
         }
 
         /// <summary>
