@@ -241,7 +241,7 @@ namespace BasicRdl.ViewModels
                     // create new ParameterTypeComponent
                     var component = new ParameterTypeComponent();
                     row = new ParameterTypeComponentRowViewModel(component, this.Session, this);
-                    row.ShortName = coordinates;
+                    row.ShortName = ComputeComponentShortName(coordinates);
                 }
 
                 row.Coordinates = coordinates;
@@ -294,6 +294,19 @@ namespace BasicRdl.ViewModels
             }
 
             return "{" + string.Join(";", indexList.Select(x => x.ToString(CultureInfo.InvariantCulture))) + "}";
+        }
+
+        /// <summary>
+        /// Compute a valid default <see cref="ParameterTypeComponent.ShortName"/> from a component's coordinates
+        /// </summary>
+        /// <param name="coordinates">The coordinates of the component, e.g. <c>{1;1;1}</c></param>
+        /// <returns>
+        /// A short name that complies with the short-name validation rules (starts with a letter, only contains
+        /// alphanumeric characters or underscores), e.g. <c>C1_1_1</c>
+        /// </returns>
+        private static string ComputeComponentShortName(string coordinates)
+        {
+            return "C" + coordinates.Trim('{', '}').Replace(";", "_");
         }
 
         /// <summary>
