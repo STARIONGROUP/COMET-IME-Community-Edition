@@ -25,10 +25,12 @@
 
 namespace CDP4SiteDirectory.ViewModels
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Reactive;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -45,6 +47,7 @@ namespace CDP4SiteDirectory.ViewModels
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using ReactiveUI;
 
@@ -110,6 +113,11 @@ namespace CDP4SiteDirectory.ViewModels
         /// Gets the <see cref="ICommand" /> to create a new <see cref="Participant" />
         /// </summary>
         public ReactiveCommand<Unit, Unit> CreateParticipantCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="ICommand" /> to create multiple <see cref="Participant" />s at once
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CreateMultipleParticipantsCommand { get; private set; }
 
         /// <summary>
         /// Gets the <see cref="ICommand" /> to create a new <see cref="IterationSetup" />
@@ -178,7 +186,11 @@ namespace CDP4SiteDirectory.ViewModels
                     }
 
                     this.ExecuteCreateCommand<Participant>(container);
-                }, 
+                },
+                this.WhenAnyValue(x => x.CanCreateParticipant));
+
+            this.CreateMultipleParticipantsCommand = ReactiveCommandCreator.CreateAsyncTask(
+                this.ExecuteCreateMultipleParticipantsCommand,
                 this.WhenAnyValue(x => x.CanCreateParticipant));
 
             this.CreateIterationSetupCommand = ReactiveCommandCreator.Create(() =>
@@ -191,8 +203,68 @@ namespace CDP4SiteDirectory.ViewModels
                     }
 
                     this.ExecuteCreateCommand<IterationSetup>(container);
-                }, 
+                },
                 this.WhenAnyValue(x => x.CanCreateIterationSetup));
+        }
+
+        /// <summary>
+        /// Executes the <see cref="CreateMultipleParticipantsCommand" /> by presenting the bulk participant creation
+        /// dialog and persisting the selected <see cref="Participant" />s in a single transaction.
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task" />
+        /// </returns>
+        private async Task ExecuteCreateMultipleParticipantsCommand()
+        {
+            var modelSetup = this.GetSelectedModelSetupContainer();
+
+            if (modelSetup == null)
+            {
+                return;
+            }
+
+            var siteDirectory = this.Session.RetrieveSiteDirectory();
+
+            var eligiblePersons = siteDirectory.Person
+                .Where(person => !person.IsDeprecated)
+                .Except(modelSetup.Participant.Select(p => p.Person))
+                .ToList();
+
+            if (!eligiblePersons.Any())
+            {
+                return;
+            }
+
+            var dialogViewModel = new BulkParticipantCreationDialogViewModel(eligiblePersons, siteDirectory.ParticipantRole, modelSetup.ActiveDomain);
+
+            var result = this.DialogNavigationService.NavigateModal(dialogViewModel) as BulkParticipantCreationResult;
+
+            if (result?.Result != true || result.Participants == null || !result.Participants.Any())
+            {
+                return;
+            }
+
+            var context = TransactionContextResolver.ResolveContext(modelSetup);
+            var modelSetupClone = modelSetup.Clone(false);
+            var transaction = new ThingTransaction(context, modelSetupClone);
+
+            foreach (var row in result.Participants)
+            {
+                var participant = new Participant(Guid.NewGuid(), null, null)
+                {
+                    Person = row.Person,
+                    Role = row.SelectedRole,
+                    SelectedDomain = row.SelectedDomain,
+                    IsActive = row.IsActive
+                };
+
+                participant.Domain.Add(row.SelectedDomain);
+
+                modelSetupClone.Participant.Add(participant);
+                transaction.Create(participant, modelSetupClone);
+            }
+
+            await this.Session.Write(transaction.FinalizeTransaction());
         }
 
         /// <summary>
@@ -223,6 +295,7 @@ namespace CDP4SiteDirectory.ViewModels
             {
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Engineering Model Setup", "", this.CreateCommand, MenuItemKind.Create, ClassKind.EngineeringModelSetup));
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Participant", "", this.CreateParticipantCommand, MenuItemKind.Create, ClassKind.Participant));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Participants", "", this.CreateMultipleParticipantsCommand, MenuItemKind.Create, ClassKind.Participant));
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create an Iteration Setup", "", this.CreateIterationSetupCommand, MenuItemKind.Create, ClassKind.IterationSetup));
             }
             else if (this.SelectedThing is ModelParticipantRowViewModel participantRowViewModel)
@@ -240,6 +313,7 @@ namespace CDP4SiteDirectory.ViewModels
                 }
 
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Participant", "", this.CreateParticipantCommand, MenuItemKind.Create, ClassKind.Participant));
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Participants", "", this.CreateMultipleParticipantsCommand, MenuItemKind.Create, ClassKind.Participant));
             }
             else if (this.SelectedThing is IterationSetupRowViewModel)
             {
@@ -256,6 +330,7 @@ namespace CDP4SiteDirectory.ViewModels
                     else if (folderRowViewModel.ShortName == "Participants")
                     {
                         this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Participant", "", this.CreateParticipantCommand, MenuItemKind.Create, ClassKind.Participant));
+                        this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Participants", "", this.CreateMultipleParticipantsCommand, MenuItemKind.Create, ClassKind.Participant));
                     }
                 }
             }

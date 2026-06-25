@@ -145,6 +145,29 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
+        public void VerifyThatIsActiveIsTrueByDefaultOnCreate()
+        {
+            var participant = new Participant(Guid.NewGuid(), this.cache, this.uri);
+
+            var dialog = new ParticipantDialogViewModel(participant, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
+
+            Assert.IsTrue(dialog.IsActive);
+        }
+
+        [Test]
+        public void VerifyThatIsActiveIsNotForcedOnInspectOrUpdate()
+        {
+            var participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person, IsActive = false };
+            this.clone.Participant.Add(participant);
+
+            var dialog = new ParticipantDialogViewModel(participant, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Update, this.thingDialogNavigationService.Object, this.clone);
+
+            Assert.IsFalse(dialog.IsActive);
+        }
+
+        [Test]
         public void VerifyPossiblePerson()
         {
             var participant = new Participant(Guid.NewGuid(), this.cache, this.uri) { Person = this.person };

@@ -109,6 +109,11 @@ namespace CDP4SiteDirectory.ViewModels
             this.isSelectedRoleDeprecated =
                 this.WhenAny(x => x.SelectedRole, selectedRole => selectedRole.Value?.IsDeprecated == true)
                     .ToProperty(this, x => x.IsSelectedRoleDeprecated, out this.isSelectedRoleDeprecated, scheduler: RxApp.MainThreadScheduler);
+
+            if (this.dialogKind == ThingDialogKind.Create)
+            {
+                this.IsActive = true;
+            }
         }
 
         /// <summary>
