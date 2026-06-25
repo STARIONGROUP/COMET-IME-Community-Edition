@@ -86,6 +86,8 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.Name = "iteration_" + this.Thing.IterationNumber.ToString(CultureInfo.InvariantCulture);
 
+            this.ModelName = (this.Thing.Container as EngineeringModelSetup)?.Name;
+
             this.FrozenOnDate = !this.Thing.FrozenOn.HasValue ? "Active" : this.Thing.FrozenOn.Value.ToString("yyyy-MM-dd HH:mm:ss");
         }
 
@@ -93,6 +95,11 @@ namespace CDP4ShellDialogs.ViewModels
         /// Gets or sets the name.
         /// </summary>
         public string Name { get; private set; }
+
+        /// <summary>
+        /// Gets the name of the <see cref="EngineeringModelSetup" /> that contains the <see cref="IterationSetup" />
+        /// </summary>
+        public string ModelName { get; private set; }
 
         /// <summary>
         /// Gets or sets the date at which the iteration was Frozen

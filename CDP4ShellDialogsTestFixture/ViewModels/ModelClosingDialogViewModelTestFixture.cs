@@ -263,6 +263,20 @@ namespace CDP4ShellDialogs.Tests
         }
 
         [Test]
+        public void VerifyThatSelectedRowSessionAndIterationRowsArePopulated()
+        {
+            this.openIterations.Add(this.iteration11, null);
+            this.openIterations.Add(this.iteration12, null);
+
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelClosingDialogViewModel(sessions);
+
+            Assert.That(viewmodel.SelectedRowSession, Is.EqualTo(viewmodel.SessionsAvailable.First()));
+            Assert.That(viewmodel.IterationRows.Count, Is.EqualTo(2));
+            Assert.That(viewmodel.IterationRows.All(r => r.ModelName == "model1"), Is.True);
+        }
+
+        [Test]
         public void VerifyThatOnlyOpenIterationsAreAvailable()
         {
             var lazyiterationSetup21 = new Lazy<Thing>(() => this.iterationSetup21);

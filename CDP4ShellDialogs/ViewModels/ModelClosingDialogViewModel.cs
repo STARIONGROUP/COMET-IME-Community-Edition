@@ -53,7 +53,17 @@ namespace CDP4ShellDialogs.ViewModels
     public class ModelClosingDialogViewModel : DialogViewModelBase
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ModelClosingDialogViewModel"/> class. 
+        /// Backing field for the <see cref="SelectedRowSession"/> property.
+        /// </summary>
+        private ModelSelectionSessionRowViewModel selectedRowSession;
+
+        /// <summary>
+        /// Backing field for the <see cref="IterationRows"/> property.
+        /// </summary>
+        private List<ModelSelectionIterationSetupRowViewModel> iterationRows;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ModelClosingDialogViewModel"/> class.
         /// </summary>
         /// <param name="sessionAvailable">
         /// The session Available.
@@ -75,6 +85,24 @@ namespace CDP4ShellDialogs.ViewModels
         /// Gets the list of <see cref="BaseRowViewModel"/> available
         /// </summary>
         public DisposableReactiveList<ModelSelectionSessionRowViewModel> SessionsAvailable { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the selected source <see cref="ModelSelectionSessionRowViewModel"/>
+        /// </summary>
+        public ModelSelectionSessionRowViewModel SelectedRowSession
+        {
+            get => this.selectedRowSession;
+            set => this.RaiseAndSetIfChanged(ref this.selectedRowSession, value);
+        }
+
+        /// <summary>
+        /// Gets the flat list of <see cref="ModelSelectionIterationSetupRowViewModel"/> of the <see cref="SelectedRowSession"/>
+        /// </summary>
+        public List<ModelSelectionIterationSetupRowViewModel> IterationRows
+        {
+            get => this.iterationRows;
+            private set => this.RaiseAndSetIfChanged(ref this.iterationRows, value);
+        }
 
         /// <summary>
         /// Gets the list of <see cref="IterationSetup"/> selected
@@ -112,6 +140,21 @@ namespace CDP4ShellDialogs.ViewModels
             this.CancelCommand.Subscribe();
 
             this.SelectedIterations.ItemsAdded.Subscribe(this.FilterIterationSelectionItems);
+
+            this.WhenAnyValue(x => x.SelectedRowSession).Subscribe(this.PopulateIterationRows);
+        }
+
+        /// <summary>
+        /// Populates the flat <see cref="IterationRows"/> from the <paramref name="session"/> and resets the current selection
+        /// </summary>
+        /// <param name="session">The selected <see cref="ModelSelectionSessionRowViewModel"/></param>
+        private void PopulateIterationRows(ModelSelectionSessionRowViewModel session)
+        {
+            this.SelectedIterations.Clear();
+
+            this.IterationRows = session == null
+                ? new List<ModelSelectionIterationSetupRowViewModel>()
+                : session.EngineeringModelSetupRowViewModels.SelectMany(m => m.IterationSetupRowViewModels).ToList();
         }
 
         /// <summary>
@@ -195,6 +238,8 @@ namespace CDP4ShellDialogs.ViewModels
                 // remove model rows that don't have any open iteration
                 availableSession.EngineeringModelSetupRowViewModels.RemoveAllAndDispose(availableSession.EngineeringModelSetupRowViewModels.ToList().Where(x => !x.IterationSetupRowViewModels.Any()));
             }
+
+            this.SelectedRowSession = this.SessionsAvailable.FirstOrDefault();
         }
 
         /// <summary>

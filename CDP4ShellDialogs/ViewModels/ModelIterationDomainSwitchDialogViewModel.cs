@@ -2,7 +2,7 @@
 // <copyright file="ModelIterationDomainSwitchDialogViewModel.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2022 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerenï¿½, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Thï¿½ate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -50,6 +50,16 @@ namespace CDP4ShellDialogs.ViewModels
     public class ModelIterationDomainSwitchDialogViewModel : DialogViewModelBase
     {
         /// <summary>
+        /// Backing field for the <see cref="SelectedRowSession" /> property.
+        /// </summary>
+        private SwitchDomainSessionRowViewModel selectedRowSession;
+
+        /// <summary>
+        /// Backing field for the <see cref="IterationRows" /> property.
+        /// </summary>
+        private List<SwitchDomainIterationSetupRowViewModel> iterationRows;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ModelClosingDialogViewModel" /> class.
         /// </summary>
         /// <param name="sessionAvailable">
@@ -74,6 +84,24 @@ namespace CDP4ShellDialogs.ViewModels
         public DisposableReactiveList<SwitchDomainSessionRowViewModel> SessionsAvailable { get; private set; }
 
         /// <summary>
+        /// Gets or sets the selected source <see cref="SwitchDomainSessionRowViewModel" />
+        /// </summary>
+        public SwitchDomainSessionRowViewModel SelectedRowSession
+        {
+            get => this.selectedRowSession;
+            set => this.RaiseAndSetIfChanged(ref this.selectedRowSession, value);
+        }
+
+        /// <summary>
+        /// Gets the flat list of <see cref="SwitchDomainIterationSetupRowViewModel" /> of the <see cref="SelectedRowSession" />
+        /// </summary>
+        public List<SwitchDomainIterationSetupRowViewModel> IterationRows
+        {
+            get => this.iterationRows;
+            private set => this.RaiseAndSetIfChanged(ref this.iterationRows, value);
+        }
+
+        /// <summary>
         /// Gets the list of <see cref="IterationSetup" /> selected
         /// </summary>
         public ReactiveList<IViewModelBase<Thing>> SelectedIterations { get; set; }
@@ -96,7 +124,7 @@ namespace CDP4ShellDialogs.ViewModels
             this.SelectedIterations = new ReactiveList<IViewModelBase<Thing>>();
             this.IsBusy = false;
 
-            var canOk = this.WhenAnyValue(x => x.SelectedIterations.Count, count => count != 0);
+            var canOk = this.WhenAnyValue(x => x.IterationRows, rows => rows != null && rows.Count != 0);
 
             this.SwitchCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteDomainSwitch, canOk, RxApp.MainThreadScheduler);
 
@@ -110,6 +138,21 @@ namespace CDP4ShellDialogs.ViewModels
             this.CancelCommand = ReactiveCommandCreator.Create(this.ExecuteCancel);
 
             this.SelectedIterations.ItemsAdded.Subscribe(this.FilterIterationSelectionItems);
+
+            this.WhenAnyValue(x => x.SelectedRowSession).Subscribe(this.PopulateIterationRows);
+        }
+
+        /// <summary>
+        /// Populates the flat <see cref="IterationRows" /> from the <paramref name="session" /> and resets the current selection
+        /// </summary>
+        /// <param name="session">The selected <see cref="SwitchDomainSessionRowViewModel" /></param>
+        private void PopulateIterationRows(SwitchDomainSessionRowViewModel session)
+        {
+            this.SelectedIterations.Clear();
+
+            this.IterationRows = session == null
+                ? new List<SwitchDomainIterationSetupRowViewModel>()
+                : session.EngineeringModelSetupRowViewModels.SelectMany(m => m.IterationSetupRowViewModels).ToList();
         }
 
         /// <summary>
@@ -123,16 +166,22 @@ namespace CDP4ShellDialogs.ViewModels
             this.IsBusy = true;
             this.LoadingMessage = "Switching...";
 
-            foreach (var iteration in this.SelectedIterations)
+            foreach (var row in this.IterationRows)
             {
-                var modelrow = (SwitchDomainIterationSetupRowViewModel)iteration;
-                var session = modelrow.Session;
+                var session = row.Session;
 
-                var openIteration = session.OpenIterations.Keys.FirstOrDefault(x => x.Iid == modelrow.IterationIid);
+                var openIteration = session.OpenIterations.Keys.FirstOrDefault(x => x.Iid == row.IterationIid);
 
-                if (openIteration != null)
+                if (openIteration == null || row.SelectedDomain == null)
                 {
-                    session.SwitchDomain(modelrow.IterationIid, modelrow.SelectedDomain);
+                    continue;
+                }
+
+                var currentDomain = session.QuerySelectedDomainOfExpertise(openIteration);
+
+                if (!Equals(currentDomain, row.SelectedDomain))
+                {
+                    session.SwitchDomain(row.IterationIid, row.SelectedDomain);
                 }
             }
 
@@ -164,6 +213,8 @@ namespace CDP4ShellDialogs.ViewModels
             {
                 this.SessionsAvailable.Add(new SwitchDomainSessionRowViewModel(session.RetrieveSiteDirectory(), session));
             }
+
+            this.SelectedRowSession = this.SessionsAvailable.FirstOrDefault();
         }
 
         /// <summary>
