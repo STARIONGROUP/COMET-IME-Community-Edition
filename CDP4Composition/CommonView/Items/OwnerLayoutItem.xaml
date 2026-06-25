@@ -6,9 +6,11 @@
              xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:converters="clr-namespace:CDP4Composition.Converters"
              mc:Ignorable="d"
              Label="Owner: ">
     <dxlc:LayoutItem.Resources>
+        <converters:DomainOfExpertiseToFontWeightConverter x:Key="DomainOfExpertiseToFontWeightConverter" />
     </dxlc:LayoutItem.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -17,13 +19,28 @@
         </Grid.ColumnDefinitions>
         <dxe:ComboBoxEdit Name="Owner"
                         DisplayMember="Name"
+                        ApplyItemTemplateToSelectedItem="True"
                         EditValue="{Binding Path=SelectedOwner,
                                             Mode=TwoWay,
                                             UpdateSourceTrigger=PropertyChanged}"
                         IsTextEditable="False"
                         ItemsSource="{Binding Path=PossibleOwner}"
                         ShowCustomItems="False"
-                        IsReadOnly="{Binding IsReadOnly}"/>
+                        IsReadOnly="{Binding IsReadOnly}">
+            <dxe:ComboBoxEdit.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Path=Name}">
+                        <TextBlock.FontWeight>
+                            <MultiBinding Converter="{StaticResource DomainOfExpertiseToFontWeightConverter}">
+                                <Binding Path="." />
+                                <Binding Path="DataContext.CurrentDomainOfExpertise"
+                                         RelativeSource="{RelativeSource AncestorType={x:Type dxe:ComboBoxEdit}}" />
+                            </MultiBinding>
+                        </TextBlock.FontWeight>
+                    </TextBlock>
+                </DataTemplate>
+            </dxe:ComboBoxEdit.ItemTemplate>
+        </dxe:ComboBoxEdit>
         <Button Grid.Column="1"
                 Width="25"
                 Height="25"

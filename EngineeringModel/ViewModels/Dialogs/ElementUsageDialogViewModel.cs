@@ -38,6 +38,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Operations;
     
     using CDP4Composition.Attributes;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
@@ -232,13 +233,19 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void PopulatePossibleOwner()
         {
             base.PopulatePossibleOwner();
-            var model = this.Thing.TopContainer as EngineeringModel;
-            if (model == null)
+            var iteration = this.Thing.GetContainerOfType<Iteration>();
+            if (iteration == null)
             {
                 throw new InvalidOperationException("The top container is not set for this usage");
             }
 
-            this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name));
+            this.PossibleOwner.AddRange(this.Session.QueryAllowedOwners(iteration, this.Thing.Owner));
+            this.CurrentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
+
+            if (this.SelectedOwner == null && this.dialogKind == ThingDialogKind.Create)
+            {
+                this.SelectedOwner = this.CurrentDomainOfExpertise ?? this.PossibleOwner.FirstOrDefault();
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 // <copyright file="ActualFiniteStateListDialogViewModel.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2022 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerenï¿½, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Thï¿½ate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -40,6 +40,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Dal.Operations;
 
     using CDP4Composition.Attributes;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -287,8 +288,13 @@ namespace CDP4EngineeringModel.ViewModels
         {
             base.PopulatePossibleOwner();
             var iteration = (Iteration)this.Container;
-            var model = (EngineeringModel)iteration.Container;
-            this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain.OrderBy(d => d.Name));
+            this.PossibleOwner.AddRange(this.Session.QueryAllowedOwners(iteration, this.Thing.Owner));
+            this.CurrentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
+
+            if (this.SelectedOwner == null && this.dialogKind == ThingDialogKind.Create)
+            {
+                this.SelectedOwner = this.CurrentDomainOfExpertise ?? this.PossibleOwner.FirstOrDefault();
+            }
         }
 
         /// <summary>

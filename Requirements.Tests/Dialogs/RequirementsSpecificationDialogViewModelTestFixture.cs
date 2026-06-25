@@ -138,6 +138,10 @@ namespace CDP4Requirements.Tests
             this.session.Setup(x => x.CDPMessageBus).Returns(this.messageBus);
             dal.Setup(x => x.MetaDataProvider).Returns(new MetaDataProvider());
             this.modelSetup.ActiveDomain.Add(this.domain);
+
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(new[] { this.domain });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domain);
+
             this.viewmodel = new RequirementsSpecificationDialogViewModel(this.resSpec, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, clone);
         }
 
@@ -183,6 +187,38 @@ namespace CDP4Requirements.Tests
 
             Assert.IsNotNull(this.viewmodel.WriteException);
             Assert.AreEqual("test", this.viewmodel.WriteException.Message);
+        }
+
+        [Test]
+        public void VerifyThatPossibleOwnerIsRestrictedToParticipantAllowedDomainsAndDefaultsToCurrent()
+        {
+            var otherDomain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "other" };
+            this.modelSetup.ActiveDomain.Add(otherDomain);
+
+            var newSpec = new RequirementsSpecification(Guid.NewGuid(), this.cache, this.uri);
+            var newClone = this.iteration.Clone(false);
+            var newTransaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.iteration), newClone);
+
+            var vm = new RequirementsSpecificationDialogViewModel(newSpec, newTransaction, this.session.Object, true, ThingDialogKind.Create, null, newClone);
+
+            Assert.That(vm.PossibleOwner, Does.Contain(this.domain));
+            Assert.That(vm.PossibleOwner, Does.Not.Contain(otherDomain));
+            Assert.That(vm.SelectedOwner, Is.EqualTo(this.domain));
+        }
+
+        [Test]
+        public void VerifyThatExistingOwnerIsKeptWhenNotAmongAllowedDomains()
+        {
+            var foreignDomain = new DomainOfExpertise(Guid.NewGuid(), this.cache, this.uri) { Name = "foreign" };
+            this.resSpec.Owner = foreignDomain;
+
+            var editClone = this.iteration.Clone(false);
+            var editTransaction = new ThingTransaction(TransactionContextResolver.ResolveContext(this.iteration), editClone);
+
+            var vm = new RequirementsSpecificationDialogViewModel(this.resSpec, editTransaction, this.session.Object, true, ThingDialogKind.Update, null, editClone);
+
+            Assert.That(vm.PossibleOwner, Does.Contain(foreignDomain));
+            Assert.That(vm.SelectedOwner, Is.EqualTo(foreignDomain));
         }
 
         [Test]

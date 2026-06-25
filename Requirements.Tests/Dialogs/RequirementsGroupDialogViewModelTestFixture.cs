@@ -114,6 +114,8 @@ namespace CDP4Requirements.Tests.Dialogs
             this.engineeringModelSetup.IterationSetup.Add(this.iterationSetup);
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(new[] { this.domainOfExpertise });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domainOfExpertise);
             this.session.Setup(x => x.ActivePerson).Returns(person);
             this.siteDir.Domain.Add(this.domainOfExpertise);
 

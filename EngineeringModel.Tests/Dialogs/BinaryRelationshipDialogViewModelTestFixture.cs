@@ -131,6 +131,8 @@ namespace CDP4EngineeringModel.Tests
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
 
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(new[] { this.domain });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domain);
             var assembler = new Assembler(this.uri, this.messageBus);
             assembler.Cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             assembler.Cache.TryAdd(new CacheKey(this.req1.Iid, this.iteration.Iid), new Lazy<Thing>(() => this.req1));

@@ -34,6 +34,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Attributes;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -106,12 +107,16 @@ namespace CDP4EngineeringModel.ViewModels
             base.PopulatePossibleOwner();
 
             var engineeringModel = (EngineeringModel)(this.Container ?? this.Thing.Container);
+            
+            var iteration = engineeringModel?.Iteration.FirstOrDefault();
 
-            if (engineeringModel != null)
+            if (iteration == null)
             {
-                var domains = engineeringModel?.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
-                this.PossibleOwner.AddRange(domains);
+                return;
             }
+
+            this.PossibleOwner.AddRange(this.Session.QueryAllowedOwners(iteration, this.Thing.Owner));
+            this.CurrentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
         }
 
         /// <summary>
