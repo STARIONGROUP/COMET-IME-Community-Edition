@@ -1,10 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="DiagramControlContextMenuViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary,
+//              Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -33,6 +34,7 @@ namespace CDP4Grapher.Tests.ViewModels
     using System.Threading.Tasks;
     using System.Windows.Input;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -79,6 +81,47 @@ namespace CDP4Grapher.Tests.ViewModels
             this.behavior.Setup(x => x.ExportGraph(It.IsAny<DiagramExportFormat>()));
             this.behavior.Setup(x => x.ApplySpecifiedLayout(It.IsAny<LayoutEnumeration>()));
             this.behavior.Setup(x => x.ApplySpecifiedLayout(It.IsAny<LayoutEnumeration>(), It.IsAny<Enum>()));
+            this.behavior.Setup(x => x.Edit(It.IsAny<Thing>()));
+            this.behavior.Setup(x => x.Inspect(It.IsAny<Thing>()));
+        }
+
+        /// <summary>
+        /// Builds a <see cref="GraphElementViewModel"/> whose represented element is an <see cref="ElementUsage"/>
+        /// </summary>
+        /// <param name="elementDefinition">The <see cref="ElementDefinition"/> referenced by the <see cref="ElementUsage"/></param>
+        /// <param name="elementUsage">The created <see cref="ElementUsage"/></param>
+        /// <returns>The <see cref="GraphElementViewModel"/></returns>
+        private GraphElementViewModel CreateUsageGraphElement(out ElementDefinition elementDefinition, out ElementUsage elementUsage)
+        {
+            elementDefinition = new ElementDefinition() { Owner = new DomainOfExpertise() };
+
+            elementUsage = new ElementUsage()
+            {
+                Container = new ElementDefinition() { Owner = new DomainOfExpertise() },
+                Owner = new DomainOfExpertise(),
+                ElementDefinition = elementDefinition
+            };
+
+            return new GraphElementViewModel(new NestedElement()
+            {
+                RootElement = new ElementDefinition() { Owner = new DomainOfExpertise() },
+                ElementUsage = { elementUsage }
+            }, this.messageBus);
+        }
+
+        /// <summary>
+        /// Builds a <see cref="GraphElementViewModel"/> whose represented element is the root <see cref="ElementDefinition"/>
+        /// </summary>
+        /// <param name="rootElement">The created root <see cref="ElementDefinition"/></param>
+        /// <returns>The <see cref="GraphElementViewModel"/></returns>
+        private GraphElementViewModel CreateRootGraphElement(out ElementDefinition rootElement)
+        {
+            rootElement = new ElementDefinition() { Owner = new DomainOfExpertise() };
+
+            return new GraphElementViewModel(new NestedElement()
+            {
+                RootElement = rootElement
+            }, this.messageBus);
         }
 
         [Test]
@@ -86,7 +129,7 @@ namespace CDP4Grapher.Tests.ViewModels
         {
             var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object };
             Assert.IsNotEmpty(vm.ContextMenu);
-            Assert.AreEqual(5, vm.ContextMenu.Count);
+            Assert.AreEqual(9, vm.ContextMenu.Count);
             Assert.AreEqual(6, vm.ContextMenu.OfType<BarSubItem>().SelectMany(x => x.Items).Count());
             Assert.AreEqual(12, vm.ContextMenu.OfType<BarSubItem>().SelectMany(x => x.Items.OfType<BarSubItem>().SelectMany(s => s.Items)).Count());
             Assert.IsNotNull(vm.Behavior);
@@ -112,7 +155,60 @@ namespace CDP4Grapher.Tests.ViewModels
             Assert.IsNotNull(vm.ApplyCircularLayout);
             Assert.IsNotNull(vm.ApplyOrganisationalChartLayout);
 
+            Assert.IsNotNull(vm.EditElementDefinitionCommand);
+            Assert.IsNotNull(vm.InspectElementDefinitionCommand);
+            Assert.IsNotNull(vm.EditElementUsageCommand);
+            Assert.IsNotNull(vm.InspectElementUsageCommand);
+
             Assert.IsNull(vm.HoveredElement);
+        }
+
+        [Test]
+        public async Task VerifyEditAndInspectElementUsageNode()
+        {
+            var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object };
+            var graphElement = this.CreateUsageGraphElement(out var elementDefinition, out var elementUsage);
+
+            Assert.IsFalse(((ICommand)vm.EditElementDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.EditElementUsageCommand).CanExecute(null));
+
+            vm.HoveredElement = graphElement;
+
+            Assert.IsTrue(((ICommand)vm.EditElementDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.InspectElementDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.EditElementUsageCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.InspectElementUsageCommand).CanExecute(null));
+
+            await vm.EditElementDefinitionCommand.Execute();
+            await vm.InspectElementDefinitionCommand.Execute();
+            await vm.EditElementUsageCommand.Execute();
+            await vm.InspectElementUsageCommand.Execute();
+
+            this.behavior.Verify(x => x.Edit(elementDefinition), Times.Once);
+            this.behavior.Verify(x => x.Inspect(elementDefinition), Times.Once);
+            this.behavior.Verify(x => x.Edit(elementUsage), Times.Once);
+            this.behavior.Verify(x => x.Inspect(elementUsage), Times.Once);
+        }
+
+        [Test]
+        public async Task VerifyEditAndInspectRootNode()
+        {
+            var vm = new DiagramControlContextMenuViewModel { Behavior = this.behavior.Object };
+            var graphElement = this.CreateRootGraphElement(out var rootElement);
+
+            vm.HoveredElement = graphElement;
+
+            Assert.IsTrue(((ICommand)vm.EditElementDefinitionCommand).CanExecute(null));
+            Assert.IsTrue(((ICommand)vm.InspectElementDefinitionCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.EditElementUsageCommand).CanExecute(null));
+            Assert.IsFalse(((ICommand)vm.InspectElementUsageCommand).CanExecute(null));
+
+            await vm.EditElementDefinitionCommand.Execute();
+            await vm.InspectElementDefinitionCommand.Execute();
+
+            this.behavior.Verify(x => x.Edit(rootElement), Times.Once);
+            this.behavior.Verify(x => x.Inspect(rootElement), Times.Once);
+            this.behavior.Verify(x => x.Edit(It.IsAny<ElementUsage>()), Times.Never);
         }
 
         [Test]

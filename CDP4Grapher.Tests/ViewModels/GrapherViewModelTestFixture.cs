@@ -1,10 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherViewModelTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary,
+//              Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -31,6 +32,7 @@ namespace CDP4Grapher.Tests.ViewModels
     using System.Threading;
     using System.Windows;
 
+    using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Navigation;
@@ -38,6 +40,7 @@ namespace CDP4Grapher.Tests.ViewModels
     using CDP4Composition.PluginSettingService;
 
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
 
     using CDP4Grapher.Tests.Data;
     using CDP4Grapher.ViewModels;
@@ -152,6 +155,43 @@ namespace CDP4Grapher.Tests.ViewModels
             vm.SetsSelectedElementAndSelectedElementPath(vm.GraphElements.FirstOrDefault());
             Assert.IsNotNull(vm.SelectedElementModelCode);
             Assert.IsNotNull(vm.SelectedElement);
+        }
+
+        [Test]
+        public void VerifyEditOpensUpdateDialog()
+        {
+            var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
+
+            vm.Edit(this.ElementUsage1);
+
+            this.thingNavigationService.Verify(
+                x => x.Navigate(It.Is<Thing>(t => t.Iid == this.ElementUsage1.Iid), It.IsAny<IThingTransaction>(), this.Session.Object, true, ThingDialogKind.Update, this.thingNavigationService.Object, It.IsAny<Thing>(), It.IsAny<System.Collections.Generic.IEnumerable<Thing>>()),
+                Times.Once);
+        }
+
+        [Test]
+        public void VerifyInspectOpensInspectDialog()
+        {
+            var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
+
+            vm.Inspect(this.TopElement);
+
+            this.thingNavigationService.Verify(
+                x => x.Navigate(this.TopElement, It.IsAny<IThingTransaction>(), this.Session.Object, true, ThingDialogKind.Inspect, this.thingNavigationService.Object, It.IsAny<Thing>(), It.IsAny<System.Collections.Generic.IEnumerable<Thing>>()),
+                Times.Once);
+        }
+
+        [Test]
+        public void VerifyEditOrInspectWithNullThingDoesNothing()
+        {
+            var vm = new GrapherViewModel(this.Option, this.Session.Object, this.thingNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, this.pluginSettingService.Object);
+
+            vm.Edit(null);
+            vm.Inspect(null);
+
+            this.thingNavigationService.Verify(
+                x => x.Navigate(It.IsAny<Thing>(), It.IsAny<IThingTransaction>(), It.IsAny<CDP4Dal.ISession>(), It.IsAny<bool>(), It.IsAny<ThingDialogKind>(), It.IsAny<IThingDialogNavigationService>(), It.IsAny<Thing>(), It.IsAny<System.Collections.Generic.IEnumerable<Thing>>()),
+                Times.Never);
         }
 
         [Test]

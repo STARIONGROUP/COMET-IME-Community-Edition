@@ -1,10 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GrapherOrgChartBehaviorTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary,
+//              Rowan de Voogt
 //
-//    This file is part of COMET-IME Community Edition.
+//    This file is part of CDP4-COMET IME Community Edition.
 //    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
 //    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
 //
@@ -98,6 +99,8 @@ namespace CDP4Grapher.Tests.Behaviors
             this.grapherViewModel.Setup(x => x.Behavior).Returns(this.behavior);
             this.grapherViewModel.Setup(x => x.Isolate(It.IsAny<GraphElementViewModel>()));
             this.grapherViewModel.Setup(x => x.ExitIsolation());
+            this.grapherViewModel.Setup(x => x.Edit(It.IsAny<CDP4Common.CommonData.Thing>()));
+            this.grapherViewModel.Setup(x => x.Inspect(It.IsAny<CDP4Common.CommonData.Thing>()));
             this.grapherViewModel.Setup(x => x.DiagramContextMenuViewModel).Returns(this.contextMenu.Object);
             this.saveFileDialog = new Mock<IOpenSaveFileDialogService>();
             this.saveFileDialog.Setup(x => x.GetSaveFileDialog(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>())).Returns(string.Empty);
@@ -197,6 +200,18 @@ namespace CDP4Grapher.Tests.Behaviors
             this.grapherViewModel.Verify(x => x.Isolate(It.IsAny<GraphElementViewModel>()), Times.Once);
             this.behavior.ExitIsolation();
             this.grapherViewModel.Verify(x => x.ExitIsolation(), Times.Once);
+        }
+
+        [Test]
+        public void VerifyEditAndInspectRouteToViewModel()
+        {
+            this.behavior.Attach(new GrapherDiagramControl() { DataContext = this.grapherViewModel.Object });
+
+            this.behavior.Edit(this.ElementDefinition1);
+            this.behavior.Inspect(this.ElementUsage1);
+
+            this.grapherViewModel.Verify(x => x.Edit(this.ElementDefinition1), Times.Once);
+            this.grapherViewModel.Verify(x => x.Inspect(this.ElementUsage1), Times.Once);
         }
     }
 }
