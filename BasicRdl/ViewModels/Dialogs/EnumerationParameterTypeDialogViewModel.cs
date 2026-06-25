@@ -40,6 +40,8 @@ namespace BasicRdl.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using ReactiveUI;
+
     /// <summary>
     /// The purpose of the <see cref="EnumerationParameterTypeDialogViewModel"/> is to provide a dialog view model
     /// for a <see cref="EnumerationParameterType"/>
@@ -47,6 +49,11 @@ namespace BasicRdl.ViewModels
     [ThingDialogViewModelExport(ClassKind.EnumerationParameterType)]
     public class EnumerationParameterTypeDialogViewModel : CDP4CommonView.EnumerationParameterTypeDialogViewModel, IThingDialogViewModel
     {
+        /// <summary>
+        /// The backing field for <see cref="IsValueDefinitionListEmpty"/>
+        /// </summary>
+        private bool isValueDefinitionListEmpty;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="EnumerationParameterTypeDialogViewModel"/> class.
         /// </summary>
@@ -94,11 +101,22 @@ namespace BasicRdl.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether no <see cref="EnumerationValueDefinition"/> has been added yet. When <c>true</c>
+        /// the dialog shows guidance that at least one value must be added on the "Values" tab before saving.
+        /// </summary>
+        public bool IsValueDefinitionListEmpty
+        {
+            get => this.isValueDefinitionListEmpty;
+            private set => this.RaiseAndSetIfChanged(ref this.isValueDefinitionListEmpty, value);
+        }
+
+        /// <summary>
         /// Updates the <see cref="DialogViewModelBase{T}.OkCanExecute"/> property using validation rules
         /// </summary>
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
+            this.IsValueDefinitionListEmpty = !this.ValueDefinition.Any();
             this.OkCanExecute = this.OkCanExecute && this.ValueDefinition.Any();
         }
     }

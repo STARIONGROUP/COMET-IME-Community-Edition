@@ -56,6 +56,11 @@ namespace BasicRdl.ViewModels
         private bool isBaseQuantityKind;
 
         /// <summary>
+        /// The backing field for <see cref="IsQuantityKindFactorListEmpty"/>
+        /// </summary>
+        private bool isQuantityKindFactorListEmpty;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="DerivedQuantityKindDialogViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -118,11 +123,22 @@ namespace BasicRdl.ViewModels
         }
 
         /// <summary>
+        /// Gets a value indicating whether no <see cref="QuantityKindFactor"/> has been added yet. When <c>true</c>
+        /// the dialog shows guidance that at least one factor must be added on the "Factors" tab before saving.
+        /// </summary>
+        public bool IsQuantityKindFactorListEmpty
+        {
+            get => this.isQuantityKindFactorListEmpty;
+            private set => this.RaiseAndSetIfChanged(ref this.isQuantityKindFactorListEmpty, value);
+        }
+
+        /// <summary>
         /// Updates the <see cref="OkCanExecute"/> property using validation rules
         /// </summary>
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
+            this.IsQuantityKindFactorListEmpty = !this.QuantityKindFactor.Any();
             this.OkCanExecute = this.OkCanExecute && this.QuantityKindFactor.Any() && this.SelectedDefaultScale != null;
         }
 

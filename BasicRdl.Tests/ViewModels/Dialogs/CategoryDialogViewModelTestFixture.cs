@@ -218,6 +218,16 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatGuidanceIsShownWhenPermissibleClassListIsEmpty()
+        {
+            Assert.IsFalse(this.viewmodel.PermissibleClass.Any());
+            Assert.IsTrue(this.viewmodel.IsPermissibleClassListEmpty);
+
+            this.viewmodel.PermissibleClass.Add(ClassKind.ElementDefinition);
+            Assert.IsFalse(this.viewmodel.IsPermissibleClassListEmpty);
+        }
+
+        [Test]
         public void VerifyThatParameterlessContructorExists()
         {
             Assert.DoesNotThrow(() => new CategoryDialogViewModel());

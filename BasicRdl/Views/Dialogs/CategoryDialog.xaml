@@ -17,6 +17,7 @@
     <dx:DXWindow.Resources>
         <ResourceDictionary>
             <converters:ReactiveClassKindToObjectListConverter x:Key="ReactiveClassKindToObjectListConverter" />
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
@@ -74,6 +75,8 @@
             <items:HyperLinkLayoutGroup />
             <items:AdvancedLayoutGroup />
         </lc:LayoutGroup>
+        <items:WarningLayoutItem Visibility="{Binding IsPermissibleClassListEmpty, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                 WarningText="At least one Permissible Class must be selected on the 'Permissible Classes' tab before this Category can be saved." />
         <items:UserValidationButtonsLayoutGroup />
         <items:ErrorMessageLayoutGroup />
     </lc:LayoutControl>

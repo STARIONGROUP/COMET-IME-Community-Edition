@@ -54,6 +54,11 @@ namespace BasicRdl.ViewModels
     public class CategoryDialogViewModel : CDP4CommonView.CategoryDialogViewModel, IThingDialogViewModel
     {
         /// <summary>
+        /// The backing field for <see cref="IsPermissibleClassListEmpty"/>
+        /// </summary>
+        private bool isPermissibleClassListEmpty;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CategoryDialogViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -95,6 +100,7 @@ namespace BasicRdl.ViewModels
             : base(category, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
             this.WhenAnyValue(vm => vm.PermissibleClass).Subscribe(_ => this.UpdateOkCanExecute());
+            this.PermissibleClass.CountChanged.Subscribe(_ => this.UpdateOkCanExecute());
             this.WhenAnyValue(vm => vm.Container).Subscribe(_ => this.PopulateSuperCategory());
         }
 
@@ -107,6 +113,16 @@ namespace BasicRdl.ViewModels
         /// Gets or sets the list of possible super categories
         /// </summary>
         public ReactiveList<Category> PossibleSuperCategories { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether no <see cref="ClassKind"/> has been selected as permissible class yet. When <c>true</c>
+        /// the dialog shows guidance that at least one permissible class must be selected on the "Permissible Classes" tab before saving.
+        /// </summary>
+        public bool IsPermissibleClassListEmpty
+        {
+            get => this.isPermissibleClassListEmpty;
+            private set => this.RaiseAndSetIfChanged(ref this.isPermissibleClassListEmpty, value);
+        }
 
         /// <summary>
         /// Initializes the list of this dialog
@@ -162,6 +178,7 @@ namespace BasicRdl.ViewModels
         protected override void UpdateOkCanExecute()
         {
             base.UpdateOkCanExecute();
+            this.IsPermissibleClassListEmpty = !this.PermissibleClass.Any();
             this.OkCanExecute = this.OkCanExecute && this.PermissibleClass.Any();
         }
 

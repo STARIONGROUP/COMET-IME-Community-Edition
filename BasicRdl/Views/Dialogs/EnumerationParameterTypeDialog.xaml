@@ -7,6 +7,7 @@
              xmlns:items="clr-namespace:CDP4CommonView.Items;assembly=CDP4Composition"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             xmlns:converters="clr-namespace:CDP4Composition.Converters;assembly=CDP4Composition"
              xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
              xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
              xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
@@ -16,6 +17,7 @@
              navigation:DialogCloser.DialogResult="{Binding DialogResult}"
              mc:Ignorable="d">
     <dx:DXWindow.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </dx:DXWindow.Resources>
     <dxlc:LayoutControl Margin="5"
                         Orientation="Vertical"
@@ -108,6 +110,8 @@
             <items:HyperLinkLayoutGroup />
             <items:AdvancedLayoutGroup />
         </dxlc:LayoutGroup>
+        <items:WarningLayoutItem Visibility="{Binding IsValueDefinitionListEmpty, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                 WarningText="At least one Value must be added on the 'Values' tab before this Enumeration Parameter Type can be saved." />
         <items:UserValidationButtonsLayoutGroup />
         <items:ErrorMessageLayoutGroup />
     </dxlc:LayoutControl>
