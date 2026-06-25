@@ -41,6 +41,7 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
     using CDP4Common.Types;
 
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Events;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.Services;
@@ -391,6 +392,52 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             await vm.VerifyRuleVerificationList.Execute();
 
             this.ruleVerificationService.Verify(x => x.Execute(this.session.Object, ruleVerificationList));
+        }
+
+        [Test]
+        public async Task VerifyThatHighlightCommandHighlightsAllViolatingThingsBelowSelectedRow()
+        {
+            var elementDefinition1 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "Battery", ShortName = "bat", Owner = this.domain };
+            var elementDefinition2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Name = "Panel", ShortName = "pan", Owner = this.domain };
+
+            this.cache.TryAdd(new CacheKey(elementDefinition1.Iid, this.iteration.Iid), new Lazy<Thing>(() => elementDefinition1));
+            this.cache.TryAdd(new CacheKey(elementDefinition2.Iid, this.iteration.Iid), new Lazy<Thing>(() => elementDefinition2));
+
+            var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.iteration.RuleVerificationList.Add(ruleVerificationList);
+
+            var builtInRuleVerification = new BuiltInRuleVerification(Guid.NewGuid(), this.cache, this.uri) { Name = "BuiltIn", IsActive = true };
+            ruleVerificationList.RuleVerification.Add(builtInRuleVerification);
+
+            var violation1 = new RuleViolation(Guid.NewGuid(), this.cache, this.uri) { Description = "v1" };
+            violation1.ViolatingThing.Add(elementDefinition1.Iid);
+
+            var violation2 = new RuleViolation(Guid.NewGuid(), this.cache, this.uri) { Description = "v2" };
+            violation2.ViolatingThing.Add(elementDefinition2.Iid);
+
+            var vm = new RuleVerificationListBrowserViewModel(this.iteration, this.participant, this.session.Object, null, null, null, null);
+
+            var listRow = vm.RuleVerificationListRowViewModels.Single(x => x.Thing == ruleVerificationList);
+
+            builtInRuleVerification.Violation.Add(violation1);
+            builtInRuleVerification.Violation.Add(violation2);
+            this.revision.SetValue(builtInRuleVerification, 10);
+            this.messageBus.SendObjectChangeEvent(builtInRuleVerification, EventKind.Updated);
+
+            var highlightedThings = new List<Thing>();
+            this.messageBus.Listen<HighlightEvent>().Subscribe(x => highlightedThings.Add(x.HighlightedThing));
+
+            var highlightedElementUsageDefinitions = new List<ElementDefinition>();
+            this.messageBus.Listen<ElementUsageHighlightEvent>().Subscribe(x => highlightedElementUsageDefinitions.Add(x.ElementDefinition));
+
+            // selecting the parent Rule Verification List row should highlight all violating things below it
+            vm.SelectedThing = listRow;
+            await vm.HighlightCommand.Execute();
+
+            CollectionAssert.AreEquivalent(new Thing[] { elementDefinition1, elementDefinition2 }, highlightedThings);
+
+            // ElementDefinition violating things must also raise an ElementUsageHighlightEvent so the Product Tree highlights their usages
+            CollectionAssert.AreEquivalent(new[] { elementDefinition1, elementDefinition2 }, highlightedElementUsageDefinitions);
         }
     }
 }

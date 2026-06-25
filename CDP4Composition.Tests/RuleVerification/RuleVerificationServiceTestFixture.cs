@@ -199,6 +199,46 @@ namespace CDP4Composition.Tests.RuleVerification
         }
 
         [Test]
+        public void VerifyThatBuiltInRuleVerificationStatusIsSetToFailedAndPersistedWhenViolationsAreFound()
+        {
+            OperationContainer writtenOperationContainer = null;
+
+            this.session.Setup(s => s.Write(It.IsAny<OperationContainer>()))
+                .Returns(Task.CompletedTask)
+                .Callback<OperationContainer>(oc => writtenOperationContainer = oc);
+
+            var service = new RuleVerificationService(this.builtInRules);
+
+            var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri);
+            this.iteration.RuleVerificationList.Add(ruleVerificationList);
+
+            var builtInRuleVerification = new BuiltInRuleVerification(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Name = this.builtInRuleName,
+                IsActive = true
+            };
+
+            ruleVerificationList.RuleVerification.Add(builtInRuleVerification);
+
+            Assert.AreEqual(RuleVerificationStatusKind.NONE, builtInRuleVerification.Status);
+
+            service.Execute(this.session.Object, ruleVerificationList);
+
+            Assert.IsTrue(builtInRuleVerification.Violation.Any());
+            Assert.AreEqual(RuleVerificationStatusKind.FAILED, builtInRuleVerification.Status);
+
+            // the status must be part of the write transaction, otherwise the data-source round-trip resets it to its stored value
+            Assert.IsNotNull(writtenOperationContainer);
+
+            var writtenVerification = writtenOperationContainer.Operations
+                .Select(operation => operation.ModifiedThing)
+                .OfType<CDP4Common.DTO.BuiltInRuleVerification>()
+                .Single();
+
+            Assert.AreEqual(RuleVerificationStatusKind.FAILED, writtenVerification.Status);
+        }
+
+        [Test]
         public async Task VerifyThatUserRuleVerificationCanBeExecutedAndMessageBusMessagesAreReceived()
         {
             var messageReceivedCounter = 0;

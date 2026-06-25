@@ -67,7 +67,27 @@
             </dx:MeasurePixelSnapper>
         </HierarchicalDataTemplate>
 
-        <HierarchicalDataTemplate DataType="{x:Type cdp4CommonView:RuleViolationRowViewModel}">
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:RuleViolationRowViewModel}"
+                                  ItemsSource="{Binding ContainedRows}">
+            <dx:MeasurePixelSnapper>
+                <StackPanel Orientation="Horizontal">
+                    <dx:PixelSnapper>
+                        <Image Style="{StaticResource ThingIcon}">
+                            <Image.Source>
+                                <MultiBinding Converter="{StaticResource ThingToIconUriConverter}" Mode="OneWay">
+                                    <Binding Path="DataContext.Row.Thing" RelativeSource="{RelativeSource AncestorType={x:Type dxg:RowControl}}" />
+                                </MultiBinding>
+                            </Image.Source>
+                        </Image>
+                    </dx:PixelSnapper>
+                    <ContentPresenter x:Name="defaultRowPresenter"
+                                      Content="{Binding}"
+                                      ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+                </StackPanel>
+            </dx:MeasurePixelSnapper>
+        </HierarchicalDataTemplate>
+
+        <HierarchicalDataTemplate DataType="{x:Type viewModels:ViolatingThingRowViewModel}">
             <dx:MeasurePixelSnapper>
                 <StackPanel Orientation="Horizontal">
                     <dx:PixelSnapper>
@@ -153,6 +173,8 @@
                     <dxg:TreeListColumn FieldName="Name" Header="Name" />
                     <dxg:TreeListColumn FieldName="ShortName" Header="Short Name" />
                     <dxg:TreeListColumn FieldName="OwnerName" Header="Owner" />
+                    <dxg:TreeListColumn FieldName="RowType" Header="Type" />
+                    <dxg:TreeListColumn FieldName="Status" Header="Status" />
                 </dxg:TreeListControl.Columns>
                 <dxg:TreeListControl.InputBindings>
                     <KeyBinding Gesture="CTRL+I" Command="{Binding Path=InspectCommand}"></KeyBinding>
