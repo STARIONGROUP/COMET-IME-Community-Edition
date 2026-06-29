@@ -349,7 +349,7 @@ namespace CDP4SiteDirectory.Tests
             Assert.IsTrue(viewmodel.CanCreateIterationSetup);
             Assert.IsTrue(viewmodel.CanCreateEngineeringModelSetup);
             viewmodel.PopulateContextMenu();
-            Assert.AreEqual(7, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(8, viewmodel.ContextMenu.Count);
 
             var participantFolderRow =
                 modelRow.ContainedRows.OfType<FolderRowViewModel>().Single(x => x.Name == "Participants");
@@ -360,7 +360,7 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(2, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(3, viewmodel.ContextMenu.Count);
 
             viewmodel.SelectedThing = iterationFolderRow;
             viewmodel.ComputePermission();
@@ -373,7 +373,7 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(4, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(5, viewmodel.ContextMenu.Count);
 
             var iterationRow = iterationFolderRow.ContainedRows.Single();
             viewmodel.SelectedThing = iterationRow;
@@ -418,7 +418,7 @@ namespace CDP4SiteDirectory.Tests
             Assert.IsTrue(viewmodel.CanCreateIterationSetup);
             Assert.IsTrue(viewmodel.CanCreateEngineeringModelSetup);
             viewmodel.PopulateContextMenu();
-            Assert.AreEqual(7, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(8, viewmodel.ContextMenu.Count);
 
             var participantFolderRow =
                 modelRow.ContainedRows.OfType<FolderRowViewModel>().Single(x => x.Name == "Participants");
@@ -429,7 +429,7 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(2, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(3, viewmodel.ContextMenu.Count);
 
             viewmodel.SelectedThing = iterationFolderRow;
             viewmodel.ComputePermission();
@@ -442,7 +442,7 @@ namespace CDP4SiteDirectory.Tests
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
 
-            Assert.AreEqual(3, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(4, viewmodel.ContextMenu.Count);
 
             foreach (var conMenu in viewmodel.ContextMenu)
             {
@@ -488,7 +488,7 @@ namespace CDP4SiteDirectory.Tests
             Assert.IsTrue(viewmodel.CanCreateIterationSetup);
             Assert.IsTrue(viewmodel.CanCreateEngineeringModelSetup);
             viewmodel.PopulateContextMenu();
-            Assert.AreEqual(7, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(8, viewmodel.ContextMenu.Count);
 
             await viewmodel.CreateParticipantCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<Participant>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<EngineeringModelSetup>(), null));
@@ -564,7 +564,7 @@ namespace CDP4SiteDirectory.Tests
 
             viewmodel.ComputePermission();
             viewmodel.PopulateContextMenu();
-            Assert.AreEqual(7, viewmodel.ContextMenu.Count);
+            Assert.AreEqual(8, viewmodel.ContextMenu.Count);
 
             await viewmodel.CreateCommand.Execute();
             this.thingDialogNavigationService.Verify(x => x.Navigate(It.IsAny<EngineeringModelSetup>(), It.IsAny<IThingTransaction>(), this.session.Object, true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, It.IsAny<SiteDirectory>(), null));
@@ -589,6 +589,136 @@ namespace CDP4SiteDirectory.Tests
             viewmodel = new ModelBrowserViewModel(this.session.Object, this.session.Object.RetrieveSiteDirectory(), this.thingDialogNavigationService.Object, this.navigationService.Object, null, null);
 
             Assert.IsFalse(((ICommand)viewmodel.CreateCommand).CanExecute(null));
+        }
+
+        [Test]
+        public async Task VerifyThatCreateMultipleParticipantsCommandWritesParticipants()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask);
+
+            var dialogNavigationService = new Mock<IDialogNavigationService>();
+
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.siteDirectory, this.thingDialogNavigationService.Object, this.navigationService.Object, dialogNavigationService.Object, null);
+
+            var role = new ParticipantRole(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Model Admin" };
+            this.siteDirectory.ParticipantRole.Add(role);
+
+            var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Thermal" };
+            this.siteDirectory.Domain.Add(domain);
+
+            var newPerson = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "Jane", Surname = "Roe", DefaultDomain = domain };
+            this.siteDirectory.Person.Add(newPerson);
+
+            var model = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            model.ActiveDomain.Add(domain);
+            this.siteDirectory.Model.Add(model);
+
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+
+            var modelRow = viewmodel.ModelSetup.Single();
+            viewmodel.SelectedThing = modelRow;
+            viewmodel.ComputePermission();
+
+            Assert.IsTrue(viewmodel.CanCreateParticipant);
+
+            var row = new BulkParticipantRowViewModel(newPerson, new[] { domain })
+            {
+                SelectedRole = role,
+                SelectedDomain = domain,
+                IsActive = true
+            };
+
+            dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>()))
+                .Returns(new BulkParticipantCreationResult(true, new[] { row }));
+
+            await viewmodel.CreateMultipleParticipantsCommand.Execute();
+
+            dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+        }
+
+        [Test]
+        public async Task VerifyThatCreateMultipleParticipantsExcludesDeprecatedPersons()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
+            var dialogNavigationService = new Mock<IDialogNavigationService>();
+
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.siteDirectory, this.thingDialogNavigationService.Object, this.navigationService.Object, dialogNavigationService.Object, null);
+
+            var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Thermal" };
+            this.siteDirectory.Domain.Add(domain);
+
+            var activePerson = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "Jane", Surname = "Roe", DefaultDomain = domain };
+            var deprecatedPerson = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "Old", Surname = "User", DefaultDomain = domain, IsDeprecated = true };
+            this.siteDirectory.Person.Add(activePerson);
+            this.siteDirectory.Person.Add(deprecatedPerson);
+
+            var model = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            model.ActiveDomain.Add(domain);
+            this.siteDirectory.Model.Add(model);
+
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+
+            var modelRow = viewmodel.ModelSetup.Single();
+            viewmodel.SelectedThing = modelRow;
+            viewmodel.ComputePermission();
+
+            BulkParticipantCreationDialogViewModel capturedDialog = null;
+
+            dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>()))
+                .Callback<IDialogViewModel>(vm => capturedDialog = vm as BulkParticipantCreationDialogViewModel)
+                .Returns(new BaseDialogResult(false));
+
+            await viewmodel.CreateMultipleParticipantsCommand.Execute();
+
+            Assert.That(capturedDialog, Is.Not.Null);
+            Assert.That(capturedDialog.Participants.Any(x => x.Person == activePerson), Is.True);
+            Assert.That(capturedDialog.Participants.Any(x => x.Person == deprecatedPerson), Is.False);
+        }
+
+        [Test]
+        public async Task VerifyThatCreateMultipleParticipantsCommandDoesNotWriteWhenCancelled()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask);
+
+            var dialogNavigationService = new Mock<IDialogNavigationService>();
+
+            var viewmodel = new ModelBrowserViewModel(this.session.Object, this.siteDirectory, this.thingDialogNavigationService.Object, this.navigationService.Object, dialogNavigationService.Object, null);
+
+            var role = new ParticipantRole(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Model Admin" };
+            this.siteDirectory.ParticipantRole.Add(role);
+
+            var domain = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri) { Name = "Thermal" };
+            this.siteDirectory.Domain.Add(domain);
+
+            var newPerson = new Person(Guid.NewGuid(), this.assembler.Cache, this.uri) { GivenName = "Jane", Surname = "Roe", DefaultDomain = domain };
+            this.siteDirectory.Person.Add(newPerson);
+
+            var model = new EngineeringModelSetup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            model.ActiveDomain.Add(domain);
+            this.siteDirectory.Model.Add(model);
+
+            this.revPropertyInfo.SetValue(this.siteDirectory, 50);
+            this.messageBus.SendObjectChangeEvent(this.siteDirectory, EventKind.Updated);
+
+            var modelRow = viewmodel.ModelSetup.Single();
+            viewmodel.SelectedThing = modelRow;
+            viewmodel.ComputePermission();
+
+            dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>()))
+                .Returns(new BaseDialogResult(false));
+
+            await viewmodel.CreateMultipleParticipantsCommand.Execute();
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Never);
         }
     }
 }
