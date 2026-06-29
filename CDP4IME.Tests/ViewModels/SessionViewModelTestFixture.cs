@@ -38,6 +38,7 @@ namespace COMET.Tests.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
     using CDP4Dal.DAL;
@@ -87,6 +88,10 @@ namespace COMET.Tests.ViewModels
         public void SetUp()
         {
             RxApp.MainThreadScheduler = Scheduler.CurrentThread;
+
+            var serviceLocator = new Mock<IServiceLocator>();
+            serviceLocator.Setup(x => x.GetInstance<IMessageBoxService>()).Returns(new Mock<IMessageBoxService>().Object);
+            ServiceLocator.SetLocatorProvider(() => serviceLocator.Object);
 
             this.messageBus = new CDPMessageBus();
             this.cache = new List<Thing>();
@@ -210,6 +215,18 @@ namespace COMET.Tests.ViewModels
 
             this.sessionViewModel.IsAutoRefreshEnabled = true;
             Assert.IsTrue(this.sessionViewModel.IsAutoRefreshEnabled);
+        }
+
+        [Test]
+        public async Task VerifyThatAutoRefreshIsStoppedWhenSessionIsClosed()
+        {
+            this.sessionViewModel.IsAutoRefreshEnabled = true;
+            Assert.IsTrue(this.sessionViewModel.IsAutoRefreshEnabled);
+
+            await this.sessionViewModel.Close.Execute();
+
+            Assert.IsTrue(this.sessionViewModel.IsClosed);
+            Assert.IsFalse(this.sessionViewModel.IsAutoRefreshEnabled);
         }
 
         [Test]

@@ -265,6 +265,9 @@ namespace COMET.ViewModels
         /// </summary>
         private async void ExecuteClose()
         {
+            this.IsAutoRefreshEnabled = false;
+            this.timer?.Stop();
+
             await this.Session.Close();
             this.authenticationRefreshService?.Dispose();
             this.IsClosed = true;
