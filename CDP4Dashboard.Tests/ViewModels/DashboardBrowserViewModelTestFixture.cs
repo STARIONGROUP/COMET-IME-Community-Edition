@@ -231,6 +231,48 @@ namespace CDP4Dashboard.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatDragOverWorksWithParameterSubscription()
+        {
+            var vm = new DashboardBrowserViewModel(this.iteration, this.session.Object, null, null, null, null);
+
+            var parameter = this.elementDef.ContainedElement.First().ParameterOverride.First().Parameter;
+            var subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain };
+            parameter.ParameterSubscription.Add(subscription);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(subscription);
+
+            vm.DragOver(dropinfo.Object);
+
+            dropinfo.VerifySet(x => x.Effects = DragDropEffects.Copy);
+        }
+
+        [Test]
+        public async Task VerifyThatDropWorksWithParameterSubscription()
+        {
+            var vm = new DashboardBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null);
+
+            var parameter = this.elementDef.ContainedElement.First().ParameterOverride.First().Parameter;
+            var subscription = new ParameterSubscription(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = this.domain };
+            parameter.ParameterSubscription.Add(subscription);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(subscription);
+
+            Assert.AreEqual(1, vm.Widgets.Count);
+
+            await vm.Drop(dropinfo.Object);
+
+            Assert.AreEqual(2, vm.Widgets.Count);
+
+            var widget = vm.Widgets.OfType<IterationTrackParameterView>().Single();
+            var widgetViewModel = widget.DataContext as IterationTrackParameterViewModel<Parameter, ParameterValueSet>;
+
+            Assert.IsNotNull(widgetViewModel);
+            Assert.AreEqual(parameter, widgetViewModel.IterationTrackParameter.ParameterOrOverride);
+        }
+
+        [Test]
         public void VerifyThatDummyWidgetIsAddedAutomatically()
         {
             var vm = new DashboardBrowserViewModel(this.iteration, this.session.Object, null, null, this.dialogNavigationService.Object, null);

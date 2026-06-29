@@ -434,11 +434,9 @@ namespace CDP4Dashboard.ViewModels
         /// <param name="dropInfo">The <see cref="IDropInfo"/> data</param>
         public void DragOver(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is Parameter parameter && this.FindIteration(parameter.Container) == this.Thing)
-            {
-                dropInfo.Effects = DragDropEffects.Copy;
-            }
-            else if (dropInfo.Payload is ParameterOverride parameterOverride && this.FindIteration(parameterOverride.Container) == this.Thing)
+            var parameterOrOverrideBase = GetParameterOrOverrideBase(dropInfo.Payload);
+
+            if (parameterOrOverrideBase != null && this.FindIteration(parameterOrOverrideBase.Container) == this.Thing)
             {
                 dropInfo.Effects = DragDropEffects.Copy;
             }
@@ -455,25 +453,47 @@ namespace CDP4Dashboard.ViewModels
         /// <returns>A <see cref="Task"/> to be executed async</returns>
         public async Task Drop(IDropInfo dropInfo)
         {
-            if (!(dropInfo.Payload is ParameterOrOverrideBase parameterOrOverrideBase))
+            var parameterOrOverrideBase = GetParameterOrOverrideBase(dropInfo.Payload);
+
+            if (parameterOrOverrideBase == null || this.FindIteration(parameterOrOverrideBase.Container) != this.Thing)
             {
                 return;
             }
 
-            var iterartionTrackParameter = new IterationTrackParameter(parameterOrOverrideBase);
+            var iterationTrackParameter = new IterationTrackParameter(parameterOrOverrideBase);
 
-            var result = this.DialogNavigationService.NavigateModal(new IterationTrackParameterDetailViewModel(iterartionTrackParameter));
+            var result = this.DialogNavigationService.NavigateModal(new IterationTrackParameterDetailViewModel(iterationTrackParameter));
 
             if (result.Result == true)
             {
-                if (dropInfo.Payload is Parameter parameter && this.FindIteration(parameter.Container) == this.Thing)
+                if (parameterOrOverrideBase is Parameter)
                 {
-                    this.AddWidget<Parameter, ParameterValueSet>(iterartionTrackParameter);
+                    this.AddWidget<Parameter, ParameterValueSet>(iterationTrackParameter);
                 }
-                else if (dropInfo.Payload is ParameterOverride parameterOverride && this.FindIteration(parameterOverride.Container) == this.Thing)
+                else if (parameterOrOverrideBase is ParameterOverride)
                 {
-                    this.AddWidget<ParameterOverride, ParameterOverrideValueSet>(iterartionTrackParameter);
+                    this.AddWidget<ParameterOverride, ParameterOverrideValueSet>(iterationTrackParameter);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Resolves the <see cref="ParameterOrOverrideBase"/> that a drag-and-drop <paramref name="payload"/> refers to.
+        /// When a <see cref="ParameterSubscription"/> is dropped, the subscribed-to <see cref="ParameterOrOverrideBase"/>
+        /// (its container) is returned so that the parameter itself - not the subscription - is tracked on the dashboard.
+        /// </summary>
+        /// <param name="payload">The drag-and-drop payload</param>
+        /// <returns>The <see cref="ParameterOrOverrideBase"/> to track, or null when the payload is not supported</returns>
+        private static ParameterOrOverrideBase GetParameterOrOverrideBase(object payload)
+        {
+            switch (payload)
+            {
+                case ParameterOrOverrideBase parameterOrOverrideBase:
+                    return parameterOrOverrideBase;
+                case ParameterSubscription parameterSubscription:
+                    return parameterSubscription.Container as ParameterOrOverrideBase;
+                default:
+                    return null;
             }
         }
 
