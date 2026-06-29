@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProcessedValueSetGeneratorTestFixture.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2022 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -26,8 +26,10 @@
 namespace CDP4Reporting.Tests.DataCollection
 {
     using System;
+    using System.Globalization;
 
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.SiteDirectoryData;
 
     using CDP4Reporting.DataCollection;
     using CDP4Reporting.SubmittableParameterValues;
@@ -167,6 +169,78 @@ namespace CDP4Reporting.Tests.DataCollection
             this.optionDependentDataCollector.Setup(x => x.SelectedOption).Returns(this.option1);
             var submittableParameterValue = new SubmittableParameterValue("ED\\P\\ST\\", true);
             Assert.That(this.processedValueSetGenerator.ValueSetWriteAllowed(submittableParameterValue, option2), Is.False);
+        }
+
+        [Test]
+        public void VerifyThatInvariantGroupSeparatedNumberIsNormalized()
+        {
+            var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+            var result = this.processedValueSetGenerator.NormalizeValue("1,234.56", quantityKind, out var isValid, out var errorText);
+
+            Assert.That(isValid, Is.True);
+            Assert.That(errorText, Is.Empty);
+            Assert.That(result, Is.EqualTo("1234.56"));
+        }
+
+        [Test]
+        public void VerifyThatPlainInvariantNumberIsUnchanged()
+        {
+            var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+            var result = this.processedValueSetGenerator.NormalizeValue("1234.56", quantityKind, out var isValid, out _);
+
+            Assert.That(isValid, Is.True);
+            Assert.That(result, Is.EqualTo("1234.56"));
+        }
+
+        [Test]
+        public void VerifyThatCurrentCultureFormattedNumberIsNormalized()
+        {
+            var originalCulture = CultureInfo.CurrentCulture;
+
+            try
+            {
+                CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("nl-NL");
+                var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+                var result = this.processedValueSetGenerator.NormalizeValue("1.234,56", quantityKind, out var isValid, out _);
+
+                Assert.That(isValid, Is.True);
+                Assert.That(result, Is.EqualTo("1234.56"));
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = originalCulture;
+            }
+        }
+
+        [Test]
+        public void VerifyThatUnparsableNumberIsFlaggedInvalid()
+        {
+            var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+            var result = this.processedValueSetGenerator.NormalizeValue("not-a-number", quantityKind, out var isValid, out var errorText);
+
+            Assert.That(isValid, Is.False);
+            Assert.That(errorText, Is.Not.Empty);
+            Assert.That(result, Is.EqualTo("not-a-number"));
+        }
+
+        [Test]
+        public void VerifyThatDefaultMarkerIsPreserved()
+        {
+            var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
+            var result = this.processedValueSetGenerator.NormalizeValue("-", quantityKind, out var isValid, out _);
+
+            Assert.That(isValid, Is.True);
+            Assert.That(result, Is.EqualTo("-"));
+        }
+
+        [Test]
+        public void VerifyThatNonNumericParameterTypeValueIsUnchanged()
+        {
+            var textParameterType = new TextParameterType(Guid.NewGuid(), null, null) { Name = "text" };
+            var result = this.processedValueSetGenerator.NormalizeValue("1,234", textParameterType, out var isValid, out _);
+
+            Assert.That(isValid, Is.True);
+            Assert.That(result, Is.EqualTo("1,234"));
         }
     }
 }

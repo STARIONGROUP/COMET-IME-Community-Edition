@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProcessedValueSetGenerator.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2023 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -172,6 +172,88 @@ namespace CDP4Reporting.Utilities
         }
 
         /// <summary>
+        /// Normalizes a value <see cref="string"/> that is about to be written back to the model so that values
+        /// originating from a report control (which may be formatted using group separators and/or the running
+        /// machine's culture, e.g. a "N2" formatted <see cref="QuantityKind"/> value) are interpreted correctly.
+        /// </summary>
+        /// <param name="value">
+        /// The value <see cref="string"/> as received from the report control.
+        /// </param>
+        /// <param name="parameterType">
+        /// The <see cref="ParameterType"/> the <paramref name="value"/> belongs to.
+        /// </param>
+        /// <param name="isValid">
+        /// true if the <paramref name="value"/> could be interpreted for the given <paramref name="parameterType"/>,
+        /// otherwise false. Non-numeric <see cref="ParameterType"/>s are always considered valid here, as their
+        /// validation is left to <see cref="ParameterType.Validate(string, MeasurementScale, IFormatProvider)"/>.
+        /// </param>
+        /// <param name="errorText">
+        /// A <see cref="string"/> that contains information about why the <paramref name="value"/> could not be
+        /// interpreted, or <see cref="string.Empty"/> when <paramref name="isValid"/> is true.
+        /// </param>
+        /// <returns>
+        /// The normalized, invariant-culture value <see cref="string"/> for a numeric <see cref="ParameterType"/>,
+        /// or the original <paramref name="value"/> when it is not numeric or could not be interpreted.
+        /// </returns>
+        public string NormalizeValue(string value, ParameterType parameterType, out bool isValid, out string errorText)
+        {
+            isValid = true;
+            errorText = string.Empty;
+
+            if (parameterType == null || string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+
+            if (!(parameterType is QuantityKind))
+            {
+                return value;
+            }
+
+            if (value.Trim().Equals(ValueSetConverter.DefaultObject(parameterType)))
+            {
+                return value;
+            }
+
+            if (this.TryParseNumericValue(value, parameterType, out var doubleValue))
+            {
+                return doubleValue.ToString(CultureInfo.InvariantCulture);
+            }
+
+            isValid = false;
+            errorText = $"Value '{value}' could not be interpreted as a valid number for ParameterType {parameterType.Name}. Please check the value's decimal and group separators.";
+
+            return value;
+        }
+
+        /// <summary>
+        /// Tries to parse a numeric value <see cref="string"/> in a culture-aware way, first using the ECSS /
+        /// invariant-culture rules (which handle group separators and a '.' decimal separator) and then falling
+        /// back to the running machine's culture (which handles e.g. a European "1.234,56" formatted value).
+        /// </summary>
+        /// <param name="value">
+        /// The value <see cref="string"/> to parse.
+        /// </param>
+        /// <param name="parameterType">
+        /// The <see cref="ParameterType"/> the <paramref name="value"/> belongs to.
+        /// </param>
+        /// <param name="doubleValue">
+        /// The parsed <see cref="double"/> value.
+        /// </param>
+        /// <returns>
+        /// true if the <paramref name="value"/> could be parsed, otherwise false.
+        /// </returns>
+        private bool TryParseNumericValue(string value, ParameterType parameterType, out double doubleValue)
+        {
+            if (ValueSetConverter.TryParseDouble(value, parameterType, out doubleValue))
+            {
+                return true;
+            }
+
+            return double.TryParse(value, NumberStyles.Any, CultureInfo.CurrentCulture, out doubleValue);
+        }
+
+        /// <summary>
         /// Process the <see cref="ParameterValueSet"/> .
         /// </summary>
         /// <param name="parameterValueSet">
@@ -210,19 +292,24 @@ namespace CDP4Reporting.Utilities
 
             if (parameterType != null)
             {
-                if (ValueSetConverter.TryParseDouble(computedValue, parameterType, out var convertedComputedValue))
-                {
-                    computedValue = convertedComputedValue.ToString(CultureInfo.InvariantCulture);
-                }
+                computedValue = this.NormalizeValue(computedValue, parameterType, out var isValidValue, out var normalizationErrorText);
 
                 computedValue = computedValue?.ToValueSetObject(parameterType).ToValueSetString(parameterType) ?? parameterValueSet.Computed[componentIndex];
 
-                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
-
-                if (validManualValue.ResultKind > validationResult)
+                if (!isValidValue)
                 {
-                    validationResult = validManualValue.ResultKind;
-                    validationErrorText = validManualValue.Message;
+                    validationResult = ValidationResultKind.Invalid;
+                    validationErrorText = normalizationErrorText;
+                }
+                else
+                {
+                    var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
+
+                    if (validManualValue.ResultKind > validationResult)
+                    {
+                        validationResult = validManualValue.ResultKind;
+                        validationErrorText = validManualValue.Message;
+                    }
                 }
             }
 
@@ -285,14 +372,24 @@ namespace CDP4Reporting.Utilities
 
             if (parameterType != null)
             {
+                computedValue = this.NormalizeValue(computedValue, parameterType, out var isValidValue, out var normalizationErrorText);
+
                 computedValue = computedValue.ToValueSetObject(parameterType).ToValueSetString(parameterType);
 
-                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
-
-                if (validManualValue.ResultKind > validationResult)
+                if (!isValidValue)
                 {
-                    validationResult = validManualValue.ResultKind;
-                    validationErrorText = validManualValue.Message;
+                    validationResult = ValidationResultKind.Invalid;
+                    validationErrorText = normalizationErrorText;
+                }
+                else
+                {
+                    var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
+
+                    if (validManualValue.ResultKind > validationResult)
+                    {
+                        validationResult = validManualValue.ResultKind;
+                        validationErrorText = validManualValue.Message;
+                    }
                 }
             }
 

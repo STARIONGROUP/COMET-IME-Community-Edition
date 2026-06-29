@@ -19,12 +19,13 @@
 
         <dxlc:LayoutGroup VerticalAlignment="top"
                           Margin="3"
-                          Height="100"
+                          MinHeight="100"
+                          Height="Auto"
                           View="Group"
                           Orientation="Horizontal">
 
             <dxlc:LayoutGroup HorizontalAlignment="Left"
-                              VerticalAlignment="Stretch">
+                              VerticalAlignment="Top">
                 <dxlc:LayoutItem HorizontalAlignment="Left">
                     <Image Source="pack://application:,,,/CDP4Composition;component/Resources/Images/Log/ExclamationRed_32x32.png"
                            Height="40"/>
@@ -36,7 +37,9 @@
                               Orientation="Vertical">
 
                 <dxlc:LayoutGroup>
-                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Auto"
+                                  MaxHeight="400">
                         <TextBlock VerticalAlignment="Top"
                                    TextWrapping="Wrap"
                                    Text="{Binding Message, Mode=OneTime}"
