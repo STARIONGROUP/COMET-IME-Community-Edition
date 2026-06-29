@@ -379,6 +379,11 @@ namespace CDP4EngineeringModel.ViewModels
         public DisposableReactiveList<IRowViewModelBase<Thing>> ElementDefinitionRowViewModels { get; private set; }
 
         /// <summary>
+        /// Gets the top-level rows of this browser, used by the Expand All / Collapse All commands
+        /// </summary>
+        protected override IEnumerable<IRowViewModelBase<Thing>> RootRowViewModels => this.ElementDefinitionRowViewModels;
+
+        /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
@@ -757,6 +762,8 @@ namespace CDP4EngineeringModel.ViewModels
                 {
                     this.ContextMenu.Add(this.SelectedThing.IsExpanded ? new ContextMenuItemViewModel("Collapse Rows", "", this.CollpaseRowsCommand, MenuItemKind.None, ClassKind.NotThing) : new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
                 }
+
+                this.AddExpandCollapseAllContextMenuItems();
 
                 if (this.SelectedThing is IHaveModelCode)
                 {
