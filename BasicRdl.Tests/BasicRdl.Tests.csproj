@@ -30,9 +30,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="5.2.1" />
-    <PackageReference Include="CDP4Common-CE" Version="30.1.1" />
-    <PackageReference Include="CDP4Dal-CE" Version="30.1.1" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.1.1" />
+    <PackageReference Include="CDP4Common-CE" Version="30.1.2" />
+    <PackageReference Include="CDP4Dal-CE" Version="30.1.2" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.1.2" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="DotLiquid" Version="2.3.197" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />

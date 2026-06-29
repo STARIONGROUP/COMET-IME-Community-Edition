@@ -7,8 +7,8 @@
     <Product>CDP4OfficeInfrastructure</Product>
     <Description>CDP4-COMET Office Infrastucture library</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
-    <AssemblyVersion>11.0.0.13</AssemblyVersion>
-    <FileVersion>11.0.0.13</FileVersion>
+    <AssemblyVersion>11.0.1.0</AssemblyVersion>
+    <FileVersion>11.0.1.0</FileVersion>
     <OutputPath>bin\$(Configuration)\</OutputPath>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
@@ -28,9 +28,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="30.1.1" />
-    <PackageReference Include="CDP4Dal-CE" Version="30.1.1" />
-    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.1.1" />
+    <PackageReference Include="CDP4Common-CE" Version="30.1.2" />
+    <PackageReference Include="CDP4Dal-CE" Version="30.1.2" />
+    <PackageReference Include="CDP4JsonSerializer-CE" Version="30.1.2" />
     <PackageReference Include="CommonServiceLocator" Version="2.0.7" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.7" />
     <PackageReference Include="NetOfficeFw.Core" Version="1.9.9" />

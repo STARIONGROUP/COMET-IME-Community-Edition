@@ -21,7 +21,7 @@
 	</PropertyGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent" />
 	<ItemGroup>
-		<PackageReference Include="CDP4Common-CE" Version="30.1.1" />
+		<PackageReference Include="CDP4Common-CE" Version="30.1.2" />
 		<PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="10.0.7" />
     <PackageReference Include="System.Text.Json" Version="10.0.7" />
 	</ItemGroup>
