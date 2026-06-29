@@ -178,12 +178,20 @@ namespace BasicRdl.ViewModels
         {
             get
             {
+                var shortNameError = this.ValidationService.ValidateObjectProperty("ShortName", this);
+                var parameterTypeError = this.ParameterType == null ? "The ParameterType must be selected." : null;
+                
+                this.ErrorMsg = shortNameError ?? parameterTypeError;
+                ((CompoundParameterTypeDialogViewModel)this.ContainerViewModel).UpdateOkCanExecuteStatus();
+
                 if (columnName == "ShortName")
                 {
-                    var validationResult = this.ValidationService.ValidateObjectProperty(columnName, this);
-                    this.ErrorMsg = validationResult;
-                    ((CompoundParameterTypeDialogViewModel)this.ContainerViewModel).UpdateOkCanExecuteStatus();
-                    return validationResult != null ? validationResult : string.Empty;
+                    return shortNameError ?? string.Empty;
+                }
+
+                if (columnName == "ParameterType")
+                {
+                    return parameterTypeError ?? string.Empty;
                 }
 
                 return string.Empty;

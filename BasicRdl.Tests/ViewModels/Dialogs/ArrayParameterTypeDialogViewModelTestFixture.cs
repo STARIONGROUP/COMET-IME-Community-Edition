@@ -156,6 +156,38 @@ namespace BasicRdl.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatNewComponentHasValidDefaultShortName()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext);
+            var viewmodel = new ArrayParameterTypeDialogViewModel(this.arrayPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
+
+            var component = (ParameterTypeComponentRowViewModel)viewmodel.Component.Single();
+
+            Assert.AreEqual("{1;1;1}", component.Coordinates);
+            Assert.AreEqual("C1_1_1", component.ShortName);
+
+            // a default short name must not raise a short-name validation error
+            Assert.IsEmpty(component["ShortName"]);
+        }
+
+        [Test]
+        public void VerifyThatMissingParameterTypeIsReportedAsError()
+        {
+            var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
+            var transaction = new ThingTransaction(transactionContext);
+            var viewmodel = new ArrayParameterTypeDialogViewModel(this.arrayPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
+
+            var component = (ParameterTypeComponentRowViewModel)viewmodel.Component.Single();
+
+            Assert.IsNull(component.ParameterType);
+            Assert.IsNotEmpty(component["ParameterType"]);
+
+            component.ParameterType = this.qt;
+            Assert.IsEmpty(component["ParameterType"]);
+        }
+
+        [Test]
         public void VerifyThatParameterlessContructorExists()
         {
             Assert.DoesNotThrow(() => new ArrayParameterTypeDialogViewModel());
