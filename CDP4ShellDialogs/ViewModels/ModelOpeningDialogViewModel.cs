@@ -2,7 +2,7 @@
 // <copyright file="ModelOpeningDialogViewModel.cs" company="Starion Group S.A.">
 //    Copyright (c) 2015-2022 Starion Group S.A.
 //
-//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
+//    Author: Sam Gerenï¿½, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Thï¿½ate, Omar Elebiary
 //
 //    This file is part of COMET-IME Community Edition.
 //    The COMET-IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
@@ -31,6 +31,7 @@ namespace CDP4ShellDialogs.ViewModels
     using System.Linq;
     using System.Reactive;
     using System.Threading.Tasks;
+    using System.Windows;
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
@@ -42,8 +43,11 @@ namespace CDP4ShellDialogs.ViewModels
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
+    using CDP4Composition.Services;
 
     using CDP4Dal;
+
+    using CommonServiceLocator;
 
     using NLog;
 
@@ -83,6 +87,16 @@ namespace CDP4ShellDialogs.ViewModels
         /// Backing field for the <see cref="SelectedEngineeringModelSetup "/> property.
         /// </summary>
         private ModelSelectionEngineeringModelSetupRowViewModel selectedEngineeringModelSetup;
+
+        /// <summary>
+        /// The (injected) <see cref="IMessageBoxService"/> used to inform the user when no usable domain is available.
+        /// </summary>
+        private readonly IMessageBoxService messageBoxService = ServiceLocator.Current.GetInstance<IMessageBoxService>();
+
+        /// <summary>
+        /// The message shown when the user has no domain of expertise that is both assigned to them and active in the model.
+        /// </summary>
+        private const string NoActiveDomainMessage = "You have no active domain of expertise in this model. Contact a model administrator to assign an active domain.";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModelOpeningDialogViewModel"/> class. 
@@ -248,6 +262,12 @@ namespace CDP4ShellDialogs.ViewModels
                     throw new NullReferenceException($"The EngineeringModelSetup that iteration {iterationSetupRow.Thing.Iid} belongs to cannot be found.");
                 }
 
+                if (iterationSetupRow.SelectedDomain == null)
+                {
+                    this.messageBoxService.Show(NoActiveDomainMessage, "No active domain of expertise", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 // Retrieve the Iteration from the IDal
                 var session = iterationSetupRow.Session;
 
@@ -281,9 +301,6 @@ namespace CDP4ShellDialogs.ViewModels
             var stopWatch = Stopwatch.StartNew();
             var activeIterationSetupRow = this.SelectedEngineeringModelSetup.IterationSetupRowViewModels.FirstOrDefault(x => x.Thing.FrozenOn == null);
 
-            this.IsBusy = true;
-            this.LoadingMessage = "Loading Iteration...";
-
             if (activeIterationSetupRow != null)
             {
                 if (!(activeIterationSetupRow.Thing.Container is EngineeringModelSetup modelSetup))
@@ -291,8 +308,22 @@ namespace CDP4ShellDialogs.ViewModels
                     throw new NullReferenceException($"The EngineeringModelSetup that iteration {activeIterationSetupRow.Thing.Iid} belongs to cannot be found.");
                 }
 
-                // Retrieve the Iteration from the IDal
                 var session = activeIterationSetupRow.Session;
+
+                if (!activeIterationSetupRow.DomainOfExpertises.Any())
+                {
+                    this.messageBoxService.Show(NoActiveDomainMessage, "No active domain of expertise", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (session.ActivePerson.DefaultDomain == null || !activeIterationSetupRow.DomainOfExpertises.Contains(session.ActivePerson.DefaultDomain))
+                {
+                    this.ExecuteNext();
+                    return;
+                }
+
+                this.IsBusy = true;
+                this.LoadingMessage = "Loading Iteration...";
 
                 var model = new EngineeringModel(modelSetup.EngineeringModelIid, session.Assembler.Cache, session.Credentials.Uri)
                     { EngineeringModelSetup = modelSetup };
@@ -301,18 +332,7 @@ namespace CDP4ShellDialogs.ViewModels
 
                 model.Iteration.Add(iteration);
 
-                DomainOfExpertise initialDomain;
-
-                if (session.ActivePerson.DefaultDomain != null && activeIterationSetupRow.DomainOfExpertises.Contains(session.ActivePerson.DefaultDomain))
-                {
-                    initialDomain = session.ActivePerson.DefaultDomain;
-                }
-                else
-                {
-                    initialDomain = activeIterationSetupRow.DomainOfExpertises.FirstOrDefault();
-                }
-
-                await session.Read(iteration, initialDomain);
+                await session.Read(iteration, session.ActivePerson.DefaultDomain);
             }
 
             this.IsBusy = false;

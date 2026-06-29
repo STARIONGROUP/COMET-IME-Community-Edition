@@ -69,9 +69,17 @@ namespace CDP4ShellDialogs.ViewModels
 
             this.DomainOfExpertises = new ReactiveList<DomainOfExpertise>();
 
-            if (participant.Domain.Count != 0)
+            var modelSetup = this.Thing.Container as EngineeringModelSetup;
+
+            var usableDomains = (modelSetup == null
+                    ? participant.Domain
+                    : participant.Domain.Where(modelSetup.ActiveDomain.Contains))
+                .OrderBy(x => x.ShortName)
+                .ToList();
+
+            if (usableDomains.Count != 0)
             {
-                this.DomainOfExpertises.AddRange(participant.Domain.OrderBy(x => x.ShortName)); 
+                this.DomainOfExpertises.AddRange(usableDomains);
 
                 this.SelectedDomain = this.DomainOfExpertises.Contains(this.ActiveParticipant.Person.DefaultDomain)
                     ? this.ActiveParticipant.Person.DefaultDomain

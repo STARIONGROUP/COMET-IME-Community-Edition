@@ -31,6 +31,7 @@ namespace CDP4ShellDialogs.Tests
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -113,6 +114,9 @@ namespace CDP4ShellDialogs.Tests
             this.person.DefaultDomain = this.domain;
             this.model1.Participant.Add(this.participant);
             this.model2.Participant.Add(this.participant);
+
+            this.model1.ActiveDomain.Add(this.domain);
+            this.model2.ActiveDomain.Add(this.domain);
 
             this.model1.IterationSetup.Add(this.iteration11);
             this.model2.IterationSetup.Add(this.iteration21);
@@ -201,6 +205,88 @@ namespace CDP4ShellDialogs.Tests
             viewmodel.SelectedIterations.Add(new ModelSelectionEngineeringModelSetupRowViewModel(this.model1, this.session.Object));
 
             Assert.AreEqual(0, viewmodel.SelectedIterations.Count);
+        }
+
+        [Test]
+        public async Task VerifyThatSelectActiveIterationOpensModelWhenDefaultDomainIsActive()
+        {
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, null);
+
+            await viewmodel.SelectActiveIterationCommand.Execute();
+
+            var res = viewmodel.DialogResult;
+            Assert.IsNotNull(res);
+            Assert.IsTrue(res.Result.Value);
+            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), this.domain, It.IsAny<bool>()), Times.Once);
+        }
+
+        [Test]
+        public async Task VerifyThatSelectActiveIterationSwitchesToIterationScreenWhenDefaultDomainIsNotActive()
+        {
+            this.person.DefaultDomain = new DomainOfExpertise(Guid.NewGuid(), null, this.uri) { Name = "nonActiveDomain" };
+
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, null);
+
+            await viewmodel.SelectActiveIterationCommand.Execute();
+
+            Assert.IsFalse(viewmodel.IsModelScreen);
+            Assert.IsTrue(viewmodel.IsIterationScreen);
+            Assert.IsFalse(viewmodel.IsBusy);
+            Assert.IsNull(viewmodel.DialogResult);
+            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>()), Times.Never);
+        }
+
+        [Test]
+        public async Task VerifyThatSelectActiveIterationSwitchesToIterationScreenWhenDefaultDomainIsNull()
+        {
+            this.person.DefaultDomain = null;
+
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, null);
+
+            await viewmodel.SelectActiveIterationCommand.Execute();
+
+            Assert.IsFalse(viewmodel.IsModelScreen);
+            Assert.IsTrue(viewmodel.IsIterationScreen);
+            Assert.IsNull(viewmodel.DialogResult);
+            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>()), Times.Never);
+        }
+
+        [Test]
+        public async Task VerifyThatSelectActiveIterationShowsMessageWhenNoActiveDomainIsAvailable()
+        {
+            // the participant's only assigned domain is no longer an active domain of the model (see issue #611)
+            this.model1.ActiveDomain.Clear();
+            this.model2.ActiveDomain.Clear();
+
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, null);
+
+            await viewmodel.SelectActiveIterationCommand.Execute();
+
+            Assert.IsTrue(viewmodel.IsModelScreen);
+            Assert.IsNull(viewmodel.DialogResult);
+            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>()), Times.Never);
+            this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
+        }
+
+        [Test]
+        public async Task VerifyThatSelectShowsMessageWhenSelectedDomainIsNull()
+        {
+            // the participant's only assigned domain is no longer an active domain of the model, so the row has no usable domain (see issue #611)
+            this.model1.ActiveDomain.Clear();
+
+            var sessions = new List<ISession> { this.session.Object };
+            var viewmodel = new ModelOpeningDialogViewModel(sessions, null);
+            viewmodel.SelectedIterations.Add(new ModelSelectionIterationSetupRowViewModel(this.iteration11, this.participant, this.session.Object));
+
+            await viewmodel.SelectCommand.Execute();
+
+            Assert.IsNull(viewmodel.DialogResult);
+            this.session.Verify(x => x.Read(It.IsAny<Iteration>(), It.IsAny<DomainOfExpertise>(), It.IsAny<bool>()), Times.Never);
+            this.messageBoxService.Verify(x => x.Show(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<MessageBoxButton>(), It.IsAny<MessageBoxImage>()), Times.Once);
         }
 
         [Test]
