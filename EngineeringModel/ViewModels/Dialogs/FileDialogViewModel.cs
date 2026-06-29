@@ -36,6 +36,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.SiteDirectoryData;
 
     using CDP4Composition.Attributes;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
 
@@ -218,9 +219,14 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void PopulatePossibleOwner()
         {
             base.PopulatePossibleOwner();
-            var engineeringModel = this.Container.GetContainerOfType<EngineeringModel>();
-            var domains = engineeringModel.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name);
-            this.PossibleOwner.AddRange(domains);
+            var iteration = this.Container.GetContainerOfType<Iteration>();
+            this.PossibleOwner.AddRange(this.Session.QueryAllowedOwners(iteration, this.Thing.Owner));
+            this.CurrentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
+
+            if (this.SelectedOwner == null && this.dialogKind == ThingDialogKind.Create)
+            {
+                this.SelectedOwner = this.CurrentDomainOfExpertise ?? this.PossibleOwner.FirstOrDefault();
+            }
         }
 
         /// <summary>

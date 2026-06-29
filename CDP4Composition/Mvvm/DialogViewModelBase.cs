@@ -39,6 +39,7 @@ namespace CDP4Composition.Mvvm
 
     using CDP4Common.CommonData;
     using CDP4Common.Exceptions;
+    using CDP4Common.SiteDirectoryData;
     using CDP4Common.Validation;
 
     using CDP4Composition.Navigation;
@@ -108,6 +109,11 @@ namespace CDP4Composition.Mvvm
         /// The kind of operation this <see cref="DialogViewModelBase{T}"/> performs
         /// </summary>
         protected ThingDialogKind dialogKind;
+
+        /// <summary>
+        /// Backing field for <see cref="CurrentDomainOfExpertise"/>
+        /// </summary>
+        private DomainOfExpertise currentDomainOfExpertise;
 
         /// <summary>
         /// Backing field for <see cref="OkCanExecute"/> property.
@@ -307,6 +313,17 @@ namespace CDP4Composition.Mvvm
         /// Gets a value indicating whether the associated view is read-only
         /// </summary>
         public virtual bool IsReadOnly => this.dialogKind == ThingDialogKind.Inspect;
+
+        /// <summary>
+        /// Gets the current <see cref="DomainOfExpertise"/> of the active session for the <see cref="CDP4Common.EngineeringModelData.Iteration"/>
+        /// the <see cref="Thing"/> belongs to, when applicable. This is used to visually highlight the user's own
+        /// <see cref="DomainOfExpertise"/> in owner-selection combo-boxes. It is <c>null</c> for dialogs that are not owner-related.
+        /// </summary>
+        public DomainOfExpertise CurrentDomainOfExpertise
+        {
+            get => this.currentDomainOfExpertise;
+            protected set => this.RaiseAndSetIfChanged(ref this.currentDomainOfExpertise, value);
+        }
 
         /// <summary>
         /// Gets a value indicating whether a non-editable field is read-only

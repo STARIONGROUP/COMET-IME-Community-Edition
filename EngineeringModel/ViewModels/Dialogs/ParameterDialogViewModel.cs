@@ -38,6 +38,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4CommonView;
 
     using CDP4Composition.Attributes;
+    using CDP4Composition.Extensions;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -499,20 +500,19 @@ namespace CDP4EngineeringModel.ViewModels
         protected override void PopulatePossibleOwner()
         {
             base.PopulatePossibleOwner();
-            var model = this.Thing.TopContainer as EngineeringModel;
+            var iteration = this.Thing.GetContainerOfType<Iteration>();
 
-            if (model == null)
+            if (iteration == null)
             {
                 return;
             }
 
-            this.PossibleOwner.AddRange(model.EngineeringModelSetup.ActiveDomain.OrderBy(x => x.Name));
+            this.PossibleOwner.AddRange(this.Session.QueryAllowedOwners(iteration, this.Thing.Owner));
+            this.CurrentDomainOfExpertise = this.Session.QuerySelectedDomainOfExpertise(iteration);
 
-            if (this.SelectedOwner == null)
+            if (this.SelectedOwner == null && this.dialogKind == ThingDialogKind.Create)
             {
-                Tuple<DomainOfExpertise, Participant> tuple;
-                this.Session.OpenIterations.TryGetValue(this.Thing.GetContainerOfType<Iteration>(), out tuple);
-                this.SelectedOwner = tuple.Item1;
+                this.SelectedOwner = this.CurrentDomainOfExpertise ?? this.PossibleOwner.FirstOrDefault();
             }
         }
 

@@ -120,6 +120,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
 
             this.cache.TryAdd(new CacheKey(this.iteration.Iid, null), new Lazy<Thing>(() => this.iteration));
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.sitedir);
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.possibleOwners);
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.alphaOwner);
 
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));

@@ -133,6 +133,8 @@ namespace CDP4EngineeringModel.Tests.Dialogs
             var transactionContext = TransactionContextResolver.ResolveContext(this.iteration);
             this.thingTransaction = new ThingTransaction(transactionContext, this.definition1Clone);
             this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
+            this.session.Setup(x => x.QueryDomainOfExpertise(It.IsAny<Iteration>())).Returns(new[] { this.domain1 });
+            this.session.Setup(x => x.QuerySelectedDomainOfExpertise(It.IsAny<Iteration>())).Returns(this.domain1);
 
             var dal = new Mock<IDal>();
             this.session.Setup(x => x.DalVersion).Returns(new Version(1, 1, 0));
