@@ -79,6 +79,9 @@ namespace CDP4ShellDialogs.Tests.RowViewModels
 
             this.person.DefaultDomain = this.domain;
 
+            this.model1.ActiveDomain.Add(this.domain);
+            this.model2.ActiveDomain.Add(this.domain);
+
             this.model1.Participant.Add(new Participant(Guid.NewGuid(), null, new Uri("https://www.stariongroup.eu"))
             {
                 Person = this.person,
