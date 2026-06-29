@@ -152,7 +152,7 @@ namespace CDP4Composition.Services
 
                 if (builtInRuleVerification != null && builtInRuleVerification.IsActive)
                 {
-                    await this.Execute(session, builtInRuleVerification, verificationList);
+                    await this.ExecuteAsync(session, builtInRuleVerification, verificationList);
                 }
 
                 var userRuleVerification = ruleVerification as UserRuleVerification;
@@ -176,7 +176,7 @@ namespace CDP4Composition.Services
         /// <param name="container">
         /// The container <see cref="RuleVerificationList"/> of the <paramref name="userRuleVerification"/>
         /// </param>
-        private async Task Execute(ISession session, BuiltInRuleVerification builtInRuleVerification, RuleVerificationList container)
+        private async Task ExecuteAsync(ISession session, BuiltInRuleVerification builtInRuleVerification, RuleVerificationList container)
         {
             var iteration = (Iteration)container.Container;
 
@@ -205,7 +205,7 @@ namespace CDP4Composition.Services
 
             var status = violations.Any() ? RuleVerificationStatusKind.FAILED : RuleVerificationStatusKind.PASSED;
             
-            await this.UpdateExecutedOn(session, builtInRuleVerification, status);
+            await this.UpdateExecutedOnAsync(session, builtInRuleVerification, status);
 
             builtInRuleVerification.Violation.AddRange(violations);
 
@@ -283,7 +283,7 @@ namespace CDP4Composition.Services
 
                 IDisposable subscription = null;
 
-                //Listen for changes to the verification rule that will happen after UpdateExecutedOn in order to get the updated version.
+                //Listen for changes to the verification rule that will happen after UpdateExecutedOnAsync in order to get the updated version.
                 //The violations must be added lastly as they are not persistent
                 subscription = session.CDPMessageBus.Listen<ObjectChangedEvent>(userRuleVerification)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
@@ -306,7 +306,7 @@ namespace CDP4Composition.Services
                         });
             }
 
-            await this.UpdateExecutedOn(session, userRuleVerification, status);
+            await this.UpdateExecutedOnAsync(session, userRuleVerification, status);
         }
 
         /// <summary>
@@ -327,7 +327,7 @@ namespace CDP4Composition.Services
         /// The <paramref name="status"/> is set on the clone so that it is part of the write transaction. If it were only
         /// set on the cached instance, the data-source round-trip would echo the previously stored status and reset it.
         /// </remarks>
-        private async Task UpdateExecutedOn(ISession session, RuleVerification ruleVerification, RuleVerificationStatusKind status)
+        private async Task UpdateExecutedOnAsync(ISession session, RuleVerification ruleVerification, RuleVerificationStatusKind status)
         {
             try
             {
