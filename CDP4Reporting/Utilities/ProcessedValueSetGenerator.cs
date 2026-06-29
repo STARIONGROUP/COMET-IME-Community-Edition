@@ -172,9 +172,12 @@ namespace CDP4Reporting.Utilities
         }
 
         /// <summary>
-        /// Normalizes a value <see cref="string"/> that is about to be written back to the model so that values
-        /// originating from a report control (which may be formatted using group separators and/or the running
-        /// machine's culture, e.g. a "N2" formatted <see cref="QuantityKind"/> value) are interpreted correctly.
+        /// Normalizes a numeric value <see cref="string"/> to the invariant culture using the SDK's
+        /// ECSS-E-TM-10-25 aware <see cref="ValueSetConverter.TryParseDouble"/>, so that values coming from a
+        /// report control that are formatted with group separators (e.g. an "N2" formatted value) are written
+        /// back to the model correctly. Non-numeric <see cref="ParameterType"/>s and the default "-" marker are
+        /// returned unchanged; validation of the result is left to the SDK's
+        /// <see cref="ValueValidator.Validate(ParameterType, object, MeasurementScale, IFormatProvider)"/>.
         /// </summary>
         /// <param name="value">
         /// The value <see cref="string"/> as received from the report control.
@@ -182,75 +185,23 @@ namespace CDP4Reporting.Utilities
         /// <param name="parameterType">
         /// The <see cref="ParameterType"/> the <paramref name="value"/> belongs to.
         /// </param>
-        /// <param name="isValid">
-        /// true if the <paramref name="value"/> could be interpreted for the given <paramref name="parameterType"/>,
-        /// otherwise false. Non-numeric <see cref="ParameterType"/>s are always considered valid here, as their
-        /// validation is left to <see cref="ParameterType.Validate(string, MeasurementScale, IFormatProvider)"/>.
-        /// </param>
-        /// <param name="errorText">
-        /// A <see cref="string"/> that contains information about why the <paramref name="value"/> could not be
-        /// interpreted, or <see cref="string.Empty"/> when <paramref name="isValid"/> is true.
-        /// </param>
         /// <returns>
-        /// The normalized, invariant-culture value <see cref="string"/> for a numeric <see cref="ParameterType"/>,
-        /// or the original <paramref name="value"/> when it is not numeric or could not be interpreted.
+        /// The normalized, invariant-culture value <see cref="string"/> for a numeric <see cref="QuantityKind"/>,
+        /// or the original <paramref name="value"/> when it is not numeric, is the default marker, or cannot be parsed.
         /// </returns>
-        public string NormalizeValue(string value, ParameterType parameterType, out bool isValid, out string errorText)
+        public string NormalizeNumericValue(string value, ParameterType parameterType)
         {
-            isValid = true;
-            errorText = string.Empty;
-
-            if (parameterType == null || string.IsNullOrWhiteSpace(value))
+            if (!(parameterType is QuantityKind) || string.IsNullOrWhiteSpace(value) || value.Trim().Equals(ValueSetConverter.DefaultObject(parameterType)))
             {
                 return value;
             }
 
-            if (!(parameterType is QuantityKind))
-            {
-                return value;
-            }
-
-            if (value.Trim().Equals(ValueSetConverter.DefaultObject(parameterType)))
-            {
-                return value;
-            }
-
-            if (this.TryParseNumericValue(value, parameterType, out var doubleValue))
+            if (ValueSetConverter.TryParseDouble(value, parameterType, out var doubleValue))
             {
                 return doubleValue.ToString(CultureInfo.InvariantCulture);
             }
 
-            isValid = false;
-            errorText = $"Value '{value}' could not be interpreted as a valid number for ParameterType {parameterType.Name}. Please check the value's decimal and group separators.";
-
             return value;
-        }
-
-        /// <summary>
-        /// Tries to parse a numeric value <see cref="string"/> in a culture-aware way, first using the ECSS /
-        /// invariant-culture rules (which handle group separators and a '.' decimal separator) and then falling
-        /// back to the running machine's culture (which handles e.g. a European "1.234,56" formatted value).
-        /// </summary>
-        /// <param name="value">
-        /// The value <see cref="string"/> to parse.
-        /// </param>
-        /// <param name="parameterType">
-        /// The <see cref="ParameterType"/> the <paramref name="value"/> belongs to.
-        /// </param>
-        /// <param name="doubleValue">
-        /// The parsed <see cref="double"/> value.
-        /// </param>
-        /// <returns>
-        /// true if the <paramref name="value"/> could be parsed, otherwise false.
-        /// </returns>
-        private bool TryParseNumericValue(string value, ParameterType parameterType, out double doubleValue)
-        {
-            if (ValueSetConverter.TryParseDouble(value, parameterType, out doubleValue))
-            {
-                return true;
-            }
-
-            return double.TryParse(value, NumberStyles.Any, CultureInfo.CurrentCulture, out doubleValue);
         }
 
         /// <summary>
@@ -292,24 +243,16 @@ namespace CDP4Reporting.Utilities
 
             if (parameterType != null)
             {
-                computedValue = this.NormalizeValue(computedValue, parameterType, out var isValidValue, out var normalizationErrorText);
+                computedValue = this.NormalizeNumericValue(computedValue, parameterType);
 
                 computedValue = computedValue?.ToValueSetObject(parameterType).ToValueSetString(parameterType) ?? parameterValueSet.Computed[componentIndex];
 
-                if (!isValidValue)
-                {
-                    validationResult = ValidationResultKind.Invalid;
-                    validationErrorText = normalizationErrorText;
-                }
-                else
-                {
-                    var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
+                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
 
-                    if (validManualValue.ResultKind > validationResult)
-                    {
-                        validationResult = validManualValue.ResultKind;
-                        validationErrorText = validManualValue.Message;
-                    }
+                if (validManualValue.ResultKind > validationResult)
+                {
+                    validationResult = validManualValue.ResultKind;
+                    validationErrorText = validManualValue.Message;
                 }
             }
 
@@ -372,24 +315,16 @@ namespace CDP4Reporting.Utilities
 
             if (parameterType != null)
             {
-                computedValue = this.NormalizeValue(computedValue, parameterType, out var isValidValue, out var normalizationErrorText);
+                computedValue = this.NormalizeNumericValue(computedValue, parameterType);
 
                 computedValue = computedValue.ToValueSetObject(parameterType).ToValueSetString(parameterType);
 
-                if (!isValidValue)
-                {
-                    validationResult = ValidationResultKind.Invalid;
-                    validationErrorText = normalizationErrorText;
-                }
-                else
-                {
-                    var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
+                var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
 
-                    if (validManualValue.ResultKind > validationResult)
-                    {
-                        validationResult = validManualValue.ResultKind;
-                        validationErrorText = validManualValue.Message;
-                    }
+                if (validManualValue.ResultKind > validationResult)
+                {
+                    validationResult = validManualValue.ResultKind;
+                    validationErrorText = validManualValue.Message;
                 }
             }
 

@@ -26,7 +26,6 @@
 namespace CDP4Reporting.Tests.DataCollection
 {
     using System;
-    using System.Globalization;
 
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -175,10 +174,8 @@ namespace CDP4Reporting.Tests.DataCollection
         public void VerifyThatInvariantGroupSeparatedNumberIsNormalized()
         {
             var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
-            var result = this.processedValueSetGenerator.NormalizeValue("1,234.56", quantityKind, out var isValid, out var errorText);
+            var result = this.processedValueSetGenerator.NormalizeNumericValue("1,234.56", quantityKind);
 
-            Assert.That(isValid, Is.True);
-            Assert.That(errorText, Is.Empty);
             Assert.That(result, Is.EqualTo("1234.56"));
         }
 
@@ -186,40 +183,17 @@ namespace CDP4Reporting.Tests.DataCollection
         public void VerifyThatPlainInvariantNumberIsUnchanged()
         {
             var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
-            var result = this.processedValueSetGenerator.NormalizeValue("1234.56", quantityKind, out var isValid, out _);
+            var result = this.processedValueSetGenerator.NormalizeNumericValue("1234.56", quantityKind);
 
-            Assert.That(isValid, Is.True);
             Assert.That(result, Is.EqualTo("1234.56"));
         }
 
         [Test]
-        public void VerifyThatCurrentCultureFormattedNumberIsNormalized()
-        {
-            var originalCulture = CultureInfo.CurrentCulture;
-
-            try
-            {
-                CultureInfo.CurrentCulture = CultureInfo.GetCultureInfo("nl-NL");
-                var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
-                var result = this.processedValueSetGenerator.NormalizeValue("1.234,56", quantityKind, out var isValid, out _);
-
-                Assert.That(isValid, Is.True);
-                Assert.That(result, Is.EqualTo("1234.56"));
-            }
-            finally
-            {
-                CultureInfo.CurrentCulture = originalCulture;
-            }
-        }
-
-        [Test]
-        public void VerifyThatUnparsableNumberIsFlaggedInvalid()
+        public void VerifyThatUnparsableNumberIsLeftUnchangedForValidation()
         {
             var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
-            var result = this.processedValueSetGenerator.NormalizeValue("not-a-number", quantityKind, out var isValid, out var errorText);
+            var result = this.processedValueSetGenerator.NormalizeNumericValue("not-a-number", quantityKind);
 
-            Assert.That(isValid, Is.False);
-            Assert.That(errorText, Is.Not.Empty);
             Assert.That(result, Is.EqualTo("not-a-number"));
         }
 
@@ -227,9 +201,8 @@ namespace CDP4Reporting.Tests.DataCollection
         public void VerifyThatDefaultMarkerIsPreserved()
         {
             var quantityKind = new SimpleQuantityKind(Guid.NewGuid(), null, null) { Name = "mass" };
-            var result = this.processedValueSetGenerator.NormalizeValue("-", quantityKind, out var isValid, out _);
+            var result = this.processedValueSetGenerator.NormalizeNumericValue("-", quantityKind);
 
-            Assert.That(isValid, Is.True);
             Assert.That(result, Is.EqualTo("-"));
         }
 
@@ -237,9 +210,8 @@ namespace CDP4Reporting.Tests.DataCollection
         public void VerifyThatNonNumericParameterTypeValueIsUnchanged()
         {
             var textParameterType = new TextParameterType(Guid.NewGuid(), null, null) { Name = "text" };
-            var result = this.processedValueSetGenerator.NormalizeValue("1,234", textParameterType, out var isValid, out _);
+            var result = this.processedValueSetGenerator.NormalizeNumericValue("1,234", textParameterType);
 
-            Assert.That(isValid, Is.True);
             Assert.That(result, Is.EqualTo("1,234"));
         }
     }
