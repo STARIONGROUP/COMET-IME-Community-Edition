@@ -407,6 +407,16 @@ namespace CDP4Composition.Mvvm
         public ReactiveCommand<Unit, Unit> CollpaseRowsCommand { get; private set; }
 
         /// <summary>
+        /// Gets the Expand All Rows Command that expands every root row of the browser and its descendants
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> ExpandAllRowsCommand { get; private set; }
+
+        /// <summary>
+        /// Gets the Collapse All Rows Command that collapses every root row of the browser and its descendants
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CollapseAllRowsCommand { get; private set; }
+
+        /// <summary>
         /// Gets the Context Menu for this browser
         /// </summary>
         public ReactiveList<ContextMenuItemViewModel> ContextMenu { get; private set; }
@@ -847,6 +857,13 @@ namespace CDP4Composition.Mvvm
         }
 
         /// <summary>
+        /// Gets the top-level rows of this browser, used by the <see cref="ExpandAllRowsCommand"/> and
+        /// <see cref="CollapseAllRowsCommand"/>. Returns an empty collection by default; browsers that present
+        /// a tree should override this to return their root <see cref="IRowViewModelBase{T}"/>s.
+        /// </summary>
+        protected virtual IEnumerable<IRowViewModelBase<Thing>> RootRowViewModels => Enumerable.Empty<IRowViewModelBase<Thing>>();
+
+        /// <summary>
         /// Executes the expand rows logic
         /// </summary>
         private void ExecuteExpandRows()
@@ -869,6 +886,28 @@ namespace CDP4Composition.Mvvm
             if (rowViewModelBase != null)
             {
                 rowViewModelBase.CollapseAllRows();
+            }
+        }
+
+        /// <summary>
+        /// Executes the expand all rows logic, expanding every root row of the browser and its descendants
+        /// </summary>
+        private void ExecuteExpandAllRows()
+        {
+            foreach (var row in this.RootRowViewModels)
+            {
+                row.ExpandAllRows();
+            }
+        }
+
+        /// <summary>
+        /// Executes the collapse all rows logic, collapsing every root row of the browser and its descendants
+        /// </summary>
+        private void ExecuteCollapseAllRows()
+        {
+            foreach (var row in this.RootRowViewModels)
+            {
+                row.CollapseAllRows();
             }
         }
 
@@ -900,6 +939,8 @@ namespace CDP4Composition.Mvvm
             this.ChangeFocusCommand = ReactiveCommandCreator.Create(this.ExecuteChangeFocusCommand);
             this.ExpandRowsCommand = ReactiveCommandCreator.Create(this.ExecuteExpandRows);
             this.CollpaseRowsCommand = ReactiveCommandCreator.Create(this.ExecuteCollapseRows);
+            this.ExpandAllRowsCommand = ReactiveCommandCreator.Create(this.ExecuteExpandAllRows);
+            this.CollapseAllRowsCommand = ReactiveCommandCreator.Create(this.ExecuteCollapseAllRows);
 
             var iteration = this.Thing as Iteration ?? this.Thing.GetContainerOfType<Iteration>();
 
@@ -972,6 +1013,23 @@ namespace CDP4Composition.Mvvm
                     this.ContextMenu.Add(new ContextMenuItemViewModel("Expand Rows", "", this.ExpandRowsCommand, MenuItemKind.None, ClassKind.NotThing));
                 }
             }
+
+            this.AddExpandCollapseAllContextMenuItems();
+        }
+
+        /// <summary>
+        /// Adds the "Expand All Rows" and "Collapse All Rows" <see cref="ContextMenuItemViewModel"/>s to the
+        /// <see cref="ContextMenu"/> when this browser exposes root rows (see <see cref="RootRowViewModels"/>).
+        /// </summary>
+        protected void AddExpandCollapseAllContextMenuItems()
+        {
+            if (!this.RootRowViewModels.Any())
+            {
+                return;
+            }
+
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Expand All Rows", "", this.ExpandAllRowsCommand, MenuItemKind.None, ClassKind.NotThing));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Collapse All Rows", "", this.CollapseAllRowsCommand, MenuItemKind.None, ClassKind.NotThing));
         }
 
         /// <summary>

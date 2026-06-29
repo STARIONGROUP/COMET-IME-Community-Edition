@@ -653,29 +653,73 @@ namespace CDP4EngineeringModel.Tests
 
             vm.SelectedThing = defRow;
             vm.PopulateContextMenu();
-            Assert.AreEqual(15, vm.ContextMenu.Count);
+            Assert.AreEqual(17, vm.ContextMenu.Count);
             vm.SelectedThing = defRow.ContainedRows[0];
             vm.PopulateContextMenu();
-            Assert.AreEqual(10, vm.ContextMenu.Count);
+            Assert.AreEqual(12, vm.ContextMenu.Count);
 
             vm.SelectedThing = defRow.ContainedRows[1];
             vm.PopulateContextMenu();
-            Assert.AreEqual(9, vm.ContextMenu.Count);
+            Assert.AreEqual(11, vm.ContextMenu.Count);
 
             var usageRow = defRow.ContainedRows[2];
             var usage2Row = defRow.ContainedRows[3];
 
             vm.SelectedThing = usageRow;
             vm.PopulateContextMenu();
-            Assert.AreEqual(6, vm.ContextMenu.Count);
+            Assert.AreEqual(8, vm.ContextMenu.Count);
 
             vm.SelectedThing = usageRow.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(10, vm.ContextMenu.Count);
+            Assert.AreEqual(12, vm.ContextMenu.Count);
 
             vm.SelectedThing = usage2Row.ContainedRows.Single();
             vm.PopulateContextMenu();
-            Assert.AreEqual(8, vm.ContextMenu.Count);
+            Assert.AreEqual(10, vm.ContextMenu.Count);
+
+            vm.Dispose();
+        }
+
+        [Test]
+        public async Task VerifyThatExpandAllAndCollapseAllRowsCommandsWork()
+        {
+            var parameter = new Parameter(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ParameterType = this.pt
+            };
+
+            var def2 = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            var usage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri)
+            {
+                ElementDefinition = def2
+            };
+
+            this.elementDef.Parameter.Add(parameter);
+            this.elementDef.ContainedElement.Add(usage);
+
+            this.iteration.Element.Add(this.elementDef);
+            this.iteration.Element.Add(def2);
+
+            var vm = new ElementDefinitionsBrowserViewModel(this.iteration, this.session.Object, null, null, null, null, null, null);
+            await this.DelayedCheck(() => vm.SingleRunBackgroundWorker == null);
+
+            var defRow = vm.ElementDefinitionRowViewModels.Single(x => x.Thing == this.elementDef);
+
+            await vm.ExpandAllRowsCommand.Execute();
+
+            Assert.IsTrue(vm.ElementDefinitionRowViewModels.All(x => x.IsExpanded));
+            Assert.IsTrue(defRow.ContainedRows.All(x => x.IsExpanded));
+
+            await vm.CollapseAllRowsCommand.Execute();
+
+            Assert.IsTrue(vm.ElementDefinitionRowViewModels.All(x => !x.IsExpanded));
+            Assert.IsTrue(defRow.ContainedRows.All(x => !x.IsExpanded));
+
+            vm.SelectedThing = defRow;
+            vm.PopulateContextMenu();
+
+            Assert.IsTrue(vm.ContextMenu.Any(x => x.Header == "Expand All Rows"));
+            Assert.IsTrue(vm.ContextMenu.Any(x => x.Header == "Collapse All Rows"));
 
             vm.Dispose();
         }
