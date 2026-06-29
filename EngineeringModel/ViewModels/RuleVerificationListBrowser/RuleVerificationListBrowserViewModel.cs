@@ -26,6 +26,7 @@
 namespace CDP4EngineeringModel.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -38,6 +39,7 @@ namespace CDP4EngineeringModel.ViewModels
 
     using CDP4Composition;
     using CDP4Composition.DragDrop;
+    using CDP4Composition.Events;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
@@ -201,6 +203,12 @@ namespace CDP4EngineeringModel.ViewModels
         public ReactiveCommand<Unit, Unit> VerifyRuleVerificationList { get; private set; }
 
         /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> used to highlight the selected violating <see cref="Thing"/>
+        /// in the other open browsers
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> HighlightCommand { get; private set; }
+
+        /// <summary>
         /// Gets the active <see cref="Participant"/>
         /// </summary>
         public Participant ActiveParticipant { get; private set; }
@@ -275,6 +283,8 @@ namespace CDP4EngineeringModel.ViewModels
             this.VerifyRuleVerificationList = ReactiveCommandCreator.CreateAsyncTask(
                 this.ExecuteVerifyRuleVerificationList,
                 this.WhenAnyValue(x => x.CanVerifyVerificationList));
+
+            this.HighlightCommand = ReactiveCommandCreator.Create(this.ExecuteHighlightCommand);
         }
 
         /// <summary>
@@ -313,6 +323,68 @@ namespace CDP4EngineeringModel.ViewModels
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Create a BuiltIn Rule Verification", "", this.CreateBuiltInRuleVerification, MenuItemKind.Create, ClassKind.BuiltInRuleVerification));
 
                 this.ContextMenu.Add(new ContextMenuItemViewModel("Execute the Rule Verification List", "", this.VerifyRuleVerificationList, MenuItemKind.None, ClassKind.NotThing));
+            }
+
+            if (this.SelectedThing != null && this.QueryViolatingThings(this.SelectedThing).Any())
+            {
+                this.ContextMenu.Add(new ContextMenuItemViewModel("Highlight the violating Things in the open Browsers", "", this.HighlightCommand, MenuItemKind.Highlight, ClassKind.NotThing));
+            }
+        }
+
+        /// <summary>
+        /// Executes the <see cref="HighlightCommand"/> by sending a <see cref="HighlightEvent"/> for each violating
+        /// <see cref="Thing"/> that is contained by the selected row, so that they are all highlighted in the other
+        /// open browsers. This works for a single violating <see cref="Thing"/> row as well as for a parent
+        /// <see cref="RuleViolation"/>, <see cref="RuleVerification"/> or <see cref="RuleVerificationList"/> row.
+        /// </summary>
+        private void ExecuteHighlightCommand()
+        {
+            this.CDPMessageBus.SendMessage(new CancelHighlightEvent());
+
+            if (this.SelectedThing == null)
+            {
+                return;
+            }
+
+            var violatingThings = this.QueryViolatingThings(this.SelectedThing).Distinct().ToList();
+
+            foreach (var violatingThing in violatingThings)
+            {
+                this.CDPMessageBus.SendMessage(new HighlightEvent(violatingThing), violatingThing);
+                this.CDPMessageBus.SendMessage(new HighlightEvent(violatingThing), null);
+                
+                if (violatingThing is ElementDefinition elementDefinition)
+                {
+                    this.CDPMessageBus.SendMessage(new ElementUsageHighlightEvent(elementDefinition), elementDefinition);
+                    this.CDPMessageBus.SendMessage(new ElementUsageHighlightEvent(elementDefinition), null);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Recursively queries the violating <see cref="Thing"/>s that are represented by the
+        /// <see cref="ViolatingThingRowViewModel"/>s contained by (or equal to) the provided row.
+        /// </summary>
+        /// <param name="row">The row to query.</param>
+        /// <returns>The violating <see cref="Thing"/>s found below the provided row.</returns>
+        private IEnumerable<Thing> QueryViolatingThings(IRowViewModelBase<Thing> row)
+        {
+            if (row is ViolatingThingRowViewModel violatingThingRow)
+            {
+                if (violatingThingRow.Thing != null)
+                {
+                    yield return violatingThingRow.Thing;
+                }
+
+                yield break;
+            }
+
+            foreach (var containedRow in row.ContainedRows)
+            {
+                foreach (var violatingThing in this.QueryViolatingThings(containedRow))
+                {
+                    yield return violatingThing;
+                }
             }
         }
 

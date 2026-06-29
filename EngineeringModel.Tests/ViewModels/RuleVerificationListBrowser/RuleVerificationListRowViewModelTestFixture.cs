@@ -395,5 +395,64 @@ namespace CDP4EngineeringModel.Tests.ViewModels.RuleVerificationListBrowser
             this.messageBus.SendObjectChangeEvent(userRuleVerification, EventKind.Updated);
             Assert.IsEmpty(userRow.ContainedRows);
         }
+
+        [Test]
+        public void VerifyThatViolatingThingsAreResolvedToRowsWithNamesAndShortNames()
+        {
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Name = "Battery",
+                ShortName = "bat",
+                Owner = this.domain
+            };
+
+            this.cache.TryAdd(new CacheKey(elementDefinition.Iid, this.iteration.Iid), new Lazy<Thing>(() => elementDefinition));
+
+            var ruleVerificationList = new RuleVerificationList(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Owner = this.domain
+            };
+
+            this.iteration.RuleVerificationList.Add(ruleVerificationList);
+
+            var builtInRuleVerification = new BuiltInRuleVerification(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Name = "BuiltIn",
+                Status = RuleVerificationStatusKind.INCONCLUSIVE,
+                IsActive = true
+            };
+
+            ruleVerificationList.RuleVerification.Add(builtInRuleVerification);
+
+            var listRowViewModel = new RuleVerificationListRowViewModel(ruleVerificationList, this.session.Object, null);
+
+            var builtInRow = listRowViewModel.ContainedRows.Single(x => x.Thing == builtInRuleVerification);
+
+            var violation = new RuleViolation(Guid.NewGuid(), this.cache, this.uri)
+            {
+                Description = "The Element Definition does not contain the required parameters."
+            };
+
+            violation.ViolatingThing.Add(elementDefinition.Iid);
+
+            builtInRuleVerification.Violation.Add(violation);
+            this.revision.SetValue(builtInRuleVerification, 10);
+            this.messageBus.SendObjectChangeEvent(builtInRuleVerification, EventKind.Updated);
+
+            var violationRow = builtInRow.ContainedRows.OfType<RuleViolationRowViewModel>().Single();
+            Assert.AreEqual(violation.Description, violationRow.Tooltip);
+
+            var violatingThingRow = violationRow.ContainedRows.OfType<ViolatingThingRowViewModel>().Single();
+            Assert.AreEqual(elementDefinition, violatingThingRow.Thing);
+            Assert.AreEqual("Battery", violatingThingRow.Name);
+            Assert.AreEqual("bat", violatingThingRow.ShortName);
+            Assert.AreEqual(this.domain.ShortName, violatingThingRow.OwnerName);
+
+            // the violation row (and its resolved violating thing) is removed when the violation is cleared
+            builtInRuleVerification.Violation.Clear();
+            this.revision.SetValue(builtInRuleVerification, 20);
+            this.messageBus.SendObjectChangeEvent(builtInRuleVerification, EventKind.Updated);
+            Assert.IsEmpty(builtInRow.ContainedRows);
+        }
     }
 }

@@ -28,6 +28,7 @@ namespace CDP4Composition.Services
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Linq;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
 
@@ -151,7 +152,7 @@ namespace CDP4Composition.Services
 
                 if (builtInRuleVerification != null && builtInRuleVerification.IsActive)
                 {
-                    this.Execute(session, builtInRuleVerification, verificationList);
+                    await this.ExecuteAsync(session, builtInRuleVerification, verificationList);
                 }
 
                 var userRuleVerification = ruleVerification as UserRuleVerification;
@@ -175,7 +176,7 @@ namespace CDP4Composition.Services
         /// <param name="container">
         /// The container <see cref="RuleVerificationList"/> of the <paramref name="userRuleVerification"/>
         /// </param>
-        private void Execute(ISession session, BuiltInRuleVerification builtInRuleVerification, RuleVerificationList container)
+        private async Task ExecuteAsync(ISession session, BuiltInRuleVerification builtInRuleVerification, RuleVerificationList container)
         {
             var iteration = (Iteration)container.Container;
 
@@ -200,9 +201,11 @@ namespace CDP4Composition.Services
                 return;
             }
 
-            var violations = builtInRule.Verify(iteration);
+            var violations = builtInRule.Verify(iteration).ToList();
 
-            this.UpdateExecutedOn(session, builtInRuleVerification);
+            var status = violations.Any() ? RuleVerificationStatusKind.FAILED : RuleVerificationStatusKind.PASSED;
+            
+            await this.UpdateExecutedOnAsync(session, builtInRuleVerification, status);
 
             builtInRuleVerification.Violation.AddRange(violations);
 
@@ -242,10 +245,10 @@ namespace CDP4Composition.Services
             }
 
             userRuleVerification.Violation.Clear();
-            userRuleVerification.Status = RuleVerificationStatusKind.PASSED;
 
             session.CDPMessageBus.SendObjectChangeEvent(userRuleVerification, EventKind.Updated);
 
+            var status = RuleVerificationStatusKind.PASSED;
             IEnumerable<RuleViolation> violations = null;
 
             switch (userRuleVerification.Rule.ClassKind)
@@ -274,12 +277,14 @@ namespace CDP4Composition.Services
 
             if (violations is not null)
             {
-                userRuleVerification.Status = RuleVerificationStatusKind.FAILED;
+                var violationList = violations.ToList();
+
+                status = violationList.Any() ? RuleVerificationStatusKind.FAILED : RuleVerificationStatusKind.PASSED;
 
                 IDisposable subscription = null;
 
-                //Listen for changes to the verification rule that will happen after UpdateExecutedOn in order to get the updated version.
-                //The violations must be added lastly as they are not persistent 
+                //Listen for changes to the verification rule that will happen after UpdateExecutedOnAsync in order to get the updated version.
+                //The violations must be added lastly as they are not persistent
                 subscription = session.CDPMessageBus.Listen<ObjectChangedEvent>(userRuleVerification)
                     .Where(objectChange => objectChange.EventKind == EventKind.Updated)
                     .ObserveOn(RxApp.MainThreadScheduler)
@@ -290,22 +295,23 @@ namespace CDP4Composition.Services
                             subscription.Dispose();
 
                             var verification = updated.ChangedThing as UserRuleVerification;
-                            verification.Violation.AddRange(violations);
+                            verification.Violation.AddRange(violationList);
 
                             session.CDPMessageBus.SendObjectChangeEvent(verification, EventKind.Updated);
 
-                            foreach (var ruleViolation in violations)
+                            foreach (var ruleViolation in violationList)
                             {
                                 session.CDPMessageBus.SendObjectChangeEvent(ruleViolation, EventKind.Added);
                             }
                         });
             }
 
-            await this.UpdateExecutedOn(session, userRuleVerification);
+            await this.UpdateExecutedOnAsync(session, userRuleVerification, status);
         }
 
         /// <summary>
-        /// Updates the Executed On property of the <paramref name="ruleVerification"/> in the data-source
+        /// Updates the <see cref="RuleVerification.ExecutedOn"/> and <see cref="RuleVerification.Status"/> properties of
+        /// the <paramref name="ruleVerification"/> in the data-source.
         /// </summary>
         /// <param name="session">
         /// The <see cref="ISession"/> instance used to update the contained <see cref="RuleVerification"/> instances on the data-source.
@@ -313,8 +319,15 @@ namespace CDP4Composition.Services
         /// <param name="ruleVerification">
         /// The <see cref="RuleVerification"/> that is to be updated.
         /// </param>
+        /// <param name="status">
+        /// The <see cref="RuleVerificationStatusKind"/> that reflects the outcome of the verification and that is to be persisted.
+        /// </param>
         /// <returns>An awaitable <see cref="Task"/></returns>
-        private async Task UpdateExecutedOn(ISession session, RuleVerification ruleVerification)
+        /// <remarks>
+        /// The <paramref name="status"/> is set on the clone so that it is part of the write transaction. If it were only
+        /// set on the cached instance, the data-source round-trip would echo the previously stored status and reset it.
+        /// </remarks>
+        private async Task UpdateExecutedOnAsync(ISession session, RuleVerification ruleVerification, RuleVerificationStatusKind status)
         {
             try
             {
@@ -323,8 +336,12 @@ namespace CDP4Composition.Services
                 var transactionContext = TransactionContextResolver.ResolveContext(ruleVerification);
                 var transaction = new ThingTransaction(transactionContext, clone);
                 clone.ExecutedOn = DateTime.UtcNow;
+                clone.Status = status;
 
                 var operationContainer = transaction.FinalizeTransaction();
+
+                ruleVerification.Status = status;
+
                 await session.Write(operationContainer);
             }
             catch (Exception ex)
