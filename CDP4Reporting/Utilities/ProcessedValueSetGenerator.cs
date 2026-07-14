@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ProcessedValueSetGenerator.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2023 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 //
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 //
@@ -172,6 +172,39 @@ namespace CDP4Reporting.Utilities
         }
 
         /// <summary>
+        /// Normalizes a numeric value <see cref="string"/> to the invariant culture using the SDK's
+        /// ECSS-E-TM-10-25 aware <see cref="ValueSetConverter.TryParseDouble"/>, so that values coming from a
+        /// report control that are formatted with group separators (e.g. an "N2" formatted value) are written
+        /// back to the model correctly. Non-numeric <see cref="ParameterType"/>s and the default "-" marker are
+        /// returned unchanged; validation of the result is left to the SDK's
+        /// <see cref="ValueValidator.Validate(ParameterType, object, MeasurementScale, IFormatProvider)"/>.
+        /// </summary>
+        /// <param name="value">
+        /// The value <see cref="string"/> as received from the report control.
+        /// </param>
+        /// <param name="parameterType">
+        /// The <see cref="ParameterType"/> the <paramref name="value"/> belongs to.
+        /// </param>
+        /// <returns>
+        /// The normalized, invariant-culture value <see cref="string"/> for a numeric <see cref="QuantityKind"/>,
+        /// or the original <paramref name="value"/> when it is not numeric, is the default marker, or cannot be parsed.
+        /// </returns>
+        public string NormalizeNumericValue(string value, ParameterType parameterType)
+        {
+            if (!(parameterType is QuantityKind) || string.IsNullOrWhiteSpace(value) || value.Trim().Equals(ValueSetConverter.DefaultObject(parameterType)))
+            {
+                return value;
+            }
+
+            if (ValueSetConverter.TryParseDouble(value, parameterType, out var doubleValue))
+            {
+                return doubleValue.ToString(CultureInfo.InvariantCulture);
+            }
+
+            return value;
+        }
+
+        /// <summary>
         /// Process the <see cref="ParameterValueSet"/> .
         /// </summary>
         /// <param name="parameterValueSet">
@@ -210,10 +243,7 @@ namespace CDP4Reporting.Utilities
 
             if (parameterType != null)
             {
-                if (ValueSetConverter.TryParseDouble(computedValue, parameterType, out var convertedComputedValue))
-                {
-                    computedValue = convertedComputedValue.ToString(CultureInfo.InvariantCulture);
-                }
+                computedValue = this.NormalizeNumericValue(computedValue, parameterType);
 
                 computedValue = computedValue?.ToValueSetObject(parameterType).ToValueSetString(parameterType) ?? parameterValueSet.Computed[componentIndex];
 
@@ -285,6 +315,8 @@ namespace CDP4Reporting.Utilities
 
             if (parameterType != null)
             {
+                computedValue = this.NormalizeNumericValue(computedValue, parameterType);
+
                 computedValue = computedValue.ToValueSetObject(parameterType).ToValueSetString(parameterType);
 
                 var validManualValue = parameterType.Validate(computedValue, measurementScale, provider);
