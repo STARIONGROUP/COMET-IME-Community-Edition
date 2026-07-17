@@ -33,6 +33,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
     using BasicRdl.ViewModels;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -235,7 +236,7 @@ namespace BasicRdl.Tests.ViewModels.Dialogs.Rows
             var transactionContext = TransactionContextResolver.ResolveContext(this.siteDir);
             var transaction = new ThingTransaction(transactionContext);
             var viewmodel = new CompoundParameterTypeDialogViewModel(this.compoundPt, transaction, this.session.Object, true, ThingDialogKind.Create, null);
-            var parameterTypeComponent = new ParameterTypeComponent() { ShortName = "Acc" };
+            var parameterTypeComponent = new ParameterTypeComponent() { ShortName = "Acc", ParameterType = this.bpt};
             var parameterTypeComponentVm = new ParameterTypeComponentRowViewModel(parameterTypeComponent, this.session.Object, viewmodel);
 
             var newValue = parameterTypeComponentVm["ShortName"]; //Normally gets called from the UI

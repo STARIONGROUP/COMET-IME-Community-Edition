@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CDP4Common-CE" Version="30.1.1" />
+    <PackageReference Include="CDP4Common-CE" Version="30.1.2" />
   </ItemGroup>
 
   <ItemGroup>
