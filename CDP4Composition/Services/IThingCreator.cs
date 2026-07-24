@@ -85,6 +85,21 @@ namespace CDP4Composition.Services
         Task CreateElementUsage(ElementDefinition container, ElementDefinition referencedDefinition, DomainOfExpertise owner, ISession session);
 
         /// <summary>
+        /// Moves an existing <see cref="ElementUsage"/> into another <see cref="ElementDefinition"/>, preserving all of its properties
+        /// (name, short-name, owner, excluded options and contained <see cref="ParameterOverride"/>s).
+        /// </summary>
+        /// <param name="elementUsage">
+        /// The <see cref="ElementUsage"/> that is to be moved.
+        /// </param>
+        /// <param name="targetElementDefinition">
+        /// The <see cref="ElementDefinition"/> that becomes the new container of the <see cref="ElementUsage"/>.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the move is performed.
+        /// </param>
+        Task MoveElementUsage(ElementUsage elementUsage, ElementDefinition targetElementDefinition, ISession session);
+
+        /// <summary>
         /// Method for creating a <see cref="BinaryRelationship"/> for requirement verification between a <see cref="ParameterOrOverrideBase"/> and a <see cref="RelationalExpression"/>.
         /// </summary>
         /// <param name="session">The <see cref="Session"/> for which the <see cref="BinaryRelationship"/> will be created</param>

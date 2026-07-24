@@ -227,5 +227,63 @@ namespace CDP4EngineeringModel.Tests.Utilities
 
             Assert.ThrowsAsync<Exception>(async () => await this.thingCreator.CreateElementUsage(elementDefinitionA, elementDefinitionB, domainOfExpertise, this.sessionThatThrowsException.Object));
         }
+
+        [Test]
+        public async Task VerifyThatMoveElementUsageExecutesWrite()
+        {
+            var elementUsage = this.SetupElementUsageToRelocate(out var targetDefinition);
+
+            await this.thingCreator.MoveElementUsage(elementUsage, targetDefinition, this.session.Object);
+
+            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()));
+        }
+
+        [Test]
+        public void VerifyThatArgumentNullExceptionsAreThrownOnMoveElementUsage()
+        {
+            var elementUsage = this.SetupElementUsageToRelocate(out var targetDefinition);
+
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.MoveElementUsage(null, targetDefinition, this.session.Object));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.MoveElementUsage(elementUsage, null, this.session.Object));
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await this.thingCreator.MoveElementUsage(elementUsage, targetDefinition, null));
+        }
+
+        [Test]
+        public void VerifyThatExceptionIsThrownWhenMoveElementUsageFails()
+        {
+            var elementUsage = this.SetupElementUsageToRelocate(out var targetDefinition);
+
+            Assert.ThrowsAsync<Exception>(async () => await this.thingCreator.MoveElementUsage(elementUsage, targetDefinition, this.sessionThatThrowsException.Object));
+        }
+
+        /// <summary>
+        /// Builds a model with a source and a target <see cref="ElementDefinition"/> and an <see cref="ElementUsage"/> contained by
+        /// the source that references a third <see cref="ElementDefinition"/>.
+        /// </summary>
+        /// <param name="targetDefinition">The target <see cref="ElementDefinition"/> to move the usage into.</param>
+        /// <returns>The <see cref="ElementUsage"/> to relocate.</returns>
+        private ElementUsage SetupElementUsageToRelocate(out ElementDefinition targetDefinition)
+        {
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, null);
+            var engineeringModel = new EngineeringModel(Guid.NewGuid(), this.cache, null);
+            var iteration = new Iteration(Guid.NewGuid(), this.cache, null);
+            engineeringModel.Iteration.Add(iteration);
+
+            var sourceDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, null) { Owner = domainOfExpertise };
+            targetDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, null) { Owner = domainOfExpertise };
+            var referencedDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, null) { Owner = domainOfExpertise };
+
+            iteration.Element.Add(sourceDefinition);
+            iteration.Element.Add(targetDefinition);
+            iteration.Element.Add(referencedDefinition);
+
+            var elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, null) { Owner = domainOfExpertise, ElementDefinition = referencedDefinition, Name = "usage", ShortName = "usage" };
+            sourceDefinition.ContainedElement.Add(elementUsage);
+
+            // the usage must be cache-resident, as it always is at runtime
+            this.cache.TryAdd(new CacheKey(elementUsage.Iid, iteration.Iid), new Lazy<Thing>(() => elementUsage));
+
+            return elementUsage;
+        }
     }
 }

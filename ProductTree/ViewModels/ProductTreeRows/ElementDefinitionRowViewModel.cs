@@ -349,6 +349,12 @@ namespace CDP4ProductTree.ViewModels
         /// </remarks>
         public void DragOver(IDropInfo dropInfo)
         {
+            if (dropInfo.Payload is ElementUsage elementUsage)
+            {
+                dropInfo.Effects = ElementUsageDropValidator.GetDropEffect(elementUsage, this.Thing, this.PermissionService);
+                return;
+            }
+
             if (dropInfo.Payload is ElementDefinition elementDefinition)
             {
                 this.DragOver(dropInfo, elementDefinition);
@@ -366,9 +372,39 @@ namespace CDP4ProductTree.ViewModels
         /// </param>
         public async Task Drop(IDropInfo dropInfo)
         {
+            if (dropInfo.Payload is ElementUsage elementUsage)
+            {
+                await this.Drop(dropInfo, elementUsage);
+                return;
+            }
+
             if (dropInfo.Payload is ElementDefinition elementDefinition)
             {
                 await this.Drop(dropInfo, elementDefinition);
+            }
+        }
+
+        /// <summary>
+        /// Handle the drop of an <see cref="ElementUsage"/> by moving it into this <see cref="ElementDefinition"/>,
+        /// preserving its name, short-name, owner and contained <see cref="ParameterOverride"/>s.
+        /// </summary>
+        /// <param name="dropInfo">The <see cref="IDropInfo"/> containing the payload</param>
+        /// <param name="elementUsage">The <see cref="ElementUsage"/></param>
+        private async Task Drop(IDropInfo dropInfo, ElementUsage elementUsage)
+        {
+            if (dropInfo.Effects != DragDropEffects.Move)
+            {
+                return;
+            }
+
+            try
+            {
+                await this.ThingCreator.MoveElementUsage(elementUsage, this.Thing, this.Session);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                this.ErrorMsg = ex.Message;
             }
         }
 

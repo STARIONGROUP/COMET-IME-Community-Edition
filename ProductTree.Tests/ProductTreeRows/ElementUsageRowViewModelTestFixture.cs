@@ -84,11 +84,13 @@ namespace ProductTree.Tests.ProductTreeRows
         private ElementDefinition elementDef3;
         private ElementDefinition elementDef4;
         private ElementDefinition elementDef5;
+        private ElementDefinition elementDef6;
         private DomainOfExpertise domain;
         private ElementUsage elementUsage;
         private ElementUsage elementUsage4;
         private ElementUsage elementUsage5;
         private ElementUsage elementUsage6;
+        private ElementUsage elementUsage7;
         private ParameterValueSet valueSet;
         private ParameterOverrideValueSet valueSetOverride;
 
@@ -156,6 +158,13 @@ namespace ProductTree.Tests.ProductTreeRows
 
             this.elementUsage6 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
                 { ElementDefinition = this.elementDef4, Container = this.elementDef5, Owner = this.domain, Name = "Element usage 6", ShortName = "EU6" };
+
+            this.elementDef6 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+
+            this.elementUsage7 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri)
+                { ElementDefinition = this.elementDef6, Owner = this.domain, Name = "Element usage 7", ShortName = "EU7" };
+
+            this.elementDef3.ContainedElement.Add(this.elementUsage7);
 
             this.valueSet = new ParameterValueSet(Guid.NewGuid(), this.cache, this.uri);
             this.valueSet.Published = new ValueArray<string>(new List<string> { "1" });
@@ -443,6 +452,36 @@ namespace ProductTree.Tests.ProductTreeRows
             await vm.Drop(dropinfo.Object);
 
             this.thingCreator.Verify(x => x.CreateElementUsage(this.elementUsage.ElementDefinition, It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), It.IsAny<ISession>()));
+        }
+
+        [Test]
+        public void VerifyThatDragOverElementUsageSetsMoveEffect()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementUsage7);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.Move, dropinfo.Object.Effects);
+        }
+
+        [Test]
+        public async Task VerifyThatDropMovesElementUsage()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementUsageRowViewModel(this.elementUsage, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementUsage7);
+            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
+
+            await vm.Drop(dropinfo.Object);
+
+            this.thingCreator.Verify(x => x.MoveElementUsage(this.elementUsage7, this.elementDef2, this.session.Object));
         }
 
         [Test]
