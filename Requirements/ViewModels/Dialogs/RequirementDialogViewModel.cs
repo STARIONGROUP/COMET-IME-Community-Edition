@@ -66,6 +66,11 @@ namespace CDP4Requirements.ViewModels
         private string shortName;
 
         /// <summary>
+        /// Backing field for <see cref="Name"/> property
+        /// </summary>
+        private string name;
+
+        /// <summary>
         /// The Required Referance-Data-library for the current <see cref="Iteration"/>
         /// </summary>
         private ModelReferenceDataLibrary mRdl;
@@ -214,6 +219,16 @@ namespace CDP4Requirements.ViewModels
         {
             get { return this.shortName; }
             set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Name
+        /// </summary>
+        [ValidationOverride(true, "RequirementName")]
+        public override string Name
+        {
+            get { return this.name; }
+            set { this.RaiseAndSetIfChanged(ref this.name, value); }
         }
 
         /// <summary>

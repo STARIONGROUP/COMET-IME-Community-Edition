@@ -42,6 +42,21 @@ namespace CDP4Composition.Services
     public class ImeValidationService : ValidationService, IImeValidationService
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="ImeValidationService" /> class.
+        /// </summary>
+        public ImeValidationService()
+        {
+            // Allow a Requirement, RequirementsGroup or RequirementsSpecification Name to start with a digit (see GitHub issue #1460).
+            // Same intent as the default "Name" rule, but the first character may also be a digit.
+            this.ValidationMap["RequirementName"] = new ValidationRule
+            {
+                PropertyName = "Name",
+                Rule = @"^([\p{L}\d]|[\p{L}\d][^()]*[^()\s])$",
+                ErrorText = "The Name must start with a letter or a digit and not contain any parentheses or trailing spaces."
+            };
+        }
+
+        /// <summary>
         /// Validates a property of a <see cref="DialogViewModelBase{T}" />.
         /// </summary>
         /// <param name="propertyName">

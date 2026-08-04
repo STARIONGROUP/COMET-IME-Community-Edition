@@ -177,5 +177,21 @@ namespace CDP4Requirements.Tests.Dialogs
             Assert.That(((ICommand)vm.CreateGroupCommand).CanExecute(null), Is.False);
             Assert.That(((ICommand)vm.EditGroupCommand).CanExecute(null), Is.False);
         }
+
+        [Test]
+        public void VerifyThatNameAndShortNameCanStartWithADigit()
+        {
+            var clone = this.reqSpec.Clone(true);
+            this.thingTransaction.CreateOrUpdate(clone);
+
+            var vm = new RequirementsGroupDialogViewModel(this.reqGroup, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Create, null, clone);
+
+            vm.ShortName = "1group";
+            vm.Name = "1 group";
+
+            Assert.That(vm["ShortName"], Is.Null);
+            Assert.That(vm["Name"], Is.Null);
+        }
     }
 }

@@ -167,6 +167,16 @@ namespace CDP4Requirements.Tests
         }
 
         [Test]
+        public void VerifyThatNameAndShortNameCanStartWithADigit()
+        {
+            this.viewmodel.ShortName = "1spec";
+            this.viewmodel.Name = "1 spec";
+
+            Assert.That(this.viewmodel["ShortName"], Is.Null);
+            Assert.That(this.viewmodel["Name"], Is.Null);
+        }
+
+        [Test]
         public async Task VerifyThatOkCommandWorks()
         {
             await this.viewmodel.OkCommand.Execute();
