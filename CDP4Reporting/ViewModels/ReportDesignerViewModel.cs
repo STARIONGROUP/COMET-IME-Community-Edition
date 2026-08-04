@@ -27,13 +27,16 @@ namespace CDP4Reporting.ViewModels
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Data;
     using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
     using System.Reactive;
     using System.Reactive.Linq;
+    using System.Reflection;
     using System.Reactive.Threading.Tasks;
     using System.Text;
     using System.Threading.Tasks;
@@ -42,6 +45,7 @@ namespace CDP4Reporting.ViewModels
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.Helpers;
+    using CDP4Common.Types;
 
     using CDP4CommonView.ViewModels;
 
@@ -299,6 +303,74 @@ namespace CDP4Reporting.ViewModels
         public ReactiveCommand<object, Unit> SubmitParameterValuesCommand { get; set; }
 
         /// <summary>
+        /// Recalculates the preview as a non-saving "what-if": it applies the values currently edited in the
+        /// preview to an in-memory clone of the <see cref="Iteration"/> and re-runs the report's data collector
+        /// against that clone, so all roll-ups recompute with the real engine without touching the model.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> WhatIfRecalculateCommand { get; set; }
+
+        /// <summary>
+        /// Loads the what-if editor grid with the report's current editable leaf values.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> LoadWhatIfEditorCommand { get; set; }
+
+        /// <summary>
+        /// Clears all what-if overrides and reloads the editor from the model.
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> ResetWhatIfCommand { get; set; }
+
+        /// <summary>
+        /// Gets the editable rows shown in the what-if editor grid.
+        /// </summary>
+        public ObservableCollection<WhatIfEditRowViewModel> WhatIfEditRows { get; } = new ObservableCollection<WhatIfEditRowViewModel>();
+
+        /// <summary>
+        /// Backing field for <see cref="IsWhatIfEditorVisible"/>.
+        /// </summary>
+        private bool isWhatIfEditorVisible;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the what-if editor panel is shown (it appears after Load Values).
+        /// </summary>
+        public bool IsWhatIfEditorVisible
+        {
+            get => this.isWhatIfEditorVisible;
+            set => this.RaiseAndSetIfChanged(ref this.isWhatIfEditorVisible, value);
+        }
+
+        /// <summary>
+        /// The what-if value overrides, keyed by parameter write-back path. These persist across recomputes so
+        /// the user's edits stick until reset.
+        /// </summary>
+        private readonly Dictionary<string, double> whatIfOverrides = new Dictionary<string, double>();
+
+        /// <summary>Maps a value set to the grid rows that resolve to it (usages of a shared element-definition value).</summary>
+        private readonly Dictionary<Guid, List<WhatIfEditRowViewModel>> whatIfValueSetToRows = new Dictionary<Guid, List<WhatIfEditRowViewModel>>();
+
+        /// <summary>
+        /// Snapshots of the model value sets that a what-if has edited (keyed by value-set Iid), so the in-memory
+        /// edits can be reverted. A what-if edits the model's value sets directly - <see cref="Thing.Clone(bool)"/>
+        /// does not remap the element-usage-to-definition references, so a clone would still resolve to (and mutate)
+        /// the same value sets - and nothing is ever written to the server; the edits are undone on Load/Reset/close.
+        /// </summary>
+        private readonly Dictionary<Guid, WhatIfValueSetSnapshot> whatIfSnapshots = new Dictionary<Guid, WhatIfValueSetSnapshot>();
+
+        /// <summary>
+        /// Backing field for <see cref="IsEditModeEnabled"/>.
+        /// </summary>
+        private bool isEditModeEnabled;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the preview's submittable cells are editable, so the user can
+        /// type new values before a what-if recalculation or a submit.
+        /// </summary>
+        public bool IsEditModeEnabled
+        {
+            get => this.isEditModeEnabled;
+            set => this.RaiseAndSetIfChanged(ref this.isEditModeEnabled, value);
+        }
+
+        /// <summary>
         /// Fires when the DataSource text needs to be cleared
         /// </summary>
         public ReactiveCommand<Unit, Unit> ClearOutputCommand { get; set; }
@@ -372,6 +444,12 @@ namespace CDP4Reporting.ViewModels
                 x => this.SubmitParameterValues().ToObservable(),
                 this.WhenAnyValue(x => x.CanSubmitParameterValues));
 
+            this.WhatIfRecalculateCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteWhatIfRecalculate);
+
+            this.LoadWhatIfEditorCommand = ReactiveCommandCreator.Create(this.LoadWhatIfEditor);
+
+            this.ResetWhatIfCommand = ReactiveCommandCreator.Create(this.ResetWhatIf);
+
             this.ClearOutputCommand = ReactiveCommandCreator.Create(() => { this.Output = string.Empty; });
 
             this.ActiveDocumentChangedCommand = ReactiveCommandCreator.CreateAsyncTask<DependencyPropertyChangedEventArgs>(x =>
@@ -381,6 +459,10 @@ namespace CDP4Reporting.ViewModels
             {
                 x.AfterPrint += this.CheckSubmittableParameterValues;
                 x.DataSourceDemanded += this.CheckDynamicTables;
+
+                // A new/opened report must not carry over the previous report's what-if scenario: revert any edits
+                // and hide the editor until the user loads it again for this report.
+                this.ResetWhatIfState();
             });
 
             this.Changing
@@ -741,6 +823,652 @@ namespace CDP4Reporting.ViewModels
         }
 
         /// <summary>
+        /// Executes the <see cref="WhatIfRecalculateCommand"/>: recomputes the report against an in-memory clone
+        /// of the iteration to which the values currently shown/edited in the preview have been applied, without
+        /// saving anything to the model. "Submit Parameter Values" is used to commit the edits for real.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private async Task ExecuteWhatIfRecalculate()
+        {
+            if (this.CurrentReport == null || this.ReportScriptHandler.CurrentDataCollector == null)
+            {
+                return;
+            }
+
+            this.IsBusy = true;
+
+            try
+            {
+                // Use the values edited in the what-if editor grid (persisted as overrides).
+                var edits = this.BuildEditsFromOverrides();
+
+                // Let the busy indicator paint before the (synchronous) recompute.
+                await Task.Yield();
+
+                // Revert any previous what-if edits so this recalculation is "model + current overrides", never
+                // cumulative; then apply the current overrides to the model's value sets (in memory, never saved).
+                this.RevertModel();
+                var applied = this.ApplyOverridesToModel(edits);
+
+                // Re-run the already-compiled C# collector against the (temporarily edited) model and refresh the
+                // preview. No recompilation is needed, and this stays on the UI thread (it touches the AvalonEdit
+                // TextDocument and the DevExpress preview).
+                this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session, true);
+                this.TriggerRefreshUI();
+                this.RefreshPreviewDocument();
+
+                this.AddOutput(edits.Count == 0
+                    ? "Recalculated - but there were no What-if edits to apply. Change a value in the What-if Editor first, then Recalculate."
+                    : $"Recalculated with {applied} of {edits.Count} edit(s) applied in memory (nothing saved - use Submit to commit, Load/Reset to revert). See details above if any were not applied.");
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "The what-if recalculation failed.");
+                this.AddOutput($"The what-if recalculation failed: {ex.Message}");
+                this.messageBoxService.Show(ex.Message, "Recalculate (what-if) failed", MessageBoxButton.OK, MessageBoxImage.Stop);
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
+        /// Forces the preview document to regenerate so a what-if recompute is reflected immediately, without the
+        /// user having to switch to the Designer tab and back.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void RefreshPreviewDocument()
+        {
+            try
+            {
+                var presenter = this.currentReportDesignerDocument?.Preview as DocumentPreviewControl;
+                presenter?.ParameterPanelViewModel?.SubmitParameters();
+            }
+            catch (Exception ex)
+            {
+                this.logger.Warn(ex, "Could not refresh the report preview after the what-if recalculation.");
+            }
+        }
+
+        /// <summary>
+        /// Loads the what-if editor grid from the report's current data: one editable row per leaf value that
+        /// carries a write-back path. Existing overrides are re-applied so previous edits are preserved.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void LoadWhatIfEditor()
+        {
+            // Undo any active what-if edits and rebuild against the model, so the loaded values are the true model
+            // values and not a previous what-if result.
+            try
+            {
+                this.RevertModel();
+                this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session, true);
+                this.TriggerRefreshUI();
+                this.RefreshPreviewDocument();
+            }
+            catch (Exception ex)
+            {
+                this.logger.Warn(ex, "Could not revert and rebuild the report against the model before loading the what-if editor.");
+            }
+
+            this.WhatIfEditRows.Clear();
+            this.whatIfValueSetToRows.Clear();
+
+            // Load always starts from a clean slate: discard any previous what-if edits so both the "current" and
+            // "what-if" columns show the real model values.
+            this.whatIfOverrides.Clear();
+
+            // Editable parameters are exactly those the report declares with [DefinedThingShortName] (so derived/
+            // computed columns like a C#-computed TotalMass are never offered). The grid is built straight from the
+            // model's nested parameters - no per-report "model path" column is needed - by matching each nested
+            // parameter's short-name to a declared one. This works for every report shape uniformly.
+            var shortNamesByColumn = this.ReflectEditableParameters();
+
+            if (shortNamesByColumn.Count == 0)
+            {
+                this.AddOutput("Could not load the what-if editor: no editable parameters were found. Declare the report's leaf parameters with [DefinedThingShortName(\"shortName\", \"Column\")] in the Datasource.");
+                return;
+            }
+
+            var columnByShortName = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var pair in shortNamesByColumn)
+            {
+                columnByShortName[pair.Value] = pair.Key;
+            }
+
+            // Scope the grid to the option shown in the preview (the report's selected option). Values that are not
+            // option-dependent share one value set across options, so de-duplicating by value set collapses those too.
+            var selectedOption = (this.ReportScriptHandler.CurrentDataCollector as IOptionDependentDataCollector)?.SelectedOption;
+            var optionTrees = this.BuildOptionTrees();
+
+            this.PopulateWhatIfRows(columnByShortName, optionTrees, selectedOption);
+
+            // If the selected option could not be matched (e.g. an iteration-only collector), use every option.
+            if (this.WhatIfEditRows.Count == 0 && selectedOption != null)
+            {
+                this.PopulateWhatIfRows(columnByShortName, optionTrees, null);
+            }
+
+            this.IsWhatIfEditorVisible = true;
+            this.AddOutput($"What-if editor loaded with {this.WhatIfEditRows.Count} editable value(s) across {columnByShortName.Count} parameter(s): {string.Join(", ", columnByShortName.Keys)}. Edit the 'What-if' column, then click Recalculate.");
+        }
+
+        /// <summary>
+        /// Populates the what-if grid from the model's nested parameters: one row per value set (so usages that share
+        /// a value - and the same value across options - collapse to a single editable row) whose parameter matches a
+        /// declared editable short-name. When <paramref name="onlyOption"/> is set, only that option's tree is used.
+        /// </summary>
+        /// <param name="columnByShortName">Map of model short-name to the report's value column header.</param>
+        /// <param name="optionTrees">The model's nested-parameter lists per option.</param>
+        /// <param name="onlyOption">When set, restricts the grid to this option; null uses every option.</param>
+        [ExcludeFromCodeCoverage]
+        private void PopulateWhatIfRows(IReadOnlyDictionary<string, string> columnByShortName, IEnumerable<Tuple<Option, List<NestedParameter>>> optionTrees, Option onlyOption)
+        {
+            var seenValueSets = new HashSet<Guid>();
+
+            foreach (var optionTree in optionTrees)
+            {
+                if (onlyOption != null && optionTree.Item1 != onlyOption)
+                {
+                    continue;
+                }
+
+                foreach (var nestedParameter in optionTree.Item2)
+                {
+                    var shortName = nestedParameter.AssociatedParameter?.ParameterType?.ShortName;
+
+                    if (string.IsNullOrEmpty(shortName) || !columnByShortName.TryGetValue(shortName, out var column))
+                    {
+                        continue;
+                    }
+
+                    if (nestedParameter.AssociatedParameter.ParameterType.NumberOfValues != 1
+                        || !(nestedParameter.ValueSet is Thing valueSetThing)
+                        || !seenValueSets.Add(valueSetThing.Iid))
+                    {
+                        continue;
+                    }
+
+                    if (!double.TryParse(nestedParameter.ActualValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var original)
+                        && !double.TryParse(nestedParameter.ActualValue, NumberStyles.Any, CultureInfo.CurrentCulture, out original))
+                    {
+                        // The parameter is declared on this element but has no numeric value (e.g. an unset "-" on a
+                        // higher-level element). It is not a meaningful what-if input, so don't show an empty row.
+                        continue;
+                    }
+
+                    var path = nestedParameter.Path;
+                    var element = string.IsNullOrEmpty(path) ? shortName : path.Split('\\')[0];
+
+                    var editRow = new WhatIfEditRowViewModel(element, column, path, original, this.OnWhatIfValueChanged)
+                    {
+                        ValueSetIid = valueSetThing.Iid,
+                        IsOverride = nestedParameter.AssociatedParameter is ParameterOverride
+                    };
+
+                    this.RegisterWhatIfRow(valueSetThing.Iid, editRow);
+                    this.WhatIfEditRows.Add(editRow);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reverts any active what-if edits, clears the editor grid and overrides, and hides the editor. Used when a
+        /// report is opened/created so no scenario carries over, and on close/dispose to leave the model pristine.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void ResetWhatIfState()
+        {
+            this.RevertModel();
+            this.WhatIfEditRows.Clear();
+            this.whatIfValueSetToRows.Clear();
+            this.whatIfOverrides.Clear();
+            this.IsWhatIfEditorVisible = false;
+        }
+
+        /// <summary>
+        /// Reflects the report's compiled assembly for parameters declared with <c>[DefinedThingShortName]</c>,
+        /// returning a map of value column name to model short-name. These are the base (editable) parameters;
+        /// derived columns (plain computed properties) are not included. Returns an empty map on any failure.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private Dictionary<string, string> ReflectEditableParameters()
+        {
+            var result = new Dictionary<string, string>();
+
+            try
+            {
+                var collector = this.ReportScriptHandler.CurrentDataCollector;
+
+                if (collector == null)
+                {
+                    return result;
+                }
+
+                foreach (var type in collector.GetType().Assembly.GetTypes())
+                {
+                    if (!typeof(DataCollectorRow).IsAssignableFrom(type))
+                    {
+                        continue;
+                    }
+
+                    foreach (var property in type.GetProperties())
+                    {
+                        var attribute = property.GetCustomAttribute<DefinedThingShortNameAttribute>();
+
+                        if (attribute != null && !string.IsNullOrEmpty(attribute.FieldName) && !string.IsNullOrEmpty(attribute.ShortName))
+                        {
+                            result[attribute.FieldName] = attribute.ShortName;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                this.logger.Warn(ex, "Could not reflect the report's [DefinedThingShortName] parameters; the what-if editor will have nothing to edit.");
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Builds the nested-parameter lists of the real model, per <see cref="Option"/>, for path resolution.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private List<Tuple<Option, List<NestedParameter>>> BuildOptionTrees()
+        {
+            var result = new List<Tuple<Option, List<NestedParameter>>>();
+            var generator = new NestedElementTreeGenerator();
+
+            foreach (Option option in this.Thing.Option)
+            {
+                try
+                {
+                    result.Add(Tuple.Create(option, generator.GetNestedParameters(option, false).ToList()));
+                }
+                catch (Exception ex)
+                {
+                    this.logger.Warn(ex, "Could not build the nested-parameter tree for option {0}.", option.ShortName);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Registers a grid row under the value set it resolves to, for sibling synchronisation.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void RegisterWhatIfRow(Guid valueSetIid, WhatIfEditRowViewModel row)
+        {
+            if (!this.whatIfValueSetToRows.TryGetValue(valueSetIid, out var rows))
+            {
+                rows = new List<WhatIfEditRowViewModel>();
+                this.whatIfValueSetToRows[valueSetIid] = rows;
+            }
+
+            rows.Add(row);
+        }
+
+        /// <summary>
+        /// Clears all what-if overrides and reloads the editor from the current report data.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void ResetWhatIf()
+        {
+            this.whatIfOverrides.Clear();
+            this.LoadWhatIfEditor();
+            this.AddOutput("What-if overrides cleared.");
+        }
+
+        /// <summary>
+        /// Records or removes a what-if override when a grid cell's value changes.
+        /// </summary>
+        /// <param name="path">The parameter write-back path of the changed value.</param>
+        /// <param name="value">The new value.</param>
+        /// <param name="original">The originally computed value.</param>
+        [ExcludeFromCodeCoverage]
+        private void OnWhatIfValueChanged(WhatIfEditRowViewModel row)
+        {
+            if (row == null || string.IsNullOrEmpty(row.Path))
+            {
+                return;
+            }
+
+            // Usages that share the same value set (a shared element-definition value) must stay in sync: display
+            // the new value on the siblings, and make sure only the edited row holds the override so the shared
+            // value set is set exactly once on recalculation.
+            if (this.whatIfValueSetToRows.TryGetValue(row.ValueSetIid, out var siblings))
+            {
+                foreach (var sibling in siblings)
+                {
+                    if (ReferenceEquals(sibling, row))
+                    {
+                        continue;
+                    }
+
+                    this.whatIfOverrides.Remove(sibling.Path);
+                    sibling.SetValueSilently(row.Value);
+                }
+            }
+
+            if (row.IsEdited && row.Value.HasValue)
+            {
+                this.whatIfOverrides[row.Path] = row.Value.Value;
+            }
+            else
+            {
+                this.whatIfOverrides.Remove(row.Path);
+            }
+        }
+
+        /// <summary>
+        /// Builds the list of edits to apply to the sandbox from the persisted what-if overrides.
+        /// </summary>
+        /// <returns>The submittable parameter values representing the overrides.</returns>
+        [ExcludeFromCodeCoverage]
+        private List<SubmittableParameterValue> BuildEditsFromOverrides()
+        {
+            var edits = new List<SubmittableParameterValue>();
+
+            foreach (var pair in this.whatIfOverrides)
+            {
+                edits.Add(new SubmittableParameterValue(pair.Key, true)
+                {
+                    Text = pair.Value.ToString(CultureInfo.InvariantCulture)
+                });
+            }
+
+            return edits;
+        }
+
+        /// <summary>
+        /// Applies the what-if edits to the model's value sets in memory, snapshotting each value set first (via
+        /// <see cref="SetModelManualValue"/>) so the edits can be reverted. Nothing is written to the server.
+        /// Cloning is deliberately not used: <see cref="Thing.Clone(bool)"/> does not remap element-usage/definition
+        /// references, so a clone would resolve to - and mutate - the same value sets anyway.
+        /// </summary>
+        /// <param name="edits">The what-if edits (parameter path + new value).</param>
+        /// <returns>The number of edits applied.</returns>
+        [ExcludeFromCodeCoverage]
+        private int ApplyOverridesToModel(IReadOnlyList<SubmittableParameterValue> edits)
+        {
+            if (edits.Count == 0)
+            {
+                return 0;
+            }
+
+            var treeGenerator = new NestedElementTreeGenerator();
+            var applied = new HashSet<string>();
+            var diagnostics = new List<string>();
+
+            foreach (Option option in this.Thing.Option)
+            {
+                var nestedParameters = treeGenerator.GetNestedParameters(option, false).ToList();
+
+                foreach (var edit in edits)
+                {
+                    if (applied.Contains(edit.Path))
+                    {
+                        continue;
+                    }
+
+                    var path = ReportingUtilities.ConvertToOptionPath(edit.Path, option);
+
+                    // An exact-option path only applies to the option it was created for.
+                    if (edit.IsExactOptionPath && edit.Path != path)
+                    {
+                        continue;
+                    }
+
+                    var matches = option.GetNestedParameterValueSetsByPath(path, nestedParameters).ToList();
+
+                    if (matches.Count == 0)
+                    {
+                        diagnostics.Add($"  - NOT FOUND in option '{option.ShortName}': {path}");
+                        continue;
+                    }
+
+                    if (matches.Count > 1)
+                    {
+                        diagnostics.Add($"  - AMBIGUOUS ({matches.Count} matches) in option '{option.ShortName}': {path}");
+                        continue;
+                    }
+
+                    var nestedParameter = matches.Single();
+
+                    if (!(nestedParameter.AssociatedParameter is ParameterOrOverrideBase parameter)
+                        || !(nestedParameter.ValueSet is ParameterValueSetBase valueSet))
+                    {
+                        diagnostics.Add($"  - unsupported value-set type for: {path}");
+                        continue;
+                    }
+
+                    if (parameter.ParameterType == null || parameter.ParameterType.NumberOfValues != 1)
+                    {
+                        diagnostics.Add($"  - not a scalar parameter: {path}");
+                        continue;
+                    }
+
+                    if (this.SetModelManualValue(valueSet, edit.Text))
+                    {
+                        applied.Add(edit.Path);
+                        diagnostics.Add($"  - APPLIED {edit.Text} to {path}");
+                    }
+                    else
+                    {
+                        diagnostics.Add($"  - could not set value '{edit.Text}' for {path}");
+                    }
+                }
+            }
+
+            foreach (var edit in edits)
+            {
+                if (!applied.Contains(edit.Path) && diagnostics.All(d => d.IndexOf(edit.Path, StringComparison.Ordinal) < 0))
+                {
+                    diagnostics.Add($"  - no matching Option for path: {edit.Path}");
+                }
+            }
+
+            if (diagnostics.Count > 0)
+            {
+                this.AddOutput("What-if apply details:\n" + string.Join("\n", diagnostics));
+            }
+
+            return applied.Count;
+        }
+
+        /// <summary>
+        /// Snapshots (once) and then sets the value of a model <see cref="ParameterValueSetBase"/> from a value
+        /// string. The snapshot lets the edit be reverted by <see cref="RevertModel"/>; nothing is written to the server.
+        /// </summary>
+        /// <param name="valueSet">The value set to update.</param>
+        /// <param name="text">The value as entered in the what-if editor.</param>
+        /// <returns>True if the value was set.</returns>
+        [ExcludeFromCodeCoverage]
+        private bool SetModelManualValue(ParameterValueSetBase valueSet, string text)
+        {
+            if (valueSet.Manual == null || valueSet.Manual.Count == 0)
+            {
+                return false;
+            }
+
+            if (!double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out var value)
+                && !double.TryParse(text, NumberStyles.Any, CultureInfo.CurrentCulture, out value))
+            {
+                return false;
+            }
+
+            if (!this.whatIfSnapshots.ContainsKey(valueSet.Iid))
+            {
+                this.whatIfSnapshots[valueSet.Iid] = new WhatIfValueSetSnapshot(valueSet);
+            }
+
+            var newValue = value.ToString(CultureInfo.InvariantCulture);
+
+            // Set every value array to the edited value and force the MANUAL switch, so the collector reads the
+            // new value regardless of how it resolves the value set's ActualValue.
+            valueSet.Manual = new ValueArray<string>(new[] { newValue });
+            valueSet.Computed = new ValueArray<string>(new[] { newValue });
+            valueSet.Reference = new ValueArray<string>(new[] { newValue });
+            valueSet.Published = new ValueArray<string>(new[] { newValue });
+            valueSet.ValueSwitch = ParameterSwitchKind.MANUAL;
+
+            return true;
+        }
+
+        /// <summary>
+        /// Reverts every value set edited by a what-if back to the snapshot taken before the edit, so the model is
+        /// exactly as it was. Called on Load, Reset and when the panel closes.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void RevertModel()
+        {
+            foreach (var snapshot in this.whatIfSnapshots.Values)
+            {
+                snapshot.Restore();
+            }
+
+            this.whatIfSnapshots.Clear();
+        }
+
+        /// <summary>
+        /// Captures the value arrays and switch of a <see cref="ParameterValueSetBase"/> so a what-if edit can be undone.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private sealed class WhatIfValueSetSnapshot
+        {
+            private readonly ParameterValueSetBase valueSet;
+            private readonly ValueArray<string> manual;
+            private readonly ValueArray<string> computed;
+            private readonly ValueArray<string> reference;
+            private readonly ValueArray<string> published;
+            private readonly ParameterSwitchKind valueSwitch;
+
+            public WhatIfValueSetSnapshot(ParameterValueSetBase valueSet)
+            {
+                this.valueSet = valueSet;
+                this.manual = valueSet.Manual;
+                this.computed = valueSet.Computed;
+                this.reference = valueSet.Reference;
+                this.published = valueSet.Published;
+                this.valueSwitch = valueSet.ValueSwitch;
+            }
+
+            public void Restore()
+            {
+                this.valueSet.Manual = this.manual;
+                this.valueSet.Computed = this.computed;
+                this.valueSet.Reference = this.reference;
+                this.valueSet.Published = this.published;
+                this.valueSet.ValueSwitch = this.valueSwitch;
+            }
+        }
+
+        /// <summary>
+        /// Enables or disables DevExpress content editing on the report's submittable cells (those bound to a
+        /// parameter path via a <c>Tag</c> expression binding), so the user can type new values in the preview.
+        /// </summary>
+        /// <param name="enabled">Whether editing should be enabled.</param>
+        [ExcludeFromCodeCoverage]
+        private void SetPreviewEditingEnabled(bool enabled)
+        {
+            var report = this.CurrentReport;
+
+            if (report == null)
+            {
+                return;
+            }
+
+            foreach (var control in report.AllControls<XRLabel>())
+            {
+                var bindings = control.ExpressionBindings.Cast<ExpressionBinding>().ToList();
+
+                // A cell is a submit target when it carries a parameter-path Tag binding.
+                var isSubmittable = bindings.Any(binding =>
+                    string.Equals(binding.PropertyName, "Tag", StringComparison.OrdinalIgnoreCase)
+                    && !string.IsNullOrEmpty(binding.Expression)
+                    && binding.Expression.IndexOf("path", StringComparison.OrdinalIgnoreCase) >= 0);
+
+                // A cell is directly editable when its Text is bound to a single data field (e.g. [Mass]);
+                // cells bound to computed expressions (e.g. sumSum(...)) cannot be content-edited by DevExpress.
+                var textBinding = bindings.FirstOrDefault(binding => string.Equals(binding.PropertyName, "Text", StringComparison.OrdinalIgnoreCase));
+                var isDataBound = IsBareFieldExpression(textBinding?.Expression);
+
+                if (isSubmittable || isDataBound)
+                {
+                    control.EditOptions.Enabled = enabled;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines whether an expression is a single bare data-field reference such as <c>[Mass]</c>.
+        /// </summary>
+        /// <param name="expression">The expression to test.</param>
+        /// <returns>True when the expression is exactly one field reference.</returns>
+        [ExcludeFromCodeCoverage]
+        private static bool IsBareFieldExpression(string expression)
+        {
+            if (string.IsNullOrWhiteSpace(expression))
+            {
+                return false;
+            }
+
+            var trimmed = expression.Trim();
+
+            return trimmed.Length > 2
+                   && trimmed[0] == '['
+                   && trimmed[trimmed.Length - 1] == ']'
+                   && trimmed.IndexOf('[', 1) < 0;
+        }
+
+        /// <summary>
+        /// Applies the requested edit-mode state: toggles content editing on the report's editable cells and
+        /// re-renders the preview against the current model so the change takes effect (editing only becomes
+        /// available in a freshly generated document).
+        /// </summary>
+        /// <param name="enabled">Whether editing should be enabled.</param>
+        [ExcludeFromCodeCoverage]
+        private void ApplyEditMode(bool enabled)
+        {
+            this.SetPreviewEditingEnabled(enabled);
+
+            if (this.CurrentReport == null || this.ReportScriptHandler.CurrentDataCollector == null)
+            {
+                return;
+            }
+
+            this.IsBusy = true;
+
+            try
+            {
+                this.AddOutput(enabled
+                    ? "Reloading the preview for editing (you may be asked to select the Option). Please wait until this says 'ready'..."
+                    : "Reloading the preview...");
+
+                // Re-render the preview (against the real model) so the editable fields appear.
+                this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session, true);
+                this.TriggerRefreshUI();
+
+                this.AddOutput(enabled
+                    ? "Edit mode is ready. The report's editable cells can now be changed in the preview - if a cell is not directly editable, use the 'Editing Fields' button in the Document ribbon group. Change values, then click Recalculate."
+                    : "Edit mode OFF - preview reloaded.");
+            }
+            catch (Exception ex)
+            {
+                this.logger.Error(ex, "Failed to toggle edit mode.");
+                this.AddOutput($"Failed to toggle edit mode: {ex.Message}");
+            }
+            finally
+            {
+                this.IsBusy = false;
+            }
+        }
+
+        /// <summary>
         /// Triggers the UI of the Reporting Designer to refresh itself.
         /// Currently implemented using a call to MakeChanges that adds a temporary datasource and removes it immediately.
         /// </summary>
@@ -997,7 +1725,24 @@ namespace CDP4Reporting.ViewModels
         /// </remarks>
         public void AfterOnClosing()
         {
+            // Undo any in-memory what-if edits so the panel never leaves the model dirty when it closes.
+            this.RevertModel();
+
             this.currentReportDesignerDocument?.SetValue(ReportDesignerDocument.HasChangesProperty, false);
+        }
+
+        /// <summary>
+        /// Disposes the view-model, reverting any in-memory what-if edits so the model is never left dirty.
+        /// </summary>
+        /// <param name="disposing">Whether managed resources are being disposed.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.RevertModel();
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

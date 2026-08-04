@@ -11,6 +11,7 @@
     xmlns:localBehaviour="clr-namespace:CDP4Reporting.Behaviours"
     xmlns:dxdo="http://schemas.devexpress.com/winfx/2008/xaml/docking"
     xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+    xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
     xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
     xmlns:dxr="http://schemas.devexpress.com/winfx/2008/xaml/ribbon"
     xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
@@ -22,6 +23,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         </ResourceDictionary>
     </UserControl.Resources>
     <dxmvvm:Interaction.Behaviors>
@@ -189,6 +191,40 @@
                                         <dxr:RibbonPageGroup Caption="Rebuild" Name="RebuildGroup" />
                                     </dxb:InsertAction.Element>
                                 </dxb:InsertAction>
+                                <dxb:InsertAction ContainerName="{x:Static dxrud:DefaultBarItemNames.PreviewPage}" Index="4">
+                                    <dxb:InsertAction.Element>
+                                        <dxr:RibbonPageGroup Caption="What-if" Name="WhatIfGroup" />
+                                    </dxb:InsertAction.Element>
+                                </dxb:InsertAction>
+                                <dxb:InsertAction ContainerName="WhatIfGroup">
+                                    <dxb:InsertAction.Element>
+                                        <dxb:BarButtonItem
+                                            LargeGlyph="{dx:DXImage Image=Edit_32x32.png}"
+                                            Command="{Binding Path=LoadWhatIfEditorCommand}"
+                                            Content="Load Values"
+                                            Hint="Load the report's editable leaf values into the What-if Editor panel" />
+                                    </dxb:InsertAction.Element>
+                                </dxb:InsertAction>
+                                <dxb:InsertAction ContainerName="WhatIfGroup">
+                                    <dxb:InsertAction.Element>
+                                        <dxb:BarButtonItem
+                                            LargeGlyph="{dx:DXImage Image=Refresh_32x32.png}"
+                                            Command="{Binding Path=WhatIfRecalculateCommand}"
+                                            Content="Recalculate"
+                                            Hint="Recalculate the preview with your What-if Editor values applied to an in-memory copy of the model (nothing is saved). Use Submit to commit." >
+                                        </dxb:BarButtonItem>
+                                    </dxb:InsertAction.Element>
+                                </dxb:InsertAction>
+                                <dxb:InsertAction ContainerName="WhatIfGroup">
+                                    <dxb:InsertAction.Element>
+                                        <dxb:BarButtonItem
+                                            LargeGlyph="{dx:DXImage Image=Reset_32x32.png}"
+                                            Command="{Binding Path=ResetWhatIfCommand}"
+                                            Content="Reset"
+                                            Hint="Clear all What-if edits and reload the editor from the model" >
+                                        </dxb:BarButtonItem>
+                                    </dxb:InsertAction.Element>
+                                </dxb:InsertAction>
                                 <dxb:InsertAction ContainerName="SubmitGroup">
                                     <dxb:InsertAction.Element>
                                         <dxb:BarButtonItem
@@ -212,6 +248,22 @@
                             </dxrud:ReportDesigner.RibbonCustomizationActions>
                             <dxrud:ReportDesignerBrowserView AllowDrop="False" CloseWindowWhenLastTabIsClosed="False" TabDragDropMode="None"  />
                         </dxrud:ReportDesigner>
+                    </dxdo:LayoutPanel>
+                </dxdo:LayoutGroup>
+                <dxdo:LayoutGroup ItemWidth="1.4*"
+                                  Visibility="{Binding Path=IsWhatIfEditorVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <dxdo:LayoutPanel Caption="What-if Editor" AllowClose="False">
+                        <dxg:GridControl ItemsSource="{Binding Path=WhatIfEditRows}" AutoGenerateColumns="None" SelectionMode="Row">
+                            <dxg:GridControl.Columns>
+                                <dxg:GridColumn FieldName="Element" Header="Element" ReadOnly="True" Width="2.5*" />
+                                <dxg:GridColumn FieldName="Parameter" Header="Parameter" ReadOnly="True" Width="1.1*" />
+                                <dxg:GridColumn FieldName="CurrentDisplay" Header="Current" ReadOnly="True" Width="*" ToolTip="A trailing * means a per-usage override; otherwise a shared element-definition value used by all usages." />
+                                <dxg:GridColumn FieldName="Value" Header="What-if" Width="*" />
+                            </dxg:GridControl.Columns>
+                            <dxg:GridControl.View>
+                                <dxg:TableView AllowEditing="True" ShowGroupPanel="False" NavigationStyle="Cell" ShowFixedTotalSummary="False" UseLightweightTemplates="All" />
+                            </dxg:GridControl.View>
+                        </dxg:GridControl>
                     </dxdo:LayoutPanel>
                 </dxdo:LayoutGroup>
             </dxdo:LayoutGroup>
