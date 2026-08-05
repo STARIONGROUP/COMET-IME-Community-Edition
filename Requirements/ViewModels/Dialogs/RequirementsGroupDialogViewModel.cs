@@ -42,6 +42,8 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using ReactiveUI;
+
     /// <summary>
     /// The purpose of the <see cref="RequirementsGroupDialogViewModel"/> is to provide a dialog view model
     /// for a <see cref="RequirementsGroup"/>
