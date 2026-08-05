@@ -46,7 +46,7 @@ namespace CDP4Composition.Services
         /// </summary>
         public ImeValidationService()
         {
-            // Allow a Requirement, RequirementsGroup or RequirementsSpecification Name to start with a digit (see GitHub issue #1460).
+            // Allow a Requirement, RequirementsGroup or RequirementsSpecification Name to start with a digit.
             // Same intent as the default "Name" rule, but the first character may also be a digit.
             this.ValidationMap["RequirementName"] = new ValidationRule
             {
