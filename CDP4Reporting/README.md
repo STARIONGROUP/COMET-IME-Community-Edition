@@ -93,15 +93,19 @@ saving anything**. Nothing touches the model or the server until you explicitly 
   computed columns are never editable** (you edit the inputs; the totals recompute).
 - Values are read straight from the model's nested-parameter tree, so **no `ModelPath` column or
   extra report setup is required** — any report with `[DefinedThingShortName]` params lights up.
-- The grid is scoped to the **option currently shown in the preview**.
+- The grid is scoped to a **single option** — the report's selected option, **pinned** when the
+  report is opened or its datasource is rebuilt and kept until the next open/rebuild (shown in the
+  Output line). It does not change between Load and Recalculate.
 - Values **shared** across usages (one element-definition value) collapse to a **single row** and
   are kept in sync; per-usage **overrides** are shown separately and marked `*`.
-- Parameters that are declared but **unvalued** on an element are skipped (no empty rows).
+- A row is shown for **every value the element actually owns**, including parameters that are
+  declared but currently **unvalued** (blank *Current*, still editable).
+- **State-dependent** values are labelled with their state in the *Parameter* column
+  (e.g. `Mass [hot]`) so the otherwise-identical rows can be told apart.
 
 ### Limits (current)
-- Shows every valued element in the option's tree — this can be **more rows than the report's own
-  detail rows**; it is not filtered to the report's row set.
-- **State-dependent** parameters show one row per state (no state label yet).
-- You can only what-if the **previewed option**; switch the preview's option to edit another.
-- Non-scalar (vector/compound) parameters aren't editable; you can't seed a currently-unset value.
+- Shows every element in the option's tree that owns a matching parameter — this can be **more rows
+  than the report's own detail rows**; it is not filtered to the report's row set.
+- To what-if a **different option**, select it and Rebuild Datasource (or reopen); that re-pins it.
+- Non-scalar (vector/compound) parameters aren't editable.
 - What-if scenarios are **in-memory only** — they're discarded when the report/panel closes.

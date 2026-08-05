@@ -356,6 +356,13 @@ namespace CDP4Reporting.ViewModels
         private readonly Dictionary<Guid, WhatIfValueSetSnapshot> whatIfSnapshots = new Dictionary<Guid, WhatIfValueSetSnapshot>();
 
         /// <summary>
+        /// The option the what-if editor works against, pinned when a report is opened or its datasource rebuilt (the
+        /// report's selected option at that moment) and reused until the next rebuild/open, so the grid does not jump
+        /// options between Load/Recalculate.
+        /// </summary>
+        private Option whatIfSelectedOption;
+
+        /// <summary>
         /// Backing field for <see cref="IsEditModeEnabled"/>.
         /// </summary>
         private bool isEditModeEnabled;
@@ -651,6 +658,7 @@ namespace CDP4Reporting.ViewModels
             this.CurrentReportProjectFilePath = reportProjectFilePath;
 
             this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session);
+            this.CaptureWhatIfOption();
             this.TriggerRefreshUI();
 
             this.lastSavedDataSourceText = this.Document.Text;
@@ -754,6 +762,7 @@ namespace CDP4Reporting.ViewModels
                 if (!this.ReportScriptHandler.CompileResults?.Errors.HasErrors ?? false)
                 {
                     this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session);
+                    this.CaptureWhatIfOption();
                     this.TriggerRefreshUI();
                 }
             }
@@ -790,6 +799,7 @@ namespace CDP4Reporting.ViewModels
                         MessageBoxImage.Information);
                 }
 
+                this.CaptureWhatIfOption();
                 this.TriggerRefreshUI();
 
                 var presenter = this.currentReportDesignerDocument?.Preview as DocumentPreviewControl;
@@ -938,9 +948,11 @@ namespace CDP4Reporting.ViewModels
                 columnByShortName[pair.Value] = pair.Key;
             }
 
-            // Scope the grid to the option shown in the preview (the report's selected option). Values that are not
-            // option-dependent share one value set across options, so de-duplicating by value set collapses those too.
-            var selectedOption = (this.ReportScriptHandler.CurrentDataCollector as IOptionDependentDataCollector)?.SelectedOption;
+            // Scope the grid to the option pinned when the report was opened / its datasource last rebuilt (falling
+            // back to the collector's current selection on first load). We keep using that option so the grid does not
+            // jump options between Load and Recalculate.
+            var selectedOption = this.whatIfSelectedOption
+                                 ?? (this.ReportScriptHandler.CurrentDataCollector as IOptionDependentDataCollector)?.SelectedOption;
             var optionTrees = this.BuildOptionTrees();
 
             this.PopulateWhatIfRows(columnByShortName, optionTrees, selectedOption);
@@ -952,13 +964,16 @@ namespace CDP4Reporting.ViewModels
             }
 
             this.IsWhatIfEditorVisible = true;
-            this.AddOutput($"What-if editor loaded with {this.WhatIfEditRows.Count} editable value(s) across {columnByShortName.Count} parameter(s): {string.Join(", ", columnByShortName.Keys)}. Edit the 'What-if' column, then click Recalculate.");
+            var optionText = selectedOption == null ? "all options" : $"option '{selectedOption.ShortName}'";
+            this.AddOutput($"What-if editor loaded with {this.WhatIfEditRows.Count} editable value(s) across {columnByShortName.Count} parameter(s) for {optionText}: {string.Join(", ", columnByShortName.Keys)}. Edit the 'What-if' column, then click Recalculate.");
         }
 
         /// <summary>
         /// Populates the what-if grid from the model's nested parameters: one row per value set (so usages that share
         /// a value - and the same value across options - collapse to a single editable row) whose parameter matches a
         /// declared editable short-name. When <paramref name="onlyOption"/> is set, only that option's tree is used.
+        /// A row is added for every value set the element actually owns, even when currently unvalued; state-dependent
+        /// values are labelled with their state so the (otherwise identical) rows can be told apart.
         /// </summary>
         /// <param name="columnByShortName">Map of model short-name to the report's value column header.</param>
         /// <param name="optionTrees">The model's nested-parameter lists per option.</param>
@@ -984,6 +999,8 @@ namespace CDP4Reporting.ViewModels
                         continue;
                     }
 
+                    // Only rows for a scalar parameter the element actually owns (a real value set) are editable. An
+                    // unset value is still shown - the element has the parameter - just with a blank current value.
                     if (nestedParameter.AssociatedParameter.ParameterType.NumberOfValues != 1
                         || !(nestedParameter.ValueSet is Thing valueSetThing)
                         || !seenValueSets.Add(valueSetThing.Iid))
@@ -991,18 +1008,24 @@ namespace CDP4Reporting.ViewModels
                         continue;
                     }
 
-                    if (!double.TryParse(nestedParameter.ActualValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var original)
-                        && !double.TryParse(nestedParameter.ActualValue, NumberStyles.Any, CultureInfo.CurrentCulture, out original))
+                    double? original = null;
+
+                    if (double.TryParse(nestedParameter.ActualValue, NumberStyles.Any, CultureInfo.InvariantCulture, out var parsed)
+                        || double.TryParse(nestedParameter.ActualValue, NumberStyles.Any, CultureInfo.CurrentCulture, out parsed))
                     {
-                        // The parameter is declared on this element but has no numeric value (e.g. an unset "-" on a
-                        // higher-level element). It is not a meaningful what-if input, so don't show an empty row.
-                        continue;
+                        original = parsed;
                     }
 
                     var path = nestedParameter.Path;
                     var element = string.IsNullOrEmpty(path) ? shortName : path.Split('\\')[0];
 
-                    var editRow = new WhatIfEditRowViewModel(element, column, path, original, this.OnWhatIfValueChanged)
+                    // Distinguish state-dependent rows (same element and parameter, one value set per state) by
+                    // appending the state short-name to the parameter label.
+                    var parameterLabel = nestedParameter.ActualState == null
+                        ? column
+                        : $"{column} [{nestedParameter.ActualState.ShortName}]";
+
+                    var editRow = new WhatIfEditRowViewModel(element, parameterLabel, path, original, this.OnWhatIfValueChanged)
                     {
                         ValueSetIid = valueSetThing.Iid,
                         IsOverride = nestedParameter.AssociatedParameter is ParameterOverride
@@ -1025,7 +1048,24 @@ namespace CDP4Reporting.ViewModels
             this.WhatIfEditRows.Clear();
             this.whatIfValueSetToRows.Clear();
             this.whatIfOverrides.Clear();
+            this.whatIfSelectedOption = null;
             this.IsWhatIfEditorVisible = false;
+        }
+
+        /// <summary>
+        /// Pins the option the what-if editor will use to the report's currently selected option. Called after a
+        /// report is opened or its datasource is rebuilt, so the what-if grid keeps using that option until the next
+        /// rebuild/open rather than re-resolving it on every Load.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void CaptureWhatIfOption()
+        {
+            var option = (this.ReportScriptHandler.CurrentDataCollector as IOptionDependentDataCollector)?.SelectedOption;
+
+            if (option != null)
+            {
+                this.whatIfSelectedOption = option;
+            }
         }
 
         /// <summary>
