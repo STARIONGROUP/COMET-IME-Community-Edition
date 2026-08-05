@@ -208,8 +208,11 @@ namespace CDP4Requirements.Tests.Dialogs
             vm.ShortName = "1req";
             vm.Name = "1 req";
 
-            Assert.That(vm["ShortName"], Is.Null);
-            Assert.That(vm["Name"], Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm["ShortName"], Is.Null);
+                Assert.That(vm["Name"], Is.Null);
+            });
         }
 
         [Test]

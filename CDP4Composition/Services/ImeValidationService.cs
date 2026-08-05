@@ -50,7 +50,7 @@ namespace CDP4Composition.Services
             // Same intent as the default "Name" rule, but the first character may also be a digit.
             this.ValidationMap["RequirementName"] = new ValidationRule
             {
-                PropertyName = "Name",
+                PropertyName = nameof(DefinedThing.Name),
                 Rule = @"^([\p{L}\d]|[\p{L}\d][^()]*[^()\s])$",
                 ErrorText = "The Name must start with a letter or a digit and not contain any parentheses or trailing spaces."
             };

@@ -172,8 +172,11 @@ namespace CDP4Requirements.Tests
             this.viewmodel.ShortName = "1spec";
             this.viewmodel.Name = "1 spec";
 
-            Assert.That(this.viewmodel["ShortName"], Is.Null);
-            Assert.That(this.viewmodel["Name"], Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.viewmodel["ShortName"], Is.Null);
+                Assert.That(this.viewmodel["Name"], Is.Null);
+            });
         }
 
         [Test]
