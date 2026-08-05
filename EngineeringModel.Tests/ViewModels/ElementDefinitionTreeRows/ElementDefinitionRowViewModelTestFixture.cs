@@ -243,6 +243,119 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
         }
 
         [Test]
+        public void VerifyThatDragElementUsageSetsMoveEffect()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            var sourceDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            var targetDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            var referencedDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            this.iteration.Element.Add(sourceDefinition);
+            this.iteration.Element.Add(targetDefinition);
+            this.iteration.Element.Add(referencedDefinition);
+
+            var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise, ElementDefinition = referencedDefinition, Name = "usage", ShortName = "usage" };
+            sourceDefinition.ContainedElement.Add(elementUsage);
+
+            var row = new ElementDefinitionRowViewModel(targetDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
+
+            var dropInfo = new Mock<IDropInfo>();
+            dropInfo.Setup(x => x.Payload).Returns(elementUsage);
+            dropInfo.SetupProperty(x => x.Effects);
+
+            row.DragOver(dropInfo.Object);
+
+            Assert.That(dropInfo.Object.Effects, Is.EqualTo(DragDropEffects.Move));
+        }
+
+        [Test]
+        public void VerifyThatElementUsageGetsMovedToAnotherElementDefinitionOnDrop()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            var sourceDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            var targetDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            var referencedDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            this.iteration.Element.Add(sourceDefinition);
+            this.iteration.Element.Add(targetDefinition);
+            this.iteration.Element.Add(referencedDefinition);
+
+            var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise, ElementDefinition = referencedDefinition, Name = "usage", ShortName = "usage" };
+            sourceDefinition.ContainedElement.Add(elementUsage);
+
+            var row = new ElementDefinitionRowViewModel(targetDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
+            row.ThingCreator = this.thingCreator.Object;
+
+            var dropInfo = new Mock<IDropInfo>();
+            dropInfo.Setup(x => x.Payload).Returns(elementUsage);
+            dropInfo.SetupProperty(x => x.Effects);
+
+            row.DragOver(dropInfo.Object);
+            Assert.That(dropInfo.Object.Effects, Is.EqualTo(DragDropEffects.Move));
+
+            row.Drop(dropInfo.Object);
+
+            this.thingCreator.Verify(x => x.MoveElementUsage(elementUsage, targetDefinition, this.session.Object));
+        }
+
+        [Test]
+        public void VerifyThatDragElementUsageOntoItsReferencedDefinitionSetsNoneEffect()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            var sourceDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            var referencedDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            this.iteration.Element.Add(sourceDefinition);
+            this.iteration.Element.Add(referencedDefinition);
+
+            var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise, ElementDefinition = referencedDefinition };
+            sourceDefinition.ContainedElement.Add(elementUsage);
+
+            // dropping the usage back onto the definition it references would create a containment loop
+            var row = new ElementDefinitionRowViewModel(referencedDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
+
+            var dropInfo = new Mock<IDropInfo>();
+            dropInfo.Setup(x => x.Payload).Returns(elementUsage);
+            dropInfo.SetupProperty(x => x.Effects);
+
+            row.DragOver(dropInfo.Object);
+
+            Assert.That(dropInfo.Object.Effects, Is.EqualTo(DragDropEffects.None));
+        }
+
+        [Test]
+        public void VerifyThatDragElementUsageOntoItsCurrentContainerSetsNoneEffect()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.assembler.Cache, this.uri);
+
+            var sourceDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            var referencedDefinition = new ElementDefinition(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise };
+            this.iteration.Element.Add(sourceDefinition);
+            this.iteration.Element.Add(referencedDefinition);
+
+            var elementUsage = new ElementUsage(Guid.NewGuid(), this.assembler.Cache, this.uri) { Owner = domainOfExpertise, ElementDefinition = referencedDefinition };
+            sourceDefinition.ContainedElement.Add(elementUsage);
+
+            var row = new ElementDefinitionRowViewModel(sourceDefinition, domainOfExpertise, this.session.Object, null, this.obfuscationService.Object);
+
+            var dropInfo = new Mock<IDropInfo>();
+            dropInfo.Setup(x => x.Payload).Returns(elementUsage);
+            dropInfo.SetupProperty(x => x.Effects);
+
+            row.DragOver(dropInfo.Object);
+
+            Assert.That(dropInfo.Object.Effects, Is.EqualTo(DragDropEffects.None));
+        }
+
+        [Test]
         public void VerifyThatDragCategorySetsCopyEffectAndCanBeDropped()
         {
             this.permissionService.Setup(x => x.CanWrite(It.IsAny<Thing>())).Returns(true);
@@ -493,6 +606,17 @@ namespace CDP4EngineeringModel.Tests.ViewModels.ElementDefinitionTreeRows
             ISession session)
         {
             throw new Exception("The Element Usage could not be created");
+        }
+
+        /// <summary>
+        /// Moves an existing <see cref="ElementUsage"/> into another <see cref="ElementDefinition"/>
+        /// </summary>
+        /// <param name="elementUsage">The <see cref="ElementUsage"/> that is to be moved.</param>
+        /// <param name="targetElementDefinition">The <see cref="ElementDefinition"/> that becomes the new container.</param>
+        /// <param name="session">The <see cref="ISession"/> in which the move is performed.</param>
+        public Task MoveElementUsage(ElementUsage elementUsage, ElementDefinition targetElementDefinition, ISession session)
+        {
+            throw new Exception("The Element Usage could not be moved");
         }
 
         /// <summary>

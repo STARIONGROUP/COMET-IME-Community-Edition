@@ -76,9 +76,11 @@ namespace ProductTree.Tests.ProductTreeRows
         private Option option;
         private ElementDefinition elementDef;
         private ElementDefinition elementDef2;
+        private ElementDefinition elementDef3;
         private Category category;
         private DomainOfExpertise domain;
         private ElementUsage elementUsage;
+        private ElementUsage elementUsage2;
 
         private ConcurrentDictionary<CacheKey, Lazy<Thing>> cache = new ConcurrentDictionary<CacheKey, Lazy<Thing>>();
         private readonly string nestedElementPath = "PATH";
@@ -120,6 +122,9 @@ namespace ProductTree.Tests.ProductTreeRows
             this.elementDef2 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
             this.elementUsage = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { ElementDefinition = this.elementDef2, Owner = this.domain };
 
+            this.elementDef3 = new ElementDefinition(Guid.NewGuid(), this.cache, this.uri) { Owner = this.domain };
+            this.elementUsage2 = new ElementUsage(Guid.NewGuid(), this.cache, this.uri) { ElementDefinition = this.elementDef3, Owner = this.domain };
+
             this.siteDir.Person.Add(this.person);
             this.siteDir.Model.Add(this.modelSetup);
             this.modelSetup.IterationSetup.Add(this.iterationSetup);
@@ -133,7 +138,9 @@ namespace ProductTree.Tests.ProductTreeRows
             this.iteration.TopElement = this.elementDef;
             this.iteration.Element.Add(this.elementDef);
             this.iteration.Element.Add(this.elementDef2);
+            this.iteration.Element.Add(this.elementDef3);
             this.elementDef.ContainedElement.Add(this.elementUsage);
+            this.elementDef2.ContainedElement.Add(this.elementUsage2);
 
             this.session.Setup(x => x.ActivePerson).Returns(this.person);
             this.session.Setup(x => x.DataSourceUri).Returns(this.uri.ToString);
@@ -354,6 +361,36 @@ namespace ProductTree.Tests.ProductTreeRows
             await vm.Drop(dropinfo.Object);
 
             this.thingCreator.Verify(x => x.CreateElementUsage(It.IsAny<ElementDefinition>(), It.IsAny<ElementDefinition>(), It.IsAny<DomainOfExpertise>(), It.IsAny<ISession>()));
+        }
+
+        [Test]
+        public void VerifyThatDragOverElementUsageSetsMoveEffect()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementUsage2);
+
+            dropinfo.SetupProperty(x => x.Effects);
+            vm.DragOver(dropinfo.Object);
+
+            Assert.AreEqual(DragDropEffects.Move, dropinfo.Object.Effects);
+        }
+
+        [Test]
+        public async Task VerifyThatDropMovesElementUsage()
+        {
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            var vm = new ElementDefinitionRowViewModel(this.elementDef, this.option, this.session.Object, null);
+
+            var dropinfo = new Mock<IDropInfo>();
+            dropinfo.Setup(x => x.Payload).Returns(this.elementUsage2);
+            dropinfo.Setup(x => x.Effects).Returns(DragDropEffects.Move);
+
+            await vm.Drop(dropinfo.Object);
+
+            this.thingCreator.Verify(x => x.MoveElementUsage(this.elementUsage2, this.elementDef, this.session.Object));
         }
     }
 

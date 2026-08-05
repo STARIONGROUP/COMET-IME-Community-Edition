@@ -269,7 +269,58 @@ namespace CDP4Composition.Services
             {
                 logger.Error(ex, "The ElementUsage could not be created");
                 throw;
-            }   
+            }
+        }
+
+        /// <summary>
+        /// Moves an existing <see cref="ElementUsage"/> into another <see cref="ElementDefinition"/>, preserving all of its properties.
+        /// </summary>
+        /// <param name="elementUsage">
+        /// The <see cref="ElementUsage"/> that is to be moved.
+        /// </param>
+        /// <param name="targetElementDefinition">
+        /// The <see cref="ElementDefinition"/> that becomes the new container of the <see cref="ElementUsage"/>.
+        /// </param>
+        /// <param name="session">
+        /// The <see cref="ISession"/> in which the move is performed.
+        /// </param>
+        public async Task MoveElementUsage(ElementUsage elementUsage, ElementDefinition targetElementDefinition, ISession session)
+        {
+            if (elementUsage == null)
+            {
+                throw new ArgumentNullException(nameof(elementUsage), "The elementUsage must not be null");
+            }
+
+            if (targetElementDefinition == null)
+            {
+                throw new ArgumentNullException(nameof(targetElementDefinition), "The targetElementDefinition must not be null");
+            }
+
+            if (session == null)
+            {
+                throw new ArgumentNullException(nameof(session), "The session may not be null");
+            }
+
+            // re-parent the usage by adding it to the target definition; the same pattern is used to move a Requirement between specifications.
+            var transactionContext = TransactionContextResolver.ResolveContext(targetElementDefinition);
+            var transaction = new ThingTransaction(transactionContext);
+
+            var usageClone = elementUsage.Clone(false);
+            transaction.CreateOrUpdate(usageClone);
+
+            var elementDefinitionClone = targetElementDefinition.Clone(false);
+            elementDefinitionClone.ContainedElement.Add(usageClone);
+            transaction.CreateOrUpdate(elementDefinitionClone);
+
+            try
+            {
+                await session.Write(transaction.FinalizeTransaction());
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex, "The ElementUsage could not be moved");
+                throw;
+            }
         }
 
         /// <summary>

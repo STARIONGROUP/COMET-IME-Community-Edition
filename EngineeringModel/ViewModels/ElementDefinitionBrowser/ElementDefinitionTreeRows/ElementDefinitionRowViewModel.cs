@@ -234,6 +234,12 @@ namespace CDP4EngineeringModel.ViewModels
                 return;
             }
 
+            if (dropInfo.Payload is ElementUsage elementUsage)
+            {
+                this.DragOver(dropInfo, elementUsage);
+                return;
+            }
+
             if (dropInfo.Payload is ElementDefinition elementDefinition)
             {
                 this.DragOver(dropInfo, elementDefinition);
@@ -283,12 +289,17 @@ namespace CDP4EngineeringModel.ViewModels
                 }
             }
 
+            if (dropInfo.Payload is ElementUsage elementUsage)
+            {
+                await this.Drop(dropInfo, elementUsage);
+            }
+
             if (dropInfo.Payload is ElementDefinition elementDefinition)
             {
                 await this.Drop(dropInfo, elementDefinition);
             }
 
-            // moving 
+            // moving
             if (dropInfo.Payload is Parameter parameter)
             {
                 await this.Drop(dropInfo, parameter);
@@ -413,6 +424,8 @@ namespace CDP4EngineeringModel.ViewModels
             sb.AppendLine();
             sb.AppendLine("NOTE: The Element Definition is always copied, including the contained Element Usages and Parameters.");
             sb.AppendLine("NOTE: This functionality is only supported if the target server is COMET.");
+            sb.AppendLine();
+            sb.AppendLine("An Element Usage dragged onto an Element Definition is moved into it, keeping its name, short-name, owner and parameter overrides.");
 
             this.Details = sb.ToString();
         }
@@ -624,6 +637,40 @@ namespace CDP4EngineeringModel.ViewModels
                     var copyCreator = new CopyCreator(this.Session, this.dialogNavigationService);
                     await copyCreator.Copy(elementDefinition, (Iteration)this.Thing.Container, dropInfo.KeyStates);
                 }
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex.Message);
+                this.ErrorMsg = ex.Message;
+            }
+        }
+
+        /// <summary>
+        /// Set the <see cref="IDropInfo.Effects"/> when the payload is an <see cref="ElementUsage"/>
+        /// </summary>
+        /// <param name="dropinfo">The <see cref="IDropInfo"/></param>
+        /// <param name="elementUsage">The <see cref="ElementUsage"/> in the payload</param>
+        private void DragOver(IDropInfo dropinfo, ElementUsage elementUsage)
+        {
+            dropinfo.Effects = ElementUsageDropValidator.GetDropEffect(elementUsage, this.Thing, this.PermissionService);
+        }
+
+        /// <summary>
+        /// Handle the drop of an <see cref="ElementUsage"/> by moving it into this <see cref="ElementDefinition"/>,
+        /// preserving its name, short-name, owner and contained <see cref="ParameterOverride"/>s.
+        /// </summary>
+        /// <param name="dropInfo">The <see cref="IDropInfo"/> containing the payload</param>
+        /// <param name="elementUsage">The <see cref="ElementUsage"/></param>
+        private async Task Drop(IDropInfo dropInfo, ElementUsage elementUsage)
+        {
+            if (dropInfo.Effects != DragDropEffects.Move)
+            {
+                return;
+            }
+
+            try
+            {
+                await this.ThingCreator.MoveElementUsage(elementUsage, this.Thing, this.Session);
             }
             catch (Exception ex)
             {
