@@ -42,6 +42,8 @@ namespace CDP4Requirements.ViewModels
     using CDP4Dal;
     using CDP4Dal.Operations;
 
+    using ReactiveUI;
+
     /// <summary>
     /// The purpose of the <see cref="RequirementsGroupDialogViewModel"/> is to provide a dialog view model
     /// for a <see cref="RequirementsGroup"/>
@@ -53,6 +55,16 @@ namespace CDP4Requirements.ViewModels
         /// The Required Referance-Data-library for the current <see cref="Iteration"/>
         /// </summary>
         private ModelReferenceDataLibrary mRdl;
+
+        /// <summary>
+        /// Backing field for <see cref="ShortName"/> property
+        /// </summary>
+        private string shortName;
+
+        /// <summary>
+        /// Backing field for <see cref="Name"/> property
+        /// </summary>
+        private string name;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RequirementsGroupDialogViewModel"/> class.
@@ -91,6 +103,26 @@ namespace CDP4Requirements.ViewModels
         public RequirementsGroupDialogViewModel(RequirementsGroup requirementsGroup, IThingTransaction transaction, ISession session, bool isRoot, ThingDialogKind dialogKind, IThingDialogNavigationService thingDialogNavigationService, Thing container = null, IEnumerable<Thing> chainOfContainers = null)
             : base(requirementsGroup, transaction, session, isRoot, dialogKind, thingDialogNavigationService, container, chainOfContainers)
         {
+        }
+
+        /// <summary>
+        /// Gets or sets the ShortName
+        /// </summary>
+        [ValidationOverride(true, "RequirementShortName")]
+        public override string ShortName
+        {
+            get { return this.shortName; }
+            set { this.RaiseAndSetIfChanged(ref this.shortName, value); }
+        }
+
+        /// <summary>
+        /// Gets or sets the Name
+        /// </summary>
+        [ValidationOverride(true, "RequirementName")]
+        public override string Name
+        {
+            get { return this.name; }
+            set { this.RaiseAndSetIfChanged(ref this.name, value); }
         }
 
         /// <summary>

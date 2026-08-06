@@ -65,6 +65,11 @@ namespace CDP4Requirements.ViewModels
         private string shortName;
 
         /// <summary>
+        /// Backing field for <see cref="Name"/> property
+        /// </summary>
+        private string name;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="RequirementsSpecificationDialogViewModel"/> class.
         /// </summary>
         /// <remarks>
@@ -137,6 +142,16 @@ namespace CDP4Requirements.ViewModels
         {
             get => this.shortName;
             set => this.RaiseAndSetIfChanged(ref this.shortName, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the Name
+        /// </summary>
+        [ValidationOverride(true, "RequirementName")]
+        public override string Name
+        {
+            get => this.name;
+            set => this.RaiseAndSetIfChanged(ref this.name, value);
         }
 
         /// <summary>

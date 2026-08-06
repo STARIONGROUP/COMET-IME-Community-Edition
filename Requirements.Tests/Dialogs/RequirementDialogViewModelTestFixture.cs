@@ -200,6 +200,22 @@ namespace CDP4Requirements.Tests.Dialogs
         }
 
         [Test]
+        public void VerifyThatNameAndShortNameCanStartWithADigit()
+        {
+            var vm = new RequirementDialogViewModel(this.requirement, this.thingTransaction, this.session.Object,
+                true, ThingDialogKind.Create, this.thingDialogNavigationService.Object, this.clone);
+
+            vm.ShortName = "1req";
+            vm.Name = "1 req";
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(vm["ShortName"], Is.Null);
+                Assert.That(vm["Name"], Is.Null);
+            });
+        }
+
+        [Test]
         public void VerifyThatPopulateGroupsWorks()
         {
             var vm = new RequirementDialogViewModel(this.requirement, this.thingTransaction, this.session.Object,
