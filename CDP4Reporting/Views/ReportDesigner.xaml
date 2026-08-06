@@ -198,11 +198,22 @@
                                 </dxb:InsertAction>
                                 <dxb:InsertAction ContainerName="WhatIfGroup">
                                     <dxb:InsertAction.Element>
-                                        <dxb:BarButtonItem
-                                            LargeGlyph="{dx:DXImage Image=Edit_32x32.png}"
-                                            Command="{Binding Path=LoadWhatIfEditorCommand}"
-                                            Content="Load Values"
-                                            Hint="Load the report's editable leaf values into the What-if Editor panel" />
+                                        <dxb:BarButtonItem Command="{Binding Path=LoadWhatIfEditorCommand}">
+                                            <dxb:BarButtonItem.Style>
+                                                <Style TargetType="dxb:BarButtonItem">
+                                                    <Setter Property="Content" Value="Start What-if Scenario" />
+                                                    <Setter Property="LargeGlyph" Value="{dx:DXImage Image=Edit_32x32.png}" />
+                                                    <Setter Property="Hint" Value="Load the report's editable values into the What-if Editor panel and start a what-if scenario" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsWhatIfEditorVisible}" Value="True">
+                                                            <Setter Property="Content" Value="End What-if Scenario" />
+                                                            <Setter Property="LargeGlyph" Value="{dx:DXImage Image=Close_32x32.png}" />
+                                                            <Setter Property="Hint" Value="Revert all what-if edits, restore the original state and close the What-if Editor panel" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </dxb:BarButtonItem.Style>
+                                        </dxb:BarButtonItem>
                                     </dxb:InsertAction.Element>
                                 </dxb:InsertAction>
                                 <dxb:InsertAction ContainerName="WhatIfGroup">

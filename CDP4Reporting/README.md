@@ -33,7 +33,7 @@ Open it from the ribbon: **Reporting** → open the *Report Designer* panel for 
 |---|---|---|
 | **Submit** | **Parameter Values** | Write the values shown in the preview back to the model (a real, saved change). |
 | **Rebuild** | **Rebuild Datasource** | Re-run the collector and refresh the preview. |
-| **What-if** | **Load Values** / **Recalculate** / **Reset** | The in-memory sandbox — see §3. |
+| **What-if** | **Start / End What-if Scenario** / **Recalculate** / **Reset** | The in-memory sandbox — see §3. |
 
 Standard DevExpress designer features (field list, band editing, grouping, summaries, and
 **Export to PDF/XLSX/…**) are available on the built-in designer surface as usual.
@@ -75,18 +75,31 @@ saving anything**. Nothing touches the model or the server until you explicitly 
 
 ### Use it
 1. Open a report and go to the **Preview** tab (make sure it has data — Rebuild if needed).
-2. **Load Values** — the *What-if Editor* panel opens on the right with one row per editable
-   parameter value:
-   - **Element** — the element the value belongs to.
-   - **Parameter** — the parameter (column) name.
+2. **Start What-if Scenario** — the *What-if Editor* panel opens on the right with one row per
+   editable parameter value:
+   - **Element** — the element's own short-name first, then its containment path in brackets,
+     e.g. `BUS  (…SpaceSeg.SV.DrySV)`, so elements sharing a prefix can be told apart.
+   - **Parameter** — the parameter (column) name; state-dependent values append the state, e.g.
+     `Power_budget [GC]`.
    - **Current** — the model value; a trailing **`*`** means it is a per-usage *override*
      (otherwise it's a shared element-definition value used by all usages).
    - **What-if** — type your new value here.
 3. **Recalculate** — the collector re-runs against an in-memory copy of the model with your edits
    applied, and the preview refreshes. Nothing is saved.
-4. **Reset** (or **Load Values** again) — discards all what-if edits and restores the true model
-   values in both columns.
-5. To keep a change for real, use **Submit → Parameter Values**.
+4. **Reset** — discards all what-if edits and restores the true model values in both columns
+   (panel stays open).
+5. **End What-if Scenario** (the same toggle button) — reverts every edit, restores the original
+   state and closes the panel.
+6. To keep a change for real, use **Submit → Parameter Values**. While a scenario is active its edits
+   are in the model, so Submit **warns first** and lets you cancel — use *End* / *Reset* if you meant
+   to submit only the original values.
+
+> **Values surfaced through custom report parameters.** Some reports compute a headline figure from
+> a specific element rather than the detail rows — e.g. a power report's *Bus Power Available* /
+> *Remaining Power* read a **BUS** element's (state-dependent) `Power_budget` via report parameters
+> (`?dyn_…`). These update on Recalculate, but only if you edit **that** element's value (find the row
+> whose *Element* ends in `.BUS`, for the right state), not a similarly-named parameter on another
+> element.
 
 ### How it decides what's editable
 - Only parameters the report declares with `[DefinedThingShortName]` are offered — so **derived /
@@ -98,14 +111,17 @@ saving anything**. Nothing touches the model or the server until you explicitly 
   Output line). It does not change between Load and Recalculate.
 - Values **shared** across usages (one element-definition value) collapse to a **single row** and
   are kept in sync; per-usage **overrides** are shown separately and marked `*`.
-- A row is shown for **every value the element actually owns**, including parameters that are
-  declared but currently **unvalued** (blank *Current*, still editable).
+- Only values that actually drive the report are editable: **leaf elements** (equipment) are always
+  shown — including **unvalued** ones (blank *Current*), so a missing value can be filled in — while
+  an **aggregating (non-leaf) element** is shown only when it *holds its own value* (e.g. a margin
+  defined at subsystem level). A parent's rolled-up total is a report summary, not a stored value, so
+  it is deliberately not offered for editing.
 - **State-dependent** values are labelled with their state in the *Parameter* column
   (e.g. `Mass [hot]`) so the otherwise-identical rows can be told apart.
 
 ### Limits (current)
-- Shows every element in the option's tree that owns a matching parameter — this can be **more rows
-  than the report's own detail rows**; it is not filtered to the report's row set.
+- The editable set is broader than the report's own detail rows in that it includes any element that
+  owns a value (not just those the report happens to display).
 - To what-if a **different option**, select it and Rebuild Datasource (or reopen); that re-pins it.
 - Non-scalar (vector/compound) parameters aren't editable.
 - What-if scenarios are **in-memory only** — they're discarded when the report/panel closes.

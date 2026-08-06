@@ -32,6 +32,7 @@ namespace CDP4Reporting.Tests.ViewModels
     using System.IO.Compression;
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
+    using System.Reflection;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -1028,6 +1029,187 @@ namespace CDP4Reporting.Tests.ViewModels
             Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.RebuildDatasourceCommand.Execute());
 
             Assert.AreEqual(true, this.reportDesignerViewModel.Output.Contains("Nothing to compile"));
+        }
+
+        [Test]
+        public void VerifyThatEditingASharedValueSyncsSiblingUsagesAndRecordsASingleOverride()
+        {
+            // Two usages of the same element definition share one value set (same ValueSetIid).
+            var valueSetIid = Guid.NewGuid();
+
+            var onValueChanged = (Action<WhatIfEditRowViewModel>)Delegate.CreateDelegate(
+                typeof(Action<WhatIfEditRowViewModel>),
+                this.reportDesignerViewModel,
+                typeof(ReportDesignerViewModel).GetMethod("OnWhatIfValueChanged", BindingFlags.NonPublic | BindingFlags.Instance));
+
+            var rowA = new WhatIfEditRowViewModel("Sat.bat_a", "Mass", @"Sat.bat_a\m\\OPT_A", 2d, onValueChanged) { ValueSetIid = valueSetIid };
+            var rowB = new WhatIfEditRowViewModel("Sat.bat_b", "Mass", @"Sat.bat_b\m\\OPT_A", 2d, onValueChanged) { ValueSetIid = valueSetIid };
+
+            this.RegisterWhatIfRow(valueSetIid, rowA);
+            this.RegisterWhatIfRow(valueSetIid, rowB);
+
+            rowA.Value = 9d;
+
+            // The sibling shows the same value...
+            Assert.That(rowB.Value, Is.EqualTo(9d));
+
+            // ...but only the edited usage holds the override, so the shared value set is set exactly once.
+            var overrides = this.GetWhatIfOverrides();
+            Assert.That(overrides.ContainsKey(rowA.Path), Is.True);
+            Assert.That(overrides[rowA.Path], Is.EqualTo(9d));
+            Assert.That(overrides.ContainsKey(rowB.Path), Is.False);
+        }
+
+        [Test]
+        public void VerifyThatEndingTheWhatIfScenarioHidesTheEditor()
+        {
+            this.reportDesignerViewModel.IsWhatIfEditorVisible = true;
+
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.LoadWhatIfEditorCommand.Execute());
+
+            Assert.That(this.reportDesignerViewModel.IsWhatIfEditorVisible, Is.False);
+        }
+
+        [Test]
+        public void VerifyThatStartingTheWhatIfScenarioWithoutEditableParametersReportsIt()
+        {
+            Assert.That(this.reportDesignerViewModel.IsWhatIfEditorVisible, Is.False);
+
+            Assert.DoesNotThrowAsync(async () => await this.reportDesignerViewModel.LoadWhatIfEditorCommand.Execute());
+
+            // No compiled collector means no [DefinedThingShortName] parameters, so the editor is not shown.
+            Assert.That(this.reportDesignerViewModel.IsWhatIfEditorVisible, Is.False);
+            Assert.That(this.reportDesignerViewModel.Output, Does.Contain("no editable parameters"));
+        }
+
+        [Test]
+        public async Task VerifyThatSubmitWarnsAndAbortsWhenAWhatIfScenarioIsActive()
+        {
+            await this.OpenSimpleReportAsync();
+            this.InjectActiveWhatIfEdit();
+
+            this.messageBoxService
+                .Setup(x => x.Show(It.IsAny<string>(), "Submit what-if values?", MessageBoxButton.OKCancel, It.IsAny<MessageBoxImage>(), It.IsAny<MessageBoxResult>()))
+                .Returns(MessageBoxResult.Cancel);
+
+            await this.reportDesignerViewModel.SubmitParameterValuesCommand.Execute();
+
+            this.messageBoxService.Verify(
+                x => x.Show(It.IsAny<string>(), "Submit what-if values?", MessageBoxButton.OKCancel, It.IsAny<MessageBoxImage>(), It.IsAny<MessageBoxResult>()),
+                Times.Once);
+
+            // Cancelled: submit did not proceed to the confirmation dialog.
+            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<SubmitConfirmationViewModel>()), Times.Never);
+        }
+
+        [Test]
+        public async Task VerifyThatSubmitProceedsWhenTheWhatIfWarningIsConfirmed()
+        {
+            await this.OpenSimpleReportAsync();
+            this.InjectActiveWhatIfEdit();
+
+            this.messageBoxService
+                .Setup(x => x.Show(It.IsAny<string>(), "Submit what-if values?", MessageBoxButton.OKCancel, It.IsAny<MessageBoxImage>(), It.IsAny<MessageBoxResult>()))
+                .Returns(MessageBoxResult.OK);
+
+            await this.reportDesignerViewModel.SubmitParameterValuesCommand.Execute();
+
+            this.messageBoxService.Verify(
+                x => x.Show(It.IsAny<string>(), "Submit what-if values?", MessageBoxButton.OKCancel, It.IsAny<MessageBoxImage>(), It.IsAny<MessageBoxResult>()),
+                Times.Once);
+
+            // Confirmed: submit proceeded past the guard; with no submittable values it reports there are no changes.
+            this.dialogNavigationService.Verify(
+                x => x.NavigateModal(It.Is<OkDialogViewModel>(d => d.Title == "Info" && d.Message.Contains("No parameter changes found"))),
+                Times.Once);
+        }
+
+        [Test]
+        public async Task VerifyThatSubmitDoesNotWarnWithoutAnActiveWhatIfScenario()
+        {
+            await this.OpenSimpleReportAsync();
+
+            await this.reportDesignerViewModel.SubmitParameterValuesCommand.Execute();
+
+            this.messageBoxService.Verify(
+                x => x.Show(It.IsAny<string>(), "Submit what-if values?", MessageBoxButton.OKCancel, It.IsAny<MessageBoxImage>(), It.IsAny<MessageBoxResult>()),
+                Times.Never);
+        }
+
+        /// <summary>
+        /// Invokes the view-model's private RegisterWhatIfRow so a grid row is grouped under its value set.
+        /// </summary>
+        private void RegisterWhatIfRow(Guid valueSetIid, WhatIfEditRowViewModel row)
+        {
+            typeof(ReportDesignerViewModel)
+                .GetMethod("RegisterWhatIfRow", BindingFlags.NonPublic | BindingFlags.Instance)
+                .Invoke(this.reportDesignerViewModel, new object[] { valueSetIid, row });
+        }
+
+        /// <summary>
+        /// Reads the view-model's private what-if override map.
+        /// </summary>
+        private IDictionary<string, double> GetWhatIfOverrides()
+        {
+            return (IDictionary<string, double>)typeof(ReportDesignerViewModel)
+                .GetField("whatIfOverrides", BindingFlags.NonPublic | BindingFlags.Instance)
+                .GetValue(this.reportDesignerViewModel);
+        }
+
+        /// <summary>
+        /// Injects a what-if snapshot so the view-model behaves as though a what-if scenario is active (its edits are
+        /// applied to the model), which is what the submit guard checks.
+        /// </summary>
+        private void InjectActiveWhatIfEdit()
+        {
+            var valueSet = new ParameterValueSet { Iid = Guid.NewGuid() };
+            valueSet.Manual = new ValueArray<string>(new[] { "1" });
+            valueSet.Computed = new ValueArray<string>(new[] { "1" });
+            valueSet.Reference = new ValueArray<string>(new[] { "1" });
+            valueSet.Published = new ValueArray<string>(new[] { "1" });
+            valueSet.ValueSwitch = ParameterSwitchKind.MANUAL;
+
+            var snapshotType = typeof(ReportDesignerViewModel).GetNestedType("WhatIfValueSetSnapshot", BindingFlags.NonPublic);
+            var snapshot = Activator.CreateInstance(snapshotType, valueSet);
+
+            var snapshots = (System.Collections.IDictionary)typeof(ReportDesignerViewModel)
+                .GetField("whatIfSnapshots", BindingFlags.NonPublic | BindingFlags.Instance)
+                .GetValue(this.reportDesignerViewModel);
+
+            snapshots[valueSet.Iid] = snapshot;
+        }
+
+        /// <summary>
+        /// Opens a minimal option-dependent report so the view-model has a current data collector (needed to reach the
+        /// submit path).
+        /// </summary>
+        private async Task OpenSimpleReportAsync()
+        {
+            var reportStream = new MemoryStream(Encoding.UTF8.GetBytes(REPORT_CODE));
+            var dataSourceStream = new MemoryStream(Encoding.UTF8.GetBytes(DATASOURCE_CODE));
+
+            using (var zipFile = ZipFile.Open(this.zipPathOpen, ZipArchiveMode.Create))
+            {
+                using (var reportEntry = zipFile.CreateEntry("Report.repx").Open())
+                {
+                    reportStream.Position = 0;
+                    await reportStream.CopyToAsync(reportEntry);
+                }
+
+                using (var reportEntry = zipFile.CreateEntry("Datasource.cs").Open())
+                {
+                    dataSourceStream.Position = 0;
+                    await dataSourceStream.CopyToAsync(reportEntry);
+                }
+            }
+
+            this.submittableParameterValuesCollector.Setup(x => x.Collect(It.IsAny<XtraReport>())).Returns(new List<SubmittableParameterValue>());
+
+            this.openSaveFileDialogService.Setup(x =>
+                x.GetOpenFileDialog(true, true, false, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), 1)).Returns(new string[] { this.zipPathOpen });
+
+            await this.reportDesignerViewModel.OpenReportCommand.Execute();
+            await this.reportDesignerViewModel.CurrentReport.CreateDocumentAsync();
         }
     }
 }

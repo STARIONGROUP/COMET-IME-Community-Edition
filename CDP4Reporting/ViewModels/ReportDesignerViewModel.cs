@@ -453,7 +453,7 @@ namespace CDP4Reporting.ViewModels
 
             this.WhatIfRecalculateCommand = ReactiveCommandCreator.CreateAsyncTask(this.ExecuteWhatIfRecalculate);
 
-            this.LoadWhatIfEditorCommand = ReactiveCommandCreator.Create(this.LoadWhatIfEditor);
+            this.LoadWhatIfEditorCommand = ReactiveCommandCreator.Create(this.ToggleWhatIfEditor);
 
             this.ResetWhatIfCommand = ReactiveCommandCreator.Create(this.ResetWhatIf);
 
@@ -893,7 +893,31 @@ namespace CDP4Reporting.ViewModels
             try
             {
                 var presenter = this.currentReportDesignerDocument?.Preview as DocumentPreviewControl;
-                presenter?.ParameterPanelViewModel?.SubmitParameters();
+
+                if (presenter?.ParameterPanelViewModel == null)
+                {
+                    return;
+                }
+
+                // Push the report parameter values that RebuildDataSource just recomputed (the "dyn_" dynamic
+                // parameters - e.g. a headline figure a report derives from a specific element such as a bus
+                // Power_budget) into the preview's parameter panel. Without this the preview keeps the pre-edit
+                // values and any figure computed from them does not change. Mirrors the Rebuild Datasource (preview)
+                // command's refresh.
+                foreach (var parameter in this.currentReport.Parameters)
+                {
+                    if (parameter.Name.StartsWith("dyn_", StringComparison.Ordinal))
+                    {
+                        var previewParameter = presenter.ParameterPanelViewModel.Parameters.SingleOrDefault(x => x.Name == parameter.Name);
+
+                        if (previewParameter != null)
+                        {
+                            previewParameter.Value = parameter.Value;
+                        }
+                    }
+                }
+
+                presenter.ParameterPanelViewModel.SubmitParameters();
             }
             catch (Exception ex)
             {
@@ -904,6 +928,30 @@ namespace CDP4Reporting.ViewModels
         /// <summary>
         /// Loads the what-if editor grid from the report's current data: one editable row per leaf value that
         /// carries a write-back path. Existing overrides are re-applied so previous edits are preserved.
+        /// </summary>
+        /// <summary>
+        /// Starts or ends the what-if scenario: when the editor is closed it loads the editable values and opens the
+        /// panel; when it is open it reverts every in-memory edit and closes the panel, returning to the original state.
+        /// </summary>
+        [ExcludeFromCodeCoverage]
+        private void ToggleWhatIfEditor()
+        {
+            if (this.IsWhatIfEditorVisible)
+            {
+                this.ResetWhatIfState();
+                this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session, true);
+                this.TriggerRefreshUI();
+                this.RefreshPreviewDocument();
+                this.AddOutput("What-if scenario ended - all edits reverted and the model restored to its original state.");
+            }
+            else
+            {
+                this.LoadWhatIfEditor();
+            }
+        }
+
+        /// <summary>
+        /// Loads the what-if editor grid from the report's model values.
         /// </summary>
         [ExcludeFromCodeCoverage]
         private void LoadWhatIfEditor()
@@ -1016,8 +1064,24 @@ namespace CDP4Reporting.ViewModels
                         original = parsed;
                     }
 
+                    var elementDefinition = (nestedParameter.Container as NestedElement)?.GetElementDefinition();
+                    var isAggregatingParent = elementDefinition != null && elementDefinition.ContainedElement.Count > 0;
+
+                    if (isAggregatingParent && !original.HasValue)
+                    {
+                        continue;
+                    }
+
                     var path = nestedParameter.Path;
-                    var element = string.IsNullOrEmpty(path) ? shortName : path.Split('\\')[0];
+                    var fullElementPath = string.IsNullOrEmpty(path) ? shortName : path.Split('\\')[0];
+
+                    // Show the element's own short-name first (so it stays visible when the column truncates),
+                    // followed by its containment path for context - e.g. "BUS  (…SpaceSeg.SV.DrySV)". This lets an
+                    // element like the power BUS be told apart from its parent, which share a truncated prefix.
+                    var lastSeparator = fullElementPath.LastIndexOf('.');
+                    var element = lastSeparator > 0 && lastSeparator < fullElementPath.Length - 1
+                        ? $"{fullElementPath.Substring(lastSeparator + 1)}  ({fullElementPath.Substring(0, lastSeparator)})"
+                        : fullElementPath;
 
                     // Distinguish state-dependent rows (same element and parameter, one value set per state) by
                     // appending the state short-name to the parameter label.
@@ -1330,11 +1394,8 @@ namespace CDP4Reporting.ViewModels
         [ExcludeFromCodeCoverage]
         private bool SetModelManualValue(ParameterValueSetBase valueSet, string text)
         {
-            if (valueSet.Manual == null || valueSet.Manual.Count == 0)
-            {
-                return false;
-            }
-
+            // Note: the value set's arrays may be empty for a never-valued (leaf) parameter; that is fine - only
+            // scalar parameters reach here, and every array is replaced below with the single edited value.
             if (!double.TryParse(text, NumberStyles.Any, CultureInfo.InvariantCulture, out var value)
                 && !double.TryParse(text, NumberStyles.Any, CultureInfo.CurrentCulture, out value))
             {
@@ -1619,6 +1680,25 @@ namespace CDP4Reporting.ViewModels
             if (!(this.ReportScriptHandler.CurrentDataCollector is IOptionDependentDataCollector optionDependentDataCollector))
             {
                 return;
+            }
+
+            // A what-if scenario edits the model in memory; those values feed the submit. Guard against saving
+            // exploratory what-if numbers by accident: warn while a scenario is active (edits applied to the model)
+            // and let the user cancel. Use End What-if Scenario / Reset first to submit only real model values.
+            if (this.whatIfSnapshots.Count > 0)
+            {
+                var confirmation = this.messageBoxService.Show(
+                    "A what-if scenario is active, so its in-memory edits will be saved to the model by this submit. "
+                    + "Continue and save the what-if values, or cancel and use 'End What-if Scenario' / 'Reset' first to submit only the original values?",
+                    "Submit what-if values?",
+                    MessageBoxButton.OKCancel,
+                    MessageBoxImage.Warning,
+                    MessageBoxResult.Cancel);
+
+                if (confirmation != MessageBoxResult.OK)
+                {
+                    return;
+                }
             }
 
             var processedValueSets = this.GetProcessedValueSets(out var errorTexts);
