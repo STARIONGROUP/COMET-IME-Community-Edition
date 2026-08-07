@@ -173,6 +173,71 @@ namespace CDP4SiteDirectory.Tests.Dialogs
         }
 
         [Test]
+        public void VerifyThatDefaultRoleIsAppliedToAllRowsButCanBeOverriddenPerPerson()
+        {
+            var adminRole = new ParticipantRole(Guid.NewGuid(), this.cache, this.uri) { Name = "Model Administrator" };
+
+            var viewModel = new BulkParticipantCreationDialogViewModel(
+                new[] { this.john, this.jane },
+                new[] { this.role, adminRole },
+                new[] { this.thermal, this.systems });
+
+            viewModel.SelectedRole = this.role;
+
+            // the global role seeds every row
+            Assert.That(viewModel.Participants.All(x => x.SelectedRole == this.role), Is.True);
+
+            // overriding a single person keeps the others on the global role
+            this.RowFor(viewModel, this.john).SelectedRole = adminRole;
+
+            Assert.That(this.RowFor(viewModel, this.john).SelectedRole, Is.EqualTo(adminRole));
+            Assert.That(this.RowFor(viewModel, this.jane).SelectedRole, Is.EqualTo(this.role));
+        }
+
+        [Test]
+        public async Task VerifyThatPerPersonRoleOverrideSurvivesOk()
+        {
+            var adminRole = new ParticipantRole(Guid.NewGuid(), this.cache, this.uri) { Name = "Model Administrator" };
+
+            var viewModel = new BulkParticipantCreationDialogViewModel(
+                new[] { this.john, this.jane },
+                new[] { this.role, adminRole },
+                new[] { this.thermal, this.systems });
+
+            viewModel.SelectedRole = this.role;
+            this.RowFor(viewModel, this.john).SelectedRole = adminRole;
+
+            await viewModel.OkCommand.Execute();
+
+            var result = viewModel.DialogResult as BulkParticipantCreationResult;
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Participants.Single(x => x.Person == this.john).SelectedRole, Is.EqualTo(adminRole));
+            Assert.That(result.Participants.Single(x => x.Person == this.jane).SelectedRole, Is.EqualTo(this.role));
+        }
+
+        [Test]
+        public async Task VerifyThatPerPersonIsActiveOverrideSurvivesOk()
+        {
+            var viewModel = this.CreateDialogViewModel();
+
+            viewModel.SelectedRole = this.role;
+            viewModel.IsActive = true;
+            this.RowFor(viewModel, this.personWithoutDefaultDomain).SelectedDomain = this.thermal;
+
+            // the default seeds every row active; a single person is then set inactive
+            this.RowFor(viewModel, this.john).IsActive = false;
+
+            await viewModel.OkCommand.Execute();
+
+            var result = viewModel.DialogResult as BulkParticipantCreationResult;
+
+            Assert.That(result, Is.Not.Null);
+            Assert.That(result.Participants.Single(x => x.Person == this.john).IsActive, Is.False);
+            Assert.That(result.Participants.Single(x => x.Person == this.jane).IsActive, Is.True);
+        }
+
+        [Test]
         public async Task VerifyThatOkResultContainsOnlySelectedParticipants()
         {
             var viewModel = this.CreateDialogViewModel();

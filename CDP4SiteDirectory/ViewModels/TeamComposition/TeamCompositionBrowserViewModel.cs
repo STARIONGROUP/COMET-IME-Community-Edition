@@ -1,23 +1,49 @@
-﻿// -------------------------------------------------------------------------------------------------
+﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="TeamCompositionBrowserViewModel.cs" company="Starion Group S.A.">
-//   Copyright (c) 2015-2020 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
+//
+//    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Rowan de Voogt
+//
+//    This file is part of CDP4-COMET IME Community Edition.
+//    The CDP4-COMET IME Community Edition is the Starion Concurrent Design Desktop Application and Excel Integration
+//    compliant with ECSS-E-TM-10-25 Annex A and Annex C.
+//
+//    The CDP4-COMET IME Community Edition is free software; you can redistribute it and/or
+//    modify it under the terms of the GNU Affero General Public
+//    License as published by the Free Software Foundation; either
+//    version 3 of the License, or any later version.
+//
+//    The CDP4-COMET IME Community Edition is distributed in the hope that it will be useful,
+//    but WITHOUT ANY WARRANTY; without even the implied warranty of
+//    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+//    GNU Affero General Public License for more details.
+//
+//    You should have received a copy of the GNU Affero General Public License
+//    along with this program. If not, see http://www.gnu.org/licenses/.
 // </copyright>
-// -------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 
 namespace CDP4SiteDirectory.ViewModels
 {
     using System;
     using System.Linq;
+    using System.Reactive;
+    using System.Threading.Tasks;
+
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
+
     using CDP4Composition;
     using CDP4Composition.Mvvm;
     using CDP4Composition.Mvvm.Types;
     using CDP4Composition.Navigation;
     using CDP4Composition.Navigation.Interfaces;
     using CDP4Composition.PluginSettingService;
+
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
+
     using ReactiveUI;
 
     /// <summary>
@@ -106,6 +132,11 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
+        /// Gets the <see cref="ReactiveCommand"/> to create multiple <see cref="Participant"/>s at once
+        /// </summary>
+        public ReactiveCommand<Unit, Unit> CreateMultipleParticipantsCommand { get; private set; }
+
+        /// <summary>
         /// Gets or sets the dock layout group target name to attach this panel to on opening
         /// </summary>
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
@@ -133,6 +164,65 @@ namespace CDP4SiteDirectory.ViewModels
         {
             base.InitializeCommands();
             this.CreateCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Participant>(this.Thing), this.WhenAnyValue(x => x.CanCreateParticipant));
+
+            this.CreateMultipleParticipantsCommand = ReactiveCommandCreator.CreateAsyncTask(
+                this.ExecuteCreateMultipleParticipantsCommand,
+                this.WhenAnyValue(x => x.CanCreateParticipant));
+        }
+
+        /// <summary>
+        /// Executes the <see cref="CreateMultipleParticipantsCommand"/> by presenting the bulk participant creation
+        /// dialog and persisting the selected <see cref="Participant"/>s in a single transaction.
+        /// </summary>
+        /// <returns>
+        /// an awaitable <see cref="Task"/>
+        /// </returns>
+        private async Task ExecuteCreateMultipleParticipantsCommand()
+        {
+            var modelSetup = this.Thing;
+
+            var siteDirectory = this.Session.RetrieveSiteDirectory();
+
+            var eligiblePersons = siteDirectory.Person
+                .Where(person => !person.IsDeprecated)
+                .Except(modelSetup.Participant.Select(p => p.Person))
+                .ToList();
+
+            if (!eligiblePersons.Any())
+            {
+                return;
+            }
+
+            var dialogViewModel = new BulkParticipantCreationDialogViewModel(eligiblePersons, siteDirectory.ParticipantRole, modelSetup.ActiveDomain);
+
+            var result = this.DialogNavigationService.NavigateModal(dialogViewModel) as BulkParticipantCreationResult;
+
+            if (result?.Result != true || result.Participants == null || !result.Participants.Any())
+            {
+                return;
+            }
+
+            var context = TransactionContextResolver.ResolveContext(modelSetup);
+            var modelSetupClone = modelSetup.Clone(false);
+            var transaction = new ThingTransaction(context, modelSetupClone);
+
+            foreach (var row in result.Participants)
+            {
+                var participant = new Participant(Guid.NewGuid(), null, null)
+                {
+                    Person = row.Person,
+                    Role = row.SelectedRole,
+                    SelectedDomain = row.SelectedDomain,
+                    IsActive = row.IsActive
+                };
+
+                participant.Domain.Add(row.SelectedDomain);
+
+                modelSetupClone.Participant.Add(participant);
+                transaction.Create(participant, modelSetupClone);
+            }
+
+            await this.Session.Write(transaction.FinalizeTransaction());
         }
 
         /// <summary>
@@ -152,6 +242,7 @@ namespace CDP4SiteDirectory.ViewModels
             base.PopulateContextMenu();
 
             this.ContextMenu.Add(new ContextMenuItemViewModel("Create a Participant", "", this.CreateCommand, MenuItemKind.Create, ClassKind.Participant));
+            this.ContextMenu.Add(new ContextMenuItemViewModel("Create Multiple Participants", "", this.CreateMultipleParticipantsCommand, MenuItemKind.Create, ClassKind.Participant));
         }
 
         /// <summary>
