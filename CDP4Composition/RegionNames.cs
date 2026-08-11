@@ -44,5 +44,11 @@ namespace CDP4Composition
         /// Defines the "Model" Ribbon page region
         /// </summary>
         public const string ModelRibbonPageRegion = "ModelRibbonPageRegion";
+
+        /// <summary>
+        /// Defines the "Requirements" Ribbon page region, allowing plugins to contribute
+        /// <see cref="Ribbon.ExtendedRibbonPageGroup"/>s to the Requirements ribbon page.
+        /// </summary>
+        public const string RequirementRibbonPageRegion = "RequirementRibbonPageRegion";
     }
 }
