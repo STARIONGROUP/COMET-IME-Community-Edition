@@ -208,8 +208,9 @@ namespace CDP4SiteDirectory.ViewModels
 
             foreach (var row in result.Participants)
             {
-                var participant = new Participant(Guid.NewGuid(), null, null)
+                var participant = new Participant
                 {
+                    Iid = Guid.NewGuid(),
                     Person = row.Person,
                     Role = row.SelectedRole,
                     SelectedDomain = row.SelectedDomain,

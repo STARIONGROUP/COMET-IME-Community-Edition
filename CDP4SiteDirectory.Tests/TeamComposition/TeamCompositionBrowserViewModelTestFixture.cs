@@ -214,7 +214,7 @@ namespace CDP4SiteDirectory.Tests
             var vm = new TeamCompositionBrowserViewModel(this.engineeringModelSetup, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
             vm.ComputePermission();
 
-            Assert.IsTrue(vm.CanCreateParticipant);
+            Assert.That(vm.CanCreateParticipant, Is.True);
 
             var row = new BulkParticipantRowViewModel(newPerson, new[] { this.systemEngineering }, new[] { this.participantRole })
             {
@@ -229,8 +229,11 @@ namespace CDP4SiteDirectory.Tests
 
             await vm.CreateMultipleParticipantsCommand.Execute();
 
-            this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
-            this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            Assert.Multiple(() =>
+            {
+                this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
+                this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            });
         }
 
         [Test]

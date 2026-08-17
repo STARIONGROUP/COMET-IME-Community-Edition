@@ -190,8 +190,11 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             // overriding a single person keeps the others on the global role
             this.RowFor(viewModel, this.john).SelectedRole = adminRole;
 
-            Assert.That(this.RowFor(viewModel, this.john).SelectedRole, Is.EqualTo(adminRole));
-            Assert.That(this.RowFor(viewModel, this.jane).SelectedRole, Is.EqualTo(this.role));
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.RowFor(viewModel, this.john).SelectedRole, Is.EqualTo(adminRole));
+                Assert.That(this.RowFor(viewModel, this.jane).SelectedRole, Is.EqualTo(this.role));
+            });
         }
 
         [Test]
@@ -212,8 +215,12 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             var result = viewModel.DialogResult as BulkParticipantCreationResult;
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Participants.Single(x => x.Person == this.john).SelectedRole, Is.EqualTo(adminRole));
-            Assert.That(result.Participants.Single(x => x.Person == this.jane).SelectedRole, Is.EqualTo(this.role));
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Participants.Single(x => x.Person == this.john).SelectedRole, Is.EqualTo(adminRole));
+                Assert.That(result.Participants.Single(x => x.Person == this.jane).SelectedRole, Is.EqualTo(this.role));
+            });
         }
 
         [Test]
@@ -233,8 +240,12 @@ namespace CDP4SiteDirectory.Tests.Dialogs
             var result = viewModel.DialogResult as BulkParticipantCreationResult;
 
             Assert.That(result, Is.Not.Null);
-            Assert.That(result.Participants.Single(x => x.Person == this.john).IsActive, Is.False);
-            Assert.That(result.Participants.Single(x => x.Person == this.jane).IsActive, Is.True);
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.Participants.Single(x => x.Person == this.john).IsActive, Is.False);
+                Assert.That(result.Participants.Single(x => x.Person == this.jane).IsActive, Is.True);
+            });
         }
 
         [Test]
