@@ -35,9 +35,9 @@ namespace CDP4SiteDirectory.ViewModels
     /// <summary>
     /// Represents a single candidate <see cref="Participant"/> to be created in the
     /// <see cref="BulkParticipantCreationDialogViewModel"/>. Each row maps one <see cref="Person"/> to the
-    /// <see cref="DomainOfExpertise"/> the created <see cref="Participant"/> shall receive. The
-    /// <see cref="ParticipantRole"/> and active state are applied for the whole batch by the owning
-    /// <see cref="BulkParticipantCreationDialogViewModel"/>.
+    /// <see cref="DomainOfExpertise"/> and <see cref="ParticipantRole"/> the created <see cref="Participant"/>
+    /// shall receive. The <see cref="ParticipantRole"/> defaults to the batch-wide role set on the owning
+    /// <see cref="BulkParticipantCreationDialogViewModel"/> but may be overridden per <see cref="Person"/>.
     /// </summary>
     public class BulkParticipantRowViewModel : ReactiveObject
     {
@@ -52,6 +52,16 @@ namespace CDP4SiteDirectory.ViewModels
         private DomainOfExpertise selectedDomain;
 
         /// <summary>
+        /// Backing field for <see cref="SelectedRole"/>
+        /// </summary>
+        private ParticipantRole selectedRole;
+
+        /// <summary>
+        /// Backing field for <see cref="IsActive"/>
+        /// </summary>
+        private bool isActive;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="BulkParticipantRowViewModel"/> class.
         /// </summary>
         /// <param name="person">
@@ -60,10 +70,14 @@ namespace CDP4SiteDirectory.ViewModels
         /// <param name="possibleDomains">
         /// The possible <see cref="DomainOfExpertise"/>s (the active domains of the model) that may be assigned.
         /// </param>
-        public BulkParticipantRowViewModel(Person person, IEnumerable<DomainOfExpertise> possibleDomains)
+        /// <param name="possibleRoles">
+        /// The possible <see cref="ParticipantRole"/>s that may be assigned to this <see cref="Person"/>.
+        /// </param>
+        public BulkParticipantRowViewModel(Person person, IEnumerable<DomainOfExpertise> possibleDomains, IEnumerable<ParticipantRole> possibleRoles)
         {
             this.Person = person;
             this.PossibleDomain = possibleDomains.ToList();
+            this.PossibleRole = possibleRoles.ToList();
             this.IsSelected = true;
 
             if (person.DefaultDomain != null && this.PossibleDomain.Contains(person.DefaultDomain))
@@ -88,6 +102,11 @@ namespace CDP4SiteDirectory.ViewModels
         public IReadOnlyList<DomainOfExpertise> PossibleDomain { get; }
 
         /// <summary>
+        /// Gets the possible <see cref="ParticipantRole"/>s that may be assigned to this <see cref="Person"/>.
+        /// </summary>
+        public IReadOnlyList<ParticipantRole> PossibleRole { get; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether a <see cref="Participant"/> shall be created for this <see cref="Person"/>.
         /// </summary>
         public bool IsSelected
@@ -108,11 +127,19 @@ namespace CDP4SiteDirectory.ViewModels
         /// <summary>
         /// Gets or sets the <see cref="ParticipantRole"/> that the created <see cref="Participant"/> shall receive.
         /// </summary>
-        public ParticipantRole SelectedRole { get; set; }
+        public ParticipantRole SelectedRole
+        {
+            get => this.selectedRole;
+            set => this.RaiseAndSetIfChanged(ref this.selectedRole, value);
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether the created <see cref="Participant"/> shall be active.
         /// </summary>
-        public bool IsActive { get; set; }
+        public bool IsActive
+        {
+            get => this.isActive;
+            set => this.RaiseAndSetIfChanged(ref this.isActive, value);
+        }
     }
 }

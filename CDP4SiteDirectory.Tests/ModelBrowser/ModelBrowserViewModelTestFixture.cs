@@ -623,7 +623,7 @@ namespace CDP4SiteDirectory.Tests
 
             Assert.IsTrue(viewmodel.CanCreateParticipant);
 
-            var row = new BulkParticipantRowViewModel(newPerson, new[] { domain })
+            var row = new BulkParticipantRowViewModel(newPerson, new[] { domain }, new[] { role })
             {
                 SelectedRole = role,
                 SelectedDomain = domain,

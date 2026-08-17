@@ -29,7 +29,9 @@ namespace CDP4SiteDirectory.Tests
     using System.Collections.Concurrent;
     using System.Linq;
     using System.Reactive.Concurrency;
+    using System.Reactive.Linq;
     using System.Reflection;
+    using System.Threading.Tasks;
 
     using CDP4Common.CommonData;
     using CDP4Common.SiteDirectoryData;
@@ -40,6 +42,7 @@ namespace CDP4SiteDirectory.Tests
 
     using CDP4Dal;
     using CDP4Dal.Events;
+    using CDP4Dal.Operations;
     using CDP4Dal.Permission;
 
     using CDP4SiteDirectory.ViewModels;
@@ -191,6 +194,46 @@ namespace CDP4SiteDirectory.Tests
             this.messageBus.SendObjectChangeEvent(this.engineeringModelSetup, EventKind.Updated);
 
             Assert.AreEqual(2, vm.Participants.Count);
+        }
+
+        [Test]
+        public async Task VerifyThatCreateMultipleParticipantsCommandWritesParticipants()
+        {
+            this.siteDir.Model.Add(this.engineeringModelSetup);
+            this.siteDir.ParticipantRole.Add(this.participantRole);
+            this.siteDir.Domain.Add(this.systemEngineering);
+            this.engineeringModelSetup.ActiveDomain.Add(this.systemEngineering);
+
+            var newPerson = new Person(Guid.NewGuid(), this.cache, this.uri) { GivenName = "Jane", Surname = "Roe", Role = this.personRole };
+            this.siteDir.Person.Add(newPerson);
+
+            this.permissionService.Setup(x => x.CanWrite(It.IsAny<ClassKind>(), It.IsAny<Thing>())).Returns(true);
+            this.session.Setup(x => x.RetrieveSiteDirectory()).Returns(this.siteDir);
+            this.session.Setup(x => x.Write(It.IsAny<OperationContainer>())).Returns(Task.CompletedTask);
+
+            var vm = new TeamCompositionBrowserViewModel(this.engineeringModelSetup, this.session.Object, this.thingDialogNavigationService.Object, this.panelNavigationService.Object, this.dialogNavigationService.Object, null);
+            vm.ComputePermission();
+
+            Assert.That(vm.CanCreateParticipant, Is.True);
+
+            var row = new BulkParticipantRowViewModel(newPerson, new[] { this.systemEngineering }, new[] { this.participantRole })
+            {
+                SelectedRole = this.participantRole,
+                SelectedDomain = this.systemEngineering,
+                IsActive = true
+            };
+
+            this.dialogNavigationService
+                .Setup(x => x.NavigateModal(It.IsAny<IDialogViewModel>()))
+                .Returns(new BulkParticipantCreationResult(true, new[] { row }));
+
+            await vm.CreateMultipleParticipantsCommand.Execute();
+
+            Assert.Multiple(() =>
+            {
+                this.dialogNavigationService.Verify(x => x.NavigateModal(It.IsAny<IDialogViewModel>()), Times.Once);
+                this.session.Verify(x => x.Write(It.IsAny<OperationContainer>()), Times.Once);
+            });
         }
 
         [Test]

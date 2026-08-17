@@ -39,10 +39,10 @@ namespace CDP4SiteDirectory.ViewModels
 
     /// <summary>
     /// The dialog-view-model that allows the user to create multiple <see cref="Participant"/>s at once for a single
-    /// <see cref="EngineeringModelSetup"/>. The selected <see cref="Person"/>s all receive the same
-    /// <see cref="ParticipantRole"/> and active state, while the <see cref="DomainOfExpertise"/> of each
-    /// <see cref="Participant"/> is chosen per <see cref="Person"/> (defaulting to the <see cref="Person"/>'s own
-    /// default domain).
+    /// <see cref="EngineeringModelSetup"/>. The <see cref="SelectedRole"/> and active state chosen on the dialog are
+    /// applied to every selected <see cref="Person"/> as a default, while the <see cref="DomainOfExpertise"/> and the
+    /// <see cref="ParticipantRole"/> may be overridden per <see cref="Person"/> (the domain defaulting to the
+    /// <see cref="Person"/>'s own default domain).
     /// </summary>
     public class BulkParticipantCreationDialogViewModel : DialogViewModelBase
     {
@@ -97,12 +97,13 @@ namespace CDP4SiteDirectory.ViewModels
 
             foreach (var person in persons.OrderBy(x => x.Name))
             {
-                var row = new BulkParticipantRowViewModel(person, this.PossibleDomain);
-                this.Subscriptions.Add(row.WhenAnyValue(x => x.IsSelected, x => x.SelectedDomain).Subscribe(_ => this.UpdateOkCanExecute()));
+                var row = new BulkParticipantRowViewModel(person, this.PossibleDomain, this.PossibleRole);
+                this.Subscriptions.Add(row.WhenAnyValue(x => x.IsSelected, x => x.SelectedDomain, x => x.SelectedRole).Subscribe(_ => this.UpdateOkCanExecute()));
                 this.Participants.Add(row);
             }
 
-            this.Subscriptions.Add(this.WhenAnyValue(x => x.SelectedRole).Subscribe(_ => this.UpdateOkCanExecute()));
+            this.Subscriptions.Add(this.WhenAnyValue(x => x.SelectedRole).Subscribe(this.ApplyRoleToRows));
+            this.Subscriptions.Add(this.WhenAnyValue(x => x.IsActive).Subscribe(this.ApplyIsActiveToRows));
 
             this.InitializeReactiveCommands();
             this.UpdateOkCanExecute();
@@ -124,7 +125,9 @@ namespace CDP4SiteDirectory.ViewModels
         public IReadOnlyList<DomainOfExpertise> PossibleDomain { get; private set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="ParticipantRole"/> that every created <see cref="Participant"/> shall receive.
+        /// Gets or sets the default <see cref="ParticipantRole"/> that is applied to every selected
+        /// <see cref="Person"/>. The role of an individual <see cref="Person"/> may still be overridden on its
+        /// <see cref="BulkParticipantRowViewModel"/>.
         /// </summary>
         public ParticipantRole SelectedRole
         {
@@ -133,7 +136,9 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether every created <see cref="Participant"/> shall be active.
+        /// Gets or sets the default value applied to every selected <see cref="Person"/> indicating whether the
+        /// created <see cref="Participant"/> shall be active. The active state of an individual <see cref="Person"/>
+        /// may still be overridden on its <see cref="BulkParticipantRowViewModel"/>.
         /// </summary>
         public bool IsActive
         {
@@ -170,13 +175,43 @@ namespace CDP4SiteDirectory.ViewModels
         }
 
         /// <summary>
+        /// Applies the batch-wide <see cref="SelectedRole"/> to every row as the default role for each
+        /// <see cref="Person"/>. Individual rows may subsequently be overridden by the user.
+        /// </summary>
+        /// <param name="role">
+        /// The <see cref="ParticipantRole"/> to apply to every row.
+        /// </param>
+        private void ApplyRoleToRows(ParticipantRole role)
+        {
+            foreach (var row in this.Participants)
+            {
+                row.SelectedRole = role;
+            }
+        }
+
+        /// <summary>
+        /// Applies the batch-wide <see cref="IsActive"/> value to every row as the default for each
+        /// <see cref="Person"/>. Individual rows may subsequently be overridden by the user.
+        /// </summary>
+        /// <param name="isActive">
+        /// A value indicating whether the created <see cref="Participant"/>s shall be active.
+        /// </param>
+        private void ApplyIsActiveToRows(bool isActive)
+        {
+            foreach (var row in this.Participants)
+            {
+                row.IsActive = isActive;
+            }
+        }
+
+        /// <summary>
         /// Updates the <see cref="OkCanExecute"/> property.
         /// </summary>
         private void UpdateOkCanExecute()
         {
             var selectedRows = this.Participants.Where(x => x.IsSelected).ToList();
 
-            this.OkCanExecute = selectedRows.Any() && this.SelectedRole != null && selectedRows.All(x => x.SelectedDomain != null);
+            this.OkCanExecute = selectedRows.Any() && selectedRows.All(x => x.SelectedDomain != null && x.SelectedRole != null);
         }
 
         /// <summary>
@@ -185,12 +220,6 @@ namespace CDP4SiteDirectory.ViewModels
         private void ExecuteOk()
         {
             var selectedRows = this.Participants.Where(x => x.IsSelected).ToList();
-
-            foreach (var row in selectedRows)
-            {
-                row.SelectedRole = this.SelectedRole;
-                row.IsActive = this.IsActive;
-            }
 
             this.DialogResult = new BulkParticipantCreationResult(true, selectedRows);
         }

@@ -31,7 +31,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,10,5" VerticalAlignment="Center" Text="Participant Role:" />
+            <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,0,10,5" VerticalAlignment="Center" Text="Default Participant Role:" />
             <dxe:ComboBoxEdit Grid.Row="0" Grid.Column="1"
                               Margin="0,0,0,5"
                               Name="Role"
@@ -40,7 +40,7 @@
                               EditValue="{Binding SelectedRole, UpdateSourceTrigger=PropertyChanged}"
                               ItemsSource="{Binding PossibleRole}" />
 
-            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" Text="Is Active:" />
+            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,0,10,0" VerticalAlignment="Center" Text="Default Is Active:" />
             <dxe:CheckEdit Grid.Row="1" Grid.Column="1"
                            Name="IsActiveCheckEdit"
                            HorizontalAlignment="Left"
@@ -94,6 +94,34 @@
                                       DisplayMemberPath="Name"
                                       SelectedItem="{Binding RowData.Row.SelectedDomain, UpdateSourceTrigger=PropertyChanged}"
                                       ItemsSource="{Binding RowData.Row.PossibleDomain}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+                <dxg:GridColumn FieldName="SelectedRole"
+                                Header="Participant Role"
+                                HorizontalHeaderContentAlignment="Left"
+                                AllowEditing="True">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <ComboBox Margin="3"
+                                      Background="White"
+                                      IsEditable="False"
+                                      DisplayMemberPath="Name"
+                                      SelectedItem="{Binding RowData.Row.SelectedRole, UpdateSourceTrigger=PropertyChanged}"
+                                      ItemsSource="{Binding RowData.Row.PossibleRole}" />
+                        </DataTemplate>
+                    </dxg:GridColumn.CellTemplate>
+                </dxg:GridColumn>
+                <dxg:GridColumn FieldName="IsActive"
+                                Header="Active"
+                                Width="55"
+                                AllowEditing="True"
+                                HorizontalHeaderContentAlignment="Center">
+                    <dxg:GridColumn.CellTemplate>
+                        <DataTemplate>
+                            <dxe:CheckEdit HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           IsChecked="{Binding RowData.Row.IsActive, UpdateSourceTrigger=PropertyChanged}" />
                         </DataTemplate>
                     </dxg:GridColumn.CellTemplate>
                 </dxg:GridColumn>
