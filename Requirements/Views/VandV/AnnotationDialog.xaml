@@ -1,0 +1,67 @@
+﻿<dx:DXWindow x:Class="CDP4Requirements.Views.AnnotationDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:lc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:navigation="clr-namespace:CDP4Composition.Navigation;assembly=CDP4Composition"
+             Width="520"
+             Height="420"
+             dx:ThemeManager.ThemeName="Seven"
+             navigation:ExtendedDialogResultCloser.DialogResult="{Binding DialogResult}"
+             mc:Ignorable="d"
+             Title="{Binding DialogTitle}">
+
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <lc:LayoutControl Grid.Row="0" Orientation="Vertical" ScrollBars="None">
+            <lc:LayoutGroup Orientation="Vertical" VerticalAlignment="Top">
+                <lc:LayoutItem Label="Raised against: ">
+                    <Label Content="{Binding AnnotatedThingCaption, Mode=OneWay}" FontWeight="Bold" />
+                </lc:LayoutItem>
+                <lc:LayoutItem Label="Short Name: "
+                               Visibility="{Binding HasIdentification, Converter={dx:BooleanToVisibilityConverter}}">
+                    <dxe:TextEdit EditValue="{Binding ShortName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
+                </lc:LayoutItem>
+                <lc:LayoutItem Label="Title: "
+                               Visibility="{Binding HasIdentification, Converter={dx:BooleanToVisibilityConverter}}">
+                    <dxe:TextEdit EditValue="{Binding Title, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
+                </lc:LayoutItem>
+                <lc:LayoutItem Label="Classification: "
+                               Visibility="{Binding HasIdentification, Converter={dx:BooleanToVisibilityConverter}}">
+                    <dxe:ComboBoxEdit IsTextEditable="False"
+                                      ItemsSource="{Binding PossibleClassifications}"
+                                      EditValue="{Binding Classification, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                </lc:LayoutItem>
+                <lc:LayoutItem Label="Content: ">
+                    <dxe:TextEdit Height="160"
+                                  AcceptsReturn="True"
+                                  TextWrapping="Wrap"
+                                  VerticalContentAlignment="Top"
+                                  EditValue="{Binding Content, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}" />
+                </lc:LayoutItem>
+            </lc:LayoutGroup>
+        </lc:LayoutControl>
+
+        <StackPanel Grid.Row="1"
+                    Margin="0,8,0,0"
+                    HorizontalAlignment="Right"
+                    Orientation="Horizontal">
+            <Button MinWidth="85"
+                    Margin="0,0,8,0"
+                    Command="{Binding OkCommand}"
+                    Content="OK"
+                    IsDefault="True" />
+            <Button MinWidth="85"
+                    Command="{Binding CancelCommand}"
+                    Content="Cancel"
+                    IsCancel="True" />
+        </StackPanel>
+    </Grid>
+</dx:DXWindow>
