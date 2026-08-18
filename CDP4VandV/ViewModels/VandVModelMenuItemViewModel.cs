@@ -37,8 +37,11 @@ namespace CDP4VandV.ViewModels
     using CDP4Common.EngineeringModelData;
 
     using CDP4Composition.Mvvm;
+    using CDP4Composition.Navigation;
 
     using CDP4Dal;
+
+    using CommonServiceLocator;
 
     using DevExpress.Xpf.Core;
 
@@ -70,6 +73,12 @@ namespace CDP4VandV.ViewModels
         /// The <see cref="VandVRdlService"/> that checks and seeds the reference data.
         /// </summary>
         private readonly VandVRdlService rdlService;
+
+        /// <summary>
+        /// The cached <see cref="IDialogNavigationService"/>, resolved lazily because a ribbon menu item is composed
+        /// before the container has finished building.
+        /// </summary>
+        private IDialogNavigationService dialogNavigationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VandVModelMenuItemViewModel"/> class.
@@ -148,9 +157,30 @@ namespace CDP4VandV.ViewModels
                 return;
             }
 
+            // stage gates are the one piece of reference data that differs per project, so they are asked for
+            // rather than seeded from the manifest's example list
+            IReadOnlyList<string> stageGates = null;
+
+            if (check.MissingParameterTypes.Any(x => x.ShortName == "vnv_stage"))
+            {
+                var proposed = VandVRdlManifest.ParameterTypes.First(x => x.ShortName == "vnv_stage").EnumerationValues;
+                var stageDialog = new StageGateDialogViewModel(proposed);
+
+                this.dialogNavigationService = this.dialogNavigationService ?? ServiceLocator.Current.GetInstance<IDialogNavigationService>();
+
+                var stageResult = this.dialogNavigationService.NavigateModal(stageDialog);
+
+                if (stageResult == null || stageResult.Result != true)
+                {
+                    return;
+                }
+
+                stageGates = stageDialog.ParseStageGates();
+            }
+
             try
             {
-                await this.rdlService.Seed(this.session, mrdl, check);
+                await this.rdlService.Seed(this.session, mrdl, check, stageGates);
                 DXMessageBox.Show("The V&V reference data has been created. You can now create V&V items from the VCD browser.", Caption, MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)

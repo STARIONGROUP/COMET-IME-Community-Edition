@@ -50,9 +50,14 @@ that collapses these three into one column cannot represent it.
 
 The plugin needs parameter types, categories and rules in the model's RDL chain. Nothing is assumed to be there.
 
-1. **Model menu > Set up V&V**.
+1. **Model ribbon tab > Set up V&V**, and pick the model.
 2. It reports exactly what is missing and what it will create.
-3. Confirm. It writes only what is absent, so it is safe to run again after an upgrade.
+3. Confirm, then **define your stage gates**: a dialog shows them as a table, one row per gate, prefilled with a
+   common example list you are expected to replace. Add, Remove, Up and Down manage the rows; the order is the
+   project's review order. They become the review milestones every activity is planned against, the RVM columns and
+   the stage filter. Cancel here aborts the whole set-up; nothing is written.
+4. It writes only what is absent, so it is safe to run again after an upgrade. Gates can be renamed or extended
+   later by editing the `V&V Stage Gate` parameter type in the reference data.
 
 The check walks the whole chained RDL (`QueryParameterTypesFromChainOfRdls` and friends), so anything already
 defined in a site RDL is reused rather than duplicated. If you lack write access to the RDL, the dialog says so and
@@ -63,7 +68,9 @@ lists what an administrator must create.
 
 ### 2.2 Open the register
 
-**Requirements ribbon > V&V Register**. It docks in the middle document area, next to your model browsers.
+**Model ribbon tab > V&V Register**. It docks in the middle document area, next to your model browsers. The
+plugin sits on the shell's own Model tab, so it works with any combination of plugins loaded and depends on none of
+them.
 
 The tree mirrors the stock Requirements browser (specification > group > requirement) and nests the V&V items under
 the requirement each one covers, so the two browsers read alike.

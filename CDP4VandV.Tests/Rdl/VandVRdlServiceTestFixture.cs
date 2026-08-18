@@ -26,10 +26,12 @@
 namespace CDP4VandV.Tests.Rdl
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
 
     using CDP4VandV.Rdl;
+    using CDP4VandV.ViewModels;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -93,6 +95,61 @@ namespace CDP4VandV.Tests.Rdl
                 .Returns(Task.CompletedTask);
 
             this.service = new VandVRdlService();
+        }
+
+        [Test]
+        public async Task VerifyThatUserDefinedStageGatesReplaceTheManifestExamples()
+        {
+            var check = this.service.Check(this.mrdl);
+            var projectGates = new List<string> { "MDR", "PRR", "Flight Acceptance" };
+
+            await this.service.Seed(this.session.Object, this.mrdl, check, projectGates);
+
+            var stageType = this.capturedOperationContainer.Operations
+                .Select(x => x.ModifiedThing)
+                .OfType<DTO.EnumerationParameterType>()
+                .Single(x => x.ShortName == "vnv_stage");
+
+            var valueDefinitions = this.capturedOperationContainer.Operations
+                .Select(x => x.ModifiedThing)
+                .OfType<DTO.EnumerationValueDefinition>()
+                .Where(x => stageType.ValueDefinition.Select(ordered => ordered.V).Contains(x.Iid))
+                .Select(x => x.Name)
+                .ToList();
+
+            Assert.That(valueDefinitions, Is.EquivalentTo(projectGates), "the project's gates are seeded, not the examples");
+            Assert.That(valueDefinitions, Does.Not.Contain("SRR"), "no hard-coded example survives");
+
+            // the other enumerations are untouched by the override
+            var methodType = this.capturedOperationContainer.Operations
+                .Select(x => x.ModifiedThing)
+                .OfType<DTO.EnumerationParameterType>()
+                .Single(x => x.ShortName == "vnv_method");
+
+            Assert.That(methodType.ValueDefinition, Has.Count.GreaterThan(0));
+        }
+
+        [Test]
+        public void VerifyThatTheStageGateDialogEditsRowsAndParsesThemInOrder()
+        {
+            var dialog = new StageGateDialogViewModel(new[] { "SRR", "PDR" });
+
+            Assert.That(dialog.StageGates.Select(x => x.Name), Is.EqualTo(new[] { "SRR", "PDR" }), "the proposal prefills the table");
+
+            dialog.StageGates.Clear();
+            dialog.StageGates.Add(new StageGateRowViewModel { Name = "  MDR  " });
+            dialog.StageGates.Add(new StageGateRowViewModel { Name = "PRR" });
+            dialog.StageGates.Add(new StageGateRowViewModel { Name = "   " });
+            dialog.StageGates.Add(new StageGateRowViewModel { Name = "prr" });
+            dialog.StageGates.Add(new StageGateRowViewModel { Name = "Flight Acceptance" });
+
+            Assert.That(dialog.ParseStageGates(), Is.EqualTo(new[] { "MDR", "PRR", "Flight Acceptance" }),
+                "trimmed, blanks dropped, case-insensitive duplicates removed, order kept");
+
+            // the order of the rows is the order of the seeded gates
+            dialog.StageGates.Move(4, 1);
+
+            Assert.That(dialog.ParseStageGates(), Is.EqualTo(new[] { "MDR", "Flight Acceptance", "PRR" }));
         }
 
         [Test]

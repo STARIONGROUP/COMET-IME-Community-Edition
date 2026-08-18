@@ -131,8 +131,12 @@ namespace CDP4VandV.Rdl
         /// <param name="session">The <see cref="ISession"/> used to write the transaction.</param>
         /// <param name="mrdl">The target <see cref="ModelReferenceDataLibrary"/>; self-contained and travels with the model.</param>
         /// <param name="missing">The <see cref="VandVRdlCheckResult"/> produced by <see cref="Check"/>.</param>
+        /// <param name="stageGates">
+        /// The project's stage gates, replacing the manifest's example list when supplied. Stage gates differ per
+        /// project, so the set-up flow asks for them rather than silently seeding a hard-coded set.
+        /// </param>
         /// <returns>A <see cref="Task"/> that completes when the write has been dispatched.</returns>
-        public async Task Seed(ISession session, ModelReferenceDataLibrary mrdl, VandVRdlCheckResult missing)
+        public async Task Seed(ISession session, ModelReferenceDataLibrary mrdl, VandVRdlCheckResult missing, IReadOnlyList<string> stageGates = null)
         {
             if (session == null)
             {
@@ -164,7 +168,7 @@ namespace CDP4VandV.Rdl
 
             foreach (var definition in missing.MissingParameterTypes)
             {
-                var parameterType = this.CreateParameterType(definition, transaction);
+                var parameterType = this.CreateParameterType(definition, transaction, stageGates);
                 clone.ParameterType.Add(parameterType);
                 transaction.Create(parameterType);
                 createdParameterTypes.Add(definition.ShortName, parameterType);
@@ -242,8 +246,9 @@ namespace CDP4VandV.Rdl
         /// </summary>
         /// <param name="definition">The <see cref="VandVParameterTypeDefinition"/>.</param>
         /// <param name="transaction">The <see cref="ThingTransaction"/> the value definitions are registered with.</param>
+        /// <param name="stageGates">The project's stage gates, used instead of the manifest list for <c>vnv_stage</c>.</param>
         /// <returns>The created <see cref="ParameterType"/>.</returns>
-        private ParameterType CreateParameterType(VandVParameterTypeDefinition definition, IThingTransaction transaction)
+        private ParameterType CreateParameterType(VandVParameterTypeDefinition definition, IThingTransaction transaction, IReadOnlyList<string> stageGates)
         {
             switch (definition.Kind)
             {
@@ -280,7 +285,11 @@ namespace CDP4VandV.Rdl
                         AllowMultiSelect = false
                     };
 
-                    foreach (var value in definition.EnumerationValues)
+                    var values = definition.ShortName == "vnv_stage" && stageGates != null && stageGates.Any()
+                        ? stageGates
+                        : definition.EnumerationValues;
+
+                    foreach (var value in values)
                     {
                         var valueDefinition = new EnumerationValueDefinition(Guid.NewGuid(), null, null)
                         {

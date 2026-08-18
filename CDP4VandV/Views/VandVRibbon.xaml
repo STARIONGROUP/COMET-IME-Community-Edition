@@ -9,7 +9,7 @@
                                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                                 xmlns:ribbon="clr-namespace:CDP4Composition.Ribbon;assembly=CDP4Composition"
                                 Name="VandVRibbonPage"
-                                ContainerRegionName="{x:Static cdp4Composition:RegionNames.RequirementRibbonPageRegion}"
+                                ContainerRegionName="{x:Static cdp4Composition:RegionNames.ModelRibbonPageRegion}"
                                 Caption="Verification &amp; Validation"
                                 MergeOrder="9000"
                                 ShowCaptionButton="False"
