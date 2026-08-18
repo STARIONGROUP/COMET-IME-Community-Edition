@@ -133,6 +133,16 @@ namespace CDP4Requirements.ViewModels
         private string selectedStage = AllStages;
 
         /// <summary>
+        /// Backing field for <see cref="CanCreateVandVItem"/>
+        /// </summary>
+        private bool canCreateVandVItem;
+
+        /// <summary>
+        /// Backing field for <see cref="CanCreateAnnotation"/>
+        /// </summary>
+        private bool canCreateAnnotation;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="VandVBrowserViewModel"/> class.
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/> that contains the requirements to browse.</param>
@@ -151,17 +161,17 @@ namespace CDP4Requirements.ViewModels
 
             this.CreateVandVItemCommand = ReactiveCommandCreator.CreateAsyncTask(
                 this.ExecuteCreateVandVItem,
-                this.WhenAnyValue(x => x.SelectedThing).Select(row => row is RequirementCoverageRowViewModel));
+                this.WhenAnyValue(x => x.SelectedThing, x => x.CanCreateVandVItem, (row, canCreate) => canCreate && row is RequirementCoverageRowViewModel));
 
             this.ExportWorkbookCommand = ReactiveCommandCreator.Create(this.ExecuteExportWorkbook);
             this.RunAnalysisCheckCommand = ReactiveCommandCreator.Create(this.ExecuteRunAnalysisCheck);
             this.OpenMatrixCommand = ReactiveCommandCreator.Create(this.ExecuteOpenMatrix);
 
-            var hasSelection = this.WhenAnyValue(x => x.SelectedThing).Select(row => row != null);
+            var canAnnotate = this.WhenAnyValue(x => x.SelectedThing, x => x.CanCreateAnnotation, (row, canCreate) => canCreate && row != null);
 
             this.CreateAnnotationCommands = AnnotationKind.All.ToDictionary(
                 kind => kind,
-                kind => ReactiveCommandCreator.CreateAsyncTask(() => this.ExecuteCreateAnnotation(kind), hasSelection));
+                kind => ReactiveCommandCreator.CreateAsyncTask(() => this.ExecuteCreateAnnotation(kind), canAnnotate));
 
             this.PossibleStages = BuildStageChoices(this.Thing);
 
@@ -251,6 +261,42 @@ namespace CDP4Requirements.ViewModels
         public string TargetName { get; set; } = LayoutGroupNames.DocumentContainer;
 
         /// <summary>
+        /// Gets a value indicating whether the current participant may create a V&amp;V item in this iteration.
+        /// </summary>
+        public bool CanCreateVandVItem
+        {
+            get => this.canCreateVandVItem;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateVandVItem, value);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the current participant may raise a review request in this model.
+        /// </summary>
+        public bool CanCreateAnnotation
+        {
+            get => this.canCreateAnnotation;
+            private set => this.RaiseAndSetIfChanged(ref this.canCreateAnnotation, value);
+        }
+
+        /// <summary>
+        /// Computes what the current participant is permitted to do, so the create actions are offered only when the
+        /// write behind them can actually succeed.
+        /// </summary>
+        public override void ComputePermission()
+        {
+            base.ComputePermission();
+
+            // called once from the base constructor, before this view-model's own state exists
+            if (this.Thing == null)
+            {
+                return;
+            }
+
+            this.CanCreateVandVItem = this.PermissionService.CanWrite(ClassKind.Requirement, this.Thing);
+            this.CanCreateAnnotation = this.PermissionService.CanWrite(ClassKind.RequestForWaiver, this.Thing.TopContainer);
+        }
+
+        /// <summary>
         /// Adds the V&amp;V entries to the inherited context menu.
         /// </summary>
         public override void PopulateContextMenu()
@@ -315,6 +361,27 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Asserts that the model carries all the V&amp;V reference data a write needs, warning the user when it does not.
+        /// </summary>
+        /// <param name="caption">The caption of the action being attempted, used on the message box.</param>
+        /// <returns>true when the V&amp;V item may be written.</returns>
+        private bool EnsureReferenceData(string caption)
+        {
+            if (VandVItemCreator.CanCreate(this.Thing))
+            {
+                return true;
+            }
+
+            DXMessageBox.Show(
+                "The V&V reference data is not complete in this model yet. Run 'Set up V&V' on the Requirements ribbon tab first.",
+                caption,
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+
+            return false;
+        }
+
+        /// <summary>
         /// Opens the V&amp;V item dialog for the selected requirement and, on OK, creates the item.
         /// </summary>
         /// <returns>A <see cref="Task"/>.</returns>
@@ -325,14 +392,8 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
-            if (!VandVItemCreator.CanCreate(this.Thing))
+            if (!this.EnsureReferenceData("Create V&V Item"))
             {
-                DXMessageBox.Show(
-                    "The V&V reference data is not present in this model yet. Run 'Set up V&V' on the Requirements ribbon tab first.",
-                    "Create V&V Item",
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-
                 return;
             }
 
@@ -421,6 +482,13 @@ namespace CDP4Requirements.ViewModels
         /// </remarks>
         private async void EditVandVItem(Requirement vandVItem, ParameterOrOverrideBase preselectedParameter = null, int? tabIndex = null)
         {
+            // an edit writes the item, its coverage and its procedure just like a create does, so it needs the same
+            // reference data; without this check a rename on a partially seeded library half-applied and then failed
+            if (!this.EnsureReferenceData("Edit V&V Item"))
+            {
+                return;
+            }
+
             var relationship = VandVItemCreator.QueryCoveringRelationship(this.Thing, vandVItem);
             var covered = relationship?.Target as Requirement;
 
@@ -890,11 +958,14 @@ namespace CDP4Requirements.ViewModels
                     .Subscribe(_ => this.Rebuild()));
 
             // the analysis check reads live parameter values, so a design change has to re-run it; ValueSet changes
-            // are what move a parameter, and they never touch the V&V item itself
+            // are what move a parameter, and they never touch the V&V item itself.
+            // Only a parameter some item actually covers is worth re-checking: re-running the check over the whole
+            // register on every value edit in the model stuttered the UI on models with a few hundred items
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterValueSet))
                     .Merge(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOverrideValueSet)))
                     .Where(x => x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
+                    .Where(x => VandVCoverageQuery.IsCoveredParameter(this.Thing, x.ChangedThing.Container as ParameterOrOverrideBase))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.RefreshAnalysisChecks()));
 
@@ -917,9 +988,12 @@ namespace CDP4Requirements.ViewModels
                     .Where(x => x.ViewModel == this.matrixViewModel && x.PanelStatus == PanelStatus.Closed)
                     .Subscribe(_ => this.matrixViewModel = null));
 
+            // only the register's own links: an ordinary requirement trace link elsewhere in the iteration used to
+            // dispose and recreate every V&V row in the tree, resubscribing them all for nothing
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
                     .Where(x => x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
+                    .Where(x => VandVCoverageQuery.IsVandVLink((BinaryRelationship)x.ChangedThing))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.RefreshCoverage()));
 
@@ -1235,6 +1309,10 @@ namespace CDP4Requirements.ViewModels
                 var status = AnnotationQuery.DescribeStatus(annotation);
                 var hasStatus = !string.IsNullOrEmpty(status);
 
+                // a participant who may not write the annotation should see the action greyed out, not discover the
+                // denial as a server exception after typing a full reply
+                var canWrite = this.PermissionService.CanWrite(annotation);
+
                 var header = hasStatus
                     ? $"{annotation.UserFriendlyShortName}, {AnnotationKind.Describe(annotation)} ({status})"
                     : $"{annotation.UserFriendlyShortName}, {AnnotationKind.Describe(annotation)}";
@@ -1256,7 +1334,7 @@ namespace CDP4Requirements.ViewModels
                         "",
                         x => this.ReplyToAnnotation((EngineeringModelDataAnnotation)x),
                         annotation,
-                        true,
+                        canWrite,
                         MenuItemKind.Create));
 
                 group.SubMenu.Add(
@@ -1265,7 +1343,7 @@ namespace CDP4Requirements.ViewModels
                         "",
                         x => this.SetAnnotationStatus((ModellingAnnotationItem)x, AnnotationStatusKind.DONE),
                         annotation,
-                        hasStatus && isOpen,
+                        hasStatus && isOpen && canWrite,
                         MenuItemKind.Edit));
 
                 group.SubMenu.Add(
@@ -1274,7 +1352,7 @@ namespace CDP4Requirements.ViewModels
                         "",
                         x => this.SetAnnotationStatus((ModellingAnnotationItem)x, AnnotationStatusKind.CLOSED),
                         annotation,
-                        hasStatus && isOpen,
+                        hasStatus && isOpen && canWrite,
                         MenuItemKind.Edit));
 
                 group.SubMenu.Add(
@@ -1283,7 +1361,7 @@ namespace CDP4Requirements.ViewModels
                         "",
                         x => this.SetAnnotationStatus((ModellingAnnotationItem)x, AnnotationStatusKind.OPEN),
                         annotation,
-                        hasStatus && !isOpen,
+                        hasStatus && !isOpen && canWrite,
                         MenuItemKind.Edit));
 
                 this.AnnotationMenuGroup.SubMenu.Add(group);

@@ -31,6 +31,8 @@ namespace CDP4Requirements.Services
     using System.Linq;
     using System.Threading.Tasks;
 
+    using CDP4Requirements.Rdl;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -54,12 +56,12 @@ namespace CDP4Requirements.Services
         /// <summary>
         /// The category short-name of a procedure step.
         /// </summary>
-        public const string StepCategoryShortName = "VnVStep";
+        public const string StepCategoryShortName = VandVCategory.VnVStep;
 
         /// <summary>
         /// The category short-name of the link from a V&amp;V item to one of its steps.
         /// </summary>
-        public const string HasStepCategoryShortName = "hasStep";
+        public const string HasStepCategoryShortName = VandVCategory.HasStep;
 
         /// <summary>
         /// Returns the procedure steps of a V&amp;V item, in step-number order.
@@ -229,7 +231,7 @@ namespace CDP4Requirements.Services
                 Owner = vandVItem.Owner
             };
 
-            created.Category.Add(ResolveCategory(mrdl, StepCategoryShortName));
+            created.Category.Add(VandVCoverageQuery.ResolveCategory(mrdl, StepCategoryShortName));
 
             AddAttribute(created, mrdl, transaction, "vnv_step_no", number.ToString(CultureInfo.InvariantCulture));
             AddAttribute(created, mrdl, transaction, "vnv_step_action", step.Action);
@@ -247,7 +249,7 @@ namespace CDP4Requirements.Services
                 Owner = vandVItem.Owner
             };
 
-            link.Category.Add(ResolveCategory(mrdl, HasStepCategoryShortName));
+            link.Category.Add(VandVCoverageQuery.ResolveCategory(mrdl, HasStepCategoryShortName));
 
             iterationClone.Relationship.Add(link);
             transaction.Create(link);
@@ -366,22 +368,5 @@ namespace CDP4Requirements.Services
             transaction.Create(simpleParameterValue);
         }
 
-        /// <summary>
-        /// Resolves a required <see cref="Category"/> by short-name from the RDL chain.
-        /// </summary>
-        /// <param name="mrdl">The model reference data library.</param>
-        /// <param name="shortName">The category short-name.</param>
-        /// <returns>The resolved <see cref="Category"/>.</returns>
-        private static Category ResolveCategory(ReferenceDataLibrary mrdl, string shortName)
-        {
-            var category = mrdl.QueryCategoriesFromChainOfRdls().FirstOrDefault(x => x.ShortName == shortName);
-
-            if (category == null)
-            {
-                throw new InvalidOperationException($"The '{shortName}' category was not found. Run 'Set up V&V' first.");
-            }
-
-            return category;
-        }
     }
 }

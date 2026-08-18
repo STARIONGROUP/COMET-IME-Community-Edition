@@ -26,8 +26,10 @@
 namespace CDP4Requirements.Services
 {
     using System;
+    using System.Linq;
 
     using CDP4Common.EngineeringModelData;
+    using CDP4Common.ReportingData;
 
     /// <summary>
     /// The close-out vocabulary of the V&amp;V register, kept in one place so the browser, the roll-up, the built-in
@@ -120,6 +122,42 @@ namespace CDP4Requirements.Services
         {
             return VandVCoverageQuery.AreSameEnumValue(compliance, "Non-Compliant")
                    || VandVCoverageQuery.AreSameEnumValue(compliance, "Partially Compliant");
+        }
+
+        /// <summary>
+        /// Asserts whether an item falls short of its requirement without that shortfall having been formally conceded,
+        /// that is, without a closed Request for Waiver or Request for Deviation raised against it. The roll-up and
+        /// <c>VnVItemCompletenessRule</c> both ask this question, and they must not answer it differently.
+        /// </summary>
+        /// <param name="item">The V&amp;V item.</param>
+        /// <returns>
+        /// true when the item is non-compliant or partially compliant and no accepted concession covers it. An item
+        /// detached from its <see cref="Iteration"/> cannot be judged, and is not reported as a shortfall.
+        /// </returns>
+        public static bool IsUnresolvedShortfall(Requirement item)
+        {
+            if (!IsShortfall(QueryCompliance(item)))
+            {
+                return false;
+            }
+
+            var iteration = item.GetContainerOfType<Iteration>();
+
+            return iteration != null && !HasAcceptedConcession(iteration, item);
+        }
+
+        /// <summary>
+        /// Asserts whether a closed Request for Waiver or Request for Deviation has been raised against the item.
+        /// </summary>
+        /// <param name="iteration">The iteration the annotations are searched in.</param>
+        /// <param name="item">The V&amp;V item.</param>
+        /// <returns>true when an accepted concession exists.</returns>
+        public static bool HasAcceptedConcession(Iteration iteration, Requirement item)
+        {
+            return AnnotationQuery.QueryFor(iteration, item)
+                .Any(annotation =>
+                    (annotation is RequestForWaiver || annotation is RequestForDeviation)
+                    && !AnnotationQuery.IsOpen(annotation));
         }
 
         /// <summary>

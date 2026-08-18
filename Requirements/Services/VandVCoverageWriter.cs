@@ -30,6 +30,8 @@ namespace CDP4Requirements.Services
     using System.Linq;
     using System.Threading.Tasks;
 
+    using CDP4Requirements.Rdl;
+
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
@@ -48,22 +50,22 @@ namespace CDP4Requirements.Services
         /// <summary>
         /// The category short-name of the "covers parameter" link.
         /// </summary>
-        public const string CoversParameter = "coversParameter";
+        public const string CoversParameter = VandVCategory.CoversParameter;
 
         /// <summary>
         /// The category short-name of the "covers option" link.
         /// </summary>
-        public const string CoversOption = "coversOption";
+        public const string CoversOption = VandVCategory.CoversOption;
 
         /// <summary>
         /// The category short-name of the "covers state" link.
         /// </summary>
-        public const string CoversState = "coversState";
+        public const string CoversState = VandVCategory.CoversState;
 
         /// <summary>
         /// The category short-name of the "verified on" link.
         /// </summary>
-        public const string VerifiedOn = "verifiedOn";
+        public const string VerifiedOn = VandVCategory.VerifiedOn;
 
         /// <summary>
         /// All coverage link categories, so existing links can be replaced wholesale.

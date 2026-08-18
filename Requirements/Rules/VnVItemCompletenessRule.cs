@@ -133,11 +133,9 @@ namespace CDP4Requirements.Rules
                         defects.Add("it is closed out but states no reason");
                     }
 
-                    var compliance = VandVCloseOut.QueryCompliance(item);
-
-                    if (VandVCloseOut.IsShortfall(compliance) && !HasAcceptedConcession(iteration, item))
+                    if (VandVCloseOut.IsUnresolvedShortfall(item))
                     {
-                        defects.Add($"it is closed out as '{compliance}' without an accepted waiver or deviation");
+                        defects.Add($"it is closed out as '{VandVCloseOut.QueryCompliance(item)}' without an accepted waiver or deviation");
                     }
 
                     if (AnnotationQuery.QueryFor(iteration, item).Any(AnnotationQuery.IsOpen))
@@ -161,21 +159,6 @@ namespace CDP4Requirements.Rules
             }
 
             return violations;
-        }
-
-        /// <summary>
-        /// Asserts whether a shortfall against the requirement has been formally conceded, that is, whether a closed
-        /// Request for Waiver or Request for Deviation has been raised against the item.
-        /// </summary>
-        /// <param name="iteration">The iteration.</param>
-        /// <param name="item">The V&amp;V item.</param>
-        /// <returns>true when an accepted concession exists.</returns>
-        private static bool HasAcceptedConcession(Iteration iteration, Requirement item)
-        {
-            return AnnotationQuery.QueryFor(iteration, item)
-                .Any(annotation =>
-                    (annotation is RequestForWaiver || annotation is RequestForDeviation)
-                    && !AnnotationQuery.IsOpen(annotation));
         }
 
         /// <summary>

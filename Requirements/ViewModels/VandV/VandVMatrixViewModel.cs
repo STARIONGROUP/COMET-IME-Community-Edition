@@ -187,18 +187,25 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         private void AddSubscriptions()
         {
+            // every subscription is filtered to this matrix's own iteration: without it, an edit in a second open
+            // model rebuilt this panel too
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(BinaryRelationship))
+                    .Where(x => x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.BuildMatrix()));
 
+            // a removed requirement's container chain is already broken, so it can no longer be attributed to an
+            // iteration; rebuilding on those is cheap next to missing a deletion from this very matrix
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(Requirement))
+                    .Where(x => x.EventKind == EventKind.Removed || x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.BuildMatrix()));
 
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(SimpleParameterValue))
+                    .Where(x => x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.BuildMatrix()));
         }

@@ -30,6 +30,7 @@ namespace CDP4Requirements.Tests.Services
     using System.Linq;
     using System.Threading.Tasks;
 
+    using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
 
     using CDP4Common.CommonData;
@@ -130,6 +131,17 @@ namespace CDP4Requirements.Tests.Services
         }
 
         [Test]
+        public void VerifyThatCanCreateIsFalseOnAPartiallySeededLibrary()
+        {
+            // the item itself could be written, but its coverage could not: creating it anyway committed the item and
+            // then threw, leaving an orphan behind
+            var coversParameter = this.srdl.DefinedCategory.Single(x => x.ShortName == VandVCategory.CoversParameter);
+            this.srdl.DefinedCategory.Remove(coversParameter);
+
+            Assert.That(VandVItemCreator.CanCreate(this.iteration), Is.False);
+        }
+
+        [Test]
         public void VerifyThatTheSuggestedShortNameIsUniqueInTheIteration()
         {
             Assert.That(VandVItemCreator.SuggestShortName(this.requirement), Is.EqualTo("VNV_REQ_1_1"));
@@ -194,14 +206,16 @@ namespace CDP4Requirements.Tests.Services
         /// </summary>
         private void SeedVandVReferenceData()
         {
-            var vnvItem = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "VnVItem", Name = "VnV Item" };
-            vnvItem.PermissibleClass.Add(ClassKind.Requirement);
+            // every category a create or edit writes, not just the two the item itself carries: CanCreate gates the
+            // whole write sequence, coverage and procedure included
+            foreach (var shortName in VandVCategory.RequiredForItemWrite)
+            {
+                var category = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = shortName, Name = shortName };
+                category.PermissibleClass.Add(ClassKind.Requirement);
+                category.PermissibleClass.Add(ClassKind.BinaryRelationship);
 
-            var verifies = new Category(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = "verifies", Name = "verifies" };
-            verifies.PermissibleClass.Add(ClassKind.BinaryRelationship);
-
-            this.srdl.DefinedCategory.Add(vnvItem);
-            this.srdl.DefinedCategory.Add(verifies);
+                this.srdl.DefinedCategory.Add(category);
+            }
 
             foreach (var shortName in new[] { "vnv_method", "vnv_stage", "vnv_acceptance", "vnv_status" })
             {

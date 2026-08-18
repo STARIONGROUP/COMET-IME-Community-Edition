@@ -75,12 +75,12 @@ namespace CDP4Requirements.ViewModels
         /// <summary>
         /// The link type denoting verification against the requirement baseline.
         /// </summary>
-        public const string VerifiesLink = "verifies";
+        public const string VerifiesLink = VandVCategory.Verifies;
 
         /// <summary>
         /// The link type denoting validation against the mission / stakeholder need.
         /// </summary>
-        public const string ValidatesLink = "validates";
+        public const string ValidatesLink = VandVCategory.Validates;
 
         /// <summary>
         /// Matches a valid short-name: letters, digits or underscores. Deliberately permits a leading digit, because
@@ -1051,8 +1051,11 @@ namespace CDP4Requirements.ViewModels
             var parameter = VandVCoverageWriter.QueryCoveredThings<ParameterOrOverrideBase>(iteration, vandVItem, VandVCoverageWriter.CoversParameter).FirstOrDefault();
             var element = VandVCoverageWriter.QueryCoveredThings<ElementDefinition>(iteration, vandVItem, VandVCoverageWriter.VerifiedOn).FirstOrDefault();
 
-            this.SelectedElementDefinition = element ?? QueryOwningElement(parameter);
+            // the parameter is assigned first on purpose: setting the element definition runs PopulateParameters
+            // synchronously, and that is where a stored ParameterOverride gets added to the list so the combo can show
+            // it. Assigning the parameter afterwards left it selected but absent from the list, i.e. blank on screen
             this.SelectedParameter = parameter;
+            this.SelectedElementDefinition = element ?? QueryOwningElement(parameter);
 
             var coveredOptions = VandVCoverageWriter.QueryCoveredThings<Option>(iteration, vandVItem, VandVCoverageWriter.CoversOption).Select(x => x.Iid).ToList();
             var coveredStates = VandVCoverageWriter.QueryCoveredThings<ActualFiniteState>(iteration, vandVItem, VandVCoverageWriter.CoversState).Select(x => x.Iid).ToList();
@@ -1074,8 +1077,9 @@ namespace CDP4Requirements.ViewModels
         /// <param name="parameter">The dropped parameter.</param>
         public void PreselectParameter(ParameterOrOverrideBase parameter)
         {
-            this.SelectedElementDefinition = QueryOwningElement(parameter);
+            // assigned in this order for the reason given in LoadCoverage
             this.SelectedParameter = parameter;
+            this.SelectedElementDefinition = QueryOwningElement(parameter);
         }
 
         /// <summary>

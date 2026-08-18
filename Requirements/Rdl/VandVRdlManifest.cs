@@ -198,6 +198,76 @@ namespace CDP4Requirements.Rdl
     }
 
     /// <summary>
+    /// The short-names of the <see cref="CDP4Common.SiteDirectoryData.Category"/>s the V&amp;V capability creates and
+    /// looks up. Every service, rule and view-model resolves its categories through these constants: the short-names
+    /// used to be typed out independently in half a dozen files, where a single typo would compile cleanly and
+    /// silently create a disconnected notion of coverage.
+    /// </summary>
+    public static class VandVCategory
+    {
+        /// <summary>The category identifying a V&amp;V item.</summary>
+        public const string VnVItem = "VnVItem";
+
+        /// <summary>The sub-category identifying a verification item.</summary>
+        public const string VerificationItem = "VerificationItem";
+
+        /// <summary>The sub-category identifying a validation item.</summary>
+        public const string ValidationItem = "ValidationItem";
+
+        /// <summary>The category identifying a test campaign group.</summary>
+        public const string TestCampaign = "TestCampaign";
+
+        /// <summary>The category identifying a stage gate group.</summary>
+        public const string StageGateGroup = "StageGateGroup";
+
+        /// <summary>The category identifying a non-conformance report.</summary>
+        public const string Ncr = "NCR";
+
+        /// <summary>The category identifying a procedure step.</summary>
+        public const string VnVStep = "VnVStep";
+
+        /// <summary>The category of the relationship by which a V&amp;V item verifies a requirement.</summary>
+        public const string Verifies = "verifies";
+
+        /// <summary>The category of the relationship by which a V&amp;V item validates a requirement.</summary>
+        public const string Validates = "validates";
+
+        /// <summary>The category of the relationship by which a V&amp;V item covers an option.</summary>
+        public const string CoversOption = "coversOption";
+
+        /// <summary>The category of the relationship by which a V&amp;V item covers an actual finite state.</summary>
+        public const string CoversState = "coversState";
+
+        /// <summary>The category of the relationship by which a V&amp;V item covers a parameter.</summary>
+        public const string CoversParameter = "coversParameter";
+
+        /// <summary>The category of the relationship by which a V&amp;V item is verified on an element definition.</summary>
+        public const string VerifiedOn = "verifiedOn";
+
+        /// <summary>The category of the relationship by which a V&amp;V item owns a procedure step.</summary>
+        public const string HasStep = "hasStep";
+
+        /// <summary>
+        /// Gets the categories marking a covering traceability relationship, the ones that make a requirement count as
+        /// covered.
+        /// </summary>
+        public static IReadOnlyList<string> CoverageLinks { get; } = new[] { Verifies, Validates };
+
+        /// <summary>
+        /// Gets every category applied to a relationship the V&amp;V capability authors, so a browser can tell a V&amp;V
+        /// link apart from an ordinary requirement trace link.
+        /// </summary>
+        public static IReadOnlyList<string> RelationshipLinks { get; } = new[] { Verifies, Validates, CoversOption, CoversState, CoversParameter, VerifiedOn, HasStep };
+
+        /// <summary>
+        /// Gets the categories that must exist before a V&amp;V item can be written. Creating or editing an item is one
+        /// user action but several writes (the item, its coverage, its procedure), so all of them are checked up front:
+        /// a partially seeded library used to commit the item and then fail on the coverage, leaving an orphan behind.
+        /// </summary>
+        public static IReadOnlyList<string> RequiredForItemWrite { get; } = new[] { VnVItem, Verifies, Validates, CoversParameter, CoversOption, CoversState, VerifiedOn, VnVStep, HasStep };
+    }
+
+    /// <summary>
     /// The single static declaration of every <see cref="CDP4Common.SiteDirectoryData.ParameterType"/>,
     /// <see cref="CDP4Common.SiteDirectoryData.Category"/> and <see cref="CDP4Common.SiteDirectoryData.Rule"/> the
     /// V&amp;V capability needs. The checker (<see cref="VandVRdlService.Check"/>) and the seeder
@@ -259,22 +329,22 @@ namespace CDP4Requirements.Rdl
         /// </summary>
         public static IReadOnlyList<VandVCategoryDefinition> Categories { get; } = new[]
         {
-            new VandVCategoryDefinition("VnVItem", "VnV Item", new[] { ClassKind.Requirement }),
-            new VandVCategoryDefinition("VerificationItem", "Verification Item", new[] { ClassKind.Requirement }, "VnVItem"),
-            new VandVCategoryDefinition("ValidationItem", "Validation Item", new[] { ClassKind.Requirement }, "VnVItem"),
-            new VandVCategoryDefinition("TestCampaign", "Test Campaign", new[] { ClassKind.RequirementsGroup }),
-            new VandVCategoryDefinition("StageGateGroup", "Stage Gate Group", new[] { ClassKind.RequirementsGroup }),
-            new VandVCategoryDefinition("NCR", "NCR", new[] { ClassKind.ReviewItemDiscrepancy }),
-            new VandVCategoryDefinition("VnVStep", "VnV Procedure Step", new[] { ClassKind.Requirement }),
+            new VandVCategoryDefinition(VandVCategory.VnVItem, "VnV Item", new[] { ClassKind.Requirement }),
+            new VandVCategoryDefinition(VandVCategory.VerificationItem, "Verification Item", new[] { ClassKind.Requirement }, VandVCategory.VnVItem),
+            new VandVCategoryDefinition(VandVCategory.ValidationItem, "Validation Item", new[] { ClassKind.Requirement }, VandVCategory.VnVItem),
+            new VandVCategoryDefinition(VandVCategory.TestCampaign, "Test Campaign", new[] { ClassKind.RequirementsGroup }),
+            new VandVCategoryDefinition(VandVCategory.StageGateGroup, "Stage Gate Group", new[] { ClassKind.RequirementsGroup }),
+            new VandVCategoryDefinition(VandVCategory.Ncr, "NCR", new[] { ClassKind.ReviewItemDiscrepancy }),
+            new VandVCategoryDefinition(VandVCategory.VnVStep, "VnV Procedure Step", new[] { ClassKind.Requirement }),
 
             // Categories applied to the traceability BinaryRelationships (governing rules are deferred, see VandVRdlService).
-            new VandVCategoryDefinition("verifies", "verifies", new[] { ClassKind.BinaryRelationship }),
-            new VandVCategoryDefinition("validates", "validates", new[] { ClassKind.BinaryRelationship }),
-            new VandVCategoryDefinition("coversOption", "covers option", new[] { ClassKind.BinaryRelationship }),
-            new VandVCategoryDefinition("coversState", "covers state", new[] { ClassKind.BinaryRelationship }),
-            new VandVCategoryDefinition("coversParameter", "covers parameter", new[] { ClassKind.BinaryRelationship }),
-            new VandVCategoryDefinition("verifiedOn", "verified on", new[] { ClassKind.BinaryRelationship }),
-            new VandVCategoryDefinition("hasStep", "has step", new[] { ClassKind.BinaryRelationship })
+            new VandVCategoryDefinition(VandVCategory.Verifies, "verifies", new[] { ClassKind.BinaryRelationship }),
+            new VandVCategoryDefinition(VandVCategory.Validates, "validates", new[] { ClassKind.BinaryRelationship }),
+            new VandVCategoryDefinition(VandVCategory.CoversOption, "covers option", new[] { ClassKind.BinaryRelationship }),
+            new VandVCategoryDefinition(VandVCategory.CoversState, "covers state", new[] { ClassKind.BinaryRelationship }),
+            new VandVCategoryDefinition(VandVCategory.CoversParameter, "covers parameter", new[] { ClassKind.BinaryRelationship }),
+            new VandVCategoryDefinition(VandVCategory.VerifiedOn, "verified on", new[] { ClassKind.BinaryRelationship }),
+            new VandVCategoryDefinition(VandVCategory.HasStep, "has step", new[] { ClassKind.BinaryRelationship })
         };
 
         /// <summary>
@@ -284,7 +354,7 @@ namespace CDP4Requirements.Rdl
         /// </summary>
         public static IReadOnlyList<VandVParameterizedCategoryRuleDefinition> ParameterizedCategoryRules { get; } = new[]
         {
-            new VandVParameterizedCategoryRuleDefinition("VnVItemAttributesRule", "V&V Item mandatory attributes", "VnVItem", "vnv_method", "vnv_stage", "vnv_acceptance", "vnv_status")
+            new VandVParameterizedCategoryRuleDefinition("VnVItemAttributesRule", "V&V Item mandatory attributes", VandVCategory.VnVItem, "vnv_method", "vnv_stage", "vnv_acceptance", "vnv_status")
         };
 
         /// <summary>
@@ -296,8 +366,8 @@ namespace CDP4Requirements.Rdl
         /// </summary>
         public static IReadOnlyList<VandVBinaryRelationshipRuleDefinition> BinaryRelationshipRules { get; } = new[]
         {
-            new VandVBinaryRelationshipRuleDefinition("verifiesRule", "verifies (V&V item verifies a requirement)", "verifies", "is verified by", "verifies", "VnVItem"),
-            new VandVBinaryRelationshipRuleDefinition("validatesRule", "validates (V&V item validates a requirement)", "validates", "is validated by", "validates", "VnVItem")
+            new VandVBinaryRelationshipRuleDefinition("verifiesRule", "verifies (V&V item verifies a requirement)", VandVCategory.Verifies, "is verified by", VandVCategory.Verifies, VandVCategory.VnVItem),
+            new VandVBinaryRelationshipRuleDefinition("validatesRule", "validates (V&V item validates a requirement)", VandVCategory.Validates, "is validated by", VandVCategory.Validates, VandVCategory.VnVItem)
         };
 
         /// <summary>

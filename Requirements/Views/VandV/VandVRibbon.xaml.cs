@@ -25,8 +25,6 @@
 
 namespace CDP4Requirements.Views
 {
-    using System.ComponentModel.Composition;
-
     using CDP4Requirements.ViewModels;
 
     using CDP4Composition.Mvvm;
@@ -39,14 +37,16 @@ namespace CDP4Requirements.Views
     /// <summary>
     /// Interaction logic for the V&amp;V ribbon group.
     /// </summary>
-    [Export(typeof(ExtendedRibbonPageGroup))]
-    [PartCreationPolicy(CreationPolicy.Shared)]
+    /// <remarks>
+    /// This group is declared as a child of <see cref="RequirementsRibbon"/>, so it must not be exported as an
+    /// <see cref="ExtendedRibbonPageGroup"/>. Doing so makes the ribbon content builder create a second instance
+    /// and the duplicate bar item names then fail to register in the ribbon name scope.
+    /// </remarks>
     public partial class VandVRibbon : ExtendedRibbonPageGroup, IView
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="VandVRibbon"/> class.
         /// </summary>
-        [ImportingConstructor]
         public VandVRibbon()
         {
             this.InitializeComponent();

@@ -131,16 +131,6 @@ namespace CDP4Requirements.Services
     public static class VandVCoverageQuery
     {
         /// <summary>
-        /// The short-name of the category identifying a V&amp;V item.
-        /// </summary>
-        private const string VnVItemCategoryShortName = "VnVItem";
-
-        /// <summary>
-        /// The short-names of the categories marking a covering traceability relationship.
-        /// </summary>
-        private static readonly string[] CoverageCategoryShortNames = { "verifies", "validates" };
-
-        /// <summary>
         /// The statuses (see <see cref="Rdl.VandVRdlManifest"/>) that close a V&amp;V item out positively. Waived,
         /// deviated and not-applicable count as closed for roll-up purposes: they are dispositioned, not outstanding.
         /// </summary>
@@ -179,7 +169,7 @@ namespace CDP4Requirements.Services
                     relationship.Target != null
                     && relationship.Source is Requirement source
                     && IsVnVItem(source)
-                    && IsCategorizedAs(relationship, CoverageCategoryShortNames))
+                    && IsCoverageLink(relationship))
                 .GroupBy(relationship => relationship.Target.Iid)
                 .ToDictionary(
                     group => group.Key,
@@ -265,6 +255,9 @@ namespace CDP4Requirements.Services
         /// Close-out wins over execution status. An item explicitly closed out counts as done whatever its execution
         /// status says, and an item that is not closed out counts as done only when its execution status is one that
         /// needs no further action. That ordering is what makes the tree agree with the VCD's close-out column.
+        /// The one exception is a shortfall closed out without an accepted concession: counting that as passed made the
+        /// roll-up claim a requirement was verified while <c>VnVItemCompletenessRule</c> reported a violation on the
+        /// very same item.
         /// </remarks>
         public static VandVStatusRollUp RollUp(IEnumerable<Requirement> items)
         {
@@ -276,7 +269,15 @@ namespace CDP4Requirements.Services
             {
                 if (VandVCloseOut.IsClosed(item))
                 {
-                    passed++;
+                    if (VandVCloseOut.IsUnresolvedShortfall(item))
+                    {
+                        failed++;
+                    }
+                    else
+                    {
+                        passed++;
+                    }
+
                     continue;
                 }
 
@@ -335,7 +336,40 @@ namespace CDP4Requirements.Services
         /// <returns>true when it is a coverage link.</returns>
         public static bool IsCoverageLink(BinaryRelationship relationship)
         {
-            return IsCategorizedAs(relationship, CoverageCategoryShortNames);
+            return IsCategorizedAs(relationship, VandVCategory.CoverageLinks);
+        }
+
+        /// <summary>
+        /// Asserts whether a relationship is any of the links the V&amp;V capability authors: coverage, option, state,
+        /// element or procedure step. An ordinary requirement trace link is not one of them, and rebuilding the whole
+        /// register when one is edited disposes and recreates every row for nothing.
+        /// </summary>
+        /// <param name="relationship">The relationship.</param>
+        /// <returns>true when the relationship belongs to the V&amp;V register.</returns>
+        public static bool IsVandVLink(BinaryRelationship relationship)
+        {
+            return IsCategorizedAs(relationship, VandVCategory.RelationshipLinks);
+        }
+
+        /// <summary>
+        /// Asserts whether a parameter is covered by any V&amp;V item in the iteration, so a value change on a parameter
+        /// nobody verifies does not re-run the analysis check over the entire register.
+        /// </summary>
+        /// <param name="iteration">The <see cref="Iteration"/>.</param>
+        /// <param name="parameter">The parameter that changed, or null.</param>
+        /// <returns>true when a <c>coversParameter</c> relationship points at it.</returns>
+        public static bool IsCoveredParameter(Iteration iteration, ParameterOrOverrideBase parameter)
+        {
+            if (iteration == null || parameter == null)
+            {
+                return false;
+            }
+
+            return iteration.Relationship
+                .OfType<BinaryRelationship>()
+                .Any(relationship =>
+                    relationship.Target == parameter
+                    && IsCategorizedAs(relationship, new[] { VandVCategory.CoversParameter }));
         }
 
         /// <summary>
@@ -345,7 +379,27 @@ namespace CDP4Requirements.Services
         /// <returns>true when it is categorized as a V&amp;V item.</returns>
         public static bool IsVnVItem(Requirement requirement)
         {
-            return IsCategorizedAs(requirement, new[] { VnVItemCategoryShortName });
+            return IsCategorizedAs(requirement, new[] { VandVCategory.VnVItem });
+        }
+
+        /// <summary>
+        /// Resolves a required <see cref="Category"/> by short-name from the RDL chain. Every V&amp;V write path
+        /// resolves its categories through this one helper, so the guidance a user gets for an unseeded library is the
+        /// same wherever the write started.
+        /// </summary>
+        /// <param name="mrdl">The model reference data library.</param>
+        /// <param name="shortName">The category short-name.</param>
+        /// <returns>The resolved <see cref="Category"/>.</returns>
+        public static Category ResolveCategory(ReferenceDataLibrary mrdl, string shortName)
+        {
+            var category = mrdl.QueryCategoriesFromChainOfRdls().FirstOrDefault(x => x.ShortName == shortName);
+
+            if (category == null)
+            {
+                throw new InvalidOperationException($"The '{shortName}' category was not found. Run 'Set up V&V' first.");
+            }
+
+            return category;
         }
 
         /// <summary>

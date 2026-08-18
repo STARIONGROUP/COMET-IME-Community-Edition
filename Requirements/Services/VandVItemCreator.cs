@@ -58,10 +58,16 @@ namespace CDP4Requirements.Services
         public const string VandVSpecificationShortName = "VNV";
 
         /// <summary>
-        /// Asserts whether the model has the reference data required to create V&amp;V items (i.e. "Set up V&amp;V" has run).
+        /// Asserts whether the model has the reference data required to write V&amp;V items (i.e. "Set up V&amp;V" has run).
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/> the item would be created in.</param>
-        /// <returns>true when the <c>VnV Item</c> and <c>verifies</c> categories and the V&amp;V parameter types exist.</returns>
+        /// <returns>true when every category a create or edit writes exists, along with the V&amp;V parameter types.</returns>
+        /// <remarks>
+        /// Every category in <see cref="VandVCategory.RequiredForItemWrite"/> is checked, not just the two the item
+        /// itself carries. Saving an item is several writes in sequence, so a library missing only the coverage or
+        /// procedure categories used to commit the item and then throw, leaving an orphan behind and reporting the
+        /// whole thing as failed.
+        /// </remarks>
         public static bool CanCreate(Iteration iteration)
         {
             if (iteration == null)
@@ -79,8 +85,7 @@ namespace CDP4Requirements.Services
             var categories = new HashSet<string>(mrdl.QueryCategoriesFromChainOfRdls().Select(x => x.ShortName));
             var parameterTypes = new HashSet<string>(mrdl.QueryParameterTypesFromChainOfRdls().Select(x => x.ShortName));
 
-            return categories.Contains("VnVItem")
-                   && categories.Contains("verifies")
+            return VandVCategory.RequiredForItemWrite.All(categories.Contains)
                    && parameterTypes.Contains("vnv_method");
         }
 
@@ -95,7 +100,7 @@ namespace CDP4Requirements.Services
         /// <param name="attributes">The V&amp;V attribute values, keyed by parameter type short-name (e.g. <c>vnv_method</c>).</param>
         /// <param name="linkCategoryShortName">The category of the traceability link, <c>verifies</c> or <c>validates</c>.</param>
         /// <returns>The created V&amp;V item, so callers can attach coverage to it.</returns>
-        public async Task<Requirement> CreateAsync(ISession session, Requirement requirement, string shortName, string name, DomainOfExpertise owner, IReadOnlyDictionary<string, string> attributes, string linkCategoryShortName = "verifies")
+        public async Task<Requirement> CreateAsync(ISession session, Requirement requirement, string shortName, string name, DomainOfExpertise owner, IReadOnlyDictionary<string, string> attributes, string linkCategoryShortName = VandVCategory.Verifies)
         {
             if (session == null)
             {
@@ -127,7 +132,7 @@ namespace CDP4Requirements.Services
                 Owner = owner
             };
 
-            vandVItem.Category.Add(ResolveCategory(mrdl, "VnVItem"));
+            vandVItem.Category.Add(VandVCoverageQuery.ResolveCategory(mrdl, VandVCategory.VnVItem));
 
             foreach (var attribute in attributes)
             {
@@ -144,7 +149,7 @@ namespace CDP4Requirements.Services
                 Owner = owner
             };
 
-            relationship.Category.Add(ResolveCategory(mrdl, linkCategoryShortName));
+            relationship.Category.Add(VandVCoverageQuery.ResolveCategory(mrdl, linkCategoryShortName));
 
             iterationClone.Relationship.Add(relationship);
             transaction.Create(relationship);
@@ -258,7 +263,7 @@ namespace CDP4Requirements.Services
             {
                 var relationshipClone = relationship.Clone(false);
                 relationshipClone.Category.Clear();
-                relationshipClone.Category.Add(ResolveCategory(mrdl, linkCategoryShortName));
+                relationshipClone.Category.Add(VandVCoverageQuery.ResolveCategory(mrdl, linkCategoryShortName));
                 transaction.CreateOrUpdate(relationshipClone);
             }
 
@@ -279,7 +284,7 @@ namespace CDP4Requirements.Services
                 .OfType<BinaryRelationship>()
                 .FirstOrDefault(x =>
                     x.Source == vandVItem
-                    && x.Category.Any(category => category.ShortName == "verifies" || category.ShortName == "validates"));
+                    && x.Category.Any(category => category.ShortName == VandVCategory.Verifies || category.ShortName == VandVCategory.Validates));
         }
 
         /// <summary>
@@ -294,7 +299,7 @@ namespace CDP4Requirements.Services
                 .OfType<BinaryRelationship>()
                 .Count(x =>
                     x.Target == requirement
-                    && x.Category.Any(category => category.ShortName == "verifies" || category.ShortName == "validates"));
+                    && x.Category.Any(category => category.ShortName == VandVCategory.Verifies || category.ShortName == VandVCategory.Validates));
         }
 
         /// <summary>
@@ -307,7 +312,7 @@ namespace CDP4Requirements.Services
         {
             var relationship = QueryCoveringRelationship(iteration, vandVItem);
 
-            return relationship?.Category.FirstOrDefault(x => x.ShortName == "verifies" || x.ShortName == "validates")?.ShortName ?? "verifies";
+            return relationship?.Category.FirstOrDefault(x => x.ShortName == VandVCategory.Verifies || x.ShortName == VandVCategory.Validates)?.ShortName ?? VandVCategory.Verifies;
         }
 
         /// <summary>
@@ -374,22 +379,5 @@ namespace CDP4Requirements.Services
             transaction.Create(simpleParameterValue);
         }
 
-        /// <summary>
-        /// Resolves a required <see cref="Category"/> by short-name from the RDL chain.
-        /// </summary>
-        /// <param name="mrdl">The model reference data library.</param>
-        /// <param name="shortName">The category short-name.</param>
-        /// <returns>The resolved <see cref="Category"/>.</returns>
-        private static Category ResolveCategory(ReferenceDataLibrary mrdl, string shortName)
-        {
-            var category = mrdl.QueryCategoriesFromChainOfRdls().FirstOrDefault(x => x.ShortName == shortName);
-
-            if (category == null)
-            {
-                throw new InvalidOperationException($"The '{shortName}' category was not found. Run 'Set up V&V' first.");
-            }
-
-            return category;
-        }
     }
 }

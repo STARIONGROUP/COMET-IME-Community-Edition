@@ -29,6 +29,8 @@ namespace CDP4Requirements.Rules
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Requirements.Services;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
 
@@ -43,18 +45,6 @@ namespace CDP4Requirements.Rules
     [BuiltInRuleMetaDataExport("STARION", "RequirementVnVCoverage", "A rule that flags requirements not covered by a 'verifies' or 'validates' relationship from a V&V item")]
     public class RequirementVnVCoverageRule : BuiltInRule
     {
-        /// <summary>
-        /// The short-names (mirroring <see cref="Rdl.VandVRdlManifest"/>) of the categories applied to a covering
-        /// traceability relationship.
-        /// </summary>
-        private static readonly string[] CoverageCategoryShortNames = { "verifies", "validates" };
-
-        /// <summary>
-        /// The short-name (mirroring <see cref="Rdl.VandVRdlManifest"/>) of the category identifying a V&amp;V item, so
-        /// V&amp;V items are not themselves flagged as uncovered requirements.
-        /// </summary>
-        private const string VnVItemCategoryShortName = "VnVItem";
-
         /// <summary>
         /// Verify an <see cref="Iteration"/> with respect to requirement V&amp;V coverage.
         /// </summary>
@@ -73,8 +63,8 @@ namespace CDP4Requirements.Rules
                     .Where(relationship =>
                         relationship.Target != null
                         && relationship.Source is Requirement source
-                        && IsCategorizedAs(source, new[] { VnVItemCategoryShortName })
-                        && IsCategorizedAs(relationship, CoverageCategoryShortNames))
+                        && VandVCoverageQuery.IsVnVItem(source)
+                        && VandVCoverageQuery.IsCoverageLink(relationship))
                     .Select(relationship => relationship.Target.Iid));
 
             var violations = new List<RuleViolation>();
@@ -83,8 +73,8 @@ namespace CDP4Requirements.Rules
             {
                 foreach (var requirement in specification.Requirement.Where(x => !x.IsDeprecated))
                 {
-                    if (IsCategorizedAs(requirement, new[] { VnVItemCategoryShortName })
-                        || Services.VandVProcedureWriter.IsStep(requirement))
+                    if (VandVCoverageQuery.IsVnVItem(requirement)
+                        || VandVProcedureWriter.IsStep(requirement))
                     {
                         continue;
                     }
@@ -105,20 +95,6 @@ namespace CDP4Requirements.Rules
             }
 
             return violations;
-        }
-
-        /// <summary>
-        /// Asserts whether a <see cref="ICategorizableThing"/> carries any of the supplied category short-names, directly
-        /// or through a super-category.
-        /// </summary>
-        /// <param name="thing">The <see cref="ICategorizableThing"/> to inspect.</param>
-        /// <param name="shortNames">The category short-names to match.</param>
-        /// <returns>true when the thing is categorized by any of the <paramref name="shortNames"/>.</returns>
-        private static bool IsCategorizedAs(ICategorizableThing thing, IReadOnlyCollection<string> shortNames)
-        {
-            return thing.Category.Any(category =>
-                shortNames.Contains(category.ShortName)
-                || category.AllSuperCategories().Any(super => shortNames.Contains(super.ShortName)));
         }
     }
 }

@@ -73,6 +73,28 @@ namespace CDP4Requirements.Rdl
         }
 
         /// <summary>
+        /// Narrows what the caller asked to seed down to what is still genuinely missing, so a concurrent set-up on the
+        /// same model cannot create a second copy of reference data that now exists.
+        /// </summary>
+        /// <param name="requested">The <see cref="VandVRdlCheckResult"/> the caller passed to <see cref="Seed"/>.</param>
+        /// <param name="current">The <see cref="VandVRdlCheckResult"/> as it stands immediately before writing.</param>
+        /// <returns>The items present in both, with the requirement target category resolved as it stands now.</returns>
+        private static VandVRdlCheckResult Intersect(VandVRdlCheckResult requested, VandVRdlCheckResult current)
+        {
+            var stillMissingParameterTypes = new HashSet<string>(current.MissingParameterTypes.Select(x => x.ShortName));
+            var stillMissingCategories = new HashSet<string>(current.MissingCategories.Select(x => x.ShortName));
+            var stillMissingRules = new HashSet<string>(current.MissingParameterizedCategoryRules.Select(x => x.ShortName));
+            var stillMissingRelationshipRules = new HashSet<string>(current.MissingBinaryRelationshipRules.Select(x => x.ShortName));
+
+            return new VandVRdlCheckResult(
+                requested.MissingParameterTypes.Where(x => stillMissingParameterTypes.Contains(x.ShortName)).ToList(),
+                requested.MissingCategories.Where(x => stillMissingCategories.Contains(x.ShortName)).ToList(),
+                requested.MissingParameterizedCategoryRules.Where(x => stillMissingRules.Contains(x.ShortName)).ToList(),
+                requested.MissingBinaryRelationshipRules.Where(x => stillMissingRelationshipRules.Contains(x.ShortName)).ToList(),
+                current.RequirementTargetCategory);
+        }
+
+        /// <summary>
         /// Resolves the model's existing requirement <see cref="Category"/>, the target for the <c>verifies</c>/
         /// <c>validates</c> rules, by matching, case-insensitively and in priority order, the short-names in
         /// <see cref="VandVRdlManifest.RequirementCategoryShortNames"/> among the categories permissible on
@@ -152,6 +174,16 @@ namespace CDP4Requirements.Rdl
             {
                 throw new ArgumentNullException(nameof(missing));
             }
+
+            if (!missing.HasMissingItems)
+            {
+                return;
+            }
+
+            // the caller's check is minutes old by now: it was taken before the confirmation and stage-gate dialogs.
+            // Nothing enforces short-name uniqueness at write time, so seeding that stale list would permanently
+            // duplicate every parameter type and category another user created in the meantime
+            missing = Intersect(missing, this.Check(mrdl));
 
             if (!missing.HasMissingItems)
             {
