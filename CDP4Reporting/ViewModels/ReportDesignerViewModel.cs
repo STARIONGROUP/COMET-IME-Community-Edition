@@ -363,21 +363,6 @@ namespace CDP4Reporting.ViewModels
         private Option whatIfSelectedOption;
 
         /// <summary>
-        /// Backing field for <see cref="IsEditModeEnabled"/>.
-        /// </summary>
-        private bool isEditModeEnabled;
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the preview's submittable cells are editable, so the user can
-        /// type new values before a what-if recalculation or a submit.
-        /// </summary>
-        public bool IsEditModeEnabled
-        {
-            get => this.isEditModeEnabled;
-            set => this.RaiseAndSetIfChanged(ref this.isEditModeEnabled, value);
-        }
-
-        /// <summary>
         /// Fires when the DataSource text needs to be cleared
         /// </summary>
         public ReactiveCommand<Unit, Unit> ClearOutputCommand { get; set; }
@@ -1465,107 +1450,6 @@ namespace CDP4Reporting.ViewModels
                 this.valueSet.Reference = this.reference;
                 this.valueSet.Published = this.published;
                 this.valueSet.ValueSwitch = this.valueSwitch;
-            }
-        }
-
-        /// <summary>
-        /// Enables or disables DevExpress content editing on the report's submittable cells (those bound to a
-        /// parameter path via a <c>Tag</c> expression binding), so the user can type new values in the preview.
-        /// </summary>
-        /// <param name="enabled">Whether editing should be enabled.</param>
-        [ExcludeFromCodeCoverage]
-        private void SetPreviewEditingEnabled(bool enabled)
-        {
-            var report = this.CurrentReport;
-
-            if (report == null)
-            {
-                return;
-            }
-
-            foreach (var control in report.AllControls<XRLabel>())
-            {
-                var bindings = control.ExpressionBindings.Cast<ExpressionBinding>().ToList();
-
-                // A cell is a submit target when it carries a parameter-path Tag binding.
-                var isSubmittable = bindings.Any(binding =>
-                    string.Equals(binding.PropertyName, "Tag", StringComparison.OrdinalIgnoreCase)
-                    && !string.IsNullOrEmpty(binding.Expression)
-                    && binding.Expression.IndexOf("path", StringComparison.OrdinalIgnoreCase) >= 0);
-
-                // A cell is directly editable when its Text is bound to a single data field (e.g. [Mass]);
-                // cells bound to computed expressions (e.g. sumSum(...)) cannot be content-edited by DevExpress.
-                var textBinding = bindings.FirstOrDefault(binding => string.Equals(binding.PropertyName, "Text", StringComparison.OrdinalIgnoreCase));
-                var isDataBound = IsBareFieldExpression(textBinding?.Expression);
-
-                if (isSubmittable || isDataBound)
-                {
-                    control.EditOptions.Enabled = enabled;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Determines whether an expression is a single bare data-field reference such as <c>[Mass]</c>.
-        /// </summary>
-        /// <param name="expression">The expression to test.</param>
-        /// <returns>True when the expression is exactly one field reference.</returns>
-        [ExcludeFromCodeCoverage]
-        private static bool IsBareFieldExpression(string expression)
-        {
-            if (string.IsNullOrWhiteSpace(expression))
-            {
-                return false;
-            }
-
-            var trimmed = expression.Trim();
-
-            return trimmed.Length > 2
-                   && trimmed[0] == '['
-                   && trimmed[trimmed.Length - 1] == ']'
-                   && trimmed.IndexOf('[', 1) < 0;
-        }
-
-        /// <summary>
-        /// Applies the requested edit-mode state: toggles content editing on the report's editable cells and
-        /// re-renders the preview against the current model so the change takes effect (editing only becomes
-        /// available in a freshly generated document).
-        /// </summary>
-        /// <param name="enabled">Whether editing should be enabled.</param>
-        [ExcludeFromCodeCoverage]
-        private void ApplyEditMode(bool enabled)
-        {
-            this.SetPreviewEditingEnabled(enabled);
-
-            if (this.CurrentReport == null || this.ReportScriptHandler.CurrentDataCollector == null)
-            {
-                return;
-            }
-
-            this.IsBusy = true;
-
-            try
-            {
-                this.AddOutput(enabled
-                    ? "Reloading the preview for editing (you may be asked to select the Option). Please wait until this says 'ready'..."
-                    : "Reloading the preview...");
-
-                // Re-render the preview (against the real model) so the editable fields appear.
-                this.ReportScriptHandler.RebuildDataSource(this.Thing, this.Session, true);
-                this.TriggerRefreshUI();
-
-                this.AddOutput(enabled
-                    ? "Edit mode is ready. The report's editable cells can now be changed in the preview - if a cell is not directly editable, use the 'Editing Fields' button in the Document ribbon group. Change values, then click Recalculate."
-                    : "Edit mode OFF - preview reloaded.");
-            }
-            catch (Exception ex)
-            {
-                this.logger.Error(ex, "Failed to toggle edit mode.");
-                this.AddOutput($"Failed to toggle edit mode: {ex.Message}");
-            }
-            finally
-            {
-                this.IsBusy = false;
             }
         }
 
