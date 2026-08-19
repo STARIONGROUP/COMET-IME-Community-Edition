@@ -412,6 +412,73 @@ namespace CDP4DiagramEditor.Tests.ViewModels
         }
 
         [Test]
+        public async Task VerifyThatDroppingAnExcludedThingLiftsTheExclusion()
+        {
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            viewModel.SelectedNode = viewModel.Nodes.Single(x => x.Thing == this.spec2);
+            await viewModel.ExcludeSelectedNodeCommand.Execute();
+
+            Assert.That(viewModel.ExcludedThings, Is.EquivalentTo(new Thing[] { this.spec2 }));
+
+            var dropInfo = new Mock<IDropInfo>();
+            dropInfo.Setup(x => x.Payload).Returns(this.spec2);
+            dropInfo.SetupProperty(x => x.Effects);
+
+            viewModel.DragOver(dropInfo.Object);
+            Assert.That(dropInfo.Object.Effects, Is.EqualTo(DragDropEffects.Copy));
+
+            await viewModel.Drop(dropInfo.Object);
+
+            // the accepted drop actually shows the thing instead of being swallowed by the exclusion
+            Assert.That(viewModel.ExcludedThings, Is.Empty);
+            Assert.That(viewModel.RootThings, Does.Contain(this.spec2));
+            Assert.That(viewModel.Nodes.Select(x => x.Thing), Does.Contain(this.spec2));
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatDeprecatingADisplayedThingRefreshesTheDiagram()
+        {
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            Assert.That(viewModel.Nodes.Count, Is.EqualTo(2));
+
+            this.spec2.IsDeprecated = true;
+            this.messageBus.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+
+            Assert.That(viewModel.Nodes.Select(x => x.Thing), Is.EquivalentTo(new Thing[] { this.spec1 }));
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatRenamingADisplayedThingRefreshesTheDiagram()
+        {
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.ComputeGraph();
+
+            this.spec2.ShortName = "renamed";
+            this.messageBus.SendObjectChangeEvent(this.spec2, EventKind.Updated);
+
+            Assert.That(viewModel.Nodes.Single(x => x.Thing == this.spec2).ShortName, Is.EqualTo("renamed"));
+
+            viewModel.Dispose();
+        }
+
+        [Test]
         public void VerifyThatTheDefaultDirectionIsApplied()
         {
             // both arrows point at spec1, so the natural downward expansion finds nothing

@@ -121,7 +121,9 @@ namespace CDP4DiagramEditor.Helpers
 
             foreach (var root in roots.Where(x => x != null))
             {
-                if (nodes.ContainsKey(root.Iid) || configuration.ExcludedThings.Contains(root.Iid))
+                // a root is not subject to the node filter, but it is subject to exclusion and deprecation, so that a
+                // deprecated thing never shows up as a root while every deprecated thing reached by traversal is hidden
+                if (nodes.ContainsKey(root.Iid) || configuration.ExcludedThings.Contains(root.Iid) || IsDeprecated(root))
                 {
                     continue;
                 }
@@ -235,6 +237,12 @@ namespace CDP4DiagramEditor.Helpers
                 }
 
                 currentLevelThings = nextLevelThings;
+
+                if (maxNodeCountReached)
+                {
+                    // no further node can be added, so any deeper level would only discard its results
+                    break;
+                }
             }
 
             return maxNodeCountReached;
@@ -325,17 +333,26 @@ namespace CDP4DiagramEditor.Helpers
         /// </returns>
         private static bool IsNodeAllowed(Thing thing, RelationshipGraphConfiguration configuration)
         {
-            if (configuration.ExcludedThings.Contains(thing.Iid))
-            {
-                return false;
-            }
-
-            if (thing is IDeprecatableThing deprecatableThing && deprecatableThing.IsDeprecated)
+            if (configuration.ExcludedThings.Contains(thing.Iid) || IsDeprecated(thing))
             {
                 return false;
             }
 
             return configuration.NodeFilter == null || configuration.NodeFilter.IsMatch(thing);
+        }
+
+        /// <summary>
+        /// Asserts whether a <see cref="Thing"/> is deprecated
+        /// </summary>
+        /// <param name="thing">
+        /// The <see cref="Thing"/> that is to be checked
+        /// </param>
+        /// <returns>
+        /// true when the <see cref="Thing"/> is an <see cref="IDeprecatableThing"/> that is deprecated
+        /// </returns>
+        private static bool IsDeprecated(Thing thing)
+        {
+            return thing is IDeprecatableThing deprecatableThing && deprecatableThing.IsDeprecated;
         }
     }
 }

@@ -404,6 +404,42 @@ namespace CDP4DiagramEditor.Tests.Helpers
         }
 
         [Test]
+        public void VerifyThatADeprecatedRootIsExcluded()
+        {
+            this.spec1.IsDeprecated = true;
+
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+
+            var builder = new RelationshipGraphBuilder(this.iteration);
+            var configuration = new RelationshipGraphConfiguration { DepthDown = 5, DepthUp = 0 };
+
+            var graph = builder.Build(new[] { this.spec1 }, configuration);
+
+            Assert.That(graph.Nodes, Is.Empty);
+            Assert.That(graph.Edges, Is.Empty);
+        }
+
+        [Test]
+        public void VerifyThatTraversalStopsAtTheLevelWhereTheNodeCapTrips()
+        {
+            // a chain that is far deeper than the cap allows
+            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
+            this.AddBinaryRelationship(this.spec2, this.spec3, this.traceCategory);
+            this.AddBinaryRelationship(this.spec3, this.spec4, this.traceCategory);
+
+            var builder = new RelationshipGraphBuilder(this.iteration);
+            var configuration = new RelationshipGraphConfiguration { DepthDown = 20, DepthUp = 0, MaxNodes = 2 };
+
+            var graph = builder.Build(new[] { this.spec1 }, configuration);
+
+            Assert.That(graph.MaxNodeCountReached, Is.True);
+            Assert.That(graph.Nodes.Select(x => x.Thing), Is.EquivalentTo(new Thing[] { this.spec1, this.spec2 }));
+
+            // nothing beyond the capped level was reached, so no node carries a deeper level
+            Assert.That(graph.Nodes.Max(x => x.Level), Is.EqualTo(1));
+        }
+
+        [Test]
         public void VerifyThatDeprecatedThingsAreExcluded()
         {
             this.spec2.IsDeprecated = true;

@@ -29,6 +29,7 @@ namespace CDP4DiagramEditor.ViewModels
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive;
+    using System.Reactive.Disposables;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
     using System.Windows;
@@ -83,6 +84,12 @@ namespace CDP4DiagramEditor.ViewModels
         /// relationship indexes are not rebuilt on every configuration change
         /// </summary>
         private RelationshipGraphBuilder builder;
+
+        /// <summary>
+        /// The subscriptions on the <see cref="Thing"/>s that are currently rendered as nodes, so that renaming or
+        /// deprecating a displayed <see cref="Thing"/> refreshes the diagram. They are replaced on every recompute.
+        /// </summary>
+        private readonly CompositeDisposable nodeSubscriptions = new CompositeDisposable();
 
         /// <summary>
         /// Backing field for <see cref="SelectedRootThing"/>
@@ -554,6 +561,15 @@ namespace CDP4DiagramEditor.ViewModels
         {
             if (dropInfo.Payload is Thing thing && this.IsDroppableRoot(thing))
             {
+                // dropping a thing that was excluded earlier is an explicit request to see it, so the exclusion is
+                // lifted rather than silently swallowing the drop
+                var excluded = this.ExcludedThings.FirstOrDefault(x => x.Iid == thing.Iid);
+
+                if (excluded != null)
+                {
+                    this.ExcludedThings.Remove(excluded);
+                }
+
                 this.RootThings.Add(thing);
                 this.ComputeGraph();
             }
@@ -603,6 +619,8 @@ namespace CDP4DiagramEditor.ViewModels
 
             this.Edges.Clear();
             this.Edges.AddRange(graph.Edges.Select(x => new TraceabilityEdgeViewModel(x, nodeLevels)));
+
+            this.SubscribeToNodes(graph.Nodes.Select(x => x.Thing));
 
             this.IsMaxNodeCountReached = graph.MaxNodeCountReached;
 
@@ -813,10 +831,31 @@ namespace CDP4DiagramEditor.ViewModels
         }
 
         /// <summary>
+        /// Replaces the subscriptions on the <see cref="Thing"/>s that are rendered as nodes, so that renaming or
+        /// deprecating one of them refreshes the diagram
+        /// </summary>
+        /// <param name="things">The <see cref="Thing"/>s that are currently rendered</param>
+        private void SubscribeToNodes(IEnumerable<Thing> things)
+        {
+            this.nodeSubscriptions.Clear();
+
+            foreach (var thing in things)
+            {
+                this.nodeSubscriptions.Add(
+                    this.Session.CDPMessageBus.Listen<ObjectChangedEvent>(thing)
+                        .Where(objectChange => objectChange.EventKind != EventKind.Added)
+                        .ObserveOn(RxApp.MainThreadScheduler)
+                        .Subscribe(_ => this.ComputeGraph()));
+            }
+        }
+
+        /// <summary>
         /// Adds the message bus subscriptions that keep the graph in sync with the model
         /// </summary>
         private void AddTraceabilitySubscriptions()
         {
+            this.Disposables.Add(this.nodeSubscriptions);
+
             foreach (var relationshipType in new[] { typeof(BinaryRelationship), typeof(MultiRelationship) })
             {
                 this.Disposables.Add(

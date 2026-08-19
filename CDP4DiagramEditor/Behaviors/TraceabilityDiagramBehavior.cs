@@ -52,10 +52,10 @@ namespace CDP4DiagramEditor.Behaviors
     public class TraceabilityDiagramBehavior : Behavior<DiagramControl>, ITraceabilityDiagramBehavior
     {
         /// <summary>
-        /// A value indicating whether a layout pass is already scheduled, used to coalesce the per-item
-        /// <see cref="DiagramControl.ItemsChanged"/> events into a single layout pass
+        /// The scheduled layout pass, used both to coalesce the per-item <see cref="DiagramControl.ItemsChanged"/>
+        /// events into a single layout pass and to abort that pass when the behavior detaches
         /// </summary>
-        private bool layoutPending;
+        private DispatcherOperation layoutOperation;
 
         /// <summary>
         /// The on attached event handler
@@ -73,6 +73,10 @@ namespace CDP4DiagramEditor.Behaviors
         /// </summary>
         protected override void OnDetaching()
         {
+            // a layout pass queued by the last items change would run after the panel is gone
+            this.layoutOperation?.Abort();
+            this.layoutOperation = null;
+
             this.AssociatedObject.DataContextChanged -= this.OnDataContextChanged;
             this.AssociatedObject.ItemsChanged -= this.OnItemsChanged;
 
@@ -90,7 +94,7 @@ namespace CDP4DiagramEditor.Behaviors
         /// </summary>
         public void ApplyLayout()
         {
-            if (!this.AssociatedObject.Items.OfType<DiagramContentItem>().Any())
+            if (this.AssociatedObject == null || !this.AssociatedObject.Items.OfType<DiagramContentItem>().Any())
             {
                 return;
             }
@@ -237,17 +241,15 @@ namespace CDP4DiagramEditor.Behaviors
                 connector.EndArrow = edge.IsReversed || edge.IsUndirected ? null : ArrowDescriptions.Filled90;
             }
 
-            if (this.layoutPending)
+            if (this.layoutOperation != null)
             {
                 return;
             }
 
-            this.layoutPending = true;
-
-            this.AssociatedObject.Dispatcher.BeginInvoke(
+            this.layoutOperation = this.AssociatedObject.Dispatcher.BeginInvoke(
                 new Action(() =>
                 {
-                    this.layoutPending = false;
+                    this.layoutOperation = null;
                     this.ApplyLayout();
                 }),
                 DispatcherPriority.Background);
