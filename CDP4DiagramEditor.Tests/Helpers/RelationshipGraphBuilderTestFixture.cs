@@ -245,24 +245,6 @@ namespace CDP4DiagramEditor.Tests.Helpers
         }
 
         [Test]
-        public void VerifyThatTheNodeFilterIsApplied()
-        {
-            this.AddBinaryRelationship(this.spec1, this.spec2, this.traceCategory);
-            this.AddBinaryRelationship(this.spec1, this.elementDefinition, this.traceCategory);
-
-            var builder = new RelationshipGraphBuilder(this.iteration);
-
-            var configuration = new RelationshipGraphConfiguration { DepthDown = 1, DepthUp = 0 };
-            configuration.NodeFilter = new RelationshipGraphFilter();
-            configuration.NodeFilter.ClassKinds.Add(ClassKind.RequirementsSpecification);
-
-            var graph = builder.Build(new[] { this.spec1 }, configuration);
-
-            Assert.That(graph.Nodes.Select(x => x.Thing), Is.EquivalentTo(new Thing[] { this.spec1, this.spec2 }));
-            Assert.That(graph.Edges.Count, Is.EqualTo(1));
-        }
-
-        [Test]
         public void VerifyThatAMultiRelationshipExpandsToAllRelatedThingsAndCostsOneLevel()
         {
             this.AddMultiRelationship(this.spec1, this.spec2, this.spec3);

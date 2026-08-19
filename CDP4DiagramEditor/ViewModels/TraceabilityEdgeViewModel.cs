@@ -36,9 +36,10 @@ namespace CDP4DiagramEditor.ViewModels
 
     /// <summary>
     /// Represents a <see cref="RelationshipGraphEdge"/> as a connector on the traceability diagram. The connector runs
-    /// from the shallower to the deeper traversal level, so the automatic layout stacks the levels in traversal order
-    /// even when the model arrow points the other way; <see cref="IsReversed"/> tells the view to draw the arrow head
-    /// on the begin side in that case, so the arrow always shows the true direction of the <see cref="Relationship"/>.
+    /// in order of ascending <see cref="RelationshipGraphNode.Level"/>, so the automatic layout stacks the upward cone
+    /// above the roots and the downward cone below them, even when the model arrow points the other way;
+    /// <see cref="IsReversed"/> then tells the view to draw the arrow head on the begin side, so the arrow keeps
+    /// showing the true direction of the <see cref="Relationship"/>.
     /// </summary>
     public class TraceabilityEdgeViewModel
     {
@@ -76,13 +77,13 @@ namespace CDP4DiagramEditor.ViewModels
 
         /// <summary>
         /// Gets the <see cref="TraceabilityNodeViewModel.Id"/> of the node the connector originates from, always the
-        /// endpoint at the shallower traversal level
+        /// endpoint with the lower <see cref="RelationshipGraphNode.Level"/>
         /// </summary>
         public Guid FromId { get; }
 
         /// <summary>
         /// Gets the <see cref="TraceabilityNodeViewModel.Id"/> of the node the connector points to, always the
-        /// endpoint at the deeper traversal level
+        /// endpoint with the higher <see cref="RelationshipGraphNode.Level"/>
         /// </summary>
         public Guid ToId { get; }
 

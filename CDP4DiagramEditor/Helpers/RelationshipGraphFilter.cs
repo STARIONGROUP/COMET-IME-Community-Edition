@@ -33,8 +33,9 @@ namespace CDP4DiagramEditor.Helpers
     using CDP4Common.SiteDirectoryData;
 
     /// <summary>
-    /// Represents a filter on a <see cref="Thing"/> by <see cref="ClassKind"/> and by <see cref="Category"/>. It is used
-    /// both to decide which <see cref="Relationship"/>s may be followed and which reached <see cref="Thing"/>s are kept.
+    /// Represents a filter on a <see cref="Thing"/> by <see cref="Category"/> and, for a <see cref="Relationship"/>,
+    /// by the direction its arrows are followed in. It is used to decide which <see cref="Relationship"/>s may be
+    /// followed at a traversal level and which <see cref="Thing"/>s make up the root set.
     /// </summary>
     public class RelationshipGraphFilter
     {
@@ -43,15 +44,8 @@ namespace CDP4DiagramEditor.Helpers
         /// </summary>
         public RelationshipGraphFilter()
         {
-            this.ClassKinds = new List<ClassKind>();
             this.Categories = new List<Category>();
         }
-
-        /// <summary>
-        /// Gets the <see cref="ClassKind"/>s that are accepted. An empty collection accepts every
-        /// <see cref="ClassKind"/>.
-        /// </summary>
-        public List<ClassKind> ClassKinds { get; }
 
         /// <summary>
         /// Gets or sets how <see cref="BinaryRelationship"/> arrows are followed at the hops this filter applies to.
@@ -85,11 +79,6 @@ namespace CDP4DiagramEditor.Helpers
         /// </returns>
         public bool IsMatch(Thing thing)
         {
-            if (this.ClassKinds.Any() && !this.ClassKinds.Contains(thing.ClassKind))
-            {
-                return false;
-            }
-
             if (!this.Categories.Any())
             {
                 return true;

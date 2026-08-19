@@ -92,8 +92,8 @@ namespace CDP4DiagramEditor.Helpers
         /// Builds the <see cref="RelationshipGraph"/> that is reachable from the supplied roots
         /// </summary>
         /// <param name="roots">
-        /// The <see cref="Thing"/>s the traversal starts from. They are always part of the resulting graph, the
-        /// <see cref="RelationshipGraphConfiguration.NodeFilter"/> is not applied to them.
+        /// The <see cref="Thing"/>s the traversal starts from. They are part of the resulting graph unless they are
+        /// excluded or deprecated.
         /// </param>
         /// <param name="configuration">
         /// The <see cref="RelationshipGraphConfiguration"/> that constrains the traversal
@@ -326,19 +326,14 @@ namespace CDP4DiagramEditor.Helpers
         /// The reached <see cref="Thing"/>
         /// </param>
         /// <param name="configuration">
-        /// The <see cref="RelationshipGraphConfiguration"/> holding the node filter and the excluded things
+        /// The <see cref="RelationshipGraphConfiguration"/> holding the excluded things
         /// </param>
         /// <returns>
         /// true when the <see cref="Thing"/> may be added
         /// </returns>
         private static bool IsNodeAllowed(Thing thing, RelationshipGraphConfiguration configuration)
         {
-            if (configuration.ExcludedThings.Contains(thing.Iid) || IsDeprecated(thing))
-            {
-                return false;
-            }
-
-            return configuration.NodeFilter == null || configuration.NodeFilter.IsMatch(thing);
+            return !configuration.ExcludedThings.Contains(thing.Iid) && !IsDeprecated(thing);
         }
 
         /// <summary>

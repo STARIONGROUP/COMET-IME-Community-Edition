@@ -479,6 +479,66 @@ namespace CDP4DiagramEditor.Tests.ViewModels
         }
 
         [Test]
+        public void VerifyThatTheUpwardConeIsLaidOutAboveTheRoot()
+        {
+            // spec3 -> spec2 -> spec1, so from spec1 the chain runs upward: spec2 at -1, spec3 at -2
+            var toRoot = this.AddBinaryRelationship(this.spec2, this.spec1, this.traceCategory);
+            var toAncestor = this.AddBinaryRelationship(this.spec3, this.spec2, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.DepthDown = 0;
+            viewModel.DepthUp = 2;
+
+            Assert.That(viewModel.Nodes.Single(x => x.Thing == this.spec2).Level, Is.EqualTo(-1));
+            Assert.That(viewModel.Nodes.Single(x => x.Thing == this.spec3).Level, Is.EqualTo(-2));
+
+            // every connector runs from the higher to the lower node, so the ancestors stack above the root
+            var rootEdge = viewModel.Edges.Single(x => x.Relationship == toRoot);
+            Assert.That(rootEdge.FromId, Is.EqualTo(this.spec2.Iid));
+            Assert.That(rootEdge.ToId, Is.EqualTo(this.spec1.Iid));
+
+            var ancestorEdge = viewModel.Edges.Single(x => x.Relationship == toAncestor);
+            Assert.That(ancestorEdge.FromId, Is.EqualTo(this.spec3.Iid));
+            Assert.That(ancestorEdge.ToId, Is.EqualTo(this.spec2.Iid));
+
+            // both keep the model arrow, so neither is drawn reversed
+            Assert.That(rootEdge.IsReversed, Is.False);
+            Assert.That(ancestorEdge.IsReversed, Is.False);
+
+            viewModel.Dispose();
+        }
+
+        [Test]
+        public void VerifyThatTheUpwardAndDownwardConesAreLaidOutOnOppositeSidesOfTheRoot()
+        {
+            // spec2 -> spec1 -> spec3, so spec2 is an ancestor and spec3 a descendant of the root
+            this.AddBinaryRelationship(this.spec2, this.spec1, this.traceCategory);
+            this.AddBinaryRelationship(this.spec1, this.spec3, this.traceCategory);
+
+            var viewModel = this.CreateViewModel();
+            viewModel.RootThings.Add(this.spec1);
+            viewModel.DepthDown = 1;
+            viewModel.DepthUp = 1;
+
+            var levels = viewModel.Nodes.ToDictionary(x => x.Thing, x => x.Level);
+
+            Assert.That(levels[this.spec2], Is.LessThan(levels[this.spec1]));
+            Assert.That(levels[this.spec3], Is.GreaterThan(levels[this.spec1]));
+
+            // the connectors follow that same order, which is what the layout ranks on
+            foreach (var edge in viewModel.Edges)
+            {
+                var from = viewModel.Nodes.Single(x => x.Id == edge.FromId).Level;
+                var to = viewModel.Nodes.Single(x => x.Id == edge.ToId).Level;
+
+                Assert.That(from, Is.LessThanOrEqualTo(to));
+            }
+
+            viewModel.Dispose();
+        }
+
+        [Test]
         public void VerifyThatTheDefaultDirectionIsApplied()
         {
             // both arrows point at spec1, so the natural downward expansion finds nothing

@@ -87,12 +87,6 @@ namespace CDP4DiagramEditor.Helpers
         public Dictionary<int, RelationshipGraphFilter> LevelFilterOverrides { get; }
 
         /// <summary>
-        /// Gets or sets the <see cref="RelationshipGraphFilter"/> that a reached <see cref="Thing"/> must match to be
-        /// added to the graph. A null value means that every reached <see cref="Thing"/> is added.
-        /// </summary>
-        public RelationshipGraphFilter NodeFilter { get; set; }
-
-        /// <summary>
         /// Gets the <see cref="Thing.Iid"/>s of the <see cref="Thing"/>s that are excluded from the graph. An excluded
         /// <see cref="Thing"/> is never added as a node, so everything that is only reachable through it disappears
         /// with it.
