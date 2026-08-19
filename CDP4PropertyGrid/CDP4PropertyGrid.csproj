@@ -9,8 +9,8 @@
     <Product>CDP4PropertyGrid</Product>
     <Description>CDP4-COMET Property Grid Plugin</Description>
     <Copyright>Copyright © Starion Group S.A.</Copyright>
-    <AssemblyVersion>11.0.1.1</AssemblyVersion>
-    <FileVersion>11.0.1.1</FileVersion>
+    <AssemblyVersion>11.0.1.2</AssemblyVersion>
+    <FileVersion>11.0.1.2</FileVersion>
 	<UseWPF>true</UseWPF>
 	<UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
@@ -36,13 +36,13 @@
   </PropertyGroup>
   <Import Project="..\Sdk.Plugin.target" />
   <ItemGroup>
-	<PackageReference Include="CDP4Common-CE" Version="30.1.2">
+	<PackageReference Include="CDP4Common-CE" Version="30.1.3">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="CDP4Dal-CE" Version="30.1.2">
+	<PackageReference Include="CDP4Dal-CE" Version="30.1.3">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
-	<PackageReference Include="CDP4JsonSerializer-CE" Version="30.1.2">
+	<PackageReference Include="CDP4JsonSerializer-CE" Version="30.1.3">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
     <PackageReference Include="DevExpress.CodeParser" Version="23.2.15">
@@ -147,10 +147,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-    <PackageReference Include="NLog" Version="6.1.2">
+    <PackageReference Include="NLog" Version="6.2.0">
       <ExcludeAssets>runtime</ExcludeAssets>
     </PackageReference>
-	<PackageReference Include="NLog.Extensions.Logging" Version="6.1.2">
+	<PackageReference Include="NLog.Extensions.Logging" Version="6.2.0">
 	  <ExcludeAssets>runtime</ExcludeAssets>
 	</PackageReference>
 	<PackageReference Include="ReactiveUI.WPF" Version="22.3.1">
