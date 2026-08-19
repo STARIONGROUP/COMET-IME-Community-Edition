@@ -1,0 +1,169 @@
+﻿<UserControl x:Class="CDP4Requirements.Views.VandVBrowser"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dx="http://schemas.devexpress.com/winfx/2008/xaml/core"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxg="http://schemas.devexpress.com/winfx/2008/xaml/grid"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:cdp4Composition="clr-namespace:CDP4Composition;assembly=CDP4Composition"
+             xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:dxb="http://schemas.devexpress.com/winfx/2008/xaml/bars"
+             xmlns:services="clr-namespace:CDP4Composition.Services;assembly=CDP4Composition"
+             xmlns:rows="clr-namespace:CDP4Requirements.ViewModels.Rows"
+             xmlns:selectors="clr-namespace:CDP4Requirements.Selectors"
+             d:DesignHeight="300"
+             d:DesignWidth="700"
+             dx:ThemeManager.ThemeName="{Binding Path=ThemeName}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/CDP4Composition;component/CommonView/Resources/CDP4Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <selectors:VandVTreeListNodeImageSelector x:Key="VandVTreeListNodeSelector" />
+
+            <!--  Specification and group rows mirror the stock Requirements browser grouping.  -->
+            <HierarchicalDataTemplate DataType="{x:Type rows:VandVSpecificationRowViewModel}" ItemsSource="{Binding ContainedRows}">
+                <ContentPresenter Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </HierarchicalDataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type rows:VandVGroupRowViewModel}" ItemsSource="{Binding ContainedRows}">
+                <ContentPresenter Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </HierarchicalDataTemplate>
+
+            <!--  Requirement rows expand to reveal the V&V items that cover them.  -->
+            <HierarchicalDataTemplate DataType="{x:Type rows:RequirementCoverageRowViewModel}" ItemsSource="{Binding ContainedRows}">
+                <ContentPresenter Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </HierarchicalDataTemplate>
+
+            <!--  V&V items expand to their procedure steps in the Procedure view.  -->
+            <HierarchicalDataTemplate DataType="{x:Type rows:VandVItemRowViewModel}" ItemsSource="{Binding ContainedRows}">
+                <ContentPresenter Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </HierarchicalDataTemplate>
+
+            <!--  Procedure steps are leaves.  -->
+            <HierarchicalDataTemplate DataType="{x:Type rows:VandVStepRowViewModel}">
+                <ContentPresenter Content="{Binding}" ContentTemplate="{Binding View.DefaultDataRowTemplate}" />
+            </HierarchicalDataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <dxb:ToolBarControl Grid.Row="0" Height="30">
+            <dxb:BarButtonItem Command="{Binding CreateVandVItemCommand}"
+                               Content="Create V&amp;V Item"
+                               Glyph="{dx:DXImage Image=Add_16x16.png}"
+                               Hint="Create a V&amp;V item for the selected requirement" />
+            <dxb:BarItemSeparator />
+            <dxb:BarEditItem Content="View: "
+                             EditWidth="130"
+                             EditValue="{Binding SelectedView, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Hint="{Binding SelectedView.Description}">
+                <dxb:BarEditItem.EditSettings>
+                    <dxe:ComboBoxEditSettings IsTextEditable="False" ItemsSource="{Binding PossibleViews}" />
+                </dxb:BarEditItem.EditSettings>
+            </dxb:BarEditItem>
+            <dxb:BarEditItem Content="Stage: "
+                             EditWidth="130"
+                             EditValue="{Binding SelectedStage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Hint="Show only the activities planned at one stage gate">
+                <dxb:BarEditItem.EditSettings>
+                    <dxe:ComboBoxEditSettings IsTextEditable="False" ItemsSource="{Binding PossibleStages}" />
+                </dxb:BarEditItem.EditSettings>
+            </dxb:BarEditItem>
+            <dxb:BarItemSeparator />
+            <dxb:BarButtonItem Command="{Binding OpenMatrixCommand}"
+                               Content="Coverage Matrix"
+                               Glyph="{dx:DXImage Image=Pivot_16x16.png}"
+                               Hint="Open the RVM coverage matrix" />
+            <dxb:BarButtonItem Command="{Binding RunAnalysisCheckCommand}"
+                               Content="Run Analysis Check"
+                               Glyph="{dx:DXImage Image=Recurrence_16x16.png}"
+                               Hint="Evaluate every V&amp;V item's covered parameter against its requirement's parametric constraints" />
+            <dxb:BarButtonItem Command="{Binding ExportWorkbookCommand}"
+                               Content="Export VCD / RVM"
+                               Glyph="{dx:DXImage Image=ExportToXLSX_16x16.png}"
+                               Hint="Export the VCD, RVM, execution records and NCRs to Excel" />
+        </dxb:ToolBarControl>
+
+        <dxg:TreeListControl Grid.Row="1"
+                             ItemsSource="{Binding SpecificationRows}"
+                             SelectedItem="{Binding SelectedThing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             services:GridUpdateService.UpdateStarted="{Binding HasUpdateStarted, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}">
+
+            <dxmvvm:Interaction.Behaviors>
+                <cdp4Composition:ContextMenuBehavior />
+
+                <!--  KeyToCommand, not KeyBinding: a KeyBinding on the tree resolves against the wrong DataContext  -->
+                <dxmvvm:KeyToCommand KeyGesture="Ctrl+E" Command="{Binding UpdateCommand}" />
+                <dxmvvm:KeyToCommand KeyGesture="Ctrl+I" Command="{Binding InspectCommand}" />
+            </dxmvvm:Interaction.Behaviors>
+
+            <!--  without these the tree is neither a drag source nor a drop target  -->
+            <b:Interaction.Behaviors>
+                <dragDrop:FrameworkElementDragBehavior />
+                <dragDrop:FrameworkElementDropBehavior />
+            </b:Interaction.Behaviors>
+
+            <dxg:TreeListControl.View>
+                <!--  TreeListViewDragDrop, not TreeListView: the stock view swallows the row-level drag, which is why
+                      a parameter could be dropped on a V&V item without anything happening  -->
+                <dragDrop:TreeListViewDragDrop Name="View"
+                                               AllowEditing="False"
+                                               AutoWidth="False"
+                                               ExpandStateFieldName="IsExpanded"
+                                               HorizontalScrollbarVisibility="Auto"
+                                               ShowHorizontalLines="False"
+                                               ShowIndicator="False"
+                                               ShowNodeImages="True"
+                                               NodeImageSelector="{StaticResource VandVTreeListNodeSelector}"
+                                               NodeImageSize="20,16"
+                                               ShowVerticalLines="False"
+                                               TreeDerivationMode="HierarchicalDataTemplate"
+                                               TreeLineStyle="Solid"
+                                               VerticalScrollbarVisibility="Auto">
+
+                    <dxg:TreeListView.ContextMenu>
+                        <ContextMenu Name="RowContextMenu" />
+                    </dxg:TreeListView.ContextMenu>
+
+                </dragDrop:TreeListViewDragDrop>
+            </dxg:TreeListControl.View>
+
+            <dxg:TreeListControl.Columns>
+                <dxg:TreeListColumn FieldName="ShortName" Header="Short Name" Width="170" Fixed="Left" />
+                <dxg:TreeListColumn FieldName="Name" Header="Name" Width="230" />
+                <dxg:TreeListColumn FieldName="Coverage" Header="Coverage" Width="110" />
+                <dxg:TreeListColumn FieldName="Method" Header="Method" Width="110" Visible="{Binding DataContext.SelectedView.ShowsPlanning, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Stage" Header="Stage" Width="80" Visible="{Binding DataContext.SelectedView.ShowsPlanning, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Level" Header="Level" Width="110" Visible="{Binding DataContext.SelectedView.ShowsPlanning, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Procedure" Header="Procedure" Width="180" Visible="{Binding DataContext.SelectedView.ShowsProcedure, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="StepAction" Header="Action" Width="220" Visible="{Binding DataContext.SelectedView.ShowsProcedure, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="StepExpected" Header="Expected" Width="200" Visible="{Binding DataContext.SelectedView.ShowsProcedure, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="StepActual" Header="Actual" Width="200" Visible="{Binding DataContext.SelectedView.ShowsProcedure, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="StepResult" Header="Step Result" Width="100" Visible="{Binding DataContext.SelectedView.ShowsProcedure, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Status" Header="Status" Width="100" Visible="{Binding DataContext.SelectedView.ShowsExecution, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Compliance" Header="Compliance" Width="130" Visible="{Binding DataContext.SelectedView.ShowsCompliance, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="CloseOut" Header="Close-out" Width="140" Visible="{Binding DataContext.SelectedView.ShowsCompliance, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Analysis" Header="Analysis Check" Width="220" Visible="{Binding DataContext.SelectedView.ShowsCompliance, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Criticality" Header="Criticality" Width="110" Visible="{Binding DataContext.SelectedView.ShowsPlanning, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Owner" Header="Owner" Width="80" Visible="{Binding DataContext.SelectedView.ShowsPlanning, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="ActivityNumber" Header="Activity No." Width="100" Visible="{Binding DataContext.SelectedView.ShowsPlanning, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="PlannedDate" Header="Planned" Width="90" Visible="{Binding DataContext.SelectedView.ShowsPlanning, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="ActualDate" Header="Actual" Width="90" Visible="{Binding DataContext.SelectedView.ShowsExecution, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Acceptance" Header="Acceptance Criteria" Width="240" Visible="{Binding DataContext.SelectedView.ShowsPlanning, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="Result" Header="Result" Width="160" Visible="{Binding DataContext.SelectedView.ShowsExecution, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+                <dxg:TreeListColumn FieldName="EvidenceReference" Header="Evidence" Width="140" Visible="{Binding DataContext.SelectedView.ShowsExecution, RelativeSource={RelativeSource AncestorType=dxg:TreeListControl}}" />
+            </dxg:TreeListControl.Columns>
+        </dxg:TreeListControl>
+    </Grid>
+</UserControl>
