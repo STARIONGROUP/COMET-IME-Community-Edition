@@ -65,11 +65,11 @@ namespace CDP4Requirements.Services
         public string CellText(string stage)
         {
             var atStage = this.VandVItems
-                .Where(item => VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(item, "vnv_stage"), stage))
+                .Where(item => VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(item, VandVParameter.Stage), stage))
                 .Select(item =>
                 {
-                    var method = VandVCoverageQuery.Attribute(item, "vnv_method");
-                    var status = VandVCoverageQuery.Attribute(item, "vnv_status");
+                    var method = VandVCoverageQuery.Attribute(item, VandVParameter.Method);
+                    var status = VandVCoverageQuery.Attribute(item, VandVParameter.Status);
 
                     string activity;
 
@@ -130,12 +130,6 @@ namespace CDP4Requirements.Services
     /// </summary>
     public static class VandVCoverageQuery
     {
-        /// <summary>
-        /// The statuses (see <see cref="Rdl.VandVRdlManifest"/>) that close a V&amp;V item out positively. Waived,
-        /// deviated and not-applicable count as closed for roll-up purposes: they are dispositioned, not outstanding.
-        /// </summary>
-        private static readonly string[] ClosedPositiveStatuses = { "Passed", "Waived", "Deviated", "Not Applicable" };
-
         /// <summary>
         /// Resolves the model reference data library of an iteration, failing with the guidance the user can act on
         /// instead of the bare <see cref="InvalidOperationException"/> that <c>Single()</c> would raise.
@@ -205,7 +199,7 @@ namespace CDP4Requirements.Services
             var stages = mrdl?
                 .QueryParameterTypesFromChainOfRdls()
                 .OfType<EnumerationParameterType>()
-                .FirstOrDefault(x => x.ShortName == "vnv_stage")?
+                .FirstOrDefault(x => x.ShortName == VandVParameter.Stage)?
                 .ValueDefinition
                 .Select(x => x.Name)
                 .ToList();
@@ -213,13 +207,13 @@ namespace CDP4Requirements.Services
             if (stages == null || !stages.Any())
             {
                 stages = VandVRdlManifest.ParameterTypes
-                    .FirstOrDefault(x => x.ShortName == "vnv_stage")?
+                    .FirstOrDefault(x => x.ShortName == VandVParameter.Stage)?
                     .EnumerationValues.ToList() ?? new List<string>();
             }
 
             var used = coverages
                 .SelectMany(coverage => coverage.VandVItems)
-                .Select(item => Attribute(item, "vnv_stage"))
+                .Select(item => Attribute(item, VandVParameter.Stage))
                 .Where(stage => !string.IsNullOrWhiteSpace(stage))
                 .Distinct();
 
@@ -281,13 +275,13 @@ namespace CDP4Requirements.Services
                     continue;
                 }
 
-                var status = Attribute(item, "vnv_status");
+                var status = Attribute(item, VandVParameter.Status);
 
-                if (AreSameEnumValue("Failed", status) || VandVCloseOut.IsShortfall(VandVCloseOut.QueryCompliance(item)))
+                if (AreSameEnumValue(VandVStatus.Failed, status) || VandVCloseOut.IsShortfall(VandVCloseOut.QueryCompliance(item)))
                 {
                     failed++;
                 }
-                else if (ClosedPositiveStatuses.Any(closed => AreSameEnumValue(closed, status)))
+                else if (VandVStatus.ClosedPositive.Any(closed => AreSameEnumValue(closed, status)))
                 {
                     passed++;
                 }
@@ -352,24 +346,24 @@ namespace CDP4Requirements.Services
         }
 
         /// <summary>
-        /// Asserts whether a parameter is covered by any V&amp;V item in the iteration, so a value change on a parameter
-        /// nobody verifies does not re-run the analysis check over the entire register.
+        /// Returns the <see cref="Thing.Iid"/> of every parameter covered by a V&amp;V item, so a caller can decide in
+        /// constant time whether a changed parameter is one the register cares about.
         /// </summary>
         /// <param name="iteration">The <see cref="Iteration"/>.</param>
-        /// <param name="parameter">The parameter that changed, or null.</param>
-        /// <returns>true when a <c>coversParameter</c> relationship points at it.</returns>
-        public static bool IsCoveredParameter(Iteration iteration, ParameterOrOverrideBase parameter)
+        /// <returns>The covered parameter identifiers.</returns>
+        public static IEnumerable<Guid> QueryCoveredParameterIids(Iteration iteration)
         {
-            if (iteration == null || parameter == null)
+            if (iteration == null)
             {
-                return false;
+                return Enumerable.Empty<Guid>();
             }
 
             return iteration.Relationship
                 .OfType<BinaryRelationship>()
-                .Any(relationship =>
-                    relationship.Target == parameter
-                    && IsCategorizedAs(relationship, new[] { VandVCategory.CoversParameter }));
+                .Where(relationship =>
+                    relationship.Target is ParameterOrOverrideBase
+                    && IsCategorizedAs(relationship, new[] { VandVCategory.CoversParameter }))
+                .Select(relationship => relationship.Target.Iid);
         }
 
         /// <summary>

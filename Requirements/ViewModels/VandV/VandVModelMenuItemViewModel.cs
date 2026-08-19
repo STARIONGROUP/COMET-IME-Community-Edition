@@ -167,9 +167,9 @@ namespace CDP4Requirements.ViewModels
             // rather than seeded from the manifest's example list
             IReadOnlyList<string> stageGates = null;
 
-            if (check.MissingParameterTypes.Any(x => x.ShortName == "vnv_stage"))
+            if (check.MissingParameterTypes.Any(x => x.ShortName == VandVParameter.Stage))
             {
-                var proposed = VandVRdlManifest.ParameterTypes.First(x => x.ShortName == "vnv_stage").EnumerationValues;
+                var proposed = VandVRdlManifest.ParameterTypes.First(x => x.ShortName == VandVParameter.Stage).EnumerationValues;
                 var stageDialog = new StageGateDialogViewModel(proposed);
 
                 this.dialogNavigationService = this.dialogNavigationService ?? ServiceLocator.Current.GetInstance<IDialogNavigationService>();

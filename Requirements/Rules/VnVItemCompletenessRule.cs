@@ -29,6 +29,7 @@ namespace CDP4Requirements.Rules
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
 
     using CDP4Common.EngineeringModelData;
@@ -46,13 +47,6 @@ namespace CDP4Requirements.Rules
     [BuiltInRuleMetaDataExport("STARION", "VnVItemCompleteness", "A rule that flags V&V items that are not fit to be executed or reported: no traceability link, no method, no stage gate, no acceptance criteria, or a closed status without a recorded result")]
     public class VnVItemCompletenessRule : BuiltInRule
     {
-        /// <summary>
-        /// The statuses (see <see cref="Rdl.VandVRdlManifest"/>) that assert an outcome, and therefore require a
-        /// recorded result. "Closed" was never a status value; close-out is the separate <c>vnv_closed</c> flag and
-        /// is checked below in its own right.
-        /// </summary>
-        private static readonly string[] ConcludedStatuses = { "Passed", "Failed", "Waived", "Deviated", "Not Applicable" };
-
         /// <summary>
         /// Verifies the V&amp;V items of an <see cref="Iteration"/>.
         /// </summary>
@@ -78,7 +72,7 @@ namespace CDP4Requirements.Rules
                          .SelectMany(specification => specification.Requirement)
                          .Where(requirement => !requirement.IsDeprecated && VandVCoverageQuery.IsVnVItem(requirement) && !VandVProcedureWriter.IsStep(requirement)))
             {
-                var status = VandVCoverageQuery.Attribute(item, "vnv_status");
+                var status = VandVCoverageQuery.Attribute(item, VandVParameter.Status);
 
                 var defects = new List<string>();
 
@@ -87,24 +81,25 @@ namespace CDP4Requirements.Rules
                     defects.Add("it is not linked to any requirement by a 'verifies' or 'validates' relationship");
                 }
 
-                if (IsBlank(item, "vnv_method"))
+                if (IsBlank(item, VandVParameter.Method))
                 {
                     defects.Add("it has no verification method");
                 }
 
-                if (IsBlank(item, "vnv_stage"))
+                if (IsBlank(item, VandVParameter.Stage))
                 {
                     defects.Add("it has no stage gate");
                 }
 
-                if (IsBlank(item, "vnv_acceptance"))
+                if (IsBlank(item, VandVParameter.AcceptanceCriteria))
                 {
                     defects.Add("it has no acceptance criteria");
                 }
 
-                var isConcluded = ConcludedStatuses.Any(concluded => VandVCoverageQuery.AreSameEnumValue(concluded, status));
+                // close-out is the separate vnv_closed flag, checked below in its own right, and never a status value
+                var isConcluded = VandVStatus.Concluded.Any(concluded => VandVCoverageQuery.AreSameEnumValue(concluded, status));
 
-                if ((isConcluded || VandVCloseOut.IsClosed(item)) && IsBlank(item, "vnv_result"))
+                if ((isConcluded || VandVCloseOut.IsClosed(item)) && IsBlank(item, VandVParameter.Result))
                 {
                     var conclusion = isConcluded ? $"its status is '{status}'" : "it is closed out";
                     defects.Add($"{conclusion} but no result was recorded");
@@ -112,14 +107,14 @@ namespace CDP4Requirements.Rules
 
                 // a procedure whose step failed cannot support a passing verdict on the activity that ran it
                 var failedSteps = VandVProcedureWriter.QuerySteps(iteration, item)
-                    .Where(step => VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(step, "vnv_step_result"), "Fail"))
+                    .Where(step => VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(step, VandVParameter.StepResult), VandVStepResult.Fail))
                     .Select(VandVProcedureWriter.QueryStepNumber)
                     .OrderBy(number => number)
                     .ToList();
 
                 if (failedSteps.Any()
-                    && (VandVCoverageQuery.AreSameEnumValue(status, "Passed")
-                        || VandVCoverageQuery.AreSameEnumValue(VandVCloseOut.QueryCompliance(item), "Compliant")))
+                    && (VandVCoverageQuery.AreSameEnumValue(status, VandVStatus.Passed)
+                        || VandVCoverageQuery.AreSameEnumValue(VandVCloseOut.QueryCompliance(item), VandVCompliance.Compliant)))
                 {
                     defects.Add($"procedure step(s) {string.Join(", ", failedSteps)} failed, but the item reports a passing outcome");
                 }

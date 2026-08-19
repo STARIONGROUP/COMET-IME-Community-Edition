@@ -25,6 +25,8 @@
 
 namespace CDP4Requirements.Services
 {
+    using CDP4Requirements.Rdl;
+
     using CDP4Common.EngineeringModelData;
 
     using ReactiveUI;
@@ -79,10 +81,10 @@ namespace CDP4Requirements.Services
         {
             this.Thing = step;
             this.number = VandVProcedureWriter.QueryStepNumber(step);
-            this.action = VandVCoverageQuery.Attribute(step, "vnv_step_action");
-            this.expectedResult = VandVCoverageQuery.Attribute(step, "vnv_step_expected");
-            this.actualResult = VandVCoverageQuery.Attribute(step, "vnv_step_actual");
-            this.result = VandVCoverageQuery.Attribute(step, "vnv_step_result");
+            this.action = VandVCoverageQuery.Attribute(step, VandVParameter.StepAction);
+            this.expectedResult = VandVCoverageQuery.Attribute(step, VandVParameter.StepExpectedResult);
+            this.actualResult = VandVCoverageQuery.Attribute(step, VandVParameter.StepActualResult);
+            this.result = VandVCoverageQuery.Attribute(step, VandVParameter.StepResult);
         }
 
         /// <summary>

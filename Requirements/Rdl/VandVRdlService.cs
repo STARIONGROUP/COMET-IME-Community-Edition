@@ -317,7 +317,7 @@ namespace CDP4Requirements.Rdl
                         AllowMultiSelect = false
                     };
 
-                    var values = definition.ShortName == "vnv_stage" && stageGates != null && stageGates.Any()
+                    var values = definition.ShortName == VandVParameter.Stage && stageGates != null && stageGates.Any()
                         ? stageGates
                         : definition.EnumerationValues;
 

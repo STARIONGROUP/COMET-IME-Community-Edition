@@ -28,6 +28,8 @@ namespace CDP4Requirements.Services
     using System;
     using System.Linq;
 
+    using CDP4Requirements.Rdl;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
 
@@ -46,49 +48,42 @@ namespace CDP4Requirements.Services
         /// <summary>
         /// The parameter type short-name of the compliance status.
         /// </summary>
-        public const string ComplianceShortName = "vnv_compliance";
+        public const string ComplianceShortName = VandVParameter.Compliance;
 
         /// <summary>
         /// The parameter type short-name of the close-out flag.
         /// </summary>
-        public const string ClosedShortName = "vnv_closed";
+        public const string ClosedShortName = VandVParameter.Closed;
 
         /// <summary>
         /// The parameter type short-name of the close-out reason.
         /// </summary>
-        public const string CloseOutReasonShortName = "vnv_closeout_reason";
+        public const string CloseOutReasonShortName = VandVParameter.CloseOutReason;
 
         /// <summary>
         /// The parameter type short-name of the person who closed the item out.
         /// </summary>
-        public const string ClosedByShortName = "vnv_closed_by";
+        public const string ClosedByShortName = VandVParameter.ClosedBy;
 
         /// <summary>
         /// The parameter type short-name of the close-out date.
         /// </summary>
-        public const string ClosedOnShortName = "vnv_closed_on";
+        public const string ClosedOnShortName = VandVParameter.ClosedOn;
 
         /// <summary>
         /// The parameter type short-name of the verification plan reference.
         /// </summary>
-        public const string PlanReferenceShortName = "vnv_plan_ref";
+        public const string PlanReferenceShortName = VandVParameter.PlanReference;
 
         /// <summary>
         /// The compliance status of an item whose compliance has not been judged yet.
         /// </summary>
-        public const string NotAssessed = "Not Assessed";
+        public const string NotAssessed = VandVCompliance.NotAssessed;
 
         /// <summary>
         /// Gets the selectable compliance statuses, in the order they are offered.
         /// </summary>
-        public static string[] PossibleCompliances { get; } =
-        {
-            NotAssessed,
-            "Compliant",
-            "Partially Compliant",
-            "Non-Compliant",
-            "Not Applicable"
-        };
+        public static string[] PossibleCompliances { get; } = VandVCompliance.All;
 
         /// <summary>
         /// Reads the close-out flag of a V&amp;V item.
@@ -120,8 +115,7 @@ namespace CDP4Requirements.Services
         /// <returns>true when the status is a shortfall against the requirement.</returns>
         public static bool IsShortfall(string compliance)
         {
-            return VandVCoverageQuery.AreSameEnumValue(compliance, "Non-Compliant")
-                   || VandVCoverageQuery.AreSameEnumValue(compliance, "Partially Compliant");
+            return VandVCompliance.Shortfalls.Any(shortfall => VandVCoverageQuery.AreSameEnumValue(compliance, shortfall));
         }
 
         /// <summary>

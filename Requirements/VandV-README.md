@@ -50,14 +50,15 @@ that collapses these three into one column cannot represent it.
 
 The plugin needs parameter types, categories and rules in the model's RDL chain. Nothing is assumed to be there.
 
-1. **Requirements ribbon tab > Set up V&V**, and pick the model.
+1. **Requirements ribbon tab > Verification & Validation > Set up V&V**, and pick the model.
 2. It reports exactly what is missing and what it will create.
 3. Confirm, then **define your stage gates**: a dialog shows them as a table, one row per gate, prefilled with a
    common example list you are expected to replace. Add, Remove, Up and Down manage the rows; the order is the
    project's review order. They become the review milestones every activity is planned against, the RVM columns and
    the stage filter. Cancel here aborts the whole set-up; nothing is written.
-4. It writes only what is absent, so it is safe to run again after an upgrade. Gates can be renamed or extended
-   later by editing the `V&V Stage Gate` parameter type in the reference data.
+4. It writes only what is absent, so it is safe to run again after an upgrade. Gates can be **added** later by
+   editing the `V&V Stage Gate` parameter type in the reference data. Renaming a gate does not move the items already
+   planned against it: they keep the old text and the matrix simply shows an extra column for it. See §4.3.
 
 The check walks the whole chained RDL (`QueryParameterTypesFromChainOfRdls` and friends), so anything already
 defined in a site RDL is reused rather than duplicated. If you lack write access to the RDL, the dialog says so and
@@ -68,7 +69,9 @@ lists what an administrator must create.
 
 ### 2.2 Open the register
 
-**Requirements ribbon tab > V&V Register**. It docks in the middle document area, next to your model browsers.
+**Requirements ribbon tab > Verification & Validation > Open VCD**, and pick the iteration. Set up V&V and Open VCD
+sit together in the one **Verification & Validation** group. The register docks in the middle document area, next to
+your model browsers.
 The V&V capability is part of the Requirements plugin, so it is available whenever requirements are.
 
 The tree mirrors the stock Requirements browser (specification > group > requirement) and nests the V&V items under
@@ -333,6 +336,30 @@ without touching code.
 The requirement category is auto-detected: the plugin matches `REQUIREMENT` or `REQ` case-insensitively, including
 sub-categories that carry one of those as a super-category.
 
+### 4.3 What you may and may not edit in the RDL
+
+The plugin finds its reference data **by short name**, so the short names above are effectively reserved.
+
+| Edit | Effect |
+| --- | --- |
+| Rename the **Name** of a parameter type or category | Safe. Only the label in the Reference Data browser changes. |
+| Add an enumeration **value** (a new method, stage gate or level) | Safe and supported. Every enumeration is read from the RDL at runtime. |
+| Rename an enumeration **value's Name** | Avoid. Values already stored on items keep the old text, and the roll-up and the built-in rules classify on the names declared in `VandVStatus`, `VandVCompliance` and `VandVStepResult`. |
+| Rename a **ShortName**, or delete a parameter type or category | Breaks that attribute. See below. |
+
+Renaming a short name looks exactly like a deletion to the plugin:
+
+- **Set up V&V** reports the short name as missing and offers to create it again. Accepting that leaves you with two
+  parameter types, the renamed one and a fresh one.
+- **Create V&V Item** and **Edit V&V Item** are refused, with "The V&V reference data is not complete in this model
+  yet", because writing an attribute whose parameter type cannot be resolved is a silent no-op that would drop what
+  the user typed.
+- Items that already carry values keep them, but those values point at the renamed type, so the plugin can no longer
+  read them: the column is blank in the register and the export, the completeness rule reports "it has no stage gate",
+  and the roll-up counts the item as open.
+
+Nothing is lost, and renaming the short name back restores everything. A real delete is normally refused by the server
+once any item references the type; it only succeeds while the type is unused.
 ---
 
 ## 5. Architecture

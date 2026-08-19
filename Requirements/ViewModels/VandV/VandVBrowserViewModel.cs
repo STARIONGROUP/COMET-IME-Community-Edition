@@ -33,6 +33,7 @@ namespace CDP4Requirements.ViewModels
     using System.Threading.Tasks;
     using System.Windows;
 
+    using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
     using CDP4Requirements.ViewModels.Rows;
 
@@ -138,9 +139,15 @@ namespace CDP4Requirements.ViewModels
         private bool canCreateVandVItem;
 
         /// <summary>
-        /// Backing field for <see cref="CanCreateAnnotation"/>
+        /// Backing field for <see cref="CreatableAnnotationKinds"/>
         /// </summary>
-        private bool canCreateAnnotation;
+        private IReadOnlyCollection<ClassKind> creatableAnnotationKinds = new HashSet<ClassKind>();
+
+        /// <summary>
+        /// The <see cref="Iid"/>s of the parameters covered by a V&amp;V item, rebuilt only when a relationship changes.
+        /// Recomputing it per value-set event meant a full relationship scan on every parameter edit in the model.
+        /// </summary>
+        private HashSet<Guid> coveredParameterIids;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="VandVBrowserViewModel"/> class.
@@ -167,11 +174,13 @@ namespace CDP4Requirements.ViewModels
             this.RunAnalysisCheckCommand = ReactiveCommandCreator.Create(this.ExecuteRunAnalysisCheck);
             this.OpenMatrixCommand = ReactiveCommandCreator.Create(this.ExecuteOpenMatrix);
 
-            var canAnnotate = this.WhenAnyValue(x => x.SelectedThing, x => x.CanCreateAnnotation, (row, canCreate) => canCreate && row != null);
-
+            // gated per kind, not once for all five: a participant may be allowed to raise a change request and not a
+            // request for waiver, and each command must reflect its own class kind
             this.CreateAnnotationCommands = AnnotationKind.All.ToDictionary(
                 kind => kind,
-                kind => ReactiveCommandCreator.CreateAsyncTask(() => this.ExecuteCreateAnnotation(kind), canAnnotate));
+                kind => ReactiveCommandCreator.CreateAsyncTask(
+                    () => this.ExecuteCreateAnnotation(kind),
+                    this.WhenAnyValue(x => x.SelectedThing, x => x.CreatableAnnotationKinds, (row, kinds) => row != null && kinds.Contains(kind.ClassKind))));
 
             this.PossibleStages = BuildStageChoices(this.Thing);
 
@@ -270,12 +279,12 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
-        /// Gets a value indicating whether the current participant may raise a review request in this model.
+        /// Gets the <see cref="ClassKind"/>s of the review requests the current participant may raise in this model.
         /// </summary>
-        public bool CanCreateAnnotation
+        public IReadOnlyCollection<ClassKind> CreatableAnnotationKinds
         {
-            get => this.canCreateAnnotation;
-            private set => this.RaiseAndSetIfChanged(ref this.canCreateAnnotation, value);
+            get => this.creatableAnnotationKinds;
+            private set => this.RaiseAndSetIfChanged(ref this.creatableAnnotationKinds, value);
         }
 
         /// <summary>
@@ -293,7 +302,11 @@ namespace CDP4Requirements.ViewModels
             }
 
             this.CanCreateVandVItem = this.PermissionService.CanWrite(ClassKind.Requirement, this.Thing);
-            this.CanCreateAnnotation = this.PermissionService.CanWrite(ClassKind.RequestForWaiver, this.Thing.TopContainer);
+
+            this.CreatableAnnotationKinds = new HashSet<ClassKind>(
+                AnnotationKind.All
+                    .Select(kind => kind.ClassKind)
+                    .Where(classKind => this.PermissionService.CanWrite(classKind, this.Thing.TopContainer)));
         }
 
         /// <summary>
@@ -405,9 +418,11 @@ namespace CDP4Requirements.ViewModels
                 return;
             }
 
+            Requirement created;
+
             try
             {
-                var created = await this.itemCreator.CreateAsync(
+                created = await this.itemCreator.CreateAsync(
                     this.Session,
                     row.Thing,
                     dialogViewModel.ShortName,
@@ -415,14 +430,39 @@ namespace CDP4Requirements.ViewModels
                     dialogViewModel.Owner,
                     dialogViewModel.BuildAttributes(),
                     dialogViewModel.LinkType);
-
-                // coverage belongs to the V&V ITEM; row.Thing is the requirement it covers
-                await this.SaveCoverageAsync(dialogViewModel, created);
-                await this.procedureWriter.WriteAsync(this.Session, this.Thing, created, dialogViewModel.ProcedureSteps.ToList());
             }
             catch (Exception ex)
             {
                 DXMessageBox.Show("The V&V item could not be created:\n\n" + ex.Message, "Create V&V Item", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            
+            await this.SaveDetailsAsync(dialogViewModel, created, "Create V&V Item");
+        }
+
+        /// <summary>
+        /// Writes the coverage and the procedure of an already committed V&amp;V item, reporting a failure as the partial
+        /// save it is.
+        /// </summary>
+        /// <param name="dialogViewModel">The dialog holding the entered coverage and procedure.</param>
+        /// <param name="vandVItem">The V&amp;V item, already written to the server.</param>
+        /// <param name="caption">The caption of the action being performed, used on the message box.</param>
+        /// <returns>A <see cref="Task"/>.</returns>
+        private async Task SaveDetailsAsync(VandVItemDialogViewModel dialogViewModel, Requirement vandVItem, string caption)
+        {
+            try
+            {
+                // coverage belongs to the V&V ITEM, not to the requirement it covers
+                await this.SaveCoverageAsync(dialogViewModel, vandVItem);
+                await this.procedureWriter.WriteAsync(this.Session, this.Thing, vandVItem, dialogViewModel.ProcedureSteps.ToList());
+            }
+            catch (Exception ex)
+            {
+                DXMessageBox.Show(
+                    $"The V&V item '{vandVItem.ShortName}' was saved, but its coverage and procedure were not:\n\n{ex.Message}\n\nOpen the item and save it again to complete it.",
+                    caption,
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
             }
         }
 
@@ -534,14 +574,14 @@ namespace CDP4Requirements.ViewModels
                     dialogViewModel.Owner,
                     dialogViewModel.BuildAttributes(),
                     dialogViewModel.LinkType);
-
-                await this.SaveCoverageAsync(dialogViewModel, vandVItem);
-                await this.procedureWriter.WriteAsync(this.Session, this.Thing, vandVItem, dialogViewModel.ProcedureSteps.ToList());
             }
             catch (Exception ex)
             {
                 DXMessageBox.Show("The V&V item could not be updated:\n\n" + ex.Message, "Edit V&V Item", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
+
+            await this.SaveDetailsAsync(dialogViewModel, vandVItem, "Edit V&V Item");
         }
 
         /// <summary>
@@ -672,13 +712,14 @@ namespace CDP4Requirements.ViewModels
         /// </summary>
         /// <param name="sender">The row the parameter was dropped on.</param>
         /// <param name="parameter">The dropped parameter.</param>
+        /// <returns>A <see cref="Task"/> that completes when the coverage has been written.</returns>
         /// <remarks>
         /// A plain parameter is coupled outright, there is nothing to choose. An option- or state-dependent parameter
         /// is ambiguous: the drag payload is the parameter itself, never the option/state row it was started from, so
         /// the browser cannot know which slice was meant. Guessing "all of them" is wrong more often than it is right,
         /// so the dialog opens on the Coverage tab with the parameter already selected and nothing ticked.
         /// </remarks>
-        private async void OnParameterDropped(object sender, ParameterOrOverrideBase parameter)
+        private async Task OnParameterDropped(object sender, ParameterOrOverrideBase parameter)
         {
             if (!(sender is VandVItemRowViewModel row))
             {
@@ -939,6 +980,26 @@ namespace CDP4Requirements.ViewModels
         }
 
         /// <summary>
+        /// Asserts whether a parameter is covered by any V&amp;V item, from a set cached until a relationship changes.
+        /// </summary>
+        /// <param name="parameter">The parameter whose value changed, or null.</param>
+        /// <returns>true when a <c>coversParameter</c> relationship points at it.</returns>
+        private bool IsCoveredParameter(ParameterOrOverrideBase parameter)
+        {
+            if (parameter == null)
+            {
+                return false;
+            }
+
+            if (this.coveredParameterIids == null)
+            {
+                this.coveredParameterIids = new HashSet<Guid>(VandVCoverageQuery.QueryCoveredParameterIids(this.Thing));
+            }
+
+            return this.coveredParameterIids.Contains(parameter.Iid);
+        }
+
+        /// <summary>
         /// Adds the message-bus subscriptions that keep the rows in sync with the model.
         /// </summary>
         private void AddSubscriptions()
@@ -965,7 +1026,7 @@ namespace CDP4Requirements.ViewModels
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterValueSet))
                     .Merge(this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(ParameterOverrideValueSet)))
                     .Where(x => x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
-                    .Where(x => VandVCoverageQuery.IsCoveredParameter(this.Thing, x.ChangedThing.Container as ParameterOrOverrideBase))
+                    .Where(x => this.IsCoveredParameter(x.ChangedThing.Container as ParameterOrOverrideBase))
                     .ObserveOn(RxApp.MainThreadScheduler)
                     .Subscribe(_ => this.RefreshAnalysisChecks()));
 
@@ -995,7 +1056,11 @@ namespace CDP4Requirements.ViewModels
                     .Where(x => x.ChangedThing.GetContainerOfType<Iteration>() == this.Thing)
                     .Where(x => VandVCoverageQuery.IsVandVLink((BinaryRelationship)x.ChangedThing))
                     .ObserveOn(RxApp.MainThreadScheduler)
-                    .Subscribe(_ => this.RefreshCoverage()));
+                    .Subscribe(_ =>
+                    {
+                        this.coveredParameterIids = null;
+                        this.RefreshCoverage();
+                    }));
 
             this.Disposables.Add(
                 this.CDPMessageBus.Listen<ObjectChangedEvent>(typeof(SimpleParameterValue))
@@ -1079,7 +1144,7 @@ namespace CDP4Requirements.ViewModels
             var skipped = results.Count - violated - satisfied;
 
             var message = satisfied + violated == 0
-                ? "No V&V item could be checked automatically.\n\nAn item is checked when it names the parameter it measures on its Coverage tab and the requirement it verifies carries a parametric constraint on that parameter type."
+                ? "No V&V item could be checked automatically.\n\nAn item is checked when it names, on its Coverage tab, the parameter it measures, and the requirement it verifies carries a parametric constraint on that parameter type."
                 : $"{satisfied} item(s) meet their constraint.\n{violated} item(s) violate it.\n{skipped} item(s) could not be checked automatically.\n\nThe whole register was checked, whatever the stage filter shows. The verdict per item is in the Analysis Check column of the Register and Compliance views.";
 
             DXMessageBox.Show(message, "Run Analysis Check", MessageBoxButton.OK, violated > 0 ? MessageBoxImage.Warning : MessageBoxImage.Information);
@@ -1149,7 +1214,7 @@ namespace CDP4Requirements.ViewModels
         private bool MatchesSelectedStage(Requirement item)
         {
             return this.SelectedStage == AllStages
-                   || VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(item, "vnv_stage"), this.SelectedStage);
+                   || VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(item, VandVParameter.Stage), this.SelectedStage);
         }
 
         /// <summary>

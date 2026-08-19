@@ -198,6 +198,215 @@ namespace CDP4Requirements.Rdl
     }
 
     /// <summary>
+    /// The values of the <c>vnv_status</c> enumeration, and the groupings the roll-up and the built-in rules classify
+    /// by. Declaring them once means the seeded enumeration and the code that interprets it cannot drift apart.
+    /// </summary>
+    /// <remarks>
+    /// Values are matched against what is stored on the item, normalised for case and for the underscore/hyphen
+    /// difference between a value definition's name and its short-name. Renaming a seeded value definition in the RDL
+    /// editor is therefore not supported: the stored values keep the old text, and new ones would carry a name this
+    /// classification does not know.
+    /// </remarks>
+    public static class VandVStatus
+    {
+        /// <summary>The activity is planned but not yet ready to run.</summary>
+        public const string Planned = "Planned";
+
+        /// <summary>The activity is ready to run.</summary>
+        public const string Ready = "Ready";
+
+        /// <summary>The activity is under way.</summary>
+        public const string InProgress = "In Progress";
+
+        /// <summary>The activity has run but has no verdict yet.</summary>
+        public const string Executed = "Executed";
+
+        /// <summary>The activity passed.</summary>
+        public const string Passed = "Passed";
+
+        /// <summary>The activity failed.</summary>
+        public const string Failed = "Failed";
+
+        /// <summary>The requirement was waived rather than verified.</summary>
+        public const string Waived = "Waived";
+
+        /// <summary>A deviation was accepted rather than the requirement verified.</summary>
+        public const string Deviated = "Deviated";
+
+        /// <summary>The activity does not apply.</summary>
+        public const string NotApplicable = "Not Applicable";
+
+        /// <summary>The activity was cancelled.</summary>
+        public const string Cancelled = "Cancelled";
+
+        /// <summary>Gets every status, in the order the enumeration is seeded.</summary>
+        public static string[] All { get; } = { Planned, Ready, InProgress, Executed, Passed, Failed, Waived, Deviated, NotApplicable, Cancelled };
+
+        /// <summary>
+        /// Gets the statuses that close an item out positively. Waived, deviated and not-applicable count as closed:
+        /// they are dispositioned, not outstanding.
+        /// </summary>
+        public static IReadOnlyList<string> ClosedPositive { get; } = new[] { Passed, Waived, Deviated, NotApplicable };
+
+        /// <summary>
+        /// Gets the statuses that assert an outcome and therefore require a recorded result.
+        /// </summary>
+        public static IReadOnlyList<string> Concluded { get; } = new[] { Passed, Failed, Waived, Deviated, NotApplicable };
+    }
+
+    /// <summary>
+    /// The values of the <c>vnv_compliance</c> enumeration, and which of them are a shortfall against the requirement.
+    /// </summary>
+    public static class VandVCompliance
+    {
+        /// <summary>Nobody has judged the compliance yet.</summary>
+        public const string NotAssessed = "Not Assessed";
+
+        /// <summary>The design meets the requirement.</summary>
+        public const string Compliant = "Compliant";
+
+        /// <summary>The design meets the requirement only in part.</summary>
+        public const string PartiallyCompliant = "Partially Compliant";
+
+        /// <summary>The design does not meet the requirement.</summary>
+        public const string NonCompliant = "Non-Compliant";
+
+        /// <summary>Compliance does not apply.</summary>
+        public const string NotApplicable = "Not Applicable";
+
+        /// <summary>
+        /// Gets every compliance status, in the order it is seeded and offered. <see cref="NotAssessed"/> leads
+        /// deliberately: the dialog defaults to the first value, and a new item must never claim a compliance nobody
+        /// has judged.
+        /// </summary>
+        public static string[] All { get; } = { NotAssessed, Compliant, PartiallyCompliant, NonCompliant, NotApplicable };
+
+        /// <summary>
+        /// Gets the statuses that are a shortfall against the requirement, closable only through a waiver or deviation.
+        /// </summary>
+        public static IReadOnlyList<string> Shortfalls { get; } = new[] { PartiallyCompliant, NonCompliant };
+    }
+
+    /// <summary>
+    /// The values of the <c>vnv_step_result</c> enumeration, the verdict of a single procedure step.
+    /// </summary>
+    public static class VandVStepResult
+    {
+        /// <summary>The step has not been run.</summary>
+        public const string NotRun = "Not Run";
+
+        /// <summary>The step passed.</summary>
+        public const string Pass = "Pass";
+
+        /// <summary>The step failed.</summary>
+        public const string Fail = "Fail";
+
+        /// <summary>The step could not be run.</summary>
+        public const string Blocked = "Blocked";
+
+        /// <summary>The step does not apply.</summary>
+        public const string NotApplicable = "Not Applicable";
+
+        /// <summary>Gets every step result, in the order the enumeration is seeded and offered.</summary>
+        public static string[] All { get; } = { NotRun, Pass, Fail, Blocked, NotApplicable };
+    }
+
+    /// <summary>
+    /// The short-names of the <see cref="CDP4Common.SiteDirectoryData.ParameterType"/>s carrying the V&amp;V attributes.
+    /// Declared here for the same reason as <see cref="VandVCategory"/>: a mistyped short-name compiles cleanly and
+    /// then silently reads and writes nothing, because a parameter type that cannot be resolved is skipped.
+    /// </summary>
+    public static class VandVParameter
+    {
+        /// <summary>The verification method.</summary>
+        public const string Method = "vnv_method";
+
+        /// <summary>The stage gate the activity is planned for.</summary>
+        public const string Stage = "vnv_stage";
+
+        /// <summary>The integration level the activity runs at.</summary>
+        public const string Level = "vnv_level";
+
+        /// <summary>The activity number.</summary>
+        public const string ActivityNumber = "vnv_activity_no";
+
+        /// <summary>The activity description.</summary>
+        public const string Description = "vnv_description";
+
+        /// <summary>The preconditions of the activity.</summary>
+        public const string Preconditions = "vnv_preconditions";
+
+        /// <summary>The conditions the activity runs under.</summary>
+        public const string Conditions = "vnv_conditions";
+
+        /// <summary>The acceptance criteria.</summary>
+        public const string AcceptanceCriteria = "vnv_acceptance";
+
+        /// <summary>The facility the activity runs at.</summary>
+        public const string Facility = "vnv_facility";
+
+        /// <summary>The external party responsible for the activity.</summary>
+        public const string ExternalResponsible = "vnv_responsible_ext";
+
+        /// <summary>The planned date.</summary>
+        public const string PlannedDate = "vnv_planned_date";
+
+        /// <summary>The criticality of the activity.</summary>
+        public const string Criticality = "vnv_criticality";
+
+        /// <summary>The free-text coverage note.</summary>
+        public const string CoverageNote = "vnv_coverage_note";
+
+        /// <summary>The execution status.</summary>
+        public const string Status = "vnv_status";
+
+        /// <summary>The date the activity actually ran.</summary>
+        public const string ActualDate = "vnv_actual_date";
+
+        /// <summary>The recorded result.</summary>
+        public const string Result = "vnv_result";
+
+        /// <summary>The reference to the evidence backing the result.</summary>
+        public const string EvidenceReference = "vnv_evidence_ref";
+
+        /// <summary>The compliance status of the design against the requirement.</summary>
+        public const string Compliance = "vnv_compliance";
+
+        /// <summary>The close-out flag.</summary>
+        public const string Closed = "vnv_closed";
+
+        /// <summary>The reason the item was closed out.</summary>
+        public const string CloseOutReason = "vnv_closeout_reason";
+
+        /// <summary>The person who closed the item out.</summary>
+        public const string ClosedBy = "vnv_closed_by";
+
+        /// <summary>The date the item was closed out.</summary>
+        public const string ClosedOn = "vnv_closed_on";
+
+        /// <summary>The reference to the verification plan.</summary>
+        public const string PlanReference = "vnv_plan_ref";
+
+        /// <summary>The reference to the procedure document.</summary>
+        public const string ProcedureReference = "vnv_procedure_ref";
+
+        /// <summary>The number of a procedure step.</summary>
+        public const string StepNumber = "vnv_step_no";
+
+        /// <summary>The action a procedure step prescribes.</summary>
+        public const string StepAction = "vnv_step_action";
+
+        /// <summary>The result a procedure step expects.</summary>
+        public const string StepExpectedResult = "vnv_step_expected";
+
+        /// <summary>The result a procedure step actually produced.</summary>
+        public const string StepActualResult = "vnv_step_actual";
+
+        /// <summary>The verdict of a procedure step.</summary>
+        public const string StepResult = "vnv_step_result";
+    }
+
+    /// <summary>
     /// The short-names of the <see cref="CDP4Common.SiteDirectoryData.Category"/>s the V&amp;V capability creates and
     /// looks up. Every service, rule and view-model resolves its categories through these constants: the short-names
     /// used to be typed out independently in half a dozen files, where a single typo would compile cleanly and
@@ -282,46 +491,46 @@ namespace CDP4Requirements.Rdl
         public static IReadOnlyList<VandVParameterTypeDefinition> ParameterTypes { get; } = new[]
         {
             // Planning
-            new VandVParameterTypeDefinition("vnv_method", "V&V Method", VandVParameterKind.Enumeration, "Inspection", "Analysis", "Similarity", "Demonstration", "Test", "Review of Design"),
-            new VandVParameterTypeDefinition("vnv_stage", "V&V Stage Gate", VandVParameterKind.Enumeration, "SRR", "PDR", "CDR", "TRR", "FAT", "HAT", "SAT", "ORR", "In-Service"),
-            new VandVParameterTypeDefinition("vnv_level", "V&V Integration Level", VandVParameterKind.Enumeration, "Equipment", "Subsystem", "System", "System-of-Systems", "Operational"),
-            new VandVParameterTypeDefinition("vnv_activity_no", "V&V Activity Number", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_description", "V&V Activity Description", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_preconditions", "V&V Preconditions", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_conditions", "V&V Conditions", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_acceptance", "V&V Acceptance Criteria", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_facility", "V&V Facility", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_responsible_ext", "V&V External Responsible", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_planned_date", "V&V Planned Date", VandVParameterKind.Date),
-            new VandVParameterTypeDefinition("vnv_criticality", "V&V Criticality", VandVParameterKind.Enumeration, "Deployment", "Operation", "Mission-critical"),
-            new VandVParameterTypeDefinition("vnv_coverage_note", "V&V Coverage Note", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.Method, "V&V Method", VandVParameterKind.Enumeration, "Inspection", "Analysis", "Similarity", "Demonstration", "Test", "Review of Design"),
+            new VandVParameterTypeDefinition(VandVParameter.Stage, "V&V Stage Gate", VandVParameterKind.Enumeration, "SRR", "PDR", "CDR", "TRR", "FAT", "HAT", "SAT", "ORR", "In-Service"),
+            new VandVParameterTypeDefinition(VandVParameter.Level, "V&V Integration Level", VandVParameterKind.Enumeration, "Equipment", "Subsystem", "System", "System-of-Systems", "Operational"),
+            new VandVParameterTypeDefinition(VandVParameter.ActivityNumber, "V&V Activity Number", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.Description, "V&V Activity Description", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.Preconditions, "V&V Preconditions", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.Conditions, "V&V Conditions", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.AcceptanceCriteria, "V&V Acceptance Criteria", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.Facility, "V&V Facility", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.ExternalResponsible, "V&V External Responsible", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.PlannedDate, "V&V Planned Date", VandVParameterKind.Date),
+            new VandVParameterTypeDefinition(VandVParameter.Criticality, "V&V Criticality", VandVParameterKind.Enumeration, "Deployment", "Operation", "Mission-critical"),
+            new VandVParameterTypeDefinition(VandVParameter.CoverageNote, "V&V Coverage Note", VandVParameterKind.Text),
 
             // Execution
-            new VandVParameterTypeDefinition("vnv_status", "V&V Status", VandVParameterKind.Enumeration, "Planned", "Ready", "In Progress", "Executed", "Passed", "Failed", "Waived", "Deviated", "Not Applicable", "Cancelled"),
-            new VandVParameterTypeDefinition("vnv_actual_date", "V&V Actual Date", VandVParameterKind.Date),
-            new VandVParameterTypeDefinition("vnv_result", "V&V Result", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_evidence_ref", "V&V Evidence Reference", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.Status, "V&V Status", VandVParameterKind.Enumeration, VandVStatus.All),
+            new VandVParameterTypeDefinition(VandVParameter.ActualDate, "V&V Actual Date", VandVParameterKind.Date),
+            new VandVParameterTypeDefinition(VandVParameter.Result, "V&V Result", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.EvidenceReference, "V&V Evidence Reference", VandVParameterKind.Text),
 
             // Close-out. ECSS-E-ST-10-02 Annex B requires the compliance status and the close-out status to be
             // recorded separately from the execution status: a test can pass while the requirement is only partly
             // met, which is exactly the case a waiver covers.
             // "Not Assessed" leads deliberately: the dialog defaults to the first value, and a new item must never
             // claim a compliance nobody has judged
-            new VandVParameterTypeDefinition("vnv_compliance", "V&V Compliance Status", VandVParameterKind.Enumeration, "Not Assessed", "Compliant", "Partially Compliant", "Non-Compliant", "Not Applicable"),
-            new VandVParameterTypeDefinition("vnv_closed", "V&V Closed", VandVParameterKind.Boolean),
-            new VandVParameterTypeDefinition("vnv_closeout_reason", "V&V Close-out Reason", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_closed_by", "V&V Closed By", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_closed_on", "V&V Closed On", VandVParameterKind.Date),
-            new VandVParameterTypeDefinition("vnv_plan_ref", "V&V Plan Reference", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.Compliance, "V&V Compliance Status", VandVParameterKind.Enumeration, VandVCompliance.All),
+            new VandVParameterTypeDefinition(VandVParameter.Closed, "V&V Closed", VandVParameterKind.Boolean),
+            new VandVParameterTypeDefinition(VandVParameter.CloseOutReason, "V&V Close-out Reason", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.ClosedBy, "V&V Closed By", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.ClosedOn, "V&V Closed On", VandVParameterKind.Date),
+            new VandVParameterTypeDefinition(VandVParameter.PlanReference, "V&V Plan Reference", VandVParameterKind.Text),
 
             // Procedure. ECSS-E-ST-10-03 expects a test procedure of ordered steps, each with what to do, what is
             // expected, and what was actually observed when it was run (the as-run procedure in the test report).
-            new VandVParameterTypeDefinition("vnv_procedure_ref", "V&V Procedure Reference", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_step_no", "V&V Step Number", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_step_action", "V&V Step Action", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_step_expected", "V&V Step Expected Result", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_step_actual", "V&V Step Actual Result", VandVParameterKind.Text),
-            new VandVParameterTypeDefinition("vnv_step_result", "V&V Step Result", VandVParameterKind.Enumeration, "Not Run", "Pass", "Fail", "Blocked", "Not Applicable")
+            new VandVParameterTypeDefinition(VandVParameter.ProcedureReference, "V&V Procedure Reference", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.StepNumber, "V&V Step Number", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.StepAction, "V&V Step Action", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.StepExpectedResult, "V&V Step Expected Result", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.StepActualResult, "V&V Step Actual Result", VandVParameterKind.Text),
+            new VandVParameterTypeDefinition(VandVParameter.StepResult, "V&V Step Result", VandVParameterKind.Enumeration, VandVStepResult.All)
         };
 
         /// <summary>
@@ -354,7 +563,7 @@ namespace CDP4Requirements.Rdl
         /// </summary>
         public static IReadOnlyList<VandVParameterizedCategoryRuleDefinition> ParameterizedCategoryRules { get; } = new[]
         {
-            new VandVParameterizedCategoryRuleDefinition("VnVItemAttributesRule", "V&V Item mandatory attributes", VandVCategory.VnVItem, "vnv_method", "vnv_stage", "vnv_acceptance", "vnv_status")
+            new VandVParameterizedCategoryRuleDefinition("VnVItemAttributesRule", "V&V Item mandatory attributes", VandVCategory.VnVItem, VandVParameter.Method, VandVParameter.Stage, VandVParameter.AcceptanceCriteria, VandVParameter.Status)
         };
 
         /// <summary>

@@ -68,6 +68,8 @@ namespace CDP4Requirements.ViewModels
         /// <param name="messageBus">The (MEF injected) <see cref="ICDPMessageBus"/>.</param>
         public VandVRibbonViewModel(ICDPMessageBus messageBus)
         {
+            this.Browser = new VandVBrowserRibbonViewModel(messageBus);
+
             this.OpenModels = new ReactiveList<VandVModelMenuItemViewModel>();
             this.OpenModels.CountChanged.Subscribe(count => this.HasModels = count != 0);
 
@@ -99,6 +101,12 @@ namespace CDP4Requirements.ViewModels
         /// Gets the "Set up V&amp;V" menu items, one per open <see cref="EngineeringModel"/>.
         /// </summary>
         public ReactiveList<VandVModelMenuItemViewModel> OpenModels { get; }
+
+        /// <summary>
+        /// Gets the view-model behind the "Open VCD" button. Set-up and Open sit in one ribbon group, and a group has a
+        /// single data context, so the group's view-model owns both.
+        /// </summary>
+        public VandVBrowserRibbonViewModel Browser { get; }
 
         /// <summary>
         /// Adds a menu item for a newly opened <see cref="EngineeringModel"/>.

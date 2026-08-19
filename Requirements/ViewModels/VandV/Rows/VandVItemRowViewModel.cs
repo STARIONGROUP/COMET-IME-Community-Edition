@@ -29,6 +29,7 @@ namespace CDP4Requirements.ViewModels.Rows
     using System.Linq;
     using System.Threading.Tasks;
 
+    using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
 
     using CDP4Common.CommonData;
@@ -320,21 +321,27 @@ namespace CDP4Requirements.ViewModels.Rows
         /// owns the write so this row stays free of transaction logic.
         /// </summary>
         /// <param name="dropInfo">The <see cref="IDropInfo"/>.</param>
-        /// <returns>A completed <see cref="Task"/>.</returns>
-        public Task Drop(IDropInfo dropInfo)
+        /// <returns>A <see cref="Task"/> that completes when the browser has finished writing the coverage.</returns>
+        /// <remarks>
+        /// The handler is awaited, not fired and forgotten: returning a completed task while the confirmation dialog
+        /// and the coverage write were still in flight cleared the browser's busy state early and let a second drop
+        /// race the first one.
+        /// </remarks>
+        public async Task Drop(IDropInfo dropInfo)
         {
-            if (dropInfo.Payload is ParameterOrOverrideBase parameter)
-            {
-                this.ParameterDropped?.Invoke(this, parameter);
-            }
+            var handler = this.ParameterDropped;
 
-            return Task.CompletedTask;
+            if (dropInfo.Payload is ParameterOrOverrideBase parameter && handler != null)
+            {
+                await handler(this, parameter);
+            }
         }
 
         /// <summary>
-        /// Raised when a parameter is dropped onto this V&amp;V item.
+        /// Raised when a parameter is dropped onto this V&amp;V item. The handler returns the <see cref="Task"/> of the
+        /// write it starts, so <see cref="Drop"/> can await it.
         /// </summary>
-        public event EventHandler<ParameterOrOverrideBase> ParameterDropped;
+        public event Func<object, ParameterOrOverrideBase, Task> ParameterDropped;
 
         /// <summary>
         /// Re-reads the V&amp;V attribute values from the <see cref="Requirement"/>'s <see cref="SimpleParameterValue"/>s.
@@ -361,7 +368,7 @@ namespace CDP4Requirements.ViewModels.Rows
         public void RefreshProcedure()
         {
             var iteration = this.Thing.GetContainerOfType<Iteration>();
-            var reference = this.Attribute("vnv_procedure_ref");
+            var reference = this.Attribute(VandVParameter.ProcedureReference);
 
             if (iteration == null)
             {
@@ -381,11 +388,11 @@ namespace CDP4Requirements.ViewModels.Rows
             // executed by the tool; this counts how much of the as-run record has been filled in.
             var recorded = steps.Count(step =>
             {
-                var result = VandVCoverageQuery.Attribute(step, "vnv_step_result");
-                return !string.IsNullOrWhiteSpace(result) && !VandVCoverageQuery.AreSameEnumValue(result, "Not Run");
+                var result = VandVCoverageQuery.Attribute(step, VandVParameter.StepResult);
+                return !string.IsNullOrWhiteSpace(result) && !VandVCoverageQuery.AreSameEnumValue(result, VandVStepResult.NotRun);
             });
 
-            var failed = steps.Count(step => VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(step, "vnv_step_result"), "Fail"));
+            var failed = steps.Count(step => VandVCoverageQuery.AreSameEnumValue(VandVCoverageQuery.Attribute(step, VandVParameter.StepResult), VandVStepResult.Fail));
 
             var summary = $"{recorded} of {steps.Count} step(s) recorded";
 
@@ -433,17 +440,17 @@ namespace CDP4Requirements.ViewModels.Rows
             this.Name = this.Thing.Name;
             this.ShortName = this.Thing.ShortName;
             this.Definition = this.Thing.Definition.FirstOrDefault()?.Content;
-            this.Method = this.Attribute("vnv_method");
-            this.Stage = this.Attribute("vnv_stage");
-            this.Level = this.Attribute("vnv_level");
-            this.Status = this.Attribute("vnv_status");
-            this.Criticality = this.Attribute("vnv_criticality");
-            this.PlannedDate = this.Attribute("vnv_planned_date");
-            this.ActualDate = this.Attribute("vnv_actual_date");
-            this.ActivityNumber = this.Attribute("vnv_activity_no");
-            this.Acceptance = this.Attribute("vnv_acceptance");
-            this.Result = this.Attribute("vnv_result");
-            this.EvidenceReference = this.Attribute("vnv_evidence_ref");
+            this.Method = this.Attribute(VandVParameter.Method);
+            this.Stage = this.Attribute(VandVParameter.Stage);
+            this.Level = this.Attribute(VandVParameter.Level);
+            this.Status = this.Attribute(VandVParameter.Status);
+            this.Criticality = this.Attribute(VandVParameter.Criticality);
+            this.PlannedDate = this.Attribute(VandVParameter.PlannedDate);
+            this.ActualDate = this.Attribute(VandVParameter.ActualDate);
+            this.ActivityNumber = this.Attribute(VandVParameter.ActivityNumber);
+            this.Acceptance = this.Attribute(VandVParameter.AcceptanceCriteria);
+            this.Result = this.Attribute(VandVParameter.Result);
+            this.EvidenceReference = this.Attribute(VandVParameter.EvidenceReference);
             this.Owner = this.Thing.Owner?.ShortName;
             this.Compliance = VandVCloseOut.QueryCompliance(this.Thing);
 

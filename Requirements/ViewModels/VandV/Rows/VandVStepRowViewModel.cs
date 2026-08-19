@@ -25,6 +25,7 @@
 
 namespace CDP4Requirements.ViewModels.Rows
 {
+    using CDP4Requirements.Rdl;
     using CDP4Requirements.Services;
 
     using CDP4Common.CommonData;
@@ -142,10 +143,10 @@ namespace CDP4Requirements.ViewModels.Rows
         {
             this.ShortName = this.Thing.ShortName;
             this.Name = this.Thing.Name;
-            this.StepAction = VandVCoverageQuery.Attribute(this.Thing, "vnv_step_action");
-            this.StepExpected = VandVCoverageQuery.Attribute(this.Thing, "vnv_step_expected");
-            this.StepActual = VandVCoverageQuery.Attribute(this.Thing, "vnv_step_actual");
-            this.StepResult = VandVCoverageQuery.Attribute(this.Thing, "vnv_step_result");
+            this.StepAction = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepAction);
+            this.StepExpected = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepExpectedResult);
+            this.StepActual = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepActualResult);
+            this.StepResult = VandVCoverageQuery.Attribute(this.Thing, VandVParameter.StepResult);
         }
     }
 }

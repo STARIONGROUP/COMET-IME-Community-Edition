@@ -31,6 +31,8 @@ namespace CDP4Requirements.ViewModels
     using System.Reactive;
     using System.Reactive.Linq;
 
+    using CDP4Requirements.Rdl;
+
     using CDP4Composition.Mvvm;
     using CDP4Composition.Navigation;
 
@@ -66,10 +68,17 @@ namespace CDP4Requirements.ViewModels
             this.MoveGateUpCommand = ReactiveCommandCreator.Create(() => this.MoveGate(-1), hasSelection);
             this.MoveGateDownCommand = ReactiveCommandCreator.Create(() => this.MoveGate(1), hasSelection);
 
+            var structuralChanges = this.StageGates.Changed.Select(_ => Unit.Default).StartWith(Unit.Default);
+
+            // the text typed into a row has to count as well: gating OK on structural changes alone left it enabled on
+            // the state the last Add or Remove produced, so blanking every name inline still let the dialog be accepted
+            var nameEdits = structuralChanges
+                .Select(_ => this.StageGates.Select(row => row.WhenAnyValue(x => x.Name).Select(__ => Unit.Default)).Merge())
+                .Switch();
+
             // the list contents drive OK, so an empty or blank-only table cannot be accepted
-            var canOk = this.StageGates.Changed
-                .Select(_ => Unit.Default)
-                .StartWith(Unit.Default)
+            var canOk = structuralChanges
+                .Merge(nameEdits)
                 .Select(_ => this.ParseStageGates().Any());
 
             this.OkCommand = ReactiveCommandCreator.Create(() => { this.DialogResult = new BaseDialogResult(true); }, canOk);
@@ -134,7 +143,15 @@ namespace CDP4Requirements.ViewModels
             {
                 var gate = (row.Name ?? string.Empty).Trim();
 
-                if (gate.Length > 0 && seen.Add(gate))
+                if (gate.Length == 0)
+                {
+                    continue;
+                }
+
+                // deduplication is on the derived short-name, not on the typed text: the seeder maps both spaces and
+                // hyphens to an underscore, so "In Service" and "In-Service" are two names for one
+                // EnumerationValueDefinition and seeding both would leave the RDL with colliding short-names
+                if (seen.Add(VandVRdlManifest.ToShortName(gate)))
                 {
                     gates.Add(gate);
                 }

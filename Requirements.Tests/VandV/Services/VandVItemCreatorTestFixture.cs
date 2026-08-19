@@ -131,6 +131,16 @@ namespace CDP4Requirements.Tests.Services
         }
 
         [Test]
+        public void VerifyThatCanCreateIsFalseWhenAnAttributeParameterTypeIsMissing()
+        {
+            // the dialog would let the user type a stage gate and the write would then drop it without a word
+            var stage = this.srdl.ParameterType.Single(x => x.ShortName == VandVParameter.Stage);
+            this.srdl.ParameterType.Remove(stage);
+
+            Assert.That(VandVItemCreator.CanCreate(this.iteration), Is.False);
+        }
+
+        [Test]
         public void VerifyThatCanCreateIsFalseOnAPartiallySeededLibrary()
         {
             // the item itself could be written, but its coverage could not: creating it anyway committed the item and
@@ -217,9 +227,11 @@ namespace CDP4Requirements.Tests.Services
                 this.srdl.DefinedCategory.Add(category);
             }
 
-            foreach (var shortName in new[] { "vnv_method", "vnv_stage", "vnv_acceptance", "vnv_status" })
+            // every manifest parameter type: writing an attribute whose parameter type is absent is a silent no-op, so
+            // CanCreate refuses a library that carries only some of them
+            foreach (var definition in VandVRdlManifest.ParameterTypes)
             {
-                this.srdl.ParameterType.Add(new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = shortName, Name = shortName, Symbol = shortName });
+                this.srdl.ParameterType.Add(new TextParameterType(Guid.NewGuid(), this.assembler.Cache, this.uri) { ShortName = definition.ShortName, Name = definition.Name, Symbol = definition.ShortName });
             }
         }
     }

@@ -29,6 +29,8 @@ namespace CDP4Requirements.Services
     using System.Collections.Generic;
     using System.Linq;
 
+    using CDP4Requirements.Rdl;
+
     using CDP4Common.EngineeringModelData;
     using CDP4Common.ReportingData;
 
@@ -124,26 +126,26 @@ namespace CDP4Requirements.Services
                     sheet.Cell(row, 4).Value = parent;
                     sheet.Cell(row, 5).Value = item.ShortName;
                     sheet.Cell(row, 6).Value = item.Name;
-                    sheet.Cell(row, 7).Value = VandVCoverageQuery.Attribute(item, "vnv_method");
-                    sheet.Cell(row, 8).Value = VandVCoverageQuery.Attribute(item, "vnv_stage");
-                    sheet.Cell(row, 9).Value = VandVCoverageQuery.Attribute(item, "vnv_level");
-                    sheet.Cell(row, 10).Value = VandVCoverageQuery.Attribute(item, "vnv_criticality");
+                    sheet.Cell(row, 7).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Method);
+                    sheet.Cell(row, 8).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Stage);
+                    sheet.Cell(row, 9).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Level);
+                    sheet.Cell(row, 10).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Criticality);
                     sheet.Cell(row, 11).Value = item.Owner?.ShortName;
                     sheet.Cell(row, 12).Value = VandVCoverageQuery.Attribute(item, VandVCloseOut.PlanReferenceShortName);
-                    sheet.Cell(row, 13).Value = VandVCoverageQuery.Attribute(item, "vnv_activity_no");
-                    sheet.Cell(row, 14).Value = VandVCoverageQuery.Attribute(item, "vnv_planned_date");
-                    sheet.Cell(row, 15).Value = VandVCoverageQuery.Attribute(item, "vnv_actual_date");
-                    sheet.Cell(row, 16).Value = VandVCoverageQuery.Attribute(item, "vnv_status");
+                    sheet.Cell(row, 13).Value = VandVCoverageQuery.Attribute(item, VandVParameter.ActivityNumber);
+                    sheet.Cell(row, 14).Value = VandVCoverageQuery.Attribute(item, VandVParameter.PlannedDate);
+                    sheet.Cell(row, 15).Value = VandVCoverageQuery.Attribute(item, VandVParameter.ActualDate);
+                    sheet.Cell(row, 16).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Status);
                     sheet.Cell(row, 17).Value = compliance;
                     sheet.Cell(row, 18).Value = VandVCloseOut.IsClosed(item) ? "Closed" : "Open";
                     sheet.Cell(row, 19).Value = VandVCoverageQuery.Attribute(item, VandVCloseOut.CloseOutReasonShortName);
                     sheet.Cell(row, 20).Value = VandVCoverageQuery.Attribute(item, VandVCloseOut.ClosedByShortName);
                     sheet.Cell(row, 21).Value = VandVCoverageQuery.Attribute(item, VandVCloseOut.ClosedOnShortName);
-                    sheet.Cell(row, 22).Value = VandVCoverageQuery.Attribute(item, "vnv_acceptance");
-                    sheet.Cell(row, 23).Value = VandVCoverageQuery.Attribute(item, "vnv_conditions");
-                    sheet.Cell(row, 24).Value = VandVCoverageQuery.Attribute(item, "vnv_facility");
-                    sheet.Cell(row, 25).Value = VandVCoverageQuery.Attribute(item, "vnv_result");
-                    sheet.Cell(row, 26).Value = VandVCoverageQuery.Attribute(item, "vnv_evidence_ref");
+                    sheet.Cell(row, 22).Value = VandVCoverageQuery.Attribute(item, VandVParameter.AcceptanceCriteria);
+                    sheet.Cell(row, 23).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Conditions);
+                    sheet.Cell(row, 24).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Facility);
+                    sheet.Cell(row, 25).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Result);
+                    sheet.Cell(row, 26).Value = VandVCoverageQuery.Attribute(item, VandVParameter.EvidenceReference);
                     sheet.Cell(row, 27).Value = analysis.Display;
 
                     if (analysis.State == VandVAnalysisState.Violated)
@@ -229,21 +231,21 @@ namespace CDP4Requirements.Services
             {
                 foreach (var item in coverage.VandVItems)
                 {
-                    var status = VandVCoverageQuery.Attribute(item, "vnv_status");
+                    var status = VandVCoverageQuery.Attribute(item, VandVParameter.Status);
 
-                    if (string.IsNullOrWhiteSpace(status) || VandVCoverageQuery.AreSameEnumValue(status, "Planned") || VandVCoverageQuery.AreSameEnumValue(status, "Ready"))
+                    if (string.IsNullOrWhiteSpace(status) || VandVCoverageQuery.AreSameEnumValue(status, VandVStatus.Planned) || VandVCoverageQuery.AreSameEnumValue(status, VandVStatus.Ready))
                     {
                         continue;
                     }
 
                     sheet.Cell(row, 1).Value = item.ShortName;
                     sheet.Cell(row, 2).Value = coverage.Requirement.ShortName;
-                    sheet.Cell(row, 3).Value = VandVCoverageQuery.Attribute(item, "vnv_method");
-                    sheet.Cell(row, 4).Value = VandVCoverageQuery.Attribute(item, "vnv_stage");
+                    sheet.Cell(row, 3).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Method);
+                    sheet.Cell(row, 4).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Stage);
                     sheet.Cell(row, 5).Value = status;
-                    sheet.Cell(row, 6).Value = VandVCoverageQuery.Attribute(item, "vnv_actual_date");
-                    sheet.Cell(row, 7).Value = VandVCoverageQuery.Attribute(item, "vnv_result");
-                    sheet.Cell(row, 8).Value = VandVCoverageQuery.Attribute(item, "vnv_evidence_ref");
+                    sheet.Cell(row, 6).Value = VandVCoverageQuery.Attribute(item, VandVParameter.ActualDate);
+                    sheet.Cell(row, 7).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Result);
+                    sheet.Cell(row, 8).Value = VandVCoverageQuery.Attribute(item, VandVParameter.EvidenceReference);
                     row++;
                 }
             }
@@ -285,22 +287,22 @@ namespace CDP4Requirements.Services
 
                     foreach (var step in steps)
                     {
-                        var result = VandVCoverageQuery.Attribute(step, "vnv_step_result");
+                        var result = VandVCoverageQuery.Attribute(step, VandVParameter.StepResult);
 
                         sheet.Cell(row, 1).Value = item.ShortName;
                         sheet.Cell(row, 2).Value = item.Name;
                         sheet.Cell(row, 3).Value = coverage.Requirement.ShortName;
-                        sheet.Cell(row, 4).Value = VandVCoverageQuery.Attribute(item, "vnv_procedure_ref");
-                        sheet.Cell(row, 5).Value = VandVCoverageQuery.Attribute(item, "vnv_preconditions");
-                        sheet.Cell(row, 6).Value = VandVCoverageQuery.Attribute(item, "vnv_conditions");
-                        sheet.Cell(row, 7).Value = VandVCoverageQuery.Attribute(item, "vnv_facility");
+                        sheet.Cell(row, 4).Value = VandVCoverageQuery.Attribute(item, VandVParameter.ProcedureReference);
+                        sheet.Cell(row, 5).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Preconditions);
+                        sheet.Cell(row, 6).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Conditions);
+                        sheet.Cell(row, 7).Value = VandVCoverageQuery.Attribute(item, VandVParameter.Facility);
                         sheet.Cell(row, 8).Value = VandVProcedureWriter.QueryStepNumber(step);
-                        sheet.Cell(row, 9).Value = VandVCoverageQuery.Attribute(step, "vnv_step_action");
-                        sheet.Cell(row, 10).Value = VandVCoverageQuery.Attribute(step, "vnv_step_expected");
-                        sheet.Cell(row, 11).Value = VandVCoverageQuery.Attribute(step, "vnv_step_actual");
+                        sheet.Cell(row, 9).Value = VandVCoverageQuery.Attribute(step, VandVParameter.StepAction);
+                        sheet.Cell(row, 10).Value = VandVCoverageQuery.Attribute(step, VandVParameter.StepExpectedResult);
+                        sheet.Cell(row, 11).Value = VandVCoverageQuery.Attribute(step, VandVParameter.StepActualResult);
                         sheet.Cell(row, 12).Value = result;
 
-                        if (VandVCoverageQuery.AreSameEnumValue(result, "Fail"))
+                        if (VandVCoverageQuery.AreSameEnumValue(result, VandVStepResult.Fail))
                         {
                             sheet.Row(row).Style.Font.FontColor = XLColor.Red;
                         }

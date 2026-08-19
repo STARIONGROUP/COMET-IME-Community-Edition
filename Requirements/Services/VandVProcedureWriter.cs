@@ -97,7 +97,7 @@ namespace CDP4Requirements.Services
         /// <returns>The step number.</returns>
         public static int QueryStepNumber(Requirement step)
         {
-            var value = VandVCoverageQuery.Attribute(step, "vnv_step_no");
+            var value = VandVCoverageQuery.Attribute(step, VandVParameter.StepNumber);
 
             return int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var number)
                 ? number
@@ -233,11 +233,11 @@ namespace CDP4Requirements.Services
 
             created.Category.Add(VandVCoverageQuery.ResolveCategory(mrdl, StepCategoryShortName));
 
-            AddAttribute(created, mrdl, transaction, "vnv_step_no", number.ToString(CultureInfo.InvariantCulture));
-            AddAttribute(created, mrdl, transaction, "vnv_step_action", step.Action);
-            AddAttribute(created, mrdl, transaction, "vnv_step_expected", step.ExpectedResult);
-            AddAttribute(created, mrdl, transaction, "vnv_step_actual", step.ActualResult);
-            AddAttribute(created, mrdl, transaction, "vnv_step_result", step.Result);
+            AddAttribute(created, mrdl, transaction, VandVParameter.StepNumber, number.ToString(CultureInfo.InvariantCulture));
+            AddAttribute(created, mrdl, transaction, VandVParameter.StepAction, step.Action);
+            AddAttribute(created, mrdl, transaction, VandVParameter.StepExpectedResult, step.ExpectedResult);
+            AddAttribute(created, mrdl, transaction, VandVParameter.StepActualResult, step.ActualResult);
+            AddAttribute(created, mrdl, transaction, VandVParameter.StepResult, step.Result);
 
             specificationClone.Requirement.Add(created);
             transaction.Create(created);
@@ -266,11 +266,11 @@ namespace CDP4Requirements.Services
             var clone = step.Thing.Clone(true);
             clone.Name = BuildStepName(step, number);
 
-            SetAttribute(clone, transaction, "vnv_step_no", number.ToString(CultureInfo.InvariantCulture));
-            SetAttribute(clone, transaction, "vnv_step_action", step.Action);
-            SetAttribute(clone, transaction, "vnv_step_expected", step.ExpectedResult);
-            SetAttribute(clone, transaction, "vnv_step_actual", step.ActualResult);
-            SetAttribute(clone, transaction, "vnv_step_result", step.Result);
+            SetAttribute(clone, transaction, VandVParameter.StepNumber, number.ToString(CultureInfo.InvariantCulture));
+            SetAttribute(clone, transaction, VandVParameter.StepAction, step.Action);
+            SetAttribute(clone, transaction, VandVParameter.StepExpectedResult, step.ExpectedResult);
+            SetAttribute(clone, transaction, VandVParameter.StepActualResult, step.ActualResult);
+            SetAttribute(clone, transaction, VandVParameter.StepResult, step.Result);
 
             transaction.CreateOrUpdate(clone);
         }

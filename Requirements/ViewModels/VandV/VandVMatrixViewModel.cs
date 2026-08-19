@@ -26,6 +26,7 @@
 namespace CDP4Requirements.ViewModels
 {
     using System;
+    using System.Collections.Generic;
     using System.Data;
     using System.Reactive;
     using System.Reactive.Linq;
@@ -145,20 +146,26 @@ namespace CDP4Requirements.ViewModels
             table.Columns.Add(RequirementColumn, typeof(string));
             table.Columns.Add(RequirementNameColumn, typeof(string));
 
+            // stage gates are free text, so a project may name one "Requirement" or "Covered". Those names belong to
+            // the fixed columns: a colliding stage gate gets its own numbered column instead of writing its coverage
+            // text over the requirement's identity
+            var reservedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { RequirementColumn, RequirementNameColumn, CoveredColumn };
+            var stageColumns = new Dictionary<string, string>();
+
             foreach (var stage in model.Stages)
             {
-                if (!table.Columns.Contains(stage))
+                var columnName = stage;
+
+                for (var suffix = 2; reservedColumns.Contains(columnName) || table.Columns.Contains(columnName); suffix++)
                 {
-                    table.Columns.Add(stage, typeof(string));
+                    columnName = $"{stage} ({suffix})";
                 }
+
+                table.Columns.Add(columnName, typeof(string));
+                stageColumns[stage] = columnName;
             }
 
-            // a project may define a stage gate literally named "Covered"; adding it twice throws and takes the
-            // whole panel down, so the fixed column is guarded exactly like the stage columns are
-            if (!table.Columns.Contains(CoveredColumn))
-            {
-                table.Columns.Add(CoveredColumn, typeof(string));
-            }
+            table.Columns.Add(CoveredColumn, typeof(string));
 
             foreach (var coverage in model.Coverages)
             {
@@ -168,7 +175,7 @@ namespace CDP4Requirements.ViewModels
 
                 foreach (var stage in model.Stages)
                 {
-                    row[stage] = coverage.CellText(stage);
+                    row[stageColumns[stage]] = coverage.CellText(stage);
                 }
 
                 row[CoveredColumn] = coverage.VandVItems.Count > 0 ? "Yes" : "NO";

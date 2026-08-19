@@ -301,11 +301,11 @@ namespace CDP4Requirements.ViewModels
             var model = (EngineeringModel)iteration.Container;
             var mrdl = model.EngineeringModelSetup.RequiredRdl.FirstOrDefault();
 
-            this.PossibleMethods = EnumerationValues(mrdl, "vnv_method");
-            this.PossibleStages = EnumerationValues(mrdl, "vnv_stage");
-            this.PossibleLevels = EnumerationValues(mrdl, "vnv_level");
-            this.PossibleCriticalities = EnumerationValues(mrdl, "vnv_criticality");
-            this.PossibleStatuses = EnumerationValues(mrdl, "vnv_status");
+            this.PossibleMethods = EnumerationValues(mrdl, VandVParameter.Method);
+            this.PossibleStages = EnumerationValues(mrdl, VandVParameter.Stage);
+            this.PossibleLevels = EnumerationValues(mrdl, VandVParameter.Level);
+            this.PossibleCriticalities = EnumerationValues(mrdl, VandVParameter.Criticality);
+            this.PossibleStatuses = EnumerationValues(mrdl, VandVParameter.Status);
             this.PossibleCompliances = EnumerationValues(mrdl, VandVCloseOut.ComplianceShortName);
 
             if (!this.PossibleCompliances.Any())
@@ -313,11 +313,11 @@ namespace CDP4Requirements.ViewModels
                 this.PossibleCompliances = VandVCloseOut.PossibleCompliances;
             }
 
-            this.PossibleStepResults = EnumerationValues(mrdl, "vnv_step_result");
+            this.PossibleStepResults = EnumerationValues(mrdl, VandVParameter.StepResult);
 
             if (!this.PossibleStepResults.Any())
             {
-                this.PossibleStepResults = new[] { "Not Run", "Pass", "Fail", "Blocked", "Not Applicable" };
+                this.PossibleStepResults = VandVStepResult.All;
             }
 
             this.PossibleLinkTypes = new[] { VerifiesLink, ValidatesLink };
@@ -886,30 +886,30 @@ namespace CDP4Requirements.ViewModels
         {
             var attributes = new Dictionary<string, string>
             {
-                { "vnv_method", this.Method },
-                { "vnv_stage", this.Stage },
-                { "vnv_level", this.Level },
-                { "vnv_criticality", this.Criticality },
-                { "vnv_status", this.Status },
-                { "vnv_acceptance", this.Acceptance },
-                { "vnv_description", this.Description },
-                { "vnv_preconditions", this.Preconditions },
-                { "vnv_conditions", this.Conditions },
-                { "vnv_facility", this.Facility },
-                { "vnv_activity_no", this.ActivityNumber },
-                { "vnv_responsible_ext", this.ResponsibleExternal },
-                { "vnv_coverage_note", this.CoverageNote },
-                { "vnv_evidence_ref", this.EvidenceReference },
-                { "vnv_result", this.Result },
+                { VandVParameter.Method, this.Method },
+                { VandVParameter.Stage, this.Stage },
+                { VandVParameter.Level, this.Level },
+                { VandVParameter.Criticality, this.Criticality },
+                { VandVParameter.Status, this.Status },
+                { VandVParameter.AcceptanceCriteria, this.Acceptance },
+                { VandVParameter.Description, this.Description },
+                { VandVParameter.Preconditions, this.Preconditions },
+                { VandVParameter.Conditions, this.Conditions },
+                { VandVParameter.Facility, this.Facility },
+                { VandVParameter.ActivityNumber, this.ActivityNumber },
+                { VandVParameter.ExternalResponsible, this.ResponsibleExternal },
+                { VandVParameter.CoverageNote, this.CoverageNote },
+                { VandVParameter.EvidenceReference, this.EvidenceReference },
+                { VandVParameter.Result, this.Result },
                 { VandVCloseOut.ComplianceShortName, this.Compliance },
                 { VandVCloseOut.ClosedShortName, this.IsClosed ? "true" : string.Empty },
                 { VandVCloseOut.CloseOutReasonShortName, this.CloseOutReason },
                 { VandVCloseOut.ClosedByShortName, this.ClosedBy },
                 { VandVCloseOut.ClosedOnShortName, this.ClosedOn?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) },
                 { VandVCloseOut.PlanReferenceShortName, this.PlanReference },
-                { "vnv_procedure_ref", this.ProcedureReference },
-                { "vnv_planned_date", this.PlannedDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) },
-                { "vnv_actual_date", this.ActualDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) }
+                { VandVParameter.ProcedureReference, this.ProcedureReference },
+                { VandVParameter.PlannedDate, this.PlannedDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) },
+                { VandVParameter.ActualDate, this.ActualDate?.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) }
             };
 
             return this.IsEditMode
@@ -963,30 +963,30 @@ namespace CDP4Requirements.ViewModels
             this.Owner = vandVItem.Owner;
             this.LinkType = string.IsNullOrWhiteSpace(existingLinkType) ? VerifiesLink : existingLinkType;
 
-            this.Method = Attribute(vandVItem, "vnv_method");
-            this.Stage = Attribute(vandVItem, "vnv_stage");
-            this.Level = Attribute(vandVItem, "vnv_level");
-            this.Criticality = Attribute(vandVItem, "vnv_criticality");
-            this.Status = Attribute(vandVItem, "vnv_status");
-            this.Acceptance = Attribute(vandVItem, "vnv_acceptance");
-            this.Description = Attribute(vandVItem, "vnv_description");
-            this.Preconditions = Attribute(vandVItem, "vnv_preconditions");
-            this.Conditions = Attribute(vandVItem, "vnv_conditions");
-            this.Facility = Attribute(vandVItem, "vnv_facility");
-            this.ActivityNumber = Attribute(vandVItem, "vnv_activity_no");
-            this.ResponsibleExternal = Attribute(vandVItem, "vnv_responsible_ext");
-            this.CoverageNote = Attribute(vandVItem, "vnv_coverage_note");
-            this.EvidenceReference = Attribute(vandVItem, "vnv_evidence_ref");
-            this.Result = Attribute(vandVItem, "vnv_result");
+            this.Method = Attribute(vandVItem, VandVParameter.Method);
+            this.Stage = Attribute(vandVItem, VandVParameter.Stage);
+            this.Level = Attribute(vandVItem, VandVParameter.Level);
+            this.Criticality = Attribute(vandVItem, VandVParameter.Criticality);
+            this.Status = Attribute(vandVItem, VandVParameter.Status);
+            this.Acceptance = Attribute(vandVItem, VandVParameter.AcceptanceCriteria);
+            this.Description = Attribute(vandVItem, VandVParameter.Description);
+            this.Preconditions = Attribute(vandVItem, VandVParameter.Preconditions);
+            this.Conditions = Attribute(vandVItem, VandVParameter.Conditions);
+            this.Facility = Attribute(vandVItem, VandVParameter.Facility);
+            this.ActivityNumber = Attribute(vandVItem, VandVParameter.ActivityNumber);
+            this.ResponsibleExternal = Attribute(vandVItem, VandVParameter.ExternalResponsible);
+            this.CoverageNote = Attribute(vandVItem, VandVParameter.CoverageNote);
+            this.EvidenceReference = Attribute(vandVItem, VandVParameter.EvidenceReference);
+            this.Result = Attribute(vandVItem, VandVParameter.Result);
             this.Compliance = VandVCloseOut.QueryCompliance(vandVItem);
             this.IsClosed = VandVCloseOut.IsClosed(vandVItem);
             this.CloseOutReason = Attribute(vandVItem, VandVCloseOut.CloseOutReasonShortName);
             this.ClosedBy = Attribute(vandVItem, VandVCloseOut.ClosedByShortName);
             this.ClosedOn = ParseDate(Attribute(vandVItem, VandVCloseOut.ClosedOnShortName));
             this.PlanReference = Attribute(vandVItem, VandVCloseOut.PlanReferenceShortName);
-            this.ProcedureReference = Attribute(vandVItem, "vnv_procedure_ref");
-            this.PlannedDate = ParseDate(Attribute(vandVItem, "vnv_planned_date"));
-            this.ActualDate = ParseDate(Attribute(vandVItem, "vnv_actual_date"));
+            this.ProcedureReference = Attribute(vandVItem, VandVParameter.ProcedureReference);
+            this.PlannedDate = ParseDate(Attribute(vandVItem, VandVParameter.PlannedDate));
+            this.ActualDate = ParseDate(Attribute(vandVItem, VandVParameter.ActualDate));
         }
 
         /// <summary>

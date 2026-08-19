@@ -67,6 +67,8 @@ namespace CDP4Requirements.Services
         /// itself carries. Saving an item is several writes in sequence, so a library missing only the coverage or
         /// procedure categories used to commit the item and then throw, leaving an orphan behind and reporting the
         /// whole thing as failed.
+        /// Every manifest parameter type is checked for the same reason: writing an attribute whose parameter type is
+        /// absent is a silent no-op, so the value the user typed would simply disappear.
         /// </remarks>
         public static bool CanCreate(Iteration iteration)
         {
@@ -86,7 +88,7 @@ namespace CDP4Requirements.Services
             var parameterTypes = new HashSet<string>(mrdl.QueryParameterTypesFromChainOfRdls().Select(x => x.ShortName));
 
             return VandVCategory.RequiredForItemWrite.All(categories.Contains)
-                   && parameterTypes.Contains("vnv_method");
+                   && VandVRdlManifest.ParameterTypes.All(x => parameterTypes.Contains(x.ShortName));
         }
 
         /// <summary>
