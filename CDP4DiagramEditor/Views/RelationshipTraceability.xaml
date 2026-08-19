@@ -1,0 +1,315 @@
+﻿<UserControl x:Class="CDP4DiagramEditor.Views.RelationshipTraceability"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dxe="http://schemas.devexpress.com/winfx/2008/xaml/editors"
+             xmlns:dxdiag="http://schemas.devexpress.com/winfx/2008/xaml/diagram"
+             xmlns:dxmvvm="http://schemas.devexpress.com/winfx/2008/xaml/mvvm"
+             xmlns:dxn="http://schemas.devexpress.com/winfx/2008/xaml/navbar"
+             xmlns:dxlc="http://schemas.devexpress.com/winfx/2008/xaml/layoutcontrol"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:dragDrop="clr-namespace:CDP4Composition.DragDrop;assembly=CDP4Composition"
+             xmlns:behaviors="clr-namespace:CDP4DiagramEditor.Behaviors"
+             xmlns:helpers="clr-namespace:CDP4DiagramEditor.Helpers"
+             xmlns:viewModels="clr-namespace:CDP4DiagramEditor.ViewModels"
+             xmlns:views="clr-namespace:CDP4DiagramEditor.Views"
+             d:DesignHeight="600"
+             d:DesignWidth="900"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <helpers:TraceabilityCategoryListConverter x:Key="CategoryListConverter" />
+        <helpers:TraceabilityClassKindListConverter x:Key="ClassKindListConverter" />
+        <helpers:TraceabilityIntegerConverter x:Key="IntegerConverter" />
+        <helpers:TraceabilityLevelToBrushConverter x:Key="LevelToBrushConverter" />
+
+        <!-- a list that stays out of sight until it has something to show -->
+        <Style x:Key="AutoHideListBox" TargetType="ListBox">
+            <Setter Property="MaxHeight" Value="120" />
+            <Setter Property="Margin" Value="0,3,0,0" />
+            <Style.Triggers>
+                <Trigger Property="HasItems" Value="False">
+                    <Setter Property="Visibility" Value="Collapsed" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <dxn:NavBarControl Grid.Column="1" MaxWidth="350" FlowDirection="RightToLeft">
+            <dxn:NavBarControl.View>
+                <dxn:NavigationPaneView IsExpanded="True" AnimateGroupExpansion="False" />
+            </dxn:NavBarControl.View>
+            <dxn:NavBarControl.Groups>
+                <dxn:NavBarGroup DisplaySource="Content" Header="Configuration">
+                    <dxn:NavBarGroup.Content>
+        <dxlc:LayoutControl Orientation="Vertical" FlowDirection="LeftToRight">
+            <dxlc:LayoutGroup Orientation="Vertical">
+                <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light" Header="Presets"
+                                  Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                    <dxlc:LayoutItem>
+                    <StackPanel>
+                        <dxe:ComboBoxEdit ItemsSource="{Binding SavedConfigurations}"
+                                          SelectedItem="{Binding SelectedConfiguration, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="True"
+                                          NullText="Select a preset..." />
+                        <dxe:TextEdit Margin="0,3,0,0"
+                                      EditValue="{Binding ConfigurationName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                      NullText="Preset name" />
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <Button Content="Save" MinWidth="60" Command="{Binding SaveConfigurationCommand}" />
+                            <Button Content="Delete" MinWidth="60" Margin="5,0,0,0" Command="{Binding DeleteConfigurationCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+
+                <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light" Header="Roots"
+                                  Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                    <dxlc:LayoutItem>
+                    <StackPanel>
+                        <TextBlock Text="Drag things from a browser onto the diagram to add roots."
+                                   TextWrapping="Wrap"
+                                   FontStyle="Italic"
+                                   Margin="0,0,0,3" />
+                        <ListBox Style="{StaticResource AutoHideListBox}"
+                                 ItemsSource="{Binding RootThings}"
+                                 SelectedItem="{Binding SelectedRootThing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding UserFriendlyShortName}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <Button Content="Remove" MinWidth="60" Command="{Binding RemoveRootThingCommand}" />
+                            <Button Content="Clear" MinWidth="60" Margin="5,0,0,0" Command="{Binding ClearRootThingsCommand}" />
+                        </StackPanel>
+                        <TextBlock Text="And/or all things of:" Margin="0,5,0,3" />
+                        <dxe:ComboBoxEdit ItemsSource="{Binding PossibleClassKinds}"
+                                          EditValue="{Binding SelectedRootClassKinds, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource ClassKindListConverter}}"
+                                          AllowNullInput="True"
+                                          NullText="Class kinds...">
+                            <dxe:ComboBoxEdit.StyleSettings>
+                                <dxe:CheckedComboBoxStyleSettings />
+                            </dxe:ComboBoxEdit.StyleSettings>
+                        </dxe:ComboBoxEdit>
+                        <dxe:ComboBoxEdit Margin="0,3,0,0"
+                                          ItemsSource="{Binding PossibleCategories}"
+                                          EditValue="{Binding SelectedRootCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource CategoryListConverter}}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="True"
+                                          NullText="Filtered by categories...">
+                            <dxe:ComboBoxEdit.StyleSettings>
+                                <dxe:CheckedComboBoxStyleSettings />
+                            </dxe:ComboBoxEdit.StyleSettings>
+                        </dxe:ComboBoxEdit>
+                    </StackPanel>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+
+                <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light" Header="Depth"
+                                  Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                    <dxlc:LayoutItem>
+                    <StackPanel>
+                        <TextBlock Text="Levels down (source to target):" />
+                        <dxe:SpinEdit Value="{Binding DepthDown, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}" MinValue="0" MaxValue="20" IsFloatValue="False" />
+                        <TextBlock Text="Levels up (target to source):" Margin="0,3,0,0" />
+                        <dxe:SpinEdit Value="{Binding DepthUp, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}" MinValue="0" MaxValue="20" IsFloatValue="False" />
+                        <TextBlock Text="Maximum nodes:" Margin="0,3,0,0" />
+                        <dxe:SpinEdit Value="{Binding MaxNodes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}" MinValue="10" MaxValue="5000" IsFloatValue="False" />
+                    </StackPanel>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+
+                <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light" Header="Relationship filter"
+                                  Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                    <dxlc:LayoutItem>
+                    <StackPanel>
+                        <TextBlock Text="Follow only relationships of category:" TextWrapping="Wrap" />
+                        <dxe:ComboBoxEdit ItemsSource="{Binding PossibleRelationshipCategories}"
+                                          EditValue="{Binding SelectedDefaultLevelCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource CategoryListConverter}}"
+                                          DisplayMember="Name"
+                                          AllowNullInput="True"
+                                          NullText="All relationships">
+                            <dxe:ComboBoxEdit.StyleSettings>
+                                <dxe:CheckedComboBoxStyleSettings />
+                            </dxe:ComboBoxEdit.StyleSettings>
+                        </dxe:ComboBoxEdit>
+                        <TextBlock Text="Arrow direction:" Margin="0,5,0,0"
+                                   ToolTip="How relationship arrows are followed. Use this when your hierarchy's arrows point the other way, or Both when they change direction along the chain." />
+                        <dxe:ComboBoxEdit ItemsSource="{Binding PossibleDirections}"
+                                          SelectedItem="{Binding SelectedDefaultDirection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Label"
+                                          IsTextEditable="False" />
+                        <TextBlock Text="Per-level overrides:" Margin="0,5,0,3"
+                                   ToolTip="At the given level (1 = first hop from the roots) only relationships of the chosen categories are followed, instead of the default filter above. E.g. level 3 → 'Satisfies' follows only satisfies links at the third hop." />
+                        <ListBox Style="{StaticResource AutoHideListBox}"
+                                 MaxHeight="150"
+                                 HorizontalContentAlignment="Stretch"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding LevelFilterRows}"
+                                 SelectedItem="{Binding SelectedLevelFilterRow, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type viewModels:TraceabilityLevelFilterRowViewModel}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="60" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <dxe:SpinEdit Grid.Row="0" Grid.Column="0"
+                                                      Value="{Binding Level, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource IntegerConverter}}"
+                                                      MinValue="1" MaxValue="20" IsFloatValue="False" />
+                                        <dxe:ComboBoxEdit Grid.Row="0" Grid.Column="1"
+                                                          Margin="3,0,0,0"
+                                                          ItemsSource="{Binding PossibleCategories}"
+                                                          EditValue="{Binding SelectedCategories, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource CategoryListConverter}}"
+                                                          DisplayMember="Name"
+                                                          AllowNullInput="True"
+                                                          NullText="Categories...">
+                                            <dxe:ComboBoxEdit.StyleSettings>
+                                                <dxe:CheckedComboBoxStyleSettings />
+                                            </dxe:ComboBoxEdit.StyleSettings>
+                                        </dxe:ComboBoxEdit>
+                                        <dxe:ComboBoxEdit Grid.Row="1" Grid.Column="1"
+                                                          Margin="3,3,0,0"
+                                                          ItemsSource="{x:Static viewModels:TraceabilityDirectionOption.All}"
+                                                          SelectedItem="{Binding SelectedDirection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                          DisplayMember="Label"
+                                                          IsTextEditable="False" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <Button Content="Add" MinWidth="60" Command="{Binding AddLevelFilterRowCommand}" />
+                            <Button Content="Remove" MinWidth="60" Margin="5,0,0,0" Command="{Binding RemoveLevelFilterRowCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+
+                <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light" Header="Diagram"
+                                  Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                    <dxlc:LayoutItem>
+                    <StackPanel>
+                        <TextBlock Text="Orientation:" />
+                        <dxe:ComboBoxEdit ItemsSource="{Binding PossibleLayoutDirections}"
+                                          EditValue="{Binding LayoutDirection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          DisplayMember="Label"
+                                          ValueMember="Direction"
+                                          IsTextEditable="False" />
+                        <TextBlock Text="Export as:" Margin="0,5,0,0" />
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <Button Content="PNG" MinWidth="50" Command="{Binding ExportCommand}" CommandParameter="PNG" />
+                            <Button Content="JPEG" MinWidth="50" Margin="5,0,0,0" Command="{Binding ExportCommand}" CommandParameter="JPEG" />
+                            <Button Content="SVG" MinWidth="50" Margin="5,0,0,0" Command="{Binding ExportCommand}" CommandParameter="SVG" />
+                        </StackPanel>
+                    </StackPanel>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+
+                <dxlc:LayoutGroup View="GroupBox" GroupBoxDisplayMode="Light" Header="Excluded from diagram"
+                                  Orientation="Vertical" IsCollapsible="False" HorizontalAlignment="Stretch">
+                    <dxlc:LayoutItem>
+                    <StackPanel>
+                        <TextBlock Text="Right-click a node to exclude it together with everything only reachable through it."
+                                   TextWrapping="Wrap" FontStyle="Italic" Margin="0,0,0,3" />
+                        <ListBox Style="{StaticResource AutoHideListBox}"
+                                 ItemsSource="{Binding ExcludedThings}"
+                                 SelectedItem="{Binding SelectedExcludedThing, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding UserFriendlyShortName}" />
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Orientation="Horizontal" Margin="0,3,0,0">
+                            <Button Content="Restore" MinWidth="60" Command="{Binding RestoreExcludedThingCommand}" />
+                            <Button Content="Restore all" MinWidth="70" Margin="5,0,0,0" Command="{Binding ResetExclusionsCommand}" />
+                        </StackPanel>
+                    </StackPanel>
+                    </dxlc:LayoutItem>
+                </dxlc:LayoutGroup>
+
+                <dxlc:LayoutItem>
+                    <Button Content="Refresh" Command="{Binding RefreshCommand}" />
+                </dxlc:LayoutItem>
+            </dxlc:LayoutGroup>
+        </dxlc:LayoutControl>
+                    </dxn:NavBarGroup.Content>
+                </dxn:NavBarGroup>
+            </dxn:NavBarControl.Groups>
+        </dxn:NavBarControl>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0"
+                    Background="#FFF3CD"
+                    BorderBrush="#FFE082"
+                    BorderThickness="1"
+                    Padding="5"
+                    Visibility="{Binding IsMaxNodeCountReached, Converter={dxmvvm:BooleanToVisibilityConverter}}">
+                <TextBlock TextWrapping="Wrap"
+                           Text="The maximum number of nodes was reached; the diagram is incomplete. Raise the maximum, lower the depth or add filters." />
+            </Border>
+
+            <TextBlock Grid.Row="1" Margin="5,2" Text="{Binding StatusMessage}" />
+
+            <views:TraceabilityDiagramControl Grid.Row="2"
+                                              SelectionMode="Single"
+                                              IsManipulationEnabled="False"
+                                              AllowRotateItems="False"
+                                              AllowResizeItems="False"
+                                              AllowApplyAutomaticLayout="True"
+                                              ShowPageBreaks="False">
+                <i:Interaction.Behaviors>
+                    <dragDrop:FrameworkElementDropBehavior />
+                </i:Interaction.Behaviors>
+                <dxmvvm:Interaction.Behaviors>
+                    <behaviors:TraceabilityDiagramBehavior />
+                    <dxmvvm:EventToCommand EventName="SelectionChanged"
+                                           Command="{Binding DiagramSelectionChangedCommand}"
+                                           PassEventArgsToCommand="True" />
+                    <dxdiag:DiagramDataBindingBehavior ItemsSource="{Binding Nodes}"
+                                                       ConnectorsSource="{Binding Edges}"
+                                                       KeyMember="Id"
+                                                       ConnectorFromMember="FromId"
+                                                       ConnectorToMember="ToId">
+                        <dxdiag:DiagramDataBindingBehavior.ItemTemplate>
+                            <DataTemplate DataType="{x:Type viewModels:TraceabilityNodeViewModel}">
+                                <Border Background="{Binding Level, Converter={StaticResource LevelToBrushConverter}}"
+                                        BorderBrush="DimGray"
+                                        BorderThickness="1"
+                                        CornerRadius="3"
+                                        Padding="6,4"
+                                        ToolTip="{Binding ToolTip}">
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock Text="{Binding ClassKindName}" FontSize="9" Foreground="DimGray" TextAlignment="Center" />
+                                        <TextBlock Text="{Binding ShortName}" FontWeight="Bold" TextAlignment="Center" />
+                                        <TextBlock Text="{Binding Name}" FontSize="10" TextAlignment="Center" TextWrapping="Wrap" MaxWidth="160" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </dxdiag:DiagramDataBindingBehavior.ItemTemplate>
+                    </dxdiag:DiagramDataBindingBehavior>
+                </dxmvvm:Interaction.Behaviors>
+            </views:TraceabilityDiagramControl>
+        </Grid>
+    </Grid>
+</UserControl>
