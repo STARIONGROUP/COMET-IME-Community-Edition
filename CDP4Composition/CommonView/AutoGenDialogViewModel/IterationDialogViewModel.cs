@@ -1200,20 +1200,7 @@ namespace CDP4CommonView
             clone.TopElement = this.SelectedTopElement;
             clone.DefaultOption = this.SelectedDefaultOption;
 
-            if (!clone.Option.SortedItems.Values.SequenceEqual(this.Option.Select(x => x.Thing)))
-            {
-                var itemCount = this.Option.Count;
-                for (var i = 0; i < itemCount; i++)
-                {
-                    var item = this.Option[i].Thing;
-                    var currentIndex = clone.Option.IndexOf(item);
-
-                    if (currentIndex != i)
-                    {
-                        clone.Option.Move(currentIndex, i);
-                    }
-                }
-            }
+            this.UpdateOrderedItemList(clone.Option, this.Option.Select(x => x.Thing));
             
         }
 

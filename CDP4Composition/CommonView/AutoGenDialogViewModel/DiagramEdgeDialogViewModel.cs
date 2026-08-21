@@ -233,20 +233,7 @@ namespace CDP4CommonView
             clone.Source = this.SelectedSource;
             clone.Target = this.SelectedTarget;
 
-            if (!clone.Point.SortedItems.Values.SequenceEqual(this.Point.Select(x => x.Thing)))
-            {
-                var itemCount = this.Point.Count;
-                for (var i = 0; i < itemCount; i++)
-                {
-                    var item = this.Point[i].Thing;
-                    var currentIndex = clone.Point.IndexOf(item);
-
-                    if (currentIndex != i)
-                    {
-                        clone.Point.Move(currentIndex, i);
-                    }
-                }
-            }
+            this.UpdateOrderedItemList(clone.Point, this.Point.Select(x => x.Thing));
             
         }
 

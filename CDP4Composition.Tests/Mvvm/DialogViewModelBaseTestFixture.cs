@@ -37,6 +37,7 @@ namespace CDP4Composition.Tests.Mvvm
     using System.Windows;
     using System.Windows.Input;
 
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
@@ -312,6 +313,81 @@ namespace CDP4Composition.Tests.Mvvm
             Assert.AreSame(row3, testdialog.OrderedRows[2]);
             Assert.AreSame(row1, testdialog.OrderedRows[3]);
         }
+
+        [Test]
+        public void VerifyThatUpdateOrderedItemListAppliesTheOrderOfTheRows()
+        {
+            var testdialog = this.CreateTestDialogViewModel(out var orderedItemList, out var persons);
+            var sortKeys = orderedItemList.SortedItems.Keys.ToList();
+
+            testdialog.UpdateOrderedItems(orderedItemList, new[] { persons[2], persons[0], persons[1] });
+
+            Assert.That(orderedItemList.SortedItems.Values, Is.EqualTo(new[] { persons[2], persons[0], persons[1] }));
+            Assert.That(orderedItemList.SortedItems.Keys, Is.EqualTo(sortKeys));
+        }
+
+        [Test]
+        public void VerifyThatUpdateOrderedItemListDoesNotMoveAnItemThatIsMarkedForDeletion()
+        {
+            var testdialog = this.CreateTestDialogViewModel(out var orderedItemList, out var persons);
+            var expected = orderedItemList.SortedItems.ToList();
+
+            // the row of a Person that is marked for deletion is no longer present, the remaining ones may not be reordered
+            persons[1].ChangeKind = ChangeKind.Delete;
+
+            testdialog.UpdateOrderedItems(orderedItemList, new[] { persons[0], persons[2] });
+
+            Assert.That(orderedItemList.SortedItems.ToList(), Is.EqualTo(expected));
+        }
+
+        [Test]
+        public void VerifyThatUpdateOrderedItemListKeepsTheSortKeyOfAnItemThatIsMarkedForDeletion()
+        {
+            var testdialog = this.CreateTestDialogViewModel(out var orderedItemList, out var persons);
+            var sortKeys = orderedItemList.SortedItems.Keys.ToList();
+
+            persons[1].ChangeKind = ChangeKind.Delete;
+
+            // the remaining rows are reordered while a Person is marked for deletion
+            testdialog.UpdateOrderedItems(orderedItemList, new[] { persons[2], persons[0] });
+
+            Assert.That(orderedItemList.SortedItems.Values, Is.EqualTo(new[] { persons[2], persons[1], persons[0] }));
+            Assert.That(orderedItemList.SortedItems.Keys, Is.EqualTo(sortKeys));
+        }
+
+        /// <summary>
+        /// Creates a <see cref="TestDialogViewModel"/> together with an <see cref="OrderedItemList{T}"/> that contains three
+        /// <see cref="Person"/>s
+        /// </summary>
+        /// <param name="orderedItemList">
+        /// The <see cref="OrderedItemList{T}"/> that contains the <see cref="Person"/>s
+        /// </param>
+        /// <param name="persons">
+        /// The <see cref="Person"/>s, in the order in which they are contained by the <see cref="OrderedItemList{T}"/>
+        /// </param>
+        /// <returns>
+        /// The <see cref="TestDialogViewModel"/>
+        /// </returns>
+        private TestDialogViewModel CreateTestDialogViewModel(out OrderedItemList<Person> orderedItemList, out List<Person> persons)
+        {
+            var testdialog = new TestDialogViewModel(this.person, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.navigation.Object, this.clone);
+
+            persons = new List<Person>
+            {
+                new Person(Guid.NewGuid(), this.cache, this.uri) { ShortName = "first" },
+                new Person(Guid.NewGuid(), this.cache, this.uri) { ShortName = "middle" },
+                new Person(Guid.NewGuid(), this.cache, this.uri) { ShortName = "last" }
+            };
+
+            orderedItemList = new OrderedItemList<Person>(this.siteDir);
+
+            foreach (var orderedPerson in persons)
+            {
+                orderedItemList.Add(orderedPerson);
+            }
+
+            return testdialog;
+        }
     }
 
     internal class OrderedRow : RowViewModelBase<Person>
@@ -370,6 +446,11 @@ namespace CDP4Composition.Tests.Mvvm
         public void MoveUp(OrderedRow row)
         {
             this.ExecuteMoveUpCommand(this.OrderedRows, row);
+        }
+
+        public void UpdateOrderedItems(OrderedItemList<Person> orderedItemList, IEnumerable<Person> rows)
+        {
+            this.UpdateOrderedItemList(orderedItemList, rows);
         }
     }
 

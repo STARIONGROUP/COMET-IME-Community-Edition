@@ -177,20 +177,7 @@ namespace CDP4CommonView
             var clone = this.Thing;
 
 
-            if (!clone.QuantityKindFactor.SortedItems.Values.SequenceEqual(this.QuantityKindFactor.Select(x => x.Thing)))
-            {
-                var itemCount = this.QuantityKindFactor.Count;
-                for (var i = 0; i < itemCount; i++)
-                {
-                    var item = this.QuantityKindFactor[i].Thing;
-                    var currentIndex = clone.QuantityKindFactor.IndexOf(item);
-
-                    if (currentIndex != i)
-                    {
-                        clone.QuantityKindFactor.Move(currentIndex, i);
-                    }
-                }
-            }
+            this.UpdateOrderedItemList(clone.QuantityKindFactor, this.QuantityKindFactor.Select(x => x.Thing));
             
         }
 

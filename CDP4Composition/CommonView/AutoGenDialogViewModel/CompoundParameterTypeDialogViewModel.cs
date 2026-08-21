@@ -192,20 +192,7 @@ namespace CDP4CommonView
 
             clone.IsFinalized = this.IsFinalized;
 
-            if (!clone.Component.SortedItems.Values.SequenceEqual(this.Component.Select(x => x.Thing)))
-            {
-                var itemCount = this.Component.Count;
-                for (var i = 0; i < itemCount; i++)
-                {
-                    var item = this.Component[i].Thing;
-                    var currentIndex = clone.Component.IndexOf(item);
-
-                    if (currentIndex != i)
-                    {
-                        clone.Component.Move(currentIndex, i);
-                    }
-                }
-            }
+            this.UpdateOrderedItemList(clone.Component, this.Component.Select(x => x.Thing));
         }
 
         /// <summary>

@@ -256,20 +256,7 @@ namespace CDP4CommonView
             clone.Category.AddRange(this.Category);
 
 
-            if (!clone.PossibleState.SortedItems.Values.SequenceEqual(this.PossibleState.Select(x => x.Thing)))
-            {
-                var itemCount = this.PossibleState.Count;
-                for (var i = 0; i < itemCount; i++)
-                {
-                    var item = this.PossibleState[i].Thing;
-                    var currentIndex = clone.PossibleState.IndexOf(item);
-
-                    if (currentIndex != i)
-                    {
-                        clone.PossibleState.Move(currentIndex, i);
-                    }
-                }
-            }
+            this.UpdateOrderedItemList(clone.PossibleState, this.PossibleState.Select(x => x.Thing));
             
         }
 

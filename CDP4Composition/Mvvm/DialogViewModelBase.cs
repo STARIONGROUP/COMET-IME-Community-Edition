@@ -37,9 +37,11 @@ namespace CDP4Composition.Mvvm
     using System.Threading.Tasks;
     using System.Windows;
 
+    using CDP4Common;
     using CDP4Common.CommonData;
     using CDP4Common.Exceptions;
     using CDP4Common.SiteDirectoryData;
+    using CDP4Common.Types;
     using CDP4Common.Validation;
 
     using CDP4Composition.Navigation;
@@ -734,6 +736,57 @@ namespace CDP4Composition.Mvvm
             }
 
             orderedList.Move(selectedIndex, selectedIndex + 1);
+        }
+
+        /// <summary>
+        /// Applies the order of the rows of a dialog to the <see cref="OrderedItemList{T}"/> of the <see cref="Thing"/> that is
+        /// being updated
+        /// </summary>
+        /// <typeparam name="TItem">
+        /// The type of <see cref="Thing"/> that is contained by the <see cref="OrderedItemList{T}"/>
+        /// </typeparam>
+        /// <param name="orderedItemList">
+        /// The <see cref="OrderedItemList{T}"/> of the clone that is to be reordered
+        /// </param>
+        /// <param name="rows">
+        /// The <see cref="Thing"/>s of the rows, in the order in which they appear in the dialog
+        /// </param>
+        /// <remarks>
+        /// A <see cref="Thing"/> that is marked for deletion is not represented by a row, it does however remain part of the
+        /// <see cref="OrderedItemList{T}"/> of the clone: <see cref="ThingTransaction.Delete"/> leaves the removal on the original
+        /// container to the data-source. Such an item keeps the position, and therefore the sort key, that it currently has, since
+        /// the data-source cannot resolve a reordered <see cref="Thing"/> that is deleted in the same transaction. The rows are laid
+        /// out over the remaining positions, in the order in which they appear in the dialog.
+        /// </remarks>
+        protected void UpdateOrderedItemList<TItem>(OrderedItemList<TItem> orderedItemList, IEnumerable<TItem> rows) where TItem : Thing
+        {
+            var orderedItems = orderedItemList.SortedItems.Values.ToList();
+            var orderedRows = rows.ToList();
+
+            if (orderedItems.Where(x => x.ChangeKind != ChangeKind.Delete).SequenceEqual(orderedRows))
+            {
+                return;
+            }
+
+            var rowIndex = 0;
+
+            for (var i = 0; i < orderedItems.Count; i++)
+            {
+                var item = orderedItems[i];
+
+                if (item.ChangeKind != ChangeKind.Delete && rowIndex < orderedRows.Count)
+                {
+                    item = orderedRows[rowIndex];
+                    rowIndex++;
+                }
+
+                var currentIndex = orderedItemList.IndexOf(item);
+
+                if (currentIndex != i)
+                {
+                    orderedItemList.Move(currentIndex, i);
+                }
+            }
         }
 
         /// <summary>
