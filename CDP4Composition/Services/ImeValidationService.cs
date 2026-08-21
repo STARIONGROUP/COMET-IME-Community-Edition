@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="ImeValidationService.cs" company="Starion Group S.A.">
-//    Copyright (c) 2015-2024 Starion Group S.A.
+//    Copyright (c) 2015-2026 Starion Group S.A.
 // 
 //    Author: Sam Gerené, Alex Vorobiev, Alexander van Delft, Nathanael Smiechowski, Antoine Théate, Omar Elebiary
 // 
@@ -25,6 +25,7 @@
 
 namespace CDP4Composition.Services
 {
+    using System;
     using System.ComponentModel.Composition;
     using System.Linq;
     using System.Text.RegularExpressions;
@@ -42,6 +43,36 @@ namespace CDP4Composition.Services
     public class ImeValidationService : ValidationService, IImeValidationService
     {
         /// <summary>
+        /// The rule that requires a non-empty value that neither starts nor ends with whitespace.
+        /// </summary>
+        private const string NoSurroundingWhitespaceRule = @"^\S([\s\S]*\S)?$";
+
+        /// <summary>
+        /// The rule that requires a non-empty value that neither starts nor ends with whitespace and that does not start with a parenthesis.
+        /// </summary>
+        private const string NoParenthesisNoSurroundingWhitespaceRule = @"^[^()\s]([\s\S]*\S)?$";
+
+        /// <summary>
+        /// The names of the validation rules that accepted leading and trailing whitespace and are tightened to
+        /// <see cref="NoSurroundingWhitespaceRule" />.
+        /// </summary>
+        private static readonly string[] NoSurroundingWhitespaceRuleNames =
+        {
+            "PersonShortName", "PersonGivenName", "PersonSurname", "TelephoneNumber", "UserPreference", "LanguageCode",
+            "ForwardRelationshipName", "InverseRelationshipName", "Exponent", "Symbol", "ScaleValueDefinition",
+            "ScaleReferenceQuantityValue", "Factor", "Modulus", "Value", "ConversionFactor"
+        };
+
+        /// <summary>
+        /// The names of the validation rules that accepted trailing whitespace and are tightened to
+        /// <see cref="NoParenthesisNoSurroundingWhitespaceRule" />.
+        /// </summary>
+        private static readonly string[] NoParenthesisNoSurroundingWhitespaceRuleNames =
+        {
+            "RDLName", "RDLShortName", "ModelSetupName", "FileRevisionName", "EnumerationValueDefinitionName"
+        };
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ImeValidationService" /> class.
         /// </summary>
         public ImeValidationService()
@@ -53,6 +84,44 @@ namespace CDP4Composition.Services
                 PropertyName = nameof(DefinedThing.Name),
                 Rule = @"^([\p{L}\d]|[\p{L}\d][^()]*[^()\s])$",
                 ErrorText = "The Name must start with a letter or a digit and not contain any parentheses or trailing spaces."
+            };
+
+            foreach (var validationRuleName in NoSurroundingWhitespaceRuleNames)
+            {
+                this.TightenWhitespaceRule(validationRuleName, NoSurroundingWhitespaceRule, existingRule => $"{existingRule.ErrorText} Leading and trailing spaces are not allowed.");
+            }
+
+            foreach (var validationRuleName in NoParenthesisNoSurroundingWhitespaceRuleNames)
+            {
+                this.TightenWhitespaceRule(validationRuleName, NoParenthesisNoSurroundingWhitespaceRule, existingRule => $"The {existingRule.PropertyName} can not be empty, start with a parenthesis, or start or end with a space.");
+            }
+        }
+
+        /// <summary>
+        /// Replaces the <see cref="ValidationRule.Rule" /> of an existing <see cref="ValidationRule" /> with a rule that rejects
+        /// leading and trailing whitespace.
+        /// </summary>
+        /// <param name="validationRuleName">
+        /// The name under which the <see cref="ValidationRule" /> is registered in the <see cref="ValidationService.ValidationMap" />.
+        /// </param>
+        /// <param name="rule">
+        /// The regular expression that replaces the registered one.
+        /// </param>
+        /// <param name="errorTextFactory">
+        /// A function that computes the new error text based on the registered <see cref="ValidationRule" />.
+        /// </param>
+        private void TightenWhitespaceRule(string validationRuleName, string rule, Func<ValidationRule, string> errorTextFactory)
+        {
+            if (!this.ValidationMap.TryGetValue(validationRuleName, out var existingRule))
+            {
+                return;
+            }
+
+            this.ValidationMap[validationRuleName] = new ValidationRule
+            {
+                PropertyName = existingRule.PropertyName,
+                Rule = rule,
+                ErrorText = errorTextFactory(existingRule)
             };
         }
 
