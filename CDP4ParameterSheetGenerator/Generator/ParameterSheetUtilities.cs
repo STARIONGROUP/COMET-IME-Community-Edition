@@ -11,6 +11,7 @@ namespace CDP4ParameterSheetGenerator.Generator
     using CDP4Common.EngineeringModelData;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Validation;
+    using CDP4Composition.Extensions;
     using CDP4OfficeInfrastructure.Excel;
     using CDP4ParameterSheetGenerator.ParameterSheet;
     using NetOffice.ExcelApi;
@@ -395,9 +396,9 @@ namespace CDP4ParameterSheetGenerator.Generator
             }
 
             var compoundParameterType = parameter.ParameterType as CompoundParameterType;
-            if (compoundParameterType != null)
+            var component = compoundParameterType?.QueryComponent(componentIndex);
+            if (component != null)
             {
-                var component = compoundParameterType.Component[componentIndex];
                 parameterType = component.ParameterType;
                 measurementScale = component.Scale;
                 return;
@@ -437,9 +438,9 @@ namespace CDP4ParameterSheetGenerator.Generator
             }
 
             var compoundParameterType = parameterOverride.ParameterType as CompoundParameterType;
-            if (compoundParameterType != null)
+            var component = compoundParameterType?.QueryComponent(componentIndex);
+            if (component != null)
             {
-                var component = compoundParameterType.Component[componentIndex];
                 parameterType = component.ParameterType;
                 measurementScale = component.Scale;
                 return;
@@ -479,9 +480,9 @@ namespace CDP4ParameterSheetGenerator.Generator
             }
 
             var compoundParameterType = parameterSubscription.ParameterType as CompoundParameterType;
-            if (compoundParameterType != null)
+            var component = compoundParameterType?.QueryComponent(componentIndex);
+            if (component != null)
             {
-                var component = compoundParameterType.Component[componentIndex];
                 parameterType = component.ParameterType;
                 measurementScale = component.Scale;
                 return;

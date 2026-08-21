@@ -34,6 +34,7 @@ namespace CDP4EngineeringModel.ViewModels
     using CDP4Common.Helpers;
     using CDP4Common.SiteDirectoryData;
 
+    using CDP4Composition.Extensions;
     using CDP4Composition.MessageBus;
     using CDP4Composition.Mvvm;
     using CDP4Composition.ViewModels;
@@ -206,7 +207,7 @@ namespace CDP4EngineeringModel.ViewModels
                     return false;
                 }
 
-                enumPt = cpt.Component[this.ValueIndex].ParameterType as EnumerationParameterType;
+                enumPt = cpt.QueryComponent(this.ValueIndex)?.ParameterType as EnumerationParameterType;
 
                 if (enumPt == null)
                 {
@@ -243,7 +244,7 @@ namespace CDP4EngineeringModel.ViewModels
 
                 if (cpt != null)
                 {
-                    enumPt = cpt.Component[this.ValueIndex].ParameterType as EnumerationParameterType;
+                    enumPt = cpt.QueryComponent(this.ValueIndex)?.ParameterType as EnumerationParameterType;
 
                     if (enumPt != null)
                     {
