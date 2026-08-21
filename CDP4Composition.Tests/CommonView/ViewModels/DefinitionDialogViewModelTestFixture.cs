@@ -30,6 +30,7 @@ namespace CDP4CommonView.Tests
     using System.Reactive.Concurrency;
     using System.Reactive.Linq;
     using System.Threading.Tasks;
+    using System.Windows.Input;
 
     using CDP4Common.CommonData;
     using CDP4Common.EngineeringModelData;
@@ -269,6 +270,43 @@ namespace CDP4CommonView.Tests
             Assert.That(vm.SelectedLanguageCode.Name, Is.EqualTo("en"));
             Assert.That(vm.PossibleLanguageCode.Any(x => x.Name == "en"), Is.True);
             Assert.That(vm.PossibleLanguageCode.Any(x => x.Name == "fr"), Is.False);
+        }
+
+        /// <summary>
+        /// Verifies that a <see cref="Citation"/> can be created on the <see cref="Definition"/> of any
+        /// <see cref="DefinedThing"/>, not only on the ones that are contained by a <see cref="ReferenceDataLibrary"/>.
+        /// </summary>
+        [Test]
+        public void VerifyThatCitationCanBeCreatedWhenThereIsNoRdlInTheChainOfContainers()
+        {
+            var group = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.assembler.Cache.TryAdd(new CacheKey(group.Iid, null), new Lazy<Thing>(() => group));
+
+            var clone = group.Clone(false);
+            clone.Definition.Add(this.simpleDefinition);
+
+            this.transaction.CreateOrUpdate(clone);
+
+            this.viewmodel = new DefinitionDialogViewModel(this.simpleDefinition, this.transaction, this.session.Object, true, ThingDialogKind.Create, null, clone, null);
+
+            Assert.That(((ICommand)this.viewmodel.CreateCitationCommand).CanExecute(null), Is.True);
+        }
+
+        /// <summary>
+        /// Verifies that a <see cref="Citation"/> may not be created when the dialog is read-only.
+        /// </summary>
+        [Test]
+        public void VerifyThatCitationCannotBeCreatedWhenTheDialogIsReadOnly()
+        {
+            var group = new RequirementsGroup(Guid.NewGuid(), this.assembler.Cache, this.uri);
+            this.assembler.Cache.TryAdd(new CacheKey(group.Iid, null), new Lazy<Thing>(() => group));
+
+            var clone = group.Clone(false);
+            clone.Definition.Add(this.simpleDefinition);
+
+            this.viewmodel = new DefinitionDialogViewModel(this.simpleDefinition, this.transaction, this.session.Object, true, ThingDialogKind.Inspect, null, clone, null);
+
+            Assert.That(((ICommand)this.viewmodel.CreateCitationCommand).CanExecute(null), Is.False);
         }
 
         [Test]

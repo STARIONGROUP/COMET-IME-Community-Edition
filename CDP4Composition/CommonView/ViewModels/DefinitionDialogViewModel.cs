@@ -33,6 +33,7 @@ namespace CDP4CommonView.ViewModels
     using System.Linq;
     using System.Reactive.Linq;
     using CDP4Common.CommonData;
+    using CDP4Common.SiteDirectoryData;
     using CDP4Dal.Operations;
     using CDP4Composition.Attributes;
     using CDP4Composition.Mvvm;
@@ -190,6 +191,7 @@ namespace CDP4CommonView.ViewModels
             this.MoveDownExampleCommand = ReactiveCommandCreator.Create(() => this.ExecuteMoveDownCommand(this.Example, this.SelectedExample), canExecuteSelectedMoveExampleCommand);
             this.CreateExampleCommand = ReactiveCommandCreator.Create(this.ExecuteCreateExampleCommand);
             this.DeleteExampleCommand = ReactiveCommandCreator.Create(this.ExecuteDeleteExampleCommand);
+            this.CreateCitationCommand = ReactiveCommandCreator.Create(() => this.ExecuteCreateCommand<Citation>(this.PopulateCitation), this.WhenAnyValue(vm => vm.IsReadOnly, v => !v));
 
             this.WhenAnyValue(x => x.SelectedLanguageCode).Where(x => x != null).Subscribe(culture => this.LanguageCode = culture.Name);
         }

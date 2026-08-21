@@ -29,6 +29,7 @@ namespace CDP4CommonView.ViewModels
     using System.Linq;
     using System.Collections.Generic;
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Dal.Operations;
     using CDP4Composition.Attributes;
     using CDP4Composition.Navigation;
@@ -110,19 +111,43 @@ namespace CDP4CommonView.ViewModels
         {
             this.PossibleSource.Clear();
 
-            var rdlsInChain = this.ChainOfContainer.OfType<ReferenceDataLibrary>().ToList();
-
-            if (!rdlsInChain.Any())
-            {
-                return;
-            }
-            
-            var referenceSources = rdlsInChain
+            var referenceSources = this.QueryApplicableReferenceDataLibraries()
                 .SelectMany(rdl => rdl.QueryReferenceSourcesFromChainOfRdls())
                 .Distinct()
                 .OrderBy(x => x.Name);
 
             this.PossibleSource.AddRange(referenceSources);
+        }
+
+        /// <summary>
+        /// Queries the <see cref="ReferenceDataLibrary"/>s that provide the <see cref="ReferenceSource"/>s that this
+        /// <see cref="Citation"/> may refer to.
+        /// </summary>
+        /// <returns>
+        /// The applicable <see cref="ReferenceDataLibrary"/>s
+        /// </returns>
+        /// <remarks>
+        /// A <see cref="Citation"/> can be created on the <see cref="Definition"/> of any <see cref="DefinedThing"/>, so
+        /// the chain of containers does not necessarily contain a <see cref="ReferenceDataLibrary"/>. When it does not,
+        /// the sources come from the required <see cref="ReferenceDataLibrary"/> of the containing
+        /// <see cref="EngineeringModel"/>, or - for a <see cref="Thing"/> that is contained by the
+        /// <see cref="SiteDirectory"/> - from the <see cref="ReferenceDataLibrary"/>s that are open in the session.
+        /// </remarks>
+        private IEnumerable<ReferenceDataLibrary> QueryApplicableReferenceDataLibraries()
+        {
+            var rdlsInChain = this.ChainOfContainer.OfType<ReferenceDataLibrary>().ToList();
+
+            if (rdlsInChain.Any())
+            {
+                return rdlsInChain;
+            }
+
+            var engineeringModel = this.ChainOfContainer
+                .Where(thing => thing != null)
+                .Select(thing => thing.GetContainerOfType<EngineeringModel>())
+                .FirstOrDefault(model => model != null);
+
+            return engineeringModel != null ? engineeringModel.RequiredRdls : this.Session.OpenReferenceDataLibraries;
         }
     }
 }

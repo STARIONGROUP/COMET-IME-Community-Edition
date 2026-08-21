@@ -32,6 +32,7 @@ namespace CDP4CommonView.Tests
     using System.Windows.Input;
 
     using CDP4Common.CommonData;
+    using CDP4Common.EngineeringModelData;
     using CDP4Common.MetaInfo;
     using CDP4Common.SiteDirectoryData;
     using CDP4Common.Types;
@@ -196,14 +197,45 @@ namespace CDP4CommonView.Tests
         }
 
         /// <summary>
-        /// Verifies that the possible sources are empty when there is no RDL in the chain of containers.
+        /// Verifies that the <see cref="ReferenceSource"/>s of the required <see cref="ModelReferenceDataLibrary"/> are
+        /// available when the <see cref="Citation"/> is created on the <see cref="Definition"/> of a <see cref="Thing"/>
+        /// that lives in an <see cref="EngineeringModel"/> - for instance an ElementDefinition. There is no
+        /// <see cref="ReferenceDataLibrary"/> in the chain of containers in that case.
         /// </summary>
         [Test]
-        public void VerifyThatPossibleSourceIsEmptyWithoutRdlInChain()
+        public void VerifyThatPossibleSourceFallsBackToTheModelRdlChain()
         {
-            this.viewmodel = new CitationDialogViewModel(this.citation, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.navigation.Object);
+            var modelSetup = new EngineeringModelSetup(Guid.NewGuid(), this.cache, null);
+            modelSetup.RequiredRdl.Add(this.modelRdl);
 
-            CollectionAssert.IsEmpty(this.viewmodel.PossibleSource);
+            var model = new EngineeringModel(Guid.NewGuid(), this.cache, null) { EngineeringModelSetup = modelSetup };
+            var iteration = new Iteration(Guid.NewGuid(), this.cache, null);
+            model.Iteration.Add(iteration);
+
+            var elementDefinition = new ElementDefinition(Guid.NewGuid(), this.cache, null);
+            iteration.Element.Add(elementDefinition);
+
+            this.viewmodel = new CitationDialogViewModel(this.citation, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.navigation.Object, null, new Thing[] { iteration, elementDefinition });
+
+            CollectionAssert.AreEqual(new[] { this.alphaSource, this.betaSource, this.gammaSource }, this.viewmodel.PossibleSource);
+        }
+
+        /// <summary>
+        /// Verifies that the <see cref="ReferenceSource"/>s of the <see cref="ReferenceDataLibrary"/>s that are open in
+        /// the <see cref="ISession"/> are available when the <see cref="Citation"/> is created on the
+        /// <see cref="Definition"/> of a <see cref="Thing"/> that is contained by the <see cref="SiteDirectory"/>.
+        /// </summary>
+        [Test]
+        public void VerifyThatPossibleSourceFallsBackToTheOpenReferenceDataLibraries()
+        {
+            this.session.Setup(x => x.OpenReferenceDataLibraries).Returns(new[] { this.siteRdl });
+
+            var domainOfExpertise = new DomainOfExpertise(Guid.NewGuid(), this.cache, null);
+            this.siteDirectory.Domain.Add(domainOfExpertise);
+
+            this.viewmodel = new CitationDialogViewModel(this.citation, this.transaction, this.session.Object, true, ThingDialogKind.Create, this.navigation.Object, null, new Thing[] { domainOfExpertise });
+
+            CollectionAssert.AreEqual(new[] { this.alphaSource, this.betaSource }, this.viewmodel.PossibleSource);
         }
 
         /// <summary>
