@@ -58,8 +58,11 @@ namespace CDP4Composition.Tests.Services
         [Test]
         public void VerifyThatTrailingWhitespaceIsRejected([ValueSource(nameof(WhitespaceSensitiveRuleNames))] string ruleName)
         {
-            Assert.That(this.validationService.ValidateProperty(ruleName, "first.last "), Is.Not.Null, $"rule {ruleName} accepted a trailing space");
-            Assert.That(this.validationService.ValidateProperty(ruleName, "first.last\t"), Is.Not.Null, $"rule {ruleName} accepted a trailing tab");
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.validationService.ValidateProperty(ruleName, "first.last "), Is.Not.Null, $"rule {ruleName} accepted a trailing space");
+                Assert.That(this.validationService.ValidateProperty(ruleName, "first.last\t"), Is.Not.Null, $"rule {ruleName} accepted a trailing tab");
+            });
         }
 
         [Test]
@@ -71,39 +74,54 @@ namespace CDP4Composition.Tests.Services
         [Test]
         public void VerifyThatEmptyValueIsRejected([ValueSource(nameof(WhitespaceSensitiveRuleNames))] string ruleName)
         {
-            Assert.That(this.validationService.ValidateProperty(ruleName, string.Empty), Is.Not.Null);
-            Assert.That(this.validationService.ValidateProperty(ruleName, "   "), Is.Not.Null);
-            Assert.That(this.validationService.ValidateProperty(ruleName, null), Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.validationService.ValidateProperty(ruleName, string.Empty), Is.Not.Null);
+                Assert.That(this.validationService.ValidateProperty(ruleName, "   "), Is.Not.Null);
+                Assert.That(this.validationService.ValidateProperty(ruleName, null), Is.Not.Null);
+            });
         }
 
         [Test]
         public void VerifyThatValidValueIsAccepted([ValueSource(nameof(WhitespaceSensitiveRuleNames))] string ruleName)
         {
-            Assert.That(this.validationService.ValidateProperty(ruleName, "first.last"), Is.Null);
-            Assert.That(this.validationService.ValidateProperty(ruleName, "a"), Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.validationService.ValidateProperty(ruleName, "first.last"), Is.Null);
+                Assert.That(this.validationService.ValidateProperty(ruleName, "a"), Is.Null);
+            });
         }
 
         [Test]
         public void VerifyThatInnerWhitespaceRemainsAccepted()
         {
-            Assert.That(this.validationService.ValidateProperty("PersonGivenName", "Jan Willem"), Is.Null);
-            Assert.That(this.validationService.ValidateProperty("RDLName", "Generic RDL"), Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.validationService.ValidateProperty("PersonGivenName", "Jan Willem"), Is.Null);
+                Assert.That(this.validationService.ValidateProperty("RDLName", "Generic RDL"), Is.Null);
+            });
         }
 
         [Test]
         public void VerifyThatRdlRulesStillRejectALeadingParenthesis()
         {
-            Assert.That(this.validationService.ValidateProperty("RDLName", "(Generic RDL)"), Is.Not.Null);
-            Assert.That(this.validationService.ValidateProperty("RDLShortName", "(RDL)"), Is.Not.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.validationService.ValidateProperty("RDLName", "(Generic RDL)"), Is.Not.Null);
+                Assert.That(this.validationService.ValidateProperty("RDLShortName", "(RDL)"), Is.Not.Null);
+            });
         }
 
         [Test]
         public void VerifyThatUnchangedRulesAreNotAffected()
         {
-            Assert.That(this.validationService.ValidateProperty("ShortName", "Bat"), Is.Null);
-            Assert.That(this.validationService.ValidateProperty("Name", "Battery"), Is.Null);
-            Assert.That(this.validationService.ValidateProperty("Name", "Battery "), Is.Not.Null);
-            Assert.That(this.validationService.ValidateProperty("EmailAddress", "john.doe@stariongroup.eu"), Is.Null);
+            Assert.Multiple(() =>
+            {
+                Assert.That(this.validationService.ValidateProperty("ShortName", "Bat"), Is.Null);
+                Assert.That(this.validationService.ValidateProperty("Name", "Battery"), Is.Null);
+                Assert.That(this.validationService.ValidateProperty("Name", "Battery "), Is.Not.Null);
+                Assert.That(this.validationService.ValidateProperty("EmailAddress", "john.doe@stariongroup.eu"), Is.Null);
+            });
         }
     }
 }
